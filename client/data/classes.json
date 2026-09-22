@@ -1,0 +1,24 @@
+{
+  "_note": "六職齊全，enabled=false 嘅暫不啟用。attackType/spellType/skill/weapons 【原】(攻略 sy2_1_*)；base/growth 數值【自訂】",
+  "classes": [
+    { "id": "yishi",  "name": "義士", "gender": "M", "enabled": true,  "attackRange": "melee",       "spell": null,          "weapons": ["刀", "錘", "槍矛"], "skill": "融合", "tier2": "武士", "tier3": "猛將",
+      "base":   { "str": 12, "agi": 8, "int": 4, "spi": 4, "pol": 6, "cha": 6 },
+      "growth": { "str": 2,  "agi": 1, "int": 1, "spi": 1 } },
+    { "id": "shinu",  "name": "仕女", "gender": "F", "enabled": false, "attackRange": "melee",       "spell": null,          "weapons": ["劍", "爪", "環"],   "skill": "開鎖", "tier2": "俠女", "tier3": "女將",
+      "base":   { "str": 10, "agi": 10, "int": 4, "spi": 4, "pol": 6, "cha": 8 },
+      "growth": { "str": 2,  "agi": 1, "int": 1, "spi": 1 } },
+    { "id": "daoshi", "name": "道士", "gender": "M", "enabled": false, "attackRange": "melee_mid",   "spell": "destructive", "weapons": ["幡", "拂塵", "符咒"], "skill": "超渡", "tier2": "仙君", "tier3": "聖君",
+      "base":   { "str": 5, "agi": 6, "int": 12, "spi": 8, "pol": 6, "cha": 6 },
+      "growth": { "str": 1, "agi": 1, "int": 2,  "spi": 1 } },
+    { "id": "wunu",   "name": "巫女", "gender": "F", "enabled": false, "attackRange": "melee_mid",   "spell": "status",      "weapons": ["鞭", "棍棒杖", "卷軸"], "skill": "潛行", "tier2": "魔女", "tier3": "妖姬",
+      "base":   { "str": 4, "agi": 7, "int": 6, "spi": 12, "pol": 5, "cha": 8 },
+      "growth": { "str": 1, "agi": 1, "int": 1, "spi": 2 } },
+    { "id": "bianshi","name": "辯士", "gender": "M", "enabled": false, "attackRange": "melee_ranged","spell": "support",     "weapons": ["扇", "筆", "弩"],   "skill": "竊聽", "tier2": "策士", "tier3": "諸葛",
+      "base":   { "str": 5, "agi": 8, "int": 11, "spi": 6, "pol": 10, "cha": 6 },
+      "growth": { "str": 1, "agi": 1, "int": 2,  "spi": 1 } },
+    { "id": "meinu",  "name": "美女", "gender": "F", "enabled": false, "attackRange": "melee_mid",   "spell": "heal",        "weapons": ["袖帶", "匕首", "琴"], "skill": "透視", "tier2": "仙女", "tier3": "聖女",
+      "base":   { "str": 4, "agi": 8, "int": 6, "spi": 10, "pol": 6, "cha": 12 },
+      "growth": { "str": 1, "agi": 1, "int": 1, "spi": 2 } }
+  ],
+  "starter": { "yishi": { "weapon": 10001, "boots": 22001, "items": [{ "id": 65210, "n": 5 }], "gold": 100 } }
+}

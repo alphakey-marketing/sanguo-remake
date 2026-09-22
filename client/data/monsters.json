@@ -1,0 +1,25 @@
+{
+  "_note": "第一批 5 種 1~10 級野區怪。名字/等級帶/區域 【原】(攻略 怪物大全 荊州/豫州/并州司隸 1~10)；數值、掉落機率【自訂】。掉落 item id 對 data/items.json。alignment: NPC 善惡值，負=惡 (殺惡 NPC 加善惡值【原】)。atkInterval = tick(10Hz)",
+  "monsters": [
+    { "id": 1001, "name": "田鼠", "level": 1, "hp": 20,  "atk": 4,  "def": 0, "atkInterval": 20, "moveSpeed": 1, "exp": 6,   "gold": [0, 3],    "alignment": -10,  "aggroRange": 0, "leash": 6,
+      "drops": [ { "item": 61501, "p": 0.5 } ] },
+    { "id": 1002, "name": "野狗", "level": 2, "hp": 35,  "atk": 7,  "def": 1, "atkInterval": 18, "moveSpeed": 1, "exp": 10,  "gold": [0, 5],    "alignment": -20,  "aggroRange": 4, "leash": 10,
+      "drops": [ { "item": 61502, "p": 0.4 }, { "item": 61503, "p": 0.3 } ] },
+    { "id": 1003, "name": "山賊", "level": 4, "hp": 70,  "atk": 12, "def": 3, "atkInterval": 15, "moveSpeed": 1, "exp": 24,  "gold": [5, 25],   "alignment": -200, "aggroRange": 5, "leash": 12,
+      "drops": [ { "item": 65210, "p": 0.1 }, { "item": 22001, "p": 0.05 } ] },
+    { "id": 1004, "name": "野豬", "level": 6, "hp": 120, "atk": 16, "def": 5, "atkInterval": 16, "moveSpeed": 1, "exp": 45,  "gold": [0, 8],    "alignment": -30,  "aggroRange": 4, "leash": 10,
+      "drops": [ { "item": 61504, "p": 0.4 }, { "item": 61503, "p": 0.5 } ] },
+    { "id": 1005, "name": "惡虎", "level": 9, "hp": 260, "atk": 26, "def": 8, "atkInterval": 14, "moveSpeed": 1, "exp": 110, "gold": [0, 15],   "alignment": -100, "aggroRange": 6, "leash": 14,
+      "drops": [ { "item": 61505, "p": 0.3 }, { "item": 58025, "p": 0.1 } ] },
+    { "id": 1006, "name": "夜狼", "level": 3, "hp": 55,  "atk": 10, "def": 2, "atkInterval": 17, "moveSpeed": 1, "exp": 18,   "gold": [0, 6],    "alignment": -40,  "aggroRange": 5, "leash": 10, "night": true,
+      "drops": [ { "item": 61502, "p": 0.3 }, { "item": 61505, "p": 0.15 } ] }
+  ],
+  "spawns": [
+    { "zone": "field_1", "monster": 1001, "count": 8, "respawnTicks": 100 },
+    { "zone": "field_1", "monster": 1002, "count": 6, "respawnTicks": 150 },
+    { "zone": "field_1", "monster": 1003, "count": 4, "respawnTicks": 200 },
+    { "zone": "field_1", "monster": 1004, "count": 3, "respawnTicks": 250 },
+    { "zone": "field_1", "monster": 1005, "count": 1, "respawnTicks": 600 },
+    { "zone": "field_1", "monster": 1006, "count": 4, "respawnTicks": 200, "night": true }
+  ]
+}

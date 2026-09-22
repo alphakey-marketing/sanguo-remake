@@ -1,0 +1,10 @@
+{
+  "name": "sanguo-remake-server",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.ts",
+    "test": "node --test src/world.test.ts src/model.test.ts src/combat.test.ts src/shop.test.ts"
+  },
+  "dependencies": { "ws": "^8.18.0" }
+}

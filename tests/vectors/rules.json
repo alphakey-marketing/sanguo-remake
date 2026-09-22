@@ -1,0 +1,3136 @@
+[
+ {
+  "fn": "attackInterval",
+  "args": [
+   0
+  ],
+  "expect": 20
+ },
+ {
+  "fn": "attackInterval",
+  "args": [
+   1
+  ],
+  "expect": 20
+ },
+ {
+  "fn": "attackInterval",
+  "args": [
+   8
+  ],
+  "expect": 16
+ },
+ {
+  "fn": "attackInterval",
+  "args": [
+   20
+  ],
+  "expect": 10
+ },
+ {
+  "fn": "attackInterval",
+  "args": [
+   27
+  ],
+  "expect": 7
+ },
+ {
+  "fn": "attackInterval",
+  "args": [
+   28
+  ],
+  "expect": 6
+ },
+ {
+  "fn": "attackInterval",
+  "args": [
+   40
+  ],
+  "expect": 6
+ },
+ {
+  "fn": "attackInterval",
+  "args": [
+   60
+  ],
+  "expect": 6
+ },
+ {
+  "fn": "attackInterval",
+  "args": [
+   100
+  ],
+  "expect": 6
+ },
+ {
+  "fn": "playerDef",
+  "args": [
+   1
+  ],
+  "expect": 0
+ },
+ {
+  "fn": "playerDef",
+  "args": [
+   2
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "playerDef",
+  "args": [
+   5
+  ],
+  "expect": 2
+ },
+ {
+  "fn": "playerDef",
+  "args": [
+   10
+  ],
+  "expect": 5
+ },
+ {
+  "fn": "playerDef",
+  "args": [
+   50
+  ],
+  "expect": 25
+ },
+ {
+  "fn": "playerDef",
+  "args": [
+   100
+  ],
+  "expect": 50
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   12,
+   10,
+   0
+  ],
+  "expect": 25,
+  "rng": [
+   0
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   12,
+   10,
+   0
+  ],
+  "expect": 28,
+  "rng": [
+   0.5
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   12,
+   10,
+   0
+  ],
+  "expect": 31,
+  "rng": [
+   0.999
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   12,
+   10,
+   0
+  ],
+  "expect": 26,
+  "rng": [
+   0.1,
+   0.9
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   12,
+   10,
+   0
+  ],
+  "expect": 30,
+  "rng": [
+   0.9,
+   0.1
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   12,
+   10,
+   0
+  ],
+  "expect": 27,
+  "rng": [
+   0.25,
+   0.75,
+   0.5
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   12,
+   10,
+   5
+  ],
+  "expect": 20,
+  "rng": [
+   0
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   12,
+   10,
+   5
+  ],
+  "expect": 23,
+  "rng": [
+   0.5
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   12,
+   10,
+   5
+  ],
+  "expect": 26,
+  "rng": [
+   0.999
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   12,
+   10,
+   5
+  ],
+  "expect": 21,
+  "rng": [
+   0.1,
+   0.9
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   12,
+   10,
+   5
+  ],
+  "expect": 25,
+  "rng": [
+   0.9,
+   0.1
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   12,
+   10,
+   5
+  ],
+  "expect": 22,
+  "rng": [
+   0.25,
+   0.75,
+   0.5
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   30,
+   50,
+   10
+  ],
+  "expect": 76,
+  "rng": [
+   0
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   30,
+   50,
+   10
+  ],
+  "expect": 85,
+  "rng": [
+   0.5
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   30,
+   50,
+   10
+  ],
+  "expect": 94,
+  "rng": [
+   0.999
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   30,
+   50,
+   10
+  ],
+  "expect": 77,
+  "rng": [
+   0.1,
+   0.9
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   30,
+   50,
+   10
+  ],
+  "expect": 93,
+  "rng": [
+   0.9,
+   0.1
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   30,
+   50,
+   10
+  ],
+  "expect": 80,
+  "rng": [
+   0.25,
+   0.75,
+   0.5
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   1,
+   0,
+   999
+  ],
+  "expect": 1,
+  "rng": [
+   0
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   1,
+   0,
+   999
+  ],
+  "expect": 1,
+  "rng": [
+   0.5
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   1,
+   0,
+   999
+  ],
+  "expect": 1,
+  "rng": [
+   0.999
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   1,
+   0,
+   999
+  ],
+  "expect": 1,
+  "rng": [
+   0.1,
+   0.9
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   1,
+   0,
+   999
+  ],
+  "expect": 1,
+  "rng": [
+   0.9,
+   0.1
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   1,
+   0,
+   999
+  ],
+  "expect": 1,
+  "rng": [
+   0.25,
+   0.75,
+   0.5
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   50,
+   100,
+   20
+  ],
+  "expect": 138,
+  "rng": [
+   0
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   50,
+   100,
+   20
+  ],
+  "expect": 155,
+  "rng": [
+   0.5
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   50,
+   100,
+   20
+  ],
+  "expect": 172,
+  "rng": [
+   0.999
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   50,
+   100,
+   20
+  ],
+  "expect": 141,
+  "rng": [
+   0.1,
+   0.9
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   50,
+   100,
+   20
+  ],
+  "expect": 169,
+  "rng": [
+   0.9,
+   0.1
+  ]
+ },
+ {
+  "fn": "calcDamage",
+  "args": [
+   50,
+   100,
+   20
+  ],
+  "expect": 146,
+  "rng": [
+   0.25,
+   0.75,
+   0.5
+  ]
+ },
+ {
+  "fn": "calcMobDamage",
+  "args": [
+   4,
+   0
+  ],
+  "expect": 4,
+  "rng": [
+   0
+  ]
+ },
+ {
+  "fn": "calcMobDamage",
+  "args": [
+   4,
+   0
+  ],
+  "expect": 4,
+  "rng": [
+   0.5
+  ]
+ },
+ {
+  "fn": "calcMobDamage",
+  "args": [
+   4,
+   0
+  ],
+  "expect": 4,
+  "rng": [
+   0.999
+  ]
+ },
+ {
+  "fn": "calcMobDamage",
+  "args": [
+   4,
+   0
+  ],
+  "expect": 4,
+  "rng": [
+   0.1,
+   0.9
+  ]
+ },
+ {
+  "fn": "calcMobDamage",
+  "args": [
+   4,
+   0
+  ],
+  "expect": 4,
+  "rng": [
+   0.9,
+   0.1
+  ]
+ },
+ {
+  "fn": "calcMobDamage",
+  "args": [
+   4,
+   0
+  ],
+  "expect": 4,
+  "rng": [
+   0.25,
+   0.75,
+   0.5
+  ]
+ },
+ {
+  "fn": "calcMobDamage",
+  "args": [
+   10,
+   3
+  ],
+  "expect": 6,
+  "rng": [
+   0
+  ]
+ },
+ {
+  "fn": "calcMobDamage",
+  "args": [
+   10,
+   3
+  ],
+  "expect": 7,
+  "rng": [
+   0.5
+  ]
+ },
+ {
+  "fn": "calcMobDamage",
+  "args": [
+   10,
+   3
+  ],
+  "expect": 8,
+  "rng": [
+   0.999
+  ]
+ },
+ {
+  "fn": "calcMobDamage",
+  "args": [
+   10,
+   3
+  ],
+  "expect": 6,
+  "rng": [
+   0.1,
+   0.9
+  ]
+ },
+ {
+  "fn": "calcMobDamage",
+  "args": [
+   10,
+   3
+  ],
+  "expect": 8,
+  "rng": [
+   0.9,
+   0.1
+  ]
+ },
+ {
+  "fn": "calcMobDamage",
+  "args": [
+   10,
+   3
+  ],
+  "expect": 7,
+  "rng": [
+   0.25,
+   0.75,
+   0.5
+  ]
+ },
+ {
+  "fn": "calcMobDamage",
+  "args": [
+   5,
+   100
+  ],
+  "expect": 1,
+  "rng": [
+   0
+  ]
+ },
+ {
+  "fn": "calcMobDamage",
+  "args": [
+   5,
+   100
+  ],
+  "expect": 1,
+  "rng": [
+   0.5
+  ]
+ },
+ {
+  "fn": "calcMobDamage",
+  "args": [
+   5,
+   100
+  ],
+  "expect": 1,
+  "rng": [
+   0.999
+  ]
+ },
+ {
+  "fn": "calcMobDamage",
+  "args": [
+   5,
+   100
+  ],
+  "expect": 1,
+  "rng": [
+   0.1,
+   0.9
+  ]
+ },
+ {
+  "fn": "calcMobDamage",
+  "args": [
+   5,
+   100
+  ],
+  "expect": 1,
+  "rng": [
+   0.9,
+   0.1
+  ]
+ },
+ {
+  "fn": "calcMobDamage",
+  "args": [
+   5,
+   100
+  ],
+  "expect": 1,
+  "rng": [
+   0.25,
+   0.75,
+   0.5
+  ]
+ },
+ {
+  "fn": "calcMobDamage",
+  "args": [
+   30,
+   10
+  ],
+  "expect": 17,
+  "rng": [
+   0
+  ]
+ },
+ {
+  "fn": "calcMobDamage",
+  "args": [
+   30,
+   10
+  ],
+  "expect": 20,
+  "rng": [
+   0.5
+  ]
+ },
+ {
+  "fn": "calcMobDamage",
+  "args": [
+   30,
+   10
+  ],
+  "expect": 23,
+  "rng": [
+   0.999
+  ]
+ },
+ {
+  "fn": "calcMobDamage",
+  "args": [
+   30,
+   10
+  ],
+  "expect": 18,
+  "rng": [
+   0.1,
+   0.9
+  ]
+ },
+ {
+  "fn": "calcMobDamage",
+  "args": [
+   30,
+   10
+  ],
+  "expect": 22,
+  "rng": [
+   0.9,
+   0.1
+  ]
+ },
+ {
+  "fn": "calcMobDamage",
+  "args": [
+   30,
+   10
+  ],
+  "expect": 19,
+  "rng": [
+   0.25,
+   0.75,
+   0.5
+  ]
+ },
+ {
+  "fn": "hitChance",
+  "args": [
+   45,
+   1,
+   1
+  ],
+  "expect": 0.8
+ },
+ {
+  "fn": "hitChance",
+  "args": [
+   60,
+   1,
+   1
+  ],
+  "expect": 0.875
+ },
+ {
+  "fn": "hitChance",
+  "args": [
+   30,
+   1,
+   1
+  ],
+  "expect": 0.7250000000000001
+ },
+ {
+  "fn": "hitChance",
+  "args": [
+   45,
+   10,
+   1
+  ],
+  "expect": 0.98
+ },
+ {
+  "fn": "hitChance",
+  "args": [
+   45,
+   1,
+   10
+  ],
+  "expect": 0.6200000000000001
+ },
+ {
+  "fn": "hitChance",
+  "args": [
+   200,
+   50,
+   1
+  ],
+  "expect": 0.98
+ },
+ {
+  "fn": "hitChance",
+  "args": [
+   0,
+   1,
+   50
+  ],
+  "expect": 0.3
+ },
+ {
+  "fn": "inRange",
+  "args": [
+   0,
+   0,
+   1,
+   1,
+   1
+  ],
+  "expect": true
+ },
+ {
+  "fn": "inRange",
+  "args": [
+   0,
+   0,
+   2,
+   1,
+   1
+  ],
+  "expect": false
+ },
+ {
+  "fn": "inRange",
+  "args": [
+   5,
+   5,
+   5,
+   5,
+   1
+  ],
+  "expect": true
+ },
+ {
+  "fn": "inRange",
+  "args": [
+   0,
+   0,
+   3,
+   0,
+   3
+  ],
+  "expect": true
+ },
+ {
+  "fn": "inRange",
+  "args": [
+   0,
+   0,
+   4,
+   0,
+   3
+  ],
+  "expect": false
+ },
+ {
+  "fn": "rollDrops",
+  "args": [
+   [
+    {
+     "item": 61501,
+     "p": 0.5
+    },
+    {
+     "item": 61502,
+     "p": 0.1
+    },
+    {
+     "item": 61503,
+     "p": 1
+    }
+   ]
+  ],
+  "expect": [
+   61501,
+   61502,
+   61503
+  ],
+  "rng": [
+   0
+  ]
+ },
+ {
+  "fn": "rollDrops",
+  "args": [
+   [
+    {
+     "item": 61501,
+     "p": 0.5
+    },
+    {
+     "item": 61502,
+     "p": 0.1
+    },
+    {
+     "item": 61503,
+     "p": 1
+    }
+   ]
+  ],
+  "expect": [
+   61503
+  ],
+  "rng": [
+   0.5
+  ]
+ },
+ {
+  "fn": "rollDrops",
+  "args": [
+   [
+    {
+     "item": 61501,
+     "p": 0.5
+    },
+    {
+     "item": 61502,
+     "p": 0.1
+    },
+    {
+     "item": 61503,
+     "p": 1
+    }
+   ]
+  ],
+  "expect": [
+   61503
+  ],
+  "rng": [
+   0.999
+  ]
+ },
+ {
+  "fn": "rollDrops",
+  "args": [
+   [
+    {
+     "item": 61501,
+     "p": 0.5
+    },
+    {
+     "item": 61502,
+     "p": 0.1
+    },
+    {
+     "item": 61503,
+     "p": 1
+    }
+   ]
+  ],
+  "expect": [
+   61501,
+   61503
+  ],
+  "rng": [
+   0.1,
+   0.9
+  ]
+ },
+ {
+  "fn": "rollDrops",
+  "args": [
+   [
+    {
+     "item": 61501,
+     "p": 0.5
+    },
+    {
+     "item": 61502,
+     "p": 0.1
+    },
+    {
+     "item": 61503,
+     "p": 1
+    }
+   ]
+  ],
+  "expect": [
+   61503
+  ],
+  "rng": [
+   0.9,
+   0.1
+  ]
+ },
+ {
+  "fn": "rollDrops",
+  "args": [
+   [
+    {
+     "item": 61501,
+     "p": 0.5
+    },
+    {
+     "item": 61502,
+     "p": 0.1
+    },
+    {
+     "item": 61503,
+     "p": 1
+    }
+   ]
+  ],
+  "expect": [
+   61501,
+   61503
+  ],
+  "rng": [
+   0.25,
+   0.75,
+   0.5
+  ]
+ },
+ {
+  "fn": "rollGold",
+  "args": [
+   [
+    0,
+    3
+   ]
+  ],
+  "expect": 0,
+  "rng": [
+   0
+  ]
+ },
+ {
+  "fn": "rollGold",
+  "args": [
+   [
+    0,
+    3
+   ]
+  ],
+  "expect": 2,
+  "rng": [
+   0.5
+  ]
+ },
+ {
+  "fn": "rollGold",
+  "args": [
+   [
+    0,
+    3
+   ]
+  ],
+  "expect": 3,
+  "rng": [
+   0.999
+  ]
+ },
+ {
+  "fn": "rollGold",
+  "args": [
+   [
+    0,
+    3
+   ]
+  ],
+  "expect": 0,
+  "rng": [
+   0.1,
+   0.9
+  ]
+ },
+ {
+  "fn": "rollGold",
+  "args": [
+   [
+    0,
+    3
+   ]
+  ],
+  "expect": 3,
+  "rng": [
+   0.9,
+   0.1
+  ]
+ },
+ {
+  "fn": "rollGold",
+  "args": [
+   [
+    0,
+    3
+   ]
+  ],
+  "expect": 1,
+  "rng": [
+   0.25,
+   0.75,
+   0.5
+  ]
+ },
+ {
+  "fn": "rollGold",
+  "args": [
+   [
+    5,
+    5
+   ]
+  ],
+  "expect": 5,
+  "rng": [
+   0
+  ]
+ },
+ {
+  "fn": "rollGold",
+  "args": [
+   [
+    5,
+    5
+   ]
+  ],
+  "expect": 5,
+  "rng": [
+   0.5
+  ]
+ },
+ {
+  "fn": "rollGold",
+  "args": [
+   [
+    5,
+    5
+   ]
+  ],
+  "expect": 5,
+  "rng": [
+   0.999
+  ]
+ },
+ {
+  "fn": "rollGold",
+  "args": [
+   [
+    5,
+    5
+   ]
+  ],
+  "expect": 5,
+  "rng": [
+   0.1,
+   0.9
+  ]
+ },
+ {
+  "fn": "rollGold",
+  "args": [
+   [
+    5,
+    5
+   ]
+  ],
+  "expect": 5,
+  "rng": [
+   0.9,
+   0.1
+  ]
+ },
+ {
+  "fn": "rollGold",
+  "args": [
+   [
+    5,
+    5
+   ]
+  ],
+  "expect": 5,
+  "rng": [
+   0.25,
+   0.75,
+   0.5
+  ]
+ },
+ {
+  "fn": "rollGold",
+  "args": [
+   [
+    10,
+    20
+   ]
+  ],
+  "expect": 10,
+  "rng": [
+   0
+  ]
+ },
+ {
+  "fn": "rollGold",
+  "args": [
+   [
+    10,
+    20
+   ]
+  ],
+  "expect": 15,
+  "rng": [
+   0.5
+  ]
+ },
+ {
+  "fn": "rollGold",
+  "args": [
+   [
+    10,
+    20
+   ]
+  ],
+  "expect": 20,
+  "rng": [
+   0.999
+  ]
+ },
+ {
+  "fn": "rollGold",
+  "args": [
+   [
+    10,
+    20
+   ]
+  ],
+  "expect": 11,
+  "rng": [
+   0.1,
+   0.9
+  ]
+ },
+ {
+  "fn": "rollGold",
+  "args": [
+   [
+    10,
+    20
+   ]
+  ],
+  "expect": 19,
+  "rng": [
+   0.9,
+   0.1
+  ]
+ },
+ {
+  "fn": "rollGold",
+  "args": [
+   [
+    10,
+    20
+   ]
+  ],
+  "expect": 12,
+  "rng": [
+   0.25,
+   0.75,
+   0.5
+  ]
+ },
+ {
+  "fn": "karmaAfterKill",
+  "args": [
+   0,
+   -10
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "karmaAfterKill",
+  "args": [
+   0,
+   100
+  ],
+  "expect": -10
+ },
+ {
+  "fn": "karmaAfterKill",
+  "args": [
+   29999,
+   -1000
+  ],
+  "expect": 30000
+ },
+ {
+  "fn": "karmaAfterKill",
+  "args": [
+   -29999,
+   1000
+  ],
+  "expect": -30000
+ },
+ {
+  "fn": "karmaAfterKill",
+  "args": [
+   500,
+   0
+  ],
+  "expect": 500
+ },
+ {
+  "fn": "deathExpLoss",
+  "args": [
+   0,
+   100
+  ],
+  "expect": 10
+ },
+ {
+  "fn": "deathExpLoss",
+  "args": [
+   -1000,
+   100
+  ],
+  "expect": 10
+ },
+ {
+  "fn": "deathExpLoss",
+  "args": [
+   -1001,
+   100
+  ],
+  "expect": 20
+ },
+ {
+  "fn": "deathExpLoss",
+  "args": [
+   -20000,
+   999
+  ],
+  "expect": 200
+ },
+ {
+  "fn": "rollDeathDrop",
+  "args": [
+   0,
+   [
+    {
+     "id": 1,
+     "n": 2
+    },
+    {
+     "id": 2,
+     "n": 1
+    },
+    {
+     "id": 3,
+     "n": 5
+    }
+   ]
+  ],
+  "expect": 1,
+  "rng": [
+   0
+  ]
+ },
+ {
+  "fn": "rollDeathDrop",
+  "args": [
+   0,
+   [
+    {
+     "id": 1,
+     "n": 2
+    },
+    {
+     "id": 2,
+     "n": 1
+    },
+    {
+     "id": 3,
+     "n": 5
+    }
+   ]
+  ],
+  "expect": 0,
+  "rng": [
+   0.5
+  ]
+ },
+ {
+  "fn": "rollDeathDrop",
+  "args": [
+   0,
+   [
+    {
+     "id": 1,
+     "n": 2
+    },
+    {
+     "id": 2,
+     "n": 1
+    },
+    {
+     "id": 3,
+     "n": 5
+    }
+   ]
+  ],
+  "expect": 0,
+  "rng": [
+   0.999
+  ]
+ },
+ {
+  "fn": "rollDeathDrop",
+  "args": [
+   0,
+   [
+    {
+     "id": 1,
+     "n": 2
+    },
+    {
+     "id": 2,
+     "n": 1
+    },
+    {
+     "id": 3,
+     "n": 5
+    }
+   ]
+  ],
+  "expect": 3,
+  "rng": [
+   0.1,
+   0.9
+  ]
+ },
+ {
+  "fn": "rollDeathDrop",
+  "args": [
+   0,
+   [
+    {
+     "id": 1,
+     "n": 2
+    },
+    {
+     "id": 2,
+     "n": 1
+    },
+    {
+     "id": 3,
+     "n": 5
+    }
+   ]
+  ],
+  "expect": 0,
+  "rng": [
+   0.9,
+   0.1
+  ]
+ },
+ {
+  "fn": "rollDeathDrop",
+  "args": [
+   0,
+   [
+    {
+     "id": 1,
+     "n": 2
+    },
+    {
+     "id": 2,
+     "n": 1
+    },
+    {
+     "id": 3,
+     "n": 5
+    }
+   ]
+  ],
+  "expect": 0,
+  "rng": [
+   0.25,
+   0.75,
+   0.5
+  ]
+ },
+ {
+  "fn": "rollDeathDrop",
+  "args": [
+   -1000,
+   [
+    {
+     "id": 1,
+     "n": 2
+    },
+    {
+     "id": 2,
+     "n": 1
+    },
+    {
+     "id": 3,
+     "n": 5
+    }
+   ]
+  ],
+  "expect": 1,
+  "rng": [
+   0
+  ]
+ },
+ {
+  "fn": "rollDeathDrop",
+  "args": [
+   -1000,
+   [
+    {
+     "id": 1,
+     "n": 2
+    },
+    {
+     "id": 2,
+     "n": 1
+    },
+    {
+     "id": 3,
+     "n": 5
+    }
+   ]
+  ],
+  "expect": 0,
+  "rng": [
+   0.5
+  ]
+ },
+ {
+  "fn": "rollDeathDrop",
+  "args": [
+   -1000,
+   [
+    {
+     "id": 1,
+     "n": 2
+    },
+    {
+     "id": 2,
+     "n": 1
+    },
+    {
+     "id": 3,
+     "n": 5
+    }
+   ]
+  ],
+  "expect": 0,
+  "rng": [
+   0.999
+  ]
+ },
+ {
+  "fn": "rollDeathDrop",
+  "args": [
+   -1000,
+   [
+    {
+     "id": 1,
+     "n": 2
+    },
+    {
+     "id": 2,
+     "n": 1
+    },
+    {
+     "id": 3,
+     "n": 5
+    }
+   ]
+  ],
+  "expect": 3,
+  "rng": [
+   0.1,
+   0.9
+  ]
+ },
+ {
+  "fn": "rollDeathDrop",
+  "args": [
+   -1000,
+   [
+    {
+     "id": 1,
+     "n": 2
+    },
+    {
+     "id": 2,
+     "n": 1
+    },
+    {
+     "id": 3,
+     "n": 5
+    }
+   ]
+  ],
+  "expect": 0,
+  "rng": [
+   0.9,
+   0.1
+  ]
+ },
+ {
+  "fn": "rollDeathDrop",
+  "args": [
+   -1000,
+   [
+    {
+     "id": 1,
+     "n": 2
+    },
+    {
+     "id": 2,
+     "n": 1
+    },
+    {
+     "id": 3,
+     "n": 5
+    }
+   ]
+  ],
+  "expect": 0,
+  "rng": [
+   0.25,
+   0.75,
+   0.5
+  ]
+ },
+ {
+  "fn": "rollDeathDrop",
+  "args": [
+   -1001,
+   [
+    {
+     "id": 1,
+     "n": 2
+    },
+    {
+     "id": 2,
+     "n": 1
+    },
+    {
+     "id": 3,
+     "n": 5
+    }
+   ]
+  ],
+  "expect": 1,
+  "rng": [
+   0
+  ]
+ },
+ {
+  "fn": "rollDeathDrop",
+  "args": [
+   -1001,
+   [
+    {
+     "id": 1,
+     "n": 2
+    },
+    {
+     "id": 2,
+     "n": 1
+    },
+    {
+     "id": 3,
+     "n": 5
+    }
+   ]
+  ],
+  "expect": 0,
+  "rng": [
+   0.5
+  ]
+ },
+ {
+  "fn": "rollDeathDrop",
+  "args": [
+   -1001,
+   [
+    {
+     "id": 1,
+     "n": 2
+    },
+    {
+     "id": 2,
+     "n": 1
+    },
+    {
+     "id": 3,
+     "n": 5
+    }
+   ]
+  ],
+  "expect": 0,
+  "rng": [
+   0.999
+  ]
+ },
+ {
+  "fn": "rollDeathDrop",
+  "args": [
+   -1001,
+   [
+    {
+     "id": 1,
+     "n": 2
+    },
+    {
+     "id": 2,
+     "n": 1
+    },
+    {
+     "id": 3,
+     "n": 5
+    }
+   ]
+  ],
+  "expect": 3,
+  "rng": [
+   0.1,
+   0.9
+  ]
+ },
+ {
+  "fn": "rollDeathDrop",
+  "args": [
+   -1001,
+   [
+    {
+     "id": 1,
+     "n": 2
+    },
+    {
+     "id": 2,
+     "n": 1
+    },
+    {
+     "id": 3,
+     "n": 5
+    }
+   ]
+  ],
+  "expect": 0,
+  "rng": [
+   0.9,
+   0.1
+  ]
+ },
+ {
+  "fn": "rollDeathDrop",
+  "args": [
+   -1001,
+   [
+    {
+     "id": 1,
+     "n": 2
+    },
+    {
+     "id": 2,
+     "n": 1
+    },
+    {
+     "id": 3,
+     "n": 5
+    }
+   ]
+  ],
+  "expect": 3,
+  "rng": [
+   0.25,
+   0.75,
+   0.5
+  ]
+ },
+ {
+  "fn": "rollDeathDrop",
+  "args": [
+   -9000,
+   [
+    {
+     "id": 1,
+     "n": 2
+    },
+    {
+     "id": 2,
+     "n": 1
+    },
+    {
+     "id": 3,
+     "n": 5
+    }
+   ]
+  ],
+  "expect": 1,
+  "rng": [
+   0
+  ]
+ },
+ {
+  "fn": "rollDeathDrop",
+  "args": [
+   -9000,
+   [
+    {
+     "id": 1,
+     "n": 2
+    },
+    {
+     "id": 2,
+     "n": 1
+    },
+    {
+     "id": 3,
+     "n": 5
+    }
+   ]
+  ],
+  "expect": 0,
+  "rng": [
+   0.5
+  ]
+ },
+ {
+  "fn": "rollDeathDrop",
+  "args": [
+   -9000,
+   [
+    {
+     "id": 1,
+     "n": 2
+    },
+    {
+     "id": 2,
+     "n": 1
+    },
+    {
+     "id": 3,
+     "n": 5
+    }
+   ]
+  ],
+  "expect": 0,
+  "rng": [
+   0.999
+  ]
+ },
+ {
+  "fn": "rollDeathDrop",
+  "args": [
+   -9000,
+   [
+    {
+     "id": 1,
+     "n": 2
+    },
+    {
+     "id": 2,
+     "n": 1
+    },
+    {
+     "id": 3,
+     "n": 5
+    }
+   ]
+  ],
+  "expect": 3,
+  "rng": [
+   0.1,
+   0.9
+  ]
+ },
+ {
+  "fn": "rollDeathDrop",
+  "args": [
+   -9000,
+   [
+    {
+     "id": 1,
+     "n": 2
+    },
+    {
+     "id": 2,
+     "n": 1
+    },
+    {
+     "id": 3,
+     "n": 5
+    }
+   ]
+  ],
+  "expect": 0,
+  "rng": [
+   0.9,
+   0.1
+  ]
+ },
+ {
+  "fn": "rollDeathDrop",
+  "args": [
+   -9000,
+   [
+    {
+     "id": 1,
+     "n": 2
+    },
+    {
+     "id": 2,
+     "n": 1
+    },
+    {
+     "id": 3,
+     "n": 5
+    }
+   ]
+  ],
+  "expect": 3,
+  "rng": [
+   0.25,
+   0.75,
+   0.5
+  ]
+ },
+ {
+  "fn": "rollDeathDrop",
+  "args": [
+   0,
+   []
+  ],
+  "expect": 0,
+  "rng": [
+   0
+  ]
+ },
+ {
+  "fn": "buyPrice",
+  "args": [
+   100,
+   0
+  ],
+  "expect": 100
+ },
+ {
+  "fn": "buyPrice",
+  "args": [
+   100,
+   10
+  ],
+  "expect": 95
+ },
+ {
+  "fn": "buyPrice",
+  "args": [
+   100,
+   40
+  ],
+  "expect": 80
+ },
+ {
+  "fn": "buyPrice",
+  "args": [
+   100,
+   100
+  ],
+  "expect": 80
+ },
+ {
+  "fn": "buyPrice",
+  "args": [
+   1,
+   50
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "buyPrice",
+  "args": [
+   0,
+   0
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "sellPrice",
+  "args": [
+   0
+  ],
+  "expect": 0
+ },
+ {
+  "fn": "sellPrice",
+  "args": [
+   1
+  ],
+  "expect": 0
+ },
+ {
+  "fn": "sellPrice",
+  "args": [
+   3
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "sellPrice",
+  "args": [
+   100
+  ],
+  "expect": 50
+ },
+ {
+  "fn": "sellPrice",
+  "args": [
+   101
+  ],
+  "expect": 50
+ },
+ {
+  "fn": "bag_add",
+  "args": [
+   [
+    {
+     "id": 1,
+     "n": 2
+    }
+   ],
+   [
+    [
+     1,
+     3
+    ],
+    [
+     9,
+     1
+    ]
+   ]
+  ],
+  "expect": [
+   {
+    "id": 1,
+    "n": 5
+   },
+   {
+    "id": 9,
+    "n": 1
+   }
+  ]
+ },
+ {
+  "fn": "bag_remove",
+  "args": [
+   [
+    {
+     "id": 1,
+     "n": 2
+    }
+   ],
+   [
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     5
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     7,
+     1
+    ]
+   ]
+  ],
+  "expect": {
+   "bag": [],
+   "results": [
+    true,
+    false,
+    true,
+    false
+   ]
+  }
+ },
+ {
+  "fn": "maxHp",
+  "args": [
+   1,
+   {
+    "str": 12,
+    "agi": 8,
+    "int": 4,
+    "spi": 4,
+    "pol": 6,
+    "cha": 6
+   }
+  ],
+  "expect": 123
+ },
+ {
+  "fn": "maxMp",
+  "args": [
+   1,
+   {
+    "str": 12,
+    "agi": 8,
+    "int": 4,
+    "spi": 4,
+    "pol": 6,
+    "cha": 6
+   }
+  ],
+  "expect": 45
+ },
+ {
+  "fn": "maxSp",
+  "args": [
+   1,
+   {
+    "str": 12,
+    "agi": 8,
+    "int": 4,
+    "spi": 4,
+    "pol": 6,
+    "cha": 6
+   }
+  ],
+  "expect": 69
+ },
+ {
+  "fn": "expToNext",
+  "args": [
+   1
+  ],
+  "expect": 20
+ },
+ {
+  "fn": "maxHp",
+  "args": [
+   2,
+   {
+    "str": 14,
+    "agi": 9,
+    "int": 5,
+    "spi": 5,
+    "pol": 6,
+    "cha": 6
+   }
+  ],
+  "expect": 146
+ },
+ {
+  "fn": "maxMp",
+  "args": [
+   2,
+   {
+    "str": 14,
+    "agi": 9,
+    "int": 5,
+    "spi": 5,
+    "pol": 6,
+    "cha": 6
+   }
+  ],
+  "expect": 55
+ },
+ {
+  "fn": "maxSp",
+  "args": [
+   2,
+   {
+    "str": 14,
+    "agi": 9,
+    "int": 5,
+    "spi": 5,
+    "pol": 6,
+    "cha": 6
+   }
+  ],
+  "expect": 74
+ },
+ {
+  "fn": "expToNext",
+  "args": [
+   2
+  ],
+  "expect": 70
+ },
+ {
+  "fn": "maxHp",
+  "args": [
+   5,
+   {
+    "str": 20,
+    "agi": 12,
+    "int": 8,
+    "spi": 8,
+    "pol": 6,
+    "cha": 6
+   }
+  ],
+  "expect": 215
+ },
+ {
+  "fn": "maxMp",
+  "args": [
+   5,
+   {
+    "str": 20,
+    "agi": 12,
+    "int": 8,
+    "spi": 8,
+    "pol": 6,
+    "cha": 6
+   }
+  ],
+  "expect": 85
+ },
+ {
+  "fn": "maxSp",
+  "args": [
+   5,
+   {
+    "str": 20,
+    "agi": 12,
+    "int": 8,
+    "spi": 8,
+    "pol": 6,
+    "cha": 6
+   }
+  ],
+  "expect": 89
+ },
+ {
+  "fn": "expToNext",
+  "args": [
+   5
+  ],
+  "expect": 362
+ },
+ {
+  "fn": "maxHp",
+  "args": [
+   10,
+   {
+    "str": 30,
+    "agi": 17,
+    "int": 13,
+    "spi": 13,
+    "pol": 6,
+    "cha": 6
+   }
+  ],
+  "expect": 330
+ },
+ {
+  "fn": "maxMp",
+  "args": [
+   10,
+   {
+    "str": 30,
+    "agi": 17,
+    "int": 13,
+    "spi": 13,
+    "pol": 6,
+    "cha": 6
+   }
+  ],
+  "expect": 135
+ },
+ {
+  "fn": "maxSp",
+  "args": [
+   10,
+   {
+    "str": 30,
+    "agi": 17,
+    "int": 13,
+    "spi": 13,
+    "pol": 6,
+    "cha": 6
+   }
+  ],
+  "expect": 114
+ },
+ {
+  "fn": "expToNext",
+  "args": [
+   10
+  ],
+  "expect": 1262
+ },
+ {
+  "fn": "maxHp",
+  "args": [
+   50,
+   {
+    "str": 110,
+    "agi": 57,
+    "int": 53,
+    "spi": 53,
+    "pol": 6,
+    "cha": 6
+   }
+  ],
+  "expect": 1250
+ },
+ {
+  "fn": "maxMp",
+  "args": [
+   50,
+   {
+    "str": 110,
+    "agi": 57,
+    "int": 53,
+    "spi": 53,
+    "pol": 6,
+    "cha": 6
+   }
+  ],
+  "expect": 535
+ },
+ {
+  "fn": "maxSp",
+  "args": [
+   50,
+   {
+    "str": 110,
+    "agi": 57,
+    "int": 53,
+    "spi": 53,
+    "pol": 6,
+    "cha": 6
+   }
+  ],
+  "expect": 314
+ },
+ {
+  "fn": "expToNext",
+  "args": [
+   50
+  ],
+  "expect": 22865
+ },
+ {
+  "fn": "maxHp",
+  "args": [
+   100,
+   {
+    "str": 210,
+    "agi": 107,
+    "int": 103,
+    "spi": 103,
+    "pol": 6,
+    "cha": 6
+   }
+  ],
+  "expect": 2400
+ },
+ {
+  "fn": "maxMp",
+  "args": [
+   100,
+   {
+    "str": 210,
+    "agi": 107,
+    "int": 103,
+    "spi": 103,
+    "pol": 6,
+    "cha": 6
+   }
+  ],
+  "expect": 1035
+ },
+ {
+  "fn": "maxSp",
+  "args": [
+   100,
+   {
+    "str": 210,
+    "agi": 107,
+    "int": 103,
+    "spi": 103,
+    "pol": 6,
+    "cha": 6
+   }
+  ],
+  "expect": 564
+ },
+ {
+  "fn": "expToNext",
+  "args": [
+   100
+  ],
+  "expect": 79621
+ },
+ {
+  "fn": "attrsAt",
+  "args": [
+   "yishi",
+   1
+  ],
+  "expect": {
+   "str": 12,
+   "agi": 8,
+   "int": 4,
+   "spi": 4,
+   "pol": 6,
+   "cha": 6
+  }
+ },
+ {
+  "fn": "attrsAt",
+  "args": [
+   "yishi",
+   5
+  ],
+  "expect": {
+   "str": 20,
+   "agi": 12,
+   "int": 8,
+   "spi": 8,
+   "pol": 6,
+   "cha": 6
+  }
+ },
+ {
+  "fn": "attrsAt",
+  "args": [
+   "yishi",
+   50
+  ],
+  "expect": {
+   "str": 110,
+   "agi": 57,
+   "int": 53,
+   "spi": 53,
+   "pol": 6,
+   "cha": 6
+  }
+ },
+ {
+  "fn": "attrsAt",
+  "args": [
+   "shinu",
+   1
+  ],
+  "expect": {
+   "str": 10,
+   "agi": 10,
+   "int": 4,
+   "spi": 4,
+   "pol": 6,
+   "cha": 8
+  }
+ },
+ {
+  "fn": "attrsAt",
+  "args": [
+   "shinu",
+   5
+  ],
+  "expect": {
+   "str": 18,
+   "agi": 14,
+   "int": 8,
+   "spi": 8,
+   "pol": 6,
+   "cha": 8
+  }
+ },
+ {
+  "fn": "attrsAt",
+  "args": [
+   "shinu",
+   50
+  ],
+  "expect": {
+   "str": 108,
+   "agi": 59,
+   "int": 53,
+   "spi": 53,
+   "pol": 6,
+   "cha": 8
+  }
+ },
+ {
+  "fn": "attrsAt",
+  "args": [
+   "daoshi",
+   1
+  ],
+  "expect": {
+   "str": 5,
+   "agi": 6,
+   "int": 12,
+   "spi": 8,
+   "pol": 6,
+   "cha": 6
+  }
+ },
+ {
+  "fn": "attrsAt",
+  "args": [
+   "daoshi",
+   5
+  ],
+  "expect": {
+   "str": 9,
+   "agi": 10,
+   "int": 20,
+   "spi": 12,
+   "pol": 6,
+   "cha": 6
+  }
+ },
+ {
+  "fn": "attrsAt",
+  "args": [
+   "daoshi",
+   50
+  ],
+  "expect": {
+   "str": 54,
+   "agi": 55,
+   "int": 110,
+   "spi": 57,
+   "pol": 6,
+   "cha": 6
+  }
+ },
+ {
+  "fn": "attrsAt",
+  "args": [
+   "wunu",
+   1
+  ],
+  "expect": {
+   "str": 4,
+   "agi": 7,
+   "int": 6,
+   "spi": 12,
+   "pol": 5,
+   "cha": 8
+  }
+ },
+ {
+  "fn": "attrsAt",
+  "args": [
+   "wunu",
+   5
+  ],
+  "expect": {
+   "str": 8,
+   "agi": 11,
+   "int": 10,
+   "spi": 20,
+   "pol": 5,
+   "cha": 8
+  }
+ },
+ {
+  "fn": "attrsAt",
+  "args": [
+   "wunu",
+   50
+  ],
+  "expect": {
+   "str": 53,
+   "agi": 56,
+   "int": 55,
+   "spi": 110,
+   "pol": 5,
+   "cha": 8
+  }
+ },
+ {
+  "fn": "attrsAt",
+  "args": [
+   "bianshi",
+   1
+  ],
+  "expect": {
+   "str": 5,
+   "agi": 8,
+   "int": 11,
+   "spi": 6,
+   "pol": 10,
+   "cha": 6
+  }
+ },
+ {
+  "fn": "attrsAt",
+  "args": [
+   "bianshi",
+   5
+  ],
+  "expect": {
+   "str": 9,
+   "agi": 12,
+   "int": 19,
+   "spi": 10,
+   "pol": 10,
+   "cha": 6
+  }
+ },
+ {
+  "fn": "attrsAt",
+  "args": [
+   "bianshi",
+   50
+  ],
+  "expect": {
+   "str": 54,
+   "agi": 57,
+   "int": 109,
+   "spi": 55,
+   "pol": 10,
+   "cha": 6
+  }
+ },
+ {
+  "fn": "attrsAt",
+  "args": [
+   "meinu",
+   1
+  ],
+  "expect": {
+   "str": 4,
+   "agi": 8,
+   "int": 6,
+   "spi": 10,
+   "pol": 6,
+   "cha": 12
+  }
+ },
+ {
+  "fn": "attrsAt",
+  "args": [
+   "meinu",
+   5
+  ],
+  "expect": {
+   "str": 8,
+   "agi": 12,
+   "int": 10,
+   "spi": 18,
+   "pol": 6,
+   "cha": 12
+  }
+ },
+ {
+  "fn": "attrsAt",
+  "args": [
+   "meinu",
+   50
+  ],
+  "expect": {
+   "str": 53,
+   "agi": 57,
+   "int": 55,
+   "spi": 108,
+   "pol": 6,
+   "cha": 12
+  }
+ },
+ {
+  "fn": "createCharacter",
+  "args": [
+   "義士甲",
+   "yishi"
+  ],
+  "expect": {
+   "name": "義士甲",
+   "classId": "yishi",
+   "level": 1,
+   "exp": 0,
+   "attrs": {
+    "str": 12,
+    "agi": 8,
+    "int": 4,
+    "spi": 4,
+    "pol": 6,
+    "cha": 6
+   },
+   "hp": 123,
+   "mp": 45,
+   "sp": 69,
+   "gold": 100,
+   "karma": 0,
+   "bag": [
+    {
+     "id": 65210,
+     "n": 5
+    }
+   ],
+   "equip": {
+    "weapon": 10001,
+    "boots": 22001
+   }
+  }
+ },
+ {
+  "fn": "gainExp",
+  "args": [
+   {
+    "name": "測",
+    "classId": "yishi",
+    "level": 1,
+    "exp": 0,
+    "attrs": {
+     "str": 12,
+     "agi": 8,
+     "int": 4,
+     "spi": 4,
+     "pol": 6,
+     "cha": 6
+    },
+    "hp": 123,
+    "mp": 45,
+    "sp": 69,
+    "gold": 100,
+    "karma": 0,
+    "bag": [
+     {
+      "id": 65210,
+      "n": 5
+     }
+    ],
+    "equip": {
+     "weapon": 10001,
+     "boots": 22001
+    }
+   },
+   0
+  ],
+  "expect": {
+   "ch": {
+    "name": "測",
+    "classId": "yishi",
+    "level": 1,
+    "exp": 0,
+    "attrs": {
+     "str": 12,
+     "agi": 8,
+     "int": 4,
+     "spi": 4,
+     "pol": 6,
+     "cha": 6
+    },
+    "hp": 123,
+    "mp": 45,
+    "sp": 69,
+    "gold": 100,
+    "karma": 0,
+    "bag": [
+     {
+      "id": 65210,
+      "n": 5
+     }
+    ],
+    "equip": {
+     "weapon": 10001,
+     "boots": 22001
+    }
+   },
+   "ups": 0
+  }
+ },
+ {
+  "fn": "gainExp",
+  "args": [
+   {
+    "name": "測",
+    "classId": "yishi",
+    "level": 1,
+    "exp": 0,
+    "attrs": {
+     "str": 12,
+     "agi": 8,
+     "int": 4,
+     "spi": 4,
+     "pol": 6,
+     "cha": 6
+    },
+    "hp": 123,
+    "mp": 45,
+    "sp": 69,
+    "gold": 100,
+    "karma": 0,
+    "bag": [
+     {
+      "id": 65210,
+      "n": 5
+     }
+    ],
+    "equip": {
+     "weapon": 10001,
+     "boots": 22001
+    }
+   },
+   10
+  ],
+  "expect": {
+   "ch": {
+    "name": "測",
+    "classId": "yishi",
+    "level": 1,
+    "exp": 10,
+    "attrs": {
+     "str": 12,
+     "agi": 8,
+     "int": 4,
+     "spi": 4,
+     "pol": 6,
+     "cha": 6
+    },
+    "hp": 123,
+    "mp": 45,
+    "sp": 69,
+    "gold": 100,
+    "karma": 0,
+    "bag": [
+     {
+      "id": 65210,
+      "n": 5
+     }
+    ],
+    "equip": {
+     "weapon": 10001,
+     "boots": 22001
+    }
+   },
+   "ups": 0
+  }
+ },
+ {
+  "fn": "gainExp",
+  "args": [
+   {
+    "name": "測",
+    "classId": "yishi",
+    "level": 1,
+    "exp": 0,
+    "attrs": {
+     "str": 12,
+     "agi": 8,
+     "int": 4,
+     "spi": 4,
+     "pol": 6,
+     "cha": 6
+    },
+    "hp": 123,
+    "mp": 45,
+    "sp": 69,
+    "gold": 100,
+    "karma": 0,
+    "bag": [
+     {
+      "id": 65210,
+      "n": 5
+     }
+    ],
+    "equip": {
+     "weapon": 10001,
+     "boots": 22001
+    }
+   },
+   100
+  ],
+  "expect": {
+   "ch": {
+    "name": "測",
+    "classId": "yishi",
+    "level": 3,
+    "exp": 10,
+    "attrs": {
+     "str": 16,
+     "agi": 10,
+     "int": 6,
+     "spi": 6,
+     "pol": 6,
+     "cha": 6
+    },
+    "hp": 169,
+    "mp": 65,
+    "sp": 79,
+    "gold": 100,
+    "karma": 0,
+    "bag": [
+     {
+      "id": 65210,
+      "n": 5
+     }
+    ],
+    "equip": {
+     "weapon": 10001,
+     "boots": 22001
+    }
+   },
+   "ups": 2
+  }
+ },
+ {
+  "fn": "gainExp",
+  "args": [
+   {
+    "name": "測",
+    "classId": "yishi",
+    "level": 1,
+    "exp": 0,
+    "attrs": {
+     "str": 12,
+     "agi": 8,
+     "int": 4,
+     "spi": 4,
+     "pol": 6,
+     "cha": 6
+    },
+    "hp": 123,
+    "mp": 45,
+    "sp": 69,
+    "gold": 100,
+    "karma": 0,
+    "bag": [
+     {
+      "id": 65210,
+      "n": 5
+     }
+    ],
+    "equip": {
+     "weapon": 10001,
+     "boots": 22001
+    }
+   },
+   477
+  ],
+  "expect": {
+   "ch": {
+    "name": "測",
+    "classId": "yishi",
+    "level": 5,
+    "exp": 0,
+    "attrs": {
+     "str": 20,
+     "agi": 12,
+     "int": 8,
+     "spi": 8,
+     "pol": 6,
+     "cha": 6
+    },
+    "hp": 215,
+    "mp": 85,
+    "sp": 89,
+    "gold": 100,
+    "karma": 0,
+    "bag": [
+     {
+      "id": 65210,
+      "n": 5
+     }
+    ],
+    "equip": {
+     "weapon": 10001,
+     "boots": 22001
+    }
+   },
+   "ups": 4
+  }
+ },
+ {
+  "fn": "gainExp",
+  "args": [
+   {
+    "name": "測",
+    "classId": "yishi",
+    "level": 1,
+    "exp": 0,
+    "attrs": {
+     "str": 12,
+     "agi": 8,
+     "int": 4,
+     "spi": 4,
+     "pol": 6,
+     "cha": 6
+    },
+    "hp": 123,
+    "mp": 45,
+    "sp": 69,
+    "gold": 100,
+    "karma": 0,
+    "bag": [
+     {
+      "id": 65210,
+      "n": 5
+     }
+    ],
+    "equip": {
+     "weapon": 10001,
+     "boots": 22001
+    }
+   },
+   5000
+  ],
+  "expect": {
+   "ch": {
+    "name": "測",
+    "classId": "yishi",
+    "level": 10,
+    "exp": 1106,
+    "attrs": {
+     "str": 30,
+     "agi": 17,
+     "int": 13,
+     "spi": 13,
+     "pol": 6,
+     "cha": 6
+    },
+    "hp": 330,
+    "mp": 135,
+    "sp": 114,
+    "gold": 100,
+    "karma": 0,
+    "bag": [
+     {
+      "id": 65210,
+      "n": 5
+     }
+    ],
+    "equip": {
+     "weapon": 10001,
+     "boots": 22001
+    }
+   },
+   "ups": 9
+  }
+ },
+ {
+  "fn": "gainExp",
+  "args": [
+   {
+    "name": "測",
+    "classId": "yishi",
+    "level": 1,
+    "exp": 0,
+    "attrs": {
+     "str": 12,
+     "agi": 8,
+     "int": 4,
+     "spi": 4,
+     "pol": 6,
+     "cha": 6
+    },
+    "hp": 123,
+    "mp": 45,
+    "sp": 69,
+    "gold": 100,
+    "karma": 0,
+    "bag": [
+     {
+      "id": 65210,
+      "n": 5
+     }
+    ],
+    "equip": {
+     "weapon": 10001,
+     "boots": 22001
+    }
+   },
+   1000000
+  ],
+  "expect": {
+   "ch": {
+    "name": "測",
+    "classId": "yishi",
+    "level": 69,
+    "exp": 14206,
+    "attrs": {
+     "str": 148,
+     "agi": 76,
+     "int": 72,
+     "spi": 72,
+     "pol": 6,
+     "cha": 6
+    },
+    "hp": 1687,
+    "mp": 725,
+    "sp": 409,
+    "gold": 100,
+    "karma": 0,
+    "bag": [
+     {
+      "id": 65210,
+      "n": 5
+     }
+    ],
+    "equip": {
+     "weapon": 10001,
+     "boots": 22001
+    }
+   },
+   "ups": 68
+  }
+ }
+]

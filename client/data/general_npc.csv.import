@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://bfdchkixlebnl"
+
+[deps]
+
+files=["res://data/general_npc.name.translation", "res://data/general_npc.f101.translation", "res://data/general_npc.f116.translation", "res://data/general_npc.skills(id:lv)x9.translation", "res://data/general_npc.raw.translation"]
+
+source_file="res://data/general_npc.csv"
+dest_files=["res://data/general_npc.name.translation", "res://data/general_npc.f101.translation", "res://data/general_npc.f116.translation", "res://data/general_npc.skills(id:lv)x9.translation", "res://data/general_npc.raw.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

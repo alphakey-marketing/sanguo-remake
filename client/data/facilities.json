@@ -1,0 +1,12 @@
+{
+  "_note": "城內設施 (Step 3.2)【原】: 練兵場(2 人對練+歷練)/私塾(政治+1)/寺廟(魅力+1)。成本【自訂】: 練兵場扣 HP/SP 比例、私塾扣 SP/MP+金、寺廟扣 SP+金。歷練: 每 10 點喺下次升級時武/智/敏/靈 +1 (cap 100)。attr cap = 屬性上限。",
+  "training": { "name": "練兵場", "x": 17, "y": 10, "color": [0.25, 0.7, 0.4],
+    "costHp": 0.15, "costSp": 0.15, "lilian": 10, "lilianCap": 100, "cooldownTicks": 300,
+    "desc": "同人對練: 扣 15% HP/SP, +10 歷練; 升呢時每 10 歷練 武/智/敏/靈 +1" },
+  "school": { "name": "私塾", "x": 19, "y": 10, "color": [0.3, 0.55, 0.95],
+    "costSp": 0.2, "costMp": 0.2, "gold": 5, "attr": "pol", "attrCap": 99,
+    "desc": "讀書: 政治 +1 (扣 20% SP/MP + 5 金)" },
+  "temple": { "name": "寺廟", "x": 21, "y": 10, "color": [0.85, 0.65, 0.3],
+    "costSp": 0.2, "gold": 8, "attr": "cha", "attrCap": 99,
+    "desc": "參拜: 魅力 +1 (扣 20% SP + 8 金)" }
+}

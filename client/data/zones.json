@@ -1,0 +1,11 @@
+{
+  "_note": "安全區(城內)/戰鬥區(野外) 分界 + 傳送點。zones 唔重疊；spawns.json 嘅 zone 欄位對應呢度 id",
+  "zones": [
+    {"id": "town", "name": "許昌城", "safe": true, "x0": 0, "y0": 0, "x1": 25, "y1": 25},
+    {"id": "field_1", "name": "城外野地", "safe": false, "x0": 26, "y0": 26, "x1": 60, "y1": 60}
+  ],
+  "travel_points": [
+    {"id": "gate_out", "name": "南門 [G]出城", "zone": "town", "x": 24, "y": 24, "to": "gate_in"},
+    {"id": "gate_in", "name": "北門 [G]入城", "zone": "field_1", "x": 27, "y": 27, "to": "gate_out"}
+  ]
+}

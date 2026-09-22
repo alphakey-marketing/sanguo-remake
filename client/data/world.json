@@ -1,0 +1,390 @@
+{
+  "_note": "世界基建 (Step 4)【自訂】: 時鐘比例、城池、天災、市場。clock.gameMinPerTick=2 → 1 game 日 = 1440 game 分 = 720 tick = 72 秒真實時間。market.cats 數值 = 每 100 人口 每日供/需/庫存基準。disasters 機會 = 每城每日，受季節限制。防災度 defense 0~100 減弱天災效果。",
+  "clock": {
+    "gameMinPerTick": 2,
+    "kePerShichen": 8,
+    "seasonDays": 30
+  },
+  "night": {
+    "startShichen": 10,
+    "endShichen": 3,
+    "startKe": 80,
+    "endKe": 24
+  },
+  "homeCity": "xuchang",
+  "cities": [
+    {
+      "id": "xuchang",
+      "name": "許昌",
+      "province": "豫州",
+      "pop": 800,
+      "defense": 50
+    },
+    {
+      "id": "xiangyang",
+      "name": "襄陽",
+      "province": "荊州",
+      "pop": 700,
+      "defense": 45
+    },
+    {
+      "id": "xinye",
+      "name": "新野",
+      "province": "荊州",
+      "pop": 450,
+      "defense": 30
+    }
+  ],
+  "market": {
+    "minFactor": 0.5,
+    "maxFactor": 2.0,
+    "drift": 0.02,
+    "stockSens": 0.25,
+    "flowSens": 0.2,
+    "stockCap": 20,
+    "cats": {
+      "43": {
+        "name": "糧食",
+        "prod": 26,
+        "demand": 26,
+        "vol": 300
+      },
+      "44": {
+        "name": "藥材",
+        "prod": 20,
+        "demand": 20,
+        "vol": 260
+      },
+      "32": {
+        "name": "礦石",
+        "prod": 14,
+        "demand": 14,
+        "vol": 200
+      },
+      "40": {
+        "name": "工具",
+        "prod": 4,
+        "demand": 4,
+        "vol": 80
+      },
+      "1": {
+        "name": "刀",
+        "prod": 2,
+        "demand": 2,
+        "vol": 50
+      },
+      "29": {
+        "name": "靴鞋",
+        "prod": 2,
+        "demand": 2,
+        "vol": 50
+      },
+      "30": {
+        "name": "戒指",
+        "prod": 2,
+        "demand": 2,
+        "vol": 50
+      },
+      "31": {
+        "name": "項鍊",
+        "prod": 2,
+        "demand": 2,
+        "vol": 50
+      }
+    },
+    "seasonSupply": {
+      "0": {
+        "43": 1.05,
+        "44": 1.1
+      },
+      "1": {
+        "43": 1.1,
+        "44": 0.9,
+        "32": 1.05
+      },
+      "2": {
+        "43": 1.15,
+        "44": 1.05,
+        "32": 1.1
+      },
+      "3": {
+        "43": 0.7,
+        "44": 0.8,
+        "32": 1.15,
+        "40": 0.9,
+        "1": 1.05
+      }
+    },
+    "seasonDemand": {
+      "0": {
+        "43": 1.05,
+        "44": 1.1
+      },
+      "1": {
+        "43": 1.1,
+        "44": 0.9,
+        "32": 1.05
+      },
+      "2": {
+        "43": 1.15,
+        "44": 1.05,
+        "32": 1.1
+      },
+      "3": {
+        "43": 0.7,
+        "44": 0.8,
+        "32": 1.15,
+        "40": 0.9,
+        "1": 1.05
+      }
+    },
+    "supplyElast": 0.3,
+    "demandElast": 0.35
+  },
+  "disasters": [
+    {
+      "id": "locust",
+      "name": "蝗災",
+      "seasons": [
+        1,
+        2
+      ],
+      "chancePerDay": 0.004,
+      "sizes": [
+        {
+          "size": "大",
+          "days": 15,
+          "supply": {
+            "43": 0.25,
+            "44": 0.5
+          }
+        },
+        {
+          "size": "中",
+          "days": 10,
+          "supply": {
+            "43": 0.6,
+            "44": 0.8
+          }
+        },
+        {
+          "size": "細",
+          "days": 5,
+          "supply": {
+            "43": 0.85
+          }
+        }
+      ]
+    },
+    {
+      "id": "plague",
+      "name": "瘟疫",
+      "seasons": [
+        0,
+        1,
+        2
+      ],
+      "chancePerDay": 0.002,
+      "sizes": [
+        {
+          "size": "大",
+          "days": 18,
+          "supply": {
+            "43": 0.45,
+            "44": 0.6
+          }
+        },
+        {
+          "size": "中",
+          "days": 12,
+          "supply": {
+            "43": 0.6,
+            "44": 0.75
+          }
+        },
+        {
+          "size": "細",
+          "days": 6,
+          "supply": {
+            "43": 0.8,
+            "44": 0.9
+          }
+        }
+      ]
+    },
+    {
+      "id": "drought",
+      "name": "旱災",
+      "seasons": [
+        0,
+        1
+      ],
+      "chancePerDay": 0.0025,
+      "sizes": [
+        {
+          "size": "大",
+          "days": 20,
+          "supply": {
+            "43": 0.35,
+            "44": 0.5
+          }
+        },
+        {
+          "size": "中",
+          "days": 12,
+          "supply": {
+            "43": 0.6,
+            "44": 0.7
+          }
+        },
+        {
+          "size": "細",
+          "days": 6,
+          "supply": {
+            "43": 0.8
+          }
+        }
+      ]
+    },
+    {
+      "id": "typhoon",
+      "name": "颶風",
+      "seasons": [
+        1
+      ],
+      "chancePerDay": 0.0025,
+      "sizes": [
+        {
+          "size": "大",
+          "days": 5,
+          "supply": {
+            "43": 0.5,
+            "44": 0.6,
+            "32": 0.7
+          }
+        },
+        {
+          "size": "中",
+          "days": 3,
+          "supply": {
+            "43": 0.7,
+            "44": 0.8
+          }
+        },
+        {
+          "size": "細",
+          "days": 2,
+          "supply": {
+            "43": 0.85
+          }
+        }
+      ]
+    },
+    {
+      "id": "flood",
+      "name": "洪水",
+      "seasons": [
+        1,
+        2
+      ],
+      "chancePerDay": 0.0025,
+      "sizes": [
+        {
+          "size": "大",
+          "days": 12,
+          "supply": {
+            "43": 0.4,
+            "44": 0.5,
+            "32": 0.6
+          }
+        },
+        {
+          "size": "中",
+          "days": 8,
+          "supply": {
+            "43": 0.6,
+            "44": 0.7
+          }
+        },
+        {
+          "size": "細",
+          "days": 4,
+          "supply": {
+            "43": 0.8
+          }
+        }
+      ]
+    },
+    {
+      "id": "blizzard",
+      "name": "暴風雪",
+      "seasons": [
+        3
+      ],
+      "chancePerDay": 0.0025,
+      "sizes": [
+        {
+          "size": "大",
+          "days": 12,
+          "supply": {
+            "43": 0.3,
+            "44": 0.5,
+            "40": 0.6
+          }
+        },
+        {
+          "size": "中",
+          "days": 8,
+          "supply": {
+            "43": 0.55,
+            "44": 0.7
+          }
+        },
+        {
+          "size": "細",
+          "days": 4,
+          "supply": {
+            "43": 0.75
+          }
+        }
+      ]
+    },
+    {
+      "id": "quake",
+      "name": "地震",
+      "seasons": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "chancePerDay": 0.002,
+      "sizes": [
+        {
+          "size": "大",
+          "days": 6,
+          "supply": {
+            "32": 1.4,
+            "40": 0.5,
+            "29": 0.7
+          }
+        },
+        {
+          "size": "中",
+          "days": 4,
+          "supply": {
+            "32": 1.25,
+            "40": 0.7
+          }
+        },
+        {
+          "size": "細",
+          "days": 2,
+          "supply": {
+            "32": 1.1
+          }
+        }
+      ]
+    }
+  ]
+}

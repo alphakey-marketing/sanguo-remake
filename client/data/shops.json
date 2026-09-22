@@ -1,0 +1,7 @@
+{
+  "_note": "城內設施【自訂】: 客棧休息收費、武器店貨單。價格用 items.json price；魅力折扣/賣價比率見 rules/shop.ts",
+  "inn": { "x": 10, "y": 10, "restCost": 5 },
+  "shops": [
+    { "id": "weapon", "name": "武器店", "x": 13, "y": 10, "stock": [10001, 10002, 12101] }
+  ]
+}
