@@ -90,6 +90,9 @@ func _ready() -> void:
 	hud.attack_pressed.connect(_hud_attack)
 	hud.auto_toggled.connect(_hud_auto)
 	hud.bag_pressed.connect(func(): show_bag = not show_bag)
+	hud.travel_pressed.connect(func():
+		var tp := _near_travel()
+		if not tp.is_empty(): _send({"t": "travel", "point": String(tp["point"])}))
 	for a in OS.get_cmdline_user_args():
 		if a == "--sshot":
 			sshot_file = "user://sshot_ui.png"
@@ -150,6 +153,13 @@ func _send(d: Dictionary) -> void:
 		"sell": sim.cmd_sell(my_id, int(d.item), int(d.get("n", 1)))
 		"facility": sim.cmd_facility(my_id, str(d.key))
 		"travel": sim.cmd_travel(my_id, str(d.point))
+		"work": sim.cmd_work(my_id, str(d.skill))
+		"equip_tool": sim.cmd_equip_tool(my_id, str(d.skill), int(d.item))
+		"storage_sub": sim.cmd_storage_sub(my_id, bool(d.on))
+		"storage_deposit": sim.cmd_storage_deposit(my_id, int(d.item), int(d.get("n", 1)))
+		"storage_withdraw": sim.cmd_storage_withdraw(my_id, int(d.item), int(d.get("n", 1)))
+		"storage_sell": sim.cmd_storage_sell(my_id, int(d.item), int(d.get("n", 1)))
+		"use_item": sim.cmd_use_item(my_id, int(d.item))
 
 func _log(s: String) -> void:
 	log_lines.append(s)
@@ -163,6 +173,8 @@ func _exp_total() -> int:
 func _on_event(e: Dictionary) -> void:
 	match e.k:
 		"chat":
+			_log("%s: %s" % [e.name, e.text])
+		"npc_say":
 			_log("%s: %s" % [e.name, e.text])
 		"hit":
 			var d = _ent(int(e.dst))
@@ -388,11 +400,29 @@ func _hud_tap(pos: Vector2) -> void:
 		target_id = -1                            # 點自己 = 取消目標
 		return
 	var e = _ent_at(g)
+	if e == null or not e.get("mob", false):
+		e = _mob_near_tap(pos)                    # 手機格仔細(16px)，容許 tap 埋隔籬格都算中
 	if e != null and e.get("mob", false):
 		target_id = int(e.id)
 		_send({"t": "attack", "target": target_id})
 	else:
 		_send({"t": "move", "x": int(g.x), "y": int(g.y)})
+
+# 容錯: tap 座標喺呢個範圍內揀最近嘅怪 (半格仔), 唔使準確咁啱格先郁到手
+const TAP_TOLERANCE := TILE * 0.9
+func _mob_near_tap(pos: Vector2):
+	var world_pos: Vector2 = pos + cam
+	var best = null
+	var best_d := TAP_TOLERANCE
+	for e in ents:
+		if not e.get("mob", false):
+			continue
+		var center: Vector2 = Vector2(e.x, e.y) * TILE + Vector2(TILE, TILE) * 0.5
+		var d: float = world_pos.distance_to(center)
+		if d < best_d:
+			best_d = d
+			best = e
+	return best
 
 func _hud_attack() -> void:
 	if auto:
@@ -504,6 +534,15 @@ func _unhandled_input(ev: InputEvent) -> void:
 		elif ev.keycode == KEY_M: _send({"t": "facility", "key": "temple"})
 		elif ev.keycode >= KEY_1 and ev.keycode <= KEY_9 and ev.keycode - KEY_1 < shop_stock.size():
 			_send({"t": "buy", "item": int(shop_stock[ev.keycode - KEY_1]), "n": 1})
+		elif ev.keycode == KEY_W: _send({"t": "work", "skill": "mining"})                # debug: 淨試採礦，未有技能揀選 UI
+		elif ev.keycode == KEY_Y:
+			_send({"t": "storage_sub", "on": not bool(ch.get("storageSub", false))})
+		elif ev.keycode == KEY_C and not ch.is_empty() and ch.bag.size() > 0:            # 存背包第一格入天地商行
+			_send({"t": "storage_deposit", "item": int(ch.bag[0].id), "n": 1})
+		elif ev.keycode == KEY_V and not ch.is_empty() and ch.storage.size() > 0:        # 由天地商行攞返第一格
+			_send({"t": "storage_withdraw", "item": int(ch.storage[0].id), "n": 1})
+		elif ev.keycode == KEY_U and not ch.is_empty() and ch.bag.size() > 0:            # 食用背包第一格 (如果食得)
+			_send({"t": "use_item", "item": int(ch.bag[0].id)})
 	elif ev is InputEventMouseButton and ev.pressed:
 		if ev.button_index == MOUSE_BUTTON_LEFT:
 			_hud_tap(ev.position)
@@ -524,10 +563,21 @@ func _draw() -> void:
 	for y in range(y0, y1):
 		for x in range(x0, x1):
 			var pos := Vector2(x, y) * TILE - cam
-			var c := Color(0.32, 0.22, 0.2) if sim.blocked.has(y * w + x) else Color(0.16 + 0.02 * ((x + y) % 2), 0.28, 0.16)
+			var safe := sim.is_safe(x, y)
+			var c: Color
+			if sim.blocked.has(y * w + x):
+				c = Color(0.32, 0.22, 0.2)
+			elif safe:
+				c = Color(0.5 + 0.02 * ((x + y) % 2), 0.46, 0.36)   # 城內: 石板/泥路色，同野外分明
+			else:
+				c = Color(0.16 + 0.02 * ((x + y) % 2), 0.28, 0.16)  # 城外: 草地色
 			if night_on:
 				c = Color(c.r * 0.5, c.g * 0.5, c.b * 0.6)   # 夜景
 			draw_rect(Rect2(pos, Vector2(TILE, TILE)), c)
+			if safe != sim.is_safe(x + 1, y):
+				draw_rect(Rect2(pos + Vector2(TILE - 2, 0), Vector2(2, TILE)), Color(0.9, 0.8, 0.3, 0.8))   # 城牆邊界(直)
+			if safe != sim.is_safe(x, y + 1):
+				draw_rect(Rect2(pos + Vector2(0, TILE - 2), Vector2(TILE, 2)), Color(0.9, 0.8, 0.3, 0.8))   # 城牆邊界(橫)
 	for f in facilities:
 		var fp := Vector2(f.x, f.y) * TILE - cam
 		draw_rect(Rect2(fp - Vector2(TILE, TILE), Vector2(TILE * 3, TILE * 3)), Color(f.color, 0.35))

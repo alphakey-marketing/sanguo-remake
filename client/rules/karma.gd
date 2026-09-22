@@ -22,3 +22,9 @@ static func tier(karma: int) -> int:
 
 static func tier_name(karma: int) -> String:
 	return TIERS[tier(karma)]["name"]
+
+
+# NPC 買物更貴【原有講無數字】→【自訂】: 罪犯起每階 +10%，中立或以上冇影響
+static func price_factor(karma: int) -> float:
+	var bad := tier(karma) - 3                # 中立=0，罪犯=1，惡人=2，殺人魔=3
+	return 1.0 + maxf(0.0, float(bad)) * 0.1

@@ -9,6 +9,7 @@ var monsters: Dictionary = {}    # id(int) -> def
 var spawns: Array = []
 var starter: Dictionary = {}
 var weapons: Dictionary = {}     # item id -> {power, hit}  武器強度(effect 99) / 命中率(effect 13)
+var heals: Dictionary = {}       # item id -> {hp, mp}  回復生命力(effect 14) / 回復靈力(effect 16)，供 cmd_use_item
 var prices: Dictionary = {}      # item id -> price
 var item_ids: Dictionary = {}    # item id -> true
 var names: Dictionary = {}       # item id -> 名
@@ -20,6 +21,8 @@ var facilities: Dictionary = {}   # 練兵場/私塾/寺廟 (data/facilities.jso
 var cities: Dictionary = {}       # city id -> def (由 world.json)
 var zones: Array = []             # 安全區/戰鬥區 (data/zones.json)
 var travel_points: Array = []     # 傳送點 (data/zones.json)
+var work: Dictionary = {}         # 工作技能 (data/work.json.skills, Step 7.1)
+var work_meta: Dictionary = {}    # 工作技能雜項 (data/work.json.toolDurability)
 
 static var _cache: GameData
 
@@ -44,6 +47,9 @@ static func load_all() -> GameData:
 	var zn: Dictionary = _read("res://data/zones.json")
 	g.zones = zn["zones"]
 	g.travel_points = zn["travel_points"]
+	var wk: Dictionary = _read("res://data/work.json")
+	g.work = wk["skills"]
+	g.work_meta = {"toolDurability": wk["toolDurability"]}
 	for x in c["classes"]:
 		g.classes[String(x["id"])] = x
 	for x in m["monsters"]:
@@ -62,12 +68,21 @@ static func load_all() -> GameData:
 		g.cats[id] = int(it.get("cat", 0))
 		var p = null
 		var h = null
+		var heal_hp := 0
+		var heal_mp := 0
 		for e in it.get("effects", []):
-			if int(e["type"]) == 99 and p == null:
+			var et := int(e["type"])
+			if et == 99 and p == null:
 				p = float(e["value"])
-			elif int(e["type"]) == 13 and h == null:
+			elif et == 13 and h == null:
 				h = float(e["value"])
+			elif et == 14:
+				heal_hp += int(e["value"])
+			elif et == 16:
+				heal_mp += int(e["value"])
 		if p != null:
 			g.weapons[id] = {"power": p, "hit": h if h != null else 45.0}
+		if heal_hp > 0 or heal_mp > 0:
+			g.heals[id] = {"hp": heal_hp, "mp": heal_mp}
 	_cache = g
 	return g

@@ -9,6 +9,7 @@ extends Control
 signal attack_pressed
 signal auto_toggled(on: bool)
 signal bag_pressed
+signal travel_pressed
 
 var main: Node2D           # 引用 main.gd: 讀 ch/ents/faces/log_lines，用 _bar/_txt 畫
 var joy: SangoJoystick
@@ -58,10 +59,13 @@ func _input(ev: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 
 # 搖桿區: 開咗商店/客棧面板就縮細，留位俾面板點擊
+# 桌面滑鼠模擬: zone 細啲(左下一細塊)，留返成個地圖俾單擊行路/攻擊，唔好成幅畫面都撳唔到地
 func _zone() -> Rect2:
 	var s := get_viewport_rect().size
 	if main != null and (main._near_shop() or main._near_inn()):
 		return Rect2(0, s.y * 0.64, s.x * 0.45, s.y * 0.36)
+	if not use_touch:
+		return Rect2(0, s.y - 140, 140, 140)
 	return Rect2(0, s.y * 0.38, s.x * 0.55, s.y * 0.62)
 
 func _attack_rect() -> Rect2:
@@ -76,6 +80,14 @@ func _bag_rect() -> Rect2:
 	var s := get_viewport_rect().size
 	return Rect2(s.x - 66, 6, 60, 40)
 
+# 傳送掣: 淨係行近城門/傳送點先顯示 (main._near_travel() 唔係空)，右上背包掣下面
+func _travel_rect() -> Rect2:
+	var s := get_viewport_rect().size
+	return Rect2(s.x - 96, 50, 90, 40)
+
+func _near_travel_point() -> Dictionary:
+	return main.call("_near_travel") if main != null else {}
+
 func _button_hit(pos: Vector2) -> bool:
 	if _attack_rect().has_point(pos):
 		attack_pressed.emit()
@@ -87,6 +99,9 @@ func _button_hit(pos: Vector2) -> bool:
 		return true
 	if _bag_rect().has_point(pos):
 		bag_pressed.emit()
+		return true
+	if not _near_travel_point().is_empty() and _travel_rect().has_point(pos):
+		travel_pressed.emit()
 		return true
 	return false
 
@@ -163,6 +178,13 @@ func _draw_btns(s: Vector2) -> void:
 	draw_rect(br, Color(0.12, 0.12, 0.12, 0.8))
 	draw_rect(br, Color(1, 1, 1, 0.7), false, 1.5)
 	_txt(Vector2(br.position.x + 12, br.position.y + 15), "背包", Color.WHITE, 14)
+	var tp := _near_travel_point()
+	if not tp.is_empty():                                    # 行近城門/傳送點先顯示
+		var tr := _travel_rect()
+		draw_rect(tr, Color(0.2, 0.6, 0.3, 0.85))
+		draw_rect(tr, Color(1, 1, 1, 0.8), false, 1.5)
+		_txt(Vector2(tr.position.x + 10, tr.position.y + 16), "傳送", Color.WHITE, 13)
+		_txt(Vector2(tr.position.x + 10, tr.position.y + 32), String(tp.get("name", "")).substr(0, 8), Color(0.9, 1, 0.9), 9)
 
 # 底部日誌（最後 3 行）
 func _draw_log(s: Vector2) -> void:

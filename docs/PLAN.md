@@ -66,16 +66,27 @@ server(64×64 格、AOI、30 機械人、10Hz)、Godot 客戶端、`world.test.t
 - UI：傳送點併入 `facilities` 畫法(綠框)，鍵 `G` / 點擊傳送點格仔觸發；`_on_event` 加 `travel` 分支
 - 測試：`tests/run_world.gd` 加 `t_zones_travel`（安全區判斷、追怪唔出手、傳送落點、唔近傳送點唔生效）；全套 `run_tests.sh`（rules 201 + sim 37 + world 89 + market + autotest）ALL OK
 
-### Step 5 NPC agent 框架（規則版）← 下一步（未做）
-- 4.5 商店改用市場價；魅力折扣保留；`rules/market.ts` + 測試
-- 驗收：模擬 1000 日價格有界、天災後價格反應合理；商店買賣走市場價
+### 玩測反饋：手機操作 + 城內外分唔到 + 攻擊唔順手 ✅ 2026-09-22
+玩測(user)反映：地圖睇落好似一張(冇真係分城內外)、傳送冇手機掣(得鍵盤 G)、自動攻擊/攻擊感覺唔 work、未見到點用技能。查證：
+- `sim.gd` 邏輯本身冇問題（`cmd_attack`/`_think_player`/`_witness_nearby` 有齊測試，autotest 端到端殺怪都過）；問題出喺 UI 層：
+  - ✅ 城內/城外一直都有真實分區(`data/zones.json`)，但畫面冇視覺分別 — 加咗：城內石板色 vs 城外草地色 + 城牆邊界線（`ui/main.gd _draw`）
+  - ✅ 手機冇傳送掣（之前得鍵盤 `G`）— `mobile_hud.gd` 加 `travel_pressed` 掣，行近城門先顯示（右上背包掣下面）
+  - ✅ 點怪攻擊: 格仔 16px 好細，手指 tap 好易 miss 咗變咗「行去嗰格」— 加咗 `_mob_near_tap()` 容錯，tap 埋隔籬都算中最近嘅怪
+  - 技能/絕招: **未實裝，唔係 bug** — 依家 義士 職業表【原】本身 術法=無，絕招(大範圍多人)要打任務先攞到(攻略：飛鷹寶戟)，任務系統仲未做(Step 7+)；即係話依家淨係得基本近戰攻擊係符合設計嘅
+  - ✅ 2026-09-22（跟進反饋二）：城內設施之前全部擠喺 `y=10` 一列、相隔 2~4 格（NEAR=3 互動半徑會重疊），冇位交流。重新分佈喺城內四角：客棧(10,5)/武器店(20,5)/練兵場(5,14)/私塾(14,14)/寺廟(22,16)，互相相隔 ≥7 格，避開 y=20 嗰道牆同南門
+- 測試：全套 `run_tests.sh`（rules 201 + sim 100 + world 119 + market + autotest）ALL OK；UI/佈局改動冇對應 headless 測試(需要真機/編輯器目測)
 
-### Step 5 NPC agent 框架（規則版）
-- 5.1 bot 升級為居民：名字、理念、性格、日程、目標、Tier 分級
-- 5.2 **記憶表**（結構化：好感、事件、目擊）；目擊判定 + **傳聞擴散**（同城快、跨城慢）
-- 5.3 善惡→NPC 反應：買價、任務可得、衛兵態度；死亡掉落規則保留【原】
-- 5.4 `brain` 介面 + 規則/模板實作 + mock；行動白名單
-- 驗收：殺善 NPC → 目擊者好感下降 → 傳聞到鄰城 → 價格/態度變化（測試可重現）
+### Step 5 NPC agent 框架（規則版）✅ 2026-09-22（跨城傳聞/任務系統除外，見下）
+- 5.1 ✅ bot 升級為居民：派理念(五角，`BotSys.IDEOLOGIES`)、開記憶表；性格/日程/目標留待 Step 6 LLM 人格化
+- 5.2 ✅（同城內）**記憶表**（`rules/npc_memory.gd`：結構化好感 + 事件 CAP 12，clamp -100~100）+ 目擊判定（`sim._witness_nearby`，WITNESS_RANGE=8 格，打招呼/目擊殺怪觸發）。**跨城傳聞擴散未做**——現時單城單野區冇「跨城」可言，留返擴地圖(豫州+荊州多城)先做
+- 5.3 部分 ✅：
+  - 善惡→買價：`RulesKarma.price_factor`（中立或以上冇加成，罪犯起每階 +10%，殺人魔 +30%）接入 `cmd_buy`
+  - 善惡→居民反應：`_kill_mob` 目擊權重按殺怪者善惡階反轉（罪犯以上目擊殺怪變差評唔係讚賞）
+  - 任務可得性/衛兵態度：任務系統未做（Step 7+ 先有任務鏈），未到，留註
+  - 死亡掉落規則沿用【原】（Step 2.4 已做，冇變）
+- 5.4 ✅（規則版，離線後備本身）：`sim/npc_brain.gd` `NpcBrain.decide(ctx, pick_idx)` — 純函數，食「好感+善惡階」（規則層已結算），揀白名單動作(`greet/warn/ignore`)+ 生成一句話模板；`sim._npc_react` 接入 `cmd_chat`，用種子 RNG 揀句 → 決定性；UI `npc_say` 事件顯示喺日誌。Step 6 加 LLM 實作時只需換呢個介面嘅實作，sim.gd 唔使改。Mock 版留返 Step 6（依家未有網絡請求可 mock）
+- 測試：`tests/run_sim.gd` 加 `t_npc_memory`(6) `t_npc_witness`(6) `t_karma_price`(5) `t_npc_brain`(8) `t_npc_react_integration`(4)；sim scenarios 全套 64 項 PASS
+- 驗收：附近打招呼/目擊殺怪 → 好感值變化，出範圍唔目擊，存讀檔一致；殺人魔玩家打招呼 → 居民警戒非打招呼；買嘢貴 10~30%（可重現，全部有測試）
 
 ### Step 6 接 LLM
 - 6.1 `brain` 之 LLM 實作（OpenRouter，OpenAI 相容 API）：對話、每日反思、記憶摘要、傳聞措辭；輸出 JSON schema 驗證，非法丟棄重試
@@ -86,10 +97,16 @@ server(64×64 格、AOI、30 機械人、10Hz)、Godot 客戶端、`world.test.t
 - 驗收：無網絡/預算用完仍可玩；mock 測試覆蓋全部動作；LLM 唔可直接改數值（測試斷言）
 
 ### Step 7 生產與成長 (L2/L3)
-- 6 初階工作技能(農耕/狩獵/伐木/釣魚/採藥/採礦)、工具耐久、工作區
-- 50 級 4 進階（廚藝/木匠/冶鐵修繕/煉丹）、天地商行
-- 二轉(50 級)、專長、寶石屬性相剋、術法（第二職業起）、座騎/戰騎
-- 生產品接入市場（Step 4）
+- 7.1 ✅ 2026-09-22 6 初階工作技能(農耕/狩獵/伐木/釣魚/採藥/採礦)：`data/work.json`（工具+11/10/7 tier 材料，對應 `items.json` 既有分類：蔬果材/食材/木材/魚材/草藥材/礦石材料）+ `rules/work.gd`（解鎖 tier、機率、耐久、SP 消耗，全部【自訂】，攻略無數字）+ `sim.cmd_equip_tool`/`cmd_work`（10 級先做得【原】、要出城(唔安全區)、工具耐久用完要重裝）
+  - 未做：工作區「工作指標」入口(依家淨係判 `is_safe`)
+- ✅ 2026-09-22 補返 **Step 4.5 缺口**：`cmd_buy`/`cmd_sell` 之前一直冇真正讀 `market_factor()`（買賣價淨係用 `items.json` base price + 魅力折扣，動態市場模擬咗但冇接落商店，PLAN 之前錯誤標咗 4.5 ✅）。而家 `cmd_buy`/`cmd_sell` 都用 `data.prices.get(item) * market_factor(item)` 做基準價先過折扣/善惡加成，測試 `t_market_wired_to_shop` 驗證 pf=2.0 買貴、pf=0.5 賣平
+  - ✅ 2026-09-22 補埋剩餘缺口：`world.json market.cats` 加返 33(食材)/35(魚材)/36(草藥材)/37(木材)/38(蔬果材) 5 個分類(prod/demand/vol【自訂】，參考現有 32(礦石) 定調)，而家 6 種工作材料全部隨供需浮動；world 場景測試由 89 → 119(自動覆蓋新 cat)
+- 7.2 ✅ 2026-09-22 天地商行（輕版）：`sim.cmd_storage_sub/_deposit/_withdraw/_sell`，`ch.storage`(獨立倉庫) + `ch.storageSub`；`_daily_hook` 子時扣 200/日(`world.json.storageFee`)，唔夠錢自動退訂；代賣隨時隨地都得(唔使近商店)，賣價一樣用 `market_factor`。UI 綁 `Y`(訂閱切換)/`C`(存背包首格)/`V`(攞倉庫首格) — 純 debug 鍵，未有正式面板
+  - 未做：買賣工具嗰部分(已有 `cmd_buy`/`cmd_equip_tool` 頂替，冇再重做)；休息(已有 `cmd_rest` 頂替)
+- 7.3 ✅ 2026-09-22 **食用消耗品**（之前完全冇「用物品」指令，淨係買/賣/裝備）：`GameData` 由 `items.json` effect type 14(回復生命力)/16(回復靈力) 解析出 `data.heals`（item id → {hp,mp}），`sim.cmd_use_item` 食用背包物品回血/回魔（封頂 max_hp/max_mp，用完扣背包一件）。UI 綁 `U`(食背包首格，debug 鍵)。呢個機制係 7.4(廚藝/煉丹產出) 嘅前提，做埋先
+- 未做：50 級 4 進階（廚藝/木匠/冶鐵修繕/煉丹，產出可以直接用 7.3 個 `cmd_use_item` 機制）
+- 未做：二轉(50 級)、專長、寶石屬性相剋、術法（第二職業起）、座騎/戰騎
+- 測試：`tests/run_sim.gd` 加 `t_work_rules`(9) + `t_work_sim`(9) + `t_market_wired_to_shop`(5) + `t_storage`(11) + `t_use_item`(6)；sim scenarios 全套 100 項 PASS
 
 ### Step 8 理念 + 登用（輕版）+ 武將同伴
 - 理念測驗（五理念）→ 可登用武將範圍【原】

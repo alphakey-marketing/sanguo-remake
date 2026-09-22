@@ -10,6 +10,7 @@ signal event_emitted(ev: Dictionary)
 const W := 64
 const H := 64
 const NEAR := 3                                        # 設施互動距離(格)
+const WITNESS_RANGE := 8                               # NPC 目擊範圍(格) (Step 5.2)
 const DEFAULT_ZONE := "field_1"
 
 var data: GameData
@@ -160,6 +161,9 @@ func _sync_stats(e: Dictionary) -> void:
 func _spawn_actor(ename: String, kind: String) -> Dictionary:
 	var e := _new_ent(ename, kind, _pick_free(5, 5, 24, 16))
 	e["ch"] = RulesStats.create_character(data, ename.substr(0, 8), "yishi")
+	e["ch"]["tools"] = {}                     # skill -> {item, dur} (Step 7.1)
+	e["ch"]["storage"] = []                   # 天地商行倉庫 [{id,n}] (Step 7.2)
+	e["ch"]["storageSub"] = false             # 有冇訂閱天地商行 (200/日)
 	_sync_stats(e)
 	return e
 
@@ -173,7 +177,9 @@ func spawn_player(pname: String) -> int:
 func add_bots(n: int) -> void:
 	for i in n:
 		var nm: String = BotSys.NAMES[i % BotSys.NAMES.size()] + (str(i) if i >= BotSys.NAMES.size() else "")
-		state["bots"].append(int(_spawn_actor(nm, "bot")["id"]))
+		var e := _spawn_actor(nm, "bot")
+		BotSys.init_identity(e, rng)
+		state["bots"].append(int(e["id"]))
 
 
 func init_mobs() -> void:
@@ -312,8 +318,37 @@ func cmd_travel(id: int, point_id: String) -> void:
 func cmd_chat(id: int, text: String) -> void:
 	var e := ent(id)
 	text = text.strip_edges().substr(0, 60)
-	if not e.is_empty() and text != "":
-		_emit({"k": "chat", "id": id, "name": e["name"], "text": text, "x": e["x"], "y": e["y"]})
+	if e.is_empty() or text == "":
+		return
+	_emit({"k": "chat", "id": id, "name": e["name"], "text": text, "x": e["x"], "y": e["y"]})
+	_witness_nearby(e, id, "greet", BotSys.W_GREET)
+	_npc_react(e, id)
+
+
+# 居民對打招呼嘅反應 (Step 5.4): brain 淨係揀白名單動作 + 生成話語，數值(好感)已經由
+# _witness_nearby 結算好，brain 唔改任何數值
+func _npc_react(actor_e: Dictionary, actor_id: int) -> void:
+	var actor_ch: Dictionary = ent(actor_id).get("ch", {})
+	var karma_tier := RulesKarma.tier(int(actor_ch.get("karma", 0))) if not actor_ch.is_empty() else 3
+	for w in ents.values():
+		if int(w["id"]) == actor_id or not w.has("mem"):
+			continue
+		if not RulesCombat.in_range(actor_e["x"], actor_e["y"], w["x"], w["y"], WITNESS_RANGE):
+			continue
+		var ctx := {"actor_name": actor_e.get("name", ""), "affinity": NpcMemory.affinity(w["mem"], actor_id), "karma_tier": karma_tier}
+		var res := NpcBrain.decide(ctx, rng.below(4))
+		if res["action"] == "ignore":
+			continue
+		_emit({"k": "npc_say", "id": w["id"], "name": w["name"], "text": res["line"], "action": res["action"], "x": w["x"], "y": w["y"]})
+
+
+# 目擊/傳聞入口 (Step 5.2): actor_id 做咗一件事，附近有記憶表嘅 NPC (bot) 記低 + 調好感
+func _witness_nearby(actor_e: Dictionary, actor_id: int, kind: String, weight: int) -> void:
+	for w in ents.values():
+		if int(w["id"]) == actor_id or not w.has("mem"):
+			continue
+		if RulesCombat.in_range(actor_e["x"], actor_e["y"], w["x"], w["y"], WITNESS_RANGE):
+			NpcMemory.witness(w["mem"], actor_id, kind, tick, weight)
 
 
 func _near(e: Dictionary, x: int, y: int) -> bool:
@@ -362,7 +397,7 @@ func cmd_buy(id: int, item: int, n: int = 1) -> void:
 	if not stock.has(item) and not stock.has(float(item)):
 		return _msg(id, "呢間店唔賣呢件")
 	var ch: Dictionary = e["ch"]
-	var cost := RulesShop.buy_price(data.prices.get(item, 0.0), ch["attrs"]["cha"]) * n
+	var cost := RulesShop.buy_price(data.prices.get(item, 0.0) * market_factor(item), ch["attrs"]["cha"], int(ch["karma"])) * n
 	if int(ch["gold"]) < cost:
 		return _msg(id, "金錢不足，要 %d" % cost)
 	ch["gold"] = int(ch["gold"]) - cost
@@ -386,9 +421,137 @@ func cmd_sell(id: int, item: int, n: int = 1) -> void:
 		return _msg(id, "裝備中，唔可以賣")
 	if not RulesShop.remove_item(ch["bag"], item, n):
 		return _msg(id, "背包冇咁多")
-	var gain := RulesShop.sell_price(data.prices.get(item, 0.0)) * n
+	var gain := RulesShop.sell_price(data.prices.get(item, 0.0) * market_factor(item)) * n
 	ch["gold"] = int(ch["gold"]) + gain
 	_msg(id, "賣出 %d 件，得 %d 金" % [n, gain])
+
+
+# 食用/飲用消耗品【原=食物藥水回 HP、藥丸散回 MP；自訂=冇食用次數限制，用完即扣背包一件】
+func cmd_use_item(id: int, item: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var heal: Dictionary = data.heals.get(item, {})
+	if heal.is_empty():
+		return _msg(id, "呢件唔可以食用")
+	var ch: Dictionary = e["ch"]
+	if not RulesShop.remove_item(ch["bag"], item, 1):
+		return _msg(id, "背包冇呢件")
+	var mhp := RulesStats.max_hp(int(ch["level"]), ch["attrs"])
+	var mmp := RulesStats.max_mp(int(ch["level"]), ch["attrs"])
+	var gained_hp := mini(int(heal.get("hp", 0)), mhp - int(ch["hp"]))
+	var gained_mp := mini(int(heal.get("mp", 0)), mmp - int(ch["mp"]))
+	ch["hp"] = int(ch["hp"]) + maxi(0, gained_hp)
+	ch["mp"] = int(ch["mp"]) + maxi(0, gained_mp)
+	_sync_stats(e)
+	_msg(id, "用咗 %s，回 %d HP %d MP" % [data.names.get(item, str(item)), maxi(0, gained_hp), maxi(0, gained_mp)])
+
+
+# ================= 天地商行 (Step 7.2)【原=功能：代買賣/存材料/買賣工具/休息；自訂=費用扣法已在 4.5 有嘅市場價/日費】=================
+# 依家做「代買賣 + 存材料」；休息/買賣工具已有 cmd_rest/cmd_buy 頂替，唔使再重做一套
+
+func cmd_storage_sub(id: int, on: bool) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return
+	e["ch"]["storageSub"] = on
+	_msg(id, "訂閱天地商行" if on else "退訂天地商行")
+
+
+func cmd_storage_deposit(id: int, item: int, n: int = 1) -> void:
+	var e := ent(id)
+	n = mini(99, n)
+	if e.is_empty() or not e.has("ch") or n < 1:
+		return
+	var ch: Dictionary = e["ch"]
+	if not bool(ch.get("storageSub", false)):
+		return _msg(id, "要先訂閱天地商行")
+	if not RulesShop.remove_item(ch["bag"], item, n):
+		return _msg(id, "背包冇咁多")
+	RulesShop.add_item(ch["storage"], item, n)
+	_msg(id, "存咗 %d 件入天地商行" % n)
+
+
+func cmd_storage_withdraw(id: int, item: int, n: int = 1) -> void:
+	var e := ent(id)
+	n = mini(99, n)
+	if e.is_empty() or not e.has("ch") or n < 1:
+		return
+	var ch: Dictionary = e["ch"]
+	if not bool(ch.get("storageSub", false)):
+		return _msg(id, "要先訂閱天地商行")
+	if not RulesShop.remove_item(ch["storage"], item, n):
+		return _msg(id, "倉庫冇咁多")
+	RulesShop.add_item(ch["bag"], item, n)
+	_msg(id, "由天地商行攞返 %d 件" % n)
+
+
+# 代買賣: 隨時隨地都可以賣 (唔使喺商店附近)，用市場價
+func cmd_storage_sell(id: int, item: int, n: int = 1) -> void:
+	var e := ent(id)
+	n = mini(99, n)
+	if e.is_empty() or not e.has("ch") or n < 1:
+		return
+	var ch: Dictionary = e["ch"]
+	if not bool(ch.get("storageSub", false)):
+		return _msg(id, "要先訂閱天地商行")
+	if not RulesShop.remove_item(ch["bag"], item, n):
+		return _msg(id, "背包冇咁多")
+	var gain := RulesShop.sell_price(data.prices.get(item, 0.0) * market_factor(item)) * n
+	ch["gold"] = int(ch["gold"]) + gain
+	_msg(id, "天地商行代賣 %d 件，得 %d 金" % [n, gain])
+
+
+# ================= 工作技能 (Step 7.1) =================
+const WORK_MIN_LEVEL := 10                                # 【原】10 級可做初階工作技能
+
+# 裝備工具: 背包要有呢件工具，裝上即扣 1 件、開耐久 (starterTool 或 tool 都得)
+func cmd_equip_tool(id: int, skill: String, item: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return
+	var sk: Dictionary = data.work.get(skill, {})
+	if sk.is_empty() or (int(sk["tool"]) != item and int(sk["starterTool"]) != item):
+		return _msg(id, "呢件唔係%s工具" % sk.get("name", skill))
+	var ch: Dictionary = e["ch"]
+	if not RulesShop.remove_item(ch["bag"], item, 1):
+		return _msg(id, "背包冇呢件工具")
+	var dur: int = int(data.work_meta.get("toolDurability", {}).get("starter" if int(sk["starterTool"]) == item else "normal", 50))
+	ch["tools"][skill] = {"item": item, "dur": dur}
+	_msg(id, "裝備咗%s（耐久 %d）" % [data.names.get(item, str(item)), dur])
+
+
+func cmd_work(id: int, skill: String) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var sk: Dictionary = data.work.get(skill, {})
+	if sk.is_empty():
+		return _msg(id, "冇呢種工作")
+	var ch: Dictionary = e["ch"]
+	if int(ch["level"]) < WORK_MIN_LEVEL:
+		return _msg(id, "要 %d 級先做得工作技能" % WORK_MIN_LEVEL)
+	if is_safe(int(e["x"]), int(e["y"])):
+		return _msg(id, "城內冇得工作，要出城")
+	var tool: Dictionary = ch["tools"].get(skill, {})
+	if tool.is_empty() or int(tool["dur"]) <= 0:
+		return _msg(id, "要裝備%s工具先" % sk["name"])
+	var msp := RulesStats.max_sp(int(ch["level"]), ch["attrs"])
+	var cost := RulesWork.sp_cost(msp)
+	if int(ch["sp"]) < cost:
+		return _msg(id, "體力不足 (要 %d SP)" % cost)
+	ch["sp"] = int(ch["sp"]) - cost
+	var materials: Array = sk["materials"]
+	var unlocked := RulesWork.unlocked_tiers(int(ch["level"]), sk["unlockLv"])
+	var tier := RulesWork.roll_tier(unlocked, rng_fn)
+	var item := int(materials[tier])
+	RulesShop.add_item(ch["bag"], item, 1)
+	tool["dur"] = RulesWork.durability_after_use(int(tool["dur"]))
+	var broke := int(tool["dur"]) <= 0
+	if broke:
+		ch["tools"].erase(skill)
+	_emit({"k": "work", "id": id, "skill": skill, "item": item, "spCost": cost, "toolBroke": broke})
+	_msg(id, "%s: 得到 %s%s" % [sk["name"], data.names.get(item, str(item)), "（工具用爛咗）" if broke else ""])
 
 
 # ================= 戰鬥 =================
@@ -409,6 +572,9 @@ func damage(t: Dictionary, dmg: int, by: Dictionary) -> void:
 
 func _kill_mob(m: Dictionary, by: Dictionary) -> void:
 	var d: Dictionary = data.monsters[int(m["mob"]["def"])]
+	if by.has("ch"):
+		var w := BotSys.W_SEE_KILL if RulesKarma.tier(int(by["ch"]["karma"])) < 5 else -BotSys.W_SEE_KILL
+		_witness_nearby(m, int(by["id"]), "see_kill", w)
 	ents.erase(m["id"])
 	var delay := 200
 	var zone_id := DEFAULT_ZONE
@@ -568,9 +734,27 @@ func _daily_hook(day: int) -> void:
 			disas.append(d)
 			changed.append(d)
 	_market_daily(season)
+	_storage_daily()
 	_emit({"k": "day", "day": day, "season": season})
 	for d in changed:
 		_emit({"k": "disaster", "name": d["name"], "city": d["city"], "size": d["size"]})
+
+
+# 天地商行【原】: 子時扣 200/日；唔夠錢自動退訂
+func _storage_daily() -> void:
+	var cost := int(data.world.get("storageFee", 200))
+	for e in ents.values():
+		if not e.has("ch"):
+			continue
+		var ch: Dictionary = e["ch"]
+		if not bool(ch.get("storageSub", false)):
+			continue
+		if int(ch["gold"]) < cost:
+			ch["storageSub"] = false
+			_msg(int(e["id"]), "天地商行費唔夠錢，自動退訂")
+			continue
+		ch["gold"] = int(ch["gold"]) - cost
+		_msg(int(e["id"]), "天地商行扣 %d 金" % cost)
 
 
 func _market_daily(season: int) -> void:

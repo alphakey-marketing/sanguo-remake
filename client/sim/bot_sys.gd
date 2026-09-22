@@ -1,10 +1,21 @@
 class_name BotSys
 extends RefCounted
-# 機械人: 有角色，會去野區打怪、血低返客棧休息、間中講嘢。供新手練兵場頂替組隊。
-# (Step 5 會升級成 NPC agent)
+# 居民 NPC (Step 5.1 升級自機械人): 有角色、理念、記憶表，會去野區打怪、血低返客棧休息、間中講嘢。
+# Tier3(路人) 用純規則行動；理念/記憶為 Step 6 LLM 層鋪路，今步只由規則寫入/讀出。
 
 const NAMES := ["黃權", "張繡", "趙雲", "關平", "周倉", "徐庶", "龐統", "法正", "馬岱", "王平", "姜維", "魏延"]
 const LINES := ["有冇人組隊?", "呢度啲怪好肥", "小心野豬", "我去練功", "升級喇!", "客棧休息好抵", "有刀賣未?", "三國萬歲"]
+const IDEOLOGIES := ["義理", "霸權", "權謀", "隱遁", "治國"]         # 【原】五角理念關係，Step 8 登用會用到
+
+# 目擊/交流權重【自訂】: 幾件初步事件先，Step 5.3 先接善惡反應
+const W_GREET := 2            # 玩家打招呼 (chat 喺附近)
+const W_SEE_KILL := 1         # 目擊玩家打怪 (中性偏正面，佩服)
+
+
+# 新居民入場: 派理念 + 開一張記憶表 (供 sim.add_bots 用)
+static func init_identity(e: Dictionary, rng: SimRng) -> void:
+	e["ch"]["ideology"] = IDEOLOGIES[rng.below(IDEOLOGIES.size())]
+	e["mem"] = NpcMemory.init_memory()
 
 
 static func think(sim) -> void:

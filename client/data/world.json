@@ -12,6 +12,7 @@
     "endKe": 24
   },
   "homeCity": "xuchang",
+  "storageFee": 200,
   "cities": [
     {
       "id": "xuchang",
@@ -90,6 +91,36 @@
         "prod": 2,
         "demand": 2,
         "vol": 50
+      },
+      "33": {
+        "name": "食材",
+        "prod": 16,
+        "demand": 16,
+        "vol": 220
+      },
+      "35": {
+        "name": "魚材",
+        "prod": 12,
+        "demand": 12,
+        "vol": 180
+      },
+      "36": {
+        "name": "草藥材",
+        "prod": 10,
+        "demand": 10,
+        "vol": 160
+      },
+      "37": {
+        "name": "木材",
+        "prod": 16,
+        "demand": 16,
+        "vol": 220
+      },
+      "38": {
+        "name": "蔬果材",
+        "prod": 18,
+        "demand": 18,
+        "vol": 240
       }
     },
     "seasonSupply": {
