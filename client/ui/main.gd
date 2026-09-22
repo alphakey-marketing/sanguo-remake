@@ -93,6 +93,7 @@ func _ready() -> void:
 	hud.travel_pressed.connect(func():
 		var tp := _near_travel()
 		if not tp.is_empty(): _send({"t": "travel", "point": String(tp["point"])}))
+	hud.debug_pressed.connect(_on_debug_pressed)
 	for a in OS.get_cmdline_user_args():
 		if a == "--sshot":
 			sshot_file = "user://sshot_ui.png"
@@ -160,6 +161,7 @@ func _send(d: Dictionary) -> void:
 		"storage_withdraw": sim.cmd_storage_withdraw(my_id, int(d.item), int(d.get("n", 1)))
 		"storage_sell": sim.cmd_storage_sell(my_id, int(d.item), int(d.get("n", 1)))
 		"use_item": sim.cmd_use_item(my_id, int(d.item))
+		"debug_give": sim.cmd_debug_give(my_id, int(d.item), int(d.get("n", 1)))
 
 func _log(s: String) -> void:
 	log_lines.append(s)
@@ -514,6 +516,31 @@ func _ent_at(g: Vector2):
 		if int(e.x) == int(g.x) and int(e.y) == int(g.y): return e
 	return null
 
+# 手機冇鍵盤，呢個俾 mobile_hud debug 掣 + 桌面鍵盤共用 (Step 5~7 未有正式面板嘅功能)
+func _on_debug_pressed(action: String) -> void:
+	match action:
+		"greet": _send({"t": "chat", "text": "大家好"})
+		"use":
+			if not ch.is_empty():
+				var food := 29054                            # debug: 燻魚(回 HP)，唔理背包原本有咩，直接派一件試食
+				_send({"t": "debug_give", "item": food, "n": 1})
+				_send({"t": "use_item", "item": food})
+		"storage_sub": _send({"t": "storage_sub", "on": not bool(ch.get("storageSub", false))})
+		"deposit":
+			if not ch.is_empty() and ch.bag.size() > 0:
+				_send({"t": "storage_deposit", "item": int(ch.bag[0].id), "n": 1})
+		"withdraw":
+			if not ch.is_empty() and ch.storage.size() > 0:
+				_send({"t": "storage_withdraw", "item": int(ch.storage[0].id), "n": 1})
+		"work_mining":
+			var sk: Dictionary = data.work.get("mining", {})
+			if not sk.is_empty() and (ch.get("tools", {}) as Dictionary).get("mining", {}).is_empty():
+				var tool := int(sk["starterTool"])          # debug: 冇工具就直接派新手工具落背包再裝備
+				_send({"t": "debug_give", "item": tool, "n": 1})
+				_send({"t": "equip_tool", "skill": "mining", "item": tool})
+			_send({"t": "work", "skill": "mining"})
+
+
 func _unhandled_input(ev: InputEvent) -> void:
 	if Input.is_emulating_mouse_from_touch():
 		# Android: 觸控事件直接做世界點擊（emulate 出嚟嘅 mouse 事件忽略，避免雙重處理）
@@ -525,7 +552,7 @@ func _unhandled_input(ev: InputEvent) -> void:
 		elif ev.keycode == KEY_R: _send({"t": "rest"})                                   # 客棧休息
 		elif ev.keycode == KEY_X and not ch.is_empty() and ch.bag.size() > 0:          # 賣背包第一格
 			_send({"t": "sell", "item": int(ch.bag[0].id), "n": 1})
-		elif ev.keycode == KEY_H: _send({"t": "chat", "text": "大家好"})
+		elif ev.keycode == KEY_H: _on_debug_pressed("greet")
 		elif ev.keycode == KEY_G:
 			var tp = _near_travel()
 			if not tp.is_empty(): _send({"t": "travel", "point": String(tp["point"])})
@@ -534,15 +561,11 @@ func _unhandled_input(ev: InputEvent) -> void:
 		elif ev.keycode == KEY_M: _send({"t": "facility", "key": "temple"})
 		elif ev.keycode >= KEY_1 and ev.keycode <= KEY_9 and ev.keycode - KEY_1 < shop_stock.size():
 			_send({"t": "buy", "item": int(shop_stock[ev.keycode - KEY_1]), "n": 1})
-		elif ev.keycode == KEY_W: _send({"t": "work", "skill": "mining"})                # debug: 淨試採礦，未有技能揀選 UI
-		elif ev.keycode == KEY_Y:
-			_send({"t": "storage_sub", "on": not bool(ch.get("storageSub", false))})
-		elif ev.keycode == KEY_C and not ch.is_empty() and ch.bag.size() > 0:            # 存背包第一格入天地商行
-			_send({"t": "storage_deposit", "item": int(ch.bag[0].id), "n": 1})
-		elif ev.keycode == KEY_V and not ch.is_empty() and ch.storage.size() > 0:        # 由天地商行攞返第一格
-			_send({"t": "storage_withdraw", "item": int(ch.storage[0].id), "n": 1})
-		elif ev.keycode == KEY_U and not ch.is_empty() and ch.bag.size() > 0:            # 食用背包第一格 (如果食得)
-			_send({"t": "use_item", "item": int(ch.bag[0].id)})
+		elif ev.keycode == KEY_W: _on_debug_pressed("work_mining")
+		elif ev.keycode == KEY_Y: _on_debug_pressed("storage_sub")
+		elif ev.keycode == KEY_C: _on_debug_pressed("deposit")
+		elif ev.keycode == KEY_V: _on_debug_pressed("withdraw")
+		elif ev.keycode == KEY_U: _on_debug_pressed("use")
 	elif ev is InputEventMouseButton and ev.pressed:
 		if ev.button_index == MOUSE_BUTTON_LEFT:
 			_hud_tap(ev.position)

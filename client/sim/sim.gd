@@ -426,6 +426,14 @@ func cmd_sell(id: int, item: int, n: int = 1) -> void:
 	_msg(id, "賣出 %d 件，得 %d 金" % [n, gain])
 
 
+# debug 用: 直接派物品落背包 (未有商店/任務可以攞到嘅嘢，方便手機冇鍵盤都測到成條流程；成品前移除)
+func cmd_debug_give(id: int, item: int, n: int = 1) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return
+	RulesShop.add_item(e["ch"]["bag"], item, n)
+
+
 # 食用/飲用消耗品【原=食物藥水回 HP、藥丸散回 MP；自訂=冇食用次數限制，用完即扣背包一件】
 func cmd_use_item(id: int, item: int) -> void:
 	var e := ent(id)

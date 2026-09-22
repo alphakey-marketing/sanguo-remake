@@ -10,6 +10,7 @@ signal attack_pressed
 signal auto_toggled(on: bool)
 signal bag_pressed
 signal travel_pressed
+signal debug_pressed(action: String)      # 手機冇鍵盤，用呢排掣代替 H/U/Y/C/V/W debug 鍵
 
 var main: Node2D           # 引用 main.gd: 讀 ch/ents/faces/log_lines，用 _bar/_txt 畫
 var joy: SangoJoystick
@@ -88,6 +89,20 @@ func _travel_rect() -> Rect2:
 func _near_travel_point() -> Dictionary:
 	return main.call("_near_travel") if main != null else {}
 
+# 手機冇鍵盤，臨時 debug 掣 (未有正式面板嘅工作/天地商行/食物/打招呼)，成品前會換走
+const DEBUG_ACTIONS := [
+	{"action": "greet", "label": "問好"},
+	{"action": "use", "label": "食嘢"},
+	{"action": "storage_sub", "label": "商行"},
+	{"action": "deposit", "label": "存倉"},
+	{"action": "withdraw", "label": "攞倉"},
+	{"action": "work_mining", "label": "採礦"},
+]
+
+# 一橫排放喺狀態框右邊、傳送/背包掣下面嘅空位，避開左下搖桿區(觸控 zone 由 s.y*0.38 開始)
+func _debug_rect(i: int) -> Rect2:
+	return Rect2(256 + i * 47, 8, 44, 26)
+
 func _button_hit(pos: Vector2) -> bool:
 	if _attack_rect().has_point(pos):
 		attack_pressed.emit()
@@ -103,6 +118,10 @@ func _button_hit(pos: Vector2) -> bool:
 	if not _near_travel_point().is_empty() and _travel_rect().has_point(pos):
 		travel_pressed.emit()
 		return true
+	for i in DEBUG_ACTIONS.size():
+		if _debug_rect(i).has_point(pos):
+			debug_pressed.emit(String(DEBUG_ACTIONS[i]["action"]))
+			return true
 	return false
 
 # ================= 繪畫 =================
@@ -113,6 +132,7 @@ func _draw() -> void:
 	_draw_status()
 	_draw_target(s)
 	_draw_btns(s)
+	_draw_debug_strip()
 	_draw_log(s)
 	if _t < 12.0:                       # 開場提示，12 秒後淡出
 		_txt(Vector2(8, s.y - 12), "拖左下移動 · 點怪攻擊 · 點地行路 · 自動=掛機", Color(1, 1, 1, 0.55), 10)
@@ -185,6 +205,14 @@ func _draw_btns(s: Vector2) -> void:
 		draw_rect(tr, Color(1, 1, 1, 0.8), false, 1.5)
 		_txt(Vector2(tr.position.x + 10, tr.position.y + 16), "傳送", Color.WHITE, 13)
 		_txt(Vector2(tr.position.x + 10, tr.position.y + 32), String(tp.get("name", "")).substr(0, 8), Color(0.9, 1, 0.9), 9)
+
+# 手機 debug 掣: 未有正式面板嗰啲功能(工作/天地商行/食物/打招呼)臨時用嚟測試，成品前換走
+func _draw_debug_strip() -> void:
+	for i in DEBUG_ACTIONS.size():
+		var r := _debug_rect(i)
+		draw_rect(r, Color(0.1, 0.1, 0.15, 0.75))
+		draw_rect(r, Color(1, 1, 1, 0.4), false, 1.0)
+		_txt(r.position + Vector2(6, 17), String(DEBUG_ACTIONS[i]["label"]), Color(0.9, 0.9, 1.0), 11)
 
 # 底部日誌（最後 3 行）
 func _draw_log(s: Vector2) -> void:
