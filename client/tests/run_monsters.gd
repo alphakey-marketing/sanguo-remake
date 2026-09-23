@@ -12,6 +12,7 @@ func _init() -> void:
 	t_monster_count(data)
 	t_item_ids(data)
 	t_spawn_zones(data)
+	t_gate_newbie(data)
 	t_cave_geometry(data)
 	t_flee_negative(data)
 	t_group_aggro(data)
@@ -401,3 +402,29 @@ func t_cave_shop(data: GameData) -> void:
 	var s := sim.save_string()
 	var loaded := Sim.load_string(data, s)
 	check(loaded != null and loaded.save_string() == s, "洞窟商店: 買賣後存讀檔一致")
+
+
+# 北門 (27,27) 新手友善: spawn area 喺 zone 入面；門口 6 格內只有 Lv≤3、18 格內冇 Lv11+ (重生都係)
+func t_gate_newbie(data: GameData) -> void:
+	for sp in data.spawns:
+		if not sp.has("area"):
+			continue
+		var z: Dictionary = {}
+		for zz in data.zones:
+			if String(zz["id"]) == String(sp.get("zone", "field_1")):
+				z = zz
+		var a: Array = sp["area"]
+		check(int(a[0]) >= int(z["x0"]) and int(a[1]) >= int(z["y0"]) and int(a[2]) <= int(z["x1"]) and int(a[3]) <= int(z["y1"]),
+			"北門: spawn area 喺 zone 入面 (%s)" % sp["monster"])
+	for seed in [1, 2, 3]:
+		var sim := Sim.new(data, seed)
+		sim.init_mobs()
+		for e in sim.ents.values():
+			if e["kind"] != "mob":
+				continue
+			var dg := maxi(absi(int(e["x"]) - 27), absi(int(e["y"]) - 27))
+			check((dg > 6 or int(e["level"]) <= 3) and (dg > 18 or int(e["level"]) <= 9), "北門: 門口附近冇高等怪 (%s Lv%d @%d,%d)" % [e["name"], int(e["level"]), int(e["x"]), int(e["y"])])
+		# 重生都守 area
+		for i in 20:
+			var m: Variant = sim._spawn_mob(11070, "field_1")
+			check(m != null and int(m["x"]) >= 46 and int(m["y"]) >= 48, "北門: 重生 Lv30 喺遠角")

@@ -269,7 +269,14 @@ func _spawn_mob(def_id: int, zone_id: String = DEFAULT_ZONE) -> Variant:
 	if d.get("night", false) and not _clock().is_night:
 		return null                     # 夜怪白天唔生
 	var z := zone_by_id(zone_id)
-	var p := _pick_free(int(z["x0"]), int(z["y0"]), int(z["x1"]), int(z["y1"]))
+	var r := [int(z["x0"]), int(z["y0"]), int(z["x1"]), int(z["y1"])]
+	# spawn 可選 area [x0,y0,x1,y1]: 限喺 zone 入面一塊 (例如北門附近只出低等怪)
+	for sp in data.spawns:
+		if int(sp["monster"]) == def_id and String(sp.get("zone", DEFAULT_ZONE)) == zone_id and sp.has("area"):
+			var a: Array = sp["area"]
+			r = [int(a[0]), int(a[1]), int(a[2]), int(a[3])]
+			break
+	var p := _pick_free(r[0], r[1], r[2], r[3])
 	var e := _new_ent(String(d["name"]), "mob", p)
 	e["face"] = 0
 	e["hp"] = int(d["hp"])

@@ -534,7 +534,7 @@ func _hud_attack() -> void:
 	var me = _me()
 	if me == null:
 		return
-	var near = _nearest_mob_safe(me)
+	var near = _pick_mob(me, false)            # 手動: 就咁打最近
 	if near != null:
 		target_id = int(near.id)
 		_send({"t": "attack", "target": target_id})
@@ -579,9 +579,13 @@ func _auto_tick() -> void:
 	if me == null:
 		return
 	var t = target_ent()
-	if t != null and t.get("mob", false):
-		return                                  # sim 自己追梗
 	var near = _nearest_mob_safe(me)
+	if t != null and t.get("mob", false):
+		# 貼身 / 打緊我 → 繼續打；否則有更近嘅就轉 (例如目標逃走咗)
+		if _mob_dist(me, t) <= 1 or int(t.get("aggro", 0)) == int(me.id):
+			return
+		if near == null or int(near.id) == target_id or _mob_dist(me, near) >= _mob_dist(me, t):
+			return                              # sim 自己追梗
 	if near != null:
 		target_id = int(near.id)
 		_send({"t": "attack", "target": target_id})
@@ -590,18 +594,33 @@ func _auto_tick() -> void:
 		_send({"t": "move", "x": 30 + (int(sim.tick) / 60) % 9, "y": 35})
 
 func _nearest_mob_safe(me: Dictionary):
+	return _pick_mob(me, true)
+
+# 揀怪: 只揀同自己同一 zone (洞窟各層座標同野外相鄰，唔可以隔層鎖)；
+# 打緊我嘅怪優先 (唔理等級)；其次最近 (Chebyshev = 實際步數，同距離再比 Manhattan)
+# safe_only: 跳過高自己兩級以上嘅怪 (掛機用)
+func _pick_mob(me: Dictionary, safe_only: bool):
+	var my_zone := str(sim.zone_view(int(me.x), int(me.y)).get("id", ""))
 	var best = null
 	var bd := 1e9
 	for e in ents:
-		if not e.get("mob", false):
+		if not e.get("mob", false) or int(e.hp) <= 0:
 			continue
-		if int(e.level) > int(ch.level) + 1:
-			continue                            # 唔打高自己兩級以上嘅怪
-		var dist: float = absf(e.x - me.x) + absf(e.y - me.y)
+		if str(sim.zone_view(int(e.x), int(e.y)).get("id", "")) != my_zone:
+			continue
+		var attacking := int(e.get("aggro", 0)) == int(me.id)
+		if safe_only and not attacking and int(e.level) > int(ch.level) + 1:
+			continue                            # 唔主動打高自己兩級以上嘅怪
+		var dist: float = _mob_dist(me, e) * 1000.0 + absf(e.x - me.x) + absf(e.y - me.y)
+		if attacking:
+			dist -= 1e6                         # 反擊優先
 		if dist < bd:
 			bd = dist
 			best = e
 	return best
+
+func _mob_dist(a: Dictionary, b: Dictionary) -> int:
+	return maxi(absi(int(a.x) - int(b.x)), absi(int(a.y) - int(b.y)))
 
 func _ent(id: int):
 	for e in ents:
