@@ -37,7 +37,7 @@
 - Windows Python 睇唔到 `/tmp`，暫存用 scratchpad
 
 ## 素材規則（重要）
-`client/assets_placeholder/` = 原版素材，**僅私人本地測試，唔公開、唔分發、唔入 git**（已 .gitignore）。引用一律經 `res://assets_placeholder/`。成品前全部換走。角色暫用頭像、怪物色塊。
+`client/assets_placeholder/` = 佔位素材（placeholder，**唔係原版素材**），唔入 git（已 .gitignore）。引用一律經 `res://assets_placeholder/`。成品前全部換走。角色暫用頭像、怪物色塊。APK / web 匯出包含佢冇問題。
 
 ## 工作方式
 - 邏輯先、UI 後：規格 → `rules/*.ts` + 測試 → 無畫面模擬 → 最簡 debug UI → 試玩 → 穩定後美化
