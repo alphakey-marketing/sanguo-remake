@@ -102,6 +102,24 @@ func put(x: int, y: int) -> void:
 	m._refresh()
 
 
+# 武器店 / 客棧 門口 (全域座標, 由 data 讀)
+func shop_pos() -> Vector2i:
+	for sh in m.data.shops:
+		if String(sh["id"]) == "weapon":
+			return Vector2i(int(sh["x"]), int(sh["y"]))
+	return Vector2i.ZERO
+
+
+# 離 c 至少 dmin 格、最近嘅行得格
+func free_away(c: Vector2i, dmin: int) -> Vector2i:
+	for r in range(dmin, dmin + 6):
+		for dy in range(-r, r + 1):
+			for dx in range(-r, r + 1):
+				if maxi(absi(dx), absi(dy)) == r and m.sim.is_free(c.x + dx, c.y + dy):
+					return Vector2i(c.x + dx, c.y + dy)
+	return c
+
+
 func _run() -> void:
 	await frames(3)
 	hud = m.hud
@@ -133,7 +151,8 @@ func _run() -> void:
 	check(int(ch["attrs"]["str"]) == str0 + 1 and int(ch["attrPoints"]) == 1, "確認分配後武力 +1 (而家 %d)" % int(ch["attrs"]["str"]))
 	hud.close_panels()
 	# 4. 行近武器店 → 互動掣 = 商店 → 揀貨 → 確認買入
-	put(20, 7)
+	var sp0 := shop_pos()
+	put(sp0.x, sp0.y + 1)
 	check(await until(func() -> bool: return String(hud.ctx.get("kind", "")) == "shop"), "近武器店互動掣應該係商店 (%s)" % hud.ctx)
 	await click(center("context"))
 	var sp: GamePanel = hud.panels.get("shop")
@@ -160,7 +179,7 @@ func _run() -> void:
 	check(int(ch["equip"]["weapon"]) == 10001, "背包撳裝備武器應該裝上")
 	hud.close_panels()
 	# 6. 客棧對話框: 休息扣錢
-	put(10, 6)
+	put(m.sim.inn_pos.x, m.sim.inn_pos.y + 1)
 	check(await until(func() -> bool: return String(hud.ctx.get("kind", "")) == "inn"), "近客棧互動掣應該係客棧 (%s)" % hud.ctx)
 	await click(center("context"))
 	var dp: GamePanel = hud.panels.get("dialog")
@@ -208,9 +227,10 @@ func _run() -> void:
 	await frames(1)
 	check(not hud.joy_active(), "放手搖桿應該停")
 	# 10. 點遠處設施 → 自動行過去 → 到咗開面板
-	put(20, 14)
+	var far := free_away(sp0, 7)
+	put(far.x, far.y)
 	await frames(2)
-	var shop_screen: Vector2 = Vector2(20, 5) * m.TILE + Vector2(m.TILE, m.TILE) * 0.5 - m.cam
+	var shop_screen: Vector2 = Vector2(sp0) * m.TILE + Vector2(m.TILE, m.TILE) * 0.5 - m.cam
 	await click(shop_screen)
 	check(not m.pending.is_empty(), "點遠處商店應該記住 pending 行過去")
 	check(await until(func() -> bool: return hud.panels.has("shop") and hud.panels["shop"].visible, 15.0), "行到商店應該自動開商店面板")

@@ -180,28 +180,22 @@ func t_spawn_zones(data: GameData) -> void:
 
 func t_cave_geometry(data: GameData) -> void:
 	var sim := Sim.new(data, 1)
-	check(not sim.is_free(15, 20), "牆: 舊城內牆 (15,20) 保留")
-	check(not sim.is_free(61, 30), "牆: 洞窟左封 x=61")
-	check(not sim.is_free(92, 5), "牆: 欄間 x=92")
-	check(not sim.is_free(62, 0), "牆: 頂行 y=0")
-	check(sim.is_free(62, 1), "牆: 第一層 room 內可用")
-	check(sim.is_free(64, 3), "牆: 洞口到達點可用")
-	check(sim.is_free(58, 44), "牆: 野外山洞入口可用")
-	# 每層 zone 內唔好有 blockers (房間要行到)
+	# 每層 = 獨立地圖: 四邊岩壁、行得格 > 200、同隔籬層唔相連 (spec 12 §2)
 	for f in range(1, 11):
 		var z := sim.zone_by_id("runan_f%d" % f)
+		check(not z.is_empty(), "洞窟 %dF: zone 存在" % f)
+		check(not sim.is_free(int(z["x0"]), int(z["y0"])) and not sim.is_free(int(z["x1"]), int(z["y1"])), "洞窟 %dF: 角位係岩壁" % f)
+		check(not sim.is_free(int(z["x1"]) + 1, int(z["y0"]) + 5), "洞窟 %dF: 地圖外 = 虛空" % f)
 		var walk := 0
 		for x in range(int(z["x0"]), int(z["x1"]) + 1):
 			for y in range(int(z["y0"]), int(z["y1"]) + 1):
 				if sim.is_free(x, y):
 					walk += 1
 		check(walk > 200, "洞窟 %dF: 可步行格 > 200 (實際 %d)" % [f, walk])
-	# 傳送點都喺自己 zone 入面
+	# 傳送點都喺自己地圖入面 + 可企
 	for p in data.travel_points:
-		if not String(p["id"]).begins_with("runan") and p["id"] not in ["cave_enter", "cave_f1"]:
-			continue
 		var zv := sim.zone_view(int(p["x"]), int(p["y"]))
-		check(not zv.is_empty(), "傳送點 %s 喺 zone 內" % p["id"])
+		check(String(zv.get("id", "")) == String(p["map"]), "傳送點 %s 喺 %s 入面" % [p["id"], p["map"]])
 		check(sim.is_free(int(p["x"]), int(p["y"])), "傳送點 %s 可企" % p["id"])
 
 
@@ -376,7 +370,7 @@ func t_runan_travel(data: GameData) -> void:
 		sim.cmd_travel(pid, src)
 		check(not to_p.is_empty() and int(sim.ent(pid)["x"]) == int(to_p["x"]) and int(sim.ent(pid)["y"]) == int(to_p["y"]),
 			"洞窟: %s → %s 就到" % [src, from_p.get("to", "?")])
-	# 而家企喺 cave_enter (58,44) 附近 → 入返去, 存檔 roundtrip
+	# 而家企喺 cave_enter 附近 → 入返去, 存檔 roundtrip
 	sim.cmd_travel(pid, "cave_enter")
 	var s := sim.save_string()
 	var loaded := Sim.load_string(data, s)
@@ -388,7 +382,11 @@ func t_runan_travel(data: GameData) -> void:
 func t_cave_shop(data: GameData) -> void:
 	var sim := Sim.new(data, 5)
 	var pid := sim.spawn_player("t")
-	_put(sim, pid, 70, 8)                                   # 洞窟商店 (1F)
+	var sh: Dictionary = {}
+	for x in data.shops:
+		if String(x["id"]) == "runan":
+			sh = x
+	_put(sim, pid, int(sh["x"]), int(sh["y"]))              # 洞窟商店 (1F)
 	var shop := sim._shop_for(sim.ent(pid))
 	check(not shop.is_empty() and String(shop.get("id", "")) == "runan", "洞窟商店: 揀啱邊間 (1F)")
 	var ch: Dictionary = sim.player_ch()
@@ -404,8 +402,14 @@ func t_cave_shop(data: GameData) -> void:
 	check(loaded != null and loaded.save_string() == s, "洞窟商店: 買賣後存讀檔一致")
 
 
-# 北門 (27,27) 新手友善: spawn area 喺 zone 入面；門口 6 格內只有 Lv≤3、18 格內冇 Lv11+ (重生都係)
+# 北門 (gate_in, 許昌出城落地點) 新手友善: spawn area 喺 zone 入面；門口 6 格內只有 Lv≤3、18 格內冇 Lv11+ (重生都係)
 func t_gate_newbie(data: GameData) -> void:
+	var gate: Dictionary = {}
+	for tp in data.travel_points:
+		if String(tp["id"]) == "gate_in":
+			gate = tp
+	var gx := int(gate["x"])
+	var gy := int(gate["y"])
 	for sp in data.spawns:
 		if not sp.has("area"):
 			continue
@@ -422,9 +426,9 @@ func t_gate_newbie(data: GameData) -> void:
 		for e in sim.ents.values():
 			if e["kind"] != "mob":
 				continue
-			var dg := maxi(absi(int(e["x"]) - 27), absi(int(e["y"]) - 27))
+			var dg := maxi(absi(int(e["x"]) - gx), absi(int(e["y"]) - gy))
 			check((dg > 6 or int(e["level"]) <= 3) and (dg > 18 or int(e["level"]) <= 9), "北門: 門口附近冇高等怪 (%s Lv%d @%d,%d)" % [e["name"], int(e["level"]), int(e["x"]), int(e["y"])])
 		# 重生都守 area
 		for i in 20:
 			var m: Variant = sim._spawn_mob(11070, "field_1")
-			check(m != null and int(m["x"]) >= 46 and int(m["y"]) >= 48, "北門: 重生 Lv30 喺遠角")
+			check(m != null and maxi(absi(int(m["x"]) - gx), absi(int(m["y"]) - gy)) > 30, "北門: 重生 Lv30 喺遠處 (潁水南岸)")

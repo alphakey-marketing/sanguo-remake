@@ -42,7 +42,8 @@ func _run() -> void:
 		RulesShop.add_item(ch["bag"], id, 2)
 	m._log("殺怪 +12 經驗 +5 金")
 	m._log("自動掛機 開")
-	put(20, 7)
+	var shp: Dictionary = m.data.shops[0]
+	put(int(shp["x"]), int(shp["y"]) + 1)
 	m.target_id = -1
 	await frames(20)
 	await shot("hud_shop_near")
@@ -63,7 +64,7 @@ func _run() -> void:
 	cp.pending = {"str": 1}
 	cp.refresh(true)
 	await shot("char")
-	put(10, 6)
+	put(m.sim.inn_pos.x, m.sim.inn_pos.y + 1)
 	await frames(15)
 	ContextActions.run(m, {"kind": "inn"})
 	await shot("inn")
@@ -71,4 +72,28 @@ func _run() -> void:
 	put(35, 35)
 	await frames(30)
 	await shot("hud_field")
+	# 地圖世界 (spec 12): 城中心 / 皇城 / 屯田 / 潁水橋 / 洞窟 / 地圖面板
+	var xc: Dictionary = m.data.map_by_id["xuchang"]
+	put(int(xc["ox"]) + 35, int(xc["oy"]) + 26)
+	await frames(10)
+	await shot("map_city")
+	put(int(xc["ox"]) + 35, int(xc["oy"]) + 20)
+	await frames(10)
+	await shot("map_palace")
+	put(70, 14)
+	await frames(10)
+	await shot("map_farm")
+	put(41, 64)
+	await frames(10)
+	await shot("map_bridge")
+	var cv: Dictionary = m.data.map_by_id["runan_f1"]
+	put(int(cv["ox"]) + 20, int(cv["oy"]) + 12)
+	await frames(10)
+	await shot("map_cave")
+	put(35, 35)
+	await frames(5)
+	hud.open_panel("map")
+	await shot("panel_area")
+	(hud.panels["map"] as MapPanel).set_tab(1)
+	await shot("panel_world")
 	get_tree().quit(0)

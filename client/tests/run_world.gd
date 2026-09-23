@@ -227,15 +227,16 @@ func t_save_file(data: GameData) -> void:
 func t_zones_travel(data: GameData) -> void:
 	var sim := Sim.new(data, 5)
 	var id := sim.spawn_player("t")
-	check(sim.is_safe(10, 10), "安全區: 城內 (10,10) 係安全")
+	var ip := sim.inn_pos
+	check(sim.is_safe(ip.x, ip.y), "安全區: 城內 (客棧) 係安全")
 	check(not sim.is_safe(30, 30), "戰鬥區: 野地 (30,30) 唔安全")
 	# 城入面追怪唔會真係出手
-	_put(sim, id, 10, 10)
+	_put(sim, id, ip.x, ip.y)
 	sim._spawn_mob(1001, "field_1")
 	var mob_id := 0
 	for e in sim.ents.values():
 		if e["kind"] == "mob": mob_id = int(e["id"])
-	_put(sim, mob_id, 11, 10)
+	_put(sim, mob_id, ip.x + 1, ip.y)
 	sim.ent(mob_id)["mob"]["state"] = "chase"
 	sim.ent(mob_id)["mob"]["target"] = id
 	var hp0 := int(sim.ent(mob_id)["hp"])

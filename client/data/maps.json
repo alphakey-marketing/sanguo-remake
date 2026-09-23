@@ -1,0 +1,616 @@
+{
+ "_note": "地圖世界 (spec 12)【自訂】。每張地圖 = data/maps/<id>.txt (一字元一格)，放喺全域格仔 (ox,oy)；地圖之間留空 = 行唔到。其他數據檔寫 map + 地圖內座標，GameData 載入時轉全域。legend.walk = 行得。areas = 地圖內命名區 (HUD 區名橫幅)。landmarks = 史蹟地標 (第一次行近彈典故)。world = 大地圖 (天下) 節點，map=null = 未開放 (B2/B3)。",
+ "legend": {
+  ".": {
+   "name": "草地",
+   "walk": true
+  },
+  ",": {
+   "name": "草叢",
+   "walk": true
+  },
+  "=": {
+   "name": "官道",
+   "walk": true
+  },
+  ":": {
+   "name": "石板街",
+   "walk": true
+  },
+  "_": {
+   "name": "地面",
+   "walk": true
+  },
+  "%": {
+   "name": "田",
+   "walk": true
+  },
+  "b": {
+   "name": "橋",
+   "walk": true
+  },
+  "+": {
+   "name": "城門",
+   "walk": true
+  },
+  "#": {
+   "name": "城牆",
+   "walk": false
+  },
+  "H": {
+   "name": "房屋",
+   "walk": false
+  },
+  "T": {
+   "name": "樹",
+   "walk": false
+  },
+  "^": {
+   "name": "山石",
+   "walk": false
+  },
+  "~": {
+   "name": "水",
+   "walk": false
+  },
+  " ": {
+   "name": "虛空",
+   "walk": false
+  }
+ },
+ "maps": [
+  {
+   "id": "field_1",
+   "name": "潁川郊外",
+   "ox": 0,
+   "oy": 0,
+   "safe": false,
+   "kind": "field",
+   "areas": [
+    {
+     "name": "許下屯田",
+     "x0": 52,
+     "y0": 5,
+     "x1": 96,
+     "y1": 22
+    },
+    {
+     "name": "許昌北郊",
+     "x0": 2,
+     "y0": 0,
+     "x1": 110,
+     "y1": 25
+    },
+    {
+     "name": "許田圍場",
+     "x0": 2,
+     "y0": 26,
+     "x1": 56,
+     "y1": 62
+    },
+    {
+     "name": "東山丘林",
+     "x0": 57,
+     "y0": 26,
+     "x1": 110,
+     "y1": 50
+    },
+    {
+     "name": "潁水南岸",
+     "x0": 57,
+     "y0": 51,
+     "x1": 110,
+     "y1": 82
+    },
+    {
+     "name": "潁水渡口",
+     "x0": 2,
+     "y0": 63,
+     "x1": 56,
+     "y1": 82
+    }
+   ]
+  },
+  {
+   "id": "xuchang",
+   "name": "許昌城",
+   "ox": 132,
+   "oy": 0,
+   "safe": true,
+   "kind": "city",
+   "city": "xuchang",
+   "spawn": [
+    30,
+    40,
+    41,
+    45
+   ],
+   "areas": [
+    {
+     "name": "許都皇城",
+     "x0": 24,
+     "y0": 6,
+     "x1": 47,
+     "y1": 18
+    },
+    {
+     "name": "練兵場",
+     "x0": 5,
+     "y0": 17,
+     "x1": 16,
+     "y1": 26
+    },
+    {
+     "name": "南市",
+     "x0": 28,
+     "y0": 34,
+     "x1": 43,
+     "y1": 46
+    }
+   ]
+  },
+  {
+   "id": "runan_f1",
+   "name": "汝南洞窟 1F",
+   "ox": 0,
+   "oy": 104,
+   "safe": false,
+   "kind": "cave"
+  },
+  {
+   "id": "runan_f2",
+   "name": "汝南洞窟 2F",
+   "ox": 64,
+   "oy": 104,
+   "safe": false,
+   "kind": "cave"
+  },
+  {
+   "id": "runan_f3",
+   "name": "汝南洞窟 3F",
+   "ox": 128,
+   "oy": 104,
+   "safe": false,
+   "kind": "cave"
+  },
+  {
+   "id": "runan_f4",
+   "name": "汝南洞窟 4F",
+   "ox": 192,
+   "oy": 104,
+   "safe": false,
+   "kind": "cave"
+  },
+  {
+   "id": "runan_f5",
+   "name": "汝南洞窟 5F",
+   "ox": 256,
+   "oy": 104,
+   "safe": false,
+   "kind": "cave"
+  },
+  {
+   "id": "runan_f6",
+   "name": "汝南洞窟 6F",
+   "ox": 0,
+   "oy": 150,
+   "safe": false,
+   "kind": "cave"
+  },
+  {
+   "id": "runan_f7",
+   "name": "汝南洞窟 7F",
+   "ox": 64,
+   "oy": 150,
+   "safe": false,
+   "kind": "cave"
+  },
+  {
+   "id": "runan_f8",
+   "name": "汝南洞窟 8F",
+   "ox": 128,
+   "oy": 150,
+   "safe": false,
+   "kind": "cave"
+  },
+  {
+   "id": "runan_f9",
+   "name": "汝南洞窟 9F",
+   "ox": 192,
+   "oy": 150,
+   "safe": false,
+   "kind": "cave"
+  },
+  {
+   "id": "runan_f10",
+   "name": "汝南洞窟 10F",
+   "ox": 256,
+   "oy": 150,
+   "safe": false,
+   "kind": "cave"
+  }
+ ],
+ "landmarks": [
+  {
+   "id": "xudu_palace",
+   "map": "xuchang",
+   "x": 35,
+   "y": 19,
+   "r": 3,
+   "name": "許都皇城",
+   "text": "建安元年（196），曹操迎漢獻帝，遷都於許，改稱許都。自此「奉天子以令不臣」，天下諸侯側目。"
+  },
+  {
+   "id": "xutian",
+   "map": "field_1",
+   "x": 32,
+   "y": 38,
+   "r": 5,
+   "name": "許田圍場",
+   "text": "演義第二十回：曹操請天子許田射鹿，借天子寶雕弓金鈚箭一發中鹿，群臣望見金箭，以為天子射中，齊呼萬歲。操縱馬直出，遮於天子之前受之。關公大怒，提刀欲斬，玄德急搖手送目止之。"
+  },
+  {
+   "id": "tuntian",
+   "map": "field_1",
+   "x": 74,
+   "y": 12,
+   "r": 5,
+   "name": "許下屯田",
+   "text": "建安元年，曹操用棗祗、韓浩之議，募民屯田許下，一年得穀百萬斛。自此州郡例置田官，征伐四方而無運糧之勞。"
+  },
+  {
+   "id": "yingshui",
+   "map": "field_1",
+   "x": 40,
+   "y": 67,
+   "r": 3,
+   "name": "潁水渡",
+   "text": "潁水出嵩山，東南流經許昌之南，潁川郡因此得名。潁川多名士：荀彧、荀攸、郭嘉、陳群、徐庶，皆出此郡。"
+  },
+  {
+   "id": "yiting",
+   "map": "field_1",
+   "x": 40,
+   "y": 23,
+   "r": 2,
+   "name": "許昌驛亭",
+   "text": "驛路分岔：東行通汝南，南渡潁水往宛城、新野。（東、南兩路尚未開通）"
+  },
+  {
+   "id": "runan_mouth",
+   "map": "field_1",
+   "x": 101,
+   "y": 61,
+   "r": 3,
+   "name": "汝南山洞",
+   "text": "山洞往東南深入汝南郡界。鄉人話洞中聚咗山賊猛獸，最深處更有妖物作祟，唔好一個人去。"
+  }
+ ],
+ "world": {
+  "_note": "大地圖 (天下) 座標 0~1 (面板內相對位置)；map = 撳入去對應地圖 (null = 未開放)",
+  "nodes": [
+   {
+    "id": "xuchang",
+    "name": "許昌",
+    "province": "豫州",
+    "x": 0.62,
+    "y": 0.16,
+    "map": "xuchang",
+    "city": true
+   },
+   {
+    "id": "yingchuan",
+    "name": "潁川郊外",
+    "province": "豫州",
+    "x": 0.62,
+    "y": 0.32,
+    "map": "field_1"
+   },
+   {
+    "id": "runan",
+    "name": "汝南",
+    "province": "豫州",
+    "x": 0.86,
+    "y": 0.46,
+    "map": "runan_f1"
+   },
+   {
+    "id": "kunyang",
+    "name": "昆陽",
+    "province": "豫州",
+    "x": 0.48,
+    "y": 0.4,
+    "map": null
+   },
+   {
+    "id": "wancheng",
+    "name": "宛城",
+    "province": "荊州",
+    "x": 0.3,
+    "y": 0.46,
+    "map": null,
+    "city": true
+   },
+   {
+    "id": "bowang",
+    "name": "博望坡",
+    "province": "荊州",
+    "x": 0.36,
+    "y": 0.58,
+    "map": null
+   },
+   {
+    "id": "xinye",
+    "name": "新野",
+    "province": "荊州",
+    "x": 0.3,
+    "y": 0.7,
+    "map": null,
+    "city": true
+   },
+   {
+    "id": "fancheng",
+    "name": "樊城",
+    "province": "荊州",
+    "x": 0.34,
+    "y": 0.82,
+    "map": null
+   },
+   {
+    "id": "xiangyang",
+    "name": "襄陽",
+    "province": "荊州",
+    "x": 0.32,
+    "y": 0.92,
+    "map": null,
+    "city": true
+   },
+   {
+    "id": "longzhong",
+    "name": "隆中",
+    "province": "荊州",
+    "x": 0.16,
+    "y": 0.9,
+    "map": null
+   }
+  ],
+  "edges": [
+   [
+    "xuchang",
+    "yingchuan"
+   ],
+   [
+    "yingchuan",
+    "runan"
+   ],
+   [
+    "yingchuan",
+    "kunyang"
+   ],
+   [
+    "kunyang",
+    "wancheng"
+   ],
+   [
+    "wancheng",
+    "bowang"
+   ],
+   [
+    "bowang",
+    "xinye"
+   ],
+   [
+    "xinye",
+    "fancheng"
+   ],
+   [
+    "fancheng",
+    "xiangyang"
+   ],
+   [
+    "xiangyang",
+    "longzhong"
+   ]
+  ]
+ },
+ "portals": [
+  {
+   "id": "gate_out",
+   "name": "南門 → 潁川郊外",
+   "map": "xuchang",
+   "x": 35,
+   "y": 51,
+   "to": "gate_in",
+   "auto": true
+  },
+  {
+   "id": "gate_in",
+   "name": "北 → 許昌城",
+   "map": "field_1",
+   "x": 40,
+   "y": 0,
+   "to": "gate_out",
+   "auto": true
+  },
+  {
+   "id": "cave_enter",
+   "name": "汝南山洞",
+   "map": "field_1",
+   "x": 101,
+   "y": 61,
+   "to": "cave_f1",
+   "auto": true
+  },
+  {
+   "id": "cave_f1",
+   "name": "洞口 → 潁川郊外",
+   "map": "runan_f1",
+   "x": 3,
+   "y": 3,
+   "to": "cave_enter",
+   "auto": true
+  },
+  {
+   "id": "f1_down",
+   "name": "落二層",
+   "map": "runan_f1",
+   "x": 40,
+   "y": 22,
+   "to": "f2_up",
+   "auto": true
+  },
+  {
+   "id": "f2_up",
+   "name": "上一層",
+   "map": "runan_f2",
+   "x": 3,
+   "y": 3,
+   "to": "f1_down",
+   "auto": true
+  },
+  {
+   "id": "f2_down",
+   "name": "落三層",
+   "map": "runan_f2",
+   "x": 40,
+   "y": 22,
+   "to": "f3_up",
+   "auto": true
+  },
+  {
+   "id": "f3_up",
+   "name": "上二層",
+   "map": "runan_f3",
+   "x": 3,
+   "y": 3,
+   "to": "f2_down",
+   "auto": true
+  },
+  {
+   "id": "f3_down",
+   "name": "落四層",
+   "map": "runan_f3",
+   "x": 40,
+   "y": 22,
+   "to": "f4_up",
+   "auto": true
+  },
+  {
+   "id": "f4_up",
+   "name": "上三層",
+   "map": "runan_f4",
+   "x": 3,
+   "y": 3,
+   "to": "f3_down",
+   "auto": true
+  },
+  {
+   "id": "f4_down",
+   "name": "落五層",
+   "map": "runan_f4",
+   "x": 40,
+   "y": 22,
+   "to": "f5_up",
+   "auto": true
+  },
+  {
+   "id": "f5_up",
+   "name": "上四層",
+   "map": "runan_f5",
+   "x": 3,
+   "y": 3,
+   "to": "f4_down",
+   "auto": true
+  },
+  {
+   "id": "f5_down",
+   "name": "落六層",
+   "map": "runan_f5",
+   "x": 40,
+   "y": 22,
+   "to": "f6_up",
+   "auto": true
+  },
+  {
+   "id": "f6_up",
+   "name": "上五層",
+   "map": "runan_f6",
+   "x": 3,
+   "y": 3,
+   "to": "f5_down",
+   "auto": true
+  },
+  {
+   "id": "f6_down",
+   "name": "落七層",
+   "map": "runan_f6",
+   "x": 40,
+   "y": 22,
+   "to": "f7_up",
+   "auto": true
+  },
+  {
+   "id": "f7_up",
+   "name": "上六層",
+   "map": "runan_f7",
+   "x": 3,
+   "y": 3,
+   "to": "f6_down",
+   "auto": true
+  },
+  {
+   "id": "f7_down",
+   "name": "落八層",
+   "map": "runan_f7",
+   "x": 40,
+   "y": 22,
+   "to": "f8_up",
+   "auto": true
+  },
+  {
+   "id": "f8_up",
+   "name": "上七層",
+   "map": "runan_f8",
+   "x": 3,
+   "y": 3,
+   "to": "f7_down",
+   "auto": true
+  },
+  {
+   "id": "f8_down",
+   "name": "落九層",
+   "map": "runan_f8",
+   "x": 40,
+   "y": 22,
+   "to": "f9_up",
+   "auto": true
+  },
+  {
+   "id": "f9_up",
+   "name": "上八層",
+   "map": "runan_f9",
+   "x": 3,
+   "y": 3,
+   "to": "f8_down",
+   "auto": true
+  },
+  {
+   "id": "f9_down",
+   "name": "落十層",
+   "map": "runan_f9",
+   "x": 40,
+   "y": 22,
+   "to": "f10_up",
+   "auto": true
+  },
+  {
+   "id": "f10_up",
+   "name": "上九層",
+   "map": "runan_f10",
+   "x": 3,
+   "y": 3,
+   "to": "f9_down",
+   "auto": true
+  }
+ ]
+}

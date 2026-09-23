@@ -114,8 +114,7 @@ func _think_player(p: Dictionary) -> void:
 		return
 	if not RulesCombat.in_range(p["x"], p["y"], t["x"], t["y"]):
 		if not RulesSpell.blocks_move(ch.get("status", {}), tick):   # 中邪定身: 唔可以追
-			p["tx"] = t["x"]
-			p["ty"] = t["y"]
+			_set_dest(p, int(t["x"]), int(t["y"]), CHASE_CAP)          # 被擋就 A* 繞 (spec 12 §3)
 		return
 	p["tx"] = p["x"]
 	p["ty"] = p["y"]

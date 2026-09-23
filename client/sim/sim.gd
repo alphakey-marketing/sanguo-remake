@@ -119,13 +119,29 @@ func step() -> void:
 	for e in ents.values():
 		# 逃跑怪 sprint: tick%2=0 嗰陣郁兩格 → 平均 1.5× 移速 (spec 04 §3)
 		var mv := 2 if (e["kind"] == "mob" and (e.get("mob", {}) as Dictionary).get("state", "") == "flee" and tick % 2 == 0) else 1
+		var moved := false
 		for _k in mv:
-			var dx := signi(int(e["tx"]) - int(e["x"]))
-			var dy := signi(int(e["ty"]) - int(e["y"]))
-			if dx != 0 and is_free(int(e["x"]) + dx, int(e["y"])):
-				e["x"] = int(e["x"]) + dx
-			elif dy != 0 and is_free(int(e["x"]), int(e["y"]) + dy):
-				e["y"] = int(e["y"]) + dy
+			# A* 路徑 (spec 12 §3): 終點 = 目的地 + 下一格相鄰先有效，否則作廢行直線
+			var path: Array = e.get("path", [])
+			if not path.is_empty():
+				var nxt := int(path[0])
+				var cur := int(e["y"]) * W + int(e["x"])
+				if int(path[-1]) == int(e["ty"]) * W + int(e["tx"]) and (absi(nxt - cur) == 1 or absi(nxt - cur) == W) and data.walk[nxt] == 1:
+					e["x"] = nxt % W
+					e["y"] = nxt / W
+					path.pop_front()
+					if path.is_empty():
+						e.erase("path")
+					moved = true
+					continue
+				e.erase("path")
+			var n := _greedy_step(int(e["x"]), int(e["y"]), int(e["tx"]), int(e["ty"]))
+			if n.x != int(e["x"]) or n.y != int(e["y"]):
+				e["x"] = n.x
+				e["y"] = n.y
+				moved = true
+		if moved:
+			_on_moved(e)
 
 
 # ================= UI 讀取 / 存檔 =================
@@ -178,7 +194,33 @@ static func load_string(game_data: GameData, s: String) -> Sim:
 		es[int(k)] = st["ents"][k]
 	st["ents"] = es
 	sim.state = st
+	sim._fix_positions()
 	return sim
+
+
+# 舊存檔 (地圖改版前, spec 12) 單位可能企喺牆/樹/虛空: 人搬返客棧、怪喺自己 spawn 範圍重揀位
+func _fix_positions() -> void:
+	for e in ents.values():
+		if is_free(int(e["x"]), int(e["y"])):
+			continue
+		var p := inn_pos
+		if e["kind"] == "mob":
+			var zone := String(e["mob"].get("zone", DEFAULT_ZONE))
+			var r: Array = []
+			for sp in data.spawns:
+				if int(sp["monster"]) == int(e["mob"]["def"]) and String(sp["zone"]) == zone:
+					r = sp["area"]
+			if r.is_empty():
+				var z := zone_by_id(zone)
+				r = [int(z["x0"]), int(z["y0"]), int(z["x1"]), int(z["y1"])]
+			p = _pick_free(int(r[0]), int(r[1]), int(r[2]), int(r[3]))
+			e["mob"]["home_x"] = p.x
+			e["mob"]["home_y"] = p.y
+		e["x"] = p.x
+		e["y"] = p.y
+		e["tx"] = p.x
+		e["ty"] = p.y
+		e.erase("path")
 
 
 # JSON 讀返嚟數字全部係 float；整數值轉返 int

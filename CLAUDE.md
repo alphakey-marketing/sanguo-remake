@@ -11,11 +11,12 @@
 
 ## 現況 (2026-09-21)
 - **全部喺 `client/` (Godot 4.7, GDScript)**：`rules/`(純函數)、`sim/`(單機世界模擬，狀態可存檔、種子 RNG)、`ui/`(畫面/輸入)、`tests/`
-- 測試：`sh tools/run_tests.sh` → rules 對拍 307 向量 + quest 81 + spell 618 + jewel/ult 118 + sim 160 + world 121 + monsters 143 + hud 版面 2394 + `--autotest` 端到端 + `--uitest` 觸控煙霧 21，全 PASS
+- 測試：`sh tools/run_tests.sh` → rules 對拍 307 向量 + quest 81 + spell 618 + jewel/ult 118 + sim 160 + world 121 + monsters 578 + maps 280 + hud 版面 2715 + `--autotest` 端到端 + `--uitest` 觸控煙霧 21，全 PASS
 - 功能：角色/升級/即時戰鬥/怪 AI+重生+掉落/死亡處分/10 個 bot/客棧+武器店/術法系統(Step 9)/寶石+絕招+融合(Step 10：寶石欄 2 格、屬性石 40+輔助石、元素術需特殊石、義士三招絕招任務鏈、打鐵鋪 QTE 融合)；手機 UI（三國群英傳M 風格）: `ui/touch/`(HudLayout 版面/搖桿/互動掣) + `ui/panels/`(背包/商店/角色/對話/記事，正式 Control 面板，玩家自己揀自己確認)；建角面板仍係舊 debug 版
-- `client/data/`：classes.json(六職，只啟用義士)、monsters.json(5 怪+spawn)、items.json(6068 件)、shops.json；`data_src/general_npc.csv`(未接入)
+- **地圖世界 B1（spec 12）**：`data/maps.json`（legend/地圖/傳送點/地標/天下節點）+ `data/maps/*.txt`（ASCII 人手地圖，一字一格）拼落 512×512 全域格仔，地圖之間隔 ≥20 格；其他數據寫 `map` + 地圖內座標，GameData 載入轉全域。A* 尋路、踩門口過圖、居民跨圖路由；UI 預渲染地圖貼圖 + 小地圖 + 地圖面板。改地圖直接改 txt（`tools/map_draft.py` 只係起稿，再跑會覆蓋）；新 txt 要喺 export include_filter 範圍（`data/maps/*.txt`）
+- `client/data/`：classes.json(六職，只啟用義士)、monsters.json(34 怪+spawn，area = 地圖內座標)、items.json(6068 件)、shops.json、maps.json；`data_src/general_npc.csv`(未接入)
 - `legacy/server/`：舊 Node+ws server，只作參考（23 項 TS 測試仍過；`tools/export_vectors.ts` 由佢導出向量）
-- **下一步 = Step 11**（怪物導入 npc_drops.csv 30+ 隻 + 汝南洞窟 10 層地圖 + 逃跑/群攻 AI + boss 每日重生，spec 04 §1~3/§11 2）
+- **下一步**：地圖 B2（宛城/新野一帶，spec 12 §1）或 Step 11 收尾（npc_drops 導入驗收），聽用家揀
 - 攻略原文 113 頁：`docs/guide/*.txt`；連結表 `docs/guide_links.tsv`
 
 ## 已定決策

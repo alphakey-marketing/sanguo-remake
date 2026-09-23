@@ -95,6 +95,7 @@ func _panel(name_: String) -> GamePanel:
 			"char": p = CharPanel.new(main)
 			"quest": p = QuestPanel.new(main)
 			"more": p = MorePanel.new(main)
+			"map": p = MapPanel.new(main)
 			_: p = DialogPanel.new(main)
 		add_child(p)
 		panels[name_] = p
@@ -151,6 +152,7 @@ func visible_ids() -> Array:
 		ids.append("skill%d" % i)
 	ids.append_array(["target", "auto"])
 	ids.append_array(HudLayout.MENU)
+	ids.append("minimap")
 	ids.append("portrait")
 	return ids
 
@@ -220,6 +222,7 @@ func _fire(id: String) -> void:
 		"menu_char", "portrait": open_panel("char")
 		"menu_quest": open_panel("quest")
 		"menu_more": open_panel("more")
+		"minimap": open_panel("map")
 		_:
 			if id.begins_with("skill"):
 				var slots := skill_slots()
@@ -561,16 +564,45 @@ func _draw_target(s: Vector2) -> void:
 	_txt(Vector2(r.position.x + 8, r.position.y + 15), "%s  Lv%d" % [t.name, int(t.level)], Color(1, 0.8, 0.7), 12)
 	_bar(r.position.x + 8, r.position.y + 25, w - 16, 6, float(t.hp) / max_hp, Color(0.9, 0.25, 0.15))
 
-# 右上: 區名 + 時辰（選單列下面）
-func _draw_info(sr: Rect2) -> void:
-	var y := sr.position.y + 6 + HudLayout.MENU_SZ + 16
-	var x := sr.end.x - 8
+# 右上小地圖: 當前地圖縮圖 (以自己為中心) + 怪/NPC/自己點 + 區名/時辰 (spec 12 §6)
+func _draw_info(_sr: Rect2) -> void:
+	var r: Rect2 = layout["minimap"]["rect"]
+	draw_rect(r, Color(0, 0, 0, 0.75 if _is_down("minimap") else 0.6))
 	var me = main._me()
-	if me != null:
+	var md: Dictionary = main.cur_map
+	if me != null and not md.is_empty():
+		const K := 2.0                              # 每格 2px
+		var inner := r.grow(-2)
+		var view := inner.size / K                  # 睇到幾多格
+		var mx := float(me.x) - float(md.ox)
+		var my := float(me.y) - float(md.oy)
+		var src := Rect2(Vector2(clampf(mx - view.x / 2, 0, maxf(0, float(md.w) - view.x)), clampf(my - view.y / 2, 0, maxf(0, float(md.h) - view.y))), view)
+		src.size = src.size.min(Vector2(float(md.w), float(md.h)) - src.position)
+		var dst := Rect2(inner.position, src.size * K)
+		draw_texture_rect_region(MapArt.minimap(main.data, md), dst, src, Color(1, 1, 1, 0.9))
+		var org := inner.position - src.position * K
+		for e in main.ents:
+			var p := org + (Vector2(float(e.x) - float(md.ox), float(e.y) - float(md.oy)) + Vector2(0.5, 0.5)) * K
+			if not dst.has_point(p) or int(e.id) == main.my_id:
+				continue
+			draw_rect(Rect2(p - Vector2(1, 1), Vector2(2, 2)), Color(0.95, 0.25, 0.2) if e.get("mob", false) else Color(0.9, 0.9, 0.9))
+		for qn in main.quest_npcs:
+			var q := org + (Vector2(float(qn.x) - float(md.ox), float(qn.y) - float(md.oy)) + Vector2(0.5, 0.5)) * K
+			if dst.has_point(q):
+				draw_rect(Rect2(q - Vector2(1.5, 1.5), Vector2(3, 3)), Color(0.4, 0.75, 1.0))
+		for f in main.facilities:
+			if String(f.kind) == "travel":
+				var tp := org + (Vector2(float(f.x) - float(md.ox), float(f.y) - float(md.oy)) + Vector2(0.5, 0.5)) * K
+				if dst.has_point(tp):
+					draw_circle(tp, 2.5, Color(0.5, 1.0, 0.4))
+		draw_circle(org + (Vector2(mx, my) + Vector2(0.5, 0.5)) * K, 2.5, Color(1, 0.9, 0.2))
 		var zv: Dictionary = main.sim.zone_view(int(me.x), int(me.y))
-		if not zv.is_empty():
-			_txt_right(Vector2(x, y), str(zv["name"]), Color(0.9, 0.85, 0.7), 13)
-	_txt_right(Vector2(x, y + 16), ("夜 " if main.night_on else "") + str(main.clock_str), Color(1, 0.95, 0.65), 11)
+		var nm := str(zv.get("area", "")) if str(zv.get("area", "")) != "" else str(zv.get("name", ""))
+		draw_rect(Rect2(r.position, Vector2(r.size.x, 14)), Color(0, 0, 0, 0.55))
+		_txt_right(Vector2(r.end.x - 4, r.position.y + 11), nm, Color(0.95, 0.88, 0.7), 11)
+	draw_rect(Rect2(Vector2(r.position.x, r.end.y - 13), Vector2(r.size.x, 13)), Color(0, 0, 0, 0.55))
+	_txt_right(Vector2(r.end.x - 4, r.end.y - 3), ("夜 " if main.night_on else "") + str(main.clock_str), Color(1, 0.95, 0.65), 10)
+	draw_rect(r, UiTheme.GOLD if _is_down("minimap") else Color(1, 1, 1, 0.35), false, 1.0)
 
 func _draw_menu() -> void:
 	for id in HudLayout.MENU:

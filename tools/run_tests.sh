@@ -18,6 +18,7 @@ run jewel_ult --script tests/run_jewel_ult.gd
 run sim --script tests/run_sim.gd
 run world --script tests/run_world.gd
 run monsters --script tests/run_monsters.gd
+run maps --script tests/run_maps.gd
 run market --script tools/market_sim.gd
 run hud --script tests/run_hud.gd
 run autotest -- --autotest
