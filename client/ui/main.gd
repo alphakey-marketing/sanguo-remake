@@ -161,6 +161,12 @@ func _send(d: Dictionary) -> void:
 		"storage_withdraw": sim.cmd_storage_withdraw(my_id, int(d.item), int(d.get("n", 1)))
 		"storage_sell": sim.cmd_storage_sell(my_id, int(d.item), int(d.get("n", 1)))
 		"use_item": sim.cmd_use_item(my_id, int(d.item))
+		"raise_attr": sim.cmd_raise_attr(my_id, str(d.attr))
+		"auto_assign": sim.cmd_auto_assign(my_id)
+		"set_title": sim.cmd_set_title(my_id, str(d.title))
+		"set_birth": sim.cmd_set_birth(my_id, int(d.month), int(d.day))
+		"set_face": sim.cmd_set_face(my_id, str(d.part), int(d.value))
+		"submit_quiz": sim.cmd_submit_quiz(my_id, d.answers)
 		"debug_give": sim.cmd_debug_give(my_id, int(d.item), int(d.get("n", 1)))
 
 func _log(s: String) -> void:
@@ -562,6 +568,11 @@ func _unhandled_input(ev: InputEvent) -> void:
 		elif ev.keycode >= KEY_1 and ev.keycode <= KEY_9 and ev.keycode - KEY_1 < shop_stock.size():
 			_send({"t": "buy", "item": int(shop_stock[ev.keycode - KEY_1]), "n": 1})
 		elif ev.keycode == KEY_W: _on_debug_pressed("work_mining")
+		elif ev.keycode == KEY_Q: _send({"t": "auto_assign"})
+		elif ev.keycode == KEY_E: _send({"t": "raise_attr", "attr": "str"})
+		elif ev.keycode == KEY_F: _send({"t": "raise_attr", "attr": "agi"})
+		elif ev.keycode == KEY_D: _send({"t": "raise_attr", "attr": "int"})
+		elif ev.keycode == KEY_S: _send({"t": "raise_attr", "attr": "spi"})
 		elif ev.keycode == KEY_Y: _on_debug_pressed("storage_sub")
 		elif ev.keycode == KEY_C: _on_debug_pressed("deposit")
 		elif ev.keycode == KEY_V: _on_debug_pressed("withdraw")
@@ -632,6 +643,7 @@ func _draw() -> void:
 	_draw_facility()
 	_draw_banner(vs)
 	_draw_clock(vs)
+	_draw_char_status(vs)
 
 # 時辰/日/季節 (右上) + 夜晚示意
 func _draw_clock(vs: Vector2) -> void:
@@ -650,6 +662,18 @@ func _draw_banner(vs: Vector2) -> void:
 	draw_rect(r, Color(0, 0, 0, 0.75))
 	draw_rect(r, col, false, 2.0)
 	_txt(r.position + Vector2(12, 18), str(banner["text"]), Color.WHITE, 13)
+
+
+# 升級點數 / 理念 / 生日 / 稱號 狀態列 (Step 7.5 debug UI)
+func _draw_char_status(vs: Vector2) -> void:
+	if ch.is_empty():
+		return
+	var y := vs.y - 78
+	draw_rect(Rect2(10, y - 6, 330, 62), Color(0, 0, 0, 0.75))
+	draw_rect(Rect2(10, y - 6, 330, 62), Color(1, 0.85, 0.4), false, 1.5)
+	_txt(Vector2(16, y + 12), "點數 %d    理念 %s" % [int(ch.get("attrPoints", 0)), str(ch.get("ideology", "未測"))], Color(1, 1, 0.7), 12)
+	_txt(Vector2(16, y + 30), "生日 %d月%d日    稱號「%s」" % [int(ch.get("birthMonth", 1)), int(ch.get("birthDay", 1)), str(ch.get("title", ""))], Color(0.85, 1, 0.8), 12)
+	_txt(Vector2(16, y + 48), "Q自動派  E力量 F敏捷 D智力 S靈力 (用升級點數)" if int(ch.get("attrPoints", 0)) > 0 else "稱號/生日/臉譜/理念測驗由建角 UI 設定 (Step 7.5)", Color(0.85, 0.9, 1), 10)
 
 func _draw_bag(vs: Vector2) -> void:
 	if show_bag and not ch.is_empty():

@@ -279,6 +279,94 @@ func _fac_attr(e: Dictionary, ch: Dictionary, f: Dictionary, attr: String) -> vo
 	_sync_stats(e)
 	var an := "政治" if attr == "pol" else "魅力"
 	_emit({"k": "train", "src": id, "type": "attr", "attr": an, "val": v + 1})
+
+
+# ================= 升級點數 / 建角欄位 (Step 7.5, spec 01 §1/§2/§5) =================
+
+# 升級自由點數: 扣 1 點，str/agi/int/spi +1；政治/魅力唔可以用升級點 (只能私塾/寺廟)
+func cmd_raise_attr(id: int, attr: String) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var ch: Dictionary = e["ch"]
+	var code := RulesStats.can_raise(ch, attr)
+	match code:
+		1: return _msg(id, "冇可分配點數 (升呢俾 %d 點)" % RulesStats.UPGRADE_POINTS)
+		2: return _msg(id, "政治/魅力唔可以用升級點，去私塾/寺廟修練")
+		3: return _msg(id, "屬性已到上限 99")
+	RulesStats.raise_attr(ch, attr)
+	_sync_stats(e)
+	_emit({"k": "attr_rise", "src": id, "attr": attr, "val": int(ch["attrs"][attr]), "points": int(ch["attrPoints"])})
+
+
+# 一鍵自動分配【自訂】: 按 classes.json.growth 建議比例派晒所有點
+func cmd_auto_assign(id: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return
+	var ch: Dictionary = e["ch"]
+	if int(ch.get("attrPoints", 0)) <= 0:
+		return _msg(id, "冇可分配點數")
+	RulesStats.auto_assign_points(ch, data.classes[ch["classId"]])
+	_sync_stats(e)
+	_emit({"k": "attr_auto", "src": id, "points": int(ch["attrPoints"])})
+	_msg(id, "自動分配合成 (剩 %d 點)" % int(ch["attrPoints"]))
+
+
+# 稱號【原】: ≤8 字，隨時可改
+func cmd_set_title(id: int, title: String) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return
+	title = title.strip_edges()
+	if title.length() < 1 or title.length() > 8:
+		return _msg(id, "稱號要 1~8 字")
+	e["ch"]["title"] = title
+	_msg(id, "稱號改做「%s」" % title)
+
+
+# 生日: 影響福日 (生日嗰日練功 exp +10%) 同結婚年數
+func cmd_set_birth(id: int, month: int, day: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return
+	var month_days := [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+	if month < 1 or month > 12 or day < 1 or day > int(month_days[month - 1]):
+		return _msg(id, "生日日期唔啱")
+	e["ch"]["birthMonth"] = month
+	e["ch"]["birthDay"] = day
+	_msg(id, "生日設為 %d月%d日 (福日練功 +10%%)" % [month, day])
+
+
+# 臉譜: 8 部位，款式 1..count (data/face.json)
+func cmd_set_face(id: int, part: String, value: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return
+	var count: int = int(data.face_parts.get(part, 0))
+	if count <= 0 or value < 1 or value > count:
+		return _msg(id, "冇呢個部位/款式")
+	e["ch"]["face"][part] = value
+	_msg(id, "%s 款式設為 %d" % [part, value])
+
+
+# 理念測驗: 一次過交答卷 (data/quiz.json 12 題，每題 0/1)，決定理念。決定了就唔可以改
+func cmd_submit_quiz(id: int, answers: Array) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return
+	var ch: Dictionary = e["ch"]
+	if not str(ch.get("ideology", "")).is_empty():
+		return _msg(id, "理念已經決定咗，唔可以改")
+	if not RulesQuiz.valid_answers(data, answers):
+		return _msg(id, "答卷唔啱 (要 %d 題)" % (data.quiz as Array).size())
+	var res := RulesQuiz.score(data, answers)
+	ch["ideology"] = str(res["ideology"])
+	ch["quizAnswers"] = []
+	for a in answers:
+		ch["quizAnswers"].append(int(a))
+	_emit({"k": "quiz", "src": id, "ideology": str(res["ideology"])})
+	_msg(id, "理念測驗完成：你嘅理念係「%s」" % str(res["ideology"]))
 func cmd_move(id: int, x: int, y: int) -> void:
 	var e := ent(id)
 	if not e.is_empty() and is_free(x, y):
@@ -604,7 +692,15 @@ func _kill_mob(m: Dictionary, by: Dictionary) -> void:
 	for it in items:
 		RulesShop.add_item(ch["bag"], int(it), 1)
 	ch["karma"] = RulesCombat.karma_after_kill(int(ch["karma"]), d["alignment"])
-	var ups := RulesStats.gain_exp(data, ch, int(d["exp"]))
+	var exp_gain := int(d["exp"])
+	if by.get("kind", "") == "player":          # 福日【自訂】：生日嗰日練功 exp +10% (spec 01 §1)
+		var clk: Dictionary = data.world["clock"]
+		exp_gain = MathX.js_round(float(exp_gain) * RulesStats.birthday_exp_mult(int(_clock()["day"]),
+			int(clk.get("yearDays", 360)), int(clk.get("monthDays", 30)),
+			int(ch.get("birthMonth", 1)), int(ch.get("birthDay", 1))))
+	var ups := RulesStats.gain_exp(data, ch, exp_gain)
+	if ups > 0 and by.get("kind", "") == "bot":   # 機械人冇人幫手派點: 直接按建議比例自動派
+		RulesStats.auto_assign_points(ch, data.classes[ch["classId"]])
 	_sync_stats(by)
 	_emit({"k": "kill", "src": by["id"], "dst": m["id"], "exp": int(d["exp"]), "gold": gold, "items": items,
 		"lvUp": int(ch["level"]) if ups > 0 else 0})

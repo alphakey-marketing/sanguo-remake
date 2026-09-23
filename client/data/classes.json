@@ -1,5 +1,5 @@
 {
-  "_note": "六職齊全，enabled=false 嘅暫不啟用。attackType/spellType/skill/weapons 【原】(攻略 sy2_1_*)；base/growth 數值【自訂】",
+  "_note": "六職齊全，enabled=false 嘅暫不啟用。attackType/spellType/skill/weapons 【原】(攻略 sy2_1_*)；base 數值【自訂】；growth = 自動分配建議比例 (spec 01 §5，升級改玩家自由點數，growth 只供 UI 一鍵自動派)",
   "classes": [
     { "id": "yishi",  "name": "義士", "gender": "M", "enabled": true,  "attackRange": "melee",       "spell": null,          "weapons": ["刀", "錘", "槍矛"], "skill": "融合", "tier2": "武士", "tier3": "猛將",
       "base":   { "str": 12, "agi": 8, "int": 4, "spi": 4, "pol": 6, "cha": 6 },
