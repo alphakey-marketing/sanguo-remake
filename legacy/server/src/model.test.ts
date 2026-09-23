@@ -5,10 +5,10 @@ import { createCharacter, gainExp, expToNext, maxHp, attrsAt, NEWBIE_LEVEL } fro
 
 const data = loadData();
 
-test('資料完整: 六職、5 種怪、只啟用義士', () => {
+test('資料完整: 六職、只啟用義士/道士 (Step 9 開道士)、9 種怪', () => {
   assert.equal(data.classes.size, 6);
-  assert.deepEqual([...data.classes.values()].filter(c => c.enabled).map(c => c.id), ['yishi']);
-  assert.equal(data.monsters.size, 5);
+  assert.deepEqual([...data.classes.values()].filter(c => c.enabled).map(c => c.id), ['yishi', 'daoshi']);
+  assert.equal(data.monsters.size, 9);
 });
 
 test('所有掉落/起手裝備 item id 都存在於 items.json', () => {

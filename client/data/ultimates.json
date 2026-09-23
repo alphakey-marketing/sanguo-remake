@@ -1,0 +1,8 @@
+{
+  "_note": "絕招定義 (Step 10, spec 02 §5)。數值模板【自訂】照規格表: 一招 ×2.0/半徑2/MP15/SP20/CD300… 武器檢查 weaponCat (items.json cat: 1=刀 2=鎚 3=矛/戟)。學識 = ch.ultimates []；CD 存 ch.ultCd = {ultId: untilTick}。quest = 對應任務 id (spec 06 §5)",
+  "ultimates": [
+    { "id": "wanli",  "name": "萬里鷹翔", "class": "yishi", "tier": 1, "mult": 2.0, "range": 2, "mp": 15, "sp": 20, "cd": 300, "weaponCat": 3, "quest": "ult_wanli" },
+    { "id": "dapeng", "name": "大鵬展翅", "class": "yishi", "tier": 2, "mult": 2.5, "range": 2, "mp": 20, "sp": 30, "cd": 360, "weaponCat": 3, "quest": "ult_dapeng" },
+    { "id": "libashan", "name": "力拔山河", "class": "yishi", "tier": 3, "mult": 3.0, "range": 3, "mp": 25, "sp": 40, "cd": 420, "weaponCat": 3, "quest": "ult_libashan" }
+  ]
+}

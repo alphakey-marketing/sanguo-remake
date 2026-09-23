@@ -23,6 +23,11 @@ static func max_sp(lv: int, a: Dictionary) -> int:
 	return int(50 + lv * 3 + a["agi"] * 2)
 
 
+# 玩家術防【自訂】(spec 02 §3): 隨等級+靈力；護鏡/光鏡/仙鏡 buff 喺 sim 再乘倍率
+static func player_spell_def(lv: int, spi: int) -> int:
+	return int(floor(lv / 3.0)) + maxi(0, int(floor((spi - 10.0) / 4.0)))
+
+
 # 升到下一級所需經驗
 static func exp_to_next(lv: int) -> int:
 	return MathX.js_round(20.0 * pow(lv, 1.8))
@@ -61,10 +66,12 @@ static func create_character(data: GameData, char_name: String, class_id: String
 	return {
 		"name": char_name, "classId": class_id, "level": 1, "exp": 0, "attrs": attrs,
 		"hp": max_hp(1, attrs), "mp": max_mp(1, attrs), "sp": max_sp(1, attrs),
-		"gold": int(st.get("gold", 0)), "karma": 0, "bag": bag, "equip": equip,
+		"gold": int(st.get("gold", 0)), "karma": 0, "bag": bag, "equip": equip, "status": {},
 		# Step 7.5 建角欄位 (spec 01 §1/§11)
 		"title": "", "birthMonth": 1, "birthDay": 1, "face": face,
 		"ideology": "", "quizAnswers": [], "attrPoints": 0, "raised": {},
+		# Step 8 任務欄位 (spec 06 §1.2): 進行中 questId -> {stage, startDay, flags}；完成記錄
+		"quests": {}, "questDone": {},
 	}
 
 

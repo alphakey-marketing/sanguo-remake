@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import * as C from '../legacy/server/src/rules/combat.ts';
 import * as S from '../legacy/server/src/rules/stats.ts';
 import * as H from '../legacy/server/src/rules/shop.ts';
+import * as P from '../legacy/server/src/rules/spell.ts';
 import { loadData } from '../legacy/server/src/model.ts';
 
 const data = loadData();
@@ -53,6 +54,29 @@ for (const lv of [1, 2, 5, 10, 50, 100]) {
   add('maxHp', [lv, a], S.maxHp(lv, a)); add('maxMp', [lv, a], S.maxMp(lv, a)); add('maxSp', [lv, a], S.maxSp(lv, a));
   add('expToNext', [lv], S.expToNext(lv));
 }
+
+// ===== Step 9 術法 (spec 02 §3/§7) =====
+const EL = ['none', 'earth', 'water', 'fire', 'wind'];
+for (const a of EL) for (const d of EL) add('elementFactor', [a, d], P.elementFactor(a, d));
+for (const [pw, at] of [[18, 8], [26, 20], [66, 30], [120, 40], [200, 55], [90, 15]])
+  add('spellAttack', [pw, at], P.spellAttack(pw, at));
+for (const [pw, at, sd, ae, de, jp] of [[18, 8, 0, 'none', 'none', 0], [26, 20, 5, 'earth', 'water', 0],
+    [66, 30, 12, 'fire', 'wind', 0], [26, 20, 5, 'water', 'earth', 0.5], [18, 5, 99, 'none', 'earth', 0],
+    [240, 55, 40, 'wind', 'wind', 1]])
+  for (const r of RNGS) add('calcSpellDamage', [pw, at, sd, ae, de, jp], P.calcSpellDamage(pw, at, sd, ae, de, jp, seqRng(r)), r);
+for (const [lv, spi] of [[1, 8], [5, 8], [10, 20], [50, 50], [100, 99], [30, 30]]) add('playerSpellDef', [lv, spi], S.playerSpellDef(lv, spi));
+for (const id of ['', 'sealed', 'hex', 'power1', 'power2', 'power3', 'armor1', 'armor2', 'armor3', 'mirror1', 'mirror2', 'mirror3'])
+  add('statusTicks', [id], P.statusTicks(id));
+const mk = (ids: string[], until: number) => Object.fromEntries(ids.map(x => [x, until]));
+for (const [ids, tick] of [[[], 0], [['power1'], 100], [['power2'], 100], [['power3'], 100],
+    [['power1', 'power2'], 100], [['power3'], 400], [['power1'], 500]] as [string[], number][])
+  add('atkMult', [ids, tick], P.atkMult(mk(ids, 400), tick));
+for (const [ids, tick] of [[[], 0], [['armor1'], 100], [['armor2'], 100], [['armor3'], 100],
+    [['armor1', 'armor3'], 100], [['armor3'], 400], [['armor2'], 500]] as [string[], number][])
+  add('defMult', [ids, tick], P.defMult(mk(ids, 400), tick));
+for (const [ids, tick] of [[[], 0], [['mirror1'], 100], [['mirror2'], 100], [['mirror3'], 100],
+    [['mirror1', 'mirror2'], 100], [['mirror3'], 400], [['mirror1'], 500]] as [string[], number][])
+  add('spellDefMult', [ids, tick], P.spellDefMult(mk(ids, 400), tick));
 for (const cls of data.classes.values()) for (const lv of [1, 5, 50]) add('attrsAt', [cls.id, lv], S.attrsAt(cls, lv));
 add('createCharacter', ['義士甲', 'yishi'], S.createCharacter(data, '義士甲', 'yishi'));
 for (const amt of [0, 10, 100, 477, 5000, 1e6]) {

@@ -136,8 +136,10 @@ func t_facilities(data: GameData) -> void:
 	var sp1 := int(ch["sp"])
 	sim.cmd_facility(id, "school")
 	check(int(ch["attrs"]["pol"]) == pol0 + 1, "私塾: 政治 +1")
-	check(int(ch["gold"]) == gold0 - int(sc["gold"]), "私塾: 扣金")
+	check(int(ch["gold"]) == gold0, "私塾: 新手第一次免費 (quest, spec 06 §2)")
 	check(int(ch["mp"]) < mp0 and int(ch["sp"]) < sp1, "私塾: 扣 SP/MP")
+	sim.cmd_facility(id, "school")
+	check(int(ch["gold"]) == gold0 - int(sc["gold"]), "私塾: 第二次先扣金")
 	ch["gold"] = 0
 	var pol1 := int(ch["attrs"]["pol"])
 	sim.cmd_facility(id, "school")
@@ -148,6 +150,7 @@ func t_facilities(data: GameData) -> void:
 	var cha0 := int(ch["attrs"]["cha"])
 	sim.cmd_facility(id, "temple")
 	check(int(ch["attrs"]["cha"]) == cha0 + 1, "寺廟: 魅力 +1")
+	check(int(ch["gold"]) == 1000, "寺廟: 新手第一次免費 (quest, spec 06 §2)")
 
 
 # ---------- 市場: 100 日有界 ----------

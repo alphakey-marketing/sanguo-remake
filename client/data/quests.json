@@ -1,0 +1,340 @@
+{
+ "_note": "任務定義 (spec 06 §1.1~§2)【原=流程/條件；自訂=數值奬勵/對話措辭】。stage 順序 = array 序；next 欄位省略（照序）。stage type: talk(同 npc 傾偈, getItem=對話中攞到道具) / talk_n(同 n 個 npc 傾偈) / repeat(重複 n 次, perDay=每日最多 1 次) / collect(交道具, 用 cmd_quest_turnin) / ask(答題, 用 cmd_quest_answer) / facility(用設施, 由 cmd_facility 推進) / fight(PK, Step 10+ 用)。hidden=true 唔顯示喺記事（service NPC）。",
+ "quests": [
+  {
+   "id": "newbie_mystery",
+   "name": "神秘老人嘅考驗",
+   "type": "newbie",
+   "giver": "mystery_old",
+   "pre": {
+    "maxLevel": 4
+   },
+   "stages": [
+    {
+     "type": "talk",
+     "npc": "mystery_old",
+     "dialog": [
+      "神秘老人：「少年，睇你面生，係初到許昌嘅新手吧？老夫有個不情之請——你幫我去搵 3 位街坊傾下偈，問下佢哋城入面有咩好去處，返嚟話畀老夫知。」"
+     ],
+     "hint": "同神秘老人傾偈"
+    },
+    {
+     "type": "talk_n",
+     "npcs": [
+      "citizen_1",
+      "citizen_2",
+      "citizen_3"
+     ],
+     "n": 3,
+     "hint": "搵賣菜嬸、算命先生、茶館老闆傾偈 (%v/%n)"
+    },
+    {
+     "type": "talk",
+     "npc": "mystery_old",
+     "dialog": [
+      "神秘老人：「好，你做到喇。呢啲藥品同盤川你攞去用，江湖險惡，保重。」"
+     ],
+     "hint": "返去同神秘老人報告",
+     "done": true
+    }
+   ],
+   "reward": {
+    "gold": 50,
+    "items": [
+     [
+      65210,
+      5
+     ]
+    ]
+   }
+  },
+  {
+   "id": "newbie_training",
+   "name": "練兵場新手訓練",
+   "type": "newbie",
+   "giver": "training_recruit",
+   "stages": [
+    {
+     "type": "talk",
+     "npc": "training_recruit",
+     "dialog": [
+      "練兵場小兵：「咁啱你嚟咗！入伍第一課——對練！接招啦！（佢同你對練咗一場）」"
+     ],
+     "hint": "同練兵場小兵對練",
+     "done": true
+    }
+   ],
+   "reward": {
+    "lilian": 10,
+    "items": [
+     [
+      10002,
+      1
+     ]
+    ]
+   }
+  },
+  {
+   "id": "newbie_temple",
+   "name": "寺廟初階修行",
+   "type": "newbie",
+   "stages": [
+    {
+     "type": "facility",
+     "fac": "temple",
+     "hint": "去寺廟修練 1 次（第一次免費）",
+     "done": true
+    }
+   ],
+   "reward": {}
+  },
+  {
+   "id": "newbie_school",
+   "name": "私塾初階補習",
+   "type": "newbie",
+   "stages": [
+    {
+     "type": "facility",
+     "fac": "school",
+     "hint": "去私塾修練 1 次（第一次免費）",
+     "done": true
+    }
+   ],
+   "reward": {}
+  },
+  {
+   "id": "newbie_dog",
+   "name": "流浪狗嘅祕密",
+   "type": "newbie",
+   "giver": "stray_dog",
+   "pre": {
+    "minLevel": 5
+   },
+   "stages": [
+    {
+     "type": "talk",
+     "npc": "stray_dog",
+     "dialog": [
+      "流浪狗咬住你衫角，拖你行咗幾步，又朝城外吠咗兩聲——好似想話你知，跟住佢有寶藏！"
+     ],
+     "hint": "留意流浪狗嘅舉動"
+    },
+    {
+     "type": "repeat",
+     "npc": "stray_dog",
+     "n": 3,
+     "perDay": true,
+     "hint": "跟蹤流浪狗（每晚子時搵佢，%v/%n 晚）",
+     "done": true
+    }
+   ],
+   "reward": {
+    "exp": 100,
+    "items": [
+     [
+      65002,
+      1
+     ]
+    ]
+   }
+  },
+  {
+   "id": "service_miyi",
+   "name": "密醫",
+   "type": "service",
+   "hidden": true,
+   "giver": "miyi",
+   "stages": []
+  },
+  {
+   "id": "ult_wanli",
+   "name": "萬里鷹翔（絕招一）",
+   "type": "ultimate",
+   "giver": "guard_captain",
+   "pre": {
+    "minLevel": 20,
+    "classId": "yishi"
+   },
+   "preHint": "武功 20 級以上，辰時~申時去練兵場門口搵禁衛大隊長（限義士/矛類武器）",
+   "stages": [
+    {
+     "type": "ask",
+     "npc": "guard_captain",
+     "dialog": [
+      "禁衛大隊長：「霸盜賊群聚山頭擾民，你肯幫手剿滅嗎？先答我：霸盜賊喺邊度作惡？」"
+     ],
+     "options": [
+      "汝南洞窟第十層",
+      "洛陽城外",
+      "許昌城內"
+     ],
+     "answer": 0,
+     "getItem": {
+      "id": 58009,
+      "n": 1
+     },
+     "hint": "答啱禁衛大隊長嘅問題（得殲盜密函）"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 58010,
+      "n": 20
+     },
+     "hint": "去城外野地打霸盜賊，收集霸盜令 %v/%n（打返嚟交低）",
+     "done": true
+    }
+   ],
+   "reward": {
+    "exp": 1500,
+    "gold": 300,
+    "items": [
+     [
+      10042,
+      1
+     ]
+    ],
+    "ultimate": "wanli"
+   }
+  },
+  {
+   "id": "ult_dapeng",
+   "name": "大鵬展翅（絕招二）",
+   "type": "ultimate",
+   "giver": "town_head",
+   "pre": {
+    "minLevel": 35,
+    "classId": "yishi",
+    "questDone": [
+     "ult_wanli"
+    ]
+   },
+   "preHint": "已學萬里鷹翔 + 武功 35 級以上，子時~卯時去搵鎮長",
+   "stages": [
+    {
+     "type": "talk",
+     "npc": "town_head",
+     "dialog": [
+      "鎮長：「城時常受流浪兵洗劫，你可否剿滅佢哋個頭目瀧銘？」"
+     ],
+     "getItem": {
+      "id": 58017,
+      "n": 1
+     },
+     "hint": "鎮長頒咗晉陽殲盜令畀你"
+    },
+    {
+     "type": "fight",
+     "npc": "stray_soldier",
+     "monster": 1011,
+     "dialog": [
+      "守門流浪兵：「想見瀧銘老大？先過我呢關！」"
+     ],
+     "hint": "去城外野地同守門流浪兵對話，引出瀧銘 PK",
+     "getItem": {
+      "id": 58018,
+      "n": 1
+     }
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 58018,
+      "n": 1
+     },
+     "hint": "拎瀧銘頭顱返去交畀鎮長 (%v/%n)",
+     "done": true
+    }
+   ],
+   "reward": {
+    "exp": 3500,
+    "gold": 800,
+    "items": [
+     [
+      58019,
+      1
+     ]
+    ],
+    "ultimate": "dapeng"
+   }
+  },
+  {
+   "id": "ult_libashan",
+   "name": "力拔山河（絕招三）",
+   "type": "ultimate",
+   "giver": "lvbu",
+   "pre": {
+    "minLevel": 45,
+    "classId": "yishi",
+    "questDone": [
+     "ult_dapeng"
+    ],
+    "hasItem": {
+     "id": 58019,
+     "n": 1
+    }
+   },
+   "preHint": "已學大鵬展翅 + 武功 45 級以上 + 身上有呂代槍文集，午時~未時去搵呂布",
+   "stages": [
+    {
+     "type": "talk",
+     "npc": "lvbu",
+     "dialog": [
+      "呂布：「槍文集我睇完喇，正！幫我收集千年礦石，我要鍛兵！」"
+     ],
+     "getItem": {
+      "id": 58039,
+      "n": 1
+     },
+     "hint": "呂布求礦書到手，去搵千年礦石"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 25120,
+      "n": 50
+     },
+     "hint": "千年石礦 %v/%n"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 25121,
+      "n": 40
+     },
+     "hint": "千年鐵礦 %v/%n"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 25122,
+      "n": 30
+     },
+     "hint": "千年銅礦 %v/%n"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 25123,
+      "n": 20
+     },
+     "hint": "千年銀礦 %v/%n"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 25124,
+      "n": 10
+     },
+     "hint": "千年金礦 %v/%n",
+     "done": true
+    }
+   ],
+   "reward": {
+    "exp": 8000,
+    "gold": 2000,
+    "ultimate": "libashan"
+   }
+  }
+ ]
+}

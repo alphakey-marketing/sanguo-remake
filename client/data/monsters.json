@@ -1,25 +1,1715 @@
 {
-  "_note": "第一批 5 種 1~10 級野區怪。名字/等級帶/區域 【原】(攻略 怪物大全 荊州/豫州/并州司隸 1~10)；數值、掉落機率【自訂】。掉落 item id 對 data/items.json。alignment: NPC 善惡值，負=惡 (殺惡 NPC 加善惡值【原】)。atkInterval = tick(10Hz)",
-  "monsters": [
-    { "id": 1001, "name": "田鼠", "level": 1, "hp": 20,  "atk": 4,  "def": 0, "atkInterval": 20, "moveSpeed": 1, "exp": 6,   "gold": [0, 3],    "alignment": -10,  "aggroRange": 0, "leash": 6,
-      "drops": [ { "item": 61501, "p": 0.5 } ] },
-    { "id": 1002, "name": "野狗", "level": 2, "hp": 35,  "atk": 7,  "def": 1, "atkInterval": 18, "moveSpeed": 1, "exp": 10,  "gold": [0, 5],    "alignment": -20,  "aggroRange": 4, "leash": 10,
-      "drops": [ { "item": 61502, "p": 0.4 }, { "item": 61503, "p": 0.3 } ] },
-    { "id": 1003, "name": "山賊", "level": 4, "hp": 70,  "atk": 12, "def": 3, "atkInterval": 15, "moveSpeed": 1, "exp": 24,  "gold": [5, 25],   "alignment": -200, "aggroRange": 5, "leash": 12,
-      "drops": [ { "item": 65210, "p": 0.1 }, { "item": 22001, "p": 0.05 } ] },
-    { "id": 1004, "name": "野豬", "level": 6, "hp": 120, "atk": 16, "def": 5, "atkInterval": 16, "moveSpeed": 1, "exp": 45,  "gold": [0, 8],    "alignment": -30,  "aggroRange": 4, "leash": 10,
-      "drops": [ { "item": 61504, "p": 0.4 }, { "item": 61503, "p": 0.5 } ] },
-    { "id": 1005, "name": "惡虎", "level": 9, "hp": 260, "atk": 26, "def": 8, "atkInterval": 14, "moveSpeed": 1, "exp": 110, "gold": [0, 15],   "alignment": -100, "aggroRange": 6, "leash": 14,
-      "drops": [ { "item": 61505, "p": 0.3 }, { "item": 58025, "p": 0.1 } ] },
-    { "id": 1006, "name": "夜狼", "level": 3, "hp": 55,  "atk": 10, "def": 2, "atkInterval": 17, "moveSpeed": 1, "exp": 18,   "gold": [0, 6],    "alignment": -40,  "aggroRange": 5, "leash": 10, "night": true,
-      "drops": [ { "item": 61502, "p": 0.3 }, { "item": 61505, "p": 0.15 } ] }
-  ],
-  "spawns": [
-    { "zone": "field_1", "monster": 1001, "count": 8, "respawnTicks": 100 },
-    { "zone": "field_1", "monster": 1002, "count": 6, "respawnTicks": 150 },
-    { "zone": "field_1", "monster": 1003, "count": 4, "respawnTicks": 200 },
-    { "zone": "field_1", "monster": 1004, "count": 3, "respawnTicks": 250 },
-    { "zone": "field_1", "monster": 1005, "count": 1, "respawnTicks": 600 },
-    { "zone": "field_1", "monster": 1006, "count": 4, "respawnTicks": 200, "night": true }
-  ]
+ "_note": "第一批 5 種 1~10 級野區怪 + 3 隻術法怪 (Step 9) + 絕招 boss (Step 10) +Step 11 導入 (spec 11 §2): npc_drops.csv rate→p (rate/100000)，p≥0.05 入 drops、p<0.05 入 rareDrops。levels/hp/atk/exp 數值 = spec 04 §1 等級帶模板【自訂】(npc_id 確定性抖動 ±20%)。boss=true → 每日重生一次 (spec 04 §3)；groups=true 群居 / flee=false 唔逃走 (boss/PK 怪)。洞窟怪 levels 由 npc_drops.csv 第 3 欄 (怪物等級)，樓層分佈見 spawns zone: runan_f1~f10。alignment: NPC 善惡值，負=惡。atkInterval = tick(10Hz)。element: 屬性 (spec 02 §3.2 相剋)。spell/spellCd: 術法怪用 data/spells.json 術法 id + 冷卻 (tick)。",
+ "monsters": [
+  {
+   "id": 1001,
+   "name": "田鼠",
+   "level": 1,
+   "hp": 20,
+   "atk": 4,
+   "def": 0,
+   "atkInterval": 20,
+   "moveSpeed": 1,
+   "exp": 6,
+   "gold": [
+    0,
+    3
+   ],
+   "alignment": -10,
+   "aggroRange": 0,
+   "leash": 6,
+   "element": "none",
+   "drops": [
+    {
+     "item": 61501,
+     "p": 0.5
+    }
+   ]
+  },
+  {
+   "id": 1002,
+   "name": "野狗",
+   "level": 2,
+   "hp": 35,
+   "atk": 7,
+   "def": 1,
+   "atkInterval": 18,
+   "moveSpeed": 1,
+   "exp": 10,
+   "gold": [
+    0,
+    5
+   ],
+   "alignment": -20,
+   "aggroRange": 4,
+   "leash": 10,
+   "element": "none",
+   "drops": [
+    {
+     "item": 61502,
+     "p": 0.4
+    },
+    {
+     "item": 61503,
+     "p": 0.3
+    }
+   ]
+  },
+  {
+   "id": 1003,
+   "name": "山賊",
+   "level": 4,
+   "hp": 70,
+   "atk": 12,
+   "def": 3,
+   "atkInterval": 15,
+   "moveSpeed": 1,
+   "exp": 24,
+   "gold": [
+    5,
+    25
+   ],
+   "alignment": -200,
+   "aggroRange": 5,
+   "leash": 12,
+   "element": "none",
+   "drops": [
+    {
+     "item": 65210,
+     "p": 0.1
+    },
+    {
+     "item": 22001,
+     "p": 0.05
+    }
+   ]
+  },
+  {
+   "id": 1004,
+   "name": "野豬",
+   "level": 6,
+   "hp": 120,
+   "atk": 16,
+   "def": 5,
+   "atkInterval": 16,
+   "moveSpeed": 1,
+   "exp": 45,
+   "gold": [
+    0,
+    8
+   ],
+   "alignment": -30,
+   "aggroRange": 4,
+   "leash": 10,
+   "element": "none",
+   "drops": [
+    {
+     "item": 61504,
+     "p": 0.4
+    },
+    {
+     "item": 61503,
+     "p": 0.5
+    }
+   ]
+  },
+  {
+   "id": 1005,
+   "name": "惡虎",
+   "level": 9,
+   "hp": 260,
+   "atk": 26,
+   "def": 8,
+   "atkInterval": 14,
+   "moveSpeed": 1,
+   "exp": 110,
+   "gold": [
+    0,
+    15
+   ],
+   "alignment": -100,
+   "aggroRange": 6,
+   "leash": 14,
+   "element": "none",
+   "drops": [
+    {
+     "item": 61505,
+     "p": 0.3
+    },
+    {
+     "item": 58025,
+     "p": 0.1
+    }
+   ]
+  },
+  {
+   "id": 1006,
+   "name": "夜狼",
+   "level": 3,
+   "hp": 55,
+   "atk": 10,
+   "def": 2,
+   "atkInterval": 17,
+   "moveSpeed": 1,
+   "exp": 18,
+   "gold": [
+    0,
+    6
+   ],
+   "alignment": -40,
+   "aggroRange": 5,
+   "leash": 10,
+   "night": true,
+   "element": "none",
+   "drops": [
+    {
+     "item": 61502,
+     "p": 0.3
+    },
+    {
+     "item": 61505,
+     "p": 0.15
+    }
+   ]
+  },
+  {
+   "id": 1007,
+   "name": "妖法師",
+   "level": 11,
+   "hp": 320,
+   "atk": 20,
+   "def": 8,
+   "spellDef": 14,
+   "atkInterval": 16,
+   "moveSpeed": 1,
+   "exp": 150,
+   "gold": [
+    0,
+    20
+   ],
+   "alignment": -150,
+   "aggroRange": 6,
+   "leash": 12,
+   "element": "fire",
+   "spell": "huo_s",
+   "spellCd": 360,
+   "drops": [
+    {
+     "item": 30507,
+     "p": 0.15
+    },
+    {
+     "item": 65210,
+     "p": 0.2
+    }
+   ]
+  },
+  {
+   "id": 1008,
+   "name": "妖道士",
+   "level": 15,
+   "hp": 520,
+   "atk": 28,
+   "def": 12,
+   "spellDef": 26,
+   "atkInterval": 15,
+   "moveSpeed": 1,
+   "exp": 260,
+   "gold": [
+    10,
+    40
+   ],
+   "alignment": -300,
+   "aggroRange": 6,
+   "leash": 12,
+   "element": "none",
+   "spell": "seal",
+   "spellCd": 480,
+   "drops": [
+    {
+     "item": 30526,
+     "p": 0.15
+    },
+    {
+     "item": 61505,
+     "p": 0.2
+    }
+   ]
+  },
+  {
+   "id": 1009,
+   "name": "妖僧侶",
+   "level": 24,
+   "hp": 1100,
+   "atk": 45,
+   "def": 20,
+   "spellDef": 60,
+   "atkInterval": 14,
+   "moveSpeed": 1,
+   "exp": 800,
+   "gold": [
+    20,
+    80
+   ],
+   "alignment": -600,
+   "aggroRange": 7,
+   "leash": 14,
+   "element": "none",
+   "spell": "hex",
+   "spellCd": 600,
+   "drops": [
+    {
+     "item": 30525,
+     "p": 0.12
+    },
+    {
+     "item": 58025,
+     "p": 0.1
+    }
+   ]
+  },
+  {
+   "id": 1010,
+   "name": "霸盜賊",
+   "level": 20,
+   "hp": 800,
+   "atk": 42,
+   "def": 14,
+   "spellDef": 30,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 420,
+   "gold": [
+    20,
+    60
+   ],
+   "alignment": -400,
+   "aggroRange": 6,
+   "leash": 14,
+   "element": "none",
+   "drops": [
+    {
+     "item": 58010,
+     "p": 0.5
+    }
+   ]
+  },
+  {
+   "id": 1011,
+   "name": "瀧銘",
+   "level": 32,
+   "hp": 1800,
+   "atk": 55,
+   "def": 22,
+   "spellDef": 40,
+   "atkInterval": 12,
+   "moveSpeed": 1,
+   "exp": 0,
+   "gold": [
+    0,
+    0
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "drops": []
+  },
+  {
+   "id": 11091,
+   "name": "山賊",
+   "level": 11,
+   "hp": 279,
+   "atk": 28,
+   "def": 10,
+   "atkInterval": 18,
+   "moveSpeed": 1,
+   "exp": 250,
+   "gold": [
+    0,
+    33
+   ],
+   "alignment": -220,
+   "aggroRange": 5,
+   "leash": 10,
+   "groups": false,
+   "flee": true,
+   "drops": [
+    {
+     "item": 29040,
+     "p": 0.09
+    },
+    {
+     "item": 29038,
+     "p": 0.3
+    }
+   ],
+   "rareDrops": [
+    {
+     "item": 10037,
+     "p": 0.004
+    },
+    {
+     "item": 11039,
+     "p": 0.002
+    },
+    {
+     "item": 22025,
+     "p": 0.006
+    },
+    {
+     "item": 13014,
+     "p": 0.002
+    },
+    {
+     "item": 14014,
+     "p": 0.002
+    },
+    {
+     "item": 23001,
+     "p": 0.002
+    },
+    {
+     "item": 29067,
+     "p": 0.025
+    }
+   ]
+  },
+  {
+   "id": 11068,
+   "name": "流氓1",
+   "level": 14,
+   "hp": 330,
+   "atk": 33,
+   "def": 10,
+   "atkInterval": 18,
+   "moveSpeed": 1,
+   "exp": 385,
+   "gold": [
+    0,
+    42
+   ],
+   "alignment": -280,
+   "aggroRange": 5,
+   "leash": 10,
+   "groups": false,
+   "flee": true,
+   "drops": [
+    {
+     "item": 29042,
+     "p": 0.3
+    }
+   ],
+   "rareDrops": [
+    {
+     "item": 10039,
+     "p": 0.002
+    },
+    {
+     "item": 11037,
+     "p": 0.002
+    },
+    {
+     "item": 12002,
+     "p": 0.002
+    },
+    {
+     "item": 22027,
+     "p": 0.0006
+    },
+    {
+     "item": 23002,
+     "p": 0.002
+    },
+    {
+     "item": 15003,
+     "p": 0.002
+    },
+    {
+     "item": 61506,
+     "p": 0.001
+    },
+    {
+     "item": 29067,
+     "p": 0.025
+    }
+   ]
+  },
+  {
+   "id": 11070,
+   "name": "地痞1",
+   "level": 30,
+   "hp": 720,
+   "atk": 48,
+   "def": 18,
+   "atkInterval": 14,
+   "moveSpeed": 1,
+   "exp": 1520,
+   "gold": [
+    0,
+    90
+   ],
+   "alignment": -600,
+   "aggroRange": 4,
+   "leash": 10,
+   "groups": false,
+   "flee": true,
+   "drops": [
+    {
+     "item": 29042,
+     "p": 0.3
+    }
+   ],
+   "rareDrops": [
+    {
+     "item": 10029,
+     "p": 0.0015
+    },
+    {
+     "item": 11029,
+     "p": 0.0015
+    },
+    {
+     "item": 12029,
+     "p": 0.0015
+    },
+    {
+     "item": 13029,
+     "p": 0.0015
+    },
+    {
+     "item": 14029,
+     "p": 0.0015
+    },
+    {
+     "item": 15029,
+     "p": 0.0015
+    },
+    {
+     "item": 61506,
+     "p": 0.002
+    },
+    {
+     "item": 29069,
+     "p": 0.025
+    },
+    {
+     "item": 31215,
+     "p": 0.002
+    }
+   ]
+  },
+  {
+   "id": 12022,
+   "name": "水鴨",
+   "level": 5,
+   "hp": 22,
+   "atk": 4,
+   "def": 0,
+   "atkInterval": 19,
+   "moveSpeed": 1,
+   "exp": 60,
+   "gold": [
+    0,
+    15
+   ],
+   "alignment": -40,
+   "aggroRange": 0,
+   "leash": 10,
+   "groups": false,
+   "flee": true,
+   "drops": [],
+   "rareDrops": []
+  },
+  {
+   "id": 12044,
+   "name": "兔兒",
+   "level": 5,
+   "hp": 21,
+   "atk": 4,
+   "def": 0,
+   "atkInterval": 19,
+   "moveSpeed": 1,
+   "exp": 60,
+   "gold": [
+    0,
+    15
+   ],
+   "alignment": -40,
+   "aggroRange": 0,
+   "leash": 10,
+   "groups": false,
+   "flee": true,
+   "drops": [],
+   "rareDrops": []
+  },
+  {
+   "id": 12003,
+   "name": "野兔",
+   "level": 7,
+   "hp": 128,
+   "atk": 17,
+   "def": 5,
+   "atkInterval": 19,
+   "moveSpeed": 1,
+   "exp": 111,
+   "gold": [
+    0,
+    21
+   ],
+   "alignment": -40,
+   "aggroRange": 0,
+   "leash": 10,
+   "groups": false,
+   "flee": true,
+   "drops": [
+    {
+     "item": 12201,
+     "p": 0.12
+    },
+    {
+     "item": 29038,
+     "p": 0.3
+    },
+    {
+     "item": 29045,
+     "p": 0.06
+    }
+   ],
+   "rareDrops": [
+    {
+     "item": 26037,
+     "p": 0.036
+    },
+    {
+     "item": 29042,
+     "p": 0.016
+    },
+    {
+     "item": 26038,
+     "p": 0.012
+    },
+    {
+     "item": 25100,
+     "p": 0.03
+    },
+    {
+     "item": 25101,
+     "p": 0.012
+    },
+    {
+     "item": 29067,
+     "p": 0.025
+    }
+   ]
+  },
+  {
+   "id": 12046,
+   "name": "草貂",
+   "level": 7,
+   "hp": 142,
+   "atk": 19,
+   "def": 5,
+   "atkInterval": 19,
+   "moveSpeed": 1,
+   "exp": 111,
+   "gold": [
+    0,
+    21
+   ],
+   "alignment": -40,
+   "aggroRange": 0,
+   "leash": 10,
+   "groups": false,
+   "flee": true,
+   "drops": [],
+   "rareDrops": []
+  },
+  {
+   "id": 12021,
+   "name": "野貂",
+   "level": 9,
+   "hp": 100,
+   "atk": 13,
+   "def": 5,
+   "atkInterval": 19,
+   "moveSpeed": 1,
+   "exp": 174,
+   "gold": [
+    0,
+    27
+   ],
+   "alignment": -40,
+   "aggroRange": 0,
+   "leash": 10,
+   "groups": false,
+   "flee": true,
+   "drops": [
+    {
+     "item": 29038,
+     "p": 0.3
+    }
+   ],
+   "rareDrops": [
+    {
+     "item": 29041,
+     "p": 0.024
+    },
+    {
+     "item": 25108,
+     "p": 0.012
+    },
+    {
+     "item": 29039,
+     "p": 0.018
+    },
+    {
+     "item": 29045,
+     "p": 0.036
+    },
+    {
+     "item": 26038,
+     "p": 0.012
+    },
+    {
+     "item": 29048,
+     "p": 0.012
+    },
+    {
+     "item": 26037,
+     "p": 0.015
+    },
+    {
+     "item": 29067,
+     "p": 0.025
+    }
+   ]
+  },
+  {
+   "id": 12029,
+   "name": "蝴蝶精",
+   "level": 9,
+   "hp": 103,
+   "atk": 14,
+   "def": 5,
+   "atkInterval": 19,
+   "moveSpeed": 1,
+   "exp": 174,
+   "gold": [
+    0,
+    27
+   ],
+   "alignment": -40,
+   "aggroRange": 0,
+   "leash": 10,
+   "groups": false,
+   "flee": true,
+   "drops": [
+    {
+     "item": 29040,
+     "p": 0.09
+    },
+    {
+     "item": 29039,
+     "p": 0.3
+    },
+    {
+     "item": 25103,
+     "p": 0.12
+    }
+   ],
+   "rareDrops": [
+    {
+     "item": 29041,
+     "p": 0.024
+    },
+    {
+     "item": 26037,
+     "p": 0.012
+    },
+    {
+     "item": 29045,
+     "p": 0.036
+    },
+    {
+     "item": 26038,
+     "p": 0.036
+    },
+    {
+     "item": 29048,
+     "p": 0.012
+    },
+    {
+     "item": 29067,
+     "p": 0.025
+    }
+   ]
+  },
+  {
+   "id": 12031,
+   "name": "蜻蜓",
+   "level": 9,
+   "hp": 116,
+   "atk": 16,
+   "def": 5,
+   "atkInterval": 19,
+   "moveSpeed": 1,
+   "exp": 174,
+   "gold": [
+    0,
+    27
+   ],
+   "alignment": -40,
+   "aggroRange": 0,
+   "leash": 10,
+   "groups": false,
+   "flee": true,
+   "drops": [
+    {
+     "item": 29040,
+     "p": 0.09
+    },
+    {
+     "item": 29039,
+     "p": 0.3
+    },
+    {
+     "item": 29045,
+     "p": 0.4
+    },
+    {
+     "item": 25103,
+     "p": 0.12
+    }
+   ],
+   "rareDrops": [
+    {
+     "item": 29041,
+     "p": 0.024
+    },
+    {
+     "item": 26037,
+     "p": 0.012
+    },
+    {
+     "item": 26038,
+     "p": 0.012
+    },
+    {
+     "item": 29048,
+     "p": 0.012
+    },
+    {
+     "item": 29067,
+     "p": 0.025
+    }
+   ]
+  },
+  {
+   "id": 12011,
+   "name": "猴子",
+   "level": 11,
+   "hp": 330,
+   "atk": 33,
+   "def": 10,
+   "atkInterval": 18,
+   "moveSpeed": 1,
+   "exp": 250,
+   "gold": [
+    0,
+    33
+   ],
+   "alignment": -40,
+   "aggroRange": 0,
+   "leash": 10,
+   "groups": false,
+   "flee": true,
+   "drops": [
+    {
+     "item": 29039,
+     "p": 0.3
+    },
+    {
+     "item": 29043,
+     "p": 0.09
+    }
+   ],
+   "rareDrops": [
+    {
+     "item": 29041,
+     "p": 0.024
+    },
+    {
+     "item": 29036,
+     "p": 0.018
+    },
+    {
+     "item": 29045,
+     "p": 0.036
+    },
+    {
+     "item": 26038,
+     "p": 0.012
+    },
+    {
+     "item": 29049,
+     "p": 0.012
+    },
+    {
+     "item": 25097,
+     "p": 0.015
+    },
+    {
+     "item": 29067,
+     "p": 0.025
+    }
+   ]
+  },
+  {
+   "id": 12005,
+   "name": "母雞",
+   "level": 11,
+   "hp": 354,
+   "atk": 35,
+   "def": 10,
+   "atkInterval": 18,
+   "moveSpeed": 1,
+   "exp": 250,
+   "gold": [
+    0,
+    33
+   ],
+   "alignment": -40,
+   "aggroRange": 0,
+   "leash": 10,
+   "groups": false,
+   "flee": true,
+   "drops": [
+    {
+     "item": 29039,
+     "p": 0.3
+    },
+    {
+     "item": 29036,
+     "p": 0.09
+    }
+   ],
+   "rareDrops": [
+    {
+     "item": 29041,
+     "p": 0.024
+    },
+    {
+     "item": 29043,
+     "p": 0.018
+    },
+    {
+     "item": 29045,
+     "p": 0.036
+    },
+    {
+     "item": 26038,
+     "p": 0.012
+    },
+    {
+     "item": 29048,
+     "p": 0.012
+    },
+    {
+     "item": 25098,
+     "p": 0.015
+    },
+    {
+     "item": 29067,
+     "p": 0.025
+    },
+    {
+     "item": 31208,
+     "p": 0.002
+    }
+   ]
+  },
+  {
+   "id": 12018,
+   "name": "山羊",
+   "level": 14,
+   "hp": 261,
+   "atk": 26,
+   "def": 10,
+   "atkInterval": 18,
+   "moveSpeed": 1,
+   "exp": 385,
+   "gold": [
+    0,
+    42
+   ],
+   "alignment": -40,
+   "aggroRange": 0,
+   "leash": 10,
+   "groups": false,
+   "flee": true,
+   "drops": [],
+   "rareDrops": [
+    {
+     "item": 16013,
+     "p": 0.006
+    },
+    {
+     "item": 17013,
+     "p": 0.006
+    },
+    {
+     "item": 18013,
+     "p": 0.006
+    }
+   ]
+  },
+  {
+   "id": 12030,
+   "name": "飛蛾怪",
+   "level": 14,
+   "hp": 336,
+   "atk": 34,
+   "def": 10,
+   "atkInterval": 18,
+   "moveSpeed": 1,
+   "exp": 385,
+   "gold": [
+    0,
+    42
+   ],
+   "alignment": -40,
+   "aggroRange": 0,
+   "leash": 10,
+   "groups": false,
+   "flee": true,
+   "drops": [
+    {
+     "item": 29043,
+     "p": 0.06
+    },
+    {
+     "item": 29042,
+     "p": 0.3
+    },
+    {
+     "item": 25104,
+     "p": 0.06
+    }
+   ],
+   "rareDrops": [
+    {
+     "item": 32101,
+     "p": 6e-05
+    },
+    {
+     "item": 26038,
+     "p": 0.006
+    },
+    {
+     "item": 32301,
+     "p": 6e-05
+    },
+    {
+     "item": 29045,
+     "p": 0.024
+    },
+    {
+     "item": 26038,
+     "p": 0.012
+    },
+    {
+     "item": 29067,
+     "p": 0.025
+    }
+   ]
+  },
+  {
+   "id": 12013,
+   "name": "野豬",
+   "level": 14,
+   "hp": 240,
+   "atk": 24,
+   "def": 10,
+   "atkInterval": 18,
+   "moveSpeed": 1,
+   "exp": 385,
+   "gold": [
+    0,
+    42
+   ],
+   "alignment": -280,
+   "aggroRange": 4,
+   "leash": 10,
+   "groups": false,
+   "flee": true,
+   "drops": [
+    {
+     "item": 12202,
+     "p": 0.12
+    },
+    {
+     "item": 29043,
+     "p": 0.3
+    }
+   ],
+   "rareDrops": [
+    {
+     "item": 32302,
+     "p": 6e-05
+    },
+    {
+     "item": 29042,
+     "p": 0.009
+    },
+    {
+     "item": 29045,
+     "p": 0.036
+    },
+    {
+     "item": 26038,
+     "p": 0.012
+    },
+    {
+     "item": 29049,
+     "p": 0.012
+    },
+    {
+     "item": 25097,
+     "p": 0.015
+    },
+    {
+     "item": 29067,
+     "p": 0.025
+    },
+    {
+     "item": 31209,
+     "p": 0.002
+    }
+   ]
+  },
+  {
+   "id": 12019,
+   "name": "瘋貓",
+   "level": 14,
+   "hp": 339,
+   "atk": 34,
+   "def": 10,
+   "atkInterval": 18,
+   "moveSpeed": 1,
+   "exp": 385,
+   "gold": [
+    0,
+    42
+   ],
+   "alignment": -280,
+   "aggroRange": 4,
+   "leash": 10,
+   "groups": false,
+   "flee": true,
+   "drops": [
+    {
+     "item": 29039,
+     "p": 0.3
+    },
+    {
+     "item": 29043,
+     "p": 0.09
+    }
+   ],
+   "rareDrops": [
+    {
+     "item": 29041,
+     "p": 0.024
+    },
+    {
+     "item": 29042,
+     "p": 0.009
+    },
+    {
+     "item": 29045,
+     "p": 0.036
+    },
+    {
+     "item": 26038,
+     "p": 0.012
+    },
+    {
+     "item": 29049,
+     "p": 0.012
+    },
+    {
+     "item": 25097,
+     "p": 0.015
+    },
+    {
+     "item": 29067,
+     "p": 0.025
+    },
+    {
+     "item": 31209,
+     "p": 0.002
+    }
+   ]
+  },
+  {
+   "id": 12012,
+   "name": "野狗",
+   "level": 16,
+   "hp": 285,
+   "atk": 28,
+   "def": 10,
+   "atkInterval": 17,
+   "moveSpeed": 1,
+   "exp": 490,
+   "gold": [
+    0,
+    48
+   ],
+   "alignment": -320,
+   "aggroRange": 5,
+   "leash": 10,
+   "groups": true,
+   "flee": true,
+   "drops": [
+    {
+     "item": 29043,
+     "p": 0.06
+    },
+    {
+     "item": 29042,
+     "p": 0.3
+    }
+   ],
+   "rareDrops": [
+    {
+     "item": 32306,
+     "p": 6e-05
+    },
+    {
+     "item": 26038,
+     "p": 0.006
+    },
+    {
+     "item": 29042,
+     "p": 0.009
+    },
+    {
+     "item": 29045,
+     "p": 0.048
+    },
+    {
+     "item": 26038,
+     "p": 0.03
+    },
+    {
+     "item": 61502,
+     "p": 0.01
+    },
+    {
+     "item": 29068,
+     "p": 0.025
+    },
+    {
+     "item": 31210,
+     "p": 0.002
+    }
+   ]
+  },
+  {
+   "id": 12006,
+   "name": "狐貍",
+   "level": 18,
+   "hp": 309,
+   "atk": 31,
+   "def": 10,
+   "atkInterval": 17,
+   "moveSpeed": 1,
+   "exp": 606,
+   "gold": [
+    0,
+    54
+   ],
+   "alignment": -360,
+   "aggroRange": 5,
+   "leash": 10,
+   "groups": false,
+   "flee": true,
+   "drops": [
+    {
+     "item": 29042,
+     "p": 0.3
+    }
+   ],
+   "rareDrops": [
+    {
+     "item": 22002,
+     "p": 0.0015
+    },
+    {
+     "item": 23003,
+     "p": 0.0018
+    },
+    {
+     "item": 24002,
+     "p": 0.0015
+    },
+    {
+     "item": 25109,
+     "p": 0.015
+    },
+    {
+     "item": 26038,
+     "p": 0.03
+    },
+    {
+     "item": 26039,
+     "p": 0.005
+    },
+    {
+     "item": 61503,
+     "p": 0.006
+    },
+    {
+     "item": 29068,
+     "p": 0.025
+    },
+    {
+     "item": 31211,
+     "p": 0.002
+    }
+   ]
+  },
+  {
+   "id": 12014,
+   "name": "花鹿",
+   "level": 20,
+   "hp": 318,
+   "atk": 32,
+   "def": 10,
+   "atkInterval": 16,
+   "moveSpeed": 1,
+   "exp": 732,
+   "gold": [
+    0,
+    60
+   ],
+   "alignment": -40,
+   "aggroRange": 0,
+   "leash": 10,
+   "groups": false,
+   "flee": true,
+   "drops": [],
+   "rareDrops": [
+    {
+     "item": 16027,
+     "p": 0.0025
+    },
+    {
+     "item": 17027,
+     "p": 0.0025
+    },
+    {
+     "item": 18027,
+     "p": 0.0025
+    }
+   ]
+  },
+  {
+   "id": 12028,
+   "name": "黃蜂",
+   "level": 20,
+   "hp": 303,
+   "atk": 30,
+   "def": 10,
+   "atkInterval": 16,
+   "moveSpeed": 1,
+   "exp": 732,
+   "gold": [
+    0,
+    60
+   ],
+   "alignment": -400,
+   "aggroRange": 4,
+   "leash": 10,
+   "groups": true,
+   "flee": true,
+   "drops": [
+    {
+     "item": 29042,
+     "p": 0.3
+    },
+    {
+     "item": 25099,
+     "p": 0.15
+    }
+   ],
+   "rareDrops": [
+    {
+     "item": 32304,
+     "p": 6e-05
+    },
+    {
+     "item": 26039,
+     "p": 0.003
+    },
+    {
+     "item": 29043,
+     "p": 0.03
+    },
+    {
+     "item": 29044,
+     "p": 0.03
+    },
+    {
+     "item": 29045,
+     "p": 0.024
+    },
+    {
+     "item": 26038,
+     "p": 0.012
+    },
+    {
+     "item": 29068,
+     "p": 0.025
+    }
+   ]
+  },
+  {
+   "id": 12017,
+   "name": "大蟒",
+   "level": 20,
+   "hp": 306,
+   "atk": 31,
+   "def": 10,
+   "atkInterval": 16,
+   "moveSpeed": 1,
+   "exp": 732,
+   "gold": [
+    0,
+    60
+   ],
+   "alignment": -400,
+   "aggroRange": 4,
+   "leash": 10,
+   "groups": false,
+   "flee": true,
+   "drops": [
+    {
+     "item": 29042,
+     "p": 0.3
+    }
+   ],
+   "rareDrops": [
+    {
+     "item": 19027,
+     "p": 0.0025
+    },
+    {
+     "item": 20027,
+     "p": 0.0025
+    },
+    {
+     "item": 21027,
+     "p": 0.0025
+    },
+    {
+     "item": 32303,
+     "p": 6e-05
+    },
+    {
+     "item": 26038,
+     "p": 0.03
+    },
+    {
+     "item": 26039,
+     "p": 0.005
+    },
+    {
+     "item": 61503,
+     "p": 0.006
+    },
+    {
+     "item": 29068,
+     "p": 0.025
+    },
+    {
+     "item": 31212,
+     "p": 0.002
+    }
+   ]
+  },
+  {
+   "id": 12034,
+   "name": "蝙蝠",
+   "level": 20,
+   "hp": 279,
+   "atk": 28,
+   "def": 10,
+   "atkInterval": 16,
+   "moveSpeed": 1,
+   "exp": 732,
+   "gold": [
+    0,
+    60
+   ],
+   "alignment": -400,
+   "aggroRange": 4,
+   "leash": 10,
+   "groups": true,
+   "flee": true,
+   "drops": [],
+   "rareDrops": []
+  },
+  {
+   "id": 19001,
+   "name": "洞窟獸王",
+   "level": 22,
+   "hp": 2619,
+   "atk": 93,
+   "def": 27,
+   "atkInterval": 16,
+   "moveSpeed": 1,
+   "exp": 1304,
+   "gold": [
+    0,
+    66
+   ],
+   "alignment": -440,
+   "aggroRange": 6,
+   "leash": 10,
+   "groups": false,
+   "flee": false,
+   "drops": [
+    {
+     "item": 61505,
+     "p": 0.5
+    },
+    {
+     "item": 61504,
+     "p": 0.35
+    },
+    {
+     "item": 29042,
+     "p": 0.3
+    },
+    {
+     "item": 25107,
+     "p": 0.12
+    },
+    {
+     "item": 28035,
+     "p": 0.08
+    }
+   ],
+   "rareDrops": [
+    {
+     "item": 32302,
+     "p": 0.02
+    }
+   ],
+   "boss": true
+  }
+ ],
+ "spawns": [
+  {
+   "zone": "field_1",
+   "monster": 1001,
+   "count": 8,
+   "respawnTicks": 100
+  },
+  {
+   "zone": "field_1",
+   "monster": 1002,
+   "count": 6,
+   "respawnTicks": 150
+  },
+  {
+   "zone": "field_1",
+   "monster": 1003,
+   "count": 4,
+   "respawnTicks": 200
+  },
+  {
+   "zone": "field_1",
+   "monster": 1004,
+   "count": 3,
+   "respawnTicks": 250
+  },
+  {
+   "zone": "field_1",
+   "monster": 1005,
+   "count": 1,
+   "respawnTicks": 600
+  },
+  {
+   "zone": "field_1",
+   "monster": 1006,
+   "count": 4,
+   "respawnTicks": 200,
+   "night": true
+  },
+  {
+   "zone": "field_1",
+   "monster": 1007,
+   "count": 2,
+   "respawnTicks": 700
+  },
+  {
+   "zone": "field_1",
+   "monster": 1008,
+   "count": 1,
+   "respawnTicks": 900
+  },
+  {
+   "zone": "field_1",
+   "monster": 1009,
+   "count": 1,
+   "respawnTicks": 1200
+  },
+  {
+   "zone": "field_1",
+   "monster": 1010,
+   "count": 4,
+   "respawnTicks": 500
+  },
+  {
+   "zone": "field_1",
+   "monster": 11091,
+   "count": 3,
+   "respawnTicks": 400
+  },
+  {
+   "zone": "field_1",
+   "monster": 11068,
+   "count": 2,
+   "respawnTicks": 500
+  },
+  {
+   "zone": "field_1",
+   "monster": 11070,
+   "count": 1,
+   "respawnTicks": 900
+  },
+  {
+   "zone": "runan_f1",
+   "monster": 12022,
+   "count": 4,
+   "respawnTicks": 150
+  },
+  {
+   "zone": "runan_f1",
+   "monster": 12044,
+   "count": 4,
+   "respawnTicks": 180
+  },
+  {
+   "zone": "runan_f2",
+   "monster": 12003,
+   "count": 3,
+   "respawnTicks": 200
+  },
+  {
+   "zone": "runan_f2",
+   "monster": 12046,
+   "count": 3,
+   "respawnTicks": 220
+  },
+  {
+   "zone": "runan_f3",
+   "monster": 12021,
+   "count": 3,
+   "respawnTicks": 240
+  },
+  {
+   "zone": "runan_f3",
+   "monster": 12029,
+   "count": 2,
+   "respawnTicks": 250
+  },
+  {
+   "zone": "runan_f3",
+   "monster": 12031,
+   "count": 2,
+   "respawnTicks": 240
+  },
+  {
+   "zone": "runan_f4",
+   "monster": 12011,
+   "count": 3,
+   "respawnTicks": 260
+  },
+  {
+   "zone": "runan_f4",
+   "monster": 12005,
+   "count": 3,
+   "respawnTicks": 260
+  },
+  {
+   "zone": "runan_f5",
+   "monster": 12018,
+   "count": 3,
+   "respawnTicks": 280
+  },
+  {
+   "zone": "runan_f5",
+   "monster": 12030,
+   "count": 2,
+   "respawnTicks": 280
+  },
+  {
+   "zone": "runan_f6",
+   "monster": 12013,
+   "count": 3,
+   "respawnTicks": 300
+  },
+  {
+   "zone": "runan_f6",
+   "monster": 12019,
+   "count": 2,
+   "respawnTicks": 300
+  },
+  {
+   "zone": "runan_f7",
+   "monster": 12012,
+   "count": 4,
+   "respawnTicks": 260
+  },
+  {
+   "zone": "runan_f8",
+   "monster": 12006,
+   "count": 3,
+   "respawnTicks": 320
+  },
+  {
+   "zone": "runan_f8",
+   "monster": 12014,
+   "count": 2,
+   "respawnTicks": 300
+  },
+  {
+   "zone": "runan_f9",
+   "monster": 12028,
+   "count": 4,
+   "respawnTicks": 240
+  },
+  {
+   "zone": "runan_f9",
+   "monster": 12017,
+   "count": 2,
+   "respawnTicks": 350
+  },
+  {
+   "zone": "runan_f9",
+   "monster": 12034,
+   "count": 4,
+   "respawnTicks": 200
+  },
+  {
+   "zone": "runan_f10",
+   "monster": 19001,
+   "count": 1,
+   "respawnTicks": 0
+  }
+ ]
 }
