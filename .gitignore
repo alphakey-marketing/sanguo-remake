@@ -1,3 +1,7 @@
 node_modules/
 client/assets_placeholder/
 client/.godot/
+client/build/
+proc.txt
+scratchpad/
+__pycache__/

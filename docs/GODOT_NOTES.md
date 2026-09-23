@@ -26,3 +26,16 @@ Godot 路徑: `D:\Download\Sengoku\godot\Godot_v4.7.2-stable_win64_console.exe`�
 - `.csv` 放喺 `res://` 會被當翻譯檔匯入而出錯 → 原始 csv 放 `data_src/`（Godot 項目外）
 - GDScript 唔同 JS：`roundi` 對負 .5 向外進位，要用 `MathX.js_round`；JSON 讀返嚟數字全部係 float（`Sim._intify` 還原 int）；`str` 係內建函數名，變數唔好叫 str
 - 64 位整數唔好放 JSON（float 精度）；RNG 狀態用 32 位
+
+## Sim 分層（繼承鏈）
+- `sim.gd` 拆咗做 8 個檔: `sim_core -> sim_quest -> sim_char -> sim_econ -> sim_combat -> sim_skill -> sim_ai -> sim`（只有 `sim.gd` 有 `class_name Sim`，其餘用 `extends "res://sim/xxx.gd"`）
+- 規矩: 每層只可以叫自己或者下層嘅 func；要叫上層嘅就將 func 搬落下層（或者搬去 `sim.gd`）
+- 對外接口（`Sim.new` / `cmd_*` / `view_*` / `save_string` / `Sim.load_string` / 常量 `Sim.W`）不變
+
+## Android APK
+- 匯出: `Godot --headless --path client --export-debug "Android" build/sanguo.apk`
+- 用預編模板 (`gradle_build/use_gradle_build=false`)，模板喺 `%APPDATA%/Godot/export_templates/4.7.2.stable/android_*.apk`（由 `D:\Download\Sengoku\.dl\export_templates.tpz` 抽出）
+- 要 `rendering/textures/vram_compression/import_etc2_astc=true`，唔係就匯唔到
+- SDK `D:/Android/Sdk`、JDK 21 `D:/Program Files/Eclipse Adoptium/jdk-21`（editor_settings-4.7.tres）；debug keystore `%APPDATA%/Godot/keystores/debug.keystore`（pass android）
+- 安裝: `D:/Android/Sdk/platform-tools/adb install -r client/build/sanguo.apk`
+- `client/build/`（APK / web 匯出）已 gitignore
