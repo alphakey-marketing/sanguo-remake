@@ -302,7 +302,7 @@ func t_fusion_sim(data: GameData) -> void:
 	sim.cmd_fusion_start(id)
 	check((ch.get("fusing", {}) as Dictionary).is_empty(), "唔喺打鐵鋪: 唔開始")
 	# 去打鐵鋪 + 背包屬性石
-	_put(sim, id, 12, 20)
+	_put(sim, id, int(data.facilities["forge"]["x"]), int(data.facilities["forge"]["y"]))
 	sim.cmd_debug_give(id, 32001, 2)     # 飄嵐之石 風10% ×2
 	sim.cmd_fusion_start(id)
 	check(not (ch.get("fusing", {}) as Dictionary).is_empty(), "開始融合 QTE")

@@ -3,6 +3,8 @@ extends RefCounted
 # 載入 res://data/*.json。數值表喺 data/，規則喺 rules/
 
 const NEWBIE_LEVEL := 5
+const WORLD_W := 512              # 全域格仔 (所有地圖拼埋一張，spec 12 §2)
+const WORLD_H := 512
 
 var classes: Dictionary = {}     # id(String) -> def
 var monsters: Dictionary = {}    # id(int) -> def
@@ -20,9 +22,16 @@ var shops: Array = []
 var world: Dictionary = {}        # clock/cities/market/disasters (data/world.json)
 var facilities: Dictionary = {}   # 練兵場/私塾/寺廟 (data/facilities.json)
 var cities: Dictionary = {}       # city id -> def (由 world.json)
-var zones: Array = []             # 安全區/戰鬥區 (data/zones.json)
-var walls: Array = []             # 地形阻擋格 rect [x0,y0,x1,y1] (data/zones.json, Step 11)
-var travel_points: Array = []     # 傳送點 (data/zones.json)
+var zones: Array = []             # 安全區/戰鬥區: 每張地圖一個 (由 data/maps.json 生成, spec 12 §2)
+var travel_points: Array = []     # 傳送點 (data/maps.json portals，已轉全域座標)
+var maps: Array = []              # 地圖 def (data/maps.json)，載入後加 w/h、座標轉全域
+var map_by_id: Dictionary = {}    # map id -> def
+var legend: Dictionary = {}       # 地形字元 -> {name, walk}
+var tiles := PackedByteArray()    # 全域地形字元 (ASCII)，0 = 虛空 (唔喺任何地圖)
+var walk := PackedByteArray()     # 全域行得表 1/0
+var portal_at: Dictionary = {}    # cell (y*W+x) -> auto 傳送點 id (踩上去就過圖)
+var landmarks: Array = []         # 史蹟地標 (已轉全域座標)
+var world_map: Dictionary = {}    # 大地圖 (天下) 節點/路線 (UI 用)
 var work: Dictionary = {}         # 工作技能 (data/work.json.skills, Step 7.1)
 var work_meta: Dictionary = {}    # 工作技能雜項 (data/work.json.toolDurability)
 var quiz: Array = []              # 理念測驗題庫 (data/quiz.json, Step 7.5)
@@ -58,10 +67,7 @@ static func load_all() -> GameData:
 	var items: Array = _read("res://data/items.json")
 	g.world = _read("res://data/world.json")
 	g.facilities = _read("res://data/facilities.json")
-	var zn: Dictionary = _read("res://data/zones.json")
-	g.zones = zn["zones"]
-	g.travel_points = zn["travel_points"]
-	g.walls = zn.get("walls", [])
+	g._load_maps(_read("res://data/maps.json"))
 	var wk: Dictionary = _read("res://data/work.json")
 	g.work = wk["skills"]
 	g.work_meta = {"toolDurability": wk["toolDurability"]}
@@ -137,5 +143,91 @@ static func load_all() -> GameData:
 			g.weapons[id] = {"power": p, "hit": h if h != null else 45.0}
 		if heal_hp > 0 or heal_mp > 0 or heal_sp > 0:
 			g.heals[id] = {"hp": heal_hp, "mp": heal_mp, "sp": heal_sp}
+	g._place_all()
 	_cache = g
 	return g
+
+
+# ---- 地圖 (spec 12 §2) ----
+# 讀每張 data/maps/<id>.txt 落全域格仔；每張地圖生成一個 zone；傳送點/地標/區域轉全域
+func _load_maps(mj: Dictionary) -> void:
+	legend = mj["legend"]
+	var walk_code := {}
+	for k in legend:
+		walk_code[String(k).unicode_at(0)] = bool(legend[k]["walk"])
+	tiles.resize(WORLD_W * WORLD_H)
+	walk.resize(WORLD_W * WORLD_H)
+	for md in mj["maps"]:
+		var id := String(md["id"])
+		var rows := FileAccess.get_file_as_string("res://data/maps/%s.txt" % id).replace("\r", "").split("\n", false)
+		assert(rows.size() > 0, "地圖檔讀唔到: " + id)
+		var ox := int(md["ox"])
+		var oy := int(md["oy"])
+		md["w"] = rows[0].length()
+		md["h"] = rows.size()
+		assert(ox + int(md["w"]) <= WORLD_W and oy + int(md["h"]) <= WORLD_H, "地圖出界: " + id)
+		for y in rows.size():
+			var row: String = rows[y]
+			for x in mini(row.length(), int(md["w"])):
+				var c := row.unicode_at(x)
+				var i := (oy + y) * WORLD_W + ox + x
+				tiles[i] = c if c < 128 else 32
+				walk[i] = 1 if walk_code.get(c, false) else 0
+		if md.has("spawn"):
+			var s: Array = md["spawn"]
+			md["spawn"] = [int(s[0]) + ox, int(s[1]) + oy, int(s[2]) + ox, int(s[3]) + oy]
+		for a in md.get("areas", []):
+			for k in ["x0", "x1"]:
+				a[k] = int(a[k]) + ox
+			for k in ["y0", "y1"]:
+				a[k] = int(a[k]) + oy
+		maps.append(md)
+		map_by_id[id] = md
+		zones.append({"id": id, "name": String(md["name"]), "safe": bool(md["safe"]), "map": id,
+			"x0": ox, "y0": oy, "x1": ox + int(md["w"]) - 1, "y1": oy + int(md["h"]) - 1})
+	travel_points = mj.get("portals", [])
+	landmarks = mj.get("landmarks", [])
+	world_map = mj.get("world", {})
+
+
+# 有 "map" 嘅物件: 地圖內座標 → 全域 (保留 lx/ly)
+func place(o: Dictionary) -> void:
+	if not o.has("map") or o.has("lx"):
+		return
+	var md: Dictionary = map_by_id.get(String(o["map"]), {})
+	assert(not md.is_empty(), "未知地圖: %s" % o["map"])
+	o["lx"] = int(o["x"])
+	o["ly"] = int(o["y"])
+	o["x"] = int(o["x"]) + int(md["ox"])
+	o["y"] = int(o["y"]) + int(md["oy"])
+
+
+func _place_all() -> void:
+	place(inn)
+	for s in shops:
+		place(s)
+	for k in facilities:
+		if facilities[k] is Dictionary:
+			place(facilities[k])
+	for n in quest_npc_list:
+		place(n)
+	for p in travel_points:
+		place(p)
+		if bool(p.get("auto", false)):
+			portal_at[int(p["y"]) * WORLD_W + int(p["x"])] = String(p["id"])
+	for lm in landmarks:
+		place(lm)
+	for sp in spawns:                     # spawn area = zone 地圖內座標 → 全域
+		var md: Dictionary = map_by_id.get(String(sp.get("zone", "")), {})
+		if md.is_empty():
+			continue
+		var a: Array = sp.get("area", [0, 0, int(md["w"]) - 1, int(md["h"]) - 1])
+		sp["area"] = [int(a[0]) + int(md["ox"]), int(a[1]) + int(md["oy"]), int(a[2]) + int(md["ox"]), int(a[3]) + int(md["oy"])]
+
+
+# 全域格屬邊張地圖 ({} = 虛空)
+func map_at(x: int, y: int) -> Dictionary:
+	for md in maps:
+		if x >= int(md["ox"]) and y >= int(md["oy"]) and x < int(md["ox"]) + int(md["w"]) and y < int(md["oy"]) + int(md["h"]):
+			return md
+	return {}

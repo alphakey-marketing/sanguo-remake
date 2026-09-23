@@ -1,7 +1,7 @@
 class_name HudLayout
 extends RefCounted
 # 手機 HUD 版面（三國群英傳M 風格）: 純函數，畫同判定共用同一份，唔會再錯位。
-#   左上 = 角色框（撳 = 角色面板）；右上 = 選單列（背包/角色/記事/更多）
+#   左上 = 角色框（撳 = 角色面板）；右上 = 選單列（背包/角色/記事/更多）+ 下面小地圖（撳 = 地圖面板）
 #   左下 = 浮動搖桿區；右下 = 普攻大圓 + 技能扇形 4 格 + 切換目標 + 自動 + 互動掣
 # 座標 = viewport 虛擬 px（640x360 起跳，aspect=expand 會變闊）。safe = 瀏海/圓角安全區（虛擬 px）。
 # 每個元件: {"kind": "circle", "c": Vector2, "r": float} 或 {"kind": "rect", "rect": Rect2}
@@ -17,6 +17,7 @@ const MENU := ["menu_bag", "menu_char", "menu_quest", "menu_more"]
 const MENU_LABELS := {"menu_bag": "背包", "menu_char": "角色", "menu_quest": "記事", "menu_more": "更多"}
 const MENU_SZ := 48.0
 const MENU_GAP := 4.0
+const MINI_SZ := Vector2(112, 50)   # 小地圖 (spec 12 §6)
 
 
 static func build(size: Vector2, safe: Rect2 = Rect2()) -> Dictionary:
@@ -33,6 +34,8 @@ static func build(size: Vector2, safe: Rect2 = Rect2()) -> Dictionary:
 	for i in MENU.size():
 		var x := R - 6 - MENU_SZ * (i + 1) - MENU_GAP * i
 		out[MENU[MENU.size() - 1 - i]] = {"kind": "rect", "rect": Rect2(x, T + 6, MENU_SZ, MENU_SZ)}
+	# 小地圖: 選單列下面靠右（區名/時辰寫喺入面）
+	out["minimap"] = {"kind": "rect", "rect": Rect2(R - 6 - MINI_SZ.x, T + 6 + MENU_SZ + 4, MINI_SZ.x, MINI_SZ.y)}
 	# 右下戰鬥群
 	var ac := Vector2(R - 74, B - 72)
 	out["attack"] = {"kind": "circle", "c": ac, "r": ATK_R}

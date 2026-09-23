@@ -116,6 +116,7 @@ func _kill_player(p: Dictionary) -> void:
 	p["tx"] = inn_pos.x
 	p["y"] = inn_pos.y
 	p["ty"] = inn_pos.y
+	p.erase("path")
 	p["atk_target"] = 0
 	_sync_stats(p)
 	_emit({"k": "die", "dst": p["id"], "lost": lost})

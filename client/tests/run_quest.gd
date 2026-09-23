@@ -138,20 +138,20 @@ func t_newbie_chain(data: GameData) -> void:
 	check(int(ch.get("lilian", 0)) == 10, "練兵場: 歷練 +10")
 	check(_bag_n(sim, id, 10002) == 1, "練兵場: 新手武器 (鬼頭刀)")
 	# --- 寺廟/私塾退款 ---
-	_put(sim, id, 22, 16)
+	_put(sim, id, int(data.facilities["temple"]["x"]), int(data.facilities["temple"]["y"]))
 	var gold0 := int(ch["gold"])
 	sim.cmd_facility(id, "temple")
 	check(bool(ch["questDone"].get("newbie_temple", false)), "寺廟: 新手任務完成")
 	check(int(ch["gold"]) == gold0, "寺廟: 退款 (免費)")
 	check(int(ch["attrs"]["cha"]) == int(data.classes["yishi"]["base"]["cha"]) + 1, "寺廟: 魅力 +1")
-	_put(sim, id, 14, 14)
+	_put(sim, id, int(data.facilities["school"]["x"]), int(data.facilities["school"]["y"]))
 	gold0 = int(ch["gold"])
 	sim.cmd_facility(id, "school")
 	check(bool(ch["questDone"].get("newbie_school", false)), "私塾: 新手任務完成")
 	check(int(ch["gold"]) == gold0, "私塾: 退款 (免費)")
 	check(int(ch["attrs"]["pol"]) == int(data.classes["yishi"]["base"]["pol"]) + 1, "私塾: 政治 +1")
 	# 再修練要收錢
-	_put(sim, id, 22, 16)
+	_put(sim, id, int(data.facilities["temple"]["x"]), int(data.facilities["temple"]["y"]))
 	sim.cmd_facility(id, "temple")
 	check(int(ch["gold"]) == gold0 - 8, "寺廟: 第二次收返 8 金")
 	# --- 流浪狗 (5 級 + 子時窗口) ---

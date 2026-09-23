@@ -210,8 +210,8 @@ func cmd_move(id: int, x: int, y: int) -> void:
 		if e["kind"] == "player":
 			_msg(id, "移動取消咗吟唱")
 		_emit({"k": "cast_interrupted", "dst": id, "reason": "move"})
-	e["tx"] = x
-	e["ty"] = y
+	var cap := mini(PATH_CAP, 200 + 40 * (absi(x - int(e["x"])) + absi(y - int(e["y"]))))   # 近路唔使大搜
+	_set_dest(e, x, y, cap)
 	e["atk_target"] = 0      # 手動行路取消攻擊
 
 
@@ -239,11 +239,71 @@ func cmd_travel(id: int, point_id: String) -> void:
 	e["y"] = int(to_p["y"])
 	e["tx"] = e["x"]
 	e["ty"] = e["y"]
+	e.erase("path")
 	e["atk_target"] = 0
 	if e.has("casting"):                     # 傳送 = 斷吟唱
 		e.erase("casting")
 		_emit({"k": "cast_interrupted", "dst": id, "reason": "travel"})
-	_emit({"k": "travel", "dst": id, "to": String(to_p["name"]), "x": e["x"], "y": e["y"]})
+	_emit({"k": "travel", "dst": id, "to": String(to_p["name"]), "x": e["x"], "y": e["y"],
+		"map": map_id_at(int(e["x"]), int(e["y"]))})
+
+
+# 行咗一格之後 (step() 叫): 踩中 auto 傳送點 = 過圖；玩家行近史蹟地標 = 第一次彈典故 (spec 12 §4~5)
+func _on_moved(e: Dictionary) -> void:
+	if not e.has("ch"):
+		return
+	var pid: String = data.portal_at.get(int(e["y"]) * W + int(e["x"]), "")
+	if pid != "":
+		cmd_travel(int(e["id"]), pid)
+		return
+	if e["kind"] != "player":
+		return
+	for lm in data.landmarks:
+		if not RulesCombat.in_range(e["x"], e["y"], int(lm["x"]), int(lm["y"]), float(lm.get("r", 3))):
+			continue
+		var seen: Array = e["ch"].get("landmarks", [])
+		if seen.has(String(lm["id"])):
+			continue
+		seen.append(String(lm["id"]))
+		e["ch"]["landmarks"] = seen
+		_emit({"k": "landmark", "dst": int(e["id"]), "id": String(lm["id"]), "name": String(lm["name"]), "text": String(lm["text"])})
+		_msg(int(e["id"]), "【%s】%s" % [lm["name"], lm["text"]])
+
+
+# 跨圖路由 (spec 12 §4): 唔喺 map_id 就行去第一跳嘅門口 (地圖圖 BFS)；返 true = 處理緊 (未到)
+func _route_to_map(e: Dictionary, map_id: String) -> bool:
+	var cur := map_id_at(int(e["x"]), int(e["y"]))
+	if cur == map_id or cur == "":
+		return false
+	var hop := next_portal(cur, map_id)
+	if hop.is_empty():
+		return false
+	var px := int(hop["x"])
+	var py := int(hop["y"])
+	if int(e["x"]) == px and int(e["y"]) == py:
+		cmd_travel(int(e["id"]), String(hop["id"]))
+	elif int(e["tx"]) != px or int(e["ty"]) != py:
+		cmd_move(int(e["id"]), px, py)
+	return true
+
+
+# 由 from_map 去 to_map 嘅第一個傳送點 (BFS，傳送點次序固定 → 決定性)
+func next_portal(from_map: String, to_map: String) -> Dictionary:
+	var first := {from_map: {}}
+	var q: Array = [from_map]
+	while not q.is_empty():
+		var m: String = q.pop_front()
+		for p in data.travel_points:
+			if String(p["map"]) != m:
+				continue
+			var nm := String(travel_point_by_id(String(p["to"])).get("map", ""))
+			if nm == "" or first.has(nm):
+				continue
+			first[nm] = p if m == from_map else first[m]
+			if nm == to_map:
+				return first[nm]
+			q.append(nm)
+	return {}
 
 
 func cmd_chat(id: int, text: String) -> void:

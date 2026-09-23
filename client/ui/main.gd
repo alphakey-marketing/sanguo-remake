@@ -47,6 +47,8 @@ var quest_items := {}              # item id -> true (任務道具，賣唔到�
 var pending := {}                  # 點遠處 NPC/設施: 行到附近自動開 {kind, ref}
 var marker := {"pos": Vector2.ZERO, "t": 0.0}   # 點地行路落點標記
 var _ask_seen := ""                # 任務答題對話框已自動彈過 (唔好一直彈)
+var cur_map := {}                  # 玩家而家身處嘅地圖 def (spec 12)
+var _place_key := ""               # 地圖+區名: 變咗就彈區名橫幅
 
 func _ready() -> void:
 	autotest = "--autotest" in OS.get_cmdline_user_args()
@@ -118,7 +120,9 @@ func _refresh() -> void:
 	quest_npcs = sim.view_quest_npcs()
 	var me = _me()
 	if me != null:
-		cam = Vector2(me.x, me.y) * TILE - get_viewport_rect().size / 2
+		cur_map = sim.map_at(int(me.x), int(me.y))
+		cam = _clamp_cam(Vector2(me.x, me.y) * TILE + Vector2(TILE, TILE) * 0.5 - get_viewport_rect().size / 2)
+		_check_place(me)
 	if target_id >= 0 and _ent(target_id) == null: target_id = -1
 	if exp_start < 0 and not ch.is_empty(): exp_start = _exp_total()
 	var cv: Variant = sim.clock_view()
@@ -126,6 +130,34 @@ func _refresh() -> void:
 	night_on = bool(cv["is_night"])
 	if float(banner["t"]) > 0:
 		banner["t"] = float(banner["t"]) - 0.016
+
+# 鏡頭限喺當前地圖入面；地圖細過畫面就置中 (spec 12 §6)
+func _clamp_cam(c: Vector2) -> Vector2:
+	if cur_map.is_empty():
+		return c
+	var vs := get_viewport_rect().size
+	var r := Rect2(Vector2(int(cur_map.ox), int(cur_map.oy)) * TILE, Vector2(int(cur_map.w), int(cur_map.h)) * TILE)
+	var out := c
+	for a in 2:
+		if r.size[a] <= vs[a]:
+			out[a] = r.position[a] + (r.size[a] - vs[a]) / 2.0
+		else:
+			out[a] = clampf(c[a], r.position[a], r.end[a] - vs[a])
+	return out.floor()
+
+# 入新地圖 / 新區域: 彈區名橫幅 (三國群英傳M 風)
+func _check_place(me: Dictionary) -> void:
+	var zv := sim.zone_view(int(me.x), int(me.y))
+	var key := "%s|%s" % [zv.get("name", ""), zv.get("area", "")]
+	if key == _place_key:
+		return
+	var first := _place_key == ""
+	_place_key = key
+	if first or autotest:
+		return
+	var nm := str(zv.get("area", "")) if str(zv.get("area", "")) != "" else str(zv.get("name", ""))
+	if nm != "":
+		banner = {"text": "— %s —" % nm, "t": 3.0, "color": Color(0.95, 0.85, 0.55)}
 
 func _process(delta: float) -> void:
 	if autotest:
@@ -329,6 +361,14 @@ func _on_event(e: Dictionary) -> void:
 			if last_season >= 0 and season != last_season:
 				_set_banner("入咗%s季" % RulesClock.SEASON_NAMES[season], Color(0.8, 0.9, 0.5), 10.0)
 			last_season = season
+		"landmark":
+			if int(e.dst) == my_id:
+				_log("【%s】%s" % [e.name, e.text])
+				if hud != null and not hud.any_panel_open() and not autotest and not uitest:
+					var nm := str(e.name)
+					var tx := str(e.text)
+					hud.open_dialog(func() -> Dictionary:
+						return {"title": nm, "text": tx, "options": [{"label": "繼續", "cb": func() -> void: hud.close_panels()}]})
 		"disaster":
 			if str(e.city) == str(data.world["homeCity"]):
 				_set_banner("天災：%s (%s)！物資價格波動" % [e.name, e.size], Color(1, 0.55, 0.3), 15.0)
@@ -351,15 +391,31 @@ func _autotest_step(me: Dictionary) -> void:
 			target_id = int(near.id); atk_sent = true
 			_send({"t": "attack", "target": target_id})
 		elif near == null and target_id < 0:
-			_send({"t": "move", "x": 35, "y": 35})     # 未見到怪: 行入野區
+			_go_field()                                 # 未見到怪: 行入野區
 		if kills > 0 and not ch.is_empty() and _exp_total() > exp_start:
 			print("PASS: moved, killed %d mob, exp %d -> %d, Lv%d" % [kills, exp_start, _exp_total(), int(ch.level)])
 			get_tree().quit(0)
 
+# 行去野區: 喺城入面就行去出城門口 (踩上去自動過圖)；已經喺野區就行去圍場
+func _go_field() -> void:
+	var me = _me()
+	if me == null:
+		return
+	var here := str(cur_map.get("id", ""))
+	if here != Sim.DEFAULT_ZONE:
+		var p := sim.next_portal(here, Sim.DEFAULT_ZONE)
+		if not p.is_empty():
+			_send({"t": "move", "x": int(p.x), "y": int(p.y)})
+		return
+	var md: Dictionary = data.map_by_id[Sim.DEFAULT_ZONE]
+	_send({"t": "move", "x": int(md.ox) + 30 + (int(sim.tick) / 60) % 9, "y": int(md.oy) + 35})
+
 func _nearest_mob(me: Dictionary):
 	var best = null; var bd := 1e9
+	var here := str(cur_map.get("id", ""))
 	for e in ents:
 		if not e.get("mob", false) or int(e.get("level", 1)) > 2: continue   # autotest 只打 1~2 級怪，免得 1 級死喺山賊
+		if sim.map_id_at(int(e.x), int(e.y)) != here: continue
 		var d: float = absf(e.x - me.x) + absf(e.y - me.y)
 		if d < bd: bd = d; best = e
 	return best
@@ -421,8 +477,21 @@ func _hud_tap(pos: Vector2) -> void:
 			_send({"t": "move", "x": int(it.ref.x), "y": int(it.ref.y)})
 			marker = {"pos": Vector2(int(it.ref.x), int(it.ref.y)), "t": 1.0}
 		return
+	if not sim.is_free(int(g.x), int(g.y)):           # 撳中屋/樹/河: 行去最近行得嘅格
+		var f := _free_near(Vector2i(g), 2)
+		if f.x < 0:
+			return
+		g = Vector2(f)
 	_send({"t": "move", "x": int(g.x), "y": int(g.y)})
 	marker = {"pos": g, "t": 1.0}
+
+func _free_near(c: Vector2i, rmax: int) -> Vector2i:
+	for r in range(1, rmax + 1):
+		for dy in range(-r, r + 1):
+			for dx in range(-r, r + 1):
+				if maxi(absi(dx), absi(dy)) == r and sim.is_free(c.x + dx, c.y + dy):
+					return Vector2i(c.x + dx, c.y + dy)
+	return Vector2i(-1, -1)
 
 # tap 格仔係咪 NPC/設施（設施佔 3x3，NPC 容許隔籬 1 格）→ ContextActions 格式
 func _interactable_at(g: Vector2) -> Dictionary:
@@ -591,7 +660,7 @@ func _auto_tick() -> void:
 		_send({"t": "attack", "target": target_id})
 		return
 	if int(sim.tick) % 60 == 0:
-		_send({"t": "move", "x": 30 + (int(sim.tick) / 60) % 9, "y": 35})
+		_go_field()
 
 func _nearest_mob_safe(me: Dictionary):
 	return _pick_mob(me, true)
@@ -714,35 +783,17 @@ func _txt(pos: Vector2, s: String, col := Color.WHITE, sz := FONT_SZ) -> void:
 
 func _draw() -> void:
 	var vs := get_viewport_rect().size
-	var x0 := maxi(0, int(cam.x / TILE)); var x1 := mini(w, int((cam.x + vs.x) / TILE) + 1)
-	var y0 := maxi(0, int(cam.y / TILE)); var y1 := mini(h, int((cam.y + vs.y) / TILE) + 1)
-	for y in range(y0, y1):
-		for x in range(x0, x1):
-			var pos := Vector2(x, y) * TILE - cam
-			var safe := sim.is_safe(x, y)
-			var zv := sim.zone_view(x, y)
-			var c: Color
-			if sim.blocked.has(y * w + x):
-				c = Color(0.32, 0.22, 0.2)
-			elif String(zv.get("id", "")).begins_with("runan_"):
-				c = Color(0.2 + 0.01 * ((x + y) % 3), 0.19, 0.23)   # 洞窟: 石板岩色 (Step 11)
-			elif safe:
-				c = Color(0.5 + 0.02 * ((x + y) % 2), 0.46, 0.36)   # 城內: 石板/泥路色，同野外分明
-			else:
-				c = Color(0.16 + 0.02 * ((x + y) % 2), 0.28, 0.16)  # 城外: 草地色
-			if night_on:
-				c = Color(c.r * 0.5, c.g * 0.5, c.b * 0.6)   # 夜景
-			draw_rect(Rect2(pos, Vector2(TILE, TILE)), c)
-			if safe != sim.is_safe(x + 1, y):
-				draw_rect(Rect2(pos + Vector2(TILE - 2, 0), Vector2(2, TILE)), Color(0.9, 0.8, 0.3, 0.8))   # 城牆邊界(直)
-			if safe != sim.is_safe(x, y + 1):
-				draw_rect(Rect2(pos + Vector2(0, TILE - 2), Vector2(TILE, 2)), Color(0.9, 0.8, 0.3, 0.8))   # 城牆邊界(橫)
+	draw_rect(Rect2(Vector2.ZERO, vs), Color(0.04, 0.04, 0.05))
+	if not cur_map.is_empty():
+		var tex := MapArt.texture(data, cur_map, TILE)
+		var mod := Color(0.5, 0.5, 0.62) if night_on else Color.WHITE      # 夜景
+		draw_texture(tex, Vector2(int(cur_map.ox), int(cur_map.oy)) * TILE - cam, mod)
 	for f in facilities:
-		var fp := Vector2(f.x, f.y) * TILE - cam
-		draw_rect(Rect2(fp - Vector2(TILE, TILE), Vector2(TILE * 3, TILE * 3)), Color(f.color, 0.35))
-		draw_rect(Rect2(fp - Vector2(TILE, TILE), Vector2(TILE * 3, TILE * 3)), f.color, false, 2.0)
-		_txt(fp + Vector2(-TILE, -TILE - 4), f.name, f.color, 12)
+		_draw_sign(f)
+	var mr := Rect2i(int(cur_map.get("ox", 0)), int(cur_map.get("oy", 0)), int(cur_map.get("w", Sim.W)), int(cur_map.get("h", Sim.H)))
 	for e in ents:
+		if not mr.has_point(Vector2i(int(e.x), int(e.y))):
+			continue                                  # 其他地圖嘅單位唔畫
 		var p := Vector2(e.x, e.y) * TILE - cam
 		var isme: bool = int(e.id) == my_id
 		var ismob: bool = e.get("mob", false)
@@ -767,6 +818,8 @@ func _draw() -> void:
 			nm += "（吟唱中）"
 		_txt(p + Vector2(-8, -18), nm, Color(1, 0.7, 0.6) if ismob else Color.WHITE, 11)
 	for qn in quest_npcs:
+		if not mr.has_point(Vector2i(int(qn.x), int(qn.y))):
+			continue
 		var qp := Vector2(int(qn.x), int(qn.y)) * TILE - cam
 		var qcol := Color(0.45, 0.75, 1.0) if not bool(qn.service) else Color(0.5, 1.0, 0.5)
 		draw_rect(Rect2(qp - Vector2(2, 2), Vector2(TILE + 4, TILE + 4)), qcol, false, 2.0)
@@ -787,15 +840,46 @@ func _draw() -> void:
 # 時辰/日/季節 (右上) + 夜晚示意
 
 
+# 設施招牌: 門口一格框 + 上面招牌 (屋已經畫喺地圖貼圖)
+func _draw_sign(f: Dictionary) -> void:
+	var fp := Vector2(f.x, f.y) * TILE - cam
+	var vs := get_viewport_rect().size
+	if fp.x < -80 or fp.y < -40 or fp.x > vs.x + 80 or fp.y > vs.y + 40:
+		return
+	var col: Color = f.color
+	draw_rect(Rect2(fp, Vector2(TILE, TILE)), Color(col, 0.35))
+	draw_rect(Rect2(fp, Vector2(TILE, TILE)), col, false, 1.5)
+	var nm := str(f.name)
+	var tw := ThemeDB.fallback_font.get_string_size(nm, HORIZONTAL_ALIGNMENT_LEFT, -1, 11).x
+	var r := Rect2(fp + Vector2(TILE / 2.0 - tw / 2.0 - 4, -18), Vector2(tw + 8, 15))
+	draw_rect(r, Color(0.12, 0.08, 0.05, 0.85))
+	draw_rect(r, col, false, 1.0)
+	_txt(r.position + Vector2(4, 12), nm, Color(1, 0.93, 0.75), 11)
+
 # 天災/季節橫幅 (頂中，目標框下)
 func _draw_banner(vs: Vector2) -> void:
 	if float(banner["t"]) <= 0 or str(banner["text"]) == "":
 		return
 	var col: Color = banner.get("color", Color(1, 0.55, 0.3))
-	var r := Rect2(vs.x / 2 - 210, 40, 420, 26)
-	draw_rect(r, Color(0, 0, 0, 0.75))
-	draw_rect(r, col, false, 2.0)
-	_txt(r.position + Vector2(12, 18), str(banner["text"]), Color.WHITE, 13)
+	# 位置: 日誌右邊 ~ 自動掣左邊之間 (唔好壓住頭像框/選單/小地圖)
+	var sr: Rect2 = hud.safe_rect() if hud != null else Rect2(Vector2.ZERO, vs)
+	var lr := HudLayout.log_rect(sr)
+	var right := sr.end.x - 60.0
+	if hud != null and hud.layout.has("auto"):
+		right = float(hud.layout["auto"]["c"].x) - float(hud.layout["auto"]["r"]) - 6.0
+	var left := lr.end.x + 6.0
+	var text := str(banner["text"])
+	var sz := 13
+	var tw := ThemeDB.fallback_font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, sz).x
+	if tw + 20 > right - left:
+		sz = 11
+		tw = ThemeDB.fallback_font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, sz).x
+	var bw := minf(tw + 20, right - left)
+	var r := Rect2((left + right - bw) / 2.0, lr.position.y, bw, 24)
+	var a := clampf(float(banner["t"]), 0.0, 1.0)          # 最後 1 秒淡出
+	draw_rect(r, Color(0, 0, 0, 0.75 * a))
+	draw_rect(r, Color(col, a), false, 1.5)
+	_txt(r.position + Vector2(10, 17), text, Color(1, 1, 1, a), sz)
 
 
 # ===== 任務答題 (ask stage, Step 10 絕招任務) =====

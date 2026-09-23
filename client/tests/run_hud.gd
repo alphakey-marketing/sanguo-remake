@@ -46,7 +46,7 @@ func t_layout(size: Vector2, ins: Vector4) -> void:
 
 func t_hit() -> void:
 	var lay := HudLayout.build(Vector2(640, 360))
-	var ids := ["attack", "skill0", "skill1", "skill2", "skill3", "target", "auto", "context"] + HudLayout.MENU
+	var ids := ["attack", "skill0", "skill1", "skill2", "skill3", "target", "auto", "context", "minimap"] + HudLayout.MENU
 	for id in ids:
 		var b := HudLayout.bounds(lay[id])
 		check(HudLayout.hit(lay, ids, b.get_center()) == id, "撳 %s 中心應該中 %s" % [id, id])

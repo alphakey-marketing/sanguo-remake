@@ -234,6 +234,7 @@ func t_equip_cast(data: GameData) -> void:
 	# 等級唔夠 (Lv1 < 5)
 	var mob_id := _spawn_one(sim, 1002)         # 野狗 35hp，一擊唔會死
 	_put(sim, mob_id, 32, 30)
+	sim.ent(mob_id)["mob"]["next_atk"] = 1 << 30  # 唔好出手 (受擊會斷吟唱，呢度淨係測施法流程)
 	var fail_msgs := []
 	sim.event_emitted.connect(func(ev: Dictionary) -> void:
 		if ev["k"] == "msg" and int(ev["dst"]) == pid:

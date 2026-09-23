@@ -76,10 +76,13 @@ func t_walk(data: GameData) -> void:
 func t_blocked(data: GameData) -> void:
 	var sim := Sim.new(data, 1)
 	var id := sim.spawn_player("t")
-	check(not sim.is_free(15, 20), "阻擋格 (15,20)")
-	sim.cmd_move(id, 15, 20)
+	var md: Dictionary = data.map_by_id["xuchang"]
+	var bx := int(md["ox"]) + 3                               # 許昌城牆
+	var by := int(md["oy"]) + 20
+	check(not sim.is_free(bx, by), "阻擋格 (城牆)")
+	sim.cmd_move(id, bx, by)
 	var e := sim.ent(id)
-	check(not (int(e["tx"]) == 15 and int(e["ty"]) == 20), "阻擋格唔可以做目標")
+	check(not (int(e["tx"]) == bx and int(e["ty"]) == by), "阻擋格唔可以做目標")
 
 
 func t_kill_mob(data: GameData) -> void:
@@ -354,7 +357,7 @@ func t_work_sim(data: GameData) -> void:
 	check(got, "工作: 採到礦材")
 	check(int(ch["sp"]) < sp0, "工作: 扣咗 SP")
 	check(int(ch["tools"]["mining"]["dur"]) == int(data.work_meta["toolDurability"]["starter"]) - 1, "工作: 工具耐久 -1")
-	_put(sim, pid, 10, 10)                                   # town (safe)
+	_put(sim, pid, sim.inn_pos.x, sim.inn_pos.y)             # 許昌城 (safe)
 	var bag_before: int = ch["bag"].size()
 	sim.cmd_work(pid, "mining")
 	check(ch["bag"].size() == bag_before, "工作: 城內唔可以工作")

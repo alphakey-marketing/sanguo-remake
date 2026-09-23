@@ -5,18 +5,19 @@ extends RefCounted
 
 signal event_emitted(ev: Dictionary)
 
-const W := 128
-const H := 64
+const W := GameData.WORLD_W                            # 全域格仔 (多張地圖拼埋, spec 12 §2)
+const H := GameData.WORLD_H
 const NEAR := 3                                        # 設施互動距離(格)
 const WITNESS_RANGE := 8                               # NPC 目擊範圍(格) (Step 5.2)
 const GROUP_RANGE := 5                                 # 群居怪同類仇恨範圍(格) (Step 11, spec 04 §3)
 const DEFAULT_ZONE := "field_1"
+const PATH_CAP := 6000                                 # cmd_move A* 節點上限 (spec 12 §3)
+const CHASE_CAP := 800                                 # 追擊 A* 節點上限
 
 var data: GameData
 var rng: SimRng
 var rng_fn: Callable
 var state: Dictionary = {}
-var blocked: Dictionary = {}      # y*W+x -> true (地形常量，唔入存檔)
 var inn_pos := Vector2i(10, 10)   # 復活點(客棧)
 
 
@@ -28,7 +29,6 @@ func _init(game_data: GameData, seed_value: int = 1) -> void:
 		"clock": {"day": 0, "ke": 0, "lastShichen": -1, "is_night": false}, "market": {}, "disasters": [],
 		"quest_npcs": {}}		# npc_id -> {"visible": bool} (Step 8)
 	inn_pos = Vector2i(int(data.inn["x"]), int(data.inn["y"]))
-	_build_terrain()
 	_init_markets()
 
 # 每城每類物資: 庫存 = vol, 價格因子 = 1.0
@@ -41,15 +41,6 @@ func _init_markets() -> void:
 			var g: Dictionary = cats[k]
 			cm[k] = {"stock": float(g["vol"]), "pf": 1.0}
 		mkt[c.id] = cm
-
-
-func _build_terrain() -> void:
-	blocked.clear()
-	for w2 in data.walls:                                  # data/zones.json walls (Step 11)
-		var x0 := int(w2[0]); var y0 := int(w2[1]); var x1 := int(w2[2]); var y1 := int(w2[3])
-		for x in range(x0, x1 + 1):
-			for y in range(y0, y1 + 1):
-				blocked[y * W + x] = true
 
 
 # ---- 讀取 ----
@@ -87,7 +78,68 @@ func market_city(city: String, cat: String) -> Dictionary:
 
 
 func is_free(x: int, y: int) -> bool:
-	return x >= 0 and y >= 0 and x < W and y < H and not blocked.has(y * W + x)
+	return x >= 0 and y >= 0 and x < W and y < H and data.walk[y * W + x] == 1
+
+
+# ---- 地圖 (spec 12) ----
+func map_at(x: int, y: int) -> Dictionary:
+	return data.map_at(x, y)
+
+
+func map_id_at(x: int, y: int) -> String:
+	return String(data.map_at(x, y).get("id", ""))
+
+
+# 地圖內命名區 (許田圍場…)；冇 = ""
+func area_name(x: int, y: int) -> String:
+	for a in data.map_at(x, y).get("areas", []):
+		if x >= int(a["x0"]) and x <= int(a["x1"]) and y >= int(a["y0"]) and y <= int(a["y1"]):
+			return String(a["name"])
+	return ""
+
+
+# 直線行一步: 先行差距大嗰個軸 (同差距先 x)，被擋就試另一軸；行唔到 = 原位
+# (唔好固定 x 先: 怪同人互追會左右跳舞永遠追唔到)
+func _greedy_step(x: int, y: int, tx: int, ty: int) -> Vector2i:
+	var dx := signi(tx - x)
+	var dy := signi(ty - y)
+	if absi(ty - y) > absi(tx - x):
+		if dy != 0 and is_free(x, y + dy):
+			return Vector2i(x, y + dy)
+		if dx != 0 and is_free(x + dx, y):
+			return Vector2i(x + dx, y)
+	else:
+		if dx != 0 and is_free(x + dx, y):
+			return Vector2i(x + dx, y)
+		if dy != 0 and is_free(x, y + dy):
+			return Vector2i(x, y + dy)
+	return Vector2i(x, y)
+
+
+# 直線 (_greedy_step) 行唔行到 (x1,y1)；行到就唔使 A*
+func _greedy_reaches(x0: int, y0: int, x1: int, y1: int) -> bool:
+	var p := Vector2i(x0, y0)
+	for _i in absi(x1 - x0) + absi(y1 - y0):
+		var n := _greedy_step(p.x, p.y, x1, y1)
+		if n == p:
+			return false
+		p = n
+	return p.x == x1 and p.y == y1
+
+
+# 設目的地: 直線行唔到就 A* (spec 12 §3)；路徑存 e.path (全域 cell)，唔會經 auto 傳送點 (終點除外)
+func _set_dest(e: Dictionary, x: int, y: int, cap: int = PATH_CAP) -> void:
+	var path: Array = e.get("path", [])
+	if int(e["tx"]) == x and int(e["ty"]) == y and (not path.is_empty() or _greedy_reaches(int(e["x"]), int(e["y"]), x, y)):
+		return
+	e["tx"] = x
+	e["ty"] = y
+	e.erase("path")
+	if _greedy_reaches(int(e["x"]), int(e["y"]), x, y):
+		return
+	var p := RulesPath.find(data.walk, W, int(e["y"]) * W + int(e["x"]), y * W + x, cap, data.portal_at)
+	if not p.is_empty():
+		e["path"] = p
 
 
 # ---- 安全區 / 戰鬥區 (data/zones.json) ----
@@ -102,7 +154,7 @@ func zone_by_id(zone_id: String) -> Dictionary:
 func zone_view(x: int, y: int) -> Dictionary:
 	for z in data.zones:
 		if x >= int(z["x0"]) and x <= int(z["x1"]) and y >= int(z["y0"]) and y <= int(z["y1"]):
-			return {"id": str(z["id"]), "name": str(z.get("name", z["id"]))}
+			return {"id": str(z["id"]), "name": str(z.get("name", z["id"])), "area": area_name(x, y)}
 	return {}
 
 
@@ -231,7 +283,8 @@ func _cleanup_fused(ch: Dictionary) -> void:
 
 
 func _spawn_actor(ename: String, kind: String, class_id: String = "yishi") -> Dictionary:
-	var e := _new_ent(ename, kind, _pick_free(5, 5, 24, 16))
+	var sp: Array = _home_map().get("spawn", [int(data.inn["x"]) - 2, int(data.inn["y"]) - 2, int(data.inn["x"]) + 2, int(data.inn["y"]) + 2])
+	var e := _new_ent(ename, kind, _pick_free(int(sp[0]), int(sp[1]), int(sp[2]), int(sp[3])))
 	e["ch"] = RulesStats.create_character(data, ename.substr(0, 8), class_id)
 	e["ch"]["tools"] = {}                     # skill -> {item, dur} (Step 7.1)
 	e["ch"]["storage"] = []                   # 天地商行倉庫 [{id,n}] (Step 7.2)
@@ -246,6 +299,14 @@ func _spawn_actor(ename: String, kind: String, class_id: String = "yishi") -> Di
 	return e
 
 
+
+
+# 新手城地圖 (world.homeCity)
+func _home_map() -> Dictionary:
+	for md in data.maps:
+		if String(md.get("city", "")) == String(data.world["homeCity"]):
+			return md
+	return {}
 
 
 func add_bots(n: int) -> void:
