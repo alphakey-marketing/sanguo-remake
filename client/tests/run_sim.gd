@@ -56,6 +56,9 @@ func _put(sim: Sim, id: int, x: int, y: int) -> void:
 	e["y"] = y
 	e["tx"] = x
 	e["ty"] = y
+	if e.has("mob"):
+		e["mob"]["home_x"] = x          # 返歸點跟埋搬，唔係 leash 會拉返去 spawn 區
+		e["mob"]["home_y"] = y
 
 
 func t_walk(data: GameData) -> void:

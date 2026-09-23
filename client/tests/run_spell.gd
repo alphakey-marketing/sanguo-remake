@@ -64,11 +64,8 @@ func _msg_is(msgs: Array, prefix: String) -> bool:
 	return false
 
 func _spawn_one(sim: Sim, def_id: int) -> int:
-	sim._spawn_mob(def_id)
-	for e in sim.ents.values():
-		if e["kind"] == "mob" and int(e["mob"]["def"]) == def_id:
-			return int(e["id"])
-	return 0
+	var e: Variant = sim._spawn_mob(def_id)     # 返新生嗰隻 (舊寫法搵第一隻同 def，叫兩次會攞到同一隻)
+	return int(e["id"]) if e != null else 0
 
 
 # ================= 資料驗證 (data/spells.json) =================
