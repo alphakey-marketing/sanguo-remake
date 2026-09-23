@@ -6,6 +6,9 @@ extends RefCounted
 const NEWBIE_LEVEL := 5    # 【原】5 級脫離新手
 const MAX_LEVEL := 100     # 【原】三轉 100 級
 const ATTR_KEYS := ["str", "agi", "int", "spi", "pol", "cha"]
+const RAIDABLE := ["str", "agi", "int", "spi"]   # 升級點數分配嘅四屬性 (spec 01 §5)
+const UPGRADE_POINTS := 3  # 【自訂】每升 1 級發幾多點
+const ATTR_CAP := 99       # 【原】修練/點數上限 99
 
 
 static func max_hp(lv: int, a: Dictionary) -> int:
@@ -25,6 +28,7 @@ static func exp_to_next(lv: int) -> int:
 	return MathX.js_round(20.0 * pow(lv, 1.8))
 
 
+# 基礎屬性 (建角用) + 自動派點後嘅預期屬性 (UI 預覽用)
 static func attrs_at(cls: Dictionary, lv: int) -> Dictionary:
 	var a := {}
 	for k in ATTR_KEYS:
@@ -51,35 +55,127 @@ static func create_character(data: GameData, char_name: String, class_id: String
 	var equip := {}
 	if not st.is_empty():
 		equip = {"weapon": int(st["weapon"]), "boots": int(st["boots"])}
+	var face := {}
+	for part in data.face_parts:
+		face[part] = 1
 	return {
 		"name": char_name, "classId": class_id, "level": 1, "exp": 0, "attrs": attrs,
 		"hp": max_hp(1, attrs), "mp": max_mp(1, attrs), "sp": max_sp(1, attrs),
 		"gold": int(st.get("gold", 0)), "karma": 0, "bag": bag, "equip": equip,
+		# Step 7.5 建角欄位 (spec 01 §1/§11)
+		"title": "", "birthMonth": 1, "birthDay": 1, "face": face,
+		"ideology": "", "quizAnswers": [], "attrPoints": 0, "raised": {},
 	}
 
 
-# 加經驗，可連升多級；升級回滿 HP/MP/SP。回傳升咗幾級
+# 加經驗，可連升多級；升級回滿 HP/MP/SP。每升 1 級發 UPGRADE_POINTS 點畀玩家分配 (spec 01 §5)。回傳升咗幾級
 static func gain_exp(data: GameData, ch: Dictionary, amount: int) -> int:
-	var cls: Dictionary = data.classes[ch["classId"]]
 	var ups := 0
 	ch["exp"] = int(ch["exp"]) + amount
 	while int(ch["level"]) < MAX_LEVEL and int(ch["exp"]) >= exp_to_next(int(ch["level"])):
 		ch["exp"] = int(ch["exp"]) - exp_to_next(int(ch["level"]))
 		ch["level"] = int(ch["level"]) + 1
 		ups += 1
+		ch["attrPoints"] = int(ch.get("attrPoints", 0)) + UPGRADE_POINTS
 	if int(ch["level"]) >= MAX_LEVEL:
 		ch["exp"] = 0
 	if ups > 0:
 		var lv := int(ch["level"])
-		ch["attrs"] = attrs_at(cls, lv)
-		# 歷練【原】: 練兵場對練儲歷練，升呢時每 10 歷練 武/智/敏/靈 +1，消耗對應歷練
+		var attrs: Dictionary = ch["attrs"]
+		# 歷練【原】: 練兵場對練儲歷練，升呢時每 10 歷練 武/智/敏/靈 +1，消耗對應歷練 (同自由點並存)
 		var lilian := int(ch.get("lilian", 0))
 		var bonus := lilian / 10
 		if bonus > 0:
-			for k in ["str", "agi", "int", "spi"]:
-				ch["attrs"][k] = int(ch["attrs"][k]) + bonus
+			for k in RAIDABLE:
+				attrs[k] = int(attrs[k]) + bonus
 			ch["lilian"] = lilian - bonus * 10
-		ch["hp"] = max_hp(lv, ch["attrs"])
-		ch["mp"] = max_mp(lv, ch["attrs"])
-		ch["sp"] = max_sp(lv, ch["attrs"])
+		ch["hp"] = max_hp(lv, attrs)
+		ch["mp"] = max_mp(lv, attrs)
+		ch["sp"] = max_sp(lv, attrs)
 	return ups
+
+
+# 升級點數分配: 得 str/agi/int/spi 可以用; 政治/魅力唔用得分點 (spec 01 §5)。
+# 回 0=成功 / 1=冇點 / 2=唔係可分配屬性 / 3=屬性已到上限
+static func can_raise(ch: Dictionary, attr: String) -> int:
+	if not RAIDABLE.has(attr):
+		return 2
+	if int(ch.get("attrPoints", 0)) <= 0:
+		return 1
+	if int(ch["attrs"][attr]) >= ATTR_CAP:
+		return 3
+	return 0
+
+
+# 扣 1 點，屬性 +1（上限內）。回同 can_raise。最大值唔會超 ATTR_CAP
+static func raise_attr(ch: Dictionary, attr: String) -> int:
+	var code := can_raise(ch, attr)
+	if code != 0:
+		return code
+	ch["attrPoints"] = int(ch["attrPoints"]) - 1
+	ch["attrs"][attr] = int(ch["attrs"][attr]) + 1
+	var raised: Dictionary = ch.get("raised", {})
+	ch["raised"] = raised
+	raised[attr] = int(raised.get(attr, 0)) + 1
+	return 0
+
+
+# 自動分配: 按 classes.json.growth 建議比例 (純 UI 提示) 派晒所有點。確定性、唔用 RNG。
+# 分配落 RAIDABLE；派到 99 上限就唔再派嗰隻，餘點留低。
+static func auto_assign_points(ch: Dictionary, cls: Dictionary) -> void:
+	var w := {}
+	var total := 0
+	for k in RAIDABLE:
+		var weight := int(cls["growth"].get(k, 0))
+		w[k] = weight
+		total += weight
+	if total <= 0:                       # 冇建議比例 → 四屬平均
+		for k in RAIDABLE:
+			w[k] = 1
+		total = RAIDABLE.size()
+	var pts := int(ch["attrPoints"])
+	if pts <= 0:
+		return
+	var spent := {}
+	for k in RAIDABLE:
+		spent[k] = 0
+	var guard := pts + 64
+	while pts > 0 and guard > 0:
+		guard -= 1
+		var best := ""
+		var best_deficit := -1.0
+		for k in RAIDABLE:
+			if int(ch["attrs"][k]) >= ATTR_CAP:
+				continue
+			var deficit := float(w[k]) - float(spent[k]) * float(total) / float(pts + spent_total(spent))
+			if deficit > best_deficit:
+				best_deficit = deficit
+				best = k
+		if best == "":                  # 四屬全部到 99
+			break
+		spent[best] = int(spent[best]) + 1
+		pts -= 1
+	for k in RAIDABLE:
+		if int(spent[k]) > 0:
+			ch["attrs"][k] = int(ch["attrs"][k]) + int(spent[k])
+			var raised: Dictionary = ch.get("raised", {})
+			ch["raised"] = raised
+			raised[k] = int(raised.get(k, 0)) + int(spent[k])
+	ch["attrPoints"] = pts
+
+
+static func spent_total(spent: Dictionary) -> int:
+	var t := 0
+	for k in spent:
+		t += int(spent[k])
+	return t
+
+
+# 福日【自訂】(spec 01 §1): 生日嗰日練功 exp ×1.1。game 年年長 year_days (=12×month_days)，day 由 0 起。
+static func birthday_exp_mult(day: int, year_days: int, month_days: int, bm: int, bd: int) -> float:
+	if year_days <= 0 or month_days <= 0 or bm < 1 or bm > 12 or bd < 1 or bd > month_days:
+		return 1.0
+	var d := day % year_days
+	var m := d / month_days + 1
+	var dd := d % month_days + 1
+	return 1.1 if m == bm and dd == bd else 1.0

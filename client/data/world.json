@@ -3,7 +3,9 @@
   "clock": {
     "gameMinPerTick": 2,
     "kePerShichen": 8,
-    "seasonDays": 30
+    "seasonDays": 30,
+    "monthDays": 30,
+    "yearDays": 360
   },
   "night": {
     "startShichen": 10,

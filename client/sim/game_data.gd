@@ -23,6 +23,8 @@ var zones: Array = []             # 安全區/戰鬥區 (data/zones.json)
 var travel_points: Array = []     # 傳送點 (data/zones.json)
 var work: Dictionary = {}         # 工作技能 (data/work.json.skills, Step 7.1)
 var work_meta: Dictionary = {}    # 工作技能雜項 (data/work.json.toolDurability)
+var quiz: Array = []              # 理念測驗題庫 (data/quiz.json, Step 7.5)
+var face_parts: Dictionary = {}   # 臉譜 8 部位款式數 (data/face.json, Step 7.5)
 
 static var _cache: GameData
 
@@ -50,6 +52,10 @@ static func load_all() -> GameData:
 	var wk: Dictionary = _read("res://data/work.json")
 	g.work = wk["skills"]
 	g.work_meta = {"toolDurability": wk["toolDurability"]}
+	var qz: Dictionary = _read("res://data/quiz.json")
+	g.quiz = qz["questions"]
+	var fc: Dictionary = _read("res://data/face.json")
+	g.face_parts = fc["parts"]
 	for x in c["classes"]:
 		g.classes[String(x["id"])] = x
 	for x in m["monsters"]:

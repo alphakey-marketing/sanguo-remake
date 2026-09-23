@@ -2702,33 +2702,50 @@
    "yishi"
   ],
   "expect": {
-   "name": "義士甲",
-   "classId": "yishi",
-   "level": 1,
-   "exp": 0,
+   "attrPoints": 0,
    "attrs": {
-    "str": 12,
     "agi": 8,
+    "cha": 6,
     "int": 4,
-    "spi": 4,
     "pol": 6,
-    "cha": 6
+    "spi": 4,
+    "str": 12
    },
-   "hp": 123,
-   "mp": 45,
-   "sp": 69,
-   "gold": 100,
-   "karma": 0,
    "bag": [
     {
      "id": 65210,
      "n": 5
     }
    ],
+   "birthDay": 1,
+   "birthMonth": 1,
+   "classId": "yishi",
    "equip": {
-    "weapon": 10001,
-    "boots": 22001
-   }
+    "boots": 22001,
+    "weapon": 10001
+   },
+   "exp": 0,
+   "face": {
+    "beard": 1,
+    "bg": 1,
+    "brow": 1,
+    "hair": 1,
+    "mouth": 1,
+    "neck": 1,
+    "nose": 1,
+    "shape": 1
+   },
+   "gold": 100,
+   "hp": 123,
+   "ideology": "",
+   "karma": 0,
+   "level": 1,
+   "mp": 45,
+   "name": "義士甲",
+   "quizAnswers": [],
+   "raised": {},
+   "sp": 69,
+   "title": ""
   }
  },
  {
@@ -2767,33 +2784,33 @@
   ],
   "expect": {
    "ch": {
-    "name": "測",
-    "classId": "yishi",
-    "level": 1,
-    "exp": 0,
     "attrs": {
-     "str": 12,
      "agi": 8,
+     "cha": 6,
      "int": 4,
-     "spi": 4,
      "pol": 6,
-     "cha": 6
+     "spi": 4,
+     "str": 12
     },
-    "hp": 123,
-    "mp": 45,
-    "sp": 69,
-    "gold": 100,
-    "karma": 0,
     "bag": [
      {
       "id": 65210,
       "n": 5
      }
     ],
+    "classId": "yishi",
     "equip": {
-     "weapon": 10001,
-     "boots": 22001
-    }
+     "boots": 22001,
+     "weapon": 10001
+    },
+    "exp": 0,
+    "gold": 100,
+    "hp": 123,
+    "karma": 0,
+    "level": 1,
+    "mp": 45,
+    "name": "測",
+    "sp": 69
    },
    "ups": 0
   }
@@ -2834,33 +2851,33 @@
   ],
   "expect": {
    "ch": {
-    "name": "測",
-    "classId": "yishi",
-    "level": 1,
-    "exp": 10,
     "attrs": {
-     "str": 12,
      "agi": 8,
+     "cha": 6,
      "int": 4,
-     "spi": 4,
      "pol": 6,
-     "cha": 6
+     "spi": 4,
+     "str": 12
     },
-    "hp": 123,
-    "mp": 45,
-    "sp": 69,
-    "gold": 100,
-    "karma": 0,
     "bag": [
      {
       "id": 65210,
       "n": 5
      }
     ],
+    "classId": "yishi",
     "equip": {
-     "weapon": 10001,
-     "boots": 22001
-    }
+     "boots": 22001,
+     "weapon": 10001
+    },
+    "exp": 10,
+    "gold": 100,
+    "hp": 123,
+    "karma": 0,
+    "level": 1,
+    "mp": 45,
+    "name": "測",
+    "sp": 69
    },
    "ups": 0
   }
@@ -2901,33 +2918,34 @@
   ],
   "expect": {
    "ch": {
-    "name": "測",
-    "classId": "yishi",
-    "level": 3,
-    "exp": 10,
+    "attrPoints": 6,
     "attrs": {
-     "str": 16,
-     "agi": 10,
-     "int": 6,
-     "spi": 6,
+     "agi": 8,
+     "cha": 6,
+     "int": 4,
      "pol": 6,
-     "cha": 6
+     "spi": 4,
+     "str": 12
     },
-    "hp": 169,
-    "mp": 65,
-    "sp": 79,
-    "gold": 100,
-    "karma": 0,
     "bag": [
      {
       "id": 65210,
       "n": 5
      }
     ],
+    "classId": "yishi",
     "equip": {
-     "weapon": 10001,
-     "boots": 22001
-    }
+     "boots": 22001,
+     "weapon": 10001
+    },
+    "exp": 10,
+    "gold": 100,
+    "hp": 153,
+    "karma": 0,
+    "level": 3,
+    "mp": 55,
+    "name": "測",
+    "sp": 75
    },
    "ups": 2
   }
@@ -2968,33 +2986,34 @@
   ],
   "expect": {
    "ch": {
-    "name": "測",
-    "classId": "yishi",
-    "level": 5,
-    "exp": 0,
+    "attrPoints": 12,
     "attrs": {
-     "str": 20,
-     "agi": 12,
-     "int": 8,
-     "spi": 8,
+     "agi": 8,
+     "cha": 6,
+     "int": 4,
      "pol": 6,
-     "cha": 6
+     "spi": 4,
+     "str": 12
     },
-    "hp": 215,
-    "mp": 85,
-    "sp": 89,
-    "gold": 100,
-    "karma": 0,
     "bag": [
      {
       "id": 65210,
       "n": 5
      }
     ],
+    "classId": "yishi",
     "equip": {
-     "weapon": 10001,
-     "boots": 22001
-    }
+     "boots": 22001,
+     "weapon": 10001
+    },
+    "exp": 0,
+    "gold": 100,
+    "hp": 183,
+    "karma": 0,
+    "level": 5,
+    "mp": 65,
+    "name": "測",
+    "sp": 81
    },
    "ups": 4
   }
@@ -3035,33 +3054,34 @@
   ],
   "expect": {
    "ch": {
-    "name": "測",
-    "classId": "yishi",
-    "level": 10,
-    "exp": 1106,
+    "attrPoints": 27,
     "attrs": {
-     "str": 30,
-     "agi": 17,
-     "int": 13,
-     "spi": 13,
+     "agi": 8,
+     "cha": 6,
+     "int": 4,
      "pol": 6,
-     "cha": 6
+     "spi": 4,
+     "str": 12
     },
-    "hp": 330,
-    "mp": 135,
-    "sp": 114,
-    "gold": 100,
-    "karma": 0,
     "bag": [
      {
       "id": 65210,
       "n": 5
      }
     ],
+    "classId": "yishi",
     "equip": {
-     "weapon": 10001,
-     "boots": 22001
-    }
+     "boots": 22001,
+     "weapon": 10001
+    },
+    "exp": 1106,
+    "gold": 100,
+    "hp": 258,
+    "karma": 0,
+    "level": 10,
+    "mp": 90,
+    "name": "測",
+    "sp": 96
    },
    "ups": 9
   }
@@ -3102,33 +3122,34 @@
   ],
   "expect": {
    "ch": {
-    "name": "測",
-    "classId": "yishi",
-    "level": 69,
-    "exp": 14206,
+    "attrPoints": 204,
     "attrs": {
-     "str": 148,
-     "agi": 76,
-     "int": 72,
-     "spi": 72,
+     "agi": 8,
+     "cha": 6,
+     "int": 4,
      "pol": 6,
-     "cha": 6
+     "spi": 4,
+     "str": 12
     },
-    "hp": 1687,
-    "mp": 725,
-    "sp": 409,
-    "gold": 100,
-    "karma": 0,
     "bag": [
      {
       "id": 65210,
       "n": 5
      }
     ],
+    "classId": "yishi",
     "equip": {
-     "weapon": 10001,
-     "boots": 22001
-    }
+     "boots": 22001,
+     "weapon": 10001
+    },
+    "exp": 14206,
+    "gold": 100,
+    "hp": 1143,
+    "karma": 0,
+    "level": 69,
+    "mp": 385,
+    "name": "測",
+    "sp": 273
    },
    "ups": 68
   }

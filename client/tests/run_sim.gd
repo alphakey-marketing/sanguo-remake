@@ -26,6 +26,11 @@ func _init() -> void:
 	t_market_wired_to_shop(data)
 	t_storage(data)
 	t_use_item(data)
+	t_create_fields(data)
+	t_attr_points(data)
+	t_upgrade_paths(data)
+	t_quiz_rules(data)
+	t_birthday_exp()
 	print("[TEST] sim scenarios: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -468,3 +473,185 @@ func t_use_item(data: GameData) -> void:
 	var s := sim.save_string()
 	var loaded := Sim.load_string(data, s)
 	check(loaded.player_ch()["hp"] == ch["hp"], "食用: 存讀檔一致")
+
+
+# ============ Step 7.5: 建角欄位 + 升級自由點數 + 理念測驗 (spec 01 §1/§2/§5) ============
+
+func t_create_fields(data: GameData) -> void:
+	var ch := RulesStats.create_character(data, "測試仔", "yishi")
+	check(ch.get("title", "?") == "", "建角: title 欄位有預設空")
+	check(int(ch.get("birthMonth", 0)) == 1 and int(ch.get("birthDay", 0)) == 1, "建角: 生日預設 1月1日")
+	check(int(ch.get("attrPoints", -1)) == 0, "建角: attrPoints 預設 0")
+	check(ch.get("raised", null) is Dictionary and ch["raised"].is_empty(), "建角: raised 預設空")
+	check(str(ch.get("ideology", "?")) == "", "建角: ideology 預設空")
+	var face: Dictionary = ch.get("face", {})
+	var ok_face := true
+	for part in data.face_parts:
+		if not face.has(str(part)) or int(face[str(part)]) < 1 or int(face[str(part)]) > int(data.face_parts[part]):
+			ok_face = false
+	check(ok_face and face.size() == data.face_parts.size(), "建角: face 8 部位齊 + 款式喺範圍內")
+	# sp 不能改動 name 嘅長度檢查之外: 稱號要 1~8 字
+	sim_cmd_title_check(data)
+
+
+func sim_cmd_title_check(data: GameData) -> void:
+	var sim := Sim.new(data, 31)
+	var id := sim.spawn_player("t")
+	sim.cmd_set_title(id, "無")                    # 1 字 OK
+	check(String(sim.player_ch()["title"]) == "無", "稱號: 1 字可以")
+	sim.cmd_set_title(id, "呢個稱號太長會唔得")      # 超過 8 字
+	check(String(sim.player_ch()["title"]) == "無", "稱號: 超過 8 字唔改")
+	sim.cmd_set_title(id, "")                       # 空
+	check(String(sim.player_ch()["title"]) == "無", "稱號: 空唔改")
+	sim.cmd_set_birth(id, 13, 1)
+	check(int(sim.player_ch()["birthMonth"]) == 1, "生日: 13 月唔受理")
+	sim.cmd_set_birth(id, 2, 30)
+	check(int(sim.player_ch()["birthDay"]) == 1, "生日: 2月30日唔受理")
+	sim.cmd_set_birth(id, 3, 15)
+	check(int(sim.player_ch()["birthMonth"]) == 3 and int(sim.player_ch()["birthDay"]) == 15, "生日: 3月15日受理")
+	sim.cmd_set_face(id, "hair", 5)
+	check(int(sim.player_ch()["face"]["hair"]) == 1, "臉譜: 款式超出範圍唔改")
+	sim.cmd_set_face(id, "hair", 2)
+	check(int(sim.player_ch()["face"]["hair"]) == 2, "臉譜: hair 款式設成 2")
+
+
+func t_attr_points(data: GameData) -> void:
+	var sim := Sim.new(data, 21)
+	var id := sim.spawn_player("t")
+	var ch := sim.player_ch()
+	RulesStats.gain_exp(data, ch, 100)               # Lv1 exp100 -> Lv3, 兩級
+	check(int(ch["attrPoints"]) == 6, "升級: 每級 +3 點 (升兩級 = 6 點)")
+	# attrs 唔再自動加，除非分配
+	check(int(ch["attrs"]["str"]) == 12, "升級: 唔自動加 str (等玩家分配)")
+	var before := int(ch["attrs"]["str"])
+	sim.cmd_raise_attr(id, "str")
+	check(int(ch["attrs"]["str"]) == before + 1, "分配: str +1")
+	check(int(ch["attrPoints"]) == 5, "分配: 扣 1 點")
+	check(int(ch["raised"].get("str", 0)) == 1, "分配: raised 有記錄")
+	sim.cmd_raise_attr(id, "agi")
+	sim.cmd_raise_attr(id, "agi")
+	sim.cmd_raise_attr(id, "int")
+	sim.cmd_raise_attr(id, "spi")
+	check(int(ch["attrPoints"]) == 1, "分配: 用咗 5 點剩 1")
+	var bp := int(ch["attrs"]["pol"])
+	var ba := int(ch["attrs"]["cha"])
+	sim.cmd_raise_attr(id, "pol")
+	sim.cmd_raise_attr(id, "cha")
+	check(int(ch["attrs"]["pol"]) == bp and int(ch["attrs"]["cha"]) == ba, "分配: 政治/魅力升唔到")
+	check(int(ch["attrPoints"]) == 1, "分配: 拒絕 pol/cha 唔扣點")
+	# 自動分配跟 growth 2:1:1:1
+	ch["attrPoints"] = 20
+	var snap := {}
+	for k in RulesStats.RAIDABLE:
+		snap[k] = int(ch["attrs"][k])
+	sim.cmd_auto_assign(id)
+	check(int(ch["attrPoints"]) == 0, "自動分配: 20 點派晒")
+	var got := {}
+	for k in RulesStats.RAIDABLE:
+		got[k] = int(ch["attrs"][k]) - snap[k]
+	check(got["str"] == 8 and got["agi"] == 4 and got["int"] == 4 and got["spi"] == 4,
+		"自動分配: 跟 growth 比例 8:4:4:4 (實際 %s)" % got)
+	check(int(ch["raised"]["str"]) == 9, "自動分配: raised 累加 (1+8)")
+	# 屬性上限 99: 派唔入超過嘅點
+	var ch2 := RulesStats.create_character(data, "受限", "yishi")
+	ch2["attrs"]["str"] = 99
+	ch2["attrPoints"] = 5
+	var r := RulesStats.raise_attr(ch2, "str")
+	check(r == 3, "分配: str 到 99 唔升得")
+	check(int(ch2["attrPoints"]) == 5, "分配: 拒絕 cap 唔扣點")
+	var r2 := RulesStats.raise_attr(ch2, "spi")
+	check(r2 == 0, "分配: spi 正常升到 (99 上限唔影響其他屬)")
+	# 存檔 roundtrip 含 attrPoints/raised
+	var s := sim.save_string()
+	var loaded := Sim.load_string(data, s)
+	check(int(loaded.player_ch()["attrPoints"]) == int(ch["attrPoints"]), "存檔: attrPoints roundtrip")
+	check(int(loaded.player_ch()["raised"]["str"]) == 9, "存檔: raised roundtrip")
+	check(int(loaded.player_ch()["attrs"]["str"]) == int(ch["attrs"]["str"]), "存檔: attrs roundtrip")
+
+
+func t_quiz_rules(data: GameData) -> void:
+	# 規則層: 五理念各有至少一組 12 題答案可以勝出 (brute force 2^12, 種子固定 = 窮舉確定性)
+	var qs: Array = data.quiz
+	check(qs.size() == 12, "測驗: 題庫 12 題")
+	# 全組合窮舉 (2^12 = 4096) 確認每個理念都有勝出集
+	var win_sets := {}
+	for i in 4096:
+		var ans := []
+		var v := i
+		for q in qs:
+			ans.append(v % 2)
+			v /= 2
+		var res := RulesQuiz.score(data, ans)
+		var ido: String = str(res["ideology"])
+		if not win_sets.has(ido):
+			win_sets[ido] = ans
+	for ideo in RulesQuiz.IDEOLOGIES:
+		check(win_sets.has(ideo), "測驗: 「%s」有一組答案可以勝出" % ideo)
+	# 並列權重: 義理 > 治國 > 霸權 > 權謀 > 隱遁
+	# 呢組答案: 義理4 + 治國4 並列最高 → 按權重義理勝 (5>4)
+	var tie_ans := [0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1]
+	var t1 := RulesQuiz.score(data, tie_ans)
+	check(JSON.stringify(t1["scores"]) == JSON.stringify({"義理": 4, "治國": 4, "權謀": 1, "霸權": 1, "隱遁": 2}),
+		"並列: 分數分佈啱 %s" % JSON.stringify(t1["scores"]))
+	check(str(t1["ideology"]) == "義理", "並列: 義理4 vs 治國4 → 義理 (權重優先)")
+
+	# sim 層: cmd_submit_quiz 一次定理念，之後唔可以改
+	var sim := Sim.new(data, 22)
+	var id := sim.spawn_player("t")
+	sim.cmd_submit_quiz(id, [])
+	check(str(sim.player_ch()["ideology"]) == "", "測驗: 空答卷唔受理")
+	var ans_arr := []
+	for q in qs:
+		ans_arr.append(0)
+	ans_arr[2] = 1                                      # Q3 揀隱遁 (先霸權多)
+	var res := RulesQuiz.score(data, ans_arr)
+	sim.cmd_submit_quiz(id, ans_arr)
+	check(str(sim.player_ch()["ideology"]) == str(res["ideology"]), "測驗: 交卷 → 理念 = 計分結果")
+	check(int(sim.player_ch()["quizAnswers"].size()) == 12, "測驗: quizAnswers 有記錄")
+	sim.cmd_submit_quiz(id, [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1])
+	check(str(sim.player_ch()["ideology"]) == str(res["ideology"]), "測驗: 已定理念唔可以再改")
+# 存檔 roundtrip
+	var s := sim.save_string()
+	var loaded := Sim.load_string(data, s)
+	check(str(loaded.player_ch()["ideology"]) == str(sim.player_ch()["ideology"]), "存檔: ideology roundtrip")
+	check(loaded.player_ch()["quizAnswers"].size() == 12, "存檔: quizAnswers roundtrip")
+
+
+func t_birthday_exp() -> void:
+	check(RulesStats.birthday_exp_mult(0, 360, 30, 1, 1) == 1.1, "福日: 1月1日 first day → 1.1")
+	check(RulesStats.birthday_exp_mult(14, 360, 30, 1, 15) == 1.1, "福日: 1月15日該日 → 1.1")
+	check(RulesStats.birthday_exp_mult(15, 360, 30, 1, 15) == 1.0, "福日: 第二日唔係生日")
+	check(RulesStats.birthday_exp_mult(44, 360, 30, 2, 15) == 1.1, "福日: 2月15日該日")
+	check(RulesStats.birthday_exp_mult(100, 0, 30, 1, 1) == 1.0, "福日: 無年日設定 → 1.0")
+
+
+# 六屬性提昇路徑驗收 (spec 01 §3/§6): 武/敏/智/靈=升級點+歷練, 政治=私塾, 魅力=寺廟
+func t_upgrade_paths(data: GameData) -> void:
+	var sim := Sim.new(data, 41)
+	var id := sim.spawn_player("t")
+	var ch := sim.player_ch()
+	# --- 歷練: 每 10 歷練升呢時武/智/敏/靈 +1 (同自由點並存) ---
+	ch["lilian"] = 25
+	var lsnap := {}
+	for k in RulesStats.RAIDABLE:
+		lsnap[k] = int(ch["attrs"][k])
+	ch["exp"] = RulesStats.exp_to_next(int(ch["level"]))     # 啱啱夠升一級
+	var ups := RulesStats.gain_exp(data, ch, 0)
+	check(ups == 1, "升級路徑: 塞足 exp 升一級")
+	for k in RulesStats.RAIDABLE:
+		check(int(ch["attrs"][k]) == lsnap[k] + 2, "升級路徑: 歷練 25 → %s +2 (每 10 +1)" % k)
+	check(int(ch["lilian"]) == 5, "升級路徑: 歷練用咗 20 剩 5")
+	check(int(ch["attrPoints"]) == 3, "升級路徑: 歷練升級同時派 3 自由點")
+	# --- 私塾: 政治 +1 (扣 SP/MP+金) ---
+	ch["gold"] = 1000
+	var pol0 := int(ch["attrs"]["pol"])
+	_put(sim, id, int(data.facilities["school"]["x"]), int(data.facilities["school"]["y"]))
+	sim.cmd_facility(id, "school")
+	check(int(ch["attrs"]["pol"]) == pol0 + 1, "升級路徑: 私塾 政治 +1")
+	# --- 寺廟: 魅力 +1 (扣 SP+金) ---
+	var cha0 := int(ch["attrs"]["cha"])
+	_put(sim, id, int(data.facilities["temple"]["x"]), int(data.facilities["temple"]["y"]))
+	sim.cmd_facility(id, "temple")
+	check(int(ch["attrs"]["cha"]) == cha0 + 1, "升級路徑: 寺廟 魅力 +1")
+	# 私塾/寺廟唔會升到武/敏/智/靈
+	check(int(ch["attrs"]["str"]) == lsnap["str"] + 2, "升級路徑: 修練唔郁武力")
