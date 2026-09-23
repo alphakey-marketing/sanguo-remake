@@ -19,6 +19,7 @@ var ents := []
 var faces := []
 var cam := Vector2.ZERO
 var autotest := false
+var uitest := false                # --uitest: 觸控 UI 煙霧測試 (tests/ui_smoke.gd)
 var t0 := 0.0
 var start_pos := Vector2i(-1, -1)
 var moved := false
@@ -30,25 +31,26 @@ var ch := {}                      # 玩家角色狀態 (sim 內同一個 Diction
 var item_names := {}              # id -> 名 (items.json)
 var floats := []                  # 傷害數字 {pos, text, color, age}
 var log_lines := []
-var show_bag := false
 var exp_start := -1
 var atk_sent := false
 var kills := 0
 var facilities := []              # 設施 {kind, name, x, y, color, fac}
 var item_prices := {}             # id -> 價錢
 var inn_cost := 0
-var shop_stock := []              # 武器店貨單 (data/shops.json)
 var clock_str := ""               # 時辰/日/季節 (sim.clock_view)
 var night_on := false
 var last_season := -1
 var banner := {"text": "", "t": 0.0}   # 天災/季節橫幅
 var last_save_tick := 0
 var quest_npcs := []               # 任務 NPC 視圖 (Step 8): sim.view_quest_npcs()
-var show_quests := false           # 記事面板 (Step 8)
 var quest_items := {}              # item id -> true (任務道具，賣唔到標記用)
+var pending := {}                  # 點遠處 NPC/設施: 行到附近自動開 {kind, ref}
+var marker := {"pos": Vector2.ZERO, "t": 0.0}   # 點地行路落點標記
+var _ask_seen := ""                # 任務答題對話框已自動彈過 (唔好一直彈)
 
 func _ready() -> void:
 	autotest = "--autotest" in OS.get_cmdline_user_args()
+	uitest = "--uitest" in OS.get_cmdline_user_args() or "--uishot" in OS.get_cmdline_user_args()
 	for i in 12:
 		var p := "%sface_%d.jpg" % [FACE_DIR, i]
 		faces.append(load(p) if ResourceLoader.exists(p) else null)   # 冇圖就畫色塊
@@ -56,11 +58,10 @@ func _ready() -> void:
 	item_names = data.names
 	for id in data.prices:
 		item_prices[id] = int(data.prices[id])
-	shop_stock = data.shops[0]["stock"]
 	inn_cost = int(data.inn["restCost"])
-	facilities.append({"kind": "inn", "name": "客棧 [R]休息", "x": int(data.inn["x"]), "y": int(data.inn["y"]), "color": Color(0.3, 0.5, 0.9)})
+	facilities.append({"kind": "inn", "name": "客棧", "x": int(data.inn["x"]), "y": int(data.inn["y"]), "color": Color(0.3, 0.5, 0.9)})
 	for sh in data.shops:
-		facilities.append({"kind": "shop", "name": "%s [1-3]買 [X]賣" % sh["name"], "x": int(sh["x"]), "y": int(sh["y"]),
+		facilities.append({"kind": "shop", "name": str(sh["name"]), "x": int(sh["x"]), "y": int(sh["y"]),
 			"color": Color(0.9, 0.7, 0.2), "stock": sh["stock"], "shopName": str(sh["name"])})
 	for key in data.facilities:
 		var fv: Variant = data.facilities[key]
@@ -77,9 +78,9 @@ func _ready() -> void:
 	for k in c:
 		if int(c[k]) == 44 or int(c[k]) == 52:
 			quest_items[int(k)] = true
-	sim = Sim.new(data, 1 if autotest else randi())
+	sim = Sim.new(data, 1 if autotest or uitest else randi())
 	var fresh := true
-	if not autotest and not ("--newgame" in OS.get_cmdline_user_args()) and SaveSys.has(SaveSys.AUTOSLOT):
+	if not autotest and not uitest and not ("--newgame" in OS.get_cmdline_user_args()) and SaveSys.has(SaveSys.AUTOSLOT):
 		var loaded := SaveSys.read_autosave(data)
 		if loaded != null:
 			sim = loaded
@@ -97,18 +98,19 @@ func _ready() -> void:
 	hud.setup(self)
 	hud.attack_pressed.connect(_hud_attack)
 	hud.auto_toggled.connect(_hud_auto)
-	hud.bag_pressed.connect(func(): show_bag = not show_bag)
-	hud.travel_pressed.connect(func():
-		var tp := _near_travel()
-		if not tp.is_empty(): _send({"t": "travel", "point": String(tp["point"])}))
-	hud.debug_pressed.connect(_on_debug_pressed)
-	hud.quest_pressed.connect(func(): show_quests = not show_quests)
+	hud.target_cycle.connect(_cycle_target)
+	hud.skill_pressed.connect(_on_skill)
+	hud.context_pressed.connect(func(act: Dictionary) -> void: ContextActions.run(self, act))
 	hud.create_done.connect(_on_create_done)
-	if fresh and not autotest:
+	if fresh and not autotest and not uitest:
 		hud.creation_mode = true
 	for a in OS.get_cmdline_user_args():
 		if a == "--sshot":
 			sshot_file = "user://sshot_ui.png"
+	if "--uitest" in OS.get_cmdline_user_args():
+		add_child(load("res://tests/ui_smoke.gd").new())
+	elif "--uishot" in OS.get_cmdline_user_args():
+		add_child(load("res://tests/ui_shot.gd").new())
 
 func _refresh() -> void:
 	ents = sim.view_ents()
@@ -136,8 +138,10 @@ func _process(delta: float) -> void:
 			_steer_tick()
 			_auto_tick()
 	_refresh()
+	if not autotest:
+		_ui_tick(delta)
 	t0 += delta
-	if not autotest and sim.tick > 0 and sim.tick % 720 == 0 and sim.tick != last_save_tick:
+	if not autotest and not uitest and sim.tick > 0 and sim.tick % 720 == 0 and sim.tick != last_save_tick:
 		last_save_tick = sim.tick
 		SaveSys.autosave(sim)
 	for f in floats: f.age += delta
@@ -287,7 +291,8 @@ func _on_event(e: Dictionary) -> void:
 			if int(e.dst) == my_id:
 				_log("你死咗，返客棧" + ("，跌咗 %s" % item_names.get(int(e.lost), str(e.lost)) if int(e.get("lost", 0)) > 0 else ""))
 				target_id = -1
-				SaveSys.autosave(sim)           # 死完即存
+				if not uitest:
+					SaveSys.autosave(sim)       # 死完即存
 				ch["status"] = {}              # 死亡清狀態 (sim 權威，UI 同步)
 		"flee":
 			if int(e.get("dst", -1)) == my_id:
@@ -359,37 +364,6 @@ func _nearest_mob(me: Dictionary):
 		if d < bd: bd = d; best = e
 	return best
 
-func _near_shop() -> bool:
-	return not _nearest_shop().is_empty()
-
-
-# 最近商店 (買賣同貨單要跟邊間店) (Step 11 洞窟商店)
-func _nearest_shop() -> Dictionary:
-	var me = _me()
-	if me == null:
-		return {}
-	for f in facilities:
-		if f.kind != "shop" or maxi(absi(int(me.x) - f.x), absi(int(me.y) - f.y)) > 3:
-			continue
-		return f
-	return {}
-
-func _near_inn() -> bool:
-	var me = _me()
-	if me == null: return false
-	for f in facilities:
-		if f.kind == "inn" and maxi(absi(int(me.x) - f.x), absi(int(me.y) - f.y)) <= 3: return true
-	return false
-
-# 附近商家設施 (練兵場/私塾/寺廟)
-func _near_fac() -> Dictionary:
-	var me = _me()
-	if me == null: return {}
-	for f in facilities:
-		if f.kind == "fac" and maxi(absi(int(me.x) - f.x), absi(int(me.y) - f.y)) <= 3:
-			return f
-	return {}
-
 # 附近傳送點 (城門: 城內/城外之間即時傳送)
 func _near_travel() -> Dictionary:
 	var me = _me()
@@ -398,98 +372,6 @@ func _near_travel() -> Dictionary:
 		if f.kind == "travel" and maxi(absi(int(me.x) - f.x), absi(int(me.y) - f.y)) <= 3:
 			return f
 	return {}
-
-func _inn_rect() -> Rect2:
-	return Rect2(get_viewport_rect().size.x / 2 - 150, 70, 300, 110)
-
-func _draw_inn() -> void:
-	if not _near_inn() or ch.is_empty(): return
-	var r := _inn_rect()
-	var col := Color(0.4, 0.6, 1.0)
-	draw_rect(r, Color(0, 0, 0, 0.8)); draw_rect(r, col, false, 2.0)
-	_txt(r.position + Vector2(10, 22), "客棧   金 %d" % int(ch.gold), col, 14)
-	_txt(r.position + Vector2(10, 46), "住宿 %d 金: 回滿 HP / MP / SP" % inn_cost)
-	var b := Rect2(r.position + Vector2(10, 62), Vector2(280, 34))
-	draw_rect(b, Color(0.2, 0.35, 0.7) if int(ch.gold) >= inn_cost else Color(0.3, 0.3, 0.3)); draw_rect(b, col, false, 1.0)
-	_txt(b.position + Vector2(90, 22), "點擊 休息 [R]", Color.WHITE, 14)
-
-# 市場價 = 基準價 × 價格因子；買入另計魅力折扣【原】，賣出 = 市場價 50%
-# ===== 設施面板 (練兵場/私塾/寺廟) =====
-func _fac_rect() -> Rect2:
-	return Rect2(get_viewport_rect().size.x / 2 - 220, 70, 440, 150)
-
-func _fac_btn_rect() -> Rect2:
-	var r := _fac_rect()
-	return Rect2(r.position + Vector2(10, 104), Vector2(420, 36))
-
-func _facility_click(pos: Vector2) -> bool:
-	var f = _near_fac()
-	if f.is_empty() or ch.is_empty(): return false
-	var r := _fac_rect()
-	if not r.has_point(pos): return false
-	# 打鐵鋪: 撳面板 = 融合開始 / 敲實 (QTE)
-	if String(f["fac"]) == "forge":
-		if (ch.get("fusing", {}) as Dictionary).is_empty():
-			_send({"t": "fusion_start"})
-		else:
-			_send({"t": "fusion_hit"})
-		return true
-	if _fac_btn_rect().has_point(pos):
-		_send({"t": "facility", "key": String(f["fac"])})
-	return true
-
-func _draw_facility() -> void:
-	var f = _near_fac()
-	if f.is_empty() or ch.is_empty(): return
-	if String(f["fac"]) == "forge":
-		_draw_forge(f)
-		return
-	var def: Dictionary = data.facilities[f["fac"]]
-	var r := _fac_rect()
-	var col := Color(f.color)
-	draw_rect(r, Color(0, 0, 0, 0.8))
-	draw_rect(r, col, false, 2.0)
-	_txt(r.position + Vector2(10, 22), "%s   (金 %d)" % [def.name, int(ch.gold)], col, 14)
-	_txt(r.position + Vector2(10, 46), str(def.desc), Color.WHITE, 11)
-	if String(f["fac"]) == "training":
-		_txt(r.position + Vector2(10, 64), "歷練 %d/100  (升級時武/智/敏/靈提升)" % int(ch.get("lilian", 0)), Color(0.7, 1.0, 0.7), 11)
-		_txt(r.position + Vector2(10, 84), "下次升級加成: 武/智/敏/靈 +%d" % (int(ch.get("lilian", 0)) / 10), Color(0.7, 1.0, 0.7), 11)
-	else:
-		var attr := str(def.attr)
-		_txt(r.position + Vector2(10, 64), "%s: %s +1  (而家 %d)" % [def.name, "政治" if attr == "pol" else "魅力", int(ch.attrs[attr])], Color(0.7, 1.0, 0.7), 11)
-	var b := _fac_btn_rect()
-	draw_rect(b, col)
-	draw_rect(b, Color.WHITE, false, 1.0)
-	_txt(b.position + Vector2(30, 23), "點擊使用", Color.WHITE, 13)
-
-
-# 打鐵鋪 (義士融合, Step 10 spec 02 §6): 集氣棒 QTE
-func _draw_forge(f: Dictionary) -> void:
-	var r := _fac_rect()
-	var col := Color(f.color)
-	draw_rect(r, Color(0, 0, 0, 0.8))
-	draw_rect(r, col, false, 2.0)
-	_txt(r.position + Vector2(10, 22), "打鐵鋪   (金 %d)" % int(ch["gold"]), col, 14)
-	var fs: Dictionary = ch.get("fusing", {})
-	if fs.is_empty():
-		_txt(r.position + Vector2(10, 46), "融合【義士】: 將屬性石燒入裝緊嗰把武器 (只能 1 粒)", Color.WHITE, 11)
-		_txt(r.position + Vector2(10, 64), "背包要有屬性石 + 武器未嵌石 + 10 級以上", Color(0.8, 0.9, 0.6), 11)
-		if str(ch.get("classId", "")) == "yishi":
-			_txt(r.position + Vector2(10, 84), "點擊面板攞料：融合開始 [N]", Color(1, 1, 0.8), 13)
-	else:
-		var pos := RulesJewel.fusion_pos(sim.tick - int(fs["start"]))
-		var jd: Dictionary = data.jewel_by_item.get(int(fs["jewel"]), {})
-		_txt(r.position + Vector2(10, 46), "嵌入緊: %s → %s   (撳實 = 敲定)" % [
-			jd.get("name", "?"), item_names.get(int(fs["weapon"]), str(fs["weapon"]))], Color(1, 0.85, 0.5), 11)
-		# 集氣棒: 0→100%，目標 50%±20% 係金色窗口
-		var bar := Rect2(r.position + Vector2(10, 66), Vector2(420, 22))
-		draw_rect(bar, Color(0.15, 0.15, 0.15))
-		var win := Rect2(bar.position + Vector2(bar.size.x * (RulesJewel.FUSION_TARGET - RulesJewel.FUSION_WINDOW), 0),
-			Vector2(bar.size.x * RulesJewel.FUSION_WINDOW * 2, bar.size.y))
-		draw_rect(win, Color(0.6, 0.75, 0.2))
-		draw_rect(Rect2(bar.position + Vector2(bar.size.x * pos - 2, -3), Vector2(4, bar.size.y + 6)), Color(1, 0.4, 0.2))
-		_txt(r.position + Vector2(10, 98), "集氣 %.0f%% — 金色窗口內撳 [N]/點擊！" % (pos * 100.0), Color(1, 1, 0.7), 12)
-
 
 # 市場價 = 基準價 × 價格因子；買入另計魅力折扣【原】，賣出 = 市場價 50%
 func _buy_price(id: int) -> int:
@@ -501,43 +383,7 @@ func _buy_price(id: int) -> int:
 func _sell_price(id: int) -> int:
 	return RulesMarket.sell_price(item_prices.get(id, 0), sim.market_factor(id))
 
-func _panel_rect() -> Rect2:
-	var vs := get_viewport_rect().size
-	var ns := _nearest_shop()
-	var stk: Array = ns.get("stock", shop_stock) if not ns.is_empty() else shop_stock
-	var nrows := maxi(stk.size(), maxi(1, ch.bag.size() if not ch.is_empty() else 1))
-	return Rect2(vs.x / 2 - 220, 70, 440, 60 + 32 * nrows)
 
-# 點擊商店面板: 左邊買、右邊賣。回傳 true = 已處理
-func _shop_click(pos: Vector2) -> bool:
-	if not _near_shop() or ch.is_empty(): return false
-	var r := _panel_rect()
-	if not r.has_point(pos): return false
-	var ns := _nearest_shop()
-	var stk: Array = ns.get("stock", shop_stock) if not ns.is_empty() else shop_stock
-	var row := int((pos.y - r.position.y - 50) / 32)
-	if row < 0: return true
-	if pos.x < r.position.x + 220:
-		if row < stk.size(): _send({"t": "buy", "item": int(stk[row]), "n": 1})
-	elif row < ch.bag.size():
-		_send({"t": "sell", "item": int(ch.bag[row].id), "n": 1})
-	return true
-
-func _draw_shop() -> void:
-	var ns := _nearest_shop()
-	if ns.is_empty() or ch.is_empty(): return
-	var stk: Array = ns.get("stock", []) as Array
-	var r := _panel_rect()
-	draw_rect(r, Color(0, 0, 0, 0.8)); draw_rect(r, Color(0.9, 0.7, 0.2), false, 2.0)
-	_txt(r.position + Vector2(10, 22), "%s   金 %d   (點 買/賣)" % [str(ns["shopName"]), int(ch["gold"])], Color(0.9, 0.7, 0.2), 14)
-	_txt(r.position + Vector2(10, 44), "買 (魅力折扣後)", Color.CYAN); _txt(r.position + Vector2(230, 44), "賣 (原價 50%)", Color.CYAN)
-	for i in stk.size():
-		var id := int(stk[i])
-		_txt(r.position + Vector2(10, 70 + 32 * i), "%s  %d 金" % [item_names.get(id, str(id)), _buy_price(id)])
-	if ch.bag.is_empty(): _txt(r.position + Vector2(230, 64), "(背包空)", Color.GRAY)
-	for i in ch.bag.size():
-		var id := int(ch.bag[i].id)
-		_txt(r.position + Vector2(230, 70 + 32 * i), "%s x%d  %d 金" % [item_names.get(id, str(id)), int(ch.bag[i].n), _sell_price(id)])
 
 func _me():
 	return _ent(my_id)
@@ -547,42 +393,122 @@ func target_ent():
 		return null
 	return _ent(target_id)
 
-# 點怪 = 攻擊，點地 = 行路，點自己 = 取消目標
+# 點怪 = 攻擊；點 NPC/設施 = 行過去自動互動；點地 = 行路（有落點標記）；點自己 = 取消目標
 func _hud_tap(pos: Vector2) -> void:
-	if _ask_click(pos):
-		return
-	if _facility_click(pos):
-		return
-	if _shop_click(pos):
-		return
-	if not ch.is_empty() and _near_inn() and _inn_rect().has_point(pos):
-		_send({"t": "rest"})
+	if hud != null and hud.any_panel_open():
 		return
 	var g: Vector2 = ((pos + cam) / TILE).floor()
-	# 點任務 NPC = 對話 (Step 8)
-	for qn in quest_npcs:
-		if int(g.x) == int(qn.x) and int(g.y) == int(qn.y):
-			_send({"t": "quest_talk", "npc": String(qn.id)})
-			return
-	var tp := _near_travel()
-	if not tp.is_empty() and int(g.x) == tp.x and int(g.y) == tp.y:
-		_send({"t": "travel", "point": String(tp["point"])})
-		return
+	pending = {}
 	var me = _me()
 	if me != null and int(g.x) == int(me.x) and int(g.y) == int(me.y):
 		target_id = -1                            # 點自己 = 取消目標
 		return
+	# 怪優先（戰鬥中最常撳）
 	var e = _ent_at(g)
 	if e == null or not e.get("mob", false):
-		e = _mob_near_tap(pos)                    # 手機格仔細(16px)，容許 tap 埋隔籬格都算中
+		e = _mob_near_tap(pos)                    # 手指粗: 容許 tap 埋隔籬格都算中
 	if e != null and e.get("mob", false):
 		target_id = int(e.id)
 		_send({"t": "attack", "target": target_id})
-	else:
-		_send({"t": "move", "x": int(g.x), "y": int(g.y)})
+		return
+	# 任務 NPC / 設施: 近就即刻互動，遠就行過去再開 (三國群英傳M 點 NPC 自動尋路)
+	var it := _interactable_at(g)
+	if not it.is_empty():
+		if me != null and ContextActions._near(me, int(it.ref.x), int(it.ref.y)):
+			ContextActions.run(self, it)
+		else:
+			pending = it
+			_send({"t": "move", "x": int(it.ref.x), "y": int(it.ref.y)})
+			marker = {"pos": Vector2(int(it.ref.x), int(it.ref.y)), "t": 1.0}
+		return
+	_send({"t": "move", "x": int(g.x), "y": int(g.y)})
+	marker = {"pos": g, "t": 1.0}
 
-# 容錯: tap 座標喺呢個範圍內揀最近嘅怪 (半格仔), 唔使準確咁啱格先郁到手
-const TAP_TOLERANCE := TILE * 0.9
+# tap 格仔係咪 NPC/設施（設施佔 3x3，NPC 容許隔籬 1 格）→ ContextActions 格式
+func _interactable_at(g: Vector2) -> Dictionary:
+	for qn in quest_npcs:
+		if absi(int(g.x) - int(qn.x)) <= 1 and absi(int(g.y) - int(qn.y)) <= 1:
+			return {"kind": "quest_npc", "label": "對話", "ref": qn}
+	for f in facilities:
+		if absi(int(g.x) - int(f.x)) <= 1 and absi(int(g.y) - int(f.y)) <= 1:
+			return {"kind": String(f.kind), "label": "", "ref": f}
+	return {}
+
+# 每幀 UI 雜務: 行到 pending 目標就開、任務答題自動彈對話框、落點標記淡出
+func _ui_tick(delta: float) -> void:
+	marker["t"] = maxf(0.0, float(marker["t"]) - delta * 1.5)
+	if hud == null or hud.creation_mode:
+		return
+	var me = _me()
+	if not pending.is_empty() and me != null:
+		if hud.joy_active():
+			pending = {}
+		elif ContextActions._near(me, int(pending.ref.x), int(pending.ref.y)):
+			var it := pending
+			pending = {}
+			ContextActions.run(self, it)
+	var ask := _active_ask()
+	var key := JSON.stringify(ask)
+	if not ask.is_empty() and key != _ask_seen and not hud.any_panel_open():
+		_ask_seen = key
+		ContextActions.run(self, {"kind": "ask"})
+
+# 切換目標: 附近怪按距離排，揀下一隻（唔會即刻打，撳攻擊先打）
+func _cycle_target() -> void:
+	var me = _me()
+	if me == null:
+		return
+	var mobs: Array = []
+	for e in ents:
+		if e.get("mob", false) and absf(e.x - me.x) + absf(e.y - me.y) <= 16:
+			mobs.append(e)
+	if mobs.is_empty():
+		_log("附近冇怪")
+		return
+	mobs.sort_custom(func(a, b): return absf(a.x - me.x) + absf(a.y - me.y) < absf(b.x - me.x) + absf(b.y - me.y))
+	var i := 0
+	for k in mobs.size():
+		if int(mobs[k].id) == target_id:
+			i = (k + 1) % mobs.size()
+	target_id = int(mobs[i].id)
+
+# 技能扇形: 術書空格 = 開背包揀術書（唔會自動裝）；有書 = 施法；絕招 = 用
+func _on_skill(sl: Dictionary) -> void:
+	if String(sl["kind"]) == "spell":
+		if int(sl["item"]) == 0:
+			hud.close_panels()
+			hud.bag_panel().open_filter("spell", int(sl["slot"]))
+			return
+		var t = target_ent()
+		var tgt := int(t.id) if t != null and bool(t.get("mob", false)) else 0
+		_send({"t": "cast_spell", "slot": int(sl["slot"]), "target": tgt})
+		return
+	if String(sl["ult"]) == "":
+		_log("未學絕招 (絕招任務: 練兵場門口禁衛大隊長)")
+		return
+	_send({"t": "use_ultimate", "ult": String(sl["ult"])})
+
+func class_has_spells() -> bool:
+	var cid := str(ch.get("classId", ""))
+	for sp in data.spells:
+		if (sp["classes"] as Array).has(cid):
+			return true
+	return false
+
+func class_has_ults() -> bool:
+	var cid := str(ch.get("classId", ""))
+	for u in data.ultimates:
+		if str(u["class"]) == cid:
+			return true
+	return false
+
+# Android 返回鍵: 有面板就關面板（唔會一撳就退出遊戲）
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST and hud != null and hud.any_panel_open():
+		hud.close_panels()
+
+# 容錯: tap 座標喺呢個範圍內揀最近嘅怪 (~1.8 格 ≈ 手指闊), 唔使準確咁啱格先郁到手
+const TAP_TOLERANCE := TILE * 1.8
 func _mob_near_tap(pos: Vector2):
 	var world_pos: Vector2 = pos + cam
 	var best = null
@@ -687,7 +613,7 @@ func _ent_at(g: Vector2):
 		if int(e.x) == int(g.x) and int(e.y) == int(g.y): return e
 	return null
 
-# 手機冇鍵盤，呢個俾 mobile_hud debug 掣 + 桌面鍵盤共用 (Step 5~7 未有正式面板嘅功能)
+# 測試功能: 「更多」面板 + 桌面鍵盤共用（成品前換走；倉庫已搬去背包面板）
 func _on_debug_pressed(action: String) -> void:
 	match action:
 		"greet": _send({"t": "chat", "text": "大家好"})
@@ -696,13 +622,6 @@ func _on_debug_pressed(action: String) -> void:
 				var food := 29054                            # debug: 燻魚(回 HP)，唔理背包原本有咩，直接派一件試食
 				_send({"t": "debug_give", "item": food, "n": 1})
 				_send({"t": "use_item", "item": food})
-		"storage_sub": _send({"t": "storage_sub", "on": not bool(ch.get("storageSub", false))})
-		"deposit":
-			if not ch.is_empty() and ch.bag.size() > 0:
-				_send({"t": "storage_deposit", "item": int(ch.bag[0].id), "n": 1})
-		"withdraw":
-			if not ch.is_empty() and ch.storage.size() > 0:
-				_send({"t": "storage_withdraw", "item": int(ch.storage[0].id), "n": 1})
 		"work_mining":
 			var sk: Dictionary = data.work.get("mining", {})
 			if not sk.is_empty() and (ch.get("tools", {}) as Dictionary).get("mining", {}).is_empty():
@@ -713,17 +632,26 @@ func _on_debug_pressed(action: String) -> void:
 
 
 func _unhandled_input(ev: InputEvent) -> void:
-	if Input.is_emulating_mouse_from_touch():
-		# Android: 觸控事件直接做世界點擊（emulate 出嚟嘅 mouse 事件忽略，避免雙重處理）
-		if ev is InputEventScreenTouch and ev.pressed:
+	if hud != null and (hud.any_panel_open() or hud.creation_mode):
+		return                                     # 面板開住: 唔做世界點擊/快捷鍵
+	# 逐個事件判斷: 觸控 = ScreenTouch；由觸控模擬出嚟嘅 mouse 事件忽略（避免雙重處理）
+	# （唔用 Input.is_emulating_mouse_from_touch(): 4.7 桌面都回 true）
+	if ev is InputEventScreenTouch:
+		if ev.pressed:
 			_hud_tap(ev.position)
 		return
+	if ev is InputEventMouse and ev.device == InputEvent.DEVICE_ID_EMULATION:
+		return
+	# 桌面快捷鍵（debug）: 背包/角色/記事/互動 開正式面板；唔再有「自動揀第一件」嘅鍵
 	if ev is InputEventKey and ev.pressed:
-		if ev.keycode == KEY_B: show_bag = not show_bag
-		elif ev.keycode == KEY_J: show_quests = not show_quests                                  # 記事
+		if ev.keycode == KEY_B: hud.bag_panel().open_filter("")
+		elif ev.keycode == KEY_C: hud.open_panel("char")
+		elif ev.keycode == KEY_J: hud.open_panel("quest")
+		elif ev.keycode == KEY_SPACE:
+			var act := ContextActions.find(self)
+			if not act.is_empty(): ContextActions.run(self, act)
+		elif ev.keycode == KEY_TAB: _cycle_target()
 		elif ev.keycode == KEY_R: _send({"t": "rest"})                                   # 客棧休息
-		elif ev.keycode == KEY_X and not ch.is_empty() and ch.bag.size() > 0:          # 賣背包第一格
-			_send({"t": "sell", "item": int(ch.bag[0].id), "n": 1})
 		elif ev.keycode == KEY_H: _on_debug_pressed("greet")
 		elif ev.keycode == KEY_G:
 			var tp = _near_travel()
@@ -731,32 +659,12 @@ func _unhandled_input(ev: InputEvent) -> void:
 		elif ev.keycode == KEY_T: _send({"t": "facility", "key": "training"})
 		elif ev.keycode == KEY_P: _send({"t": "facility", "key": "school"})
 		elif ev.keycode == KEY_M: _send({"t": "facility", "key": "temple"})
-		elif ev.keycode >= KEY_1 and ev.keycode <= KEY_9:
-			var stk: Array = _nearest_shop().get("stock", []) as Array
-			var idx: int = int(ev.keycode) - KEY_1
-			if idx < stk.size(): _send({"t": "buy", "item": int(stk[idx]), "n": 1})
-		elif ev.keycode == KEY_A and not ch.is_empty() and ch.has("bag"):   # 裝備背包第一把武器 (Step 10)
-			for b in ch["bag"]:
-				if int(data.cats.get(int(b["id"]), 0)) in [1, 2, 3]:
-					_send({"t": "equip_weapon", "item": int(b["id"])})
-					break
 		elif ev.keycode == KEY_L and not ch.is_empty():            # 絕招 (最新學嗰招)
 			var ults: Array = ch.get("ultimates", [])
 			if ults.is_empty():
 				_log("未學任何絕招")
 			else:
 				_send({"t": "use_ultimate", "ult": str(ults[ults.size() - 1])})
-		elif ev.keycode == KEY_I and not ch.is_empty() and ch.has("equip"):   # 寶石欄 0: 裝第一粒背包寶石 / 卸
-			var jews: Array = ch["equip"].get("jewels", [0, 0])
-			if int(jews[0]) != 0:
-				_send({"t": "equip_jewel", "item": 0, "slot": 0})
-			else:
-				for b in ch["bag"]:
-					if data.jewel_by_item.has(int(b["id"])):
-						_send({"t": "equip_jewel", "item": int(b["id"]), "slot": 0})
-						break
-		elif ev.keycode == KEY_O and not ch.is_empty() and ch.has("equip"):   # 寶石欄 1 卸
-			_send({"t": "equip_jewel", "item": 0, "slot": 1})
 		elif ev.keycode == KEY_N and not ch.is_empty():             # 融合: 開始 / 敲實 (打鐵鋪)
 			if (ch.get("fusing", {}) as Dictionary).is_empty():
 				_send({"t": "fusion_start"})
@@ -766,19 +674,11 @@ func _unhandled_input(ev: InputEvent) -> void:
 		elif ev.keycode == KEY_Z and not ch.is_empty() and ch.has("equip"):   # 施法: 快捷列 1 (Step 9)
 			var tgt := target_id if target_id >= 0 else 0
 			_send({"t": "cast_spell", "slot": 0, "target": tgt})
-		elif ev.keycode == KEY_K and not ch.is_empty() and ch.has("equip"):   # 快捷列 1 裝第一本背包術書
-			for b in ch["bag"]:
-				if data.spell_by_item.has(int(b["id"])):
-					_send({"t": "equip_spellbook", "item": int(b["id"]), "slot": 0})
-					break
 		elif ev.keycode == KEY_Q: _send({"t": "auto_assign"})
 		elif ev.keycode == KEY_E: _send({"t": "raise_attr", "attr": "str"})
 		elif ev.keycode == KEY_F: _send({"t": "raise_attr", "attr": "agi"})
 		elif ev.keycode == KEY_D: _send({"t": "raise_attr", "attr": "int"})
 		elif ev.keycode == KEY_S: _send({"t": "raise_attr", "attr": "spi"})
-		elif ev.keycode == KEY_Y: _on_debug_pressed("storage_sub")
-		elif ev.keycode == KEY_C: _on_debug_pressed("deposit")
-		elif ev.keycode == KEY_V: _on_debug_pressed("withdraw")
 		elif ev.keycode == KEY_U: _on_debug_pressed("use")
 	elif ev is InputEventMouseButton and ev.pressed:
 		if ev.button_index == MOUSE_BUTTON_LEFT:
@@ -857,34 +757,15 @@ func _draw() -> void:
 	for f in floats:
 		var fp: Vector2 = f.pos - cam + Vector2(2, -20 - 24 * f.age)
 		_txt(fp, f.text, f.color, 14)
-	_draw_bag(vs)
-	_draw_shop()
-	_draw_inn()
-	_draw_facility()
-	_draw_zone(vs)
+	if float(marker["t"]) > 0.0:                   # 點地落點標記（縮細 + 淡出）
+		var mc: Vector2 = marker["pos"] * TILE + Vector2(TILE, TILE) * 0.5 - cam
+		var k := float(marker["t"])
+		draw_arc(mc, 4.0 + 10.0 * k, 0, TAU, 24, Color(1, 0.9, 0.4, k), 2.0)
 	_draw_banner(vs)
-	_draw_clock(vs)
-	_draw_char_status(vs)
-	_draw_quests(vs)
-	_draw_ask(vs)
 
-# 所在區名 (左上角) (Step 11 洞窟)
-func _draw_zone(vs: Vector2) -> void:
-	var me = _me()
-	if me == null:
-		return
-	var zv := sim.zone_view(int(me.x), int(me.y))
-	if zv.is_empty():
-		return
-	_txt(Vector2(10, 12), str(zv["name"]), Color(0.9, 0.85, 0.7), 14)
 
 
 # 時辰/日/季節 (右上) + 夜晚示意
-func _draw_clock(vs: Vector2) -> void:
-	_txt(Vector2(vs.x - 252, 44), clock_str, Color(1, 0.95, 0.65), 13)
-	if night_on:
-		draw_circle(Vector2(vs.x - 24, 50), 6, Color(0.9, 0.9, 0.75))
-		_txt(Vector2(vs.x - 44, 52), "夜", Color(0.8, 0.8, 0.9), 9)
 
 
 # 天災/季節橫幅 (頂中，目標框下)
@@ -914,95 +795,17 @@ func _active_ask() -> Dictionary:
 	return {}
 
 
-func _ask_rect() -> Rect2:
-	var vs := get_viewport_rect().size
-	return Rect2(vs.x / 2 - 200, 130, 400, 54 + 30 * 3)
 
 
-func _ask_click(pos: Vector2) -> bool:
-	var ask := _active_ask()
-	if ask.is_empty():
-		return false
-	var r := _ask_rect()
-	if not r.has_point(pos):
-		return false
-	var i := int((pos.y - r.position.y - 46) / 30)
-	if i >= 0 and i < (ask["options"] as Array).size():
-		_send({"t": "quest_answer", "quest": str(ask["q"]), "answer": i})
-	return true
 
 
-func _draw_ask(vs: Vector2) -> void:
-	var ask := _active_ask()
-	if ask.is_empty():
-		return
-	var r := _ask_rect()
-	draw_rect(r, Color(0, 0, 0, 0.85))
-	draw_rect(r, Color(1, 0.8, 0.3), false, 2.0)
-	var dl: Array = ask["dialog"]
-	var qline := "答題！" if dl.is_empty() else str(dl[0])
-	if qline.length() > 30:
-		qline = qline.substr(0, 29) + "…"
-	_txt(r.position + Vector2(10, 18), qline, Color(1, 0.9, 0.5), 11)
-	var opts: Array = ask["options"]
-	for i in opts.size():
-		var orr := Rect2(r.position + Vector2(10, 46 + 30 * i), Vector2(380, 26))
-		draw_rect(orr, Color(0.25, 0.3, 0.5))
-		draw_rect(orr, Color(1, 1, 1), false, 1.0)
-		var ot := str(opts[i])
-		if ot.length() > 26:
-			ot = ot.substr(0, 25) + "…"
-		_txt(orr.position + Vector2(8, 18), ot, Color.WHITE, 12)
 
 
 # 記事面板 (Step 8, spec 06 §1.2): 進行中任務 + 提示；完成記錄
-func _draw_quests(vs: Vector2) -> void:
-	if not show_quests:
-		return
-	var qs := sim.view_quests()
-	var lines: Array = []
-	for q in qs:
-		if bool(q.get("active", false)):
-			var h: String = str(q.get("hint", ""))
-			if h.length() > 26:
-				h = h.substr(0, 25) + "…"
-			lines.append("● %s — %s" % [q.name, h])
-		elif bool(q.get("done", false)):
-			lines.append("✓ %s (完成)" % q.name)
-	var r := Rect2(vs.x - 330, 96, 324, 22 + 15 * maxi(1, lines.size()))
-	draw_rect(r, Color(0, 0, 0, 0.82))
-	draw_rect(r, Color(1, 0.85, 0.4), false, 1.5)
-	_txt(r.position + Vector2(10, 16), "記事", Color(1, 0.9, 0.5), 12)
-	if lines.is_empty():
-		_txt(r.position + Vector2(10, 38), "未有任務 — 去城門口搵神秘老人", Color.GRAY, 11)
-	for i in lines.size():
-		_txt(r.position + Vector2(10, 38 + 15 * i), str(lines[i]), Color.WHITE, 11)
 
 
 # 建角面板完成（mobile_hud)_on_create_done 用
 func _on_create_done() -> void:
-	show_quests = false
 	_log("建角完成，出發！")
 
 # 升級點數 / 理念 / 生日 / 稱號 狀態列 (Step 7.5 debug UI)
-func _draw_char_status(vs: Vector2) -> void:
-	if ch.is_empty():
-		return
-	var y := vs.y - 78
-	draw_rect(Rect2(10, y - 6, 330, 62), Color(0, 0, 0, 0.75))
-	draw_rect(Rect2(10, y - 6, 330, 62), Color(1, 0.85, 0.4), false, 1.5)
-	_txt(Vector2(16, y + 12), "點數 %d    理念 %s" % [int(ch.get("attrPoints", 0)), str(ch.get("ideology", "未測"))], Color(1, 1, 0.7), 12)
-	_txt(Vector2(16, y + 30), "生日 %d月%d日    稱號「%s」" % [int(ch.get("birthMonth", 1)), int(ch.get("birthDay", 1)), str(ch.get("title", ""))], Color(0.85, 1, 0.8), 12)
-	_txt(Vector2(16, y + 48), "Q自動派  E力量 F敏捷 D智力 S靈力 (用升級點數)" if int(ch.get("attrPoints", 0)) > 0 else "任務：城門口神秘老人 / 練兵場小兵 · 記事[J]睇任務", Color(0.85, 0.9, 1), 10)
-
-func _draw_bag(vs: Vector2) -> void:
-	if show_bag and not ch.is_empty():
-		var bag: Array = ch.bag
-		draw_rect(Rect2(vs.x - 190, 52, 184, 30 + 16 * maxi(1, bag.size())), Color(0, 0, 0, 0.7))
-		_txt(Vector2(vs.x - 182, 70), "背包")
-		for i in bag.size():
-			var bid := int(bag[i].id)
-			var tag := ""
-			if quest_items.has(bid):
-				tag = " (任)"
-			_txt(Vector2(vs.x - 182, 88 + 16 * i), "%s x%d%s" % [item_names.get(bid, str(bid)), int(bag[i].n), tag])
