@@ -43,6 +43,9 @@ var night_on := false
 var last_season := -1
 var banner := {"text": "", "t": 0.0}   # 天災/季節橫幅
 var last_save_tick := 0
+var quest_npcs := []               # 任務 NPC 視圖 (Step 8): sim.view_quest_npcs()
+var show_quests := false           # 記事面板 (Step 8)
+var quest_items := {}              # item id -> true (任務道具，賣唔到標記用)
 
 func _ready() -> void:
 	autotest = "--autotest" in OS.get_cmdline_user_args()
@@ -57,7 +60,8 @@ func _ready() -> void:
 	inn_cost = int(data.inn["restCost"])
 	facilities.append({"kind": "inn", "name": "客棧 [R]休息", "x": int(data.inn["x"]), "y": int(data.inn["y"]), "color": Color(0.3, 0.5, 0.9)})
 	for sh in data.shops:
-		facilities.append({"kind": "shop", "name": "%s [1-3]買 [X]賣" % sh["name"], "x": int(sh["x"]), "y": int(sh["y"]), "color": Color(0.9, 0.7, 0.2)})
+		facilities.append({"kind": "shop", "name": "%s [1-3]買 [X]賣" % sh["name"], "x": int(sh["x"]), "y": int(sh["y"]),
+			"color": Color(0.9, 0.7, 0.2), "stock": sh["stock"], "shopName": str(sh["name"])})
 	for key in data.facilities:
 		var fv: Variant = data.facilities[key]
 		if not fv is Dictionary:          # 跳過 _note
@@ -69,6 +73,10 @@ func _ready() -> void:
 	for tp in data.travel_points:
 		facilities.append({"kind": "travel", "point": String(tp["id"]), "name": String(tp["name"]),
 			"x": int(tp["x"]), "y": int(tp["y"]), "color": Color(0.6, 0.9, 0.4)})
+	var c: Dictionary = data.cats
+	for k in c:
+		if int(c[k]) == 44 or int(c[k]) == 52:
+			quest_items[int(k)] = true
 	sim = Sim.new(data, 1 if autotest else randi())
 	var fresh := true
 	if not autotest and not ("--newgame" in OS.get_cmdline_user_args()) and SaveSys.has(SaveSys.AUTOSLOT):
@@ -94,6 +102,10 @@ func _ready() -> void:
 		var tp := _near_travel()
 		if not tp.is_empty(): _send({"t": "travel", "point": String(tp["point"])}))
 	hud.debug_pressed.connect(_on_debug_pressed)
+	hud.quest_pressed.connect(func(): show_quests = not show_quests)
+	hud.create_done.connect(_on_create_done)
+	if fresh and not autotest:
+		hud.creation_mode = true
 	for a in OS.get_cmdline_user_args():
 		if a == "--sshot":
 			sshot_file = "user://sshot_ui.png"
@@ -101,6 +113,7 @@ func _ready() -> void:
 func _refresh() -> void:
 	ents = sim.view_ents()
 	ch = sim.player_ch()
+	quest_npcs = sim.view_quest_npcs()
 	var me = _me()
 	if me != null:
 		cam = Vector2(me.x, me.y) * TILE - get_viewport_rect().size / 2
@@ -167,11 +180,29 @@ func _send(d: Dictionary) -> void:
 		"set_birth": sim.cmd_set_birth(my_id, int(d.month), int(d.day))
 		"set_face": sim.cmd_set_face(my_id, str(d.part), int(d.value))
 		"submit_quiz": sim.cmd_submit_quiz(my_id, d.answers)
+		"quest_talk": sim.cmd_quest_talk(my_id, str(d.npc))
+		"select_class": sim.cmd_select_class(my_id, str(d.class_id))
+		"equip_spellbook": sim.cmd_equip_spellbook(my_id, int(d.item), int(d.get("slot", 0)))
+		"cast_spell": sim.cmd_cast_spell(my_id, int(d.slot), int(d.get("target", 0)))
+		"equip_weapon": sim.cmd_equip_weapon(my_id, int(d.item))
+		"equip_jewel": sim.cmd_equip_jewel(my_id, int(d.item), int(d.get("slot", 0)))
+		"use_ultimate": sim.cmd_use_ultimate(my_id, str(d.ult))
+		"fusion_start": sim.cmd_fusion_start(my_id)
+		"fusion_hit": sim.cmd_fusion_hit(my_id)
+		"quest_answer": sim.cmd_quest_answer(my_id, str(d.quest), int(d.answer))
 		"debug_give": sim.cmd_debug_give(my_id, int(d.item), int(d.get("n", 1)))
 
 func _log(s: String) -> void:
 	log_lines.append(s)
 	if log_lines.size() > 6: log_lines.pop_front()
+
+const STATUS_NAMES := {"sealed": "封咒", "hex": "中邪", "power1": "聚力", "power2": "強力", "power3": "神力",
+	"armor1": "護甲", "armor2": "金甲", "armor3": "聖鎧", "mirror1": "護鏡", "mirror2": "光鏡", "mirror3": "仙鏡"}
+const ELEM_TAG := {"earth": "地", "water": "水", "fire": "火", "wind": "風"}
+
+func _ent_name(id: int) -> String:
+	var d = _ent(id)
+	return str(d.name) if d != null else "？"
 
 func _exp_total() -> int:
 	var t := 0
@@ -190,6 +221,56 @@ func _on_event(e: Dictionary) -> void:
 				var dmg: int = int(e.dmg)
 				floats.append({"pos": Vector2(d.x, d.y) * TILE, "text": "miss" if dmg == 0 else str(dmg),
 					"color": Color.YELLOW if int(e.dst) == my_id else Color.WHITE, "age": 0.0})
+		"spell_hit":
+			var d2 = _ent(int(e.dst))
+			if d2 != null:
+				var dmg2: int = int(e.dmg)
+				floats.append({"pos": Vector2(d2.x, d2.y) * TILE,
+					"text": ("miss" if dmg2 == 0 else str(dmg2)) + " " + String(ELEM_TAG.get(str(e.elem), "")),
+					"color": Color(1, 0.45, 1.0) if int(e.dst) == my_id else Color(0.85, 0.45, 0.95), "age": 0.0})
+		"cast_start":
+			if int(e.src) == my_id:
+				_log("開始吟唱 %s…" % item_names.get(int(e.book), str(e.book)))
+			elif int(e.dst) == my_id:
+				_log("%s 對你吟唱術法！" % _ent_name(int(e.src)))
+		"cast_interrupted":
+			var reason: String = str(e.get("reason", ""))
+			var who := "你" if int(e.dst) == my_id else _ent_name(int(e.dst))
+			_log("%s吟唱被打斷 (%s)" % [who, "移動" if reason == "move" else "受擊" if reason == "hit" else reason])
+		"status":
+			if int(e.dst) == my_id:
+				var sid: String = str(e.id)
+				_log("%s%s (剩 %d tick)" % ["解除" if not bool(e.get("applied", true)) else "狀態: ",
+					STATUS_NAMES.get(sid, sid), maxi(0, int(e.get("until", 0)) - sim.tick)])
+		"spellbook":
+			if int(e.src) == my_id:
+				_log("快捷列 %d: %s" % [int(e.slot) + 1, item_names.get(int(e.item), "(空)") if int(e.item) > 0 else "(空)"])
+		"jewel":
+			if int(e.src) == my_id:
+				_log("寶石欄 %d: %s" % [int(e.slot) + 1, item_names.get(int(e.item), "(空)") if int(e.item) > 0 else "(空)"])
+		"equip":
+			if int(e.src) == my_id:
+				_log("裝備武器: %s" % item_names.get(int(e.item), str(e.item)))
+		"ult":
+			if int(e.src) == my_id:
+				_log("「%s」！ (-%d MP -%d SP)" % [e.name, int(e.get("mp", 0)), int(e.get("sp", 0))])
+		"ult_hit":
+			var d3 = _ent(int(e.dst))
+			if d3 != null:
+				floats.append({"pos": Vector2(d3.x, d3.y) * TILE, "text": str(int(e.dmg)),
+					"color": Color(1, 0.35, 0.1), "age": 0.0})
+		"fusion":
+			if int(e.src) == my_id:
+				match str(e.get("state", "")):
+					"start": _log("融合 QTE 起動！喺 50%% 左右撳實！")
+					"ok": _log("融合成功！武器嵌咗 %s+%d%%" % [e.get("elem", ""), int(e.get("pct", 0))])
+					"fail": _log("融合失敗，再試下")
+		"quest_battle":
+			if int(e.dst) == my_id:
+				_log("%s 出現咗！打贏攞証物！" % str(e.name))
+		"reclass":
+			my_id = int(e.id)
+			_log("職業改做 %s" % str(e.class))
 		"kill":
 			if int(e.src) == my_id:
 				kills += 1
@@ -207,12 +288,37 @@ func _on_event(e: Dictionary) -> void:
 				_log("你死咗，返客棧" + ("，跌咗 %s" % item_names.get(int(e.lost), str(e.lost)) if int(e.get("lost", 0)) > 0 else ""))
 				target_id = -1
 				SaveSys.autosave(sim)           # 死完即存
+				ch["status"] = {}              # 死亡清狀態 (sim 權威，UI 同步)
+		"flee":
+			if int(e.get("dst", -1)) == my_id:
+				_log("%s 見你唔夠打，逃咗！" % str(e.get("name", "")))
 		"train":
 			if int(e.src) == my_id:
 				if e.has("partner"):
 					_log("同 %s 對練，歷練 %d/100" % [e.partner, int(e.lilian)])
 				else:
 					_log("%s: %s +1 (而家 %d)" % ["私塾" if e.attr == "政治" else "寺廟", e.attr, int(e.val)])
+		"quest":
+			if int(e.dst) == my_id:
+				var qname := String(e.quest)
+				if bool(e.get("started", false)):
+					_log("接咗任務「%s」" % qname)
+				elif bool(e.get("done", false)):
+					var rw: Dictionary = e.get("reward", {})
+					var parts: Array = []
+					if int(rw.get("gold", 0)) > 0: parts.append("+%d 金" % int(rw["gold"]))
+					if int(rw.get("exp", 0)) > 0: parts.append("+%d 經驗" % int(rw["exp"]))
+					if int(rw.get("lilian", 0)) > 0: parts.append("+%d 歷練" % int(rw["lilian"]))
+					if rw.has("ultimate"): parts.append("學識絕招「%s」！" % str(rw["ultimate"]))
+					if rw.has("items"):
+						for it in rw["items"]:
+							parts.append("%s x%d" % [item_names.get(int(it.id), str(it.id)), int(it.n)])
+					_log("任務完成「%s」 %s" % [qname, " ".join(parts) if not parts.is_empty() else ""])
+				else:
+					_log("「%s」有進展" % qname)
+		"heal":
+			if int(e.dst) == my_id:
+				_log("密醫幫你醫治，回復 %d HP" % int(e.hp))
 		"day":
 			var season := int(e.season)
 			if last_season >= 0 and season != last_season:
@@ -254,12 +360,19 @@ func _nearest_mob(me: Dictionary):
 	return best
 
 func _near_shop() -> bool:
+	return not _nearest_shop().is_empty()
+
+
+# 最近商店 (買賣同貨單要跟邊間店) (Step 11 洞窟商店)
+func _nearest_shop() -> Dictionary:
 	var me = _me()
-	if me == null: return false
+	if me == null:
+		return {}
 	for f in facilities:
-		if f.kind != "shop": continue
-		if maxi(absi(int(me.x) - f.x), absi(int(me.y) - f.y)) <= 3: return true
-	return false
+		if f.kind != "shop" or maxi(absi(int(me.x) - f.x), absi(int(me.y) - f.y)) > 3:
+			continue
+		return f
+	return {}
 
 func _near_inn() -> bool:
 	var me = _me()
@@ -314,6 +427,13 @@ func _facility_click(pos: Vector2) -> bool:
 	if f.is_empty() or ch.is_empty(): return false
 	var r := _fac_rect()
 	if not r.has_point(pos): return false
+	# 打鐵鋪: 撳面板 = 融合開始 / 敲實 (QTE)
+	if String(f["fac"]) == "forge":
+		if (ch.get("fusing", {}) as Dictionary).is_empty():
+			_send({"t": "fusion_start"})
+		else:
+			_send({"t": "fusion_hit"})
+		return true
 	if _fac_btn_rect().has_point(pos):
 		_send({"t": "facility", "key": String(f["fac"])})
 	return true
@@ -321,6 +441,9 @@ func _facility_click(pos: Vector2) -> bool:
 func _draw_facility() -> void:
 	var f = _near_fac()
 	if f.is_empty() or ch.is_empty(): return
+	if String(f["fac"]) == "forge":
+		_draw_forge(f)
+		return
 	var def: Dictionary = data.facilities[f["fac"]]
 	var r := _fac_rect()
 	var col := Color(f.color)
@@ -340,6 +463,34 @@ func _draw_facility() -> void:
 	_txt(b.position + Vector2(30, 23), "點擊使用", Color.WHITE, 13)
 
 
+# 打鐵鋪 (義士融合, Step 10 spec 02 §6): 集氣棒 QTE
+func _draw_forge(f: Dictionary) -> void:
+	var r := _fac_rect()
+	var col := Color(f.color)
+	draw_rect(r, Color(0, 0, 0, 0.8))
+	draw_rect(r, col, false, 2.0)
+	_txt(r.position + Vector2(10, 22), "打鐵鋪   (金 %d)" % int(ch["gold"]), col, 14)
+	var fs: Dictionary = ch.get("fusing", {})
+	if fs.is_empty():
+		_txt(r.position + Vector2(10, 46), "融合【義士】: 將屬性石燒入裝緊嗰把武器 (只能 1 粒)", Color.WHITE, 11)
+		_txt(r.position + Vector2(10, 64), "背包要有屬性石 + 武器未嵌石 + 10 級以上", Color(0.8, 0.9, 0.6), 11)
+		if str(ch.get("classId", "")) == "yishi":
+			_txt(r.position + Vector2(10, 84), "點擊面板攞料：融合開始 [N]", Color(1, 1, 0.8), 13)
+	else:
+		var pos := RulesJewel.fusion_pos(sim.tick - int(fs["start"]))
+		var jd: Dictionary = data.jewel_by_item.get(int(fs["jewel"]), {})
+		_txt(r.position + Vector2(10, 46), "嵌入緊: %s → %s   (撳實 = 敲定)" % [
+			jd.get("name", "?"), item_names.get(int(fs["weapon"]), str(fs["weapon"]))], Color(1, 0.85, 0.5), 11)
+		# 集氣棒: 0→100%，目標 50%±20% 係金色窗口
+		var bar := Rect2(r.position + Vector2(10, 66), Vector2(420, 22))
+		draw_rect(bar, Color(0.15, 0.15, 0.15))
+		var win := Rect2(bar.position + Vector2(bar.size.x * (RulesJewel.FUSION_TARGET - RulesJewel.FUSION_WINDOW), 0),
+			Vector2(bar.size.x * RulesJewel.FUSION_WINDOW * 2, bar.size.y))
+		draw_rect(win, Color(0.6, 0.75, 0.2))
+		draw_rect(Rect2(bar.position + Vector2(bar.size.x * pos - 2, -3), Vector2(4, bar.size.y + 6)), Color(1, 0.4, 0.2))
+		_txt(r.position + Vector2(10, 98), "集氣 %.0f%% — 金色窗口內撳 [N]/點擊！" % (pos * 100.0), Color(1, 1, 0.7), 12)
+
+
 # 市場價 = 基準價 × 價格因子；買入另計魅力折扣【原】，賣出 = 市場價 50%
 func _buy_price(id: int) -> int:
 	var base: float = item_prices.get(id, 0)
@@ -352,29 +503,36 @@ func _sell_price(id: int) -> int:
 
 func _panel_rect() -> Rect2:
 	var vs := get_viewport_rect().size
-	return Rect2(vs.x / 2 - 220, 70, 440, 60 + 32 * maxi(shop_stock.size(), maxi(1, ch.bag.size() if not ch.is_empty() else 1)))
+	var ns := _nearest_shop()
+	var stk: Array = ns.get("stock", shop_stock) if not ns.is_empty() else shop_stock
+	var nrows := maxi(stk.size(), maxi(1, ch.bag.size() if not ch.is_empty() else 1))
+	return Rect2(vs.x / 2 - 220, 70, 440, 60 + 32 * nrows)
 
 # 點擊商店面板: 左邊買、右邊賣。回傳 true = 已處理
 func _shop_click(pos: Vector2) -> bool:
 	if not _near_shop() or ch.is_empty(): return false
 	var r := _panel_rect()
 	if not r.has_point(pos): return false
+	var ns := _nearest_shop()
+	var stk: Array = ns.get("stock", shop_stock) if not ns.is_empty() else shop_stock
 	var row := int((pos.y - r.position.y - 50) / 32)
 	if row < 0: return true
 	if pos.x < r.position.x + 220:
-		if row < shop_stock.size(): _send({"t": "buy", "item": int(shop_stock[row]), "n": 1})
+		if row < stk.size(): _send({"t": "buy", "item": int(stk[row]), "n": 1})
 	elif row < ch.bag.size():
 		_send({"t": "sell", "item": int(ch.bag[row].id), "n": 1})
 	return true
 
 func _draw_shop() -> void:
-	if not _near_shop() or ch.is_empty(): return
+	var ns := _nearest_shop()
+	if ns.is_empty() or ch.is_empty(): return
+	var stk: Array = ns.get("stock", []) as Array
 	var r := _panel_rect()
 	draw_rect(r, Color(0, 0, 0, 0.8)); draw_rect(r, Color(0.9, 0.7, 0.2), false, 2.0)
-	_txt(r.position + Vector2(10, 22), "武器店   金 %d   (點 買/賣)" % int(ch.gold), Color(0.9, 0.7, 0.2), 14)
+	_txt(r.position + Vector2(10, 22), "%s   金 %d   (點 買/賣)" % [str(ns["shopName"]), int(ch["gold"])], Color(0.9, 0.7, 0.2), 14)
 	_txt(r.position + Vector2(10, 44), "買 (魅力折扣後)", Color.CYAN); _txt(r.position + Vector2(230, 44), "賣 (原價 50%)", Color.CYAN)
-	for i in shop_stock.size():
-		var id := int(shop_stock[i])
+	for i in stk.size():
+		var id := int(stk[i])
 		_txt(r.position + Vector2(10, 70 + 32 * i), "%s  %d 金" % [item_names.get(id, str(id)), _buy_price(id)])
 	if ch.bag.is_empty(): _txt(r.position + Vector2(230, 64), "(背包空)", Color.GRAY)
 	for i in ch.bag.size():
@@ -391,6 +549,8 @@ func target_ent():
 
 # 點怪 = 攻擊，點地 = 行路，點自己 = 取消目標
 func _hud_tap(pos: Vector2) -> void:
+	if _ask_click(pos):
+		return
 	if _facility_click(pos):
 		return
 	if _shop_click(pos):
@@ -399,6 +559,11 @@ func _hud_tap(pos: Vector2) -> void:
 		_send({"t": "rest"})
 		return
 	var g: Vector2 = ((pos + cam) / TILE).floor()
+	# 點任務 NPC = 對話 (Step 8)
+	for qn in quest_npcs:
+		if int(g.x) == int(qn.x) and int(g.y) == int(qn.y):
+			_send({"t": "quest_talk", "npc": String(qn.id)})
+			return
 	var tp := _near_travel()
 	if not tp.is_empty() and int(g.x) == tp.x and int(g.y) == tp.y:
 		_send({"t": "travel", "point": String(tp["point"])})
@@ -555,6 +720,7 @@ func _unhandled_input(ev: InputEvent) -> void:
 		return
 	if ev is InputEventKey and ev.pressed:
 		if ev.keycode == KEY_B: show_bag = not show_bag
+		elif ev.keycode == KEY_J: show_quests = not show_quests                                  # 記事
 		elif ev.keycode == KEY_R: _send({"t": "rest"})                                   # 客棧休息
 		elif ev.keycode == KEY_X and not ch.is_empty() and ch.bag.size() > 0:          # 賣背包第一格
 			_send({"t": "sell", "item": int(ch.bag[0].id), "n": 1})
@@ -565,9 +731,46 @@ func _unhandled_input(ev: InputEvent) -> void:
 		elif ev.keycode == KEY_T: _send({"t": "facility", "key": "training"})
 		elif ev.keycode == KEY_P: _send({"t": "facility", "key": "school"})
 		elif ev.keycode == KEY_M: _send({"t": "facility", "key": "temple"})
-		elif ev.keycode >= KEY_1 and ev.keycode <= KEY_9 and ev.keycode - KEY_1 < shop_stock.size():
-			_send({"t": "buy", "item": int(shop_stock[ev.keycode - KEY_1]), "n": 1})
+		elif ev.keycode >= KEY_1 and ev.keycode <= KEY_9:
+			var stk: Array = _nearest_shop().get("stock", []) as Array
+			var idx: int = int(ev.keycode) - KEY_1
+			if idx < stk.size(): _send({"t": "buy", "item": int(stk[idx]), "n": 1})
+		elif ev.keycode == KEY_A and not ch.is_empty() and ch.has("bag"):   # 裝備背包第一把武器 (Step 10)
+			for b in ch["bag"]:
+				if int(data.cats.get(int(b["id"]), 0)) in [1, 2, 3]:
+					_send({"t": "equip_weapon", "item": int(b["id"])})
+					break
+		elif ev.keycode == KEY_L and not ch.is_empty():            # 絕招 (最新學嗰招)
+			var ults: Array = ch.get("ultimates", [])
+			if ults.is_empty():
+				_log("未學任何絕招")
+			else:
+				_send({"t": "use_ultimate", "ult": str(ults[ults.size() - 1])})
+		elif ev.keycode == KEY_I and not ch.is_empty() and ch.has("equip"):   # 寶石欄 0: 裝第一粒背包寶石 / 卸
+			var jews: Array = ch["equip"].get("jewels", [0, 0])
+			if int(jews[0]) != 0:
+				_send({"t": "equip_jewel", "item": 0, "slot": 0})
+			else:
+				for b in ch["bag"]:
+					if data.jewel_by_item.has(int(b["id"])):
+						_send({"t": "equip_jewel", "item": int(b["id"]), "slot": 0})
+						break
+		elif ev.keycode == KEY_O and not ch.is_empty() and ch.has("equip"):   # 寶石欄 1 卸
+			_send({"t": "equip_jewel", "item": 0, "slot": 1})
+		elif ev.keycode == KEY_N and not ch.is_empty():             # 融合: 開始 / 敲實 (打鐵鋪)
+			if (ch.get("fusing", {}) as Dictionary).is_empty():
+				_send({"t": "fusion_start"})
+			else:
+				_send({"t": "fusion_hit"})
 		elif ev.keycode == KEY_W: _on_debug_pressed("work_mining")
+		elif ev.keycode == KEY_Z and not ch.is_empty() and ch.has("equip"):   # 施法: 快捷列 1 (Step 9)
+			var tgt := target_id if target_id >= 0 else 0
+			_send({"t": "cast_spell", "slot": 0, "target": tgt})
+		elif ev.keycode == KEY_K and not ch.is_empty() and ch.has("equip"):   # 快捷列 1 裝第一本背包術書
+			for b in ch["bag"]:
+				if data.spell_by_item.has(int(b["id"])):
+					_send({"t": "equip_spellbook", "item": int(b["id"]), "slot": 0})
+					break
 		elif ev.keycode == KEY_Q: _send({"t": "auto_assign"})
 		elif ev.keycode == KEY_E: _send({"t": "raise_attr", "attr": "str"})
 		elif ev.keycode == KEY_F: _send({"t": "raise_attr", "attr": "agi"})
@@ -598,9 +801,12 @@ func _draw() -> void:
 		for x in range(x0, x1):
 			var pos := Vector2(x, y) * TILE - cam
 			var safe := sim.is_safe(x, y)
+			var zv := sim.zone_view(x, y)
 			var c: Color
 			if sim.blocked.has(y * w + x):
 				c = Color(0.32, 0.22, 0.2)
+			elif String(zv.get("id", "")).begins_with("runan_"):
+				c = Color(0.2 + 0.01 * ((x + y) % 3), 0.19, 0.23)   # 洞窟: 石板岩色 (Step 11)
 			elif safe:
 				c = Color(0.5 + 0.02 * ((x + y) % 2), 0.46, 0.36)   # 城內: 石板/泥路色，同野外分明
 			else:
@@ -633,7 +839,21 @@ func _draw() -> void:
 		if int(e.id) == target_id:
 			draw_rect(Rect2(p - Vector2(2, 2), Vector2(TILE + 4, TILE + 4)), Color.CYAN, false, 2.0)
 		var nm := str(e.name) + (" Lv%d" % int(e.level) if ismob else "")
+		if not (e.get("statuses", []) as Array).is_empty():
+			var tags: Array = []
+			for sid in e["statuses"]:
+				tags.append(STATUS_NAMES.get(str(sid), str(sid)))
+			nm += " [%s]" % str(",".join(tags))
+		if bool(e.get("casting", false)):
+			nm += "（吟唱中）"
 		_txt(p + Vector2(-8, -18), nm, Color(1, 0.7, 0.6) if ismob else Color.WHITE, 11)
+	for qn in quest_npcs:
+		var qp := Vector2(int(qn.x), int(qn.y)) * TILE - cam
+		var qcol := Color(0.45, 0.75, 1.0) if not bool(qn.service) else Color(0.5, 1.0, 0.5)
+		draw_rect(Rect2(qp - Vector2(2, 2), Vector2(TILE + 4, TILE + 4)), qcol, false, 2.0)
+		draw_circle(qp + Vector2(TILE, TILE) * 0.5, 6, Color(0.1, 0.25, 0.45, 0.9))
+		_txt(qp + Vector2(-6, -20), "!" if not bool(qn.service) else "+", Color(1, 0.9, 0.3), 12)
+		_txt(qp + Vector2(-8, -32), str(qn.name), qcol, 11)
 	for f in floats:
 		var fp: Vector2 = f.pos - cam + Vector2(2, -20 - 24 * f.age)
 		_txt(fp, f.text, f.color, 14)
@@ -641,9 +861,23 @@ func _draw() -> void:
 	_draw_shop()
 	_draw_inn()
 	_draw_facility()
+	_draw_zone(vs)
 	_draw_banner(vs)
 	_draw_clock(vs)
 	_draw_char_status(vs)
+	_draw_quests(vs)
+	_draw_ask(vs)
+
+# 所在區名 (左上角) (Step 11 洞窟)
+func _draw_zone(vs: Vector2) -> void:
+	var me = _me()
+	if me == null:
+		return
+	var zv := sim.zone_view(int(me.x), int(me.y))
+	if zv.is_empty():
+		return
+	_txt(Vector2(10, 12), str(zv["name"]), Color(0.9, 0.85, 0.7), 14)
+
 
 # 時辰/日/季節 (右上) + 夜晚示意
 func _draw_clock(vs: Vector2) -> void:
@@ -664,6 +898,92 @@ func _draw_banner(vs: Vector2) -> void:
 	_txt(r.position + Vector2(12, 18), str(banner["text"]), Color.WHITE, 13)
 
 
+# ===== 任務答題 (ask stage, Step 10 絕招任務) =====
+func _active_ask() -> Dictionary:
+	if ch.is_empty():
+		return {}
+	for q in data.quests:
+		if not (ch.get("quests", {}) as Dictionary).has(String(q["id"])):
+			continue
+		var st: Dictionary = ch["quests"][String(q["id"])]
+		if bool(st.get("done", false)):
+			continue
+		var stage := RulesQuest.stage_of(ch, q)
+		if not stage.is_empty() and String(stage.get("type", "")) == "ask":
+			return {"q": str(q["id"]), "dialog": stage.get("dialog", []), "options": stage.get("options", [])}
+	return {}
+
+
+func _ask_rect() -> Rect2:
+	var vs := get_viewport_rect().size
+	return Rect2(vs.x / 2 - 200, 130, 400, 54 + 30 * 3)
+
+
+func _ask_click(pos: Vector2) -> bool:
+	var ask := _active_ask()
+	if ask.is_empty():
+		return false
+	var r := _ask_rect()
+	if not r.has_point(pos):
+		return false
+	var i := int((pos.y - r.position.y - 46) / 30)
+	if i >= 0 and i < (ask["options"] as Array).size():
+		_send({"t": "quest_answer", "quest": str(ask["q"]), "answer": i})
+	return true
+
+
+func _draw_ask(vs: Vector2) -> void:
+	var ask := _active_ask()
+	if ask.is_empty():
+		return
+	var r := _ask_rect()
+	draw_rect(r, Color(0, 0, 0, 0.85))
+	draw_rect(r, Color(1, 0.8, 0.3), false, 2.0)
+	var dl: Array = ask["dialog"]
+	var qline := "答題！" if dl.is_empty() else str(dl[0])
+	if qline.length() > 30:
+		qline = qline.substr(0, 29) + "…"
+	_txt(r.position + Vector2(10, 18), qline, Color(1, 0.9, 0.5), 11)
+	var opts: Array = ask["options"]
+	for i in opts.size():
+		var orr := Rect2(r.position + Vector2(10, 46 + 30 * i), Vector2(380, 26))
+		draw_rect(orr, Color(0.25, 0.3, 0.5))
+		draw_rect(orr, Color(1, 1, 1), false, 1.0)
+		var ot := str(opts[i])
+		if ot.length() > 26:
+			ot = ot.substr(0, 25) + "…"
+		_txt(orr.position + Vector2(8, 18), ot, Color.WHITE, 12)
+
+
+# 記事面板 (Step 8, spec 06 §1.2): 進行中任務 + 提示；完成記錄
+func _draw_quests(vs: Vector2) -> void:
+	if not show_quests:
+		return
+	var qs := sim.view_quests()
+	var lines: Array = []
+	for q in qs:
+		if bool(q.get("active", false)):
+			var h: String = str(q.get("hint", ""))
+			if h.length() > 26:
+				h = h.substr(0, 25) + "…"
+			lines.append("● %s — %s" % [q.name, h])
+		elif bool(q.get("done", false)):
+			lines.append("✓ %s (完成)" % q.name)
+	var r := Rect2(vs.x - 330, 96, 324, 22 + 15 * maxi(1, lines.size()))
+	draw_rect(r, Color(0, 0, 0, 0.82))
+	draw_rect(r, Color(1, 0.85, 0.4), false, 1.5)
+	_txt(r.position + Vector2(10, 16), "記事", Color(1, 0.9, 0.5), 12)
+	if lines.is_empty():
+		_txt(r.position + Vector2(10, 38), "未有任務 — 去城門口搵神秘老人", Color.GRAY, 11)
+	for i in lines.size():
+		_txt(r.position + Vector2(10, 38 + 15 * i), str(lines[i]), Color.WHITE, 11)
+
+
+# 建角面板完成（mobile_hud)_on_create_done 用
+func _on_create_done() -> void:
+	show_quests = false
+	_log("建角完成，出發！")
+
 # 升級點數 / 理念 / 生日 / 稱號 狀態列 (Step 7.5 debug UI)
 func _draw_char_status(vs: Vector2) -> void:
 	if ch.is_empty():
@@ -673,7 +993,7 @@ func _draw_char_status(vs: Vector2) -> void:
 	draw_rect(Rect2(10, y - 6, 330, 62), Color(1, 0.85, 0.4), false, 1.5)
 	_txt(Vector2(16, y + 12), "點數 %d    理念 %s" % [int(ch.get("attrPoints", 0)), str(ch.get("ideology", "未測"))], Color(1, 1, 0.7), 12)
 	_txt(Vector2(16, y + 30), "生日 %d月%d日    稱號「%s」" % [int(ch.get("birthMonth", 1)), int(ch.get("birthDay", 1)), str(ch.get("title", ""))], Color(0.85, 1, 0.8), 12)
-	_txt(Vector2(16, y + 48), "Q自動派  E力量 F敏捷 D智力 S靈力 (用升級點數)" if int(ch.get("attrPoints", 0)) > 0 else "稱號/生日/臉譜/理念測驗由建角 UI 設定 (Step 7.5)", Color(0.85, 0.9, 1), 10)
+	_txt(Vector2(16, y + 48), "Q自動派  E力量 F敏捷 D智力 S靈力 (用升級點數)" if int(ch.get("attrPoints", 0)) > 0 else "任務：城門口神秘老人 / 練兵場小兵 · 記事[J]睇任務", Color(0.85, 0.9, 1), 10)
 
 func _draw_bag(vs: Vector2) -> void:
 	if show_bag and not ch.is_empty():
@@ -681,4 +1001,8 @@ func _draw_bag(vs: Vector2) -> void:
 		draw_rect(Rect2(vs.x - 190, 52, 184, 30 + 16 * maxi(1, bag.size())), Color(0, 0, 0, 0.7))
 		_txt(Vector2(vs.x - 182, 70), "背包")
 		for i in bag.size():
-			_txt(Vector2(vs.x - 182, 88 + 16 * i), "%s x%d" % [item_names.get(int(bag[i].id), str(bag[i].id)), int(bag[i].n)])
+			var bid := int(bag[i].id)
+			var tag := ""
+			if quest_items.has(bid):
+				tag = " (任)"
+			_txt(Vector2(vs.x - 182, 88 + 16 * i), "%s x%d%s" % [item_names.get(bid, str(bid)), int(bag[i].n), tag])

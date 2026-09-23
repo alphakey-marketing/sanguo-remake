@@ -8,6 +8,10 @@ export const maxHp = (lv: number, a: Attrs) => 60 + lv * 15 + a.str * 4;
 export const maxMp = (lv: number, a: Attrs) => 20 + lv * 5 + a.spi * 3 + a.int * 2;
 export const maxSp = (lv: number, a: Attrs) => 50 + lv * 3 + a.agi * 2;
 
+// 玩家術防【自訂】(spec 02 §3): 隨等級+靈力
+// floor(lv/3) + max(0, floor((spi-10)/4))
+export const playerSpellDef = (lv: number, spi: number) => Math.floor(lv / 3) + Math.max(0, Math.floor((spi - 10) / 4));
+
 // 升到下一級所需經驗
 export const expToNext = (lv: number) => Math.round(20 * Math.pow(lv, 1.8));
 

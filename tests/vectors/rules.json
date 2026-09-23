@@ -2426,6 +2426,1157 @@
   "expect": 79621
  },
  {
+  "fn": "elementFactor",
+  "args": [
+   "none",
+   "none"
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "elementFactor",
+  "args": [
+   "none",
+   "earth"
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "elementFactor",
+  "args": [
+   "none",
+   "water"
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "elementFactor",
+  "args": [
+   "none",
+   "fire"
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "elementFactor",
+  "args": [
+   "none",
+   "wind"
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "elementFactor",
+  "args": [
+   "earth",
+   "none"
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "elementFactor",
+  "args": [
+   "earth",
+   "earth"
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "elementFactor",
+  "args": [
+   "earth",
+   "water"
+  ],
+  "expect": 1.5
+ },
+ {
+  "fn": "elementFactor",
+  "args": [
+   "earth",
+   "fire"
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "elementFactor",
+  "args": [
+   "earth",
+   "wind"
+  ],
+  "expect": 0.6666666666666666
+ },
+ {
+  "fn": "elementFactor",
+  "args": [
+   "water",
+   "none"
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "elementFactor",
+  "args": [
+   "water",
+   "earth"
+  ],
+  "expect": 0.6666666666666666
+ },
+ {
+  "fn": "elementFactor",
+  "args": [
+   "water",
+   "water"
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "elementFactor",
+  "args": [
+   "water",
+   "fire"
+  ],
+  "expect": 1.5
+ },
+ {
+  "fn": "elementFactor",
+  "args": [
+   "water",
+   "wind"
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "elementFactor",
+  "args": [
+   "fire",
+   "none"
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "elementFactor",
+  "args": [
+   "fire",
+   "earth"
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "elementFactor",
+  "args": [
+   "fire",
+   "water"
+  ],
+  "expect": 0.6666666666666666
+ },
+ {
+  "fn": "elementFactor",
+  "args": [
+   "fire",
+   "fire"
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "elementFactor",
+  "args": [
+   "fire",
+   "wind"
+  ],
+  "expect": 1.5
+ },
+ {
+  "fn": "elementFactor",
+  "args": [
+   "wind",
+   "none"
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "elementFactor",
+  "args": [
+   "wind",
+   "earth"
+  ],
+  "expect": 1.5
+ },
+ {
+  "fn": "elementFactor",
+  "args": [
+   "wind",
+   "water"
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "elementFactor",
+  "args": [
+   "wind",
+   "fire"
+  ],
+  "expect": 0.6666666666666666
+ },
+ {
+  "fn": "elementFactor",
+  "args": [
+   "wind",
+   "wind"
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "spellAttack",
+  "args": [
+   18,
+   8
+  ],
+  "expect": 26.64
+ },
+ {
+  "fn": "spellAttack",
+  "args": [
+   26,
+   20
+  ],
+  "expect": 57.2
+ },
+ {
+  "fn": "spellAttack",
+  "args": [
+   66,
+   30
+  ],
+  "expect": 184.79999999999998
+ },
+ {
+  "fn": "spellAttack",
+  "args": [
+   120,
+   40
+  ],
+  "expect": 408
+ },
+ {
+  "fn": "spellAttack",
+  "args": [
+   200,
+   55
+  ],
+  "expect": 860
+ },
+ {
+  "fn": "spellAttack",
+  "args": [
+   90,
+   15
+  ],
+  "expect": 171
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   18,
+   8,
+   0,
+   "none",
+   "none",
+   0
+  ],
+  "expect": 24,
+  "rng": [
+   0
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   18,
+   8,
+   0,
+   "none",
+   "none",
+   0
+  ],
+  "expect": 27,
+  "rng": [
+   0.5
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   18,
+   8,
+   0,
+   "none",
+   "none",
+   0
+  ],
+  "expect": 29,
+  "rng": [
+   0.999
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   18,
+   8,
+   0,
+   "none",
+   "none",
+   0
+  ],
+  "expect": 25,
+  "rng": [
+   0.1,
+   0.9
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   18,
+   8,
+   0,
+   "none",
+   "none",
+   0
+  ],
+  "expect": 29,
+  "rng": [
+   0.9,
+   0.1
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   18,
+   8,
+   0,
+   "none",
+   "none",
+   0
+  ],
+  "expect": 25,
+  "rng": [
+   0.25,
+   0.75,
+   0.5
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   26,
+   20,
+   5,
+   "earth",
+   "water",
+   0
+  ],
+  "expect": 74,
+  "rng": [
+   0
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   26,
+   20,
+   5,
+   "earth",
+   "water",
+   0
+  ],
+  "expect": 82,
+  "rng": [
+   0.5
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   26,
+   20,
+   5,
+   "earth",
+   "water",
+   0
+  ],
+  "expect": 90,
+  "rng": [
+   0.999
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   26,
+   20,
+   5,
+   "earth",
+   "water",
+   0
+  ],
+  "expect": 75,
+  "rng": [
+   0.1,
+   0.9
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   26,
+   20,
+   5,
+   "earth",
+   "water",
+   0
+  ],
+  "expect": 88,
+  "rng": [
+   0.9,
+   0.1
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   26,
+   20,
+   5,
+   "earth",
+   "water",
+   0
+  ],
+  "expect": 78,
+  "rng": [
+   0.25,
+   0.75,
+   0.5
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   66,
+   30,
+   12,
+   "fire",
+   "wind",
+   0
+  ],
+  "expect": 223,
+  "rng": [
+   0
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   66,
+   30,
+   12,
+   "fire",
+   "wind",
+   0
+  ],
+  "expect": 248,
+  "rng": [
+   0.5
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   66,
+   30,
+   12,
+   "fire",
+   "wind",
+   0
+  ],
+  "expect": 272,
+  "rng": [
+   0.999
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   66,
+   30,
+   12,
+   "fire",
+   "wind",
+   0
+  ],
+  "expect": 228,
+  "rng": [
+   0.1,
+   0.9
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   66,
+   30,
+   12,
+   "fire",
+   "wind",
+   0
+  ],
+  "expect": 267,
+  "rng": [
+   0.9,
+   0.1
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   66,
+   30,
+   12,
+   "fire",
+   "wind",
+   0
+  ],
+  "expect": 235,
+  "rng": [
+   0.25,
+   0.75,
+   0.5
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   26,
+   20,
+   5,
+   "water",
+   "earth",
+   0.5
+  ],
+  "expect": 49,
+  "rng": [
+   0
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   26,
+   20,
+   5,
+   "water",
+   "earth",
+   0.5
+  ],
+  "expect": 54,
+  "rng": [
+   0.5
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   26,
+   20,
+   5,
+   "water",
+   "earth",
+   0.5
+  ],
+  "expect": 60,
+  "rng": [
+   0.999
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   26,
+   20,
+   5,
+   "water",
+   "earth",
+   0.5
+  ],
+  "expect": 50,
+  "rng": [
+   0.1,
+   0.9
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   26,
+   20,
+   5,
+   "water",
+   "earth",
+   0.5
+  ],
+  "expect": 59,
+  "rng": [
+   0.9,
+   0.1
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   26,
+   20,
+   5,
+   "water",
+   "earth",
+   0.5
+  ],
+  "expect": 52,
+  "rng": [
+   0.25,
+   0.75,
+   0.5
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   18,
+   5,
+   99,
+   "none",
+   "earth",
+   0
+  ],
+  "expect": 11,
+  "rng": [
+   0
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   18,
+   5,
+   99,
+   "none",
+   "earth",
+   0
+  ],
+  "expect": 12,
+  "rng": [
+   0.5
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   18,
+   5,
+   99,
+   "none",
+   "earth",
+   0
+  ],
+  "expect": 13,
+  "rng": [
+   0.999
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   18,
+   5,
+   99,
+   "none",
+   "earth",
+   0
+  ],
+  "expect": 11,
+  "rng": [
+   0.1,
+   0.9
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   18,
+   5,
+   99,
+   "none",
+   "earth",
+   0
+  ],
+  "expect": 13,
+  "rng": [
+   0.9,
+   0.1
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   18,
+   5,
+   99,
+   "none",
+   "earth",
+   0
+  ],
+  "expect": 11,
+  "rng": [
+   0.25,
+   0.75,
+   0.5
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   240,
+   55,
+   40,
+   "wind",
+   "wind",
+   1
+  ],
+  "expect": 1327,
+  "rng": [
+   0
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   240,
+   55,
+   40,
+   "wind",
+   "wind",
+   1
+  ],
+  "expect": 1474,
+  "rng": [
+   0.5
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   240,
+   55,
+   40,
+   "wind",
+   "wind",
+   1
+  ],
+  "expect": 1621,
+  "rng": [
+   0.999
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   240,
+   55,
+   40,
+   "wind",
+   "wind",
+   1
+  ],
+  "expect": 1356,
+  "rng": [
+   0.1,
+   0.9
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   240,
+   55,
+   40,
+   "wind",
+   "wind",
+   1
+  ],
+  "expect": 1592,
+  "rng": [
+   0.9,
+   0.1
+  ]
+ },
+ {
+  "fn": "calcSpellDamage",
+  "args": [
+   240,
+   55,
+   40,
+   "wind",
+   "wind",
+   1
+  ],
+  "expect": 1401,
+  "rng": [
+   0.25,
+   0.75,
+   0.5
+  ]
+ },
+ {
+  "fn": "playerSpellDef",
+  "args": [
+   1,
+   8
+  ],
+  "expect": 0
+ },
+ {
+  "fn": "playerSpellDef",
+  "args": [
+   5,
+   8
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "playerSpellDef",
+  "args": [
+   10,
+   20
+  ],
+  "expect": 5
+ },
+ {
+  "fn": "playerSpellDef",
+  "args": [
+   50,
+   50
+  ],
+  "expect": 26
+ },
+ {
+  "fn": "playerSpellDef",
+  "args": [
+   100,
+   99
+  ],
+  "expect": 55
+ },
+ {
+  "fn": "playerSpellDef",
+  "args": [
+   30,
+   30
+  ],
+  "expect": 15
+ },
+ {
+  "fn": "statusTicks",
+  "args": [
+   ""
+  ],
+  "expect": 0
+ },
+ {
+  "fn": "statusTicks",
+  "args": [
+   "sealed"
+  ],
+  "expect": 600
+ },
+ {
+  "fn": "statusTicks",
+  "args": [
+   "hex"
+  ],
+  "expect": 300
+ },
+ {
+  "fn": "statusTicks",
+  "args": [
+   "power1"
+  ],
+  "expect": 900
+ },
+ {
+  "fn": "statusTicks",
+  "args": [
+   "power2"
+  ],
+  "expect": 900
+ },
+ {
+  "fn": "statusTicks",
+  "args": [
+   "power3"
+  ],
+  "expect": 900
+ },
+ {
+  "fn": "statusTicks",
+  "args": [
+   "armor1"
+  ],
+  "expect": 900
+ },
+ {
+  "fn": "statusTicks",
+  "args": [
+   "armor2"
+  ],
+  "expect": 900
+ },
+ {
+  "fn": "statusTicks",
+  "args": [
+   "armor3"
+  ],
+  "expect": 900
+ },
+ {
+  "fn": "statusTicks",
+  "args": [
+   "mirror1"
+  ],
+  "expect": 900
+ },
+ {
+  "fn": "statusTicks",
+  "args": [
+   "mirror2"
+  ],
+  "expect": 900
+ },
+ {
+  "fn": "statusTicks",
+  "args": [
+   "mirror3"
+  ],
+  "expect": 900
+ },
+ {
+  "fn": "atkMult",
+  "args": [
+   [],
+   0
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "atkMult",
+  "args": [
+   [
+    "power1"
+   ],
+   100
+  ],
+  "expect": 1.15
+ },
+ {
+  "fn": "atkMult",
+  "args": [
+   [
+    "power2"
+   ],
+   100
+  ],
+  "expect": 1.3
+ },
+ {
+  "fn": "atkMult",
+  "args": [
+   [
+    "power3"
+   ],
+   100
+  ],
+  "expect": 1.5
+ },
+ {
+  "fn": "atkMult",
+  "args": [
+   [
+    "power1",
+    "power2"
+   ],
+   100
+  ],
+  "expect": 1.3
+ },
+ {
+  "fn": "atkMult",
+  "args": [
+   [
+    "power3"
+   ],
+   400
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "atkMult",
+  "args": [
+   [
+    "power1"
+   ],
+   500
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "defMult",
+  "args": [
+   [],
+   0
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "defMult",
+  "args": [
+   [
+    "armor1"
+   ],
+   100
+  ],
+  "expect": 1.2
+ },
+ {
+  "fn": "defMult",
+  "args": [
+   [
+    "armor2"
+   ],
+   100
+  ],
+  "expect": 1.4
+ },
+ {
+  "fn": "defMult",
+  "args": [
+   [
+    "armor3"
+   ],
+   100
+  ],
+  "expect": 1.6
+ },
+ {
+  "fn": "defMult",
+  "args": [
+   [
+    "armor1",
+    "armor3"
+   ],
+   100
+  ],
+  "expect": 1.6
+ },
+ {
+  "fn": "defMult",
+  "args": [
+   [
+    "armor3"
+   ],
+   400
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "defMult",
+  "args": [
+   [
+    "armor2"
+   ],
+   500
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "spellDefMult",
+  "args": [
+   [],
+   0
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "spellDefMult",
+  "args": [
+   [
+    "mirror1"
+   ],
+   100
+  ],
+  "expect": 1.2
+ },
+ {
+  "fn": "spellDefMult",
+  "args": [
+   [
+    "mirror2"
+   ],
+   100
+  ],
+  "expect": 1.4
+ },
+ {
+  "fn": "spellDefMult",
+  "args": [
+   [
+    "mirror3"
+   ],
+   100
+  ],
+  "expect": 1.6
+ },
+ {
+  "fn": "spellDefMult",
+  "args": [
+   [
+    "mirror1",
+    "mirror2"
+   ],
+   100
+  ],
+  "expect": 1.4
+ },
+ {
+  "fn": "spellDefMult",
+  "args": [
+   [
+    "mirror3"
+   ],
+   400
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "spellDefMult",
+  "args": [
+   [
+    "mirror1"
+   ],
+   500
+  ],
+  "expect": 1
+ },
+ {
   "fn": "attrsAt",
   "args": [
    "yishi",
@@ -2742,9 +3893,12 @@
    "level": 1,
    "mp": 45,
    "name": "義士甲",
+   "questDone": {},
+   "quests": {},
    "quizAnswers": [],
    "raised": {},
    "sp": 69,
+   "status": {},
    "title": ""
   }
  },
@@ -2785,32 +3939,32 @@
   "expect": {
    "ch": {
     "attrs": {
-     "agi": 8,
-     "cha": 6,
-     "int": 4,
-     "pol": 6,
-     "spi": 4,
-     "str": 12
+     "agi": 8.0,
+     "cha": 6.0,
+     "int": 4.0,
+     "pol": 6.0,
+     "spi": 4.0,
+     "str": 12.0
     },
     "bag": [
      {
-      "id": 65210,
-      "n": 5
+      "id": 65210.0,
+      "n": 5.0
      }
     ],
     "classId": "yishi",
     "equip": {
-     "boots": 22001,
-     "weapon": 10001
+     "boots": 22001.0,
+     "weapon": 10001.0
     },
     "exp": 0,
-    "gold": 100,
-    "hp": 123,
-    "karma": 0,
-    "level": 1,
-    "mp": 45,
+    "gold": 100.0,
+    "hp": 123.0,
+    "karma": 0.0,
+    "level": 1.0,
+    "mp": 45.0,
     "name": "測",
-    "sp": 69
+    "sp": 69.0
    },
    "ups": 0
   }
@@ -2852,32 +4006,32 @@
   "expect": {
    "ch": {
     "attrs": {
-     "agi": 8,
-     "cha": 6,
-     "int": 4,
-     "pol": 6,
-     "spi": 4,
-     "str": 12
+     "agi": 8.0,
+     "cha": 6.0,
+     "int": 4.0,
+     "pol": 6.0,
+     "spi": 4.0,
+     "str": 12.0
     },
     "bag": [
      {
-      "id": 65210,
-      "n": 5
+      "id": 65210.0,
+      "n": 5.0
      }
     ],
     "classId": "yishi",
     "equip": {
-     "boots": 22001,
-     "weapon": 10001
+     "boots": 22001.0,
+     "weapon": 10001.0
     },
     "exp": 10,
-    "gold": 100,
-    "hp": 123,
-    "karma": 0,
-    "level": 1,
-    "mp": 45,
+    "gold": 100.0,
+    "hp": 123.0,
+    "karma": 0.0,
+    "level": 1.0,
+    "mp": 45.0,
     "name": "測",
-    "sp": 69
+    "sp": 69.0
    },
    "ups": 0
   }
@@ -2920,28 +4074,28 @@
    "ch": {
     "attrPoints": 6,
     "attrs": {
-     "agi": 8,
-     "cha": 6,
-     "int": 4,
-     "pol": 6,
-     "spi": 4,
-     "str": 12
+     "agi": 8.0,
+     "cha": 6.0,
+     "int": 4.0,
+     "pol": 6.0,
+     "spi": 4.0,
+     "str": 12.0
     },
     "bag": [
      {
-      "id": 65210,
-      "n": 5
+      "id": 65210.0,
+      "n": 5.0
      }
     ],
     "classId": "yishi",
     "equip": {
-     "boots": 22001,
-     "weapon": 10001
+     "boots": 22001.0,
+     "weapon": 10001.0
     },
     "exp": 10,
-    "gold": 100,
+    "gold": 100.0,
     "hp": 153,
-    "karma": 0,
+    "karma": 0.0,
     "level": 3,
     "mp": 55,
     "name": "測",
@@ -2988,28 +4142,28 @@
    "ch": {
     "attrPoints": 12,
     "attrs": {
-     "agi": 8,
-     "cha": 6,
-     "int": 4,
-     "pol": 6,
-     "spi": 4,
-     "str": 12
+     "agi": 8.0,
+     "cha": 6.0,
+     "int": 4.0,
+     "pol": 6.0,
+     "spi": 4.0,
+     "str": 12.0
     },
     "bag": [
      {
-      "id": 65210,
-      "n": 5
+      "id": 65210.0,
+      "n": 5.0
      }
     ],
     "classId": "yishi",
     "equip": {
-     "boots": 22001,
-     "weapon": 10001
+     "boots": 22001.0,
+     "weapon": 10001.0
     },
     "exp": 0,
-    "gold": 100,
+    "gold": 100.0,
     "hp": 183,
-    "karma": 0,
+    "karma": 0.0,
     "level": 5,
     "mp": 65,
     "name": "測",
@@ -3056,28 +4210,28 @@
    "ch": {
     "attrPoints": 27,
     "attrs": {
-     "agi": 8,
-     "cha": 6,
-     "int": 4,
-     "pol": 6,
-     "spi": 4,
-     "str": 12
+     "agi": 8.0,
+     "cha": 6.0,
+     "int": 4.0,
+     "pol": 6.0,
+     "spi": 4.0,
+     "str": 12.0
     },
     "bag": [
      {
-      "id": 65210,
-      "n": 5
+      "id": 65210.0,
+      "n": 5.0
      }
     ],
     "classId": "yishi",
     "equip": {
-     "boots": 22001,
-     "weapon": 10001
+     "boots": 22001.0,
+     "weapon": 10001.0
     },
     "exp": 1106,
-    "gold": 100,
+    "gold": 100.0,
     "hp": 258,
-    "karma": 0,
+    "karma": 0.0,
     "level": 10,
     "mp": 90,
     "name": "測",
@@ -3124,28 +4278,28 @@
    "ch": {
     "attrPoints": 204,
     "attrs": {
-     "agi": 8,
-     "cha": 6,
-     "int": 4,
-     "pol": 6,
-     "spi": 4,
-     "str": 12
+     "agi": 8.0,
+     "cha": 6.0,
+     "int": 4.0,
+     "pol": 6.0,
+     "spi": 4.0,
+     "str": 12.0
     },
     "bag": [
      {
-      "id": 65210,
-      "n": 5
+      "id": 65210.0,
+      "n": 5.0
      }
     ],
     "classId": "yishi",
     "equip": {
-     "boots": 22001,
-     "weapon": 10001
+     "boots": 22001.0,
+     "weapon": 10001.0
     },
     "exp": 14206,
-    "gold": 100,
+    "gold": 100.0,
     "hp": 1143,
-    "karma": 0,
+    "karma": 0.0,
     "level": 69,
     "mp": 385,
     "name": "測",

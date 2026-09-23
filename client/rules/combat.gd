@@ -18,13 +18,15 @@ static func player_def(lv: int) -> int:
 
 
 # 傷害 = max(1, (武力係數*武力 + 武器強度) * 隨機(0.9~1.1) - 防禦)
-static func calc_damage(strength: float, weapon_power: float, def: float, rng: Callable = Callable()) -> int:
-	return maxi(1, MathX.js_round((STR_COEF * strength + weapon_power) * (0.9 + MathX.roll(rng) * 0.2) - def))
+# atk_mult/def_mult = 狀態 buff 倍率 (聚力/護甲系, spec 02 §7)，冇狀態 = 1.0
+static func calc_damage(strength: float, weapon_power: float, def: float, rng: Callable = Callable(),
+		atk_mult: float = 1.0, def_mult: float = 1.0) -> int:
+	return maxi(1, MathX.js_round((STR_COEF * strength + weapon_power) * atk_mult * (0.9 + MathX.roll(rng) * 0.2) - def * def_mult))
 
 
 # 怪物傷害 = max(1, atk * 隨機(0.9~1.1) - 防禦)
-static func calc_mob_damage(atk: float, def: float, rng: Callable = Callable()) -> int:
-	return maxi(1, MathX.js_round(atk * (0.9 + MathX.roll(rng) * 0.2) - def))
+static func calc_mob_damage(atk: float, def: float, rng: Callable = Callable(), atk_mult: float = 1.0, def_mult: float = 1.0) -> int:
+	return maxi(1, MathX.js_round(atk * atk_mult * (0.9 + MathX.roll(rng) * 0.2) - def * def_mult))
 
 
 # 命中率: 武器命中率(45 = 基準) + 等級差

@@ -11,11 +11,11 @@
 
 ## 現況 (2026-09-21)
 - **全部喺 `client/` (Godot 4.7, GDScript)**：`rules/`(純函數)、`sim/`(單機世界模擬，狀態可存檔、種子 RNG)、`ui/`(畫面/輸入)、`tests/`
-- 測試：`sh tools/run_tests.sh` → rules 對拍 201 向量 + sim 場景 22 項 + `--autotest` 端到端，全 PASS
-- 功能：角色/升級/即時戰鬥/怪 AI+重生+掉落/死亡處分/10 個 bot/客棧+武器店；UI 仍係滑鼠鍵盤 debug 版
+- 測試：`sh tools/run_tests.sh` → rules 對拍 307 向量 + quest 81 + spell 618 + jewel/ult 118 + sim 160 + world 121 + `--autotest` 端到端，全 PASS
+- 功能：角色/升級/即時戰鬥/怪 AI+重生+掉落/死亡處分/10 個 bot/客棧+武器店/術法系統(Step 9)/寶石+絕招+融合(Step 10：寶石欄 2 格、屬性石 40+輔助石、元素術需特殊石、義士三招絕招任務鏈、打鐵鋪 QTE 融合)；UI 仍係滑鼠鍵盤 debug 版
 - `client/data/`：classes.json(六職，只啟用義士)、monsters.json(5 怪+spawn)、items.json(6068 件)、shops.json；`data_src/general_npc.csv`(未接入)
 - `legacy/server/`：舊 Node+ws server，只作參考（23 項 TS 測試仍過；`tools/export_vectors.ts` 由佢導出向量）
-- **下一步 = Step 3.2**（L1 收尾 + 手機觸控原型），再 Step 4（存檔/時鐘/天災/市場）
+- **下一步 = Step 11**（怪物導入 npc_drops.csv 30+ 隻 + 汝南洞窟 10 層地圖 + 逃跑/群攻 AI + boss 每日重生，spec 04 §1~3/§11 2）
 - 攻略原文 113 頁：`docs/guide/*.txt`；連結表 `docs/guide_links.tsv`
 
 ## 已定決策

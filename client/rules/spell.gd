@@ -1,0 +1,98 @@
+class_name RulesSpell
+extends RefCounted
+# 術法系統純函數 (spec 02 §3/§7)。數值【自訂】；術書等級/職業/大範圍/需寶石表 = data/spells.json
+# 由 legacy TS 版 (legacy/server/src/rules/spell.ts) 導出向量對拍
+
+
+# 【原】地剋水、水剋火、火剋風、風剋地
+const BEATS := {"earth": "water", "water": "fire", "fire": "wind", "wind": "earth"}
+const COUNTER_X := 1.5            # 克制乘數【自訂】基數
+
+
+static func element_factor(att: String, def: String) -> float:
+	if String(BEATS.get(att, "")) == def:
+		return COUNTER_X
+	if String(BEATS.get(def, "")) == att:
+		return 1.0 / COUNTER_X
+	return 1.0
+
+
+# 術攻 = 術書威力 × (1 + 0.06×對應屬性(智力/靈力))【原 sy2_1_4】
+static func spell_attack(power: float, attr: float) -> float:
+	return power * (1.0 + 0.06 * attr)
+
+
+# 術法傷害 = max(1, round(術攻 × rand(0.9~1.1) × (100/(100+術防)) × 相剋 × (1+寶石加成)))
+static func calc_spell_damage(power: float, attr: float, spell_def: float, att_elem: String, def_elem: String,
+		jewel_pct: float, rng: Callable = Callable()) -> int:
+	var atk := spell_attack(power, attr)
+	return maxi(1, MathX.js_round(atk * (0.9 + MathX.roll(rng) * 0.2) * (100.0 / (100.0 + spell_def))
+		* element_factor(att_elem, def_elem) * (1.0 + jewel_pct)))
+
+
+# ================= 狀態 (spec 02 §7) =================
+# 持續(tick): 封咒 600 / 中邪 300 / buff 全部 900
+const STATUS_TICKS := {"sealed": 600, "hex": 300,
+	"armor1": 900, "armor2": 900, "armor3": 900,
+	"mirror1": 900, "mirror2": 900, "mirror3": 900,
+	"power1": 900, "power2": 900, "power3": 900}
+
+
+static func status_ticks(id: String) -> int:
+	return int(STATUS_TICKS.get(id, 0))
+
+
+# status = {狀態id: until_tick}
+static func has(status: Dictionary, id: String, tick: int) -> bool:
+	return int(status.get(id, 0)) > tick
+
+
+static func add_status(status: Dictionary, id: String, ticks: int, tick: int) -> void:
+	status[id] = tick + ticks
+
+
+static func clear_status(status: Dictionary, id: String) -> void:
+	status.erase(id)
+
+
+# 封咒: 唔可以施術法
+static func blocks_cast(status: Dictionary, tick: int) -> bool:
+	return has(status, "sealed", tick)
+
+
+# 中邪: 定身郁唔到
+static func blocks_move(status: Dictionary, tick: int) -> bool:
+	return has(status, "hex", tick)
+
+
+# buff 倍率 (無狀態 = 1.0): 聚力/強力/神力 = 物攻 +15%/30%/50%
+static func atk_mult(status: Dictionary, tick: int) -> float:
+	if has(status, "power3", tick):
+		return 1.5
+	if has(status, "power2", tick):
+		return 1.3
+	if has(status, "power1", tick):
+		return 1.15
+	return 1.0
+
+
+# 護甲/金甲/聖鎧 = 物防 +20%/40%/60%
+static func def_mult(status: Dictionary, tick: int) -> float:
+	if has(status, "armor3", tick):
+		return 1.6
+	if has(status, "armor2", tick):
+		return 1.4
+	if has(status, "armor1", tick):
+		return 1.2
+	return 1.0
+
+
+# 護鏡/光鏡/仙鏡 = 術防 +20%/40%/60%
+static func spell_def_mult(status: Dictionary, tick: int) -> float:
+	if has(status, "mirror3", tick):
+		return 1.6
+	if has(status, "mirror2", tick):
+		return 1.4
+	if has(status, "mirror1", tick):
+		return 1.2
+	return 1.0

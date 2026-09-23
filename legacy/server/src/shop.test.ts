@@ -15,9 +15,9 @@ test('買賣價: 魅力折扣有上限，賣價 50%', () => {
 test('客棧: 要喺附近、要有錢；回滿 HP 同扣錢', () => {
   const w = new World();
   const p = w.spawnPlayer('t'), ch = p.ch!;
-  p.x = INN.x + 10; ch.hp = p.hp = 1; ch.gold = 100;
+  p.x = w.data.inn.x + 10; ch.hp = p.hp = 1; ch.gold = 100;
   w.rest(p.id); assert.equal(ch.gold, 100);
-  p.x = INN.x; p.y = INN.y;
+  p.x = w.data.inn.x; p.y = w.data.inn.y;
   w.rest(p.id); assert.equal(ch.gold, 100 - w.data.inn.restCost); assert.ok(ch.hp > 1);
   ch.gold = 0; ch.hp = 1; w.rest(p.id); assert.equal(ch.hp, 1);
 });

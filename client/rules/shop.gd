@@ -20,6 +20,23 @@ static func add_item(bag: Array, id: int, n: int) -> void:
 	bag.append({"id": id, "n": n})
 
 
+# 背包有幾多件 (Step 10: pre hasItem 檢查用)
+static func has_item(bag: Array, id: int, n: int) -> bool:
+	for s in bag:
+		if int(s["id"]) == id and int(s["n"]) >= n:
+			return true
+	return false
+
+
+# 背包內一種道具總件數 (融合後清理 fusedJewels 用)
+static func count_item(bag: Array, id: int) -> int:
+	var t := 0
+	for s in bag:
+		if int(s["id"]) == id:
+			t += int(s["n"])
+	return t
+
+
 static func remove_item(bag: Array, id: int, n: int) -> bool:
 	for i in bag.size():
 		var s: Dictionary = bag[i]

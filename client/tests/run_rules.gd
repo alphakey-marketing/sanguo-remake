@@ -42,6 +42,26 @@ func _call(v: Dictionary, data: GameData) -> Variant:
 		"karmaAfterKill": return RulesCombat.karma_after_kill(int(a[0]), a[1])
 		"deathExpLoss": return RulesCombat.death_exp_loss(int(a[0]), a[1])
 		"rollDeathDrop": return RulesCombat.roll_death_drop(int(a[0]), a[1], r)
+		"elementFactor": return RulesSpell.element_factor(a[0], a[1])
+		"spellAttack": return RulesSpell.spell_attack(a[0], a[1])
+		"calcSpellDamage": return RulesSpell.calc_spell_damage(a[0], a[1], a[2], a[3], a[4], a[5], r)
+		"playerSpellDef": return RulesStats.player_spell_def(int(a[0]), int(a[1]))
+		"statusTicks": return RulesSpell.status_ticks(a[0])
+		"atkMult":
+			var st := {}
+			for pr in a[0]:
+				st[str(pr)] = 400
+			return RulesSpell.atk_mult(st, int(a[1]))
+		"defMult":
+			var st2 := {}
+			for pr2 in a[0]:
+				st2[str(pr2)] = 400
+			return RulesSpell.def_mult(st2, int(a[1]))
+		"spellDefMult":
+			var st3 := {}
+			for pr3 in a[0]:
+				st3[str(pr3)] = 400
+			return RulesSpell.spell_def_mult(st3, int(a[1]))
 		"buyPrice": return RulesShop.buy_price(a[0], a[1])
 		"sellPrice": return RulesShop.sell_price(a[0])
 		"bag_add":

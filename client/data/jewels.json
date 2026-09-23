@@ -1,0 +1,6156 @@
+{
+ "_note": "寶石目錄 (Step 10, spec 02 §4)。由 tools/gen_jewels.py 由 items.json 生成，唔好手改。stones=屬性石(風/地/水/火×10階, pct=10..100)；special=大範圍施放石(元素術解鎖)；support=輔助效果(著裝即生效, rules/jewel.gd support_bonus)；fusable=融合材料(cat39, 鑲武器用 Step 12 加)。",
+ "stones": [
+  {
+   "id": 32001,
+   "name": "飄嵐之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 41,
+     "label": "風屬性",
+     "value": 10,
+     "dan": false
+    }
+   ],
+   "elem": "wind",
+   "pct": 10
+  },
+  {
+   "id": 32002,
+   "name": "微風之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 41,
+     "label": "風屬性",
+     "value": 20,
+     "dan": false
+    }
+   ],
+   "elem": "wind",
+   "pct": 20
+  },
+  {
+   "id": 32003,
+   "name": "疾風之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 41,
+     "label": "風屬性",
+     "value": 30,
+     "dan": false
+    }
+   ],
+   "elem": "wind",
+   "pct": 30
+  },
+  {
+   "id": 32004,
+   "name": "狂風之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 41,
+     "label": "風屬性",
+     "value": 40,
+     "dan": false
+    }
+   ],
+   "elem": "wind",
+   "pct": 40
+  },
+  {
+   "id": 32005,
+   "name": "暴風之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 41,
+     "label": "風屬性",
+     "value": 50,
+     "dan": false
+    }
+   ],
+   "elem": "wind",
+   "pct": 50
+  },
+  {
+   "id": 32006,
+   "name": "颶風之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 41,
+     "label": "風屬性",
+     "value": 60,
+     "dan": false
+    }
+   ],
+   "elem": "wind",
+   "pct": 60
+  },
+  {
+   "id": 32007,
+   "name": "旋風之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 41,
+     "label": "風屬性",
+     "value": 70,
+     "dan": false
+    }
+   ],
+   "elem": "wind",
+   "pct": 70
+  },
+  {
+   "id": 32008,
+   "name": "神風之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 41,
+     "label": "風屬性",
+     "value": 80,
+     "dan": false
+    }
+   ],
+   "elem": "wind",
+   "pct": 80
+  },
+  {
+   "id": 32009,
+   "name": "御風之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 41,
+     "label": "風屬性",
+     "value": 90,
+     "dan": false
+    }
+   ],
+   "elem": "wind",
+   "pct": 90
+  },
+  {
+   "id": 32010,
+   "name": "風雲之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 41,
+     "label": "風屬性",
+     "value": 100,
+     "dan": false
+    }
+   ],
+   "elem": "wind",
+   "pct": 100
+  },
+  {
+   "id": 32011,
+   "name": "黃土之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 42,
+     "label": "地屬性",
+     "value": 10,
+     "dan": false
+    }
+   ],
+   "elem": "earth",
+   "pct": 10
+  },
+  {
+   "id": 32012,
+   "name": "曠野之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 42,
+     "label": "地屬性",
+     "value": 20,
+     "dan": false
+    }
+   ],
+   "elem": "earth",
+   "pct": 20
+  },
+  {
+   "id": 32013,
+   "name": "荒原之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 42,
+     "label": "地屬性",
+     "value": 30,
+     "dan": false
+    }
+   ],
+   "elem": "earth",
+   "pct": 30
+  },
+  {
+   "id": 32014,
+   "name": "沙漠之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 42,
+     "label": "地屬性",
+     "value": 40,
+     "dan": false
+    }
+   ],
+   "elem": "earth",
+   "pct": 40
+  },
+  {
+   "id": 32015,
+   "name": "愚公之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 42,
+     "label": "地屬性",
+     "value": 50,
+     "dan": false
+    }
+   ],
+   "elem": "earth",
+   "pct": 50
+  },
+  {
+   "id": 32016,
+   "name": "五嶽之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 42,
+     "label": "地屬性",
+     "value": 60,
+     "dan": false
+    }
+   ],
+   "elem": "earth",
+   "pct": 60
+  },
+  {
+   "id": 32017,
+   "name": "絕地之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 42,
+     "label": "地屬性",
+     "value": 70,
+     "dan": false
+    }
+   ],
+   "elem": "earth",
+   "pct": 70
+  },
+  {
+   "id": 32018,
+   "name": "地牛之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 42,
+     "label": "地屬性",
+     "value": 80,
+     "dan": false
+    }
+   ],
+   "elem": "earth",
+   "pct": 80
+  },
+  {
+   "id": 32019,
+   "name": "大地之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 42,
+     "label": "地屬性",
+     "value": 90,
+     "dan": false
+    }
+   ],
+   "elem": "earth",
+   "pct": 90
+  },
+  {
+   "id": 32020,
+   "name": "盤古之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 42,
+     "label": "地屬性",
+     "value": 100,
+     "dan": false
+    }
+   ],
+   "elem": "earth",
+   "pct": 100
+  },
+  {
+   "id": 32021,
+   "name": "露水之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 43,
+     "label": "水屬性",
+     "value": 10,
+     "dan": false
+    }
+   ],
+   "elem": "water",
+   "pct": 10
+  },
+  {
+   "id": 32022,
+   "name": "甘霖之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 43,
+     "label": "水屬性",
+     "value": 20,
+     "dan": false
+    }
+   ],
+   "elem": "water",
+   "pct": 20
+  },
+  {
+   "id": 32023,
+   "name": "山泉之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 43,
+     "label": "水屬性",
+     "value": 30,
+     "dan": false
+    }
+   ],
+   "elem": "water",
+   "pct": 30
+  },
+  {
+   "id": 32024,
+   "name": "激流之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 43,
+     "label": "水屬性",
+     "value": 40,
+     "dan": false
+    }
+   ],
+   "elem": "water",
+   "pct": 40
+  },
+  {
+   "id": 32025,
+   "name": "大禹之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 43,
+     "label": "水屬性",
+     "value": 50,
+     "dan": false
+    }
+   ],
+   "elem": "water",
+   "pct": 50
+  },
+  {
+   "id": 32026,
+   "name": "百川之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 43,
+     "label": "水屬性",
+     "value": 60,
+     "dan": false
+    }
+   ],
+   "elem": "water",
+   "pct": 60
+  },
+  {
+   "id": 32027,
+   "name": "汪洋之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 43,
+     "label": "水屬性",
+     "value": 70,
+     "dan": false
+    }
+   ],
+   "elem": "water",
+   "pct": 70
+  },
+  {
+   "id": 32028,
+   "name": "七海之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 43,
+     "label": "水屬性",
+     "value": 80,
+     "dan": false
+    }
+   ],
+   "elem": "water",
+   "pct": 80
+  },
+  {
+   "id": 32029,
+   "name": "天水之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 43,
+     "label": "水屬性",
+     "value": 90,
+     "dan": false
+    }
+   ],
+   "elem": "water",
+   "pct": 90
+  },
+  {
+   "id": 32030,
+   "name": "共工之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 43,
+     "label": "水屬性",
+     "value": 100,
+     "dan": false
+    }
+   ],
+   "elem": "water",
+   "pct": 100
+  },
+  {
+   "id": 32031,
+   "name": "燎原之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 44,
+     "label": "火屬性",
+     "value": 10,
+     "dan": false
+    }
+   ],
+   "elem": "fire",
+   "pct": 10
+  },
+  {
+   "id": 32032,
+   "name": "火焰之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 44,
+     "label": "火屬性",
+     "value": 20,
+     "dan": false
+    }
+   ],
+   "elem": "fire",
+   "pct": 20
+  },
+  {
+   "id": 32033,
+   "name": "燃燒之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 44,
+     "label": "火屬性",
+     "value": 30,
+     "dan": false
+    }
+   ],
+   "elem": "fire",
+   "pct": 30
+  },
+  {
+   "id": 32034,
+   "name": "業火之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 44,
+     "label": "火屬性",
+     "value": 40,
+     "dan": false
+    }
+   ],
+   "elem": "fire",
+   "pct": 40
+  },
+  {
+   "id": 32035,
+   "name": "烈焰之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 44,
+     "label": "火屬性",
+     "value": 50,
+     "dan": false
+    }
+   ],
+   "elem": "fire",
+   "pct": 50
+  },
+  {
+   "id": 32036,
+   "name": "火龍之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 44,
+     "label": "火屬性",
+     "value": 60,
+     "dan": false
+    }
+   ],
+   "elem": "fire",
+   "pct": 60
+  },
+  {
+   "id": 32037,
+   "name": "獄焚之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 44,
+     "label": "火屬性",
+     "value": 70,
+     "dan": false
+    }
+   ],
+   "elem": "fire",
+   "pct": 70
+  },
+  {
+   "id": 32038,
+   "name": "爆炎之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 44,
+     "label": "火屬性",
+     "value": 80,
+     "dan": false
+    }
+   ],
+   "elem": "fire",
+   "pct": 80
+  },
+  {
+   "id": 32039,
+   "name": "金烏之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 44,
+     "label": "火屬性",
+     "value": 90,
+     "dan": false
+    }
+   ],
+   "elem": "fire",
+   "pct": 90
+  },
+  {
+   "id": 32040,
+   "name": "祝融之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 44,
+     "label": "火屬性",
+     "value": 100,
+     "dan": false
+    }
+   ],
+   "elem": "fire",
+   "pct": 100
+  }
+ ],
+ "special": [
+  {
+   "id": 32301,
+   "name": "風之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 46,
+     "label": "風之術",
+     "value": 0,
+     "dan": false
+    }
+   ],
+   "elem": "wind"
+  },
+  {
+   "id": 32302,
+   "name": "地之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 47,
+     "label": "地之術",
+     "value": 0,
+     "dan": false
+    }
+   ],
+   "elem": "earth"
+  },
+  {
+   "id": 32303,
+   "name": "水之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 48,
+     "label": "水之術",
+     "value": 0,
+     "dan": false
+    }
+   ],
+   "elem": "water"
+  },
+  {
+   "id": 32304,
+   "name": "火之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 49,
+     "label": "火之術",
+     "value": 0,
+     "dan": false
+    }
+   ],
+   "elem": "fire"
+  },
+  {
+   "id": 32305,
+   "name": "無之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 50,
+     "label": "無屬性術(葉/針/雲/其他)",
+     "value": 0,
+     "dan": false
+    }
+   ],
+   "elem": "none"
+  },
+  {
+   "id": 32306,
+   "name": "生之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 51,
+     "label": "生之術(恢復)",
+     "value": 0,
+     "dan": false
+    }
+   ],
+   "elem": "life"
+  }
+ ],
+ "support": [
+  {
+   "id": 32041,
+   "name": "虹光之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 63,
+     "label": "",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32042,
+   "name": "星光之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 63,
+     "label": "",
+     "value": 20,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32043,
+   "name": "傳說之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 63,
+     "label": "",
+     "value": 25,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32044,
+   "name": "元素之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 63,
+     "label": "",
+     "value": 20,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32045,
+   "name": "飄邈之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 63,
+     "label": "",
+     "value": 25,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32046,
+   "name": "異界之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 63,
+     "label": "",
+     "value": 30,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32047,
+   "name": "幻域之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 63,
+     "label": "",
+     "value": 60,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32048,
+   "name": "仙境之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 63,
+     "label": "",
+     "value": 70,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32049,
+   "name": "聖靈之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 63,
+     "label": "",
+     "value": 75,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32050,
+   "name": "回春之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 65,
+     "label": "",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32051,
+   "name": "奇異之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 65,
+     "label": "",
+     "value": 20,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32052,
+   "name": "萬法之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 65,
+     "label": "",
+     "value": 25,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32053,
+   "name": "聖潔之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 65,
+     "label": "",
+     "value": 30,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32054,
+   "name": "聖潔之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 65,
+     "label": "",
+     "value": 40,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32055,
+   "name": "能量之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 65,
+     "label": "",
+     "value": 50,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32056,
+   "name": "吸魂之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 64,
+     "label": "",
+     "value": 2,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32057,
+   "name": "掠奪之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 64,
+     "label": "",
+     "value": 4,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32058,
+   "name": "陰影之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 64,
+     "label": "",
+     "value": 6,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32059,
+   "name": "深淵之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 64,
+     "label": "",
+     "value": 8,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32060,
+   "name": "吞噬之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 64,
+     "label": "",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32101,
+   "name": "元氣之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 15,
+     "label": "HP上限值",
+     "value": 2,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32102,
+   "name": "生命之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 15,
+     "label": "HP上限值",
+     "value": 4,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32103,
+   "name": "循環之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 15,
+     "label": "HP上限值",
+     "value": 6,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32104,
+   "name": "無極之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 15,
+     "label": "HP上限值",
+     "value": 8,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32105,
+   "name": "穹蒼之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 15,
+     "label": "HP上限值",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32106,
+   "name": "三界之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 17,
+     "label": "MP上限值",
+     "value": 2,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32107,
+   "name": "四方之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 17,
+     "label": "MP上限值",
+     "value": 4,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32108,
+   "name": "七星之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 17,
+     "label": "MP上限值",
+     "value": 6,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32109,
+   "name": "八荒之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 17,
+     "label": "MP上限值",
+     "value": 8,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32110,
+   "name": "九天之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 17,
+     "label": "MP上限值",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32111,
+   "name": "泉源之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 20,
+     "label": "體力上限(推斷)",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32112,
+   "name": "活力之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 20,
+     "label": "體力上限(推斷)",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32113,
+   "name": "浩瀚之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 15,
+     "label": "HP上限值",
+     "value": 15,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32114,
+   "name": "造化之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 15,
+     "label": "HP上限值",
+     "value": 20,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32115,
+   "name": "左輔之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 15,
+     "label": "HP上限值",
+     "value": 25,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32116,
+   "name": "終極之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 15,
+     "label": "HP上限值",
+     "value": 30,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32117,
+   "name": "無雙之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 15,
+     "label": "HP上限值",
+     "value": 5,
+     "dan": false
+    },
+    {
+     "type": 17,
+     "label": "MP上限值",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32118,
+   "name": "十地之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 17,
+     "label": "MP上限值",
+     "value": 15,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32119,
+   "name": "天地之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 17,
+     "label": "MP上限值",
+     "value": 20,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32120,
+   "name": "右弼之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 17,
+     "label": "MP上限值",
+     "value": 25,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32121,
+   "name": "究極之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 17,
+     "label": "MP上限值",
+     "value": 30,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32122,
+   "name": "帝君之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 15,
+     "label": "HP上限值",
+     "value": 8,
+     "dan": false
+    },
+    {
+     "type": 17,
+     "label": "MP上限值",
+     "value": 8,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32123,
+   "name": "太陽之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 20,
+     "label": "體力上限(推斷)",
+     "value": 15,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32201,
+   "name": "強化之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 7,
+     "label": "物攻威力",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32202,
+   "name": "力量之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 7,
+     "label": "物攻威力",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32203,
+   "name": "防護之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 52,
+     "label": "物理受擊減少",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32204,
+   "name": "鐵壁之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 52,
+     "label": "物理受擊減少",
+     "value": 6,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32205,
+   "name": "閃避之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 10,
+     "label": "物理迴避率(%)",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32206,
+   "name": "絕影之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 10,
+     "label": "物理迴避率(%)",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32207,
+   "name": "無邊之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32208,
+   "name": "無界之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32209,
+   "name": "封靈之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 53,
+     "label": "術法受擊減少",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32210,
+   "name": "無缺之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 53,
+     "label": "術法受擊減少",
+     "value": 6,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32211,
+   "name": "無蹤之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 12,
+     "label": "術法迴避率(%)",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32212,
+   "name": "飛昇之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 12,
+     "label": "術法迴避率(%)",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32213,
+   "name": "破壞之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 7,
+     "label": "物攻威力",
+     "value": 15,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32214,
+   "name": "守護之石",
+   "cat": 47,
+   "effects": []
+  },
+  {
+   "id": 32215,
+   "name": "乘風之石",
+   "cat": 47,
+   "effects": []
+  },
+  {
+   "id": 32216,
+   "name": "虛空之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 15,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32217,
+   "name": "障壁之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 52,
+     "label": "物理受擊減少",
+     "value": 8,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32218,
+   "name": "化羽之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 53,
+     "label": "術法受擊減少",
+     "value": 8,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32219,
+   "name": "衝鋒之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 7,
+     "label": "物攻威力",
+     "value": 5,
+     "dan": false
+    },
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32220,
+   "name": "堅壁之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 52,
+     "label": "物理受擊減少",
+     "value": 5,
+     "dan": false
+    },
+    {
+     "type": 53,
+     "label": "術法受擊減少",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32221,
+   "name": "孟嘗之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 7,
+     "label": "物攻威力",
+     "value": 5,
+     "dan": false
+    },
+    {
+     "type": 52,
+     "label": "物理受擊減少",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32222,
+   "name": "平原之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 7,
+     "label": "物攻威力",
+     "value": 5,
+     "dan": false
+    },
+    {
+     "type": 53,
+     "label": "術法受擊減少",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32223,
+   "name": "春申之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 5,
+     "dan": false
+    },
+    {
+     "type": 52,
+     "label": "物理受擊減少",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32224,
+   "name": "信陵之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 5,
+     "dan": false
+    },
+    {
+     "type": 53,
+     "label": "術法受擊減少",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32225,
+   "name": "聖戰之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32226,
+   "name": "渾沌之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 11,
+     "label": "術法防禦力",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32227,
+   "name": "帝王之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 2,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32228,
+   "name": "封魔之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 11,
+     "label": "術法防禦力",
+     "value": 2,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32229,
+   "name": "月缺之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 13,
+     "label": "武器命中率",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32230,
+   "name": "豫讓之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 13,
+     "label": "武器命中率",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32231,
+   "name": "荊軻之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 13,
+     "label": "武器命中率",
+     "value": 15,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32232,
+   "name": "藍影之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 21,
+     "label": "術法命中率",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32233,
+   "name": "曹沫之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 21,
+     "label": "術法命中率",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32234,
+   "name": "專諸之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 21,
+     "label": "術法命中率",
+     "value": 15,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32235,
+   "name": "霸王之石II",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 7,
+     "label": "物攻威力",
+     "value": 30,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32236,
+   "name": "山河之石",
+   "cat": 47,
+   "effects": []
+  },
+  {
+   "id": 32237,
+   "name": "老君之石II",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 40,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32238,
+   "name": "五行之石",
+   "cat": 47,
+   "effects": []
+  },
+  {
+   "id": 32239,
+   "name": "鈴星之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 7,
+     "label": "物攻威力",
+     "value": 5,
+     "dan": false
+    },
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 5,
+     "dan": false
+    },
+    {
+     "type": 52,
+     "label": "物理受擊減少",
+     "value": 5,
+     "dan": false
+    },
+    {
+     "type": 53,
+     "label": "術法受擊減少",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32307,
+   "name": "防邪之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 34,
+     "label": "迴避中邪",
+     "value": 25,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32308,
+   "name": "防咒之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 35,
+     "label": "迴避封咒",
+     "value": 25,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32309,
+   "name": "防惑之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 36,
+     "label": "迴避媚惑",
+     "value": 25,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32310,
+   "name": "防毒之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 37,
+     "label": "迴避蠱毒",
+     "value": 25,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32311,
+   "name": "防緩之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 38,
+     "label": "迴避遲緩",
+     "value": 25,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32312,
+   "name": "虎威寶石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 13,
+     "label": "武器命中率",
+     "value": 7,
+     "dan": false
+    },
+    {
+     "type": 21,
+     "label": "術法命中率",
+     "value": 7,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32313,
+   "name": "玄龜寶石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 10,
+     "label": "物理迴避率(%)",
+     "value": 7,
+     "dan": false
+    },
+    {
+     "type": 12,
+     "label": "術法迴避率(%)",
+     "value": 7,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32314,
+   "name": "白蛇寶石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 20,
+     "label": "體力上限(推斷)",
+     "value": 10,
+     "dan": false
+    },
+    {
+     "type": 13,
+     "label": "武器命中率",
+     "value": 10,
+     "dan": false
+    },
+    {
+     "type": 21,
+     "label": "術法命中率",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32315,
+   "name": "銀狐寶石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 20,
+     "label": "體力上限(推斷)",
+     "value": 10,
+     "dan": false
+    },
+    {
+     "type": 15,
+     "label": "HP上限值",
+     "value": 10,
+     "dan": false
+    },
+    {
+     "type": 17,
+     "label": "MP上限值",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32316,
+   "name": "金鵬寶石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 15,
+     "label": "HP上限值",
+     "value": 15,
+     "dan": false
+    },
+    {
+     "type": 17,
+     "label": "MP上限值",
+     "value": 15,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32317,
+   "name": "麒麟寶石",
+   "cat": 47,
+   "effects": []
+  },
+  {
+   "id": 32318,
+   "name": "紫凰寶石",
+   "cat": 47,
+   "effects": []
+  },
+  {
+   "id": 32319,
+   "name": "狂龍寶石",
+   "cat": 47,
+   "effects": []
+  },
+  {
+   "id": 32320,
+   "name": "離火之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 13,
+     "label": "武器命中率",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32321,
+   "name": "玄冰之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 21,
+     "label": "術法命中率",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32322,
+   "name": "地獄之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 7,
+     "label": "物攻威力",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32323,
+   "name": "虎皇之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32324,
+   "name": "東方之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 10,
+     "label": "物理迴避率(%)",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32325,
+   "name": "西方之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 12,
+     "label": "術法迴避率(%)",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32326,
+   "name": "南方之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 52,
+     "label": "物理受擊減少",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32327,
+   "name": "北方之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 53,
+     "label": "術法受擊減少",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32501,
+   "name": "武力之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 1,
+     "label": "武力",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32502,
+   "name": "敏捷之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 2,
+     "label": "敏捷",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32503,
+   "name": "靈力之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 4,
+     "label": "靈力",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32504,
+   "name": "智力之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 5,
+     "label": "智力",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32505,
+   "name": "閃亮之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 63,
+     "label": "",
+     "value": 50,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32506,
+   "name": "怪力之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 7,
+     "label": "物攻威力",
+     "value": 15,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32507,
+   "name": "法威之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 15,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32508,
+   "name": "巫山之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 52,
+     "label": "物理受擊減少",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32509,
+   "name": "滄海之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 53,
+     "label": "術法受擊減少",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32510,
+   "name": "血牛之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 15,
+     "label": "HP上限值",
+     "value": 15,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32511,
+   "name": "洛神之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 17,
+     "label": "MP上限值",
+     "value": 15,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32512,
+   "name": "閃亮之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 63,
+     "label": "",
+     "value": 50,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32513,
+   "name": "山河之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 52,
+     "label": "物理受擊減少",
+     "value": 20,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32514,
+   "name": "五行之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 53,
+     "label": "術法受擊減少",
+     "value": 20,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32515,
+   "name": "睿智仙石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 5,
+     "label": "智力",
+     "value": 15,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32516,
+   "name": "白起之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 7,
+     "label": "物攻威力",
+     "value": 30,
+     "dan": false
+    },
+    {
+     "type": 52,
+     "label": "物理受擊減少",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32517,
+   "name": "孫武之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 120,
+     "dan": false
+    },
+    {
+     "type": 52,
+     "label": "物理受擊減少",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32518,
+   "name": "廉頗之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 7,
+     "label": "物攻威力",
+     "value": 30,
+     "dan": false
+    },
+    {
+     "type": 53,
+     "label": "術法受擊減少",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 32519,
+   "name": "子房之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 120,
+     "dan": false
+    },
+    {
+     "type": 53,
+     "label": "術法受擊減少",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 63018,
+   "name": "霸王之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 7,
+     "label": "物攻威力",
+     "value": 20,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 63019,
+   "name": "老君之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 30,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 63020,
+   "name": "聖潔之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 65,
+     "label": "",
+     "value": 30,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 63021,
+   "name": "封印之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 65,
+     "label": "",
+     "value": 40,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 63022,
+   "name": "能量之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 65,
+     "label": "",
+     "value": 50,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 65132,
+   "name": "霸王之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 7,
+     "label": "物攻威力",
+     "value": 20,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 65133,
+   "name": "老君之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 30,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 65134,
+   "name": "聖潔之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 65,
+     "label": "",
+     "value": 30,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 65135,
+   "name": "封印之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 65,
+     "label": "",
+     "value": 40,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 65136,
+   "name": "能量之石",
+   "cat": 47,
+   "effects": [
+    {
+     "type": 65,
+     "label": "",
+     "value": 50,
+     "dan": false
+    }
+   ]
+  }
+ ],
+ "fusable": [
+  {
+   "id": 25075,
+   "name": "紅寶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 25,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25076,
+   "name": "橙寶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 10,
+     "label": "物理迴避率(%)",
+     "value": 15,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25077,
+   "name": "黃寶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25078,
+   "name": "綠寶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 36,
+     "label": "迴避媚惑",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25079,
+   "name": "藍寶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25080,
+   "name": "靛寶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 12,
+     "label": "術法迴避率(%)",
+     "value": 15,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25081,
+   "name": "紫寶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 11,
+     "label": "術法防禦力",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25082,
+   "name": "紅水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 300,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25083,
+   "name": "橙水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 1,
+     "label": "武力",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25084,
+   "name": "黃水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 35,
+     "label": "迴避封咒",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25085,
+   "name": "綠水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 2,
+     "label": "敏捷",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25086,
+   "name": "藍水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 50,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25087,
+   "name": "靛水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 4,
+     "label": "靈力",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25088,
+   "name": "紫水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 5,
+     "label": "智力",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25089,
+   "name": "琥珀石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 34,
+     "label": "迴避中邪",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25090,
+   "name": "地心石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 37,
+     "label": "迴避蠱毒",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25091,
+   "name": "太陰石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 38,
+     "label": "迴避遲緩",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25092,
+   "name": "星辰石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 58,
+     "label": "",
+     "value": 30,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25093,
+   "name": "彗星石",
+   "cat": 39,
+   "effects": []
+  },
+  {
+   "id": 25094,
+   "name": "仙界石",
+   "cat": 39,
+   "effects": []
+  },
+  {
+   "id": 25125,
+   "name": "橙水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 1,
+     "label": "武力",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25126,
+   "name": "綠水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 2,
+     "label": "敏捷",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25127,
+   "name": "靛水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 4,
+     "label": "靈力",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25128,
+   "name": "紫水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 5,
+     "label": "智力",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25129,
+   "name": "橙水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 1,
+     "label": "武力",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25130,
+   "name": "綠水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 2,
+     "label": "敏捷",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25131,
+   "name": "靛水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 4,
+     "label": "靈力",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25132,
+   "name": "紫水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 5,
+     "label": "智力",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25133,
+   "name": "橙水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 1,
+     "label": "武力",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25134,
+   "name": "綠水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 2,
+     "label": "敏捷",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25135,
+   "name": "靛水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 4,
+     "label": "靈力",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25136,
+   "name": "紫水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 5,
+     "label": "智力",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25137,
+   "name": "極光橙水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 1,
+     "label": "武力",
+     "value": 2,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25138,
+   "name": "極光綠水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 2,
+     "label": "敏捷",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25139,
+   "name": "極光靛水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 4,
+     "label": "靈力",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25140,
+   "name": "極光紫水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 5,
+     "label": "智力",
+     "value": 2,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25141,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 250,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25142,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 500,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25143,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 750,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25144,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 1000,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25145,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 250,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25146,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 500,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25147,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 750,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25148,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 1000,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25149,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 250,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25150,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 500,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25151,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 750,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25152,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 1000,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25153,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 250,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25154,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 500,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25155,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 750,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25156,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 1000,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25157,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 250,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25158,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 500,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25159,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 750,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25160,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 1000,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25161,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 50,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25162,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 100,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25163,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 150,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25164,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 200,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25165,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 50,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25166,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 100,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25167,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 150,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25168,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 200,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25169,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 50,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25170,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 100,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25171,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 150,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25172,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 200,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25173,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 50,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25174,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 100,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25175,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 150,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25176,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 200,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25177,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 50,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25178,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 100,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25179,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 150,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25180,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 200,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25201,
+   "name": "綠松石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 10,
+     "dan": false
+    },
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 25,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25202,
+   "name": "黃玉石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 10,
+     "dan": false
+    },
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25203,
+   "name": "珊瑚石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 10,
+     "label": "物理迴避率(%)",
+     "value": 15,
+     "dan": false
+    },
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25204,
+   "name": "海藍石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 10,
+     "label": "物理迴避率(%)",
+     "value": 15,
+     "dan": false
+    },
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 25,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25205,
+   "name": "芙蓉石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 12,
+     "label": "術法迴避率(%)",
+     "value": 15,
+     "dan": false
+    },
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 25,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25206,
+   "name": "海棠石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 11,
+     "label": "術法防禦力",
+     "value": 10,
+     "dan": false
+    },
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 25,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25207,
+   "name": "流光石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 500,
+     "dan": false
+    },
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 100,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25208,
+   "name": "飄邈石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 5,
+     "dan": false
+    },
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 15,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25501,
+   "name": "白虎石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 11,
+     "label": "術法防禦力",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25502,
+   "name": "玄武石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25503,
+   "name": "朱雀石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 15,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25504,
+   "name": "青龍石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 58,
+     "label": "",
+     "value": 50,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25505,
+   "name": "紫玄晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 58,
+     "label": "",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25506,
+   "name": "紫玄晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 58,
+     "label": "",
+     "value": 15,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25507,
+   "name": "紫玄晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 58,
+     "label": "",
+     "value": 20,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25508,
+   "name": "紫玄晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 58,
+     "label": "",
+     "value": 25,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25509,
+   "name": "紫玄晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 58,
+     "label": "",
+     "value": 35,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25510,
+   "name": "紫玄晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 58,
+     "label": "",
+     "value": 40,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25511,
+   "name": "紫玄晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 58,
+     "label": "",
+     "value": 45,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25512,
+   "name": "月心石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 58,
+     "label": "",
+     "value": 30,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25513,
+   "name": "血心石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 20,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25514,
+   "name": "血晶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25801,
+   "name": "至尊水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 1,
+     "label": "武力",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25802,
+   "name": "無上水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 1,
+     "label": "武力",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25803,
+   "name": "吉祥水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 2,
+     "label": "敏捷",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25804,
+   "name": "如意水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 2,
+     "label": "敏捷",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25805,
+   "name": "流波水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 4,
+     "label": "靈力",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25806,
+   "name": "水漾水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 4,
+     "label": "靈力",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25807,
+   "name": "如夢水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 5,
+     "label": "智力",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25808,
+   "name": "幻影水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 5,
+     "label": "智力",
+     "value": 1,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25809,
+   "name": "綠松石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 7,
+     "label": "物攻威力",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25810,
+   "name": "海藍石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 7,
+     "label": "物攻威力",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25811,
+   "name": "黃玉石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25812,
+   "name": "靛光石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25813,
+   "name": "月長石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 11,
+     "label": "術法防禦力",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25814,
+   "name": "珊瑚石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 11,
+     "label": "術法防禦力",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25815,
+   "name": "蛋白石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 11,
+     "label": "術法防禦力",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25816,
+   "name": "煙波石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 13,
+     "label": "武器命中率",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25817,
+   "name": "飄邈石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 13,
+     "label": "武器命中率",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25818,
+   "name": "天長石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 15,
+     "label": "HP上限值",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25819,
+   "name": "地久石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 15,
+     "label": "HP上限值",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25820,
+   "name": "芙蓉石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 17,
+     "label": "MP上限值",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25821,
+   "name": "海棠石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 17,
+     "label": "MP上限值",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25822,
+   "name": "流光石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 21,
+     "label": "術法命中率",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25823,
+   "name": "異芒石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 21,
+     "label": "術法命中率",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25824,
+   "name": "春蘭石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 52,
+     "label": "物理受擊減少",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25825,
+   "name": "夏竹石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 52,
+     "label": "物理受擊減少",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25826,
+   "name": "秋菊石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 53,
+     "label": "術法受擊減少",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25827,
+   "name": "冬梅石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 53,
+     "label": "術法受擊減少",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 25828,
+   "name": "孔雀石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56103,
+   "name": "至尊水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 1,
+     "label": "武力",
+     "value": 6,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56104,
+   "name": "極光橙水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 1,
+     "label": "武力",
+     "value": 7,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56109,
+   "name": "水漾水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 4,
+     "label": "靈力",
+     "value": 6,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56110,
+   "name": "極光靛水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 4,
+     "label": "靈力",
+     "value": 7,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56115,
+   "name": "幻影水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 5,
+     "label": "智力",
+     "value": 6,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56116,
+   "name": "極光紫水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 5,
+     "label": "智力",
+     "value": 7,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56117,
+   "name": "藍寶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 15,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56118,
+   "name": "玄武石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56119,
+   "name": "黃寶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 20,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56120,
+   "name": "飄邈石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 15,
+     "dan": false
+    },
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 20,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56121,
+   "name": "綠松石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 55,
+     "dan": false
+    },
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 400,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56122,
+   "name": "黃玉石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 55,
+     "dan": false
+    },
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 500,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56123,
+   "name": "白虎石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 11,
+     "label": "術法防禦力",
+     "value": 10,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56124,
+   "name": "紫寶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 11,
+     "label": "術法防禦力",
+     "value": 15,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56125,
+   "name": "海棠石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 11,
+     "label": "術法防禦力",
+     "value": 60,
+     "dan": false
+    },
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 400,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56130,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 750,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56135,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 1000,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56136,
+   "name": "流光石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 2000,
+     "dan": false
+    },
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 600,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56141,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 300,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56146,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 350,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56147,
+   "name": "星辰石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 58,
+     "label": "",
+     "value": 80,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56148,
+   "name": "青龍石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 58,
+     "label": "",
+     "value": 100,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56149,
+   "name": "月心石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 58,
+     "label": "",
+     "value": 80,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56150,
+   "name": "孔雀石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 15,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56151,
+   "name": "朱雀石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 25,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56152,
+   "name": "紅寶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 35,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56153,
+   "name": "蒼煙萬頃石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 5,
+     "label": "智力",
+     "value": 5,
+     "dan": false
+    },
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 15,
+     "dan": false
+    },
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 1000,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56154,
+   "name": "衡陽歸雁石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 1000,
+     "dan": false
+    },
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 18,
+     "dan": false
+    },
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 400,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56155,
+   "name": "化作斷魂石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 1,
+     "label": "武力",
+     "value": 5,
+     "dan": false
+    },
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 15,
+     "dan": false
+    },
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 25,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56156,
+   "name": "俱焚掠殺石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 1,
+     "label": "武力",
+     "value": 8,
+     "dan": false
+    },
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 15,
+     "dan": false
+    },
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 1000,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56160,
+   "name": "真化作斷魂石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 1,
+     "label": "武力",
+     "value": 12,
+     "dan": false
+    },
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 55,
+     "dan": false
+    },
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 450,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56161,
+   "name": "真俱焚掠殺石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 14,
+     "label": "",
+     "value": 6000,
+     "dan": false
+    },
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 55,
+     "dan": false
+    },
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 450,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56196,
+   "name": "至尊水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 1,
+     "label": "武力",
+     "value": 2,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56197,
+   "name": "至尊水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 1,
+     "label": "武力",
+     "value": 3,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56198,
+   "name": "至尊水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 1,
+     "label": "武力",
+     "value": 4,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56199,
+   "name": "至尊水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 1,
+     "label": "武力",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56200,
+   "name": "極光橙水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 1,
+     "label": "武力",
+     "value": 3,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56201,
+   "name": "極光橙水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 1,
+     "label": "武力",
+     "value": 4,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56202,
+   "name": "極光橙水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 1,
+     "label": "武力",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56203,
+   "name": "極光橙水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 1,
+     "label": "武力",
+     "value": 6,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56220,
+   "name": "水漾水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 4,
+     "label": "靈力",
+     "value": 2,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56221,
+   "name": "水漾水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 4,
+     "label": "靈力",
+     "value": 3,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56222,
+   "name": "水漾水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 4,
+     "label": "靈力",
+     "value": 4,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56223,
+   "name": "水漾水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 4,
+     "label": "靈力",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56224,
+   "name": "極光靛水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 4,
+     "label": "靈力",
+     "value": 3,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56225,
+   "name": "極光靛水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 4,
+     "label": "靈力",
+     "value": 4,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56226,
+   "name": "極光靛水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 4,
+     "label": "靈力",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56227,
+   "name": "極光靛水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 4,
+     "label": "靈力",
+     "value": 6,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56244,
+   "name": "幻影水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 5,
+     "label": "智力",
+     "value": 2,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56245,
+   "name": "幻影水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 5,
+     "label": "智力",
+     "value": 3,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56246,
+   "name": "幻影水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 5,
+     "label": "智力",
+     "value": 4,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56247,
+   "name": "幻影水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 5,
+     "label": "智力",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56248,
+   "name": "極光紫水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 5,
+     "label": "智力",
+     "value": 3,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56249,
+   "name": "極光紫水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 5,
+     "label": "智力",
+     "value": 4,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56250,
+   "name": "極光紫水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 5,
+     "label": "智力",
+     "value": 5,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56251,
+   "name": "極光紫水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 5,
+     "label": "智力",
+     "value": 6,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56252,
+   "name": "藍寶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 11,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56253,
+   "name": "藍寶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 12,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56254,
+   "name": "藍寶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 13,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56255,
+   "name": "藍寶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 14,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56256,
+   "name": "玄武石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 6,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56257,
+   "name": "玄武石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 7,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56258,
+   "name": "玄武石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 8,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56259,
+   "name": "玄武石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 9,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56260,
+   "name": "黃寶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 12,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56261,
+   "name": "黃寶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 14,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56262,
+   "name": "黃寶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 16,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56263,
+   "name": "黃寶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 18,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56264,
+   "name": "飄邈石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 7,
+     "dan": false
+    },
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 16,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56265,
+   "name": "飄邈石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 9,
+     "dan": false
+    },
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 17,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56266,
+   "name": "飄邈石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 11,
+     "dan": false
+    },
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 18,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56267,
+   "name": "飄邈石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 13,
+     "dan": false
+    },
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 19,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56268,
+   "name": "綠松石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 20,
+     "dan": false
+    },
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 80,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56269,
+   "name": "綠松石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 30,
+     "dan": false
+    },
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 100,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56270,
+   "name": "綠松石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 40,
+     "dan": false
+    },
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 200,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56271,
+   "name": "綠松石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 50,
+     "dan": false
+    },
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 300,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56272,
+   "name": "黃玉石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 20,
+     "dan": false
+    },
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 50,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56273,
+   "name": "黃玉石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 30,
+     "dan": false
+    },
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 100,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56274,
+   "name": "黃玉石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 40,
+     "dan": false
+    },
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 200,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56275,
+   "name": "黃玉石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 9,
+     "label": "物理防禦力",
+     "value": 50,
+     "dan": false
+    },
+    {
+     "type": 8,
+     "label": "術攻威力",
+     "value": 300,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56276,
+   "name": "白虎石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 11,
+     "label": "術法防禦力",
+     "value": 6,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56277,
+   "name": "白虎石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 11,
+     "label": "術法防禦力",
+     "value": 7,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56278,
+   "name": "白虎石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 11,
+     "label": "術法防禦力",
+     "value": 8,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56279,
+   "name": "白虎石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 11,
+     "label": "術法防禦力",
+     "value": 9,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56280,
+   "name": "紫寶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 11,
+     "label": "術法防禦力",
+     "value": 11,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56281,
+   "name": "紫寶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 11,
+     "label": "術法防禦力",
+     "value": 12,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56282,
+   "name": "紫寶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 11,
+     "label": "術法防禦力",
+     "value": 13,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56283,
+   "name": "紫寶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 11,
+     "label": "術法防禦力",
+     "value": 14,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56284,
+   "name": "海棠石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 11,
+     "label": "術法防禦力",
+     "value": 20,
+     "dan": false
+    },
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 80,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56285,
+   "name": "海棠石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 11,
+     "label": "術法防禦力",
+     "value": 30,
+     "dan": false
+    },
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 100,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56286,
+   "name": "海棠石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 11,
+     "label": "術法防禦力",
+     "value": 40,
+     "dan": false
+    },
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 200,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56287,
+   "name": "海棠石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 11,
+     "label": "術法防禦力",
+     "value": 50,
+     "dan": false
+    },
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 300,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56304,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 350,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56305,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 450,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56306,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 550,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56307,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 650,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56324,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 600,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56325,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 700,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56326,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 800,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56327,
+   "name": "赤水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 900,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56328,
+   "name": "流光石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 800,
+     "dan": false
+    },
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 200,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56329,
+   "name": "流光石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 1000,
+     "dan": false
+    },
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 300,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56330,
+   "name": "流光石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 1300,
+     "dan": false
+    },
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 400,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56331,
+   "name": "流光石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 56,
+     "label": "紅水晶",
+     "value": 1600,
+     "dan": false
+    },
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 500,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56348,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 100,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56349,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 150,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56350,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 200,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56351,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 250,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56368,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 150,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56369,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 200,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56370,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 250,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56371,
+   "name": "青水晶",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 57,
+     "label": "藍水晶",
+     "value": 300,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56372,
+   "name": "星辰石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 58,
+     "label": "",
+     "value": 40,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56373,
+   "name": "星辰石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 58,
+     "label": "",
+     "value": 50,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56374,
+   "name": "星辰石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 58,
+     "label": "",
+     "value": 60,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56375,
+   "name": "星辰石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 58,
+     "label": "",
+     "value": 70,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56376,
+   "name": "青龍石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 58,
+     "label": "",
+     "value": 60,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56377,
+   "name": "青龍石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 58,
+     "label": "",
+     "value": 70,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56378,
+   "name": "青龍石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 58,
+     "label": "",
+     "value": 80,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56379,
+   "name": "青龍石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 58,
+     "label": "",
+     "value": 90,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56380,
+   "name": "月心石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 58,
+     "label": "",
+     "value": 40,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56381,
+   "name": "月心石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 58,
+     "label": "",
+     "value": 50,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56382,
+   "name": "月心石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 58,
+     "label": "",
+     "value": 60,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56383,
+   "name": "月心石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 58,
+     "label": "",
+     "value": 70,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56384,
+   "name": "孔雀石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 7,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56385,
+   "name": "孔雀石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 9,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56386,
+   "name": "孔雀石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 11,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56387,
+   "name": "孔雀石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 13,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56388,
+   "name": "朱雀石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 17,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56389,
+   "name": "朱雀石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 19,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56390,
+   "name": "朱雀石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 21,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56391,
+   "name": "朱雀石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 23,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56392,
+   "name": "紅寶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 27,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56393,
+   "name": "紅寶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 29,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56394,
+   "name": "紅寶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 31,
+     "dan": false
+    }
+   ]
+  },
+  {
+   "id": 56395,
+   "name": "紅寶石",
+   "cat": 39,
+   "effects": [
+    {
+     "type": 99,
+     "label": "武器強度=攻擊力(武器)",
+     "value": 33,
+     "dan": false
+    }
+   ]
+  }
+ ]
+}
