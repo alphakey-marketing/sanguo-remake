@@ -14,6 +14,7 @@ var prices: Dictionary = {}      # item id -> price
 var item_ids: Dictionary = {}    # item id -> true
 var names: Dictionary = {}       # item id -> 名
 var cats: Dictionary = {}        # item id -> cat (物品分類, 市場用)
+var info: Dictionary = {}        # item id -> {cat_label, req_lv, effects:[{label, value}]}  UI 物品詳情用
 var inn: Dictionary = {}
 var shops: Array = []
 var world: Dictionary = {}        # clock/cities/market/disasters (data/world.json)
@@ -105,6 +106,10 @@ static func load_all() -> GameData:
 		g.names[id] = str(it.get("name", id))
 		g.prices[id] = float(it.get("price", 0))
 		g.cats[id] = int(it.get("cat", 0))
+		var effs: Array = []
+		for e in it.get("effects", []):
+			effs.append({"label": str(e.get("label", "")), "value": int(e.get("value", 0)), "type": int(e.get("type", 0))})
+		g.info[id] = {"cat_label": str(it.get("cat_label", "")), "req_lv": int(it.get("req_lv", 0)), "effects": effs}
 		var p = null
 		var h = null
 		var heal_hp := 0

@@ -19,7 +19,9 @@ run sim --script tests/run_sim.gd
 run world --script tests/run_world.gd
 run monsters --script tests/run_monsters.gd
 run market --script tools/market_sim.gd
+run hud --script tests/run_hud.gd
 run autotest -- --autotest
+run uitest -- --uitest
 
 [ $rc = 0 ] && echo "ALL OK" || echo "SOME FAILED"
 exit $rc
