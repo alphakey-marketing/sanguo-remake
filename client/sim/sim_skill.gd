@@ -203,7 +203,7 @@ func cmd_use_ultimate(id: int, ult_id: String) -> void:
 	ch["sp"] = int(ch["sp"]) - sp_cost
 	cd[ult_id] = tick + int(ult["cd"])
 	ch["ultCd"] = cd
-	var wdef: Dictionary = data.weapons.get(w, {"power": 0.0, "hit": 45.0})
+	var wdef: Dictionary = _weapon_def(ch)     # 耐久 0 = 威力減半 (Step 12)
 	var atk_mult := RulesSpell.atk_mult(ch.get("status", {}), tick) * (1.0 + float(_jewel_bonus(ch).get("atkPct", 0.0)))
 	var eff_str := _eff_attr(ch, "str") + float(_jewel_bonus(ch).get("strFlat", 0))
 	_emit({"k": "ult", "src": id, "ult": ult_id, "name": str(ult["name"]), "mp": mp_cost, "sp": sp_cost})

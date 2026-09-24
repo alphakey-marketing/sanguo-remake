@@ -93,6 +93,18 @@ func _call(v: Dictionary, data: GameData) -> Variant:
 		"equipReduceDmg": return RulesEquip.reduce_dmg(int(a[0]), int(a[1]), int(a[2]))
 		"equipHitWears": return RulesEquip.hit_wears(int(a[0]), int(a[1]))
 		"equipDurAfterDeath": return RulesEquip.dur_after_death(int(a[0]), int(a[1]), a[2])
+		# 生產技能等級 / 進階生產 / 修理 (Step 12)
+		"workExpToNext": return RulesWork.exp_to_next(int(a[0]), a[1])
+		"workGainExp": return RulesWork.gain_exp(int(a[0]), int(a[1]), int(a[2]), a[3])
+		"workBasicSuccess": return RulesWork.basic_success(int(a[0]), a[1])
+		"workCraftChance": return RulesWork.craft_chance(int(a[0]), int(a[1]), a[2])
+		"workAdvUnlocked": return RulesWork.adv_unlocked(a[0], a[1], int(a[2]))
+		"workHasMaterials":
+			var bc := {}
+			for k in a[0]:
+				bc[int(k)] = int(a[0][k])        # JSON key 係 String → int
+			return RulesWork.has_materials(bc, a[1])
+		"workRepairCost": return RulesWork.repair_cost(a[0], int(a[1]), int(a[2]), a[3])
 	push_error("未知 fn: " + String(v["fn"]))
 	return null
 

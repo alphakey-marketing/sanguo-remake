@@ -263,10 +263,44 @@ func _ensure_equip(ch: Dictionary) -> void:
 	for it in _equipped_items(ch):
 		if RulesShop.count_item(ch["bag"], it) < _equipped_n(ch, it):
 			RulesShop.add_item(ch["bag"], it, _equipped_n(ch, it) - RulesShop.count_item(ch["bag"], it))
-	for s in RulesEquip.SLOTS:
-		var a := int(eq[s])
-		if a > 0 and not eq["dur"].has(str(a)):
-			eq["dur"][str(a)] = int(data.armors.get(a, {}).get("max_dur", 0))
+	if not eq.has("whits"):
+		eq["whits"] = 0
+	for it in _equipped_items(ch):
+		if not eq["dur"].has(str(it)):
+			eq["dur"][str(it)] = _max_dur(it)
+
+
+# 裝備耐久上限: 防具/武器 (Step 12 武器都有耐久)；其他 = 0
+func _max_dur(item: int) -> int:
+	if data.armors.has(item):
+		return int(data.armors[item]["max_dur"])
+	return int(data.weapons.get(item, {}).get("max_dur", 0))
+
+
+# 現用武器 {power, hit}；耐久 0 = 武器強度減半【自訂】(同防具一致, Step 12)
+func _weapon_def(ch: Dictionary) -> Dictionary:
+	var w := int(ch["equip"].get("weapon", 0))
+	var wd: Dictionary = data.weapons.get(w, {"power": 0.0, "hit": 45.0})
+	if w > 0 and int(ch["equip"].get("dur", {}).get(str(w), 1)) <= 0:
+		return {"power": float(wd["power"]) * 0.5, "hit": wd["hit"]}
+	return wd
+
+
+# 出手磨損 (Step 12): 每打中 hitsPerWear 下 → 現用武器耐久 -1
+func _wear_weapon_hit(e: Dictionary) -> void:
+	var eq: Dictionary = e["ch"]["equip"]
+	var w := int(eq.get("weapon", 0))
+	if w == 0 or not eq.has("dur"):
+		return
+	eq["whits"] = int(eq.get("whits", 0)) + 1
+	if not RulesEquip.hit_wears(int(eq["whits"]), int(data.equip_cfg["durability"]["hitsPerWear"])):
+		return
+	var k := str(w)
+	if int(eq["dur"].get(k, 0)) > 0:
+		eq["dur"][k] = int(eq["dur"][k]) - 1
+		if int(eq["dur"][k]) == 0:
+			_emit({"k": "armor_broken", "dst": int(e["id"]), "item": w})
+			_msg(int(e["id"]), "「%s」耐久用盡，威力減半" % data.names.get(w, str(w)))
 
 
 # 身上所有裝備 item id (武器 3 槽 + 5 部位，唔計 0)
@@ -321,16 +355,18 @@ func _wear_armor_hit(e: Dictionary) -> void:
 				_msg(int(e["id"]), "「%s」耐久用盡，效果減半" % data.names.get(a, str(a)))
 
 
-# 死亡: 身上每件防具扣上限 10% 耐久 (spec 03 §4.3)
+# 死亡: 身上每件裝備 (防具 + 武器) 扣上限 10% 耐久 (spec 03 §4.3)
 func _wear_armor_death(ch: Dictionary) -> void:
 	var eq: Dictionary = ch["equip"]
 	if not eq.has("dur"):
 		return
-	for s in RulesEquip.SLOTS:
-		var a := int(eq[s])
-		if a > 0:
-			eq["dur"][str(a)] = RulesEquip.dur_after_death(int(eq["dur"].get(str(a), 0)),
-				int(data.armors.get(a, {}).get("max_dur", 0)), float(data.equip_cfg["durability"]["deathLossPct"]))
+	var seen := {}
+	for a in _equipped_items(ch):     # 防具 + 武器 3 槽 (同一件只扣一次)
+		if seen.has(a):
+			continue
+		seen[a] = true
+		eq["dur"][str(a)] = RulesEquip.dur_after_death(int(eq["dur"].get(str(a), 0)),
+			_max_dur(a), float(data.equip_cfg["durability"]["deathLossPct"]))
 
 
 # 背包已經冇嘅防具 → 清耐久記錄
@@ -385,6 +421,7 @@ func _spawn_actor(ename: String, kind: String, class_id: String = "yishi") -> Di
 	var e := _new_ent(ename, kind, _pick_free(int(sp[0]), int(sp[1]), int(sp[2]), int(sp[3])))
 	e["ch"] = RulesStats.create_character(data, ename.substr(0, 8), class_id)
 	e["ch"]["tools"] = {}                     # skill -> {item, dur} (Step 7.1)
+	e["ch"]["workLv"] = {}                    # 生產技能等級 skill -> {lv, exp} (Step 12；未做過 = 冇 key)
 	e["ch"]["storage"] = []                   # 天地商行倉庫 [{id,n}] (Step 7.2)
 	e["ch"]["storageSub"] = false             # 有冇訂閱天地商行 (200/日)
 	e["ch"]["equip"]["spellbooks"] = [0, 0, 0]   # 術法快捷列 3 格 (Step 9, spec 02 §3.1)

@@ -1,6 +1,18 @@
 {
   "_note": "工作技能【原=技能種類/工具/城外工作區；自訂=解鎖等級/機率/耐久，攻略無數字】(Step 7.1)。材料 id 對應 data/items.json 既有分類 (草藥材/礦石材料/木材/蔬果材/魚材/食材)。tool=正式工具、starterTool=新手工具(平、耐久低)。",
   "toolDurability": { "starter": 50, "normal": 200 },
+  "_note12": "Step 12 (spec 05 §2/§4)：技能等級 1~100【原】；經驗/機率/修理費【自訂】。初階 tier 按技能等級解鎖 (唔再睇角色等級)。進階 = 對應初階 50 級解鎖【原】，要喺城內設施 (facilities.json crafts) + 進階工具【原】(暫時工具店賣，Step 14 官宅後改)。repair: 武器 = 冶鐵、頭/身/靴 = 修繕、戒指/項鍊 = 木匠【原】",
+  "level": { "max": 100, "base": 4, "perLv": 1, "gainOk": 2, "gainFail": 1 },
+  "basicRate": { "base": 0.85, "perLv": 0.005, "cap": 0.98, "big": 0.005 },
+  "craftRate": { "base": 0.6, "perLv": 0.006, "perItemLv": 0.01, "min": 0.05, "max": 0.98, "failLoseMat": 0.5 },
+  "repair": { "serviceRate": 0.3 },
+  "advanced": {
+    "cooking":   { "name": "廚藝", "tool": 26005, "from": ["farming", "fishing", "hunting"], "unlockLv": 50 },
+    "alchemy":   { "name": "煉丹", "tool": 26012, "from": ["herbalism"], "unlockLv": 50 },
+    "carpentry": { "name": "木匠", "tool": 26007, "from": ["woodcutting"], "unlockLv": 50, "repairs": ["ring", "necklace"] },
+    "smithing":  { "name": "冶鐵", "tool": 26004, "from": ["mining"], "unlockLv": 50, "repairs": ["weapon"] },
+    "mending":   { "name": "修繕", "tool": 26010, "from": ["mining"], "unlockLv": 50, "repairs": ["head", "body", "boots"] }
+  },
   "skills": {
     "farming": {
       "name": "農耕", "tool": 26001, "starterTool": 26031,

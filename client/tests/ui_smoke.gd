@@ -281,6 +281,38 @@ func _run() -> void:
 	check(await until(func() -> bool: return not m.sim.ent(m.my_id).has("goto")), "搖桿郁應該取消自動尋路")
 	touch(p0 + Vector2(0, 120), false, 2)
 	await frames(1)
+	# 12. 工房 (Step 12): 互動掣 → 生產面板 → 揀柳葉刀 → 製作；修理頁 → 自己修
+	m._send({"t": "debug_work_lv", "add": 49})
+	m._send({"t": "debug_give", "item": 26004, "n": 1})
+	m._send({"t": "debug_give", "item": 25001, "n": 200})
+	var wf: Dictionary = m.data.facilities["workshop"]
+	put(int(wf["x"]), int(wf["y"]) + 1)
+	check(await until(func() -> bool: return String(hud.ctx.get("kind", "")) == "fac"), "近工房互動掣應該係設施 (%s)" % hud.ctx)
+	await click(center("context"))
+	var cp2: GamePanel = hud.panels.get("craft")
+	check(cp2 != null and cp2.visible, "撳互動掣應該開生產面板")
+	if cp2 != null:
+		check(press(cp2, "裝備鐵鎚"), "生產面板: 背包有鐵鎚應該有「裝備鐵鎚」掣")
+		await frames(1)
+		cp2.refresh(true)
+		press(cp2, m.item_names[10001])
+		await frames(1)
+		var bag_w := RulesShop.count_item(ch["bag"], 25001)
+		for i in 5:
+			ch["sp"] = 99999
+			press(cp2, "製作")
+			await frames(1)
+		check(RulesShop.count_item(ch["bag"], 25001) < bag_w, "撳製作應該用咗材料")
+		ch["equip"]["dur"][str(int(ch["equip"]["weapon"]))] = 1
+		cp2.set_tab(3)                                  # 冶鐵/修繕/木匠/修理
+		await frames(1)
+		press(cp2, m.item_names[int(ch["equip"]["weapon"])])
+		await frames(1)
+		press(cp2, "自己修理")
+		await frames(1)
+		var w2 := int(ch["equip"]["weapon"])
+		check(int(ch["equip"]["dur"][str(w2)]) == int(m.data.weapons[w2]["max_dur"]), "修理頁: 自己修理應該回滿耐久")
+	hud.close_panels()
 	print("[TEST] ui_smoke: %d, fail %d" % [total, fails])
 	print("PASS: ui smoke" if fails == 0 else "FAIL: ui smoke")
 	get_tree().quit(1 if fails > 0 else 0)

@@ -96,6 +96,7 @@ func _panel(name_: String) -> GamePanel:
 			"quest": p = QuestPanel.new(main)
 			"more": p = MorePanel.new(main)
 			"map": p = MapPanel.new(main)
+			"craft": p = CraftPanel.new(main)
 			_: p = DialogPanel.new(main)
 		add_child(p)
 		panels[name_] = p
@@ -107,6 +108,10 @@ func bag_panel() -> BagPanel:
 func shop_panel() -> ShopPanel:
 	close_panels()
 	return _panel("shop") as ShopPanel
+
+func craft_panel() -> CraftPanel:
+	close_panels()
+	return _panel("craft") as CraftPanel
 
 func open_panel(name_: String) -> void:
 	close_panels()

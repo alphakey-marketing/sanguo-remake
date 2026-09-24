@@ -231,10 +231,11 @@ func slot_name(slot: String) -> String:
 	return str(main.data.equip_cfg["slotNames"].get(slot, slot))
 
 
+# 防具/武器耐久 (Step 12 武器都有)
 func armor_dur_text(ch: Dictionary, id: int) -> String:
-	var ad: Dictionary = main.data.armors.get(id, {})
-	var cur := int(ch.get("equip", {}).get("dur", {}).get(str(id), int(ad.get("max_dur", 0))))
-	return "耐久 %d/%d%s" % [cur, int(ad.get("max_dur", 0)), "（減半）" if cur <= 0 else ""]
+	var mx := int(main.data.armors.get(id, main.data.weapons.get(id, {})).get("max_dur", 0))
+	var cur := int(ch.get("equip", {}).get("dur", {}).get(str(id), mx))
+	return "耐久 %d/%d%s" % [cur, mx, "（減半）" if cur <= 0 else ""]
 
 
 # 防具同身上同部位嗰件比較: [[text, color]]，↑ 綠 ↓ 紅
