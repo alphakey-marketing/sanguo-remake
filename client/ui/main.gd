@@ -61,7 +61,8 @@ func _ready() -> void:
 	for id in data.prices:
 		item_prices[id] = int(data.prices[id])
 	inn_cost = int(data.inn["restCost"])
-	facilities.append({"kind": "inn", "name": "客棧", "x": int(data.inn["x"]), "y": int(data.inn["y"]), "color": Color(0.3, 0.5, 0.9)})
+	for inn in data.inns:
+		facilities.append({"kind": "inn", "name": String(inn["name"]), "x": int(inn["x"]), "y": int(inn["y"]), "color": Color(0.3, 0.5, 0.9)})
 	for sh in data.shops:
 		facilities.append({"kind": "shop", "name": str(sh["name"]), "x": int(sh["x"]), "y": int(sh["y"]),
 			"color": Color(0.9, 0.7, 0.2), "stock": sh["stock"], "shopName": str(sh["name"])})
@@ -203,6 +204,7 @@ func _send(d: Dictionary) -> void:
 		"sell": sim.cmd_sell(my_id, int(d.item), int(d.get("n", 1)))
 		"facility": sim.cmd_facility(my_id, str(d.key))
 		"travel": sim.cmd_travel(my_id, str(d.point))
+		"goto_map": sim.cmd_goto_map(my_id, str(d.map))
 		"work": sim.cmd_work(my_id, str(d.skill))
 		"equip_tool": sim.cmd_equip_tool(my_id, str(d.skill), int(d.item))
 		"storage_sub": sim.cmd_storage_sub(my_id, bool(d.on))
@@ -389,7 +391,10 @@ func _autotest_step(me: Dictionary) -> void:
 	if start_pos.x < 0:
 		start_pos = p
 		_send({"t": "chat", "text": "autotest"}); _send({"t": "rest"}); _send({"t": "buy", "item": 10001, "n": 1})
-		_send({"t": "move", "x": p.x + 6, "y": p.y + 2})
+		for d in [Vector2i(6, 2), Vector2i(-6, 2), Vector2i(6, -2), Vector2i(-6, -2), Vector2i(3, 0), Vector2i(-3, 0), Vector2i(0, 3), Vector2i(0, -3)]:
+			if sim.is_free(p.x + d.x, p.y + d.y):     # 出生位由 RNG 定，揀一格行得嘅
+				_send({"t": "move", "x": p.x + d.x, "y": p.y + d.y})
+				break
 	elif not moved:
 		if p != start_pos: moved = true; print("moved %s -> %s, saw %d entities" % [start_pos, p, ents.size()])
 	else:

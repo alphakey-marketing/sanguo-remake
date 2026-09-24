@@ -1942,6 +1942,259 @@
    "monster": 19001,
    "count": 1,
    "respawnTicks": 0
+  },
+  {
+   "zone": "runan_road",
+   "monster": 12006,
+   "count": 3,
+   "respawnTicks": 320,
+   "area": [
+    4,
+    4,
+    36,
+    36
+   ]
+  },
+  {
+   "zone": "runan_road",
+   "monster": 12014,
+   "count": 2,
+   "respawnTicks": 300,
+   "area": [
+    4,
+    4,
+    36,
+    36
+   ]
+  },
+  {
+   "zone": "runan_road",
+   "monster": 12017,
+   "count": 2,
+   "respawnTicks": 350,
+   "area": [
+    48,
+    4,
+    72,
+    36
+   ]
+  },
+  {
+   "zone": "runan_road",
+   "monster": 12028,
+   "count": 3,
+   "respawnTicks": 240,
+   "area": [
+    48,
+    22,
+    72,
+    36
+   ]
+  },
+  {
+   "zone": "runan_road",
+   "monster": 1010,
+   "count": 3,
+   "respawnTicks": 500,
+   "area": [
+    75,
+    25,
+    87,
+    33
+   ]
+  },
+  {
+   "zone": "kunyang",
+   "monster": 12018,
+   "count": 3,
+   "respawnTicks": 280,
+   "area": [
+    4,
+    2,
+    88,
+    30
+   ]
+  },
+  {
+   "zone": "kunyang",
+   "monster": 12019,
+   "count": 3,
+   "respawnTicks": 300,
+   "area": [
+    4,
+    31,
+    32,
+    62
+   ]
+  },
+  {
+   "zone": "kunyang",
+   "monster": 12013,
+   "count": 3,
+   "respawnTicks": 300,
+   "area": [
+    62,
+    36,
+    88,
+    62
+   ]
+  },
+  {
+   "zone": "kunyang",
+   "monster": 11068,
+   "count": 2,
+   "respawnTicks": 500,
+   "area": [
+    35,
+    45,
+    59,
+    59
+   ]
+  },
+  {
+   "zone": "kunyang",
+   "monster": 1008,
+   "count": 1,
+   "respawnTicks": 900,
+   "area": [
+    35,
+    45,
+    59,
+    59
+   ]
+  },
+  {
+   "zone": "wancheng_road",
+   "monster": 12003,
+   "count": 3,
+   "respawnTicks": 200,
+   "area": [
+    40,
+    16,
+    58,
+    46
+   ]
+  },
+  {
+   "zone": "wancheng_road",
+   "monster": 12046,
+   "count": 3,
+   "respawnTicks": 220,
+   "area": [
+    62,
+    2,
+    92,
+    20
+   ]
+  },
+  {
+   "zone": "wancheng_road",
+   "monster": 12021,
+   "count": 2,
+   "respawnTicks": 240,
+   "area": [
+    62,
+    36,
+    92,
+    46
+   ]
+  },
+  {
+   "zone": "wancheng_road",
+   "monster": 12011,
+   "count": 3,
+   "respawnTicks": 260,
+   "area": [
+    10,
+    16,
+    28,
+    46
+   ]
+  },
+  {
+   "zone": "wancheng_road",
+   "monster": 11091,
+   "count": 2,
+   "respawnTicks": 400,
+   "area": [
+    10,
+    2,
+    28,
+    12
+   ]
+  },
+  {
+   "zone": "bowang",
+   "monster": 1001,
+   "count": 6,
+   "respawnTicks": 100,
+   "area": [
+    8,
+    48,
+    90,
+    66
+   ]
+  },
+  {
+   "zone": "bowang",
+   "monster": 1002,
+   "count": 4,
+   "respawnTicks": 150,
+   "area": [
+    8,
+    48,
+    90,
+    66
+   ]
+  },
+  {
+   "zone": "bowang",
+   "monster": 1003,
+   "count": 4,
+   "respawnTicks": 200,
+   "area": [
+    2,
+    17,
+    93,
+    44
+   ]
+  },
+  {
+   "zone": "bowang",
+   "monster": 1004,
+   "count": 3,
+   "respawnTicks": 250,
+   "area": [
+    2,
+    2,
+    93,
+    16
+   ]
+  },
+  {
+   "zone": "bowang",
+   "monster": 1005,
+   "count": 1,
+   "respawnTicks": 600,
+   "area": [
+    2,
+    2,
+    93,
+    16
+   ]
+  },
+  {
+   "zone": "bowang",
+   "monster": 1006,
+   "count": 3,
+   "respawnTicks": 200,
+   "night": true,
+   "area": [
+    2,
+    17,
+    93,
+    44
+   ]
   }
  ]
 }

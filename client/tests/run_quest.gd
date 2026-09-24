@@ -1,6 +1,6 @@
 extends SceneTree
 # 任務系統測試 (Step 8, spec 06 §1~2): schema 驗證 / 時辰窗口 NPC / pre 條件 /
-# 新手任務鏈端到端 / 密醫服務 / 任務道具唔賣得 / 存檔 roundtrip / turnin/answer。
+# 新手任務鏈端到端 / 新野任務 (Step 11.7) / 密醫服務 / 任務道具唔賣得 / 存檔 roundtrip / turnin/answer。
 # 跑: Godot --headless --path client --script tests/run_quest.gd   (失敗 exit 1)
 
 var fails := 0
@@ -20,6 +20,7 @@ func _init() -> void:
 	t_reward_use(data)
 	t_turnin_answer(data)
 	t_roundtrip(data)
+	t_xinye_quests(data)
 	print("[TEST] quest: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -336,3 +337,32 @@ func _bag(ch: Dictionary, id: int) -> int:
 		if int(b["id"]) == id:
 			return int(b["n"])
 	return 0
+
+# ---------- 新野任務 (Step 11.7): 送公文去許昌 / 客棧收仙楂 ----------
+func t_xinye_quests(data: GameData) -> void:
+	var sim := Sim.new(data, 7)
+	var id := sim.spawn_player("t")
+	var ch: Dictionary = sim.player_ch()
+	for nid in ["xinye_clerk", "xinye_innkeeper", "xuchang_courier"]:
+		check(_npc_visible(sim, nid), "新野任務: %s 可見" % nid)
+	check(sim.map_id_at(int(data.quest_npcs["xinye_clerk"]["x"]), int(data.quest_npcs["xinye_clerk"]["y"])) == "xinye", "新野縣吏喺新野城")
+	var gold0 := int(ch["gold"])
+	_talk(sim, id, "xinye_clerk")
+	check(int(ch["quests"]["xinye_letter"]["stage"]) == 1, "公文: stage 1 (去許昌)")
+	_talk(sim, id, "xinye_clerk")
+	check(int(ch["quests"]["xinye_letter"]["stage"]) == 1, "公文: 未交驛丞再搵縣吏唔推進")
+	_talk(sim, id, "xuchang_courier")
+	check(int(ch["quests"]["xinye_letter"]["stage"]) == 2, "公文: 驛丞蓋印 stage 2")
+	_talk(sim, id, "xinye_clerk")
+	check(bool(ch["questDone"].get("xinye_letter", false)), "公文: 完成")
+	check(int(ch["gold"]) == gold0 + 120, "公文: +120 金")
+	# 客棧缺貨: 交 8 粒仙楂
+	_talk(sim, id, "xinye_innkeeper")
+	check(int(ch["quests"]["xinye_inn"]["stage"]) == 1, "客棧缺貨: stage 1 (收集)")
+	RulesShop.add_item(ch["bag"], 29038, 5)
+	sim.cmd_quest_turnin(id, "xinye_inn")
+	check(not bool(ch["questDone"].get("xinye_inn", false)), "客棧缺貨: 唔夠 8 粒交唔到")
+	RulesShop.add_item(ch["bag"], 29038, 3)
+	sim.cmd_quest_turnin(id, "xinye_inn")
+	check(bool(ch["questDone"].get("xinye_inn", false)) and _bag_n(sim, id, 29038) == 0, "客棧缺貨: 交齊完成 + 扣仙楂")
+	check(_bag_n(sim, id, 29043) >= 5, "客棧缺貨: 獎勵回血草 ×5")

@@ -17,7 +17,8 @@ var item_ids: Dictionary = {}    # item id -> true
 var names: Dictionary = {}       # item id -> 名
 var cats: Dictionary = {}        # item id -> cat (物品分類, 市場用)
 var info: Dictionary = {}        # item id -> {cat_label, req_lv, effects:[{label, value}]}  UI 物品詳情用
-var inn: Dictionary = {}
+var inn: Dictionary = {}          # 新手城 (許昌) 客棧 = 出生/復活預設點
+var inns: Array = []              # 所有客棧 (inn + shops.json inns)，死亡返最近嗰間 (Step 11.7)
 var shops: Array = []
 var world: Dictionary = {}        # clock/cities/market/disasters (data/world.json)
 var facilities: Dictionary = {}   # 練兵場/私塾/寺廟 (data/facilities.json)
@@ -106,6 +107,9 @@ static func load_all() -> GameData:
 	g.spawns = m["spawns"]
 	g.starter = c["starter"]
 	g.inn = sh["inn"]
+	g.inn["id"] = String(g.inn.get("id", "xuchang"))
+	g.inn["name"] = String(g.inn.get("name", "客棧"))
+	g.inns = [g.inn] + sh.get("inns", [])
 	g.shops = sh["shops"]
 	for c_ in g.world["cities"]:
 		g.cities[c_.id] = c_
@@ -211,7 +215,8 @@ func place(o: Dictionary) -> void:
 
 
 func _place_all() -> void:
-	place(inn)
+	for x in inns:
+		place(x)
 	for s in shops:
 		place(s)
 	for k in facilities:

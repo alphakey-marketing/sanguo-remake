@@ -5,9 +5,10 @@ func cmd_rest(id: int) -> void:
 	var e := ent(id)
 	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
 		return
-	var cost := int(data.inn["restCost"])
-	if not _near(e, inn_pos.x, inn_pos.y):
+	var inn := _inn_near(e)
+	if inn.is_empty():
 		return _msg(id, "要喺客棧附近先可以休息")
+	var cost := int(inn["restCost"])
 	var ch: Dictionary = e["ch"]
 	if int(ch["gold"]) < cost:
 		return _msg(id, "住宿要 %d 金" % cost)
@@ -15,6 +16,13 @@ func cmd_rest(id: int) -> void:
 	_full_heal(ch)
 	_sync_stats(e)
 	_msg(id, "休息完畢，花 %d 金" % cost)
+
+
+func _inn_near(e: Dictionary) -> Dictionary:
+	for x in data.inns:
+		if _near(e, int(x["x"]), int(x["y"])):
+			return x
+	return {}
 
 
 func _shop_for(e: Dictionary) -> Dictionary:

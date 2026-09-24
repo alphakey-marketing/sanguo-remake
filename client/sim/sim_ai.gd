@@ -107,6 +107,8 @@ func _think_player(p: Dictionary) -> void:
 	if p.has("casting"):
 		_resolve_cast(p)
 		return
+	if int(p["atk_target"]) == 0 and p.has("goto") and int(p["hp"]) > 0 and not RulesSpell.blocks_move(p["ch"].get("status", {}), tick):
+		_goto_tick(p)                # 大地圖自動尋路 (Step 11.7)
 	if int(p["atk_target"]) == 0 or not p.has("ch"):
 		return
 	var t := ent(int(p["atk_target"]))

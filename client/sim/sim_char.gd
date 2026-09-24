@@ -196,7 +196,18 @@ func cmd_submit_quiz(id: int, answers: Array) -> void:
 		ch["quizAnswers"].append(int(a))
 	_emit({"k": "quiz", "src": id, "ideology": str(res["ideology"])})
 	_msg(id, "理念測驗完成：你嘅理念係「%s」" % str(res["ideology"]))
+# 玩家手動行 (搖桿/撳地) = 取消自動尋路
 func cmd_move(id: int, x: int, y: int) -> void:
+	var e := ent(id)
+	if not e.is_empty() and e.has("goto") and is_free(x, y):
+		e.erase("goto")
+		if e["kind"] == "player":
+			_msg(id, "取消自動尋路")
+	_move(id, x, y)
+
+
+# 行去 (x,y): 直線唔通就 A* (spec 12 §3)；自動尋路/居民路由都用呢個
+func _move(id: int, x: int, y: int, cap: int = 0) -> void:
 	var e := ent(id)
 	if e.is_empty() or not is_free(x, y):
 		return
@@ -210,7 +221,8 @@ func cmd_move(id: int, x: int, y: int) -> void:
 		if e["kind"] == "player":
 			_msg(id, "移動取消咗吟唱")
 		_emit({"k": "cast_interrupted", "dst": id, "reason": "move"})
-	var cap := mini(PATH_CAP, 200 + 40 * (absi(x - int(e["x"])) + absi(y - int(e["y"]))))   # 近路唔使大搜
+	if cap <= 0:
+		cap = mini(PATH_CAP, 200 + 40 * (absi(x - int(e["x"])) + absi(y - int(e["y"]))))   # 近路唔使大搜
 	_set_dest(e, x, y, cap)
 	e["atk_target"] = 0      # 手動行路取消攻擊
 
@@ -283,8 +295,72 @@ func _route_to_map(e: Dictionary, map_id: String) -> bool:
 	if int(e["x"]) == px and int(e["y"]) == py:
 		cmd_travel(int(e["id"]), String(hop["id"]))
 	elif int(e["tx"]) != px or int(e["ty"]) != py:
-		cmd_move(int(e["id"]), px, py)
+		_move(int(e["id"]), px, py, PATH_CAP)      # 門口可能好遠 (成張圖)
 	return true
+
+
+# 大地圖撳城 = 自動尋路 (spec 12 §1 B2): 記低目的地圖，_think_player 每 tick 經 _route_to_map 行；
+# 手動行 (cmd_move)/死亡 = 取消；打緊怪暫停，打完繼續
+func cmd_goto_map(id: int, map_id: String) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var md: Dictionary = data.map_by_id.get(map_id, {})
+	if md.is_empty():
+		return
+	var cur := map_id_at(int(e["x"]), int(e["y"]))
+	if cur == map_id:
+		e.erase("goto")
+		return _msg(id, "你已經喺%s" % md["name"])
+	if next_portal(cur, map_id).is_empty():
+		return _msg(id, "去唔到%s" % md["name"])
+	e["goto"] = map_id
+	e["atk_target"] = 0
+	_msg(id, "自動尋路：前往%s（行一步就取消）" % md["name"])
+
+
+# 自動尋路每 tick: 到咗 = 清；返 true = 仲喺路上
+func _goto_tick(e: Dictionary) -> bool:
+	var goal := String(e.get("goto", ""))
+	if goal == "":
+		return false
+	if _route_to_map(e, goal):
+		return true
+	e.erase("goto")
+	if map_id_at(int(e["x"]), int(e["y"])) == goal:
+		_emit({"k": "goto_done", "dst": int(e["id"]), "map": goal})
+		_msg(int(e["id"]), "已到達%s" % String(data.map_by_id[goal]["name"]))
+	return false
+
+
+# 兩張地圖之間最少過幾次圖 (BFS；-1 = 去唔到)
+func map_hops(from_map: String, to_map: String) -> int:
+	var dist := {from_map: 0}
+	var q: Array = [from_map]
+	while not q.is_empty():
+		var m: String = q.pop_front()
+		if m == to_map:
+			return int(dist[m])
+		for p in data.travel_points:
+			if String(p["map"]) != m:
+				continue
+			var nm := String(travel_point_by_id(String(p["to"])).get("map", ""))
+			if nm != "" and not dist.has(nm):
+				dist[nm] = int(dist[m]) + 1
+				q.append(nm)
+	return -1
+
+
+# 最近嘅客棧 (過圖次數最少；同分 = data.inns 先嗰間，即許昌)
+func nearest_inn(map_id: String) -> Dictionary:
+	var best: Dictionary = data.inn
+	var bd := 1 << 30
+	for x in data.inns:
+		var d := map_hops(map_id, String(x["map"]))
+		if d >= 0 and d < bd:
+			bd = d
+			best = x
+	return best
 
 
 # 由 from_map 去 to_map 嘅第一個傳送點 (BFS，傳送點次序固定 → 決定性)
