@@ -1,5 +1,5 @@
 {
- "_note": "地圖世界 (spec 12)【自訂】。每張地圖 = data/maps/<id>.txt (一字元一格)，放喺全域格仔 (ox,oy)；地圖之間留空 = 行唔到。其他數據檔寫 map + 地圖內座標，GameData 載入時轉全域。legend.walk = 行得。areas = 地圖內命名區 (HUD 區名橫幅)。landmarks = 史蹟地標 (第一次行近彈典故)。world = 大地圖 (天下) 節點，map=null = 未開放 (B2/B3)。",
+ "_note": "地圖世界 (spec 12)【自訂】。每張地圖 = data/maps/<id>.txt (一字元一格)，放喺全域格仔 (ox,oy)；地圖之間留空 = 行唔到。其他數據檔寫 map + 地圖內座標，GameData 載入時轉全域。legend.walk = 行得。areas = 地圖內命名區 (HUD 區名橫幅)。landmarks = 史蹟地標 (第一次行近彈典故)。world = 大地圖 (天下) 節點，map=null = 未開放 (B3)。",
  "legend": {
   ".": {
    "name": "草地",
@@ -228,6 +228,176 @@
    "oy": 150,
    "safe": false,
    "kind": "cave"
+  },
+  {
+   "id": "runan_road",
+   "name": "汝南道",
+   "ox": 224,
+   "oy": 0,
+   "safe": false,
+   "kind": "field",
+   "areas": [
+    {
+     "name": "汝南賊寨",
+     "x0": 74,
+     "y0": 24,
+     "x1": 88,
+     "y1": 34
+    },
+    {
+     "name": "汝南山口",
+     "x0": 76,
+     "y0": 2,
+     "x1": 94,
+     "y1": 16
+    },
+    {
+     "name": "汝水渡",
+     "x0": 36,
+     "y0": 2,
+     "x1": 50,
+     "y1": 37
+    },
+    {
+     "name": "汝南道",
+     "x0": 0,
+     "y0": 0,
+     "x1": 95,
+     "y1": 39
+    }
+   ]
+  },
+  {
+   "id": "kunyang",
+   "name": "昆陽",
+   "ox": 340,
+   "oy": 0,
+   "safe": false,
+   "kind": "field",
+   "areas": [
+    {
+     "name": "昆陽故城",
+     "x0": 34,
+     "y0": 43,
+     "x1": 60,
+     "y1": 61
+    },
+    {
+     "name": "滍水北岸",
+     "x0": 0,
+     "y0": 0,
+     "x1": 89,
+     "y1": 30
+    },
+    {
+     "name": "昆陽南郊",
+     "x0": 0,
+     "y0": 31,
+     "x1": 89,
+     "y1": 63
+    }
+   ]
+  },
+  {
+   "id": "wancheng_road",
+   "name": "宛城道",
+   "ox": 0,
+   "oy": 196,
+   "safe": false,
+   "kind": "field",
+   "areas": [
+    {
+     "name": "宛城東郊",
+     "x0": 0,
+     "y0": 0,
+     "x1": 28,
+     "y1": 49
+    },
+    {
+     "name": "淯水",
+     "x0": 29,
+     "y0": 0,
+     "x1": 38,
+     "y1": 49
+    },
+    {
+     "name": "淯水田莊",
+     "x0": 62,
+     "y0": 20,
+     "x1": 92,
+     "y1": 40
+    },
+    {
+     "name": "宛城道",
+     "x0": 39,
+     "y0": 0,
+     "x1": 95,
+     "y1": 49
+    }
+   ]
+  },
+  {
+   "id": "bowang",
+   "name": "博望坡",
+   "ox": 116,
+   "oy": 196,
+   "safe": false,
+   "kind": "field",
+   "areas": [
+    {
+     "name": "博望北林",
+     "x0": 0,
+     "y0": 0,
+     "x1": 95,
+     "y1": 16
+    },
+    {
+     "name": "博望坡",
+     "x0": 0,
+     "y0": 17,
+     "x1": 95,
+     "y1": 44
+    },
+    {
+     "name": "新野北郊",
+     "x0": 0,
+     "y0": 45,
+     "x1": 95,
+     "y1": 69
+    }
+   ]
+  },
+  {
+   "id": "xinye",
+   "name": "新野城",
+   "ox": 232,
+   "oy": 196,
+   "safe": true,
+   "kind": "city",
+   "city": "xinye",
+   "areas": [
+    {
+     "name": "新野縣衙",
+     "x0": 22,
+     "y0": 8,
+     "x1": 41,
+     "y1": 17
+    },
+    {
+     "name": "城南校場",
+     "x0": 27,
+     "y0": 33,
+     "x1": 36,
+     "y1": 40
+    },
+    {
+     "name": "新野市集",
+     "x0": 5,
+     "y0": 24,
+     "x1": 58,
+     "y1": 30
+    }
+   ]
   }
  ],
  "landmarks": [
@@ -274,7 +444,7 @@
    "y": 23,
    "r": 2,
    "name": "許昌驛亭",
-   "text": "驛路分岔：東行通汝南，南渡潁水往宛城、新野。（東、南兩路尚未開通）"
+   "text": "驛路分岔：東行通汝南道，南過潁水往昆陽、宛城、新野。"
   },
   {
    "id": "runan_mouth",
@@ -284,6 +454,60 @@
    "r": 3,
    "name": "汝南山洞",
    "text": "山洞往東南深入汝南郡界。鄉人話洞中聚咗山賊猛獸，最深處更有妖物作祟，唔好一個人去。"
+  },
+  {
+   "id": "runan_bandits",
+   "map": "runan_road",
+   "x": 80,
+   "y": 27,
+   "r": 3,
+   "name": "汝南賊寨",
+   "text": "建安五年（200），汝南黃巾劉辟等叛曹應袁紹，袁紹遣劉備引兵與劉辟會合，攻略許下。寨中至今仍聚住一班亡命之徒。"
+  },
+  {
+   "id": "kunyang_ruins",
+   "map": "kunyang",
+   "x": 45,
+   "y": 46,
+   "r": 4,
+   "name": "昆陽故城",
+   "text": "更始元年（23），劉秀以數千之眾守昆陽，大破王莽號稱百萬之軍。時雷電大風，屋瓦皆飛，莽軍赴滍水死者以萬數，滍水為之不流。"
+  },
+  {
+   "id": "yushui",
+   "map": "wancheng_road",
+   "x": 31,
+   "y": 14,
+   "r": 3,
+   "name": "淯水",
+   "text": "演義第十六回：曹操征張繡，繡降而復叛，夜襲曹營。典韋獨擋寨門，身被數十槍而死；長子曹昂、侄曹安民皆歿。操敗走淯水，後祭典韋而哭。"
+  },
+  {
+   "id": "wancheng_gate",
+   "map": "wancheng_road",
+   "x": 12,
+   "y": 14,
+   "r": 2,
+   "name": "宛城東門",
+   "text": "宛城，南陽郡治，荊北重鎮。城門緊閉，守軍喊話：「城中戒嚴，閒人免進！」（宛城尚未開放）"
+  },
+  {
+   "id": "bowang_po",
+   "map": "bowang",
+   "x": 45,
+   "y": 30,
+   "r": 4,
+   "name": "博望坡",
+   "text": "演義第三十九回：諸葛亮初出茅廬，於博望坡伏兵，「左有山名豫山，右有林名安林」。夏侯惇追入狹谷，蘆葦中火起，曹軍大敗。此乃孔明用兵第一功。"
+  },
+  {
+   "id": "xinye_yamen",
+   "map": "xinye",
+   "x": 31,
+   "y": 16,
+   "r": 3,
+   "name": "新野縣衙",
+   "text": "劉備依劉表，屯兵新野。徐庶化名單福投效，教破曹仁八門金鎖陣；後徐庶走馬薦諸葛，玄德三顧茅廬於隆中。"
   }
  ],
  "world": {
@@ -307,6 +531,14 @@
     "map": "field_1"
    },
    {
+    "id": "runan_road",
+    "name": "汝南道",
+    "province": "豫州",
+    "x": 0.76,
+    "y": 0.24,
+    "map": "runan_road"
+   },
+   {
     "id": "runan",
     "name": "汝南",
     "province": "豫州",
@@ -320,13 +552,21 @@
     "province": "豫州",
     "x": 0.48,
     "y": 0.4,
-    "map": null
+    "map": "kunyang"
+   },
+   {
+    "id": "wancheng_road",
+    "name": "宛城道",
+    "province": "荊州",
+    "x": 0.38,
+    "y": 0.48,
+    "map": "wancheng_road"
    },
    {
     "id": "wancheng",
     "name": "宛城",
     "province": "荊州",
-    "x": 0.3,
+    "x": 0.2,
     "y": 0.46,
     "map": null,
     "city": true
@@ -337,7 +577,7 @@
     "province": "荊州",
     "x": 0.36,
     "y": 0.58,
-    "map": null
+    "map": "bowang"
    },
    {
     "id": "xinye",
@@ -345,7 +585,7 @@
     "province": "荊州",
     "x": 0.3,
     "y": 0.7,
-    "map": null,
+    "map": "xinye",
     "city": true
    },
    {
@@ -385,14 +625,26 @@
    ],
    [
     "yingchuan",
+    "runan_road"
+   ],
+   [
+    "runan_road",
+    "runan"
+   ],
+   [
+    "yingchuan",
     "kunyang"
    ],
    [
     "kunyang",
+    "wancheng_road"
+   ],
+   [
+    "wancheng_road",
     "wancheng"
    ],
    [
-    "wancheng",
+    "wancheng_road",
     "bowang"
    ],
    [
@@ -610,6 +862,114 @@
    "x": 3,
    "y": 3,
    "to": "f9_down",
+   "auto": true
+  },
+  {
+   "id": "east_out",
+   "name": "東 → 汝南道",
+   "map": "field_1",
+   "x": 111,
+   "y": 24,
+   "to": "rr_west",
+   "auto": true
+  },
+  {
+   "id": "south_out",
+   "name": "南 → 昆陽",
+   "map": "field_1",
+   "x": 40,
+   "y": 83,
+   "to": "ky_north",
+   "auto": true
+  },
+  {
+   "id": "rr_west",
+   "name": "西 → 潁川郊外",
+   "map": "runan_road",
+   "x": 0,
+   "y": 20,
+   "to": "east_out",
+   "auto": true
+  },
+  {
+   "id": "rr_cave",
+   "name": "汝南山洞（後洞）",
+   "map": "runan_road",
+   "x": 87,
+   "y": 10,
+   "to": "cave_back",
+   "auto": true
+  },
+  {
+   "id": "cave_back",
+   "name": "後洞 → 汝南道",
+   "map": "runan_f1",
+   "x": 42,
+   "y": 13,
+   "to": "rr_cave",
+   "auto": true
+  },
+  {
+   "id": "ky_north",
+   "name": "北 → 潁川郊外",
+   "map": "kunyang",
+   "x": 45,
+   "y": 0,
+   "to": "south_out",
+   "auto": true
+  },
+  {
+   "id": "ky_west",
+   "name": "西 → 宛城道",
+   "map": "kunyang",
+   "x": 0,
+   "y": 40,
+   "to": "wc_east",
+   "auto": true
+  },
+  {
+   "id": "wc_east",
+   "name": "東 → 昆陽",
+   "map": "wancheng_road",
+   "x": 95,
+   "y": 14,
+   "to": "ky_west",
+   "auto": true
+  },
+  {
+   "id": "wc_south",
+   "name": "南 → 博望坡",
+   "map": "wancheng_road",
+   "x": 60,
+   "y": 49,
+   "to": "bw_north",
+   "auto": true
+  },
+  {
+   "id": "bw_north",
+   "name": "北 → 宛城道",
+   "map": "bowang",
+   "x": 48,
+   "y": 0,
+   "to": "wc_south",
+   "auto": true
+  },
+  {
+   "id": "bw_south",
+   "name": "南 → 新野城",
+   "map": "bowang",
+   "x": 48,
+   "y": 69,
+   "to": "xy_north",
+   "auto": true
+  },
+  {
+   "id": "xy_north",
+   "name": "北門 → 博望坡",
+   "map": "xinye",
+   "x": 31,
+   "y": 0,
+   "to": "bw_south",
    "auto": true
   }
  ]

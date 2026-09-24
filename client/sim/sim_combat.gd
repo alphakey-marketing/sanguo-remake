@@ -123,11 +123,13 @@ func _kill_player(p: Dictionary) -> void:
 	ch["status"] = {}
 	p.erase("casting")
 	ch.erase("fusing")
-	p["x"] = inn_pos.x
-	p["tx"] = inn_pos.x
-	p["y"] = inn_pos.y
-	p["ty"] = inn_pos.y
+	var inn := nearest_inn(map_id_at(int(p["x"]), int(p["y"])))    # 返最近客棧 (過圖次數最少) (Step 11.7)
+	p["x"] = int(inn["x"])
+	p["tx"] = int(inn["x"])
+	p["y"] = int(inn["y"])
+	p["ty"] = int(inn["y"])
 	p.erase("path")
+	p.erase("goto")
 	p["atk_target"] = 0
 	_sync_stats(p)
 	_emit({"k": "die", "dst": p["id"], "lost": lost})

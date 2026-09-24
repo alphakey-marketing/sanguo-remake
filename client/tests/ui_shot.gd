@@ -112,4 +112,13 @@ func _run() -> void:
 	await shot("panel_area")
 	(hud.panels["map"] as MapPanel).set_tab(1)
 	await shot("panel_world")
+	# B2 (Step 11.7): 新野城 / 博望坡 / 昆陽故城 / 宛城道淯水 + 天下頁揀新野
+	(hud.panels["map"] as MapPanel).select_node("xinye")
+	await shot("panel_world_xinye")
+	hud.close_panels()
+	for it in [["xinye", 31, 24, "map_xinye"], ["bowang", 46, 30, "map_bowang"], ["kunyang", 46, 44, "map_kunyang"], ["wancheng_road", 31, 16, "map_wancheng"], ["runan_road", 80, 22, "map_runan_road"]]:
+		var md: Dictionary = m.data.map_by_id[it[0]]
+		put(int(md["ox"]) + int(it[1]), int(md["oy"]) + int(it[2]))
+		await frames(10)
+		await shot(it[3])
 	get_tree().quit(0)

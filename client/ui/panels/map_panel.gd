@@ -2,9 +2,10 @@ class_name MapPanel
 extends GamePanel
 # 地圖面板 (spec 12 §6)。撳小地圖開。
 #   區域: 當前地圖全圖 + 地標/門口/設施/任務 NPC/自己；已到過嘅地標有名，未到過 = 「？」
-#   天下: 豫州荊州城池節點 + 路線；自己所在發光；未開放 = 灰 (B2/B3 開)
+#   天下: 豫州荊州城池節點 + 路線；自己所在發光；未開放 = 灰 (B3 開)；撳已開放節點 →「自動前往」(sim.cmd_goto_map)
 
 var _info := ""                  # 天下頁: 撳咗邊個節點嘅說明
+var _sel_map := ""               # 天下頁: 撳咗嘅已開放節點對應地圖 ("" = 冇 / 而家喺度)
 
 
 func _init(m: Node) -> void:
@@ -15,7 +16,7 @@ func _init(m: Node) -> void:
 
 func sig() -> String:
 	var me = main._me()
-	return JSON.stringify([tab, _info, main.cur_map.get("id", ""), int(me.x) if me != null else 0, int(me.y) if me != null else 0])
+	return JSON.stringify([tab, _info, _sel_map, main.cur_map.get("id", ""), int(me.x) if me != null else 0, int(me.y) if me != null else 0])
 
 
 func _build_body() -> void:
@@ -29,7 +30,11 @@ func _build_body() -> void:
 	else:
 		view.draw.connect(func() -> void: _draw_world(view))
 		view.gui_input.connect(func(ev: InputEvent) -> void: _world_tap(view, ev))
-		body.add_child(wrap_lbl(_info if _info != "" else "撳城池睇詳情。灰色 = 未開放（之後版本開通）", 13, UiTheme.DIM))
+		var row := HBoxContainer.new()
+		row.add_child(wrap_lbl(_info if _info != "" else "撳城池睇詳情。灰色 = 未開放（之後版本開通）", 13, UiTheme.DIM))
+		if _sel_map != "":
+			row.add_child(btn("自動前往", func() -> void: goto_sel(), 120))
+		body.add_child(row)
 
 
 # ---- 區域 ----
@@ -133,7 +138,42 @@ func _world_tap(view: Control, ev: InputEvent) -> void:
 	for n in main.data.world_map.get("nodes", []):
 		if _node_pos(view, n).distance_to(ev.position) <= 18:
 			var open: bool = n.get("map") != null
-			var md: Dictionary = main.data.map_by_id.get(String(n.map), {}) if open else {}
-			_info = "%s（%s）— %s" % [n.name, n.province, ("而家喺度" if String(n.id) == _here_node() else String(md.get("name", ""))) if open else "未開放"]
-			refresh(true)
+			select_node(String(n.id))
 			return
+
+
+# 揀節點: 顯示說明；已開放又唔喺度 = 可以自動前往
+func select_node(node_id: String) -> void:
+	for n in main.data.world_map.get("nodes", []):
+		if String(n.id) != node_id:
+			continue
+		var open: bool = n.get("map") != null
+		var here := String(n.id) == _here_node()
+		var md: Dictionary = main.data.map_by_id.get(String(n.map), {}) if open else {}
+		_info = "%s（%s）— %s" % [n.name, n.province, ("而家喺度" if here else String(md.get("name", ""))) if open else "未開放"]
+		if open:
+			_info += _lv_text(String(n.map))
+		_sel_map = String(n.map) if open and not here else ""
+		refresh(true)
+
+
+# 地圖怪物等級範圍 (洞窟當汝南成條計)；冇怪 = 安全
+func _lv_text(map_id: String) -> String:
+	var lo := 999
+	var hi := 0
+	for sp in main.data.spawns:
+		var z := String(sp["zone"])
+		if z == map_id or (map_id.begins_with("runan_f") and z.begins_with("runan_f")):
+			var lv := int(main.data.monsters[int(sp["monster"])]["level"])
+			lo = mini(lo, lv)
+			hi = maxi(hi, lv)
+	return "　（安全）" if hi == 0 else "　怪物 Lv%d~%d" % [lo, hi]
+
+
+func goto_sel() -> void:
+	if _sel_map == "":
+		return
+	main._send({"t": "goto_map", "map": _sel_map})
+	_sel_map = ""
+	_info = ""
+	main.hud.close_panels()

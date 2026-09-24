@@ -1,5 +1,6 @@
 extends SceneTree
 # 地圖世界測試 (spec 12 §7): 地圖檔格式 / 數據落點 / 連通 / A* / 自動過圖 / 跨圖路由 / 地標 / 存檔。
+# B2 (Step 11.7): 新地圖連通/傳送點成對 / 大地圖自動尋路 / 新野客棧/商店 / 死亡返最近客棧。
 # 跑: Godot --headless --path client --script tests/run_maps.gd   (失敗 exit 1)
 
 var fails := 0
@@ -21,6 +22,10 @@ func _init() -> void:
 	t_path_save(data)
 	t_art(data)
 	t_old_save(data)
+	t_b2_links(data)
+	t_goto(data)
+	t_goto_save(data)
+	t_xinye(data)
 	print("[TEST] maps: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -330,3 +335,129 @@ func t_old_save(data: GameData) -> void:
 	var m := b.ent(mid)
 	check(b.is_free(int(m["x"]), int(m["y"])) and b.map_id_at(int(m["x"]), int(m["y"])) == String(m["mob"]["zone"]), "舊存檔: 怪搬返自己地圖")
 	check(Sim.load_string(data, b.save_string()).save_string() == b.save_string(), "舊存檔: 修正後 roundtrip 一致")
+
+
+# B2: 傳送點成對、全部地圖由許昌去得、大地圖節點地圖存在、新野路線、博望南口新手友善
+func t_b2_links(data: GameData) -> void:
+	var sim := Sim.new(data, 1)
+	var bad := []
+	for p in data.travel_points:
+		var to := sim.travel_point_by_id(String(p["to"]))
+		if to.is_empty() or String(to["to"]) != String(p["id"]):
+			bad.append(p["id"])
+	check(bad.is_empty(), "傳送點全部成對 (%s)" % [bad])
+	for md in data.maps:
+		check(sim.map_hops("xuchang", String(md["id"])) >= 0, "由許昌去得 %s" % md["id"])
+	for n in data.world_map["nodes"]:
+		if n.get("map") != null:
+			check(data.map_by_id.has(String(n["map"])), "天下節點 %s 地圖存在" % n["id"])
+	for e in data.world_map["edges"]:
+		var ids: Array = data.world_map["nodes"].map(func(n): return String(n["id"]))
+		check(ids.has(String(e[0])) and ids.has(String(e[1])), "天下路線 %s 節點存在" % [e])
+	for mid in ["runan_road", "kunyang", "wancheng_road", "bowang", "xinye"]:
+		var nd: Array = data.world_map["nodes"].filter(func(n): return n.get("map") != null and String(n["map"]) == mid)
+		check(nd.size() == 1, "B2 %s 喺天下已開放" % mid)
+	check(sim.map_hops("xuchang", "xinye") == 5, "許昌 → 新野 過 5 次圖 (%d)" % sim.map_hops("xuchang", "xinye"))
+	check(String(sim.next_portal("xuchang", "xinye").get("id", "")) == "gate_out", "路由: 許昌 → 新野 第一跳 = 南門")
+	check(String(sim.next_portal("xinye", "xuchang").get("id", "")) == "xy_north", "路由: 新野 → 許昌 第一跳 = 北門")
+	check(String(sim.next_portal("runan_road", "runan_f1").get("id", "")) == "rr_cave", "路由: 汝南道 → 洞窟 = 後洞")
+	check(sim.map_hops("runan_f1", "runan_road") == 1, "洞窟 1F ↔ 汝南道 相連")
+	check(data.map_by_id["xinye"]["safe"] and not data.map_by_id["bowang"]["safe"], "新野安全、博望坡野區")
+	# 博望坡南口 (新野出城落地點) 6 格內只出 Lv≤2
+	var bs := sim.travel_point_by_id("bw_south")
+	for sp in data.spawns:
+		if String(sp["zone"]) != "bowang" or int(data.monsters[int(sp["monster"])]["level"]) <= 2:
+			continue
+		var a: Array = sp["area"]
+		var dx := maxi(0, maxi(int(a[0]) - int(bs["x"]), int(bs["x"]) - int(a[2])))
+		var dy := maxi(0, maxi(int(a[1]) - int(bs["y"]), int(bs["y"]) - int(a[3])))
+		check(maxi(dx, dy) > 6, "博望南口 6 格內冇 Lv3+ 怪 (%s)" % sp["monster"])
+
+
+# 大地圖自動尋路: 許昌 → 新野 (過 5 次圖)、行一步取消、同圖/未知地圖唔理
+func t_goto(data: GameData) -> void:
+	var sim := Sim.new(data, 21)
+	var id := sim.spawn_player("t")
+	var evs := []
+	sim.event_emitted.connect(func(ev: Dictionary) -> void:
+		if ev["k"] == "goto_done" or ev["k"] == "travel":
+			evs.append(ev))
+	sim.cmd_goto_map(id, "xinye")
+	check(String(sim.ent(id).get("goto", "")) == "xinye", "尋路: 設咗目的地")
+	var n := 0
+	while n < 3000 and sim.ent(id).has("goto"):
+		sim.step()
+		n += 1
+	var e := sim.ent(id)
+	check(sim.map_id_at(int(e["x"]), int(e["y"])) == "xinye", "尋路: 許昌 → 新野 到達 (%d tick, 而家 %s)" % [n, sim.map_id_at(int(e["x"]), int(e["y"]))])
+	check(not e.has("goto"), "尋路: 到咗清目的地")
+	var travels := evs.filter(func(v): return v["k"] == "travel")
+	check(travels.size() == 5, "尋路: 過 5 次圖 (%d)" % travels.size())
+	check(evs.size() > 0 and evs[-1]["k"] == "goto_done" and String(evs[-1]["map"]) == "xinye", "尋路: goto_done 事件")
+	# 返程再中途手動行 = 取消
+	sim.cmd_goto_map(id, "xuchang")
+	for i in 20:
+		sim.step()
+	var x := int(sim.ent(id)["x"])
+	var y := int(sim.ent(id)["y"])
+	sim.cmd_move(id, x, y)
+	check(not sim.ent(id).has("goto"), "尋路: 手動行 = 取消")
+	# 同一張圖 / 未知地圖 / 去唔到
+	sim.cmd_goto_map(id, sim.map_id_at(x, y))
+	check(not sim.ent(id).has("goto"), "尋路: 已經喺目的地圖 = 唔設")
+	sim.cmd_goto_map(id, "nowhere")
+	check(not sim.ent(id).has("goto"), "尋路: 未知地圖 = 唔設")
+	# 死亡取消
+	sim.cmd_goto_map(id, "runan_road")
+	sim._kill_player(sim.ent(id))
+	check(not sim.ent(id).has("goto"), "尋路: 死亡 = 取消")
+
+
+# 尋路中途存檔 → 讀返續行一致 (有怪有居民)
+func t_goto_save(data: GameData) -> void:
+	var a := Sim.new(data, 22)
+	a.init_mobs()
+	var id := a.spawn_player("t")
+	a.cmd_goto_map(id, "xinye")
+	for i in 150:
+		a.step()
+	check(a.ent(id).has("goto"), "尋路存檔: 行緊")
+	var s := a.save_string()
+	var b := Sim.load_string(data, s)
+	check(b != null and b.save_string() == s, "尋路存檔: roundtrip 一致")
+	for i in 300:
+		a.step()
+		b.step()
+	check(a.save_string() == b.save_string(), "尋路存檔: 讀檔後續行一致")
+
+
+# 新野: 客棧休息 / 商店買嘢 / 死亡返最近客棧
+func t_xinye(data: GameData) -> void:
+	var sim := Sim.new(data, 23)
+	var id := sim.spawn_player("t")
+	var ch: Dictionary = sim.ent(id)["ch"]
+	var inn: Dictionary = data.inns.filter(func(x): return String(x["id"]) == "xinye")[0]
+	check(sim.map_id_at(int(inn["x"]), int(inn["y"])) == "xinye", "新野客棧喺新野城")
+	_put(sim, id, int(inn["x"]), int(inn["y"]))
+	ch["gold"] = 100
+	sim.ent(id)["hp"] = 1
+	sim.cmd_rest(id)
+	check(int(ch["gold"]) == 100 - int(inn["restCost"]) and int(sim.ent(id)["hp"]) > 1, "新野客棧: 休息扣錢回血")
+	var shop: Dictionary = data.shops.filter(func(x): return String(x["id"]) == "weapon_xy")[0]
+	_put(sim, id, int(shop["x"]), int(shop["y"]))
+	ch["gold"] = 1000
+	var item := int(shop["stock"][0])
+	sim.cmd_buy(id, item, 1)
+	check(RulesShop.count_item(ch["bag"], item) >= 1 and int(ch["gold"]) < 1000, "新野武器店: 買到嘢")
+	# 死亡: 博望坡 → 新野客棧；潁川郊外 → 許昌客棧
+	var bw: Dictionary = data.map_by_id["bowang"]
+	_put(sim, id, int(bw["ox"]) + 48, int(bw["oy"]) + 30)
+	sim._kill_player(sim.ent(id))
+	check(int(sim.ent(id)["x"]) == int(inn["x"]) and int(sim.ent(id)["y"]) == int(inn["y"]), "死亡: 博望坡 → 返新野客棧")
+	_put(sim, id, 30, 30)
+	sim._kill_player(sim.ent(id))
+	check(int(sim.ent(id)["x"]) == sim.inn_pos.x and int(sim.ent(id)["y"]) == sim.inn_pos.y, "死亡: 潁川郊外 → 返許昌客棧")
+	var rr: Dictionary = data.map_by_id["runan_road"]
+	_put(sim, id, int(rr["ox"]) + 10, int(rr["oy"]) + 20)
+	sim._kill_player(sim.ent(id))
+	check(sim.map_id_at(int(sim.ent(id)["x"]), int(sim.ent(id)["y"])) == "xuchang", "死亡: 汝南道 → 返許昌客棧")

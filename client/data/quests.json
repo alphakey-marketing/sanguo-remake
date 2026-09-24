@@ -335,6 +335,77 @@
     "gold": 2000,
     "ultimate": "libashan"
    }
+  },
+  {
+   "id": "xinye_letter",
+   "name": "新野公文",
+   "type": "general",
+   "giver": "xinye_clerk",
+   "stages": [
+    {
+     "type": "talk",
+     "npc": "xinye_clerk",
+     "dialog": [
+      "新野縣吏：「呢封公文要即日送到許昌，交畀南門附近嘅驛丞。路經博望坡、宛城道、昆陽，一路小心！」"
+     ],
+     "hint": "同新野縣吏傾偈"
+    },
+    {
+     "type": "talk",
+     "npc": "xuchang_courier",
+     "dialog": [
+      "許昌驛丞：「新野嘅公文？辛苦晒。我喺回條度蓋個印，你帶返去畀縣吏。」"
+     ],
+     "hint": "去許昌南門附近搵驛丞交公文（大地圖撳許昌可以自動尋路）"
+    },
+    {
+     "type": "talk",
+     "npc": "xinye_clerk",
+     "dialog": [
+      "新野縣吏：「回條收到！做得好，呢啲係你嘅酬勞。」"
+     ],
+     "hint": "返新野交回條畀縣吏",
+     "done": true
+    }
+   ],
+   "reward": {
+    "exp": 300,
+    "gold": 120
+   }
+  },
+  {
+   "id": "xinye_inn",
+   "name": "客棧缺貨",
+   "type": "general",
+   "giver": "xinye_innkeeper",
+   "stages": [
+    {
+     "type": "talk",
+     "npc": "xinye_innkeeper",
+     "dialog": [
+      "新野客棧掌櫃：「酸梅湯賣斷市，仙楂用晒！博望坡啲田鼠山賊身上成日有仙楂，幫我攞 8 粒返嚟得唔得？」"
+     ],
+     "hint": "同新野客棧掌櫃傾偈"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 29038,
+      "n": 8
+     },
+     "hint": "去博望坡打田鼠/山賊收集仙楂 %v/%n，交畀掌櫃",
+     "done": true
+    }
+   ],
+   "reward": {
+    "gold": 80,
+    "items": [
+     [
+      29043,
+      5
+     ]
+    ]
+   }
   }
  ]
 }
