@@ -13,6 +13,16 @@ func _init() -> void:
 	t_level(data)
 	t_tier1_window(data)
 	t_general_talk(data)
+	t_survey_limits(data)
+	t_candidates(data)
+	t_arena_win(data)
+	t_arena_lose(data)
+	t_arena_fight(data)
+	t_arena_walk_away(data)
+	t_quiz(data)
+	t_quiz_fail(data)
+	t_save_roundtrip(data)
+	t_determinism(data)
 	print("[TEST] recruit scenarios: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -170,3 +180,302 @@ func t_general_talk(data: GameData) -> void:
 		if String(ev.get("k", "")) == "npc_say" and int(ev.get("general", 0)) == int(gd["id"]):
 			said = true
 	check(said and _last(msgs).contains("戰等"), "傾偈: 講對白 + 簡介")
+
+
+# ---------------- B: 調查 / 擂台 / 問答 ----------------
+# 開局: 許昌城內，巳時 (Tier1 大部分喺度)，指定等級/理念
+func _setup(data: GameData, lv: int, ideo: String, seed: int = 135) -> Array:
+	var r := _new(data, seed)
+	var sim: Sim = r[0]
+	var ch: Dictionary = r[2]
+	ch["level"] = lv
+	ch["ideology"] = ideo
+	_at(sim, 1, 40)
+	return r
+
+
+func _survey(sim: Sim, pid: int, kind: String) -> Array:
+	var out: Array = []
+	var cb := func(ev: Dictionary) -> void:
+		if String(ev.get("k", "")) == "recruit_survey":
+			out.append_array(ev["cands"])
+	sim.event_emitted.connect(cb)
+	sim.cmd_recruit_survey(pid, kind)
+	sim.event_emitted.disconnect(cb)
+	return out
+
+
+func _mob_of(sim: Sim, ch: Dictionary) -> Dictionary:
+	return sim.ent(int(ch.get("recruit", {}).get("pending", {}).get("mob", 0)))
+
+
+func t_survey_limits(data: GameData) -> void:
+	var r := _setup(data, 5, "義理")
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	var msgs: Array = r[3]
+	var inn := sim.nearest_inn("xuchang")
+	var z := sim.zone_by_id("field_1")
+	var fp := sim._free_near(int(z["x0"]) + 45, int(z["y0"]) + 20)
+	_put(sim, pid, fp.x, fp.y)
+	sim.cmd_recruit_survey(pid, "wen")
+	check(_last(msgs).contains("城池"), "調查: 野外唔得")
+	_put(sim, pid, int(inn["x"]), int(inn["y"]))
+	sim.cmd_recruit_survey(pid, "wen")
+	check(int(ch.get("recruit", {}).get("surveyDay", -1)) == 1, "調查: 城內 OK，記低日子")
+	sim.cmd_recruit_survey(pid, "wu")
+	check(_last(msgs).contains("今日已經調查"), "調查: 每日 1 次 (換類別都唔得)")
+	_at(sim, 2, 40)
+	sim.cmd_recruit_survey(pid, "wen")
+	check(int(ch["recruit"]["surveyDay"]) == 2, "調查: 第二日可以再調查")
+	ch["recruit"]["lockMonth"] = sim._month()
+	_at(sim, 3, 40)
+	sim.cmd_recruit_survey(pid, "wen")
+	check(_last(msgs).contains("今個月"), "調查: 成功嗰個月封鎖")
+	_at(sim, 30, 40)
+	sim.cmd_recruit_survey(pid, "wen")
+	check(int(ch["recruit"]["surveyDay"]) == 30, "調查: 下個月 (第 30 日) 解封")
+	sim.cmd_recruit_pick(pid, 999999)
+	check(_last(msgs).contains("要先調查"), "揀人: 唔喺候選 = 唔得")
+
+
+func t_candidates(data: GameData) -> void:
+	var r := _setup(data, 5, "義理")
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	var cands := _survey(sim, pid, "wen")
+	var cfg := data.recruit_cfg
+	var ok := not cands.is_empty()
+	var names := {}
+	var has_zhong := false
+	for c in cands:
+		var g: Dictionary = data.general_by_id[int(c["id"])]
+		ok = ok and RulesRecruit.check(g, ch, cfg) == "" and String(g["type"]) == "wen"
+		ok = ok and int(g["tier"]) >= 0 and (int(g["tier"]) == 1 or int(g["lv"]) >= 5 - int(cfg["poolBelow"]))
+		ok = ok and not names.has(String(g["name"]))
+		names[String(g["name"])] = true
+		if String(g["name"]) == "鍾繇":
+			has_zhong = true
+		if String(g["name"]) == "蔡邕":
+			ok = false          # 隱遁 唔喺義理可登表
+	check(ok, "候選: 全部過 check / 啱類別 / 冇同名 / 冇 tier -1")
+	check(has_zhong, "候選: 城內見到嘅 Tier1 (鍾繇 9 級治國) 入選")
+	check(cands.size() >= int(cfg["surveyMax"]), "候選: 登用池補夠 %d 個" % int(cfg["surveyMax"]))
+	# 同一日同一人 → 同一個結果；Tier1 唔見到就唔入
+	var vis := {}
+	var c2 := RulesRecruit.candidates(data.generals, ch, "wen", 1, vis, {}, cfg)
+	var c3 := RulesRecruit.candidates(data.generals, ch, "wen", 1, vis, {}, cfg)
+	var same := c2.size() == c3.size()
+	var any_t1 := false
+	for i in c2.size():
+		same = same and int(c2[i]["id"]) == int(c3[i]["id"])
+		any_t1 = any_t1 or int(c2[i]["tier"]) == 1
+	check(same and not any_t1, "候選: 可重現；Tier1 唔見到就唔入")
+	var c4 := RulesRecruit.candidates(data.generals, ch, "wen", 2, vis, {}, cfg)
+	var diff := false
+	for i in mini(c2.size(), c4.size()):
+		diff = diff or int(c2[i]["id"]) != int(c4[i]["id"])
+	check(diff, "候選: 唔同日子出唔同人")
+	var gone := {int(c2[0]["id"]): true}
+	var c5 := RulesRecruit.candidates(data.generals, ch, "wen", 1, vis, gone, cfg)
+	var still := false
+	for g in c5:
+		still = still or int(g["id"]) == int(c2[0]["id"])
+	check(not still, "候選: 走咗嘅人唔再出")
+
+
+# 高等玩家調查武將 → 揀第一個 → 擂台開始
+func _arena_setup(data: GameData, seed: int = 135) -> Array:
+	var r := _setup(data, 60, "義理", seed)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var cands := _survey(sim, pid, "wu")
+	check(not cands.is_empty(), "擂台: 60 級有武將候選")
+	sim.cmd_recruit_pick(pid, int(cands[0]["id"]))
+	r.append(int(cands[0]["id"]))
+	return r
+
+
+func t_arena_win(data: GameData) -> void:
+	var r := _arena_setup(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	var evs: Array = r[4]
+	var gid: int = r[5]
+	var m := _mob_of(sim, ch)
+	check(not m.is_empty() and bool(m["mob"].has("arena")) and int(sim.ent(pid)["atk_target"]) == int(m["id"]), "擂台: 生成臨時怪 + 自動鎖定")
+	check(String(ch["recruit"]["pending"]["kind"]) == "arena", "擂台: pending = arena")
+	var hp0 := int(m["hp"])
+	sim.damage(m, 50, {"id": -5, "kind": "bot", "ch": {}})
+	check(int(m["hp"]) == hp0, "擂台: 挑戰者以外打唔到")
+	sim.damage(m, 999999, sim.ent(pid))
+	check(sim.ent(int(m["id"])).is_empty(), "擂台: 打到 0 = 制服 (臨時怪收走)")
+	var comp := sim.ent(int(ch["recruit"].get("comp", 0)))
+	check(not comp.is_empty() and String(comp["kind"]) == "gen" and int(comp["gen"]["gid"]) == gid, "擂台贏: 生成同伴")
+	check(int(ch["recruit"]["lockMonth"]) == sim._month() and not ch["recruit"].has("pending"), "擂台贏: 封鎖本月 + 清 pending")
+	check(bool(sim.state["generals"][str(gid)]["serving"]), "擂台贏: 武將標記跟緊人")
+	var won := false
+	for ev in evs:
+		if String(ev.get("k", "")) == "recruit_result" and bool(ev["ok"]):
+			won = true
+	check(won, "擂台贏: recruit_result ok")
+	var cv := sim.companion_view()
+	check(int(cv.get("gid", 0)) == gid and int(cv["daysLeft"]) == int(data.recruit_cfg["serveDays"]) and int(cv["loyalty"]) >= 60,
+		"companion_view: gid / 30 日 / 忠誠")
+	sim.cmd_recruit_survey(pid, "wu")
+	check(_last(r[3]).contains("已經有人才"), "有同伴: 唔可以再調查")
+
+
+func t_arena_lose(data: GameData) -> void:
+	var r := _arena_setup(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	var evs: Array = r[4]
+	var gid: int = r[5]
+	var m := _mob_of(sim, ch)
+	var gold := int(ch["gold"])
+	sim.damage(sim.ent(pid), 999999, m)
+	var died := false
+	for ev in evs:
+		if String(ev.get("k", "")) == "die":
+			died = true
+	check(int(sim.ent(pid)["hp"]) == 1 and not died and int(ch["gold"]) == gold, "擂台輸: 留 1 HP，唔算死冇處分")
+	check(sim.ent(int(m["id"])).is_empty() and not ch["recruit"].has("pending") and int(ch["recruit"].get("comp", 0)) == 0, "擂台輸: 武將走人，冇同伴")
+	check(sim._general_away(gid), "擂台輸: 武將呢個月唔再出現")
+	sim.cmd_recruit_survey(pid, "wu")
+	check(_last(r[3]).contains("今日已經調查"), "擂台輸: 調查算用咗")
+
+
+# 真打: 60 級強化玩家喺城內 (安全區) 擂台照打得
+func t_arena_fight(data: GameData) -> void:
+	var r := _arena_setup(data, 7)
+	var sim: Sim = r[0]
+	var ch: Dictionary = r[2]
+	for k in ["str", "agi"]:
+		ch["attrs"][k] = 99
+	var m := _mob_of(sim, ch)
+	m["hp"] = mini(int(m["hp"]), 300)
+	for i in 600:
+		sim.step()
+		if not ch["recruit"].has("pending"):
+			break
+	check(int(ch["recruit"].get("comp", 0)) != 0, "擂台實戰: 安全區都打得，打贏收同伴")
+
+
+func t_arena_walk_away(data: GameData) -> void:
+	var r := _arena_setup(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	var e := sim.ent(pid)
+	var m := _mob_of(sim, ch)
+	var fp := sim._free_near(int(e["x"]) + 20, int(e["y"]))
+	_put(sim, int(m["id"]), fp.x, fp.y)
+	sim.step()
+	check(not ch["recruit"].has("pending") and int(ch["recruit"].get("comp", 0)) == 0, "擂台: 走甩 (>12 格) = 輸")
+
+
+# 文官問答: 5 級義理調查文官 → 揀鍾繇
+func _quiz_setup(data: GameData, seed: int = 135) -> Array:
+	var r := _setup(data, 5, "義理", seed)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var gid := 0
+	for c in _survey(sim, pid, "wen"):
+		if String(c["name"]) == "鍾繇":
+			gid = int(c["id"])
+	sim.cmd_recruit_pick(pid, gid)
+	r.append(gid)
+	return r
+
+
+func _answer(sim: Sim, pid: int, right: bool) -> void:
+	var qv := sim.recruit_quiz_view()
+	var q: Dictionary = {}
+	for x in sim.data.quiz_generals:
+		if String(x["q"]) == String(qv["q"]):
+			q = x
+	sim.cmd_recruit_answer(pid, int(q["a"]) if right else (int(q["a"]) + 1) % 4)
+
+
+func t_quiz(data: GameData) -> void:
+	var r := _quiz_setup(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	var gid: int = r[5]
+	var qv := sim.recruit_quiz_view()
+	check(int(qv.get("n", 0)) == 10 and int(qv["i"]) == 0 and (qv["opts"] as Array).size() == 4, "問答: 10 題，每題 4 選項")
+	var seen := {}
+	for q in ch["recruit"]["pending"]["qs"]:
+		seen[int(q)] = true
+	check(seen.size() == 10, "問答: 10 題唔重複")
+	_answer(sim, pid, false)
+	_answer(sim, pid, false)
+	for i in 8:
+		_answer(sim, pid, true)
+	check(int(ch["recruit"].get("comp", 0)) != 0 and int(sim.ent(int(ch["recruit"]["comp"]))["gen"]["gid"]) == gid, "問答: 錯 2 啱 8 = 過關登用")
+
+
+func t_quiz_fail(data: GameData) -> void:
+	var r := _quiz_setup(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	var gid: int = r[5]
+	for i in 3:
+		_answer(sim, pid, i != 1)
+	check(ch["recruit"].has("pending"), "問答: 錯 1 題未完")
+	_answer(sim, pid, false)
+	_answer(sim, pid, false)
+	check(not ch["recruit"].has("pending") and int(ch["recruit"].get("comp", 0)) == 0, "問答: 錯第 3 題即刻失敗")
+	check(sim._general_away(gid), "問答失敗: 文官呢個月走人")
+	check(sim.recruit_quiz_view().is_empty(), "問答失敗: 冇題目")
+	var r2 := _quiz_setup(data, 8)
+	var sim2: Sim = r2[0]
+	sim2.cmd_recruit_cancel(int(r2[1]))
+	check(not r2[2]["recruit"].has("pending") and sim2._general_away(int(r2[5])), "問答: 放棄 = 失敗")
+
+
+func t_save_roundtrip(data: GameData) -> void:
+	var r := _quiz_setup(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	_answer(sim, pid, true)
+	var s1 := sim.save_string()
+	var loaded := Sim.load_string(data, s1)
+	check(loaded.save_string() == s1, "存檔: 問答中 save→load→save 一致")
+	check(int(loaded.recruit_quiz_view().get("i", -1)) == 1, "存檔: 問答進度保留")
+	for i in 9:
+		_answer(loaded, pid, true)
+	check(int(loaded.player_ch()["recruit"].get("comp", 0)) != 0, "存檔: 讀返之後答完登用")
+	var s2 := loaded.save_string()
+	var l2 := Sim.load_string(data, s2)
+	check(l2.save_string() == s2 and not l2.companion_view().is_empty(), "存檔: 有同伴 roundtrip")
+	var ra := _arena_setup(data)
+	var s3: String = ra[0].save_string()
+	var l3 := Sim.load_string(data, s3)
+	check(l3.save_string() == s3, "存檔: 擂台中 roundtrip")
+	l3.step()
+	check(not _mob_of(l3, l3.player_ch()).is_empty(), "存檔: 讀返擂台繼續")
+
+
+func _run_seq(data: GameData) -> String:
+	var r := _quiz_setup(data, 99)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	for i in 10:
+		if sim.recruit_quiz_view().is_empty():
+			break
+		_answer(sim, pid, i % 5 != 0)
+	for i in 50:
+		sim.step()
+	return sim.save_string()
+
+
+func t_determinism(data: GameData) -> void:
+	check(_run_seq(data) == _run_seq(data), "決定性: 同種子同結果")
