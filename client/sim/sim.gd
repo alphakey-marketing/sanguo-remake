@@ -111,6 +111,7 @@ func step() -> void:
 	state["tick"] = tick + 1
 	_advance_clock()
 	BotSys.think(self)
+	_recruit_tick()             # 擂台勝負 (Step 13.5)
 	for id in ents.keys():
 		var e: Dictionary = ents.get(id, {})
 		if e.is_empty():
@@ -163,7 +164,7 @@ func view_ents() -> Array:
 			if int(st_all[k]) > tick:
 				st_vis.append(str(k))
 		out.append({"id": e["id"], "name": e["name"], "x": e["x"], "y": e["y"], "face": e["face"],
-			"bot": e["kind"] == "bot", "hp": e["hp"], "maxHp": e["max_hp"], "level": e["level"], "mob": e["kind"] == "mob",
+			"bot": e["kind"] == "bot", "gen": e["kind"] == "gen", "hp": e["hp"], "maxHp": e["max_hp"], "level": e["level"], "mob": e["kind"] == "mob",
 			"statuses": st_vis, "casting": e.has("casting"),
 			"aggro": int(e["mob"]["target"]) if e["kind"] == "mob" and e["mob"]["state"] == "chase" else 0})   # 怪追緊邊個
 	return out

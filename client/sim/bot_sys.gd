@@ -48,7 +48,7 @@ static func think(sim) -> void:
 		var best := 0
 		var best_d := 1 << 30
 		for m in sim.ents.values():
-			if m["kind"] != "mob" or int(m["level"]) > int(ch["level"]) + 2:
+			if m["kind"] != "mob" or int(m["level"]) > int(ch["level"]) + 2 or m["mob"].has("arena"):
 				continue
 			var d := maxi(absi(int(m["x"]) - int(e["x"])), absi(int(m["y"]) - int(e["y"])))
 			if d > 14 or d >= best_d or sim.map_id_at(int(m["x"]), int(m["y"])) != my_map:

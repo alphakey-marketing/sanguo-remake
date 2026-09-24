@@ -64,7 +64,8 @@ static func survey_block(rec: Dictionary, day: int, month: int) -> String:
 
 # 候選排序 key: 每日唔同 (同一日調查結果一樣，可重現)
 static func _order_key(gid: int, day: int) -> int:
-	return ((gid * 2654435761) ^ (day * 40503)) & 0x7FFFFFFF
+	var h := ((gid * 73856093) ^ (day * 19349663)) & 0x7FFFFFFF
+	return (h * 2654435761) & 0x7FFFFFFF       # 再乘一次: 日子差 1 都會洗牌 (h < 2^31 → 唔會溢位)
 
 
 # 調查候選 (spec 09 §3.2)
