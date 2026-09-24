@@ -1,6 +1,7 @@
 extends SceneTree
 # 地圖世界測試 (spec 12 §7): 地圖檔格式 / 數據落點 / 連通 / A* / 自動過圖 / 跨圖路由 / 地標 / 存檔。
 # B2 (Step 11.7): 新地圖連通/傳送點成對 / 大地圖自動尋路 / 新野客棧/商店 / 死亡返最近客棧。
+# B2.5 (Step 16 前置): 陳留/于毒山寨/小沛/汝南城/丁府/宛城/荊州地界/港口/樊城/漢水渡口/襄陽/監獄/長沙。
 # 跑: Godot --headless --path client --script tests/run_maps.gd   (失敗 exit 1)
 
 var fails := 0
@@ -26,6 +27,8 @@ func _init() -> void:
 	t_goto(data)
 	t_goto_save(data)
 	t_xinye(data)
+	t_b25(data)
+	t_b25_goto(data)
 	print("[TEST] maps: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -460,4 +463,106 @@ func t_xinye(data: GameData) -> void:
 	var rr: Dictionary = data.map_by_id["runan_road"]
 	_put(sim, id, int(rr["ox"]) + 10, int(rr["oy"]) + 20)
 	sim._kill_player(sim.ent(id))
-	check(sim.map_id_at(int(sim.ent(id)["x"]), int(sim.ent(id)["y"])) == "xuchang", "死亡: 汝南道 → 返許昌客棧")
+	check(sim.map_id_at(int(sim.ent(id)["x"]), int(sim.ent(id)["y"])) == "runan_city", "死亡: 汝南道 → 返汝南客棧 (B2.5)")
+
+
+# B2.5: 新地圖開放 / 路線過圖數 / 室內 parent / 新城客棧+商店 / 死亡返最近客棧 / 怪等級帶
+func t_b25(data: GameData) -> void:
+	var sim := Sim.new(data, 24)
+	var new_maps := ["chenliu", "yudu", "xiaopei", "runan_city", "ding_fu", "wancheng", "jingzhou",
+		"gangkou", "fancheng", "hanshui", "xiangyang", "xy_prison", "changsha"]
+	for mid in new_maps:
+		check(data.map_by_id.has(mid), "B2.5 地圖存在: %s" % mid)
+		var md: Dictionary = data.map_by_id.get(mid, {})
+		if String(md.get("kind", "")) == "house":
+			check(data.map_by_id.has(String(md.get("parent", ""))) and bool(md["safe"]), "室內 %s: 有 parent + 安全" % mid)
+		else:
+			var nd: Array = data.world_map["nodes"].filter(func(n): return n.get("map") != null and String(n["map"]) == mid)
+			check(nd.size() == 1, "B2.5 %s 喺天下已開放" % mid)
+	var hops := {"chenliu": 1, "yudu": 2, "xiaopei": 2, "runan_city": 3, "ding_fu": 4, "wancheng": 4}
+	for mid in hops:
+		check(sim.map_hops("xuchang", mid) == int(hops[mid]), "許昌 → %s 過 %d 次圖 (%d)" % [mid, hops[mid], sim.map_hops("xuchang", mid)])
+	var hops2 := {"jingzhou": 1, "gangkou": 2, "fancheng": 1, "hanshui": 2, "xiangyang": 3, "xy_prison": 4, "changsha": 4}
+	for mid in hops2:
+		check(sim.map_hops("xinye", mid) == int(hops2[mid]), "新野 → %s 過 %d 次圖 (%d)" % [mid, hops2[mid], sim.map_hops("xinye", mid)])
+	check(sim.map_hops("xuchang", "xinye") == 5, "許昌 → 新野 仍然 5 次")
+	check(String(sim.next_portal("xuchang", "chenliu").get("id", "")) == "gate_north", "路由: 許昌 → 陳留 = 北門")
+	check(String(sim.next_portal("xinye", "gangkou").get("id", "")) == "xy_west", "路由: 新野 → 港口 = 西門")
+	check(String(sim.next_portal("xinye", "xiangyang").get("id", "")) == "xy_south", "路由: 新野 → 襄陽 = 南門")
+	check(String(sim.next_portal("runan_road", "runan_f1").get("id", "")) == "rr_cave", "路由: 汝南道 → 洞窟 仍然 = 後洞")
+	# 新城客棧休息 + 武器店買嘢
+	var id := sim.spawn_player("t")
+	var ch: Dictionary = sim.ent(id)["ch"]
+	for iid in ["runan", "wancheng", "xiangyang"]:
+		var inn: Dictionary = data.inns.filter(func(x): return String(x["id"]) == iid)[0]
+		_put(sim, id, int(inn["x"]), int(inn["y"]))
+		ch["gold"] = 100
+		sim.ent(id)["hp"] = 1
+		sim.cmd_rest(id)
+		check(int(ch["gold"]) == 100 - int(inn["restCost"]) and int(sim.ent(id)["hp"]) > 1, "%s: 休息扣錢回血" % inn["name"])
+	for sid in ["weapon_rn", "armor_wc", "weapon_xyc"]:
+		var shop: Dictionary = data.shops.filter(func(x): return String(x["id"]) == sid)[0]
+		_put(sim, id, int(shop["x"]), int(shop["y"]))
+		ch["gold"] = 1000
+		var item := int(shop["stock"][0])
+		var before := RulesShop.count_item(ch["bag"], item)
+		sim.cmd_buy(id, item, 1)
+		check(RulesShop.count_item(ch["bag"], item) == before + 1 and int(ch["gold"]) < 1000, "%s: 買到嘢" % shop["name"])
+	# 死亡返最近客棧
+	var deaths := {"chenliu": "xuchang", "yudu": "xuchang", "gangkou": "xinye", "fancheng": "xinye",
+		"hanshui": "xiangyang", "wancheng_road": "wancheng", "ding_fu": "runan_city"}
+	for mid in deaths:
+		var md: Dictionary = data.map_by_id[mid]
+		var spot := Vector2i(-1, -1)
+		for y in int(md["h"]):
+			for x in int(md["w"]):
+				if spot.x < 0 and sim.is_free(int(md["ox"]) + x, int(md["oy"]) + y):
+					spot = Vector2i(int(md["ox"]) + x, int(md["oy"]) + y)
+		_put(sim, id, spot.x, spot.y)
+		sim._kill_player(sim.ent(id))
+		var at := sim.map_id_at(int(sim.ent(id)["x"]), int(sim.ent(id)["y"]))
+		check(at == String(deaths[mid]), "死亡: %s → 返 %s 客棧 (%s)" % [mid, deaths[mid], at])
+	# 怪物等級帶: 陳留 9~20、山寨 11~14、荊州地界 9~11、港口 12~15、樊城 11~14、漢水 16~20；城/室內冇怪
+	var bands := {"chenliu": [9, 20], "yudu": [11, 14], "jingzhou": [9, 11], "gangkou": [12, 15], "fancheng": [11, 14], "hanshui": [16, 20]}
+	for mid in new_maps:
+		var lvs: Array = []
+		for sp in data.spawns:
+			if String(sp["zone"]) == mid:
+				lvs.append(int(data.monsters[int(sp["monster"])]["level"]))
+		if bands.has(mid):
+			check(not lvs.is_empty() and lvs.min() >= int(bands[mid][0]) and lvs.max() <= int(bands[mid][1]),
+				"%s 怪 Lv%d~%d (%s)" % [mid, bands[mid][0], bands[mid][1], lvs])
+		else:
+			check(lvs.is_empty() and bool(data.map_by_id[mid]["safe"]), "%s 安全冇怪" % mid)
+	# 新怪有掉落 (導入自原版表)
+	for mid_ in [11072, 11069, 27248, 27005, 27008]:
+		var m: Dictionary = data.monsters.get(mid_, {})
+		check(not m.is_empty() and (m.get("drops", []).size() + m.get("rareDrops", []).size()) > 0, "新怪 %d 有掉落" % mid_)
+	# 港口東北口 (入口落地) 6 格內冇怪 spawn 區
+	var gk := sim.travel_point_by_id("gk_ne")
+	for sp in data.spawns:
+		if String(sp["zone"]) != "gangkou":
+			continue
+		var a: Array = sp["area"]
+		var dx := maxi(0, maxi(int(a[0]) - int(gk["x"]), int(gk["x"]) - int(a[2])))
+		var dy := maxi(0, maxi(int(a[1]) - int(gk["y"]), int(gk["y"]) - int(a[3])))
+		check(maxi(dx, dy) > 2, "港口入口 2 格內冇 spawn 區 (%s)" % sp["monster"])
+
+
+# B2.5 大地圖自動尋路: 許昌 → 襄陽 (8 次過圖)、新野 → 港口、許昌 → 小沛
+func t_b25_goto(data: GameData) -> void:
+	for pair in [["xuchang", "xiangyang", 8], ["xuchang", "xiaopei", 2], ["xuchang", "yudu", 2]]:
+		var sim := Sim.new(data, 25)
+		var id := sim.spawn_player("t")
+		var n_travel := [0]
+		sim.event_emitted.connect(func(ev: Dictionary) -> void:
+			if ev["k"] == "travel":
+				n_travel[0] += 1)
+		sim.cmd_goto_map(id, String(pair[1]))
+		var n := 0
+		while n < 12000 and sim.ent(id).has("goto"):
+			sim.step()
+			n += 1
+		var e := sim.ent(id)
+		check(sim.map_id_at(int(e["x"]), int(e["y"])) == String(pair[1]), "尋路: 許昌 → %s 到達 (%d tick)" % [pair[1], n])
+		check(n_travel[0] == int(pair[2]), "尋路: 許昌 → %s 過 %d 次圖 (%d)" % [pair[1], pair[2], n_travel[0]])

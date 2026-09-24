@@ -1,5 +1,5 @@
 {
- "_note": "第一批 5 種 1~10 級野區怪 + 3 隻術法怪 (Step 9) + 絕招 boss (Step 10) +Step 11 導入 (spec 11 §2): npc_drops.csv rate→p (rate/100000)，p≥0.05 入 drops、p<0.05 入 rareDrops。levels/hp/atk/exp 數值 = spec 04 §1 等級帶模板【自訂】(npc_id 確定性抖動 ±20%)。boss=true → 每日重生一次 (spec 04 §3)；groups=true 群居 / flee=false 唔逃走 (boss/PK 怪)。洞窟怪 levels 由 npc_drops.csv 第 3 欄 (怪物等級)，樓層分佈見 spawns zone: runan_f1~f10。alignment: NPC 善惡值，負=惡。atkInterval = tick(10Hz)。element: 屬性 (spec 02 §3.2 相剋)。spell/spellCd: 術法怪用 data/spells.json 術法 id + 冷卻 (tick)。 dropSrc: 掉落借用嘅原版 npc_id (1~10 級新手怪)；掉落由 tools/import_drops.py 生成，冇 CSV 來源 = 【自訂】手寫。",
+ "_note": "第一批 5 種 1~10 級野區怪 + 3 隻術法怪 (Step 9) + 絕招 boss (Step 10) +Step 11 導入 (spec 11 §2): npc_drops.csv rate→p (rate/100000)，p≥0.05 入 drops、p<0.05 入 rareDrops。levels/hp/atk/exp 數值 = spec 04 §1 等級帶模板【自訂】(npc_id 確定性抖動 ±20%)。boss=true → 每日重生一次 (spec 04 §3)；groups=true 群居 / flee=false 唔逃走 (boss/PK 怪)。洞窟怪 levels 由 npc_drops.csv 第 3 欄 (怪物等級)，樓層分佈見 spawns zone: runan_f1~f10。alignment: NPC 善惡值，負=惡。atkInterval = tick(10Hz)。element: 屬性 (spec 02 §3.2 相剋)。spell/spellCd: 術法怪用 data/spells.json 術法 id + 冷卻 (tick)。 dropSrc: 掉落借用嘅原版 npc_id (1~10 級新手怪)；掉落由 tools/import_drops.py 生成，冇 CSV 來源 = 【自訂】手寫。 Step 15.9 (B2.5): 11072 盜賊 / 11069 流氓2 (原版表)；27248 瘋狂小兵 Lv12 (港口，原版 Lv50 降級【自訂】，掉落借 11072)、27005 海盜賊 Lv15 (借 11068)、27008 山寨山賊 Lv14 (借 11091)；spawn zone: chenliu/yudu/jingzhou/gangkou/fancheng/hanshui。",
  "monsters": [
   {
    "id": 1001,
@@ -1663,6 +1663,313 @@
     }
    ],
    "boss": true
+  },
+  {
+   "id": 11072,
+   "name": "盜賊",
+   "level": 9,
+   "hp": 230,
+   "atk": 24,
+   "def": 8,
+   "atkInterval": 18,
+   "moveSpeed": 1,
+   "exp": 174,
+   "gold": [
+    0,
+    27
+   ],
+   "alignment": -180,
+   "aggroRange": 5,
+   "leash": 10,
+   "groups": false,
+   "flee": true,
+   "drops": [
+    {
+     "item": 29041,
+     "p": 0.06
+    },
+    {
+     "item": 29040,
+     "p": 0.3
+    }
+   ],
+   "rareDrops": [
+    {
+     "item": 10037,
+     "p": 0.004
+    },
+    {
+     "item": 11039,
+     "p": 0.002
+    },
+    {
+     "item": 22025,
+     "p": 0.006
+    },
+    {
+     "item": 13014,
+     "p": 0.002
+    },
+    {
+     "item": 14014,
+     "p": 0.002
+    },
+    {
+     "item": 23001,
+     "p": 0.002
+    },
+    {
+     "item": 29067,
+     "p": 0.025
+    }
+   ]
+  },
+  {
+   "id": 11069,
+   "name": "流氓2",
+   "level": 20,
+   "hp": 700,
+   "atk": 50,
+   "def": 14,
+   "atkInterval": 18,
+   "moveSpeed": 1,
+   "exp": 732,
+   "gold": [
+    0,
+    60
+   ],
+   "alignment": -400,
+   "aggroRange": 5,
+   "leash": 10,
+   "groups": false,
+   "flee": true,
+   "drops": [
+    {
+     "item": 29042,
+     "p": 0.3
+    }
+   ],
+   "rareDrops": [
+    {
+     "item": 10002,
+     "p": 0.0018
+    },
+    {
+     "item": 11014,
+     "p": 0.0018
+    },
+    {
+     "item": 12014,
+     "p": 0.0018
+    },
+    {
+     "item": 13002,
+     "p": 0.0018
+    },
+    {
+     "item": 14002,
+     "p": 0.0018
+    },
+    {
+     "item": 15002,
+     "p": 0.0018
+    },
+    {
+     "item": 61506,
+     "p": 0.002
+    },
+    {
+     "item": 29068,
+     "p": 0.025
+    },
+    {
+     "item": 31212,
+     "p": 0.002
+    }
+   ]
+  },
+  {
+   "id": 27248,
+   "name": "瘋狂小兵",
+   "level": 12,
+   "hp": 300,
+   "atk": 30,
+   "def": 10,
+   "atkInterval": 18,
+   "moveSpeed": 1,
+   "exp": 290,
+   "gold": [
+    0,
+    36
+   ],
+   "alignment": -240,
+   "aggroRange": 5,
+   "leash": 10,
+   "groups": true,
+   "flee": true,
+   "drops": [
+    {
+     "item": 29041,
+     "p": 0.06
+    },
+    {
+     "item": 29040,
+     "p": 0.3
+    }
+   ],
+   "rareDrops": [
+    {
+     "item": 10037,
+     "p": 0.004
+    },
+    {
+     "item": 11039,
+     "p": 0.002
+    },
+    {
+     "item": 22025,
+     "p": 0.006
+    },
+    {
+     "item": 13014,
+     "p": 0.002
+    },
+    {
+     "item": 14014,
+     "p": 0.002
+    },
+    {
+     "item": 23001,
+     "p": 0.002
+    },
+    {
+     "item": 29067,
+     "p": 0.025
+    }
+   ],
+   "dropSrc": 11072
+  },
+  {
+   "id": 27005,
+   "name": "海盜賊",
+   "level": 15,
+   "hp": 380,
+   "atk": 37,
+   "def": 11,
+   "atkInterval": 18,
+   "moveSpeed": 1,
+   "exp": 435,
+   "gold": [
+    0,
+    45
+   ],
+   "alignment": -300,
+   "aggroRange": 5,
+   "leash": 10,
+   "groups": false,
+   "flee": true,
+   "drops": [
+    {
+     "item": 29042,
+     "p": 0.3
+    }
+   ],
+   "rareDrops": [
+    {
+     "item": 10039,
+     "p": 0.002
+    },
+    {
+     "item": 11037,
+     "p": 0.002
+    },
+    {
+     "item": 12002,
+     "p": 0.002
+    },
+    {
+     "item": 22027,
+     "p": 0.0006
+    },
+    {
+     "item": 23002,
+     "p": 0.002
+    },
+    {
+     "item": 15003,
+     "p": 0.002
+    },
+    {
+     "item": 61506,
+     "p": 0.001
+    },
+    {
+     "item": 29067,
+     "p": 0.025
+    }
+   ],
+   "dropSrc": 11068
+  },
+  {
+   "id": 27008,
+   "name": "山寨山賊",
+   "level": 14,
+   "hp": 340,
+   "atk": 34,
+   "def": 10,
+   "atkInterval": 18,
+   "moveSpeed": 1,
+   "exp": 385,
+   "gold": [
+    0,
+    42
+   ],
+   "alignment": -280,
+   "aggroRange": 5,
+   "leash": 10,
+   "groups": true,
+   "flee": true,
+   "drops": [
+    {
+     "item": 29040,
+     "p": 0.09
+    },
+    {
+     "item": 29038,
+     "p": 0.3
+    }
+   ],
+   "rareDrops": [
+    {
+     "item": 10037,
+     "p": 0.004
+    },
+    {
+     "item": 11039,
+     "p": 0.002
+    },
+    {
+     "item": 22025,
+     "p": 0.006
+    },
+    {
+     "item": 13014,
+     "p": 0.002
+    },
+    {
+     "item": 14014,
+     "p": 0.002
+    },
+    {
+     "item": 23001,
+     "p": 0.002
+    },
+    {
+     "item": 29067,
+     "p": 0.025
+    }
+   ],
+   "dropSrc": 11091
   }
  ],
  "spawns": [
@@ -2194,6 +2501,282 @@
     17,
     93,
     44
+   ]
+  },
+  {
+   "zone": "chenliu",
+   "monster": 11072,
+   "count": 4,
+   "respawnTicks": 200,
+   "area": [
+    30,
+    36,
+    62,
+    52
+   ]
+  },
+  {
+   "zone": "chenliu",
+   "monster": 11091,
+   "count": 4,
+   "respawnTicks": 400,
+   "area": [
+    4,
+    16,
+    40,
+    28
+   ]
+  },
+  {
+   "zone": "chenliu",
+   "monster": 12019,
+   "count": 3,
+   "respawnTicks": 300,
+   "area": [
+    4,
+    33,
+    40,
+    52
+   ]
+  },
+  {
+   "zone": "chenliu",
+   "monster": 11068,
+   "count": 3,
+   "respawnTicks": 500,
+   "area": [
+    56,
+    16,
+    92,
+    28
+   ]
+  },
+  {
+   "zone": "chenliu",
+   "monster": 11069,
+   "count": 2,
+   "respawnTicks": 600,
+   "area": [
+    78,
+    34,
+    92,
+    52
+   ]
+  },
+  {
+   "zone": "yudu",
+   "monster": 27008,
+   "count": 5,
+   "respawnTicks": 400,
+   "area": [
+    13,
+    14,
+    25,
+    36
+   ]
+  },
+  {
+   "zone": "yudu",
+   "monster": 27008,
+   "count": 3,
+   "respawnTicks": 400,
+   "area": [
+    30,
+    10,
+    66,
+    40
+   ]
+  },
+  {
+   "zone": "yudu",
+   "monster": 11091,
+   "count": 3,
+   "respawnTicks": 400,
+   "area": [
+    30,
+    10,
+    66,
+    40
+   ]
+  },
+  {
+   "zone": "jingzhou",
+   "monster": 12021,
+   "count": 3,
+   "respawnTicks": 240,
+   "area": [
+    66,
+    4,
+    92,
+    16
+   ]
+  },
+  {
+   "zone": "jingzhou",
+   "monster": 12011,
+   "count": 3,
+   "respawnTicks": 260,
+   "area": [
+    30,
+    4,
+    52,
+    18
+   ]
+  },
+  {
+   "zone": "jingzhou",
+   "monster": 12005,
+   "count": 3,
+   "respawnTicks": 260,
+   "area": [
+    66,
+    26,
+    92,
+    46
+   ]
+  },
+  {
+   "zone": "jingzhou",
+   "monster": 11091,
+   "count": 3,
+   "respawnTicks": 400,
+   "area": [
+    4,
+    4,
+    28,
+    26
+   ]
+  },
+  {
+   "zone": "jingzhou",
+   "monster": 12029,
+   "count": 3,
+   "respawnTicks": 250,
+   "area": [
+    30,
+    32,
+    52,
+    46
+   ]
+  },
+  {
+   "zone": "gangkou",
+   "monster": 27248,
+   "count": 6,
+   "respawnTicks": 300,
+   "area": [
+    16,
+    4,
+    76,
+    30
+   ]
+  },
+  {
+   "zone": "gangkou",
+   "monster": 27005,
+   "count": 4,
+   "respawnTicks": 400,
+   "area": [
+    16,
+    18,
+    60,
+    31
+   ]
+  },
+  {
+   "zone": "fancheng",
+   "monster": 12011,
+   "count": 3,
+   "respawnTicks": 260,
+   "area": [
+    4,
+    4,
+    40,
+    20
+   ]
+  },
+  {
+   "zone": "fancheng",
+   "monster": 12018,
+   "count": 3,
+   "respawnTicks": 280,
+   "area": [
+    4,
+    22,
+    36,
+    38
+   ]
+  },
+  {
+   "zone": "fancheng",
+   "monster": 12013,
+   "count": 3,
+   "respawnTicks": 300,
+   "area": [
+    8,
+    40,
+    30,
+    52
+   ]
+  },
+  {
+   "zone": "fancheng",
+   "monster": 12030,
+   "count": 3,
+   "respawnTicks": 280,
+   "area": [
+    50,
+    46,
+    92,
+    56
+   ]
+  },
+  {
+   "zone": "hanshui",
+   "monster": 12012,
+   "count": 4,
+   "respawnTicks": 260,
+   "area": [
+    4,
+    2,
+    36,
+    14
+   ]
+  },
+  {
+   "zone": "hanshui",
+   "monster": 12006,
+   "count": 3,
+   "respawnTicks": 320,
+   "area": [
+    44,
+    2,
+    76,
+    14
+   ]
+  },
+  {
+   "zone": "hanshui",
+   "monster": 12014,
+   "count": 2,
+   "respawnTicks": 300,
+   "area": [
+    4,
+    28,
+    36,
+    40
+   ]
+  },
+  {
+   "zone": "hanshui",
+   "monster": 12028,
+   "count": 3,
+   "respawnTicks": 240,
+   "area": [
+    44,
+    28,
+    76,
+    40
    ]
   }
  ]
