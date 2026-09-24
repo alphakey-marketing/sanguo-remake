@@ -5152,5 +5152,408 @@
    0.3
   ],
   "expect": 1
+ },
+ {
+  "fn": "tiandiToolResale",
+  "args": [
+   175,
+   2,
+   200
+  ],
+  "expect": 0
+ },
+ {
+  "fn": "tiandiToolResale",
+  "args": [
+   3000,
+   200,
+   200
+  ],
+  "expect": 1500
+ },
+ {
+  "fn": "tiandiToolResale",
+  "args": [
+   3000,
+   1,
+   50
+  ],
+  "expect": 30
+ },
+ {
+  "fn": "tiandiToolResale",
+  "args": [
+   40,
+   0,
+   200
+  ],
+  "expect": 0
+ },
+ {
+  "fn": "tiandiToolResale",
+  "args": [
+   500,
+   250,
+   200
+  ],
+  "expect": 250
+ },
+ {
+  "fn": "tiandiGoldOk",
+  "args": [
+   2999,
+   {
+    "goldMin": 3000,
+    "goldMax": 50000,
+    "goldPerFame": 1000,
+    "unitsPerFame": 200,
+    "chaExpPerPoint": 100,
+    "chaCap": 99
+   }
+  ],
+  "expect": false
+ },
+ {
+  "fn": "tiandiGoldOk",
+  "args": [
+   3000,
+   {
+    "goldMin": 3000,
+    "goldMax": 50000,
+    "goldPerFame": 1000,
+    "unitsPerFame": 200,
+    "chaExpPerPoint": 100,
+    "chaCap": 99
+   }
+  ],
+  "expect": true
+ },
+ {
+  "fn": "tiandiGoldOk",
+  "args": [
+   49999,
+   {
+    "goldMin": 3000,
+    "goldMax": 50000,
+    "goldPerFame": 1000,
+    "unitsPerFame": 200,
+    "chaExpPerPoint": 100,
+    "chaCap": 99
+   }
+  ],
+  "expect": true
+ },
+ {
+  "fn": "tiandiGoldOk",
+  "args": [
+   50000,
+   {
+    "goldMin": 3000,
+    "goldMax": 50000,
+    "goldPerFame": 1000,
+    "unitsPerFame": 200,
+    "chaExpPerPoint": 100,
+    "chaCap": 99
+   }
+  ],
+  "expect": true
+ },
+ {
+  "fn": "tiandiGoldOk",
+  "args": [
+   50001,
+   {
+    "goldMin": 3000,
+    "goldMax": 50000,
+    "goldPerFame": 1000,
+    "unitsPerFame": 200,
+    "chaExpPerPoint": 100,
+    "chaCap": 99
+   }
+  ],
+  "expect": false
+ },
+ {
+  "fn": "tiandiDonationFame",
+  "args": [
+   "gold",
+   3000,
+   {
+    "goldMin": 3000,
+    "goldMax": 50000,
+    "goldPerFame": 1000,
+    "unitsPerFame": 200,
+    "chaExpPerPoint": 100,
+    "chaCap": 99
+   }
+  ],
+  "expect": 3
+ },
+ {
+  "fn": "tiandiDonationFame",
+  "args": [
+   "gold",
+   50000,
+   {
+    "goldMin": 3000,
+    "goldMax": 50000,
+    "goldPerFame": 1000,
+    "unitsPerFame": 200,
+    "chaExpPerPoint": 100,
+    "chaCap": 99
+   }
+  ],
+  "expect": 50
+ },
+ {
+  "fn": "tiandiDonationFame",
+  "args": [
+   "gold",
+   3999,
+   {
+    "goldMin": 3000,
+    "goldMax": 50000,
+    "goldPerFame": 1000,
+    "unitsPerFame": 200,
+    "chaExpPerPoint": 100,
+    "chaCap": 99
+   }
+  ],
+  "expect": 3
+ },
+ {
+  "fn": "tiandiDonationFame",
+  "args": [
+   "units",
+   199,
+   {
+    "goldMin": 3000,
+    "goldMax": 50000,
+    "goldPerFame": 1000,
+    "unitsPerFame": 200,
+    "chaExpPerPoint": 100,
+    "chaCap": 99
+   }
+  ],
+  "expect": 0
+ },
+ {
+  "fn": "tiandiDonationFame",
+  "args": [
+   "units",
+   200,
+   {
+    "goldMin": 3000,
+    "goldMax": 50000,
+    "goldPerFame": 1000,
+    "unitsPerFame": 200,
+    "chaExpPerPoint": 100,
+    "chaCap": 99
+   }
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "tiandiDonationFame",
+  "args": [
+   "units",
+   1234,
+   {
+    "goldMin": 3000,
+    "goldMax": 50000,
+    "goldPerFame": 1000,
+    "unitsPerFame": 200,
+    "chaExpPerPoint": 100,
+    "chaCap": 99
+   }
+  ],
+  "expect": 6
+ },
+ {
+  "fn": "tiandiChaGain",
+  "args": [
+   10,
+   0,
+   30,
+   {
+    "goldMin": 3000,
+    "goldMax": 50000,
+    "goldPerFame": 1000,
+    "unitsPerFame": 200,
+    "chaExpPerPoint": 100,
+    "chaCap": 99
+   }
+  ],
+  "expect": {
+   "cha": 10,
+   "exp": 30,
+   "ups": 0
+  }
+ },
+ {
+  "fn": "tiandiChaGain",
+  "args": [
+   10,
+   90,
+   20,
+   {
+    "goldMin": 3000,
+    "goldMax": 50000,
+    "goldPerFame": 1000,
+    "unitsPerFame": 200,
+    "chaExpPerPoint": 100,
+    "chaCap": 99
+   }
+  ],
+  "expect": {
+   "cha": 11,
+   "exp": 10,
+   "ups": 1
+  }
+ },
+ {
+  "fn": "tiandiChaGain",
+  "args": [
+   50,
+   0,
+   500,
+   {
+    "goldMin": 3000,
+    "goldMax": 50000,
+    "goldPerFame": 1000,
+    "unitsPerFame": 200,
+    "chaExpPerPoint": 100,
+    "chaCap": 99
+   }
+  ],
+  "expect": {
+   "cha": 55,
+   "exp": 0,
+   "ups": 5
+  }
+ },
+ {
+  "fn": "tiandiChaGain",
+  "args": [
+   98,
+   50,
+   100,
+   {
+    "goldMin": 3000,
+    "goldMax": 50000,
+    "goldPerFame": 1000,
+    "unitsPerFame": 200,
+    "chaExpPerPoint": 100,
+    "chaCap": 99
+   }
+  ],
+  "expect": {
+   "cha": 99,
+   "exp": 0,
+   "ups": 1
+  }
+ },
+ {
+  "fn": "tiandiChaGain",
+  "args": [
+   99,
+   0,
+   100,
+   {
+    "goldMin": 3000,
+    "goldMax": 50000,
+    "goldPerFame": 1000,
+    "unitsPerFame": 200,
+    "chaExpPerPoint": 100,
+    "chaCap": 99
+   }
+  ],
+  "expect": {
+   "cha": 99,
+   "exp": 0,
+   "ups": 0
+  }
+ },
+ {
+  "fn": "tiandiChaGain",
+  "args": [
+   20,
+   99,
+   1,
+   {
+    "goldMin": 3000,
+    "goldMax": 50000,
+    "goldPerFame": 1000,
+    "unitsPerFame": 200,
+    "chaExpPerPoint": 100,
+    "chaCap": 99
+   }
+  ],
+  "expect": {
+   "cha": 21,
+   "exp": 0,
+   "ups": 1
+  }
+ },
+ {
+  "fn": "tiandiDonationUnits",
+  "args": [
+   {
+    "25064": 120,
+    "25074": 1,
+    "10001": 5
+   },
+   {
+    "25064": 1,
+    "25074": 100
+   }
+  ],
+  "expect": 220
+ },
+ {
+  "fn": "tiandiPlanHaul",
+  "args": [
+   [
+    {
+     "id": 25001,
+     "n": 80
+    },
+    {
+     "id": 10001,
+     "n": 1
+    },
+    {
+     "id": 25064,
+     "n": 30
+    }
+   ],
+   {
+    "25001": "mining",
+    "25064": "farming"
+   },
+   [
+    "mining"
+   ],
+   990,
+   1000
+  ],
+  "expect": {
+   "deposit": [
+    [
+     25001,
+     10
+    ]
+   ],
+   "sell": [
+    [
+     25001,
+     70
+    ],
+    [
+     25064,
+     30
+    ]
+   ]
+  }
  }
 ]

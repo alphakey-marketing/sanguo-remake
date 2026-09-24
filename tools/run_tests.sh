@@ -21,6 +21,7 @@ run monsters --script tests/run_monsters.gd
 run maps --script tests/run_maps.gd
 run equip --script tests/run_equip.gd
 run craft --script tests/run_craft.gd
+run tiandi --script tests/run_tiandi.gd
 run market --script tools/market_sim.gd
 run hud --script tests/run_hud.gd
 run autotest -- --autotest

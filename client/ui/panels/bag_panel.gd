@@ -13,7 +13,7 @@ var want_slot := -1           # 由快捷格入嚟: 裝落邊格
 func _init(m: Node) -> void:
 	super(m)
 	title_lbl.text = "背包"
-	set_tabs(["背包", "天地商行"])
+	set_tabs(["背包", "天地商行", "腳伕"])
 
 
 func open_filter(f: String, slot := -1) -> void:
@@ -41,7 +41,7 @@ func close() -> void:
 func sig() -> String:
 	var ch: Dictionary = main.ch
 	return JSON.stringify([tab, sel, sel_slot, filter, ch.get("bag", []), ch.get("storage", []), ch.get("equip", {}),
-		ch.get("gold", 0), ch.get("storageSub", false), ch.get("tools", {}), ch.get("level", 1)])
+		ch.get("gold", 0), ch.get("storageSub", false), ch.get("tools", {}), ch.get("level", 1), ch.get("tiandi", {})])
 
 
 func _build_body() -> void:
@@ -68,8 +68,10 @@ func _build_body() -> void:
 				refresh(true)))
 		_build_grid(left, _bag_list(ch))
 		_build_detail(right, ch)
-	else:
+	elif tab == 1:
 		_build_storage(left, right, ch)
+	else:
+		_build_porter(left, right, ch)
 
 
 func _bag_list(ch: Dictionary) -> Array:
@@ -298,3 +300,30 @@ func _build_storage(left: Control, right: Control, ch: Dictionary) -> void:
 	right.add_child(btn("攞返 x1", func() -> void: main._send({"t": "storage_withdraw", "item": id, "n": 1})))
 	right.add_child(btn("全部攞返 x%d" % n, func() -> void: main._send({"t": "storage_withdraw", "item": id, "n": n})))
 	right.add_child(btn("代賣 x1  (%d 金)" % main._sell_price(id), func() -> void: main._send({"t": "storage_sell", "item": id, "n": 1})))
+
+
+# 腳伕頁 (Step 13): 負重滿自動存邊啲材料 + 自動買/賣工具 + 工作區小屋休息
+func _build_porter(left: Control, right: Control, ch: Dictionary) -> void:
+	var d: GameData = main.data
+	var cfg: Dictionary = d.world["tiandi"]
+	if not bool(ch.get("storageSub", false)):
+		left.add_child(wrap_lbl("要先喺「天地商行」頁訂閱，腳伕先會幫你做嘢。", 14, UiTheme.DIM))
+		return
+	var td: Dictionary = ch.get("tiandi", {})
+	var dep: Array = td.get("deposit", [])
+	left.add_child(wrap_lbl("材料多過 %d 件 = 負重滿：勾咗嘅入倉，其餘賣市集" % int(cfg["bagMatCap"]), 13, UiTheme.DIM))
+	for sk in d.work:
+		var skill := String(sk)
+		var on := dep.has(skill)
+		left.add_child(btn(("✔ 存 " if on else "　存 ") + str(d.work[sk]["name"]), func() -> void:
+			main._send({"t": "tiandi_set", "key": "deposit:" + skill, "on": not on})))
+	var buy := bool(td.get("buyTool", false))
+	var sell := bool(td.get("sellTool", false))
+	right.add_child(lbl("倉庫 %d / %d 件" % [RulesTiandi.stack_total(ch.get("storage", [])), int(cfg["storageCap"])], 15, UiTheme.GOLD))
+	right.add_child(btn(("✔ " if buy else "　") + "自動買工具（爛咗買新）", func() -> void:
+		main._send({"t": "tiandi_set", "key": "buyTool", "on": not buy})))
+	right.add_child(btn(("✔ " if sell else "　") + "自動賣工具（耐久剩 %d）" % int(cfg["toolSellAt"]), func() -> void:
+		main._send({"t": "tiandi_set", "key": "sellTool", "on": not sell})))
+	right.add_child(hsep())
+	right.add_child(btn("工作區小屋休息 (%d 金)" % int(cfg["restCost"]), func() -> void: main._send({"t": "storage_rest"})))
+	right.add_child(wrap_lbl("城外先用得；回滿 HP/MP/SP", 12, UiTheme.DIM))

@@ -133,6 +133,9 @@ func cmd_storage_deposit(id: int, item: int, n: int = 1) -> void:
 		return _msg(id, "要先訂閱天地商行")
 	if _locked_by_equip(ch, item, n):
 		return _msg(id, "裝備中，唔可以存 (先卸下)")
+	var cap := int(data.world["tiandi"]["storageCap"])
+	if RulesTiandi.stack_total(ch["storage"]) + n > cap:
+		return _msg(id, "倉庫滿咗 (上限 %d 件)" % cap)
 	if not RulesShop.remove_item(ch["bag"], item, n):
 		return _msg(id, "背包冇咁多")
 	RulesShop.add_item(ch["storage"], item, n)
@@ -172,6 +175,207 @@ func cmd_storage_sell(id: int, item: int, n: int = 1) -> void:
 	ch["gold"] = int(ch["gold"]) + gain
 	_cleanup_dur(ch)
 	_msg(id, "天地商行代賣 %d 件，得 %d 金" % [n, gain])
+
+
+# ================= 天地商行自動化 (Step 13, spec 05 §3) =================
+# 【原】功能: 負重滿自動存/賣材料、自動買賣工具、工作區小屋休息；【自訂】負重 = 背包工作材料件數 (world.json tiandi)
+
+# 設定: key = "deposit:<skill>" / "buyTool" / "sellTool"
+func cmd_tiandi_set(id: int, key: String, on: bool) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return
+	var td := tiandi_cfg(e["ch"])
+	if key.begins_with("deposit:"):
+		var sk := key.substr(8)
+		if not data.work.has(sk):
+			return
+		var dep: Array = td["deposit"]
+		if on and not dep.has(sk):
+			dep.append(sk)
+		elif not on:
+			dep.erase(sk)
+	elif key == "buyTool" or key == "sellTool":
+		td[key] = on
+	else:
+		return
+	_emit({"k": "tiandi_set", "id": id, "key": key, "on": on})
+
+
+# 天地商行設定 (舊存檔冇 → 補)
+func tiandi_cfg(ch: Dictionary) -> Dictionary:
+	if not ch.has("tiandi"):
+		ch["tiandi"] = {"deposit": [], "buyTool": false, "sellTool": false}
+	return ch["tiandi"]
+
+
+# 工作區小屋休息【原】: 訂閱咗 + 喺城外 (工作區)，收費回滿 HP/MP/SP
+func cmd_storage_rest(id: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var ch: Dictionary = e["ch"]
+	if not bool(ch.get("storageSub", false)):
+		return _msg(id, "要先訂閱天地商行")
+	if is_safe(int(e["x"]), int(e["y"])):
+		return _msg(id, "小屋喺城外工作區，城內去客棧啦")
+	var cost := int(data.world["tiandi"]["restCost"])
+	if int(ch["gold"]) < cost:
+		return _msg(id, "小屋休息要 %d 金" % cost)
+	ch["gold"] = int(ch["gold"]) - cost
+	_full_heal(ch)
+	_sync_stats(e)
+	_msg(id, "喺工作區小屋休息完畢，花 %d 金" % cost)
+
+
+# 工具耐久上限 (新手工具 / 正式工具)
+func _tool_max_dur(skill: String, item: int) -> int:
+	var sk := _skill_def(skill)
+	var td: Dictionary = data.work_meta.get("toolDurability", {})
+	return int(td.get("starter" if int(sk.get("starterTool", -1)) == item else "normal", 50))
+
+
+# 做完一次工作: 耐久剩 toolSellAt 自動賣【原】；冇工具 (爛咗/賣咗) + 勾咗買工具 → 自動買返同一件【原】
+func _tiandi_tools(id: int, ch: Dictionary, skill: String, item: int) -> void:
+	if not bool(ch.get("storageSub", false)):
+		return
+	var td := tiandi_cfg(ch)
+	var cur: Dictionary = ch["tools"].get(skill, {})
+	if bool(td.get("sellTool", false)) and not cur.is_empty() and int(cur["dur"]) <= int(data.world["tiandi"]["toolSellAt"]):
+		var gain := RulesTiandi.tool_resale(int(data.prices.get(item, 0.0)), int(cur["dur"]), _tool_max_dur(skill, item))
+		ch["tools"].erase(skill)
+		ch["gold"] = int(ch["gold"]) + gain
+		_emit({"k": "tiandi_tool", "id": id, "skill": skill, "act": "sell", "item": item, "gold": gain})
+		_msg(id, "天地商行: 代賣%s，得 %d 金" % [data.names.get(item, str(item)), gain])
+	if not bool(td.get("buyTool", false)) or ch["tools"].has(skill):
+		return
+	var cost := RulesShop.buy_price(data.prices.get(item, 0.0) * market_factor(item), ch["attrs"]["cha"], int(ch["karma"]))
+	if int(ch["gold"]) < cost:
+		return _msg(id, "天地商行: 買新%s要 %d 金，唔夠錢" % [data.names.get(item, str(item)), cost])
+	ch["gold"] = int(ch["gold"]) - cost
+	ch["tools"][skill] = {"item": item, "dur": _tool_max_dur(skill, item)}
+	_emit({"k": "tiandi_tool", "id": id, "skill": skill, "act": "buy", "item": item, "gold": cost})
+	_msg(id, "天地商行: 代買新%s，花 %d 金" % [data.names.get(item, str(item)), cost])
+
+
+# 負重滿【自訂=材料件數 > bagMatCap】→ 腳伕搬晒材料: 勾咗嘅入倉 (到倉滿)，其餘賣市集【原】。任務道具唔郁
+func _tiandi_haul(id: int, ch: Dictionary) -> void:
+	if not bool(ch.get("storageSub", false)):
+		return
+	var cfg: Dictionary = data.world["tiandi"]
+	var view: Array = []
+	for s in ch["bag"]:
+		if not RulesQuest.is_quest_item(data, int(s["id"])):
+			view.append(s)
+	if RulesTiandi.mat_load(view, data.mat_skill) <= int(cfg["bagMatCap"]):
+		return
+	var plan := RulesTiandi.plan_haul(view, data.mat_skill, tiandi_cfg(ch)["deposit"],
+		RulesTiandi.stack_total(ch["storage"]), int(cfg["storageCap"]))
+	var dep_n := 0
+	var sell_n := 0
+	var gold := 0
+	for d in plan["deposit"]:
+		RulesShop.remove_item(ch["bag"], int(d[0]), int(d[1]))
+		RulesShop.add_item(ch["storage"], int(d[0]), int(d[1]))
+		dep_n += int(d[1])
+	for d in plan["sell"]:
+		RulesShop.remove_item(ch["bag"], int(d[0]), int(d[1]))
+		gold += RulesShop.sell_price(data.prices.get(int(d[0]), 0.0) * market_factor(int(d[0]))) * int(d[1])
+		sell_n += int(d[1])
+	ch["gold"] = int(ch["gold"]) + gold
+	_emit({"k": "tiandi_haul", "id": id, "deposit": dep_n, "sell": sell_n, "gold": gold})
+	_msg(id, "天地商行腳伕: 存 %d 件入倉，賣 %d 件得 %d 金" % [dep_n, sell_n, gold])
+
+
+# ================= 捐贈官令 + 行動力 (Step 13, spec 05 §7 / spec 08 §1) =================
+
+func ap_max(_ch: Dictionary) -> int:
+	return int(data.world["ap"]["max"])          # Step 14 頭銜再加上限
+
+
+func ap_of(ch: Dictionary) -> int:
+	return int(ch.get("ap", ap_max(ch)))
+
+
+func _near_donation(e: Dictionary) -> bool:
+	for k in data.facilities:
+		var f = data.facilities[k]
+		if f is Dictionary and bool(f.get("donation", false)) and _near(e, int(f["x"]), int(f["y"])):
+			return true
+	return false
+
+
+# 捐金錢【原】3000~50000
+func cmd_donate_gold(id: int, amount: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var cfg: Dictionary = data.donation
+	var ch: Dictionary = e["ch"]
+	if not _near_donation(e):
+		return _msg(id, "要去官府捐獻處先得")
+	if not RulesTiandi.gold_ok(amount, cfg):
+		return _msg(id, "捐獻金額要 %d~%d 金" % [int(cfg["goldMin"]), int(cfg["goldMax"])])
+	if int(ch["gold"]) < amount:
+		return _msg(id, "金錢不足")
+	if ap_of(ch) < int(cfg["apCost"]):
+		return _msg(id, "行動力不足 (要 %d)" % int(cfg["apCost"]))
+	ch["gold"] = int(ch["gold"]) - amount
+	_donate_reward(e, ch, RulesTiandi.donation_fame("gold", amount, cfg), "%d 金" % amount)
+
+
+# 捐物資【原】: items = [[item id, n], ...]，只收轉換表入面嘅物資；合共 ≥ 100 單位
+func cmd_donate_items(id: int, items: Array) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var cfg: Dictionary = data.donation
+	var ch: Dictionary = e["ch"]
+	if not _near_donation(e):
+		return _msg(id, "要去官府捐獻處先得")
+	var counts := {}
+	for it in items:
+		var iid := int(it[0])
+		var n := int(it[1])
+		if n <= 0 or not data.donation_rates.has(iid) or RulesQuest.is_quest_item(data, iid):
+			continue
+		counts[iid] = int(counts.get(iid, 0)) + n
+	for iid in counts:
+		if RulesShop.count_item(ch["bag"], iid) < int(counts[iid]):
+			return _msg(id, "背包冇咁多%s" % data.names.get(iid, str(iid)))
+	var units := RulesTiandi.donation_units(counts, data.donation_rates)
+	if units < int(cfg["unitsMin"]):
+		return _msg(id, "物資要 %d 單位以上 (而家 %d)" % [int(cfg["unitsMin"]), units])
+	if ap_of(ch) < int(cfg["apCost"]):
+		return _msg(id, "行動力不足 (要 %d)" % int(cfg["apCost"]))
+	for iid in counts:
+		RulesShop.remove_item(ch["bag"], iid, int(counts[iid]))
+	_donate_reward(e, ch, RulesTiandi.donation_fame("units", units, cfg), "物資 %d 單位" % units)
+
+
+# 背包入面可以捐嘅物資 [[id, n]] (UI「捐晒物資」用；任務道具唔計)
+func donatable_items(ch: Dictionary) -> Array:
+	var out: Array = []
+	for s in ch.get("bag", []):
+		var iid := int(s["id"])
+		if data.donation_rates.has(iid) and not RulesQuest.is_quest_item(data, iid):
+			out.append([iid, int(s["n"])])
+	return out
+
+
+# 捐獻成功: 扣行動力 + 名聲 + 魅力經驗【原=三樣都有；數值自訂】
+func _donate_reward(e: Dictionary, ch: Dictionary, fame: int, what: String) -> void:
+	var id := int(e["id"])
+	var cfg: Dictionary = data.donation
+	ch["ap"] = ap_of(ch) - int(cfg["apCost"])
+	ch["fame"] = int(ch.get("fame", 0)) + fame
+	var r := RulesTiandi.cha_gain(int(ch["attrs"]["cha"]), int(ch.get("chaExp", 0)), fame * int(cfg["chaExpPerFame"]), cfg)
+	ch["attrs"]["cha"] = int(r["cha"])
+	ch["chaExp"] = int(r["exp"])
+	_sync_stats(e)
+	_emit({"k": "donate", "id": id, "what": what, "fame": fame, "chaUps": int(r["ups"])})
+	var tail := "，魅力 +%d" % int(r["ups"]) if int(r["ups"]) > 0 else ""
+	_msg(id, "捐獻 %s：名聲 +%d%s" % [what, fame, tail])
 
 
 # ================= 工作技能 (Step 7.1) =================
@@ -281,6 +485,7 @@ func cmd_work(id: int, skill: String) -> void:
 		item = int(materials[tier])
 		n = 2 if MathX.roll(rng_fn) < float(cfg["big"]) else 1       # 大成功雙倍
 		RulesShop.add_item(ch["bag"], item, n)
+	var tool_item := int(tool["item"])
 	tool["dur"] = RulesWork.durability_after_use(int(tool["dur"]))
 	var broke := int(tool["dur"]) <= 0
 	if broke:
@@ -292,6 +497,8 @@ func cmd_work(id: int, skill: String) -> void:
 	else:
 		_msg(id, "%s: 失手，咩都冇%s" % [sk["name"], tail])
 	_work_gain(id, ch, skill, int(data.work_meta["level"]["gainOk" if ok else "gainFail"]))
+	_tiandi_tools(id, ch, skill, tool_item)
+	_tiandi_haul(id, ch)
 
 
 # ================= 進階生產 + 修理 (Step 12, spec 05 §4) =================

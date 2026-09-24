@@ -105,8 +105,26 @@ func _call(v: Dictionary, data: GameData) -> Variant:
 				bc[int(k)] = int(a[0][k])        # JSON key 係 String → int
 			return RulesWork.has_materials(bc, a[1])
 		"workRepairCost": return RulesWork.repair_cost(a[0], int(a[1]), int(a[2]), a[3])
+		"tiandiToolResale": return RulesTiandi.tool_resale(int(a[0]), int(a[1]), int(a[2]))
+		"tiandiGoldOk": return RulesTiandi.gold_ok(int(a[0]), a[1])
+		"tiandiDonationFame": return RulesTiandi.donation_fame(String(a[0]), int(a[1]), a[2])
+		"tiandiChaGain": return RulesTiandi.cha_gain(int(a[0]), int(a[1]), int(a[2]), a[3])
+		"tiandiDonationUnits": return RulesTiandi.donation_units(_int_keys(a[0]), _int_keys(a[1]))
+		"tiandiPlanHaul":
+			var bag: Array = []
+			for s in a[0]:
+				bag.append({"id": int(s["id"]), "n": int(s["n"])})
+			return RulesTiandi.plan_haul(bag, _int_keys(a[1]), a[2], int(a[3]), int(a[4]))
 	push_error("未知 fn: " + String(v["fn"]))
 	return null
+
+
+# JSON key 係 String → int
+func _int_keys(d: Dictionary) -> Dictionary:
+	var out := {}
+	for k in d:
+		out[int(k)] = d[k]
+	return out
 
 
 # 數值容差比較；Dictionary/Array 遞迴

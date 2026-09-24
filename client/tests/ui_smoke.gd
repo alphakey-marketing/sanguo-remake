@@ -313,6 +313,36 @@ func _run() -> void:
 		var w2 := int(ch["equip"]["weapon"])
 		check(int(ch["equip"]["dur"][str(w2)]) == int(m.data.weapons[w2]["max_dur"]), "修理頁: 自己修理應該回滿耐久")
 	hud.close_panels()
+	# 13. 朝廷捐獻處 (Step 13): 互動掣 → 捐獻對話框 → 捐 3000 金 → 名聲 +3、扣行動力
+	var df: Dictionary = m.data.facilities["donate_xc"]
+	put(int(df["x"]), int(df["y"]) + 1)
+	check(await until(func() -> bool: return String(hud.ctx.get("kind", "")) == "fac" and String(hud.ctx.get("ref", {}).get("fac", "")) == "donate_xc"),
+		"近捐獻處互動掣應該係捐獻處 (%s)" % hud.ctx)
+	await click(center("context"))
+	var dp2: GamePanel = hud.panels.get("dialog")
+	check(dp2 != null and dp2.visible, "捐獻處應該開對話框")
+	if dp2 != null:
+		ch["gold"] = 10000
+		var fame0 := int(ch.get("fame", 0))
+		dp2.refresh(true)
+		await frames(1)
+		press(dp2, "捐 3000 金")
+		await frames(1)
+		check(int(ch["gold"]) == 7000 and int(ch.get("fame", 0)) == fame0 + 3 and int(ch["ap"]) == 90, "撳捐 3000 金: 扣錢 + 名聲 +3 + 扣行動力")
+	hud.close_panels()
+	# 14. 背包「腳伕」頁 (Step 13): 訂閱後勾存採礦 + 自動買工具
+	ch["storageSub"] = true
+	var bp2: BagPanel = hud.bag_panel()
+	bp2.open_filter("")
+	bp2.set_tab(2)
+	await frames(1)
+	press(bp2, "　存 採礦")
+	await frames(1)
+	bp2.refresh(true)
+	press(bp2, "　自動買工具")
+	await frames(1)
+	check((ch["tiandi"]["deposit"] as Array).has("mining") and bool(ch["tiandi"]["buyTool"]), "腳伕頁: 勾存採礦 + 自動買工具 (%s)" % ch.get("tiandi"))
+	hud.close_panels()
 	print("[TEST] ui_smoke: %d, fail %d" % [total, fails])
 	print("PASS: ui smoke" if fails == 0 else "FAIL: ui smoke")
 	get_tree().quit(1 if fails > 0 else 0)

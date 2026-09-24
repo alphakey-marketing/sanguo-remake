@@ -39,6 +39,9 @@ var work_adv: Dictionary = {}     # 進階技能 (data/work.json.advanced, Step 
 var recipes: Dictionary = {}      # 成品 item id -> {id, skill, lv, need:[[id,n]]} (data/recipes.json, Step 12)
 var recipes_by_skill: Dictionary = {}  # 進階 skill -> [recipe] (按 lv 排)
 var tool_skill: Dictionary = {}   # 工具 item id -> skill (初階 tool/starterTool + 進階 tool)
+var mat_skill: Dictionary = {}    # 初階工作材料 item id -> skill (天地商行自動存, Step 13)
+var donation: Dictionary = {}     # 捐贈官令設定 (data/donation.json, Step 13)
+var donation_rates: Dictionary = {}  # item id -> 捐獻單位【原】
 var quiz: Array = []              # 理念測驗題庫 (data/quiz.json, Step 7.5)
 var face_parts: Dictionary = {}   # 臉譜 8 部位款式數 (data/face.json, Step 7.5)
 var quests: Array = []            # 任務定義 (data/quests.json, Step 8)
@@ -83,6 +86,8 @@ static func load_all() -> GameData:
 	for sk in g.work:
 		g.tool_skill[int(g.work[sk]["tool"])] = sk
 		g.tool_skill[int(g.work[sk]["starterTool"])] = sk
+		for mid in g.work[sk]["materials"]:
+			g.mat_skill[int(mid)] = sk
 	for sk in g.work_adv:
 		g.tool_skill[int(g.work_adv[sk]["tool"])] = sk
 		g.recipes_by_skill[sk] = []
@@ -90,6 +95,10 @@ static func load_all() -> GameData:
 	for r in rc["recipes"]:
 		g.recipes[int(r["id"])] = r
 		g.recipes_by_skill[String(r["skill"])].append(r)
+	g.donation = _read("res://data/donation.json")
+	for cat in g.donation["table"]:
+		for row in g.donation["table"][cat]:
+			g.donation_rates[int(row["id"])] = int(row["rate"])
 	var qz: Dictionary = _read("res://data/quiz.json")
 	g.quiz = qz["questions"]
 	var fc: Dictionary = _read("res://data/face.json")

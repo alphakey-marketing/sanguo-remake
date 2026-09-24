@@ -424,6 +424,9 @@ func _spawn_actor(ename: String, kind: String, class_id: String = "yishi") -> Di
 	e["ch"]["workLv"] = {}                    # 生產技能等級 skill -> {lv, exp} (Step 12；未做過 = 冇 key)
 	e["ch"]["storage"] = []                   # 天地商行倉庫 [{id,n}] (Step 7.2)
 	e["ch"]["storageSub"] = false             # 有冇訂閱天地商行 (200/日)
+	e["ch"]["tiandi"] = {"deposit": [], "buyTool": false, "sellTool": false}   # 天地商行自動化設定 (Step 13)
+	e["ch"]["ap"] = int(data.world["ap"]["max"])   # 行動力 (Step 13)，子時回滿
+	e["ch"]["chaExp"] = 0                       # 魅力經驗 (捐獻, Step 13)
 	e["ch"]["equip"]["spellbooks"] = [0, 0, 0]   # 術法快捷列 3 格 (Step 9, spec 02 §3.1)
 	e["ch"]["equip"]["jewels"] = [0, 0]         # 寶石欄 2 格 (Step 10, spec 02 §4)
 	e["ch"]["ultimates"] = []                   # 已學絕招 (spec 02 §5)
