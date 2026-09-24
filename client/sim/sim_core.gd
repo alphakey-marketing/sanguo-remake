@@ -506,6 +506,37 @@ func _office_on_talk(_e: Dictionary, _key: String, _x: int, _y: int) -> void:
 	pass
 
 
+# 居民委託 / 收集冊 hook (Step 16)：sim_comm 覆寫
+func _comm_on_talk(_e: Dictionary, _npc_id: String) -> bool:
+	return false
+
+
+func _comm_on_kill(_by: Dictionary, _def_id: int) -> void:
+	pass
+
+
+func cmd_book_exchange(_id: int) -> void:
+	pass
+
+
+func order_count(ch: Dictionary, item: int) -> int:
+	return RulesShop.count_item(ch["bag"], item)
+
+
+func _order_consume(ch: Dictionary, item: int) -> bool:
+	return RulesShop.remove_item(ch["bag"], item, 1)
+
+
+# (x,y) 附近搵一格空位 (一圈圈向外)
+func _free_near(x: int, y: int) -> Vector2i:
+	for r in range(1, 6):
+		for dy in range(-r, r + 1):
+			for dx in range(-r, r + 1):
+				if maxi(absi(dx), absi(dy)) == r and is_free(x + dx, y + dy):
+					return Vector2i(x + dx, y + dy)
+	return Vector2i(x, y)
+
+
 func _near(e: Dictionary, x: int, y: int) -> bool:
 	return RulesCombat.in_range(e["x"], e["y"], x, y, NEAR)
 

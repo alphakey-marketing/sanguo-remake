@@ -122,8 +122,9 @@ func _think_player(p: Dictionary) -> void:
 		return
 	p["tx"] = p["x"]
 	p["ty"] = p["y"]
-	if is_safe(int(p["x"]), int(p["y"])) and not (t.get("mob", {}) as Dictionary).has("arena"):
-		return     # 安全區唔畀出手 (登用擂台例外, Step 13.5) (理論上怪唔會入城，呢度做多重保險)
+	var tm: Dictionary = t.get("mob", {})
+	if is_safe(int(p["x"]), int(p["y"])) and not tm.has("arena") and not tm.has("quest_boss"):
+		return     # 安全區唔畀出手 (登用擂台 / 任務 PK boss 例外: 丁刺史府, Step 13.5/16) (理論上怪唔會入城，呢度做多重保險)
 	if tick < int(p["next_atk"]):
 		return
 	var w: Dictionary = _weapon_def(ch)     # 耐久 0 = 威力減半 (Step 12)

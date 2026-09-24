@@ -20,8 +20,8 @@
 | 02 戰鬥 | 🟡 | 🟡 | 近戰即時制、術法（Step 9）、5 屬性相剋、狀態系統、寶石 2 格、義士三招絕招、義士融合 QTE、防具 5 部位 + 武器 3 槽 + 耐久（Step 11.6）+ 武器耐久/修理（Step 12） | 其他 5 職特技/絕招；組隊（同伴）；馬戰 |
 | 03 善惡死亡 | 🟡 | ✅ | 七階、死亡掉物品/跌經驗、善惡影響價格 | 天譴、幸運符/護身符/還魂丹 |
 | 04 怪物地圖 | 🟡 | ✅ | 39 怪（`data/monsters.json`，32 隻掉落由 `tools/import_drops.py` 導入 npc_drops；B2.5 加盜賊/流氓2/瘋狂小兵/海盜賊/山寨山賊）、重生、逃跑/群攻 AI、boss 每日重生、汝南洞窟 10 層 | 特殊場景；戰役場景 |
-| 05 生產經濟 | 🟡 | ✅ | 6 初階技能 + 技能等級、5 進階技能 + 2318 配方（`rules/work.gd`、`data/recipes.json`）、修理（自己修/打鐵鋪）、工具店、倉庫/代賣、天地商行自動化 + 捐獻（Step 13，`rules/tiandi.gd`、`data/donation.json`）、動態市場、商店 | 大宗師、NPC 修理委託、特製/白金工具、捐義勇軍 |
-| 06 任務 | 🟡 | ✅ | 框架（`rules/quest.gd`、`data/quests.json`）、新手 5 條、義士絕招三條、官令 3 條（Step 14，`data/office.json`、`sim/sim_office.gd`） | 其餘 4 條官令、歷史、團體、戰役、專長、結婚（`QUEST_TYPES` 只有名） |
+| 05 生產經濟 | 🟡 | ✅ | 6 初階技能 + 技能等級、5 進階技能 + 2318 配方（`rules/work.gd`、`data/recipes.json`）、修理（自己修/打鐵鋪）、工具店、倉庫/代賣、天地商行自動化 + 捐獻（Step 13，`rules/tiandi.gd`、`data/donation.json`）、動態市場、商店 | 大宗師、特製/白金工具、捐義勇軍 |
+| 06 任務 | 🟡 | ✅ | 框架（`rules/quest.gd`、`data/quests.json`）、新手 5 條、義士絕招三條、官令 3 條（Step 14，`data/office.json`、`sim/sim_office.gd`）、歷史任務豫荊 6 條 + 門禁 + 武將收集冊 + 居民委託 4 種（Step 16，`rules/commission.gd`、`sim/sim_comm.gd`） | 其餘 4 條官令、其餘 5 條歷史（洛陽/零陵/長沙深區）、團體、戰役、專長、結婚 |
 | 07 座騎戰騎 | ❌ | ❌ | — | 全部 |
 | 08 名聲義勇軍 | 🟡 | 🟡 | 任務獎勵寫 `ch.fame`；捐贈官令（Step 13）；頭銜 60 階（`data/titles.json` 由 `tools/gen_titles.py` 導入）+ 官宅（許昌官宅/新野縣衙：討取/官令/捐獻/換行動丹）+ 月俸（Step 14） | 義舉證明、城池進貢、名聲競爭（名額）、官宅內政 6 種、義勇軍、營地、救災、民心、法令 |
 | 09 登用武將 | 🟡 | 🟡 | 居民 bot、記憶/好感（`rules/npc_memory.gd`）、規則版 brain（`sim/npc_brain.gd`）；Step 13.5：1261 武將導入（`data/generals.json`）、Tier1 19 人城內按時辰出現、調查/擂台/問答、同伴 4 指令、忠誠、30 日到期、頭銜條件（Step 14）（`rules/recruit.gd`、`sim/sim_recruit.gd`、登用面板）；Step 15：將軍令/御賜金牌、武將寶物 2 格、藥膳師補品、6 指令（絕招/術法）、70 特技表 + 20 passive（`data/general_skills.json`、`rules/general.gd`） | 其餘 50 特技（主動/國戰/生產）、內政協助、帶兵、LLM 層 |
@@ -135,10 +135,15 @@
 - 偏離：小沛（徐州）/陳留（兗州）/長沙 唔喺豫荊，只做任務需要嘅一角；原版港口小兵 Lv50 → Lv12【自訂】
 - 驗收：`tests/run_maps.gd` +83（1101：過圖數/路由/室內/新城客棧商店/死亡返最近客棧/怪等級帶/新怪掉落/許昌 → 襄陽尋路 8 次過圖）+ monsters 向量 +2 ✅
 
-### Step 16 歷史任務（豫荊 6 條）+ 一般任務模板（spec 06 §4）
-- [ ] 6 條歷史任務（將軍令掉落 → 接 Step 15）
-- [ ] 居民隨機委託生成器
-- 驗收：孫堅任務全線；將軍令入收集冊
+### ✅ Step 16 歷史任務（豫荊 6 條）+ 一般任務模板（spec 06 §4）
+- [x] 6 條歷史任務【原】sy3_5（`data/quests.json` type `history`）：少年孫堅打海賊 / 聲東擊西退于毒 / 搶救曹操大作戰 / 袁紹義助王允 / 董卓初登場 / 代呂布斬丁原；獎勵將軍令 → 接 Step 15 登用
+- [x] 任務框架擴充（`rules/quest.gd`）：`pre.attr`（魅力門檻）、talk `takeItems`（交信物先推進）、fight `takeItems`（出兵令）、`reward.polExp`；NPC `questOnly`（boss/內應只喺任務要佢先出現）+ `strictWindow`（董卓卯~酉、獄中曹操子~丑，任務進行中都守時辰）；對話 fight stage NPC = 自動開 PK、collect stage giver = 自動交（UI 本來冇掣）
+- [x] 門禁 `portal.gate`（`maps.json`）：襄陽監獄子~丑時先入得、丁刺史府要丁原家鑰匙；安全區（丁府）打得任務 boss（同擂台一樣例外）；3 隻 boss 胡玉/于毒/丁原（`monsters.json` 1012~1014【自訂】數值）
+- [x] 武將收集冊【原】sy2_6_1：許昌老丈收地/水/火/風/生/無之石各 1 換冊；將軍令收入冊唔佔背包位，登用照用（背包先、冊後扣）；背包「查閱」
+- [x] 居民委託生成器（`rules/commission.gd` + `data/commissions.json` + `sim/sim_comm.gd`）：6 位委託人（許昌 2 + 新野/宛城/汝南/襄陽），每人每日 1 單，4 種 = 打怪 / 收集 / 送信 / 即場修理（要進階技能 + 工具，補 Step 12 NPC 修理委託）；最多 3 單、3 日過期；出單由 (日, 人, salt) 決定唔食 RNG
+- [x] UI：委託對話框（傾偈/接委託/覆命/放棄）、老丈對話框、收集冊查閱、記事顯示委託
+- 偏離 spec：獄吏（監獄內應）【自訂】（攻略只寫「潛入監獄得通行令」）；委託全部【自訂】；安全區內絕招仍然用唔到（只可普攻/術法）
+- 驗收：`tests/run_hist.gd` 159 項（資料驗證、純函數、孫堅全線 + 其餘 5 條、門禁、安全區 PK、收集冊 + 登用、4 種委託 + 上限/過期/放棄、存檔 roundtrip、決定性）+ `--uitest` 委託/收集冊（67）✅
 
 ### Step 16.5 地圖 B3（spec 12 §1）
 - [ ] 隆中；驛站快速傳送（樊城/漢水渡口/襄陽城已喺 Step 15.9 做咗）

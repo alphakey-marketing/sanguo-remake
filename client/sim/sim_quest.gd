@@ -19,7 +19,7 @@ func _sync_quest_npcs() -> void:
 	var changed := false
 	for n in data.quest_npc_list:
 		var nid := String(n["id"])
-		var vis := RulesQuest.npc_visible(n, ch, ke) or RulesQuest.quest_locks_npc(ch, nid, data.quests)
+		var vis := RulesQuest.npc_shown(n, ch, ke, data.quests)
 		var cur := bool(qn.get(nid, {}).get("visible", false))
 		if vis != cur:
 			qn[nid] = {"visible": vis}
@@ -45,9 +45,9 @@ func _quest_emit(e: Dictionary, q: Dictionary, res: Dictionary) -> void:
 	elif bool(res.get("done", false)):
 		_sync_stats(e)
 		_emit({"k": "quest", "dst": id, "quest": q["id"], "done": true, "reward": res.get("reward", {})})
-		_sync_quest_npcs()          # 完成: 解鎖 NPC 嘅強制常駐
 	else:
 		_emit({"k": "quest", "dst": id, "quest": q["id"], "stage": int(res.get("stage", 0))})
+	_sync_quest_npcs()          # 開始/推進/完成都可能改 NPC 常駐 (questOnly boss/內應, Step 16)
 	if not str(res.get("msg", "")).is_empty():
 		_msg(id, str(res["msg"]))
 
@@ -80,16 +80,42 @@ func cmd_quest_talk(id: int, npc_id: String) -> void:
 		spoke = true
 		_quest_emit(e, q, res)
 	if not spoke:
+		spoke = _quest_talk_auto(e, npc_id)
+	if not spoke:
+		spoke = _comm_on_talk(e, npc_id)       # 居民委託 (Step 16): 送信到手 / 回報
+	if not spoke:
 		var pool: Array = npc.get("idle", [])
 		if not pool.is_empty():
 			_emit({"k": "npc_say", "id": 0, "name": str(npc["name"]), "text": str(pool[rng.below(pool.size())]),
 				"action": "greet", "x": int(npc["x"]), "y": int(npc["y"])})
 
 
+# 對話觸發 PK / 交收集品 (Step 16): 當前 stage = fight 且 npc 啱 → 開打；collect 且係 giver/stage npc → 交
+func _quest_talk_auto(e: Dictionary, npc_id: String) -> bool:
+	var ch: Dictionary = e["ch"]
+	for q in data.quests:
+		var stage := RulesQuest.stage_of(ch, q)
+		if stage.is_empty():
+			continue
+		match String(stage.get("type", "")):
+			"fight":
+				if String(stage.get("npc", "")) == npc_id:
+					cmd_quest_battle(int(e["id"]), String(q["id"]))
+					return true
+			"collect":
+				if String(stage.get("npc", q.get("giver", ""))) == npc_id:
+					cmd_quest_turnin(int(e["id"]), String(q["id"]))
+					return true
+	return false
+
+
 # 服務 NPC 功能（密醫【原】: 免費醫療 100 HP，一日 3 次）
 func _quest_service(e: Dictionary, ch: Dictionary, npc: Dictionary) -> void:
 	var id := int(e["id"])
 	var sv: Dictionary = npc["service"]
+	if String(sv.get("kind", "")) == "book":       # 許昌老丈 (Step 16): 對話 = 試換收集冊
+		cmd_book_exchange(id)
+		return
 	if String(sv.get("kind", "")) != "heal":
 		return _msg(id, "%s：而家冇服務" % npc["name"])
 	var qid := ""
@@ -195,7 +221,8 @@ func view_quest_npcs() -> Array:
 		var qv: Dictionary = state["quest_npcs"].get(String(n["id"]), {})
 		if bool(qv.get("visible", false)):
 			out.append({"id": n["id"], "name": n["name"], "x": n["x"], "y": n["y"], "desc": n.get("desc", ""),
-				"service": (n.get("service", {}) as Dictionary).size() > 0})
+				"service": (n.get("service", {}) as Dictionary).size() > 0,
+				"svc": String(n.get("service", {}).get("kind", "")), "comm": bool(n.get("commission", false))})
 	return out
 
 
@@ -235,6 +262,9 @@ func cmd_quest_battle(id: int, quest_id: String) -> void:
 	var npc: Dictionary = data.quest_npcs.get(String(stage.get("npc", "")), {})
 	if npc.is_empty() or not _near(e, int(npc["x"]), int(npc["y"])):
 		return _msg(id, "要行近%s先得" % npc.get("name", ""))
+	for ti in stage.get("takeItems", []):
+		if not RulesShop.has_item(e["ch"]["bag"], int(ti[0]), int(ti[1])):
+			return _msg(id, "要帶齊%s先開得戰" % data.names.get(int(ti[0]), str(ti[0])))
 	var boss_id := int(stage.get("monster", 0))
 	if boss_id <= 0 or not data.monsters.has(boss_id):
 		return
@@ -246,8 +276,10 @@ func cmd_quest_battle(id: int, quest_id: String) -> void:
 	if b == null:
 		return
 	b["mob"]["quest_boss"] = qid
-	b["x"] = int(npc["x"]) + 1      # 放喺 NPC 隔籬 (野區)
-	b["y"] = int(npc["y"]) + 1
+	var p := _free_near(int(npc["x"]), int(npc["y"]))     # 放喺 NPC 隔籬行得嘅格
+	b["x"] = p.x
+	b["y"] = p.y
+	b["mob"]["zone"] = map_id_at(p.x, p.y)
 	b["tx"] = b["x"]
 	b["ty"] = b["y"]
 	b["mob"]["home_x"] = b["x"]

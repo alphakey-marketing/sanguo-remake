@@ -82,6 +82,7 @@ func _kill_mob(m: Dictionary, by: Dictionary, exp_mult: float = 1.0) -> void:
 			int(clk.get("yearDays", 360)), int(clk.get("monthDays", 30)),
 			int(ch.get("birthMonth", 1)), int(ch.get("birthDay", 1))))
 	var ups := RulesStats.gain_exp(data, ch, exp_gain)
+	_comm_on_kill(by, int(m["mob"]["def"]))      # 居民委託打怪計數 (Step 16)
 	if ups > 0:
 		_sync_quest_npcs()          # 升級可能改變任務 NPC 可見性 (神秘老人/流浪狗)
 	if ups > 0 and by.get("kind", "") == "bot":   # 機械人冇人幫手派點: 直接按建議比例自動派

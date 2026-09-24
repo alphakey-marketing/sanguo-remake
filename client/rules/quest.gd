@@ -8,6 +8,7 @@ const QUEST_TYPES := ["newbie", "general", "official", "history", "ultimate", "g
 const STAGE_TYPES := ["talk", "talk_n", "repeat", "collect", "ask", "facility", "fight"]
 const QUEST_ITEM_CATS := [44, 52]          # 任務雜物 / 任務物品 (spec 06 §1.2: 61501 田鼠碎骨等)
 const HINT_VARS := ["%v", "%n"]            # hint 內 %v=目前進度 %n=需要數量
+const ATTR_KEYS := ["str", "agi", "int", "spi", "pol", "cha"]
 
 
 # ================= schema 驗證 (data load 後跑，回傳錯誤 String 列表) =================
@@ -44,6 +45,11 @@ static func validate(data: GameData) -> Array:
 				for nid in npcs:
 					if not data.quest_npcs.has(String(nid)):
 						errs.append("%s.s%d: talk_n npc 唔存在 (%s)" % [id, si, nid])
+			for ti in st.get("takeItems", []):
+				if not data.item_ids.has(int(ti[0])):
+					errs.append("%s.s%d: takeItems 道具唔存在 (%s)" % [id, si, ti[0]])
+			if t == "fight" and not data.monsters.has(int(st.get("monster", 0))):
+				errs.append("%s.s%d: fight monster 唔存在 (%s)" % [id, si, st.get("monster", "")])
 			if t == "collect":
 				var it: Dictionary = st.get("item", {})
 				if it.is_empty() or not data.item_ids.has(int(it.get("id", -1))):
@@ -61,6 +67,9 @@ static func validate(data: GameData) -> Array:
 			for it in rw.get("items", []):
 				if not data.item_ids.has(int(it[0])):
 					errs.append("%s: reward item 唔存在 (%s)" % [id, it[0]])
+		for k in q.get("pre", {}).get("attr", {}):
+			if not ATTR_KEYS.has(String(k)):
+				errs.append("%s: pre.attr 屬性唔啱 (%s)" % [id, k])
 		var gv := String(q.get("giver", ""))
 		if gv != "" and not data.quest_npcs.has(gv):
 			errs.append("%s: giver npc 唔存在 (%s)" % [id, gv])
@@ -91,7 +100,7 @@ static func ke_in_window(ke: int, start_ke: int, end_ke: int) -> bool:
 
 
 static func npc_visible(npc: Dictionary, ch: Dictionary, ke: int) -> bool:
-	if ch.is_empty():
+	if ch.is_empty() or bool(npc.get("questOnly", false)):
 		return false
 	if npc.has("maxLevel") and int(ch["level"]) > int(npc["maxLevel"]):
 		return false
@@ -100,6 +109,18 @@ static func npc_visible(npc: Dictionary, ch: Dictionary, ke: int) -> bool:
 	var w: Dictionary = npc.get("window", {})
 	if not w.is_empty() and not ke_in_window(ke, int(w["startKe"]), int(w["endKe"])):
 		return false
+	return true
+
+
+# 最終顯示: 平時規則 或 任務強制常駐；strictWindow = 任務進行中都要守時辰 (Step 16 董卓卯~酉/獄中曹操子~丑)
+static func npc_shown(npc: Dictionary, ch: Dictionary, ke: int, quests: Array) -> bool:
+	if npc_visible(npc, ch, ke):
+		return true
+	if ch.is_empty() or not quest_locks_npc(ch, String(npc.get("id", "")), quests):
+		return false
+	var w: Dictionary = npc.get("window", {})
+	if bool(npc.get("strictWindow", false)) and not w.is_empty():
+		return ke_in_window(ke, int(w["startKe"]), int(w["endKe"]))
 	return true
 
 
@@ -122,7 +143,7 @@ static func quest_locks_npc(ch: Dictionary, npc_id: String, quests: Array) -> bo
 
 
 # ================= pre 條件 (spec 06 §1.1: 全部要符合先觸發) =================
-# 支持: maxLevel/minLevel/level/classId/karmaMin/karmaMax/ideology/questDone
+# 支持: maxLevel/minLevel/level/classId/karmaMin/karmaMax/ideology/attr {k: 最低}/hasItem/questDone
 static func pre_ok(data: GameData, q: Dictionary, ch: Dictionary) -> bool:
 	var pre: Dictionary = q.get("pre", {})
 	if pre.is_empty():
@@ -142,6 +163,9 @@ static func pre_ok(data: GameData, q: Dictionary, ch: Dictionary) -> bool:
 		return false
 	if pre.has("ideology") and String(ch.get("ideology", "")) != String(pre["ideology"]):
 		return false
+	for k in pre.get("attr", {}):   # 屬性門檻 (Step 16 歷史任務: 魅力 10+)
+		if int(ch["attrs"].get(k, 0)) < int(pre["attr"][k]):
+			return false
 	if pre.has("hasItem"):          # 身上要有道具先觸發 (Step 10 絕招三: 呂代槍文集)
 		var need: Dictionary = pre["hasItem"]
 		if not RulesShop.has_item(ch["bag"], int(need.get("id", 0)), int(need.get("n", 1))):
@@ -213,6 +237,13 @@ static func on_npc_talk(data: GameData, ch: Dictionary, q: Dictionary, npc_id: S
 		"talk", "fight":
 			if t == "fight":
 				return out                            # PK 由 cmd_quest_battle 處理 (Step 10+)，talk 唔推進
+			var take: Array = stage.get("takeItems", [])
+			for ti in take:                           # 交信物 (Step 16): 要帶齊先推進，推進先扣
+				if not RulesShop.has_item(ch["bag"], int(ti[0]), int(ti[1])):
+					out["msg"] = "要帶齊%s" % data.names.get(int(ti[0]), str(ti[0]))
+					return out
+			for ti in take:
+				RulesShop.remove_item(ch["bag"], int(ti[0]), int(ti[1]))
 			out["dialog"] = stage.get("dialog", [])
 			return _advance(data, ch, q, st, stage, out)
 		"talk_n":
@@ -278,6 +309,8 @@ static func on_fight_win(data: GameData, ch: Dictionary, q: Dictionary) -> Dicti
 	var stage := _stage(q, int(st.get("stage", 0)))
 	if stage.is_empty() or String(stage.get("type", "")) != "fight":
 		return out
+	for ti in stage.get("takeItems", []):      # 出兵令之類: 打贏先收 (召喚時已 check 過有)
+		RulesShop.remove_item(ch["bag"], int(ti[0]), int(ti[1]))
 	return _advance(data, ch, q, st, stage, out)
 
 
@@ -335,7 +368,7 @@ static func _advance(data: GameData, ch: Dictionary, q: Dictionary, st: Dictiona
 
 
 # ================= 獎勵結算 =================
-# reward keys: exp/gold/fame/lilian/items [[id,n]...]/attr {k:+1}/ultimate/spell/expert
+# reward keys: exp/gold/fame/lilian/items [[id,n]...]/attr {k:+1}/polExp/ultimate/spell/expert
 # 回傳 payload（事件/訊息用）；未支援嘅 key 忽略
 static func apply_reward(data: GameData, ch: Dictionary, reward: Dictionary) -> Dictionary:
 	var payload := {}
@@ -370,6 +403,13 @@ static func apply_reward(data: GameData, ch: Dictionary, reward: Dictionary) -> 
 			ch["attrs"][k] = int(ch["attrs"].get(k, 0)) + int(reward["attr"][k])
 			attrs[k] = int(reward["attr"][k])
 		payload["attr"] = attrs
+	if reward.has("polExp"):            # 政治經驗 (Step 16 歷史任務): 同官令一樣換算政治點
+		var pe := int(reward["polExp"])
+		var r := RulesTiandi.cha_gain(int(ch["attrs"]["pol"]), int(ch.get("polExp", 0)), pe,
+			{"chaExpPerPoint": data.office["polExpPerPoint"], "chaCap": data.office["polCap"]})
+		ch["attrs"]["pol"] = int(r["cha"])
+		ch["polExp"] = int(r["exp"])
+		payload["polExp"] = pe
 	if reward.has("ultimate"):          # 絕招 (Step 10, spec 02 §5): 學識 -> ch.ultimates 列表
 		var uid := String(reward["ultimate"])
 		var ults: Array = ch.get("ultimates", [])
@@ -385,7 +425,10 @@ static func apply_reward(data: GameData, ch: Dictionary, reward: Dictionary) -> 
 
 
 # 任務道具 (cat 44 任務雜物 / cat 52 任務物品) 唔賣得 (spec 06 §1.2)
+# 武將收集冊 (Step 16) 一樣唔賣得
 static func is_quest_item(data: GameData, item_id: int) -> bool:
+	if item_id == int(data.comm.get("book", {}).get("item", 0)):
+		return true
 	return QUEST_ITEM_CATS.has(int(data.cats.get(item_id, 0)))
 
 

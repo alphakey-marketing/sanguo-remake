@@ -1,5 +1,5 @@
 {
- "_note": "第一批 5 種 1~10 級野區怪 + 3 隻術法怪 (Step 9) + 絕招 boss (Step 10) +Step 11 導入 (spec 11 §2): npc_drops.csv rate→p (rate/100000)，p≥0.05 入 drops、p<0.05 入 rareDrops。levels/hp/atk/exp 數值 = spec 04 §1 等級帶模板【自訂】(npc_id 確定性抖動 ±20%)。boss=true → 每日重生一次 (spec 04 §3)；groups=true 群居 / flee=false 唔逃走 (boss/PK 怪)。洞窟怪 levels 由 npc_drops.csv 第 3 欄 (怪物等級)，樓層分佈見 spawns zone: runan_f1~f10。alignment: NPC 善惡值，負=惡。atkInterval = tick(10Hz)。element: 屬性 (spec 02 §3.2 相剋)。spell/spellCd: 術法怪用 data/spells.json 術法 id + 冷卻 (tick)。 dropSrc: 掉落借用嘅原版 npc_id (1~10 級新手怪)；掉落由 tools/import_drops.py 生成，冇 CSV 來源 = 【自訂】手寫。 Step 15.9 (B2.5): 11072 盜賊 / 11069 流氓2 (原版表)；27248 瘋狂小兵 Lv12 (港口，原版 Lv50 降級【自訂】，掉落借 11072)、27005 海盜賊 Lv15 (借 11068)、27008 山寨山賊 Lv14 (借 11091)；spawn zone: chenliu/yudu/jingzhou/gangkou/fancheng/hanshui。",
+ "_note": "第一批 5 種 1~10 級野區怪 + 3 隻術法怪 (Step 9) + 絕招 boss (Step 10) +Step 11 導入 (spec 11 §2): npc_drops.csv rate→p (rate/100000)，p≥0.05 入 drops、p<0.05 入 rareDrops。levels/hp/atk/exp 數值 = spec 04 §1 等級帶模板【自訂】(npc_id 確定性抖動 ±20%)。boss=true → 每日重生一次 (spec 04 §3)；groups=true 群居 / flee=false 唔逃走 (boss/PK 怪)。洞窟怪 levels 由 npc_drops.csv 第 3 欄 (怪物等級)，樓層分佈見 spawns zone: runan_f1~f10。alignment: NPC 善惡值，負=惡。atkInterval = tick(10Hz)。element: 屬性 (spec 02 §3.2 相剋)。spell/spellCd: 術法怪用 data/spells.json 術法 id + 冷卻 (tick)。 dropSrc: 掉落借用嘅原版 npc_id (1~10 級新手怪)；掉落由 tools/import_drops.py 生成，冇 CSV 來源 = 【自訂】手寫。 Step 15.9 (B2.5): 11072 盜賊 / 11069 流氓2 (原版表)；27248 瘋狂小兵 Lv12 (港口，原版 Lv50 降級【自訂】，掉落借 11072)、27005 海盜賊 Lv15 (借 11068)、27008 山寨山賊 Lv14 (借 11091)；spawn zone: chenliu/yudu/jingzhou/gangkou/fancheng/hanshui。 Step 16 歷史任務 PK boss (冇重生/冇掉落，由 cmd_quest_battle 召喚): 1012 胡玉 Lv13 / 1013 于毒 Lv15 / 1014 丁原 Lv18，數值【自訂】。",
  "monsters": [
   {
    "id": 1001,
@@ -464,6 +464,69 @@
     0
    ],
    "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "drops": []
+  },
+  {
+   "id": 1012,
+   "name": "胡玉",
+   "level": 13,
+   "hp": 900,
+   "atk": 34,
+   "def": 11,
+   "spellDef": 20,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 0,
+   "gold": [
+    0,
+    0
+   ],
+   "alignment": -600,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "drops": []
+  },
+  {
+   "id": 1013,
+   "name": "于毒",
+   "level": 15,
+   "hp": 1100,
+   "atk": 38,
+   "def": 12,
+   "spellDef": 24,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 0,
+   "gold": [
+    0,
+    0
+   ],
+   "alignment": -700,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "drops": []
+  },
+  {
+   "id": 1014,
+   "name": "丁原",
+   "level": 18,
+   "hp": 1400,
+   "atk": 44,
+   "def": 14,
+   "spellDef": 28,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 0,
+   "gold": [
+    0,
+    0
+   ],
+   "alignment": -200,
    "aggroRange": 8,
    "leash": 16,
    "element": "none",
