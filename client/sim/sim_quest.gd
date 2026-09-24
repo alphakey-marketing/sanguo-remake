@@ -75,6 +75,10 @@ func cmd_quest_talk(id: int, npc_id: String) -> void:
 	var spoke := false
 	for q in data.quests:
 		var res := RulesQuest.on_npc_talk(data, ch, q, npc_id, day)
+		if bool(res.get("blocked", false)):          # 今日拜訪過 / 未帶齊信物: 提示，唔推進
+			_msg(int(e["id"]), str(res["msg"]))
+			spoke = true
+			continue
 		if not bool(res.get("changed", false)):
 			continue
 		spoke = true

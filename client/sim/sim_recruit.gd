@@ -130,7 +130,7 @@ func _order_cands(ch: Dictionary, kind: String, gone: Dictionary, cands: Array) 
 	for k in ch.get("orderBook", {}):
 		held.append(int(k))
 	for it in held:
-		var gname := RulesGeneral.order_general_name(String(data.names.get(it, "")), String(data.gen2_cfg["orderSuffix"]))
+		var gname := RulesGeneral.order_general_name(String(data.names.get(it, "")), String(data.gen2_cfg["orderSuffix"]), data.gen2_cfg.get("orderAlias", {}))
 		if gname == "" or names.has(gname):
 			continue
 		var g := _order_general(gname)

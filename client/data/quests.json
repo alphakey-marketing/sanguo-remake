@@ -1,5 +1,5 @@
 {
- "_note": "任務定義 (spec 06 §1.1~§2)【原=流程/條件；自訂=數值奬勵/對話措辭】。stage 順序 = array 序；next 欄位省略（照序）。stage type: talk(同 npc 傾偈, getItem=對話中攞到道具) / talk_n(同 n 個 npc 傾偈) / repeat(重複 n 次, perDay=每日最多 1 次) / collect(交道具, 用 cmd_quest_turnin) / ask(答題, 用 cmd_quest_answer) / facility(用設施, 由 cmd_facility 推進) / fight(PK, Step 10+ 用)。hidden=true 唔顯示喺記事（service NPC）。 Step 16 歷史任務 (type=history, spec 06 §4【原】sy3_5): talk.takeItems = 對話要帶齊呢啲道具先推進 (推進時扣)；fight = 行近 npc 對話召喚 boss；pre.attr = 屬性門檻 (魅力)；reward.polExp = 政治經驗。對話措辭【自訂】。",
+ "_note": "任務定義 (spec 06 §1.1~§2)【原=流程/條件；自訂=數值奬勵/對話措辭】。stage 順序 = array 序；next 欄位省略（照序）。stage type: talk(同 npc 傾偈, getItem=對話中攞到道具) / talk_n(同 n 個 npc 傾偈) / repeat(重複 n 次, perDay=每日最多 1 次) / collect(交道具, 用 cmd_quest_turnin) / ask(答題, 用 cmd_quest_answer) / facility(用設施, 由 cmd_facility 推進) / fight(PK, Step 10+ 用)。hidden=true 唔顯示喺記事（service NPC）。 Step 16 歷史任務 (type=history, spec 06 §4【原】sy3_5): talk.takeItems = 對話要帶齊呢啲道具先推進 (推進時扣)；fight = 行近 npc 對話召喚 boss；pre.attr = 屬性門檻 (魅力)；reward.polExp = 政治經驗。 Step 16.5 (B3): repeat.dialogs = 第 n 次對白、repeat.dayMsg = 同日再嚟嘅提示。對話措辭【自訂】。",
  "quests": [
   {
    "id": "newbie_mystery",
@@ -812,6 +812,63 @@
      [
       32305,
       1
+     ]
+    ]
+   }
+  },
+  {
+   "id": "hist_longzhong",
+   "name": "三顧茅廬",
+   "type": "history",
+   "giver": "simahui",
+   "pre": {
+    "minLevel": 10
+   },
+   "preHint": "武功 10 級以上，去襄陽城西門內搵水鏡先生司馬徽",
+   "stages": [
+    {
+     "type": "talk",
+     "npc": "simahui",
+     "dialog": [
+      "司馬徽：「臥龍、鳳雛，兩人得一，可安天下。臥龍者，諸葛孔明也，隱居喺城西隆中。你想見佢？就要有誠意——佢唔係一請就出嚟嘅人。」"
+     ],
+     "hint": "出襄陽西門去隆中，上臥龍岡草廬拜訪"
+    },
+    {
+     "type": "repeat",
+     "npc": "caolu_boy",
+     "n": 3,
+     "perDay": true,
+     "dayMsg": "書童：「先生今日唔喺度，你聽日再嚟啦。」",
+     "dialogs": [
+      "書童：「先生今朝一早出咗門，唔知去咗邊，可能三五日，可能十幾日先返。」",
+      "書童：「唉，你又嚟遲一步，先生同朋友出咗去閒遊。你改日再試下啦。」",
+      "書童：「先生返咗嚟，喺入面午睡……你等等，我入去通傳。」"
+     ],
+     "hint": "去隆中草廬拜訪臥龍（一日一次，%v/%n 顧）"
+    },
+    {
+     "type": "talk",
+     "npc": "zhugeliang",
+     "dialog": [
+      "諸葛亮：「承蒙三顧，亮豈敢再辭？今曹操擁百萬之眾，挾天子以令諸侯；孫權據有江東，已歷三世。荊州用武之國，益州險塞沃野——若跨有荊、益，外結孫權，內修政理，則霸業可成，漢室可興矣。」",
+      "諸葛亮：「呢塊令牌你收好，他日有用得著亮嘅地方，憑佢嚟搵我。」"
+     ],
+     "done": true,
+     "hint": "入草廬見諸葛亮"
+    }
+   ],
+   "reward": {
+    "fame": 30,
+    "polExp": 20,
+    "items": [
+     [
+      62246,
+      1
+     ],
+     [
+      29017,
+      5
      ]
     ]
    }

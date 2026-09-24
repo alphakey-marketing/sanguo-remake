@@ -34,7 +34,9 @@ static func find(main: Node) -> Dictionary:
 		match String(f.kind):
 			"shop": best = {"kind": "shop", "label": "商店", "ref": f}
 			"inn": best = {"kind": "inn", "label": "客棧", "ref": f}
-			"fac": best = {"kind": "fac", "label": str(main.data.facilities[f.fac]["name"]).substr(0, 3), "ref": f}
+			"fac":
+				var fd: Dictionary = main.data.facilities[f.fac]
+				best = {"kind": "fac", "label": "驛站" if bool(fd.get("station", false)) else str(fd["name"]).substr(0, 3), "ref": f}
 			"travel": best = {"kind": "travel", "label": "傳送", "ref": f}
 	if not best.is_empty():
 		return best
@@ -266,6 +268,8 @@ static func fac_dialog(main: Node, f: Dictionary) -> Dictionary:
 		return forge_dialog(main, def)
 	if bool(def.get("office", false)):
 		return office_dialog(main, def)
+	if bool(def.get("station", false)):
+		return station_dialog(main, def)
 	if bool(def.get("donation", false)):
 		return donate_dialog(main, def)
 	var text := str(def.get("desc", ""))
@@ -277,6 +281,21 @@ static func fac_dialog(main: Node, f: Dictionary) -> Dictionary:
 	text += "\n金 %d" % int(ch.get("gold", 0))
 	return {"title": str(def["name"]), "text": text,
 		"options": [{"label": "使用", "cb": func() -> void: main._send({"t": "facility", "key": key})}, _leave(main)]}
+
+
+# 驛站 (Step 16.5 B3): 列出其他驛站 + 車費，撳 = 搭車 (唔夠錢灰)
+static func station_dialog(main: Node, def: Dictionary) -> Dictionary:
+	var v: Dictionary = main.sim.station_view(main.my_id)
+	var opts: Array = []
+	for r in v.get("list", []):
+		var k := str(r["key"])
+		var go := func() -> void:
+			main._send({"t": "station", "to": k})
+			main.hud.close_panels()
+		opts.append({"label": "%s (%d 金)" % [r["name"], int(r["fare"])], "cb": go, "disabled": str(r["why"]) != ""})
+	opts.append(_leave(main))
+	return {"title": str(def["name"]), "text": "驛站馬車：揀目的地即刻出發，車費按路程計。
+金 %d" % int(v.get("gold", 0)), "options": opts}
 
 
 # 官宅 (Step 14): 討取頭銜 / 官令 (接/覆命/放棄) / 捐獻 / 貢獻換行動丹

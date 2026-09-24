@@ -19,6 +19,8 @@
   "tiandi": { "bagMatCap": 100, "storageCap": 1000, "toolSellAt": 2, "restCost": 10 },
   "_noteAp": "行動力 (Step 13/14)【原=捐獻/官令扣行動力；上限 = 頭銜表 ap 欄 (冇頭銜 = max)；自訂=每日子時回滿】",
   "ap": { "max": 100 },
+  "_noteStation": "驛站快速傳送 (Step 16.5, spec 12 B3)【自訂】: 車費 = base + perHop × 兩個驛站地圖之間嘅過圖次數；一開始全部開放",
+  "station": { "base": 30, "perHop": 15 },
   "_noteThirst": "飲水度 (Step 14, spec 01 §9)【原=聊天扣、客棧喝茶回 50 + 回 MP；自訂=單機改同 NPC 搭話扣 chat、茶錢 teaCost、回 MP teaMp 比例】；0 = 口渴，NPC 只講模板句",
   "thirst": { "max": 100, "chat": 1, "tea": 50, "teaCost": 5, "teaMp": 0.3 },
   "cities": [

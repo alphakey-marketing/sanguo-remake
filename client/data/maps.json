@@ -687,6 +687,47 @@
      "y1": 38
     }
    ]
+  },
+  {
+   "id": "longzhong",
+   "name": "隆中",
+   "ox": 208,
+   "oy": 452,
+   "safe": false,
+   "kind": "field",
+   "areas": [
+    {
+     "name": "臥龍岡",
+     "x0": 5,
+     "y0": 3,
+     "x1": 27,
+     "y1": 24
+    },
+    {
+     "name": "竹林",
+     "x0": 38,
+     "y0": 3,
+     "x1": 60,
+     "y1": 20
+    },
+    {
+     "name": "隴畝",
+     "x0": 8,
+     "y0": 34,
+     "x1": 42,
+     "y1": 46
+    }
+   ]
+  },
+  {
+   "id": "caolu",
+   "name": "草廬",
+   "ox": 300,
+   "oy": 452,
+   "safe": true,
+   "kind": "house",
+   "parent": "longzhong",
+   "areas": []
   }
  ],
  "landmarks": [
@@ -887,6 +928,24 @@
    "r": 3,
    "name": "長沙",
    "text": "中平四年，區星作亂，孫堅為長沙太守，旬月破之，封烏程侯。後關羽戰黃忠於長沙，黃忠、魏延歸劉備。"
+  },
+  {
+   "id": "wolong_gang",
+   "map": "longzhong",
+   "x": 16,
+   "y": 20,
+   "r": 3,
+   "name": "臥龍岡",
+   "text": "諸葛亮躬耕隴畝，好為梁父吟，每自比於管仲、樂毅。時人莫之許也，惟博陵崔州平、潁川徐庶與亮友善，謂為信然。"
+  },
+  {
+   "id": "longzhong_dui",
+   "map": "caolu",
+   "x": 14,
+   "y": 10,
+   "r": 3,
+   "name": "隆中對",
+   "text": "建安十二年，劉備三顧茅廬。亮為之畫策：跨有荊、益，保其巖阻，西和諸戎，南撫夷越，外結好孫權，內修政理——天下三分之勢，定於草廬之中。"
   }
  ],
  "world": {
@@ -990,7 +1049,7 @@
     "province": "荊州",
     "x": 0.16,
     "y": 0.9,
-    "map": null
+    "map": "longzhong"
    },
    {
     "id": "chenliu",
@@ -1693,6 +1752,42 @@
    "x": 23,
    "y": 0,
    "to": "xyc_south",
+   "auto": true
+  },
+  {
+   "id": "xyc_west",
+   "name": "西門 → 隆中",
+   "map": "xiangyang",
+   "x": 0,
+   "y": 24,
+   "to": "lz_east",
+   "auto": true
+  },
+  {
+   "id": "lz_east",
+   "name": "東口 → 襄陽城",
+   "map": "longzhong",
+   "x": 71,
+   "y": 25,
+   "to": "xyc_west",
+   "auto": true
+  },
+  {
+   "id": "lz_caolu",
+   "name": "草廬",
+   "map": "longzhong",
+   "x": 15,
+   "y": 13,
+   "to": "cl_door",
+   "auto": true
+  },
+  {
+   "id": "cl_door",
+   "name": "門口 → 臥龍岡",
+   "map": "caolu",
+   "x": 14,
+   "y": 17,
+   "to": "lz_caolu",
    "auto": true
   }
  ]

@@ -1,5 +1,5 @@
 {
-  "_note": "城內設施 (Step 3.2；Step 12 加 repair=修理服務、crafts=進階工作區)【原】: 練兵場(2 人對練+歷練)/私塾(政治+1)/寺廟(魅力+1)。成本【自訂】: 練兵場扣 HP/SP 比例、私塾扣 SP/MP+金、寺廟扣 SP+金。歷練: 每 10 點喺下次升級時武/智/敏/靈 +1 (cap 100)。attr cap = 屬性上限。",
+  "_note": "城內設施 (Step 16.5 B3: station = 驛站，rules/station.gd，車費見 world.json station；Step 3.2；Step 12 加 repair=修理服務、crafts=進階工作區)【原】: 練兵場(2 人對練+歷練)/私塾(政治+1)/寺廟(魅力+1)。成本【自訂】: 練兵場扣 HP/SP 比例、私塾扣 SP/MP+金、寺廟扣 SP+金。歷練: 每 10 點喺下次升級時武/智/敏/靈 +1 (cap 100)。attr cap = 屬性上限。",
   "training": { "name": "練兵場", "map": "xuchang", "x": 10, "y": 21, "color": [0.25, 0.7, 0.4],
     "costHp": 0.15, "costSp": 0.15, "lilian": 10, "lilianCap": 100, "cooldownTicks": 300,
     "desc": "同人對練: 扣 15% HP/SP, +10 歷練; 升呢時每 10 歷練 武/智/敏/靈 +1" },
@@ -22,5 +22,15 @@
   "donate_xc": { "name": "許昌官宅", "map": "xuchang", "x": 35, "y": 18, "color": [0.85, 0.3, 0.3], "donation": true, "office": true, "city": "許昌",
     "desc": "官宅【原】: 討取頭銜 / 官令 (每日 1 次) / 捐贈官令 (捐 3000~50000 金或物資 100 單位起 → 名聲 + 魅力經驗) / 貢獻換行動丹 (Step 13~14)" },
   "donate_xy": { "name": "新野縣衙", "map": "xinye", "x": 27, "y": 18, "color": [0.85, 0.3, 0.3], "donation": true, "office": true, "city": "新野",
-    "desc": "官宅【原】: 討取頭銜 / 官令 / 捐贈官令 / 貢獻換行動丹 (任何城池官宅都得, Step 13~14)" }
+    "desc": "官宅【原】: 討取頭銜 / 官令 / 捐贈官令 / 貢獻換行動丹 (任何城池官宅都得, Step 13~14)" },
+  "station_xc": { "name": "許昌驛站", "map": "xuchang", "x": 40, "y": 34, "color": [0.75, 0.55, 0.25], "station": true,
+    "desc": "驛站【自訂】(B3): 收費快速傳送去其他城池驛站，車費 = 基本費 + 每過一張圖加價 (一開始全部開放)" },
+  "station_xy": { "name": "新野驛站", "map": "xinye", "x": 6, "y": 20, "color": [0.75, 0.55, 0.25], "station": true,
+    "desc": "驛站【自訂】(B3): 收費快速傳送去其他城池驛站，車費 = 基本費 + 每過一張圖加價 (一開始全部開放)" },
+  "station_rn": { "name": "汝南驛站", "map": "runan_city", "x": 6, "y": 19, "color": [0.75, 0.55, 0.25], "station": true,
+    "desc": "驛站【自訂】(B3): 收費快速傳送去其他城池驛站，車費 = 基本費 + 每過一張圖加價 (一開始全部開放)" },
+  "station_wc": { "name": "宛城驛站", "map": "wancheng", "x": 65, "y": 24, "color": [0.75, 0.55, 0.25], "station": true,
+    "desc": "驛站【自訂】(B3): 收費快速傳送去其他城池驛站，車費 = 基本費 + 每過一張圖加價 (一開始全部開放)" },
+  "station_xyc": { "name": "襄陽驛站", "map": "xiangyang", "x": 31, "y": 53, "color": [0.75, 0.55, 0.25], "station": true,
+    "desc": "驛站【自訂】(B3): 收費快速傳送去其他城池驛站，車費 = 基本費 + 每過一張圖加價 (一開始全部開放)" }
 }
