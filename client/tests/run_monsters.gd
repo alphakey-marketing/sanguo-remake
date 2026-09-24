@@ -11,6 +11,7 @@ func _init() -> void:
 	t_import_vectors(data)
 	t_monster_count(data)
 	t_item_ids(data)
+	t_drop_rules(data)
 	t_spawn_zones(data)
 	t_gate_newbie(data)
 	t_cave_geometry(data)
@@ -60,6 +61,8 @@ const CSV_VECTORS := [
 	"12029,蝴蝶精,9,9,無花果(29041)@2400 光輝石墨(26037)@1200 野香菇(29040)@9000 野芋(29039)@30000 梅子(29045)@3600 光輝之石(26038)@3600 大片山葉(29048)@1200 深色蟲藥粉(25103)@12000 草菇(29067)@2500",
 	"12030,飛蛾怪,14,9,元氣之石(32101)@6 光輝之石(26038)@600 風之石(32301)@6 回血草(29043)@6000 梅子(29045)@2400 光輝之石(26038)@1200 甜蘿蔔(29042)@30000 高品質蟲粉(25104)@6000 草菇(29067)@2500",
 	"12031,蜻蜓,9,9,無花果(29041)@2400 光輝石墨(26037)@1200 野香菇(29040)@9000 野芋(29039)@30000 梅子(29045)@40000 光輝之石(26038)@1200 大片山葉(29048)@1200 深色蟲藥粉(25103)@12000 草菇(29067)@2500",
+	"12002,田鼠,1,7,田鼠碎骨(61501)@2000 光輝石墨(26037)@3600 仙楂(29038)@30000 野香菇(29040)@4500 梅子(29045)@2400 光輝之石(26038)@1200 苦味葉(29047)@1200",
+	"26009,惡虎,28,8,虎威戰袍(19009)@400 虎威神袍(20018)@400 虎威仙裳(21018)@400 猛虎頭帶(16028)@360 伏虎冠(17028)@360 黃鶯羽飾(18028)@360 老虎飾品(61033)@2400 猛獸皮(61505)@1600",
 	"12022,水鴨,5,0,",
 	"12034,蝙蝠,20,0,",
 	"12044,兔兒,5,0,",
@@ -91,29 +94,32 @@ func t_import_vectors(data: GameData) -> void:
 		var expected := _parse_csv_line(line)
 		var common: Array = expected.filter(func(e: Array) -> bool: return e[1] >= 0.05)
 		var rare: Array = expected.filter(func(e: Array) -> bool: return e[1] < 0.05)
-		var d: Dictionary = data.monsters.get(mid, {})
-		check(not d.is_empty(), "導入: 怪 %d (%s) 存在" % [mid, f[1]])
-		if d.is_empty():
-			continue
-		var actual: Array = []
-		for x in d.get("drops", []):
-			actual.append([int(x["item"]), float(x["p"])])
-		for x in d.get("rareDrops", []):
-			actual.append([int(x["item"]), float(x["p"])])
 		var exp_pair: Array = []
 		for x in common:
 			exp_pair.append(x)
 		for x in rare:
 			exp_pair.append(x)
-		var ok := actual.size() == exp_pair.size()
-		if ok:
-			for i in actual.size():
-				if int(actual[i][0]) != int(exp_pair[i][0]) or absf(float(actual[i][1]) - float(exp_pair[i][1])) > 1e-9:
-					ok = false
-					break
-		check(ok, "導入: %s 掉落 p 對照 CSV (%d 項)" % [f[1], expected.size()])
-		if not ok:
-			print("      expected=%s\n      actual=%s" % [str(exp_pair), str(actual)])
+		# 對照對象 = id 同 CSV 一樣，或者 dropSrc 指住呢行 (1~10 級新手怪借原版同名怪掉落)
+		var targets: Array = []
+		for d in data.monsters.values():
+			if int(d["id"]) == mid or int(d.get("dropSrc", -1)) == mid:
+				targets.append(d)
+		check(not targets.is_empty(), "導入: CSV %d (%s) 有怪用緊" % [mid, f[1]])
+		for d in targets:
+			var actual: Array = []
+			for x in d.get("drops", []):
+				actual.append([int(x["item"]), float(x["p"])])
+			for x in d.get("rareDrops", []):
+				actual.append([int(x["item"]), float(x["p"])])
+			var ok := actual.size() == exp_pair.size()
+			if ok:
+				for i in actual.size():
+					if int(actual[i][0]) != int(exp_pair[i][0]) or absf(float(actual[i][1]) - float(exp_pair[i][1])) > 1e-9:
+						ok = false
+						break
+			check(ok, "導入: %d %s 掉落 p 對照 CSV %d (%d 項)" % [int(d["id"]), f[1], mid, expected.size()])
+			if not ok:
+				print("      expected=%s\n      actual=%s" % [str(exp_pair), str(actual)])
 	# boss 19001
 	var boss: Dictionary = data.monsters.get(19001, {})
 	check(not boss.is_empty(), "導入: boss 19001 存在")
@@ -149,6 +155,29 @@ func t_item_ids(data: GameData) -> void:
 			if not data.item_ids.has(int(x["item"])):
 				bad.append([d["id"], int(x["item"])])
 	check(bad.is_empty(), "導入: 全部掉落 item id 喺 items.json (%d 個唔啱)" % bad.size())
+
+
+# 全表: 每隻怪一係有 CSV 來源 (向量表)，一係喺【自訂】白名單；drops/rareDrops 按 0.05 分界、p 喺 (0,1]
+const CUSTOM_DROPS := [1006, 1007, 1008, 1009, 1010, 1011, 19001]
+
+func t_drop_rules(data: GameData) -> void:
+	var csv_ids := {}
+	for line in CSV_VECTORS:
+		csv_ids[int(String(line).split(",")[0])] = true
+	var no_src: Array = []
+	var bad_split: Array = []
+	for d in data.monsters.values():
+		var src := int(d.get("dropSrc", d["id"]))
+		if not csv_ids.has(src) and not CUSTOM_DROPS.has(int(d["id"])):
+			no_src.append(int(d["id"]))
+		for x in d.get("drops", []):
+			if float(x["p"]) < 0.05 or float(x["p"]) > 1.0:
+				bad_split.append([d["id"], x["item"]])
+		for x in d.get("rareDrops", []):
+			if float(x["p"]) >= 0.05 or float(x["p"]) <= 0.0:
+				bad_split.append([d["id"], x["item"]])
+	check(no_src.is_empty(), "導入: 每隻怪都有 CSV 來源或者喺【自訂】白名單 (冇嘅: %s)" % str(no_src))
+	check(bad_split.is_empty(), "導入: drops p≥0.05 / rareDrops p<0.05 分界啱 (錯: %s)" % str(bad_split))
 
 
 func t_spawn_zones(data: GameData) -> void:
@@ -292,6 +321,18 @@ func t_group_aggro(data: GameData) -> void:
 	sim.step()
 	check(String(b["mob"]["state"]) == "chase", "群攻: step 後 b 仍然追緊")
 	check(String(c["mob"]["state"]) == "wander", "群攻: step 後 c 仍然遊蕩")
+	# 逃跑緊嘅同伴唔會被叫返嚟追
+	var e: Variant = sim._spawn_mob(12028, "field_1")
+	_put(sim, int(e["id"]), 31, 31)
+	e["mob"]["state"] = "flee"
+	e["mob"]["target"] = pid
+	sim.damage(a, 5, sim.ent(pid))
+	check(String(e["mob"]["state"]) == "flee", "群攻: 逃跑緊嘅同伴唔會被扯返嚟追")
+	# 唔同種唔連鎖
+	var f: Variant = sim._spawn_mob(12003, "field_1")   # 野兔 (唔同 def)
+	_put(sim, int(f["id"]), 31, 29)
+	sim.damage(a, 5, sim.ent(pid))
+	check(String(f["mob"]["state"]) != "chase", "群攻: 唔同種怪唔會連鎖")
 
 
 # boss: 每日重生 + 唔逃跑

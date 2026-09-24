@@ -17,6 +17,7 @@ func damage(t: Dictionary, dmg: int, by: Dictionary) -> void:
 			for o in ents.values():
 				if o["kind"] == "mob" and int(o["id"]) != int(t["id"]) \
 						and int(o.get("mob", {}).get("def", -1)) == int(t["mob"]["def"]) \
+						and String(o["mob"]["state"]) != "flee" and int(o["hp"]) > 0 \
 						and RulesCombat.in_range(t["x"], t["y"], o["x"], o["y"], GROUP_RANGE):
 					o["mob"]["state"] = "chase"
 					o["mob"]["target"] = int(by["id"])

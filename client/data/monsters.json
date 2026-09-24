@@ -1,5 +1,5 @@
 {
- "_note": "第一批 5 種 1~10 級野區怪 + 3 隻術法怪 (Step 9) + 絕招 boss (Step 10) +Step 11 導入 (spec 11 §2): npc_drops.csv rate→p (rate/100000)，p≥0.05 入 drops、p<0.05 入 rareDrops。levels/hp/atk/exp 數值 = spec 04 §1 等級帶模板【自訂】(npc_id 確定性抖動 ±20%)。boss=true → 每日重生一次 (spec 04 §3)；groups=true 群居 / flee=false 唔逃走 (boss/PK 怪)。洞窟怪 levels 由 npc_drops.csv 第 3 欄 (怪物等級)，樓層分佈見 spawns zone: runan_f1~f10。alignment: NPC 善惡值，負=惡。atkInterval = tick(10Hz)。element: 屬性 (spec 02 §3.2 相剋)。spell/spellCd: 術法怪用 data/spells.json 術法 id + 冷卻 (tick)。",
+ "_note": "第一批 5 種 1~10 級野區怪 + 3 隻術法怪 (Step 9) + 絕招 boss (Step 10) +Step 11 導入 (spec 11 §2): npc_drops.csv rate→p (rate/100000)，p≥0.05 入 drops、p<0.05 入 rareDrops。levels/hp/atk/exp 數值 = spec 04 §1 等級帶模板【自訂】(npc_id 確定性抖動 ±20%)。boss=true → 每日重生一次 (spec 04 §3)；groups=true 群居 / flee=false 唔逃走 (boss/PK 怪)。洞窟怪 levels 由 npc_drops.csv 第 3 欄 (怪物等級)，樓層分佈見 spawns zone: runan_f1~f10。alignment: NPC 善惡值，負=惡。atkInterval = tick(10Hz)。element: 屬性 (spec 02 §3.2 相剋)。spell/spellCd: 術法怪用 data/spells.json 術法 id + 冷卻 (tick)。 dropSrc: 掉落借用嘅原版 npc_id (1~10 級新手怪)；掉落由 tools/import_drops.py 生成，冇 CSV 來源 = 【自訂】手寫。",
  "monsters": [
   {
    "id": 1001,
@@ -19,10 +19,37 @@
    "aggroRange": 0,
    "leash": 6,
    "element": "none",
+   "dropSrc": 12002,
    "drops": [
     {
+     "item": 29038,
+     "p": 0.3
+    }
+   ],
+   "rareDrops": [
+    {
      "item": 61501,
-     "p": 0.5
+     "p": 0.02
+    },
+    {
+     "item": 26037,
+     "p": 0.036
+    },
+    {
+     "item": 29040,
+     "p": 0.045
+    },
+    {
+     "item": 29045,
+     "p": 0.024
+    },
+    {
+     "item": 26038,
+     "p": 0.012
+    },
+    {
+     "item": 29047,
+     "p": 0.012
     }
    ]
   },
@@ -44,14 +71,49 @@
    "aggroRange": 4,
    "leash": 10,
    "element": "none",
+   "dropSrc": 12012,
    "drops": [
     {
-     "item": 61502,
-     "p": 0.4
+     "item": 29043,
+     "p": 0.06
     },
     {
-     "item": 61503,
+     "item": 29042,
      "p": 0.3
+    }
+   ],
+   "rareDrops": [
+    {
+     "item": 32306,
+     "p": 6e-05
+    },
+    {
+     "item": 26038,
+     "p": 0.006
+    },
+    {
+     "item": 29042,
+     "p": 0.009
+    },
+    {
+     "item": 29045,
+     "p": 0.048
+    },
+    {
+     "item": 26038,
+     "p": 0.03
+    },
+    {
+     "item": 61502,
+     "p": 0.01
+    },
+    {
+     "item": 29068,
+     "p": 0.025
+    },
+    {
+     "item": 31210,
+     "p": 0.002
     }
    ]
   },
@@ -73,14 +135,45 @@
    "aggroRange": 5,
    "leash": 12,
    "element": "none",
+   "dropSrc": 11091,
    "drops": [
     {
-     "item": 65210,
-     "p": 0.1
+     "item": 29040,
+     "p": 0.09
     },
     {
-     "item": 22001,
-     "p": 0.05
+     "item": 29038,
+     "p": 0.3
+    }
+   ],
+   "rareDrops": [
+    {
+     "item": 10037,
+     "p": 0.004
+    },
+    {
+     "item": 11039,
+     "p": 0.002
+    },
+    {
+     "item": 22025,
+     "p": 0.006
+    },
+    {
+     "item": 13014,
+     "p": 0.002
+    },
+    {
+     "item": 14014,
+     "p": 0.002
+    },
+    {
+     "item": 23001,
+     "p": 0.002
+    },
+    {
+     "item": 29067,
+     "p": 0.025
     }
    ]
   },
@@ -102,14 +195,49 @@
    "aggroRange": 4,
    "leash": 10,
    "element": "none",
+   "dropSrc": 12013,
    "drops": [
     {
-     "item": 61504,
-     "p": 0.4
+     "item": 12202,
+     "p": 0.12
     },
     {
-     "item": 61503,
-     "p": 0.5
+     "item": 29043,
+     "p": 0.3
+    }
+   ],
+   "rareDrops": [
+    {
+     "item": 32302,
+     "p": 6e-05
+    },
+    {
+     "item": 29042,
+     "p": 0.009
+    },
+    {
+     "item": 29045,
+     "p": 0.036
+    },
+    {
+     "item": 26038,
+     "p": 0.012
+    },
+    {
+     "item": 29049,
+     "p": 0.012
+    },
+    {
+     "item": 25097,
+     "p": 0.015
+    },
+    {
+     "item": 29067,
+     "p": 0.025
+    },
+    {
+     "item": 31209,
+     "p": 0.002
     }
    ]
   },
@@ -131,14 +259,40 @@
    "aggroRange": 6,
    "leash": 14,
    "element": "none",
-   "drops": [
+   "dropSrc": 26009,
+   "drops": [],
+   "rareDrops": [
     {
-     "item": 61505,
-     "p": 0.3
+     "item": 19009,
+     "p": 0.004
     },
     {
-     "item": 58025,
-     "p": 0.1
+     "item": 20018,
+     "p": 0.004
+    },
+    {
+     "item": 21018,
+     "p": 0.004
+    },
+    {
+     "item": 16028,
+     "p": 0.0036
+    },
+    {
+     "item": 17028,
+     "p": 0.0036
+    },
+    {
+     "item": 18028,
+     "p": 0.0036
+    },
+    {
+     "item": 61033,
+     "p": 0.024
+    },
+    {
+     "item": 61505,
+     "p": 0.016
     }
    ]
   },
