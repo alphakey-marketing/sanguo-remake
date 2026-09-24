@@ -1,6 +1,6 @@
 extends RefCounted
 # Sim 繼承鏈 第 1 層: 核心狀態 / 讀取 / 共用 helper / 生成單位
-# 鏈: sim_core -> sim_quest -> sim_char -> sim_econ -> sim_combat -> sim_skill -> sim_ai -> sim (class_name Sim)
+# 鏈: sim_core -> sim_quest -> sim_char -> sim_econ -> sim_combat -> sim_skill -> sim_ai -> sim_recruit -> sim (class_name Sim)
 # 規矩: 每層只可以叫自己或者下層嘅 func (上層 func 下層睇唔到)
 
 signal event_emitted(ev: Dictionary)
@@ -465,7 +465,7 @@ func init_mobs() -> void:
 
 
 func _spawn_mob(def_id: int, zone_id: String = DEFAULT_ZONE) -> Variant:
-	var d: Dictionary = data.monsters[def_id]
+	var d: Dictionary = data.mob_def(def_id)
 	if d.get("night", false) and not _clock().is_night:
 		return null                     # 夜怪白天唔生
 	var z := zone_by_id(zone_id)

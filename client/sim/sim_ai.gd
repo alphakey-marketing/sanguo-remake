@@ -4,7 +4,7 @@ extends "res://sim/sim_skill.gd"
 # 怪物 AI: 遊蕩 / 仇恨追擊 / 脫戰回歸 / 術法吟唱 (Step 9) / 逃跑 (Step 11)
 func _think_mob(m: Dictionary) -> void:
 	var s: Dictionary = m["mob"]
-	var d: Dictionary = data.monsters[int(s["def"])]
+	var d: Dictionary = data.mob_def(int(s["def"]))
 	var tgt := ent(int(s["target"]))
 	# 術法怪吟唱中: 停低，tick 到生效；受擊中斷喺 damage() 處理
 	if m.has("casting"):
@@ -136,7 +136,7 @@ func _think_player(p: Dictionary) -> void:
 		t["mob"]["state"] = "chase"
 		t["mob"]["target"] = p["id"]
 		return
-	var mdef: Dictionary = data.monsters[int(t["mob"]["def"])]
+	var mdef: Dictionary = data.mob_def(int(t["mob"]["def"]))
 	# 聚力/強力/神力 buff: 物攻 ×1.15/1.3/1.5 (spec 02 §7) + 輔助石物攻 % (effect 7)
 	var atk_mult := RulesSpell.atk_mult(ch.get("status", {}), tick)
 	atk_mult = atk_mult * (1.0 + float(_jewel_bonus(ch).get("atkPct", 0.0)))
