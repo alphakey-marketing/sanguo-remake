@@ -23,6 +23,12 @@ run market --script tools/market_sim.gd
 run hud --script tests/run_hud.gd
 run autotest -- --autotest
 run uitest -- --uitest
+# 掉落導入核對 (要本機有原版 npc_drops.csv，冇就跳過)
+if [ -f /d/Download/sanguo/extracted/text/npc_drops.csv ]; then
+  out=$(PYTHONIOENCODING=utf-8 python tools/import_drops.py --check 2>&1); code=$?
+  echo "$out"
+  [ $code = 0 ] || { echo "!! drops exit $code"; rc=1; }
+fi
 
 [ $rc = 0 ] && echo "ALL OK" || echo "SOME FAILED"
 exit $rc
