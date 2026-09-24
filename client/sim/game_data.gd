@@ -65,6 +65,11 @@ var recruit_cfg: Dictionary = {}  # generals.json cfg
 var general_skill_names: Dictionary = {}  # skill id(String) -> 名
 var quiz_generals: Array = []     # 文官問答題庫 (data/quiz_generals.json) [{q, opts[4], a}]
 var _arena_defs: Dictionary = {}  # 擂台臨時怪 def 快取 (mob_def 用)
+var gen2_cfg: Dictionary = {}     # 登用 v2 (data/general_skills.json cfg, Step 15)
+var gen_skills: Array = []        # 70 項特技
+var gen_skill_by_id: Dictionary = {}   # 特技 id -> def
+var gen_skill_override: Dictionary = {}  # 武將名 -> 特技 id (名將指定)
+var general_order_item: Dictionary = {}  # 武將名 -> 將軍令 item id
 
 static var _cache: GameData
 
@@ -144,6 +149,13 @@ static func load_all() -> GameData:
 		g.general_by_id[int(x["id"])] = x
 		if int(x["tier"]) == 1:
 			g.generals_t1.append(x)
+	var gs: Dictionary = _read("res://data/general_skills.json")
+	g.gen2_cfg = gs["cfg"]
+	g.gen_skills = gs["skills"]
+	for s in g.gen_skills:
+		s["id"] = int(s["id"])
+		g.gen_skill_by_id[int(s["id"])] = s
+	g.gen_skill_override = gs.get("override", {})
 	var qg: Dictionary = _read("res://data/quiz_generals.json")
 	g.quiz_generals = qg["questions"]
 	var ul: Dictionary = _read("res://data/ultimates.json")
@@ -169,6 +181,9 @@ static func load_all() -> GameData:
 		g.names[id] = str(it.get("name", id))
 		g.prices[id] = float(it.get("price", 0))
 		g.cats[id] = int(it.get("cat", 0))
+		var gname := RulesGeneral.order_general_name(g.names[id], String(g.gen2_cfg["orderSuffix"]))
+		if gname != "" and not g.general_order_item.has(gname):
+			g.general_order_item[gname] = id
 		var effs: Array = []
 		for e in it.get("effects", []):
 			effs.append({"label": str(e.get("label", "")), "value": int(e.get("value", 0)), "type": int(e.get("type", 0))})
@@ -206,6 +221,8 @@ static func load_all() -> GameData:
 				"max_dur": RulesEquip.max_dur(int(it.get("req_lv", 0)), g.equip_cfg["durability"])}
 		if heal_hp > 0 or heal_mp > 0 or heal_sp > 0:
 			g.heals[id] = {"hp": heal_hp, "mp": heal_mp, "sp": heal_sp}
+	for k in g.gen2_cfg["tonics"]:          # 武將補品價【自訂】(items.json 原價 0)
+		g.prices[int(k)] = float(g.gen2_cfg["tonics"][k]["price"])
 	g._place_all()
 	_cache = g
 	return g

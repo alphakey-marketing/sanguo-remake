@@ -16,8 +16,10 @@ const IDEO_OK := {
 	"治國": ["治國", "隱遁", "義理"],
 }
 const ARENA_DEF_BASE := 900000          # 擂台臨時怪 def id = BASE + 武將 id (唔入 monsters.json)
-const ORDERS := ["active", "assist", "stop", "follow"]   # 主動/協助/停止/遠距跟隨 (絕招/術法 = Step 15)
-const ORDER_NAMES := {"active": "主動攻擊", "assist": "協助攻擊", "stop": "停止攻擊", "follow": "遠距跟隨"}
+# 戰鬥指令 6 種【原】: 主動/協助/絕招/術法/停止/遠距跟隨 (絕招/術法 = Step 15)
+const ORDERS := ["active", "assist", "ult", "spell", "stop", "follow"]
+const ORDER_NAMES := {"active": "主動攻擊", "assist": "協助攻擊", "ult": "絕招攻擊", "spell": "術法攻擊",
+	"stop": "停止攻擊", "follow": "遠距跟隨"}
 
 
 # 理念相合: 出仕人人得；玩家未定理念 = 只可以登用出仕
@@ -71,14 +73,15 @@ static func _order_key(gid: int, day: int) -> int:
 # 調查候選 (spec 09 §3.2)
 # kind = "wu"/"wen"；visible_t1 = 而家城內見到嘅 Tier1 id (Dictionary id->true)；gone = 呢個月走咗/跟緊人嘅 id
 # Tier1: 要喺城內見到；登用池 (tier 0): 戰等喺 [玩家 -poolBelow, 玩家 +levelGap]，同名只列一個
+# free = 御賜金牌 (Step 15): 無視理念/等級/頭銜 (池仍然要 ≥ 玩家 -poolBelow)
 static func candidates(gens: Array, ch: Dictionary, kind: String, day: int, visible_t1: Dictionary,
-		gone: Dictionary, cfg: Dictionary) -> Array:
+		gone: Dictionary, cfg: Dictionary, free: bool = false) -> Array:
 	var t1: Array = []
 	var pool: Array = []
 	var plv := int(ch["level"])
 	for g in gens:
 		var gid := int(g["id"])
-		if String(g["type"]) != kind or gone.has(gid) or not check(g, ch, cfg).is_empty():
+		if String(g["type"]) != kind or gone.has(gid) or (not free and not check(g, ch, cfg).is_empty()):
 			continue
 		var tier := int(g["tier"])
 		if tier == 1:

@@ -257,6 +257,7 @@ func _send(d: Dictionary) -> void:
 		"recruit_cancel": sim.cmd_recruit_cancel(my_id)
 		"companion_order": sim.cmd_companion_order(my_id, str(d.order))
 		"companion_gift": sim.cmd_companion_gift(my_id, int(d.item))
+		"companion_treasure": sim.cmd_companion_treasure(my_id, int(d.item))
 		"companion_dismiss": sim.cmd_companion_dismiss(my_id)
 
 func _log(s: String) -> void:
@@ -325,6 +326,9 @@ func _on_event(e: Dictionary) -> void:
 		"ult":
 			if int(e.src) == my_id:
 				_log("「%s」！ (-%d MP -%d SP)" % [e.name, int(e.get("mp", 0)), int(e.get("sp", 0))])
+		"comp_skill":
+			if int(e.dst) == my_id:
+				_log("%s：「%s」！" % [_ent_name(int(e.src)), e.name])
 		"ult_hit":
 			var d3 = _ent(int(e.dst))
 			if d3 != null:

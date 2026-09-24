@@ -80,9 +80,85 @@ func _gone_ids() -> Dictionary:
 	return out
 
 
-func _gen_view(g: Dictionary) -> Dictionary:
+# pass = 要用嘅憑證 ("medal"/"order"/"")，UI 顯示「持令」
+func _gen_view(g: Dictionary, ch: Dictionary = {}) -> Dictionary:
+	var pn := _pass_need(ch, g) if not ch.is_empty() else ""
 	return {"id": int(g["id"]), "name": g["name"], "lv": int(g["lv"]), "type": g["type"], "sub": g["sub"],
-		"ideo": g["ideo"], "t1": int(g["tier"]) == 1}
+		"ideo": g["ideo"], "t1": int(g["tier"]) == 1, "pass": pn if pn != "x" else "",
+		"skill": String(_gskill_def(RulesGeneral.skill_for(g, data.gen_skills, data.gen_skill_override)).get("name", ""))}
+
+
+# ================= 將軍令 / 御賜金牌 (Step 15, spec 09 §3.1) =================
+func _has_medal(ch: Dictionary) -> bool:
+	return RulesShop.count_item(ch["bag"], int(data.gen2_cfg["goldMedal"])) > 0
+
+
+func _has_order(ch: Dictionary, g: Dictionary) -> bool:
+	var it := int(data.general_order_item.get(String(g["name"]), 0))
+	return it != 0 and RulesShop.count_item(ch["bag"], it) > 0
+
+
+# 登用呢位要唔要用憑證: "" = 唔使 (正常條件過)；"medal"/"order" = 要用；"x" = 用都唔得
+# 將軍令 = 無視理念/等級/頭銜；金牌 = 再加無視時辰 (Tier1 時辰外都得)
+func _pass_need(ch: Dictionary, g: Dictionary) -> String:
+	var ok := RulesRecruit.check(g, ch, data.recruit_cfg).is_empty()
+	var hidden := int(g["tier"]) == 1 and not general_visible(g)
+	if ok and not hidden:
+		return ""
+	var pk := RulesGeneral.pass_kind(not hidden and _has_order(ch, g), _has_medal(ch))
+	return pk if pk != "" else "x"
+
+
+# 登用唔得嘅原因 ("" = 得)
+func _recruit_why(ch: Dictionary, g: Dictionary) -> String:
+	if _pass_need(ch, g) != "x":
+		return ""
+	var why := RulesRecruit.check(g, ch, data.recruit_cfg)
+	return why if why != "" else "而家搵唔到呢位人才"
+
+
+# 背包有將軍令嘅人才: 一定入候選 (放最前)；同名揀 Tier1 (要見到或者有金牌)，否則 Tier0 最細 id
+func _order_cands(ch: Dictionary, kind: String, gone: Dictionary, cands: Array) -> Array:
+	var names := {}
+	for g in cands:
+		names[String(g["name"])] = true
+	var front: Array = []
+	for b in ch["bag"]:
+		if int(b["n"]) <= 0:
+			continue
+		var gname := RulesGeneral.order_general_name(String(data.names.get(int(b["id"]), "")), String(data.gen2_cfg["orderSuffix"]))
+		if gname == "" or names.has(gname):
+			continue
+		var g := _order_general(gname)
+		if g.is_empty() or String(g["type"]) != kind or gone.has(int(g["id"])) or _pass_need(ch, g) == "x":
+			continue
+		names[gname] = true
+		front.append(g)
+	return front + cands
+
+
+func _order_general(gname: String) -> Dictionary:
+	var best := {}
+	for g in data.generals:
+		if String(g["name"]) != gname or int(g["tier"]) < 0:
+			continue
+		if int(g["tier"]) == 1:
+			return g
+		if best.is_empty():
+			best = g
+	return best
+
+
+# 登用成功: 用咗嘅憑證消失【原】(用完即消)
+func _consume_pass(pe: Dictionary, g: Dictionary) -> void:
+	var rec := _rec(pe["ch"])
+	var ps: Dictionary = rec.get("pass", {})
+	rec.erase("pass")
+	if ps.is_empty() or int(ps["gid"]) != int(g["id"]):
+		return
+	var it := int(data.gen2_cfg["goldMedal"]) if String(ps["kind"]) == "medal" else int(data.general_order_item.get(String(g["name"]), 0))
+	if it != 0 and RulesShop.remove_item(pe["ch"]["bag"], it, 1):
+		_msg(int(pe["id"]), "「%s」用咗" % data.names.get(it, str(it)))
 
 
 # 調查【原】: 城池街道用；每日 1 次 (唔理成敗)；成功登用嗰個月封鎖。kind = "wu" 武將登用 / "wen" 文官登用
@@ -104,17 +180,20 @@ func cmd_recruit_survey(id: int, kind: String) -> void:
 	if not why.is_empty():
 		return _msg(id, why)
 	rec["surveyDay"] = day
+	var medal := _has_medal(ch)
 	var vis := {}
-	for g in data.generals_t1:
-		if String(g["map"]) == String(md["id"]) and general_visible(g):
+	for g in data.generals_t1:        # 御賜金牌【原】: 子午時 (時辰外) 嘅人才都搵到
+		if String(g["map"]) == String(md["id"]) and (general_visible(g) or (medal and not _general_away(int(g["id"])))):
 			vis[int(g["id"])] = true
-	var cands := RulesRecruit.candidates(data.generals, ch, kind, day, vis, _gone_ids(), data.recruit_cfg)
+	var gone := _gone_ids()
+	var cands := RulesRecruit.candidates(data.generals, ch, kind, day, vis, gone, data.recruit_cfg, medal)
+	cands = _order_cands(ch, kind, gone, cands)
 	rec["kind"] = kind
 	rec["cands"] = []
 	var views: Array = []
 	for g in cands:
 		rec["cands"].append(int(g["id"]))
-		views.append(_gen_view(g))
+		views.append(_gen_view(g, ch))
 	_emit({"k": "recruit_survey", "dst": id, "kind": kind, "cands": views})
 	if views.is_empty():
 		_msg(id, "調查咗一輪，搵唔到合適嘅%s" % RulesRecruit.type_name(kind))
@@ -132,9 +211,16 @@ func cmd_recruit_pick(id: int, gid: int) -> void:
 	if not (rec.get("cands", []) as Array).has(gid) or not (rec.get("pending", {}) as Dictionary).is_empty():
 		return _msg(id, "要先調查，再揀候選人才")
 	var g: Dictionary = data.general_by_id.get(gid, {})
-	var why := RulesRecruit.check(g, ch, data.recruit_cfg)
+	var why := _recruit_why(ch, g)
 	if not why.is_empty():
 		return _msg(id, "%s：%s" % [g["name"], why])
+	var pn := _pass_need(ch, g)
+	if pn != "":
+		rec["pass"] = {"gid": gid, "kind": pn}
+		_msg(id, "你出示「%s」，%s無話可說" % [data.names.get(int(data.gen2_cfg["goldMedal"]) if pn == "medal"
+			else int(data.general_order_item.get(String(g["name"]), 0)), ""), g["name"]])
+	else:
+		rec.erase("pass")
 	rec["cands"] = []
 	if String(g["type"]) == "wu":
 		_arena_start(e, g)
@@ -307,6 +393,7 @@ func cmd_recruit_cancel(id: int) -> void:
 
 # 失敗【原】: 人才走人 (呢個月唔再出現)；調查已經用咗
 func _recruit_fail(pe: Dictionary, g: Dictionary, why: String) -> void:
+	_rec(pe["ch"]).erase("pass")          # 失敗唔消耗將軍令/金牌【自訂】
 	_gen_state(int(g["id"]))["awayMonth"] = _month()
 	_emit({"k": "recruit_result", "dst": int(pe["id"]), "gid": int(g["id"]), "ok": false})
 	_msg(int(pe["id"]), why)
@@ -316,6 +403,7 @@ func _recruit_fail(pe: Dictionary, g: Dictionary, why: String) -> void:
 func _recruit_success(pe: Dictionary, g: Dictionary) -> void:
 	var rec := _rec(pe["ch"])
 	rec["lockMonth"] = _month()
+	_consume_pass(pe, g)
 	var c := _spawn_companion(pe, g)
 	rec["comp"] = int(c["id"])
 	_gen_state(int(g["id"]))["serving"] = true
@@ -335,6 +423,8 @@ func _spawn_companion(pe: Dictionary, g: Dictionary) -> Dictionary:
 	ch["gold"] = 0
 	ch["equip"]["spellbooks"] = [0, 0, 0]
 	ch["equip"]["jewels"] = [0, 0]
+	ch["genSkill"] = RulesGeneral.skill_for(g, data.gen_skills, data.gen_skill_override)   # 特技 (Step 15)
+	ch["genTreasures"] = []                                                              # 寶物 2 格
 	_ensure_equip(ch)
 	_full_heal(ch)
 	c["ch"] = ch
@@ -342,7 +432,7 @@ func _spawn_companion(pe: Dictionary, g: Dictionary) -> Dictionary:
 	c["gen"] = {"gid": int(g["id"]), "owner": int(pe["id"]), "since": day,
 		"until": RulesRecruit.until_day(day, data.recruit_cfg),
 		"loyalty": RulesRecruit.loyalty_init(String(pe["ch"].get("ideology", "")), String(g["ideo"]), data.recruit_cfg),
-		"order": "assist"}
+		"order": "assist", "skillCd": 0}
 	_sync_stats(c)
 	return c
 
@@ -354,9 +444,19 @@ func companion_view() -> Dictionary:
 		return {}
 	var gn: Dictionary = c["gen"]
 	var g: Dictionary = data.general_by_id[int(gn["gid"])]
+	var ch: Dictionary = c["ch"]
+	var sk := _gskill_def(int(ch.get("genSkill", 0)))
+	var trs: Array = []
+	for t in ch.get("genTreasures", []):
+		trs.append({"item": int(t["item"]), "name": data.names.get(int(t["item"]), ""), "value": int(t["value"]),
+			"type": String(data.gen2_cfg["treasure"][String(t["type"])]["name"])})
 	return {"id": int(c["id"]), "gid": int(gn["gid"]), "name": c["name"], "lv": int(c["level"]), "hp": int(c["hp"]),
 		"maxHp": int(c["max_hp"]), "loyalty": int(gn["loyalty"]), "order": String(gn["order"]),
-		"daysLeft": maxi(0, int(gn["until"]) - int(_clock()["day"])), "type": g["type"], "sub": g["sub"], "face": int(c["face"])}
+		"daysLeft": maxi(0, int(gn["until"]) - int(_clock()["day"])), "type": g["type"], "sub": g["sub"], "face": int(c["face"]),
+		"mp": int(ch["mp"]), "maxMp": _eff_max_mp(ch), "sp": int(ch["sp"]), "maxSp": _eff_max_sp(ch),
+		"skill": String(sk.get("name", "")), "skillDesc": String(sk.get("desc", "")),
+		"spell": String(_comp_spell(c)["name"]), "treasures": trs,
+		"stats": RulesGeneral.treasure_bonus(ch.get("genTreasures", []), data.gen2_cfg)["stats"]}
 
 
 # 登用面板視圖 (UI): 城內? / 調查封鎖原因 / 上次候選 / 考驗中 / 同伴
@@ -377,8 +477,8 @@ func recruit_view() -> Dictionary:
 	for gid in rec.get("cands", []):
 		var g: Dictionary = data.general_by_id.get(int(gid), {})
 		if not g.is_empty():
-			var v := _gen_view(g)
-			v["why"] = RulesRecruit.check(g, pe["ch"], data.recruit_cfg)
+			var v := _gen_view(g, pe["ch"])
+			v["why"] = _recruit_why(pe["ch"], g)
 			cands.append(v)
 	var pend: Dictionary = rec.get("pending", {})
 	return {"inCity": in_city, "block": block, "kind": String(rec.get("kind", "")), "cands": cands,
@@ -408,6 +508,7 @@ func _think_companion(c: Dictionary) -> void:
 	if int(c["atk_target"]) == 0 and tick % int(cfg["regenTicks"]) == 0 and int(ch["hp"]) < int(c["max_hp"]):
 		ch["hp"] = mini(int(c["max_hp"]), int(ch["hp"]) + maxi(1, int(ceil(int(c["max_hp"]) * float(cfg["regenPct"])))))
 		_sync_stats(c)
+	_skill_regen(c, o)
 	var omap := map_id_at(int(o["x"]), int(o["y"]))
 	if map_id_at(int(c["x"]), int(c["y"])) != omap:
 		c["atk_target"] = 0
@@ -420,17 +521,20 @@ func _think_companion(c: Dictionary) -> void:
 	var tgt := ent(int(c["atk_target"]))
 	if d > int(cfg["leashOwner"]) or order == "stop" or order == "follow" or not _hittable(tgt):
 		c["atk_target"] = 0
-	if order == "assist":
+	var skill_order := order == "ult" or order == "spell"     # 絕招/術法: 幫主公打，冇就自己搵 (Step 15)
+	if order == "assist" or skill_order:
 		var ot := ent(int(o["atk_target"]))
 		if _hittable(ot):
 			c["atk_target"] = int(ot["id"])
 		elif int(c["atk_target"]) == 0:
 			c["atk_target"] = _attacker_of(o)      # 主公被打就幫手
-	elif order == "active" and int(c["atk_target"]) == 0 and d <= int(cfg["leashOwner"]):
+	if (order == "active" or skill_order) and int(c["atk_target"]) == 0 and d <= int(cfg["leashOwner"]):
 		c["atk_target"] = _hunt_target(c, int(cfg["huntRange"]))
 		if int(c["atk_target"]) == 0:
 			c["atk_target"] = _attacker_of(o)
 	if int(c["atk_target"]) != 0:
+		if skill_order:
+			_comp_skill(c, ent(int(c["atk_target"])))
 		return
 	var want := int(cfg["farFollow"]) if order == "follow" else int(cfg["follow"])
 	if d <= want:
@@ -504,18 +608,55 @@ func cmd_companion_gift(id: int, item: int) -> void:
 		return
 	if not _near(o, int(c["x"]), int(c["y"])):
 		return _msg(id, "要行近%s先得" % c["name"])
+	var ch: Dictionary = c["ch"]
 	var heal: Dictionary = data.heals.get(item, {})
+	var tonic: Dictionary = data.gen2_cfg["tonics"].get(str(item), {})     # 武將補品 (藥膳師, Step 15): 按上限 %
+	if not tonic.is_empty():
+		heal = {"hp": MathX.js_round(_eff_max_hp(ch) * float(tonic.get("hpPct", 0.0))),
+			"mp": MathX.js_round(_eff_max_mp(ch) * float(tonic.get("mpPct", 0.0))),
+			"sp": MathX.js_round(_eff_max_sp(ch) * float(tonic.get("spPct", 0.0)))}
 	if heal.is_empty():
 		return _msg(id, "呢件唔係補品")
 	if not RulesShop.remove_item(o["ch"]["bag"], item, 1):
 		return _msg(id, "背包冇呢件")
-	var ch: Dictionary = c["ch"]
 	ch["hp"] = mini(_eff_max_hp(ch), int(ch["hp"]) + int(heal.get("hp", 0)))
 	ch["mp"] = mini(_eff_max_mp(ch), int(ch["mp"]) + int(heal.get("mp", 0)))
 	ch["sp"] = mini(_eff_max_sp(ch), int(ch["sp"]) + int(heal.get("sp", 0)))
 	_sync_stats(c)
 	_msg(id, "%s收下%s" % [c["name"], data.names.get(item, str(item))])
-	_loyalty_change(c, int(data.recruit_cfg["loyalty"]["gift"]))
+	_loyalty_change(c, int(data.recruit_cfg["loyalty"]["gift"]) + int(_comp_eff(c).get("giftAdd", 0)))
+
+
+# 贈與寶物【原】: 武將寶物 2 格；同類高取代低 (低嘅消失)；放咗攞唔返，登用完跟武將走
+func cmd_companion_treasure(id: int, item: int) -> void:
+	var o := ent(id)
+	var c := _companion_of(o)
+	if c.is_empty() or int(o["hp"]) <= 0:
+		return
+	if not _near(o, int(c["x"]), int(c["y"])):
+		return _msg(id, "要行近%s先得" % c["name"])
+	var t := RulesGeneral.treasure_of(int(data.cats.get(item, 0)), data.info.get(item, {}).get("effects", []), data.gen2_cfg)
+	if t.is_empty():
+		return _msg(id, "呢件唔係武將寶物")
+	if RulesShop.count_item(o["ch"]["bag"], item) <= 0:
+		return _msg(id, "背包冇呢件")
+	var ch: Dictionary = c["ch"]
+	var r := RulesGeneral.treasure_put(ch.get("genTreasures", []), item, t, int(data.gen2_cfg["treasureSlots"]))
+	var nm := String(data.names.get(item, str(item)))
+	if String(r["res"]) == "full":
+		return _msg(id, "%s嘅寶物格滿咗 (最多 %d 種)" % [c["name"], int(data.gen2_cfg["treasureSlots"])])
+	RulesShop.remove_item(o["ch"]["bag"], item, 1)
+	ch["genTreasures"] = r["slots"]
+	_sync_stats(c)
+	match String(r["res"]):
+		"add":
+			_msg(id, "%s收下「%s」" % [c["name"], nm])
+		"replace":
+			_msg(id, "「%s」取代咗「%s」(舊寶物消失)" % [nm, data.names.get(int(r["old"]), "")])
+		"lost":
+			_msg(id, "同類寶物數值更高，「%s」消失咗" % nm)
+	_emit({"k": "companion", "dst": id, "comp": companion_view()})
+	_loyalty_change(c, int(data.recruit_cfg["loyalty"]["gift"]) + int(_comp_eff(c).get("giftAdd", 0)))
 
 
 # 主動解散 (唔算得罪: 返城，下次仲可以再登)
@@ -527,6 +668,7 @@ func cmd_companion_dismiss(id: int) -> void:
 
 # 忠誠變動 → 0 即刻走 (spec 09 §4)；<leave 喺子時結算
 func _loyalty_change(c: Dictionary, delta: int) -> void:
+	delta = RulesGeneral.loyalty_delta(delta, _comp_eff(c))     # 忠義: 跌減半 (Step 15)
 	if delta == 0:
 		return
 	var gn: Dictionary = c["gen"]
@@ -588,7 +730,8 @@ func _kill_player(p: Dictionary) -> void:
 	var owner := int(p["gen"]["owner"])
 	_emit({"k": "companion_ko", "dst": owner, "id": int(p["id"])})
 	_msg(owner, "%s受傷，退返%s休養" % [p["name"], inn.get("name", "客棧")])
-	_loyalty_change(p, int(data.recruit_cfg["loyalty"]["ko"]))
+	if not bool(_comp_eff(p).get("noKoLoss", false)):     # 堅忍 (Step 15)
+		_loyalty_change(p, int(data.recruit_cfg["loyalty"]["ko"]))
 
 
 # 同伴殺怪: 掉落/金/善惡歸主公，經驗 × expShare；殺善怪 → 義理/治國同伴忠誠跌
@@ -599,8 +742,169 @@ func _kill_mob(m: Dictionary, by: Dictionary, exp_mult: float = 1.0) -> void:
 		var o := ent(int(by["gen"]["owner"]))
 		if not o.is_empty():
 			killer = o
-			exp_mult *= float(data.recruit_cfg["companion"]["expShare"])
+			exp_mult *= RulesGeneral.exp_share(float(data.recruit_cfg["companion"]["expShare"]), _comp_eff(by))   # 教導
 	super(m, killer, exp_mult)
 	var c := _companion_of(killer)
 	if not c.is_empty():
 		_loyalty_change(c, RulesRecruit.loyalty_kill_delta(String(c["ch"]["ideology"]), float(d.get("alignment", 0)), data.recruit_cfg))
+
+
+# ================= 特技 / 寶物加成 / 絕招術法 (Step 15, spec 09 §3.3~3.4) =================
+func _gskill_def(sid: int) -> Dictionary:
+	return data.gen_skill_by_id.get(sid, {})
+
+
+# 同伴 ch 嘅特技效果 ({} = 冇 / 未實作)
+func _skill_eff_of(ch: Dictionary) -> Dictionary:
+	return RulesGeneral.skill_eff(_gskill_def(int(ch.get("genSkill", 0))))
+
+
+func _comp_eff(c: Dictionary) -> Dictionary:
+	return _skill_eff_of(c["ch"]) if c.has("ch") else {}
+
+
+# 同伴術法 = 武將最高等級攻擊戰術 (火計/水計/落石…) → {name, elem}
+func _comp_spell(c: Dictionary) -> Dictionary:
+	var g: Dictionary = data.general_by_id.get(int(c["gen"]["gid"]), {})
+	return RulesGeneral.spell_of(g, data.gen2_cfg["tactics"], data.general_skill_names)
+
+
+# 主公身上嘅特技光環 (督戰/護主): 同伴生存 + 同圖 + auraRange 格內
+func _owner_aura(ch: Dictionary) -> Dictionary:
+	var c := ent(int(ch.get("recruit", {}).get("comp", 0)))
+	if c.is_empty() or not c.has("gen") or int(c["hp"]) <= 0:
+		return {}
+	var aura: Dictionary = _comp_eff(c).get("owner", {})
+	if aura.is_empty():
+		return {}
+	var o := ent(int(c["gen"]["owner"]))
+	if o.is_empty() or not _aura_near(c, o):
+		return {}
+	return aura
+
+
+func _aura_near(c: Dictionary, o: Dictionary) -> bool:
+	return map_id_at(int(c["x"]), int(c["y"])) == map_id_at(int(o["x"]), int(o["y"])) \
+		and _cheb(c, o) <= int(data.gen2_cfg["auraRange"])
+
+
+# 同伴: 寶物 + 特技 self 加成疊落輔助石加成；主公: 特技光環
+func _jewel_bonus(ch: Dictionary) -> Dictionary:
+	var b := super(ch)
+	var extra: Array = []
+	if ch.has("genTreasures"):
+		extra.append(RulesGeneral.treasure_bonus(ch["genTreasures"], data.gen2_cfg)["bonus"])
+		extra.append(_skill_eff_of(ch).get("self", {}))
+	elif ch.has("recruit"):
+		var aura := _owner_aura(ch)
+		if not aura.is_empty():
+			extra.append(aura)
+	if extra.is_empty():
+		return b
+	extra.push_front(b)
+	return RulesJewel.sum_bonus(extra)
+
+
+# 同伴屬性: 寶物 (速度 → 敏捷、術攻 → 智力) + 特技 flat (疾風)
+func _eff_attr(ch: Dictionary, k: String) -> float:
+	var v := super(ch, k)
+	if ch.has("genTreasures"):
+		v += float(RulesGeneral.treasure_bonus(ch["genTreasures"], data.gen2_cfg)["flat"].get(k, 0))
+		v += float(_skill_eff_of(ch).get("flat", {}).get(k, 0))
+	return v
+
+
+# 特技回復 (回春/冥想/養氣 戰鬥中都回；醫術 = 主公附近回 HP)
+func _skill_regen(c: Dictionary, o: Dictionary) -> void:
+	if tick % int(data.gen2_cfg["regenTicks"]) != 0:
+		return
+	var eff := _comp_eff(c)
+	if eff.is_empty():
+		return
+	var ch: Dictionary = c["ch"]
+	if eff.has("regenPct"):
+		ch["hp"] = mini(_eff_max_hp(ch), int(ch["hp"]) + maxi(1, MathX.js_round(_eff_max_hp(ch) * float(eff["regenPct"]))))
+	if eff.has("mpRegenPct"):
+		ch["mp"] = mini(_eff_max_mp(ch), int(ch["mp"]) + maxi(1, MathX.js_round(_eff_max_mp(ch) * float(eff["mpRegenPct"]))))
+	if eff.has("spRegenPct"):
+		ch["sp"] = mini(_eff_max_sp(ch), int(ch["sp"]) + maxi(1, MathX.js_round(_eff_max_sp(ch) * float(eff["spRegenPct"]))))
+	_sync_stats(c)
+	if eff.has("ownerRegenPct") and int(o["hp"]) > 0 and _aura_near(c, o):
+		var och: Dictionary = o["ch"]
+		och["hp"] = mini(_eff_max_hp(och), int(och["hp"]) + maxi(1, MathX.js_round(_eff_max_hp(och) * float(eff["ownerRegenPct"]))))
+		_sync_stats(o)
+
+
+# 絕招/術法指令【原】: 夠 SP/MP + 冷卻完就出招；唔夠 = 普通攻擊 (交返 _think_player)
+# 絕招 = 以自己為中心範圍物理 ×mult；術法 = 單體戰術 (元素跟武將戰術)，即發
+func _comp_skill(c: Dictionary, t: Dictionary) -> void:
+	if t.is_empty() or int(t["hp"]) <= 0 or int(c["hp"]) <= 0:
+		return
+	var gn: Dictionary = c["gen"]
+	var ch: Dictionary = c["ch"]
+	if tick < int(c["next_atk"]) or tick < int(gn.get("skillCd", 0)) or is_safe(int(c["x"]), int(c["y"])):
+		return
+	var order := String(gn["order"])
+	var uc: Dictionary = data.gen2_cfg["ult"]
+	var sc: Dictionary = data.gen2_cfg["spell"]
+	var reach := int(uc["range"]) if order == "ult" else int(sc["range"])
+	if not RulesCombat.in_range(c["x"], c["y"], t["x"], t["y"], reach):
+		return
+	var lv := int(ch["level"])
+	var mp_need := _mp_cost(ch, RulesGeneral.spell_mp(lv, sc))
+	var sp_need := _sp_cost(ch, int(uc["sp"]))
+	var pick := RulesGeneral.skill_pick(order, int(ch["mp"]), int(ch["sp"]), mp_need, sp_need, true)
+	if pick == "":
+		return
+	c["tx"] = c["x"]
+	c["ty"] = c["y"]
+	c["next_atk"] = tick + RulesCombat.attack_interval(_eff_attr(ch, "agi"))
+	var owner := int(gn["owner"])
+	if pick == "ult":
+		ch["sp"] = int(ch["sp"]) - sp_need
+		gn["skillCd"] = tick + int(uc["cd"])
+		var targets: Array = []
+		for o in ents.values():
+			if _hittable(o) and RulesCombat.in_range(c["x"], c["y"], o["x"], o["y"], int(uc["range"])):
+				targets.append(o)
+		var wdef: Dictionary = _weapon_def(ch)
+		var atk_mult := RulesSpell.atk_mult(ch.get("status", {}), tick) * (1.0 + float(_jewel_bonus(ch).get("atkPct", 0.0)))
+		var eff_str := _eff_attr(ch, "str") + float(_jewel_bonus(ch).get("strFlat", 0))
+		_emit({"k": "comp_skill", "src": int(c["id"]), "dst": owner, "skill": "ult", "name": String(uc["name"]), "sp": sp_need})
+		for o in targets:
+			var mdef: Dictionary = data.mob_def(int(o["mob"]["def"]))
+			var dmg := MathX.js_round(RulesCombat.calc_damage(eff_str, wdef["power"], mdef["def"], rng_fn, atk_mult, 1.0) * float(uc["mult"]))
+			_emit({"k": "ult_hit", "src": int(c["id"]), "dst": o["id"], "dmg": dmg, "ult": "gen"})
+			damage(o, dmg, c)
+	else:
+		ch["mp"] = int(ch["mp"]) - mp_need
+		gn["skillCd"] = tick + int(sc["cd"])
+		var sp := _comp_spell(c)
+		var mdef2: Dictionary = data.mob_def(int(t["mob"]["def"]))
+		var power := RulesGeneral.spell_power(lv, sc) * (1.0 + float(_jewel_bonus(ch).get("spellAtkPct", 0.0)))
+		var dmg2 := RulesSpell.calc_spell_damage(power, _eff_attr(ch, "int"), float(mdef2.get("spellDef", 0)),
+			String(sp["elem"]), str(mdef2.get("element", "none")), 0.0, rng_fn)
+		_emit({"k": "comp_skill", "src": int(c["id"]), "dst": owner, "skill": "spell", "name": String(sp["name"]), "mp": mp_need})
+		_emit({"k": "spell_hit", "src": int(c["id"]), "dst": t["id"], "dmg": dmg2, "elem": String(sp["elem"])})
+		damage(t, dmg2, c)
+	if not ents.has(int(c["id"])):
+		return
+	_sync_stats(c)
+
+
+# 辯才: 同伴喺身邊 → 主公發話唔扣飲水度 (口渴 0 照樣講唔到)
+func _sip_thirst(e: Dictionary) -> bool:
+	if String(e.get("kind", "")) == "player" and thirst_of(e["ch"]) > 0:
+		var c := _companion_of(e)
+		if not c.is_empty() and bool(_comp_eff(c).get("noThirst", false)) and _aura_near(c, e):
+			return true
+	return super(e)
+
+
+# 官令行動力消耗 (政才 = 減半)
+func _office_ap_cost(ch: Dictionary) -> int:
+	var base := int(data.office["apCost"])
+	var c := ent(int(ch.get("recruit", {}).get("comp", 0)))
+	if c.is_empty() or not c.has("gen"):
+		return base
+	return MathX.js_round(base * float(_comp_eff(c).get("apCostMul", 1.0)))

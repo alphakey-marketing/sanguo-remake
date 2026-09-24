@@ -1,6 +1,7 @@
 class_name RecruitPanel
 extends GamePanel
 # 登用面板 (Step 13.5, spec 09 §3): 調查 → 揀候選 → 擂台/問答；有同伴就顯示同伴 + 戰鬥指令 + 送補品 + 解散。
+# Step 15: 候選「持令/金牌」+ 特技；同伴 MP/SP、特技、術法、寶物 2 格 + 贈與寶物、武將補品。
 # 全部讀 sim.recruit_view()，經 main._send 發意圖。
 
 func _init(m: Node) -> void:
@@ -14,8 +15,10 @@ func sig() -> String:
 	if not c.is_empty():            # HP 郁得好密: 只取整數 10% 級數，唔好每下重砌
 		c = c.duplicate()
 		c["hp"] = int(c["hp"]) * 10 / maxi(1, int(c["maxHp"]))
+		c["mp"] = int(c.get("mp", 0)) * 10 / maxi(1, int(c.get("maxMp", 1)))
+		c["sp"] = int(c.get("sp", 0)) * 10 / maxi(1, int(c.get("maxSp", 1)))
 		v["comp"] = c
-	return JSON.stringify([v, _gifts().size()])
+	return JSON.stringify([v, _gifts().size(), _treasures().size()])
 
 
 func _build_body() -> void:
@@ -65,8 +68,9 @@ func _build_survey(list: VBoxContainer, v: Dictionary) -> void:
 		var gid := int(c["id"])
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 6)
-		var info := wrap_lbl("%s%s　戰等 %d　%s%s　%s" % ["★" if bool(c["t1"]) else "", c["name"], int(c["lv"]),
-			RulesRecruit.type_name(String(c["type"])), c["sub"], c["ideo"]], 14)
+		var tag := String({"order": "【持令】", "medal": "【金牌】"}.get(String(c.get("pass", "")), ""))
+		var info := wrap_lbl("%s%s%s　戰等 %d　%s%s　%s　特技:%s" % [tag, "★" if bool(c["t1"]) else "", c["name"], int(c["lv"]),
+			RulesRecruit.type_name(String(c["type"])), c["sub"], c["ideo"], String(c.get("skill", ""))], 14)
 		row.add_child(info)
 		var b := btn("PK" if String(c["type"]) == "wu" else "問答", func() -> void: main._send({"t": "recruit_pick", "gid": gid}), 72)
 		b.disabled = String(c.get("why", "")) != ""
@@ -90,6 +94,10 @@ func _build_comp(list: VBoxContainer, c: Dictionary) -> void:
 	list.add_child(lbl("%s　Lv%d　%s%s" % [c["name"], int(c["lv"]), RulesRecruit.type_name(String(c["type"])), c["sub"]], 17, UiTheme.GOLD))
 	list.add_child(lbl("HP %d/%d　忠誠 %d　剩 %d 日" % [int(c["hp"]), int(c["maxHp"]), int(c["loyalty"]), int(c["daysLeft"])], 15,
 		UiTheme.BAD if int(c["loyalty"]) < 40 else UiTheme.TEXT))
+	list.add_child(lbl("MP %d/%d　SP %d/%d　術法:%s" % [int(c.get("mp", 0)), int(c.get("maxMp", 0)), int(c.get("sp", 0)),
+		int(c.get("maxSp", 0)), String(c.get("spell", ""))], 14))
+	if String(c.get("skill", "")) != "":
+		list.add_child(wrap_lbl("特技「%s」：%s" % [c["skill"], c.get("skillDesc", "")], 14, UiTheme.GOLD))
 	list.add_child(lbl("戰鬥指令", 14, UiTheme.DIM))
 	var g := GridContainer.new()
 	g.columns = 2
@@ -102,6 +110,7 @@ func _build_comp(list: VBoxContainer, c: Dictionary) -> void:
 			func() -> void: main._send({"t": "companion_order", "order": order}))
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		g.add_child(b)
+	_build_treasure(list, c)
 	var gifts := _gifts()
 	if not gifts.is_empty():
 		list.add_child(lbl("送補品（回血 + 忠誠）", 14, UiTheme.DIM))
@@ -113,10 +122,44 @@ func _build_comp(list: VBoxContainer, c: Dictionary) -> void:
 	list.add_child(btn("解散（叫佢返去）", func() -> void: main._send({"t": "companion_dismiss"})))
 
 
-# 背包入面嘅回復品 (補品)
+# 武將寶物 2 格【原】: 放咗攞唔返；同類高取代低 (低嘅消失)
+func _build_treasure(list: VBoxContainer, c: Dictionary) -> void:
+	var trs: Array = c.get("treasures", [])
+	var slots := int(main.data.gen2_cfg["treasureSlots"])
+	var names: Array = []
+	for i in slots:
+		names.append("%s(%s+%d)" % [trs[i]["name"], trs[i]["type"], int(trs[i]["value"])] if i < trs.size() else "（空）")
+	list.add_child(lbl("武將寶物：" + "　".join(names), 14))
+	var st: Dictionary = c.get("stats", {})
+	if not st.is_empty():
+		list.add_child(lbl("兵量 %d　武材 +%d　軍略 +%d" % [int(st.get("troops", 0)), int(st.get("wucai", 0)), int(st.get("junlue", 0))], 13, UiTheme.DIM))
+	var mine := _treasures()
+	if mine.is_empty():
+		return
+	list.add_child(lbl("贈與寶物（攞唔返；同類低值會消失）", 14, UiTheme.DIM))
+	for it in mine.slice(0, 4):
+		var item: int = it
+		list.add_child(btn("贈 %s ×%d" % [item_name(item), RulesShop.count_item(main.ch.get("bag", []), item)],
+			func() -> void: main._send({"t": "companion_treasure", "item": item})))
+
+
+# 背包入面嘅回復品 (補品) + 武將補品 (藥膳師)
 func _gifts() -> Array:
 	var out: Array = []
+	var tonics: Dictionary = main.data.gen2_cfg["tonics"]
 	for b in main.ch.get("bag", []):
-		if main.data.heals.has(int(b["id"])) and not out.has(int(b["id"])):
-			out.append(int(b["id"]))
+		var id := int(b["id"])
+		if (main.data.heals.has(id) or tonics.has(str(id))) and not out.has(id):
+			out.append(id)
+	return out
+
+
+# 背包入面嘅武將寶物
+func _treasures() -> Array:
+	var out: Array = []
+	for b in main.ch.get("bag", []):
+		var id := int(b["id"])
+		if not out.has(id) and not RulesGeneral.treasure_of(int(main.data.cats.get(id, 0)),
+				main.data.info.get(id, {}).get("effects", []), main.data.gen2_cfg).is_empty():
+			out.append(id)
 	return out

@@ -91,6 +91,16 @@ func press(root: Node, prefix: String) -> bool:
 	return true
 
 
+# 子節點有冇 Label 包含 text
+func _has_text(root: Node, text: String) -> bool:
+	if root is Label and (root as Label).text.contains(text):
+		return true
+	for c in root.get_children():
+		if _has_text(c, text):
+			return true
+	return false
+
+
 func put(x: int, y: int) -> void:
 	var e: Dictionary = m.sim.ent(m.my_id)
 	e["x"] = x
@@ -414,6 +424,20 @@ func _run() -> void:
 		press(rp, "主動攻擊")
 		await frames(1)
 		check(String(m.sim.companion_view().get("order", "")) == "active", "同伴指令: 主動攻擊")
+		# 16. 登用 v2 (Step 15): 術法攻擊指令 + 贈與寶物 + 特技顯示
+		rp.refresh(true)
+		press(rp, "術法攻擊")
+		await frames(1)
+		check(String(m.sim.companion_view().get("order", "")) == "spell", "同伴指令: 術法攻擊")
+		var comp_e: Dictionary = m.sim.ent(int(m.sim.companion_view()["id"]))
+		put(int(comp_e["x"]) + 1, int(comp_e["y"]))
+		RulesShop.add_item(ch["bag"], 54807, 1)
+		rp.refresh(true)
+		check(press(rp, "贈 物攻之石I"), "登用面板應該有「贈 物攻之石I」掣")
+		await frames(1)
+		check((m.sim.companion_view().get("treasures", []) as Array).size() == 1, "贈與寶物: 同伴寶物格 1 件")
+		rp.refresh(true)
+		check(_has_text(rp, "特技「"), "登用面板顯示特技")
 	hud.close_panels()
 	print("[TEST] ui_smoke: %d, fail %d" % [total, fails])
 	print("PASS: ui smoke" if fails == 0 else "FAIL: ui smoke")
