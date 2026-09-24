@@ -343,6 +343,50 @@ func _run() -> void:
 	await frames(1)
 	check((ch["tiandi"]["deposit"] as Array).has("mining") and bool(ch["tiandi"]["buyTool"]), "腳伕頁: 勾存採礦 + 自動買工具 (%s)" % ch.get("tiandi"))
 	hud.close_panels()
+	# 15. 登用 (Step 13.5): 行近典韋 → 人才對話框 → 登用面板 → 調查文官 → 問答全啱 → 同伴框 → 改指令
+	ch["level"] = 5
+	ch["ideology"] = "義理"
+	var dw: Dictionary = {}
+	for g in m.data.generals_t1:
+		if String(g["name"]) == "典韋":
+			dw = g
+	put(int(dw["x"]) + 1, int(dw["y"]))
+	check(await until(func() -> bool: return String(hud.ctx.get("kind", "")) == "general"), "近典韋互動掣應該係人才 (%s)" % hud.ctx)
+	await click(center("context"))
+	var dp3: GamePanel = hud.panels.get("dialog")
+	check(dp3 != null and dp3.visible and press(dp3, "登用"), "人才對話框應該有「登用…」掣")
+	await frames(1)
+	var rp: GamePanel = hud.panels.get("recruit")
+	check(rp != null and rp.visible, "撳登用應該開登用面板")
+	if rp != null:
+		press(rp, "調查文官")
+		await frames(1)
+		rp.refresh(true)
+		check(press(rp, "問答"), "調查文官之後應該有候選 + 問答掣")
+		await frames(1)
+		for i in 10:
+			var qv: Dictionary = m.sim.recruit_quiz_view()
+			if qv.is_empty():
+				break
+			var a := 0
+			for q in m.data.quiz_generals:
+				if String(q["q"]) == String(qv["q"]):
+					a = int(q["a"])
+			rp.refresh(true)
+			press(rp, "ABCD"[a] + ".")
+			await frames(1)
+		check(not m.sim.companion_view().is_empty(), "問答全啱應該登用到同伴")
+	hud.close_panels()
+	await frames(2)
+	check(hud.visible_ids().has("companion"), "有同伴: HUD 顯示同伴框")
+	await click(center("companion"))
+	check(hud.panels.has("recruit") and hud.panels["recruit"].visible, "撳同伴框應該開登用面板")
+	if rp != null:
+		rp.refresh(true)
+		press(rp, "主動攻擊")
+		await frames(1)
+		check(String(m.sim.companion_view().get("order", "")) == "active", "同伴指令: 主動攻擊")
+	hud.close_panels()
 	print("[TEST] ui_smoke: %d, fail %d" % [total, fails])
 	print("PASS: ui smoke" if fails == 0 else "FAIL: ui smoke")
 	get_tree().quit(1 if fails > 0 else 0)

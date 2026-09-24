@@ -43,6 +43,8 @@ var last_season := -1
 var banner := {"text": "", "t": 0.0}   # 天災/季節橫幅
 var last_save_tick := 0
 var quest_npcs := []               # 任務 NPC 視圖 (Step 8): sim.view_quest_npcs()
+var generals := []                 # 城內 Tier1 武將 (Step 13.5): sim.view_generals()
+var comp := {}                     # 登用同伴 (Step 13.5): sim.companion_view()，{} = 冇
 var quest_items := {}              # item id -> true (任務道具，賣唔到標記用)
 var pending := {}                  # 點遠處 NPC/設施: 行到附近自動開 {kind, ref}
 var marker := {"pos": Vector2.ZERO, "t": 0.0}   # 點地行路落點標記
@@ -119,6 +121,8 @@ func _refresh() -> void:
 	ents = sim.view_ents()
 	ch = sim.player_ch()
 	quest_npcs = sim.view_quest_npcs()
+	generals = sim.view_generals()
+	comp = sim.companion_view()
 	var me = _me()
 	if me != null:
 		cur_map = sim.map_at(int(me.x), int(me.y))
@@ -240,6 +244,14 @@ func _send(d: Dictionary) -> void:
 		"repair": sim.cmd_repair(my_id, int(d.item))
 		"repair_service": sim.cmd_repair_service(my_id, int(d.item))
 		"debug_work_lv": sim.cmd_debug_work_lv(my_id, int(d.add))
+		"general_talk": sim.cmd_general_talk(my_id, int(d.gid))
+		"recruit_survey": sim.cmd_recruit_survey(my_id, str(d.kind))
+		"recruit_pick": sim.cmd_recruit_pick(my_id, int(d.gid))
+		"recruit_answer": sim.cmd_recruit_answer(my_id, int(d.answer))
+		"recruit_cancel": sim.cmd_recruit_cancel(my_id)
+		"companion_order": sim.cmd_companion_order(my_id, str(d.order))
+		"companion_gift": sim.cmd_companion_gift(my_id, int(d.item))
+		"companion_dismiss": sim.cmd_companion_dismiss(my_id)
 
 func _log(s: String) -> void:
 	log_lines.append(s)
@@ -373,6 +385,24 @@ func _on_event(e: Dictionary) -> void:
 		"heal":
 			if int(e.dst) == my_id:
 				_log("密醫幫你醫治，回復 %d HP" % int(e.hp))
+		# ---- 登用 (Step 13.5) ----
+		"recruit_survey", "recruit_quiz":
+			if int(e.dst) == my_id and hud != null and not autotest:
+				var rp = hud.panels.get("recruit")
+				if rp == null or not rp.visible:
+					hud.open_panel("recruit")
+		"arena_start":
+			if int(e.dst) == my_id:
+				target_id = int(e.mob)
+				if hud != null:
+					hud.close_panels()
+				_set_banner("擂台 PK：%s" % str(e.name), Color(1, 0.8, 0.3), 4.0)
+		"recruit_result":
+			if int(e.dst) == my_id and bool(e.ok):
+				_set_banner("登用成功：%s" % str(data.general_by_id.get(int(e.gid), {}).get("name", "")), Color(0.6, 1, 0.6), 5.0)
+		"companion_leave":
+			if int(e.dst) == my_id:
+				_set_banner("%s離開咗（%s）" % [str(e.name), str(e.reason)], Color(1, 0.7, 0.4), 6.0)
 		"day":
 			var season := int(e.season)
 			if last_season >= 0 and season != last_season:
@@ -518,6 +548,9 @@ func _interactable_at(g: Vector2) -> Dictionary:
 	for qn in quest_npcs:
 		if absi(int(g.x) - int(qn.x)) <= 1 and absi(int(g.y) - int(qn.y)) <= 1:
 			return {"kind": "quest_npc", "label": "對話", "ref": qn}
+	for gn in generals:
+		if absi(int(g.x) - int(gn.x)) <= 1 and absi(int(g.y) - int(gn.y)) <= 1:
+			return {"kind": "general", "label": "人才", "ref": gn}
 	for f in facilities:
 		if absi(int(g.x) - int(f.x)) <= 1 and absi(int(g.y) - int(f.y)) <= 1:
 			return {"kind": String(f.kind), "label": "", "ref": f}
@@ -825,7 +858,8 @@ func _draw() -> void:
 			if f != null: draw_texture_rect(f, Rect2(p - Vector2(4, 8), Vector2(24, 26)), false)
 			else: draw_rect(Rect2(p, Vector2(TILE, TILE)), Color.RED if isme else Color.ORANGE)
 			if isme: draw_rect(Rect2(p - Vector2(4, 8), Vector2(24, 26)), Color.YELLOW, false, 2.0)
-		if e.has("hp") and e.has("maxHp") and (ismob or isme):
+		var isgen: bool = e.get("gen", false)
+		if e.has("hp") and e.has("maxHp") and (ismob or isme or isgen):
 			_bar(p + Vector2(-2, -14), Vector2(20, 3), float(e.hp) / float(e.maxHp), Color(0.9, 0.2, 0.2) if ismob else Color(0.3, 0.8, 0.3))
 		if int(e.id) == target_id:
 			draw_rect(Rect2(p - Vector2(2, 2), Vector2(TILE + 4, TILE + 4)), Color.CYAN, false, 2.0)
@@ -837,7 +871,9 @@ func _draw() -> void:
 			nm += " [%s]" % str(",".join(tags))
 		if bool(e.get("casting", false)):
 			nm += "（吟唱中）"
-		_txt(p + Vector2(-8, -18), nm, Color(1, 0.7, 0.6) if ismob else Color.WHITE, 11)
+		if isgen:
+			nm = "【同伴】" + nm
+		_txt(p + Vector2(-8, -18), nm, Color(1, 0.7, 0.6) if ismob else Color(0.6, 1, 0.65) if isgen else Color.WHITE, 11)
 	for qn in quest_npcs:
 		if not mr.has_point(Vector2i(int(qn.x), int(qn.y))):
 			continue
@@ -847,6 +883,18 @@ func _draw() -> void:
 		draw_circle(qp + Vector2(TILE, TILE) * 0.5, 6, Color(0.1, 0.25, 0.45, 0.9))
 		_txt(qp + Vector2(-6, -20), "!" if not bool(qn.service) else "+", Color(1, 0.9, 0.3), 12)
 		_txt(qp + Vector2(-8, -32), str(qn.name), qcol, 11)
+	for gn in generals:                             # Tier1 武將 (Step 13.5): 框色 = 武將橙紅 / 文官金 (名唔加字，隔 3 格會撞)
+		if not mr.has_point(Vector2i(int(gn.x), int(gn.y))):
+			continue
+		var gp := Vector2(int(gn.x), int(gn.y)) * TILE - cam
+		var gcol := Color(1.0, 0.55, 0.35) if str(gn.type) == "wu" else Color(1.0, 0.82, 0.3)
+		var gf = faces[int(gn.id) % faces.size()] if faces.size() > 0 else null
+		if gf != null:
+			draw_texture_rect(gf, Rect2(gp - Vector2(4, 8), Vector2(24, 26)), false)
+		else:
+			draw_rect(Rect2(gp, Vector2(TILE, TILE)), Color(0.6, 0.45, 0.15))
+		draw_rect(Rect2(gp - Vector2(5, 9), Vector2(26, 28)), gcol, false, 2.0)
+		_txt(gp + Vector2(-4, -12), str(gn.name), gcol, 11)
 	for f in floats:
 		var fp: Vector2 = f.pos - cam + Vector2(2, -20 - 24 * f.age)
 		_txt(fp, f.text, f.color, 14)
@@ -889,6 +937,8 @@ func _draw_banner(vs: Vector2) -> void:
 	if hud != null and hud.layout.has("auto"):
 		right = float(hud.layout["auto"]["c"].x) - float(hud.layout["auto"]["r"]) - 6.0
 	var left := lr.end.x + 6.0
+	if hud != null and not comp.is_empty() and hud.layout.has("companion"):
+		left = (hud.layout["companion"]["rect"] as Rect2).end.x + 6.0
 	var text := str(banner["text"])
 	var sz := 13
 	var tw := ThemeDB.fallback_font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, sz).x

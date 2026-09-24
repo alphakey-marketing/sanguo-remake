@@ -356,6 +356,33 @@ func companion_view() -> Dictionary:
 		"daysLeft": maxi(0, int(gn["until"]) - int(_clock()["day"])), "type": g["type"], "sub": g["sub"], "face": int(c["face"])}
 
 
+# 登用面板視圖 (UI): 城內? / 調查封鎖原因 / 上次候選 / 考驗中 / 同伴
+func recruit_view() -> Dictionary:
+	var pe := ent(int(state["player_id"]))
+	if pe.is_empty():
+		return {}
+	var rec: Dictionary = pe["ch"].get("recruit", {})
+	var in_city := String(map_at(int(pe["x"]), int(pe["y"])).get("kind", "")) == "city"
+	var block := RulesRecruit.survey_block(rec, int(_clock()["day"]), _month())
+	if not (rec.get("pending", {}) as Dictionary).is_empty():
+		block = "考驗緊人才"
+	elif int(rec.get("comp", 0)) != 0:
+		block = "已經有人才跟緊你"
+	elif block.is_empty() and not in_city:
+		block = "要喺城池街道先可以調查"
+	var cands: Array = []
+	for gid in rec.get("cands", []):
+		var g: Dictionary = data.general_by_id.get(int(gid), {})
+		if not g.is_empty():
+			var v := _gen_view(g)
+			v["why"] = RulesRecruit.check(g, pe["ch"], data.recruit_cfg)
+			cands.append(v)
+	var pend: Dictionary = rec.get("pending", {})
+	return {"inCity": in_city, "block": block, "kind": String(rec.get("kind", "")), "cands": cands,
+		"pending": String(pend.get("kind", "")), "pendingName": String(data.general_by_id.get(int(pend.get("gid", 0)), {}).get("name", "")),
+		"quiz": recruit_quiz_view(pe["ch"]), "comp": companion_view()}
+
+
 func _companion_of(owner: Dictionary) -> Dictionary:
 	if not owner.has("ch"):
 		return {}

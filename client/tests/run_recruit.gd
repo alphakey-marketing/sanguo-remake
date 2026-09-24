@@ -33,6 +33,7 @@ func _init() -> void:
 	t_comp_gift_dismiss(data)
 	t_comp_cross_map(data)
 	t_comp_save(data)
+	t_recruit_view(data)
 	print("[TEST] recruit scenarios: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -737,3 +738,31 @@ func t_comp_save(data: GameData) -> void:
 		sim.step()
 		l.step()
 	check(l.save_string() == sim.save_string(), "存檔: 讀返之後同原本一齊行 30 tick 結果一樣")
+
+
+# ---------------- D: UI 讀取 ----------------
+func t_recruit_view(data: GameData) -> void:
+	var r := _setup(data, 5, "義理")
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var v := sim.recruit_view()
+	check(bool(v["inCity"]) and String(v["block"]) == "" and (v["cands"] as Array).is_empty(), "recruit_view: 城內可調查、未有候選")
+	sim.cmd_recruit_survey(pid, "wen")
+	v = sim.recruit_view()
+	check(not (v["cands"] as Array).is_empty() and String(v["block"]).contains("今日"), "recruit_view: 調查後有候選 + 今日封鎖")
+	sim.cmd_recruit_pick(pid, int(v["cands"][0]["id"]))
+	v = sim.recruit_view()
+	check(String(v["pending"]) == "quiz" and not (v["quiz"] as Dictionary).is_empty() and String(v["block"]) == "考驗緊人才", "recruit_view: 問答中")
+	var z := sim.zone_by_id("field_1")
+	var fp := sim._free_near(int(z["x0"]) + 45, int(z["y0"]) + 20)
+	var r2 := _setup(data, 5, "義理", 3)
+	_put(r2[0], int(r2[1]), fp.x, fp.y)
+	check(String(r2[0].recruit_view()["block"]).contains("城池"), "recruit_view: 野外 = 要喺城池")
+	var r3 := _comp_setup(data, 4)
+	var v3: Dictionary = r3[0].recruit_view()
+	check(not (v3["comp"] as Dictionary).is_empty() and String(v3["block"]).contains("已經有人才"), "recruit_view: 有同伴")
+	var ents: Array = r3[0].view_ents()
+	var has_gen := false
+	for e in ents:
+		has_gen = has_gen or bool(e.get("gen", false))
+	check(has_gen, "view_ents: 同伴標 gen")

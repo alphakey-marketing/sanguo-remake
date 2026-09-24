@@ -20,6 +20,8 @@ func sig() -> String:
 
 
 func _build_body() -> void:
+	body.add_child(btn("登用人才 / 同伴", func() -> void: main.hud.open_panel("recruit")))
+	body.add_child(hsep())
 	body.add_child(lbl("設定", 16, UiTheme.GOLD))
 	var hud = main.hud
 	body.add_child(btn("撳掣震動：%s" % ("開" if hud.vibrate_on else "關"), func() -> void:
