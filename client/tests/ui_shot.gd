@@ -175,6 +175,8 @@ func _run() -> void:
 	hud.close_panels()
 	await frames(10)
 	await shot("recruit_companion_hud")
+	m._send({"t": "debug_give", "item": 54807, "n": 1})     # Step 15: 寶物 + 武將補品 → 面板有贈與掣
+	m._send({"t": "debug_give", "item": 30015, "n": 2})
 	hud.open_panel("recruit")
 	await shot("recruit_companion_panel")
 	get_tree().quit(0)

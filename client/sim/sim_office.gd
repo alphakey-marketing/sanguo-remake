@@ -77,7 +77,7 @@ func order_block(ch: Dictionary, order_id: String) -> String:
 	if o.is_empty():
 		return "冇呢條官令"
 	return RulesTitle.order_block(o, int(ch.get("titleRank", 0)), ap_of(ch), int(_clock()["day"]), _office_of(ch),
-		int(data.office["apCost"]))
+		_office_ap_cost(ch))
 
 
 func cmd_office_order(id: int, order_id: String) -> void:
@@ -104,11 +104,11 @@ func cmd_office_order(id: int, order_id: String) -> void:
 		RulesShop.add_item(ch["bag"], int(o["item"]), 1)
 	elif String(o["kind"]) == "census":
 		od["met"] = []
-	ch["ap"] = ap_of(ch) - int(data.office["apCost"])
+	ch["ap"] = ap_of(ch) - _office_ap_cost(ch)
 	off["orderDay"] = int(_clock()["day"])
 	off["order"] = od
 	_emit({"k": "office_order", "id": id, "order": order_id, "started": true})
-	_msg(id, "接咗官令「%s」：%s（行動力 -%d）" % [o["name"], order_text(ch), int(data.office["apCost"])])
+	_msg(id, "接咗官令「%s」：%s（行動力 -%d）" % [o["name"], order_text(ch), _office_ap_cost(ch)])
 
 
 # 而家手上官令嘅說明 (UI/訊息用)
