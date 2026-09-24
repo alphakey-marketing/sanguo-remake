@@ -55,14 +55,16 @@ func _think_mob(m: Dictionary) -> void:
 			if tick >= int(s["next_atk"]):
 				s["next_atk"] = tick + int(d["atkInterval"])
 				var pch: Dictionary = tgt["ch"]
-				# 輔助石: 玩家物防 %/flat + 物迴避 % (Step 10, spec 02 §4)
+				# 輔助石: 玩家物防 %/flat + 物迴避 % (Step 10, spec 02 §4)；防具: 物防/物迴避/物理受擊減少 (Step 11.6, spec 02 §9)
 				var jb := _jewel_bonus(pch)
-				var pdef := RulesCombat.player_def(int(pch["level"])) + int(jb.get("defFlat", 0))
+				var ab := _armor_bonus(pch)
+				var caps: Dictionary = data.equip_cfg["caps"]
+				var pdef := RulesCombat.player_def(int(pch["level"])) + int(jb.get("defFlat", 0)) + int(ab["def"])
 				var pd := pdef * RulesSpell.def_mult(pch.get("status", {}), tick) * (1.0 + float(jb.get("defPct", 0.0)))
-				if rng.next() < float(jb.get("evadePct", 0.0)):
+				if rng.next() < RulesEquip.evade_chance(int(ab["evade"]), float(jb.get("evadePct", 0.0)), int(caps["evadePct"])):
 					_emit({"k": "hit", "src": m["id"], "dst": tgt["id"], "dmg": 0})     # 迴避咗
 				else:
-					var dmg := RulesCombat.calc_mob_damage(d["atk"], pd, rng_fn)
+					var dmg := RulesEquip.reduce_dmg(RulesCombat.calc_mob_damage(d["atk"], pd, rng_fn), int(ab["dmgRed"]), int(caps["dmgRedPct"]))
 					_emit({"k": "hit", "src": m["id"], "dst": tgt["id"], "dmg": dmg})
 					damage(tgt, dmg, m)
 		else:
@@ -123,7 +125,7 @@ func _think_player(p: Dictionary) -> void:
 	if tick < int(p["next_atk"]):
 		return
 	var w: Dictionary = data.weapons.get(int(ch["equip"].get("weapon", 0)), {"power": 0.0, "hit": 45.0})
-	p["next_atk"] = tick + RulesCombat.attack_interval(ch["attrs"]["agi"])
+	p["next_atk"] = tick + RulesCombat.attack_interval(_eff_attr(ch, "agi"))
 	# 輔助石命中率 % (effect 13) (Step 10, spec 02 §4)
 	var base_hit := RulesCombat.hit_chance(w["hit"], int(ch["level"]), int(t["level"]))
 	var hit := base_hit + float(_jewel_bonus(ch).get("hitPct", 0.0))
@@ -136,7 +138,7 @@ func _think_player(p: Dictionary) -> void:
 	# 聚力/強力/神力 buff: 物攻 ×1.15/1.3/1.5 (spec 02 §7) + 輔助石物攻 % (effect 7)
 	var atk_mult := RulesSpell.atk_mult(ch.get("status", {}), tick)
 	atk_mult = atk_mult * (1.0 + float(_jewel_bonus(ch).get("atkPct", 0.0)))
-	var eff_str := float(ch["attrs"]["str"]) + float(_jewel_bonus(ch).get("strFlat", 0))
+	var eff_str := _eff_attr(ch, "str") + float(_jewel_bonus(ch).get("strFlat", 0))
 	var elem_mult := _phys_elem_mult(ch, str(mdef.get("element", "none")))
 	var dmg0 := RulesCombat.calc_damage(eff_str, w["power"], mdef["def"], rng_fn, atk_mult, 1.0)
 	var dmg := MathX.js_round(dmg0 * elem_mult)

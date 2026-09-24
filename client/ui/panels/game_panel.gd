@@ -220,3 +220,40 @@ func item_desc(id: int) -> Array:
 			continue
 		out.append("%s %d" % [lab, int(e["value"])])
 	return out
+
+
+# ---- 裝備 (Step 11.6) ----
+const ARMOR_STAT_NAMES := [["def", "物防"], ["evade", "物迴避%"], ["sdef", "術防"], ["sevade", "術迴避%"],
+	["str", "武力"], ["agi", "敏捷"], ["int", "智力"], ["spi", "靈力"], ["dmgRed", "物理受擊-%"], ["sdmgRed", "術法受擊-%"]]
+
+
+func slot_name(slot: String) -> String:
+	return str(main.data.equip_cfg["slotNames"].get(slot, slot))
+
+
+func armor_dur_text(ch: Dictionary, id: int) -> String:
+	var ad: Dictionary = main.data.armors.get(id, {})
+	var cur := int(ch.get("equip", {}).get("dur", {}).get(str(id), int(ad.get("max_dur", 0))))
+	return "耐久 %d/%d%s" % [cur, int(ad.get("max_dur", 0)), "（減半）" if cur <= 0 else ""]
+
+
+# 防具同身上同部位嗰件比較: [[text, color]]，↑ 綠 ↓ 紅
+func armor_compare(ch: Dictionary, id: int) -> Array:
+	var ad: Dictionary = main.data.armors.get(id, {})
+	if ad.is_empty():
+		return []
+	var cur_id := int(ch.get("equip", {}).get(str(ad["slot"]), 0))
+	var cur: Dictionary = main.data.armors.get(cur_id, {}).get("stats", {})
+	var out: Array = []
+	for pair in ARMOR_STAT_NAMES:
+		var k: String = pair[0]
+		var nv := int(ad["stats"].get(k, 0))
+		var ov := int(cur.get(k, 0)) if cur_id != id else nv
+		if nv == 0 and ov == 0:
+			continue
+		var diff := nv - ov
+		var t := "%s %d" % [pair[1], nv]
+		if diff != 0:
+			t += "  (%s%d)" % ["↑" if diff > 0 else "↓", absi(diff)]
+		out.append([t, UiTheme.GOOD if diff > 0 else UiTheme.BAD if diff < 0 else UiTheme.TEXT])
+	return out

@@ -58,8 +58,8 @@ func cmd_sell(id: int, item: int, n: int = 1) -> void:
 	for b in ch["bag"]:
 		if int(b["id"]) == item:
 			have = int(b["n"])
-	if int(ch["equip"].get("weapon", 0)) == item and have <= n:
-		return _msg(id, "裝備中，唔可以賣")
+	if _locked_by_equip(ch, item, n):
+		return _msg(id, "裝備中，唔可以賣 (先卸下)")
 	var eq_books: Array = ch["equip"].get("spellbooks", [0, 0, 0])
 	if (eq_books as Array).has(item) and have <= n:
 		return _msg(id, "快捷列裝備中，唔可以賣")
@@ -67,6 +67,7 @@ func cmd_sell(id: int, item: int, n: int = 1) -> void:
 		return _msg(id, "背包冇咁多")
 	var gain := RulesShop.sell_price(data.prices.get(item, 0.0) * market_factor(item)) * n
 	ch["gold"] = int(ch["gold"]) + gain
+	_cleanup_dur(ch)
 	_cleanup_fused(ch)                    # 賣晒融合武器 → 清嵌石記錄
 	_msg(id, "賣出 %d 件，得 %d 金" % [n, gain])
 
@@ -122,6 +123,8 @@ func cmd_storage_deposit(id: int, item: int, n: int = 1) -> void:
 	var ch: Dictionary = e["ch"]
 	if not bool(ch.get("storageSub", false)):
 		return _msg(id, "要先訂閱天地商行")
+	if _locked_by_equip(ch, item, n):
+		return _msg(id, "裝備中，唔可以存 (先卸下)")
 	if not RulesShop.remove_item(ch["bag"], item, n):
 		return _msg(id, "背包冇咁多")
 	RulesShop.add_item(ch["storage"], item, n)
@@ -153,10 +156,13 @@ func cmd_storage_sell(id: int, item: int, n: int = 1) -> void:
 		return _msg(id, "要先訂閱天地商行")
 	if RulesQuest.is_quest_item(data, item):
 		return _msg(id, "任務道具唔可以賣 (會擋任務)")
+	if _locked_by_equip(ch, item, n):
+		return _msg(id, "裝備中，唔可以賣 (先卸下)")
 	if not RulesShop.remove_item(ch["bag"], item, n):
 		return _msg(id, "背包冇咁多")
 	var gain := RulesShop.sell_price(data.prices.get(item, 0.0) * market_factor(item)) * n
 	ch["gold"] = int(ch["gold"]) + gain
+	_cleanup_dur(ch)
 	_msg(id, "天地商行代賣 %d 件，得 %d 金" % [n, gain])
 
 
@@ -212,21 +218,103 @@ func cmd_work(id: int, skill: String) -> void:
 	_msg(id, "%s: 得到 %s%s" % [sk["name"], data.names.get(item, str(item)), "（工具用爛咗）" if broke else ""])
 
 
-# ================= 寶石欄 + 武器裝備 (Step 10, spec 02 §4) =================
-# 裝備武器: 背包要有；唔限職業武器 (武器分類只影響絕招, ultimates.json weaponCat)
-func cmd_equip_weapon(id: int, item: int) -> void:
+# ================= 裝備: 武器 3 槽 + 5 部位防具 (Step 10/11.6, spec 02 §9) =================
+# 裝備 = 背包參照 (件嘢留喺背包)；身上已裝嘅件數唔可以賣/存/死亡跌
+
+func _locked_by_equip(ch: Dictionary, item: int, n: int) -> bool:
+	return _equipped_n(ch, item) > 0 and RulesShop.count_item(ch["bag"], item) - n < _equipped_n(ch, item)
+
+
+# 武器可唔可以用: 職業武器類【原】(classes.json weapons = items cat_label)
+func _weapon_ok(ch: Dictionary, item: int) -> bool:
+	var cls: Dictionary = data.classes.get(str(ch.get("classId", "")), {})
+	return (cls.get("weapons", []) as Array).has(str(data.info.get(item, {}).get("cat_label", "")))
+
+
+# 通用裝備: 武器 → 武器槽 wslot (-1 = 現用槽)；防具 → 按部位 (b54_59 部位碼)。背包要有、等級夠
+func cmd_equip(id: int, item: int, wslot: int = -1) -> void:
 	var e := ent(id)
 	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
 		return
 	var ch: Dictionary = e["ch"]
-	var has := RulesShop.has_item(ch["bag"], item, 1)
-	if not has:
+	var eq: Dictionary = ch["equip"]
+	var need_lv := int(data.info.get(item, {}).get("req_lv", 0))
+	var nm: String = data.names.get(item, str(item))
+	if data.armors.has(item):
+		var slot: String = data.armors[item]["slot"]
+		if int(eq[slot]) == item:
+			return _msg(id, "已經著緊「%s」" % nm)
+		if not RulesShop.has_item(ch["bag"], item, 1):
+			return _msg(id, "背包冇呢件裝備")
+		if int(ch["level"]) < need_lv:
+			return _msg(id, "要 Lv%d 先著得「%s」" % [need_lv, nm])
+		eq[slot] = item
+		if not eq["dur"].has(str(item)):
+			eq["dur"][str(item)] = int(data.armors[item]["max_dur"])
+		_emit({"k": "equip", "src": id, "slot": slot, "item": item})
+		return _msg(id, "著上「%s」" % nm)
+	if not data.weapons.has(item):
+		return _msg(id, "呢件唔係武器或防具")
+	if not RulesShop.has_item(ch["bag"], item, 1):
 		return _msg(id, "背包冇呢件武器")
-	if int(data.cats.get(item, 0)) not in [1, 2, 3]:
-		return _msg(id, "呢件唔係武器")
-	ch["equip"]["weapon"] = item
-	_emit({"k": "equip", "src": id, "slot": "weapon", "item": item})
-	_msg(id, "裝備咗「%s」" % data.names.get(item, str(item)))
+	if not _weapon_ok(ch, item):
+		return _msg(id, "%s用唔到「%s」" % [data.classes.get(str(ch["classId"]), {}).get("name", "呢個職業"), nm])
+	if int(ch["level"]) < need_lv:
+		return _msg(id, "要 Lv%d 先用得「%s」" % [need_lv, nm])
+	var ws := int(eq["wslot"]) if wslot < 0 else wslot
+	if ws < 0 or ws >= RulesEquip.WEAPON_SLOTS:
+		return _msg(id, "武器槽得 %d 格" % RulesEquip.WEAPON_SLOTS)
+	# 同一件武器背包得 1 件 → 由其他槽搬過嚟
+	if RulesShop.count_item(ch["bag"], item) <= _equipped_n(ch, item) - (1 if int(eq["weapons"][ws]) == item else 0):
+		for i in RulesEquip.WEAPON_SLOTS:
+			if i != ws and int(eq["weapons"][i]) == item:
+				eq["weapons"][i] = 0
+				break
+	eq["weapons"][ws] = item
+	eq["weapon"] = int(eq["weapons"][int(eq["wslot"])])
+	_emit({"k": "equip", "src": id, "slot": "weapon", "wslot": ws, "item": item})
+	_msg(id, "裝備咗「%s」%s" % [nm, "" if ws == int(eq["wslot"]) else "（武器槽 %d）" % (ws + 1)])
+
+
+# 卸下: part = head/body/boots/ring/necklace 或 "weapon" (wslot -1 = 現用槽)
+func cmd_unequip(id: int, part: String, wslot: int = -1) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return
+	var eq: Dictionary = e["ch"]["equip"]
+	var item := 0
+	if part == "weapon":
+		var ws := int(eq["wslot"]) if wslot < 0 else wslot
+		if ws < 0 or ws >= RulesEquip.WEAPON_SLOTS:
+			return
+		item = int(eq["weapons"][ws])
+		eq["weapons"][ws] = 0
+		eq["weapon"] = int(eq["weapons"][int(eq["wslot"])])
+	elif RulesEquip.SLOTS.has(part):
+		item = int(eq[part])
+		eq[part] = 0
+	if item == 0:
+		return
+	_emit({"k": "equip", "src": id, "slot": part, "item": 0})
+	_msg(id, "卸下「%s」" % data.names.get(item, str(item)))
+
+
+# 切換武器槽【原】(Alt+A/S/D)；空槽都切得 (= 空手)
+func cmd_switch_weapon(id: int, wslot: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or wslot < 0 or wslot >= RulesEquip.WEAPON_SLOTS:
+		return
+	var eq: Dictionary = e["ch"]["equip"]
+	eq["wslot"] = wslot
+	eq["weapon"] = int(eq["weapons"][wslot])
+	e["ch"].erase("fusing")
+	_emit({"k": "equip", "src": id, "slot": "weapon", "wslot": wslot, "item": int(eq["weapon"])})
+	_msg(id, "切換武器槽 %d：%s" % [wslot + 1, data.names.get(int(eq["weapon"]), "空手")])
+
+
+# 舊指令保留做包裝 (Step 10)
+func cmd_equip_weapon(id: int, item: int) -> void:
+	cmd_equip(id, item, -1)
 
 
 # 寶石欄裝卸 (2 格): 背包要有，裝備唔消耗。item=0 = 清空。slot 0 = 攻擊用屬性石

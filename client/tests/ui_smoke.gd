@@ -168,6 +168,7 @@ func _run() -> void:
 		check(int(ch["gold"]) < gold0 and RulesShop.has_item(ch["bag"], 10001, 1), "確認買入應該扣錢入背包")
 	hud.close_panels()
 	# 5. 背包: 揀武器 → 裝備（玩家自己撳）
+	ch["equip"]["weapons"][int(ch["equip"]["wslot"])] = 0
 	ch["equip"]["weapon"] = 0
 	hud.bag_panel().open_filter("")
 	var bp: BagPanel = hud.panels["bag"]
@@ -177,6 +178,33 @@ func _run() -> void:
 	press(bp, "裝備武器")
 	await frames(1)
 	check(int(ch["equip"]["weapon"]) == 10001, "背包撳裝備武器應該裝上")
+	# 5b. 背包: 揀防具 → 裝備（頭部）(Step 11.6)
+	m._send({"t": "debug_give", "item": 16001, "n": 1})
+	bp.refresh(true)
+	await frames(1)
+	press(bp, m.item_names[16001].substr(0, 4))
+	await frames(1)
+	press(bp, "裝備（")
+	await frames(1)
+	check(int(ch["equip"]["head"]) == 16001, "背包撳裝備防具應該著上頭部")
+	hud.close_panels()
+	# 5c. 角色面板裝備頁: 撳頭部格 → 卸下；撳武2 → 切換做現用
+	hud.open_panel("char")
+	var chp: GamePanel = hud.panels["char"]
+	chp.set_tab(1)
+	await frames(1)
+	press(chp, "頭部")
+	await frames(1)
+	press(chp, "卸下")
+	await frames(1)
+	check(int(ch["equip"]["head"]) == 0, "裝備頁撳卸下應該卸頭部")
+	press(chp, "武2")
+	await frames(1)
+	press(chp, "切換做現用")
+	await frames(1)
+	check(int(ch["equip"]["wslot"]) == 1, "裝備頁切換武器槽 2")
+	m._send({"t": "switch_weapon", "wslot": 0})
+	chp.set_tab(0)
 	hud.close_panels()
 	# 6. 客棧對話框: 休息扣錢
 	put(m.sim.inn_pos.x, m.sim.inn_pos.y + 1)

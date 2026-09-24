@@ -30,6 +30,8 @@ func damage(t: Dictionary, dmg: int, by: Dictionary) -> void:
 			_emit({"k": "flee", "src": int(t["id"]), "dst": int(by["id"]), "name": str(t["name"])})
 	if t.has("ch"):
 		t["ch"]["hp"] = t["hp"]
+		if dmg > 0:
+			_wear_armor_hit(t)          # 防具受擊磨損 (Step 11.6)
 	if int(t["hp"]) > 0:
 		return
 	if t["kind"] == "mob":
@@ -105,9 +107,17 @@ func _schedule_respawn(m: Dictionary, d: Dictionary) -> void:
 func _kill_player(p: Dictionary) -> void:
 	var ch: Dictionary = p["ch"]
 	ch["exp"] = maxi(0, int(ch["exp"]) - RulesCombat.death_exp_loss(int(ch["karma"]), RulesStats.exp_to_next(int(ch["level"]))))
-	var lost := RulesCombat.roll_death_drop(int(ch["karma"]), ch["bag"], rng_fn)
+	# 身上裝備唔會跌【自訂】: 只喺「未裝備」嘅件數入面擲
+	var loose: Array = []
+	for b in ch["bag"]:
+		var free := int(b["n"]) - _equipped_n(ch, int(b["id"]))
+		if free > 0:
+			loose.append({"id": int(b["id"]), "n": free})
+	var lost := RulesCombat.roll_death_drop(int(ch["karma"]), loose, rng_fn)
 	if lost > 0:
 		RulesShop.remove_item(ch["bag"], lost, 1)
+		_cleanup_dur(ch)
+	_wear_armor_death(ch)           # 死亡每件防具扣 10% 耐久 (spec 03 §4.3)
 	_cleanup_fused(ch)              # 跌走咗武器 → 清除融合記錄
 	_full_heal(ch)
 	ch["status"] = {}

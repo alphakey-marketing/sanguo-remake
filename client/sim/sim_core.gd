@@ -243,6 +243,104 @@ func _eff_max_sp(ch: Dictionary) -> int:
 	return RulesStats.max_sp(int(ch["level"]), ch["attrs"]) + int(_jewel_bonus(ch).get("spFlat", 0))
 
 
+# ================= 裝備 (Step 11.6, spec 02 §9) =================
+# equip = {weapon (現用), weapons[3], wslot, head/body/boots/ring/necklace (item id, 0 = 空),
+#          dur {str(item): 耐久}, hits (受擊累計)}。裝備 = 背包參照 (件嘢留喺背包，唔可以賣/死亡唔會跌)
+# 補齊欄位 + 舊存檔兼容 (舊版得 weapon/boots，而且開場武器/靴唔喺背包)
+func _ensure_equip(ch: Dictionary) -> void:
+	var eq: Dictionary = ch["equip"]
+	if not eq.has("weapons"):
+		eq["weapons"] = [int(eq.get("weapon", 0)), 0, 0]
+		eq["wslot"] = 0
+	eq["weapon"] = int(eq["weapons"][int(eq["wslot"])])
+	for s in RulesEquip.SLOTS:
+		if not eq.has(s):
+			eq[s] = 0
+	if not eq.has("dur"):
+		eq["dur"] = {}
+	if not eq.has("hits"):
+		eq["hits"] = 0
+	for it in _equipped_items(ch):
+		if RulesShop.count_item(ch["bag"], it) < _equipped_n(ch, it):
+			RulesShop.add_item(ch["bag"], it, _equipped_n(ch, it) - RulesShop.count_item(ch["bag"], it))
+	for s in RulesEquip.SLOTS:
+		var a := int(eq[s])
+		if a > 0 and not eq["dur"].has(str(a)):
+			eq["dur"][str(a)] = int(data.armors.get(a, {}).get("max_dur", 0))
+
+
+# 身上所有裝備 item id (武器 3 槽 + 5 部位，唔計 0)
+func _equipped_items(ch: Dictionary) -> Array:
+	var out: Array = []
+	var eq: Dictionary = ch["equip"]
+	for w in eq.get("weapons", [eq.get("weapon", 0)]):
+		if int(w) > 0:
+			out.append(int(w))
+	for s in RulesEquip.SLOTS:
+		if int(eq.get(s, 0)) > 0:
+			out.append(int(eq[s]))
+	return out
+
+
+func _equipped_n(ch: Dictionary, item: int) -> int:
+	return _equipped_items(ch).count(item)
+
+
+# 身上防具加總 (耐久 0 減半)
+func _armor_bonus(ch: Dictionary) -> Dictionary:
+	var worn: Array = []
+	var eq: Dictionary = ch["equip"]
+	for s in RulesEquip.SLOTS:
+		var a := int(eq.get(s, 0))
+		var ad: Dictionary = data.armors.get(a, {})
+		if a > 0 and not ad.is_empty():
+			worn.append({"stats": ad["stats"], "dur": int(eq.get("dur", {}).get(str(a), 0))})
+	return RulesEquip.sum_worn(worn)
+
+
+# 戰鬥用有效屬性 = 基礎 + 防具加成 (只影響戰鬥，唔改 HP/MP/SP 上限【自訂】)
+func _eff_attr(ch: Dictionary, k: String) -> float:
+	return float(ch["attrs"].get(k, 0)) + float(_armor_bonus(ch).get(k, 0))
+
+
+# 受擊磨損: 每 hitsPerWear 下有傷害 → 身上每件防具耐久 -1 (spec 02 §9)
+func _wear_armor_hit(e: Dictionary) -> void:
+	var ch: Dictionary = e["ch"]
+	var eq: Dictionary = ch["equip"]
+	if not eq.has("hits"):
+		return
+	eq["hits"] = int(eq["hits"]) + 1
+	if not RulesEquip.hit_wears(int(eq["hits"]), int(data.equip_cfg["durability"]["hitsPerWear"])):
+		return
+	for s in RulesEquip.SLOTS:
+		var a := int(eq[s])
+		if a > 0 and int(eq["dur"].get(str(a), 0)) > 0:
+			eq["dur"][str(a)] = int(eq["dur"][str(a)]) - 1
+			if int(eq["dur"][str(a)]) == 0:
+				_emit({"k": "armor_broken", "dst": int(e["id"]), "item": a})
+				_msg(int(e["id"]), "「%s」耐久用盡，效果減半" % data.names.get(a, str(a)))
+
+
+# 死亡: 身上每件防具扣上限 10% 耐久 (spec 03 §4.3)
+func _wear_armor_death(ch: Dictionary) -> void:
+	var eq: Dictionary = ch["equip"]
+	if not eq.has("dur"):
+		return
+	for s in RulesEquip.SLOTS:
+		var a := int(eq[s])
+		if a > 0:
+			eq["dur"][str(a)] = RulesEquip.dur_after_death(int(eq["dur"].get(str(a), 0)),
+				int(data.armors.get(a, {}).get("max_dur", 0)), float(data.equip_cfg["durability"]["deathLossPct"]))
+
+
+# 背包已經冇嘅防具 → 清耐久記錄
+func _cleanup_dur(ch: Dictionary) -> void:
+	var d: Dictionary = ch["equip"].get("dur", {})
+	for k in d.keys():
+		if RulesShop.count_item(ch["bag"], int(k)) <= 0:
+			d.erase(k)
+
+
 # 裝備緊嘅屬性石 (slot 0, 攻擊用) → {elem, pct} / {}
 func _equip_stone(ch: Dictionary) -> Dictionary:
 	var it := int(ch["equip"].get("jewels", [0, 0])[0])
@@ -295,6 +393,7 @@ func _spawn_actor(ename: String, kind: String, class_id: String = "yishi") -> Di
 	e["ch"]["ultCd"] = {}                       # ultId -> until tick
 	e["ch"]["fusedJewels"] = {}                 # 武器嵌石: weapon item id -> {elem, pct} (融合, 只能 1 粒)
 	e["ch"]["fusing"] = {}                      # 進行中融合 QTE {weapon, jewel, start} (Step 10)
+	_ensure_equip(e["ch"])                      # 武器 3 槽 + 5 部位防具 + 耐久 (Step 11.6)
 	_sync_stats(e)
 	return e
 

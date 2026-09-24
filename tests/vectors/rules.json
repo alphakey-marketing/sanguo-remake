@@ -4307,5 +4307,341 @@
    },
    "ups": 68
   }
+ },
+ {
+  "fn": "equipArmorStats",
+  "args": [
+   [
+    {
+     "type": 9,
+     "value": 2
+    },
+    {
+     "type": 11,
+     "value": 1
+    }
+   ]
+  ],
+  "expect": {
+   "def": 2,
+   "evade": 0,
+   "sdef": 1,
+   "sevade": 0,
+   "str": 0,
+   "agi": 0,
+   "int": 0,
+   "spi": 0,
+   "dmgRed": 0,
+   "sdmgRed": 0,
+   "resist": {}
+  }
+ },
+ {
+  "fn": "equipArmorStats",
+  "args": [
+   [
+    {
+     "type": 9,
+     "value": 4
+    },
+    {
+     "type": 10,
+     "value": 3
+    },
+    {
+     "type": 12,
+     "value": 2
+    },
+    {
+     "type": 1,
+     "value": 3
+    },
+    {
+     "type": 4,
+     "value": 1
+    },
+    {
+     "type": 52,
+     "value": 5
+    },
+    {
+     "type": 34,
+     "value": 10
+    },
+    {
+     "type": 39,
+     "value": 5
+    },
+    {
+     "type": 99,
+     "value": 7
+    }
+   ]
+  ],
+  "expect": {
+   "def": 4,
+   "evade": 3,
+   "sdef": 0,
+   "sevade": 2,
+   "str": 3,
+   "agi": 0,
+   "int": 0,
+   "spi": 1,
+   "dmgRed": 5,
+   "sdmgRed": 0,
+   "resist": {
+    "hex": 15,
+    "sealed": 5,
+    "charm": 5,
+    "poison": 5
+   }
+  }
+ },
+ {
+  "fn": "equipArmorStats",
+  "args": [
+   []
+  ],
+  "expect": {
+   "def": 0,
+   "evade": 0,
+   "sdef": 0,
+   "sevade": 0,
+   "str": 0,
+   "agi": 0,
+   "int": 0,
+   "spi": 0,
+   "dmgRed": 0,
+   "sdmgRed": 0,
+   "resist": {}
+  }
+ },
+ {
+  "fn": "equipMaxDur",
+  "args": [
+   0,
+   {
+    "base": 50,
+    "perLv": 5
+   }
+  ],
+  "expect": 50
+ },
+ {
+  "fn": "equipMaxDur",
+  "args": [
+   51,
+   {
+    "base": 50,
+    "perLv": 5
+   }
+  ],
+  "expect": 305
+ },
+ {
+  "fn": "equipSumWorn",
+  "args": [
+   [
+    {
+     "stats": {
+      "def": 5,
+      "evade": 3,
+      "sdef": 0,
+      "sevade": 0,
+      "str": 0,
+      "agi": 0,
+      "int": 0,
+      "spi": 0,
+      "dmgRed": 0,
+      "sdmgRed": 0,
+      "resist": {}
+     },
+     "dur": 10
+    },
+    {
+     "stats": {
+      "def": 7,
+      "evade": 0,
+      "sdef": 3,
+      "sevade": 0,
+      "str": 0,
+      "agi": 0,
+      "int": 0,
+      "spi": 0,
+      "dmgRed": 0,
+      "sdmgRed": 0,
+      "resist": {
+       "hex": 10
+      }
+     },
+     "dur": 0
+    }
+   ]
+  ],
+  "expect": {
+   "def": 8,
+   "evade": 3,
+   "sdef": 1,
+   "sevade": 0,
+   "str": 0,
+   "agi": 0,
+   "int": 0,
+   "spi": 0,
+   "dmgRed": 0,
+   "sdmgRed": 0,
+   "resist": {
+    "hex": 5
+   }
+  }
+ },
+ {
+  "fn": "equipSumWorn",
+  "args": [
+   []
+  ],
+  "expect": {
+   "def": 0,
+   "evade": 0,
+   "sdef": 0,
+   "sevade": 0,
+   "str": 0,
+   "agi": 0,
+   "int": 0,
+   "spi": 0,
+   "dmgRed": 0,
+   "sdmgRed": 0,
+   "resist": {}
+  }
+ },
+ {
+  "fn": "equipEvadeChance",
+  "args": [
+   3,
+   0.05,
+   60
+  ],
+  "expect": 0.08
+ },
+ {
+  "fn": "equipEvadeChance",
+  "args": [
+   80,
+   0.1,
+   60
+  ],
+  "expect": 0.6
+ },
+ {
+  "fn": "equipEvadeChance",
+  "args": [
+   0,
+   0.0,
+   60
+  ],
+  "expect": 0.0
+ },
+ {
+  "fn": "equipReduceDmg",
+  "args": [
+   100,
+   20,
+   50
+  ],
+  "expect": 80
+ },
+ {
+  "fn": "equipReduceDmg",
+  "args": [
+   100,
+   90,
+   50
+  ],
+  "expect": 50
+ },
+ {
+  "fn": "equipReduceDmg",
+  "args": [
+   1,
+   50,
+   50
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "equipReduceDmg",
+  "args": [
+   0,
+   20,
+   50
+  ],
+  "expect": 0
+ },
+ {
+  "fn": "equipReduceDmg",
+  "args": [
+   37,
+   0,
+   50
+  ],
+  "expect": 37
+ },
+ {
+  "fn": "equipHitWears",
+  "args": [
+   10,
+   10
+  ],
+  "expect": true
+ },
+ {
+  "fn": "equipHitWears",
+  "args": [
+   9,
+   10
+  ],
+  "expect": false
+ },
+ {
+  "fn": "equipHitWears",
+  "args": [
+   0,
+   10
+  ],
+  "expect": false
+ },
+ {
+  "fn": "equipHitWears",
+  "args": [
+   20,
+   10
+  ],
+  "expect": true
+ },
+ {
+  "fn": "equipDurAfterDeath",
+  "args": [
+   50,
+   50,
+   0.1
+  ],
+  "expect": 45
+ },
+ {
+  "fn": "equipDurAfterDeath",
+  "args": [
+   3,
+   305,
+   0.1
+  ],
+  "expect": 0
+ },
+ {
+  "fn": "equipDurAfterDeath",
+  "args": [
+   305,
+   305,
+   0.1
+  ],
+  "expect": 274
  }
 ]

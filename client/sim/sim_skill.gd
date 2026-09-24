@@ -140,7 +140,7 @@ func _sp_cost(ch: Dictionary, base: int) -> int:
 # 傷害術: 大範圍 (aoe>0) = 以目標格為圓心打晒所有怪物；隊友唔受【原】
 func _spell_hit(p: Dictionary, def: Dictionary, t: Dictionary) -> void:
 	var ch: Dictionary = p["ch"]
-	var attr := float(ch["attrs"].get(str(def["stat"]), 0))
+	var attr := _eff_attr(ch, str(def["stat"]))
 	# 寶石加成 (Step 10, spec 02 §3.2): 裝備 slot 0 屬性石同術法元素相同 → 石 pct 加成；另加輔助術攻 %
 	var stone := _equip_stone(ch)
 	var jewel_pct := RulesJewel.spell_jewel_bonus(str(stone.get("elem", "")), str(def.get("elem", "")),
@@ -205,7 +205,7 @@ func cmd_use_ultimate(id: int, ult_id: String) -> void:
 	ch["ultCd"] = cd
 	var wdef: Dictionary = data.weapons.get(w, {"power": 0.0, "hit": 45.0})
 	var atk_mult := RulesSpell.atk_mult(ch.get("status", {}), tick) * (1.0 + float(_jewel_bonus(ch).get("atkPct", 0.0)))
-	var eff_str := float(ch["attrs"]["str"]) + float(_jewel_bonus(ch).get("strFlat", 0))
+	var eff_str := _eff_attr(ch, "str") + float(_jewel_bonus(ch).get("strFlat", 0))
 	_emit({"k": "ult", "src": id, "ult": ult_id, "name": str(ult["name"]), "mp": mp_cost, "sp": sp_cost})
 	_msg(id, "「%s」！" % ult["name"])
 	for o in targets:
@@ -360,16 +360,28 @@ func _resolve_mob_cast(m: Dictionary, s: Dictionary, d: Dictionary, tgt: Diction
 				targets.append(tgt)
 			for o in targets:
 				var pch: Dictionary = o["ch"]
-				var pd := RulesStats.player_spell_def(int(pch["level"]), int(pch["attrs"]["spi"])) \
+				# 防具: 術防 flat + 術迴避 + 術法受擊減少 (Step 11.6)；冇術迴避就唔擲骰 (保持舊重播一致)
+				var ab := _armor_bonus(pch)
+				var caps: Dictionary = data.equip_cfg["caps"]
+				var pd := (RulesStats.player_spell_def(int(pch["level"]), int(_eff_attr(pch, "spi"))) + int(ab["sdef"])) \
 					* RulesSpell.spell_def_mult(pch.get("status", {}), tick)
-				var dmg := RulesSpell.calc_spell_damage(float(sdef["power"]), float(d["level"]), pd,
-					str(sdef["elem"]), "none", 0.0, rng_fn)
+				if int(ab["sevade"]) > 0 and rng.next() < RulesEquip.evade_chance(int(ab["sevade"]), 0.0, int(caps["evadePct"])):
+					_emit({"k": "spell_hit", "src": m["id"], "dst": o["id"], "dmg": 0, "elem": str(sdef["elem"])})    # 術迴避
+					continue
+				var dmg := RulesEquip.reduce_dmg(RulesSpell.calc_spell_damage(float(sdef["power"]), float(d["level"]), pd,
+					str(sdef["elem"]), "none", 0.0, rng_fn), int(ab["sdmgRed"]), int(caps["dmgRedPct"]))
 				_emit({"k": "spell_hit", "src": m["id"], "dst": o["id"], "dmg": dmg, "elem": str(sdef["elem"])})
 				damage(o, dmg, m)
 		"status":
 			var sid := str(sdef.get("status", ""))
 			if sid != "" and not tgt.is_empty() and tgt.has("ch"):
 				var pch2: Dictionary = tgt["ch"]
+				# 防具迴避異常狀態 34~37/39 (Step 11.6)
+				var res := int(_armor_bonus(pch2)["resist"].get(sid, 0))
+				if res > 0 and rng.next() < minf(res, int(data.equip_cfg["caps"]["resistPct"])) / 100.0:
+					_emit({"k": "status", "dst": tgt["id"], "id": sid, "until": 0, "applied": false, "resisted": true})
+					s["next_spell"] = tick + int(d.get("spellCd", 600))
+					return
 				if not pch2.has("status"):
 					pch2["status"] = {}
 				RulesSpell.add_status(pch2["status"], sid, RulesSpell.status_ticks(sid), tick)
