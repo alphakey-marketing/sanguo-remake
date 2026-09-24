@@ -10,7 +10,7 @@
     { "id": "daoshi", "name": "道士", "gender": "M", "enabled": true, "attackRange": "melee_mid",   "spell": "destructive", "weapons": ["幡", "拂塵", "符咒"], "skill": "超渡", "tier2": "仙君", "tier3": "聖君",
       "base":   { "str": 5, "agi": 6, "int": 12, "spi": 8, "pol": 6, "cha": 6 },
       "growth": { "str": 1, "agi": 1, "int": 2,  "spi": 1 } },
-    { "id": "wunu",   "name": "巫女", "gender": "F", "enabled": false, "attackRange": "melee_mid",   "spell": "status",      "weapons": ["鞭", "棍棒杖", "卷軸"], "skill": "潛行", "tier2": "魔女", "tier3": "妖姬",
+    { "id": "wunu",   "name": "巫女", "gender": "F", "enabled": false, "attackRange": "melee_mid",   "spell": "status",      "weapons": ["鞭", "棍杖", "卷軸"], "skill": "潛行", "tier2": "魔女", "tier3": "妖姬",
       "base":   { "str": 4, "agi": 7, "int": 6, "spi": 12, "pol": 5, "cha": 8 },
       "growth": { "str": 1, "agi": 1, "int": 1, "spi": 2 } },
     { "id": "bianshi","name": "辯士", "gender": "M", "enabled": false, "attackRange": "melee_ranged","spell": "support",     "weapons": ["扇", "筆", "弩"],   "skill": "竊聽", "tier2": "策士", "tier3": "諸葛",

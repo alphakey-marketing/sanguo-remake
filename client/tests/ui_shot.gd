@@ -64,6 +64,22 @@ func _run() -> void:
 	cp.pending = {"str": 1}
 	cp.refresh(true)
 	await shot("char")
+	# 裝備 (Step 11.6): 背包揀防具比較 + 角色裝備頁紙娃娃
+	m._send({"t": "debug_give", "item": 16001, "n": 1})
+	m._send({"t": "debug_give", "item": 19001, "n": 1})
+	m._send({"t": "equip", "item": 16001})
+	cp.set_tab(1)
+	cp.sel_slot = "head"
+	cp.refresh(true)
+	await shot("char_equip")
+	cp.set_tab(0)
+	hud.close_panels()
+	hud.bag_panel().open_filter("")
+	bp.sel = 19001
+	bp.sel_slot = ""
+	bp.refresh(true)
+	await shot("bag_armor")
+	hud.close_panels()
 	put(m.sim.inn_pos.x, m.sim.inn_pos.y + 1)
 	await frames(15)
 	ContextActions.run(m, {"kind": "inn"})

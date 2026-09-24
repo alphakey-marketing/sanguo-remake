@@ -46,6 +46,8 @@ var jewels: Dictionary = {}      # 寶石目錄 (data/jewels.json, Step 10): sto
 var jewel_by_item: Dictionary = {}  # item id -> jewel def (全種類)
 var ultimates: Array = []        # 絕招定義 (data/ultimates.json, Step 10, spec 02 §5)
 var ult_by_id: Dictionary = {}   # ult id -> def
+var armors: Dictionary = {}      # item id -> {slot, req_lv, max_dur, stats} 防具 (Step 11.6, spec 02 §9)
+var equip_cfg: Dictionary = {}   # data/equip.json (部位碼/耐久/上限)
 
 static var _cache: GameData
 
@@ -92,6 +94,7 @@ static func load_all() -> GameData:
 		for j in jw.get(cat, []):
 			j["kind"] = "stone" if cat == "stones" else "special" if cat == "special" else "support" if cat == "support" else "fusable"
 			g.jewel_by_item[int(j["id"])] = j
+	g.equip_cfg = _read("res://data/equip.json")
 	var ul: Dictionary = _read("res://data/ultimates.json")
 	g.ultimates = ul["ultimates"]
 	for u in g.ultimates:
@@ -139,6 +142,11 @@ static func load_all() -> GameData:
 					heal_mp += v
 				else:
 					heal_sp += v
+		var slot := str(g.equip_cfg["slotCode"].get(str(int((it.get("b54_59", [0, 0, 0]) as Array)[2])), ""))
+		if slot != "":
+			g.armors[id] = {"slot": slot, "req_lv": int(it.get("req_lv", 0)),
+				"max_dur": RulesEquip.max_dur(int(it.get("req_lv", 0)), g.equip_cfg["durability"]),
+				"stats": RulesEquip.armor_stats(it.get("effects", []))}
 		if p != null:
 			g.weapons[id] = {"power": p, "hit": h if h != null else 45.0}
 		if heal_hp > 0 or heal_mp > 0 or heal_sp > 0:

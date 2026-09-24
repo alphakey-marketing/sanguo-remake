@@ -85,6 +85,14 @@ func _call(v: Dictionary, data: GameData) -> Variant:
 			var ch: Dictionary = a[0].duplicate(true)
 			var ups := RulesStats.gain_exp(data, ch, int(a[1]))
 			return {"ch": ch, "ups": ups}
+		# 裝備 (Step 11.6)
+		"equipArmorStats": return RulesEquip.armor_stats(a[0])
+		"equipMaxDur": return RulesEquip.max_dur(int(a[0]), a[1])
+		"equipSumWorn": return RulesEquip.sum_worn(a[0])
+		"equipEvadeChance": return RulesEquip.evade_chance(int(a[0]), a[1], int(a[2]))
+		"equipReduceDmg": return RulesEquip.reduce_dmg(int(a[0]), int(a[1]), int(a[2]))
+		"equipHitWears": return RulesEquip.hit_wears(int(a[0]), int(a[1]))
+		"equipDurAfterDeath": return RulesEquip.dur_after_death(int(a[0]), int(a[1]), a[2])
 	push_error("未知 fn: " + String(v["fn"]))
 	return null
 

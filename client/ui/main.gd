@@ -221,6 +221,9 @@ func _send(d: Dictionary) -> void:
 		"equip_spellbook": sim.cmd_equip_spellbook(my_id, int(d.item), int(d.get("slot", 0)))
 		"cast_spell": sim.cmd_cast_spell(my_id, int(d.slot), int(d.get("target", 0)))
 		"equip_weapon": sim.cmd_equip_weapon(my_id, int(d.item))
+		"equip": sim.cmd_equip(my_id, int(d.item), int(d.get("wslot", -1)))
+		"unequip": sim.cmd_unequip(my_id, str(d.part), int(d.get("wslot", -1)))
+		"switch_weapon": sim.cmd_switch_weapon(my_id, int(d.wslot))
 		"equip_jewel": sim.cmd_equip_jewel(my_id, int(d.item), int(d.get("slot", 0)))
 		"use_ultimate": sim.cmd_use_ultimate(my_id, str(d.ult))
 		"fusion_start": sim.cmd_fusion_start(my_id)
@@ -286,7 +289,11 @@ func _on_event(e: Dictionary) -> void:
 				_log("寶石欄 %d: %s" % [int(e.slot) + 1, item_names.get(int(e.item), "(空)") if int(e.item) > 0 else "(空)"])
 		"equip":
 			if int(e.src) == my_id:
-				_log("裝備武器: %s" % item_names.get(int(e.item), str(e.item)))
+				var part: String = str(data.equip_cfg["slotNames"].get(str(e.slot), "武器"))
+				_log("%s: %s" % [part, item_names.get(int(e.item), str(e.item)) if int(e.item) > 0 else "(卸下)"])
+		"armor_broken":
+			if int(e.dst) == my_id:
+				_log("「%s」耐久用盡，效果減半" % item_names.get(int(e.item), str(e.item)))
 		"ult":
 			if int(e.src) == my_id:
 				_log("「%s」！ (-%d MP -%d SP)" % [e.name, int(e.get("mp", 0)), int(e.get("sp", 0))])

@@ -2,14 +2,17 @@ class_name CharPanel
 extends GamePanel
 # 角色面板: 左 = 屬性 + 分配點數（＋/－ 先暫存，撳「確認分配」先送 sim）；右 = 角色資料。
 # 「建議分配」係玩家自己撳嘅選項（按職業比例派晒），唔會自動派。政治/魅力唔用得點數，放右邊資料。
+# 頁籤「裝備」= 紙娃娃 (Step 11.6): 頭/身/靴/戒/項鍊 + 武器 3 槽 + 寶石 2 格；撳格揀中 → 右邊詳情 + 卸下/切換
 
 const ATTR_NAMES := {"str": "武力", "agi": "敏捷", "int": "智力", "spi": "靈力", "pol": "政治", "cha": "魅力"}
 var pending := {}             # attr -> 暫存加咗幾多
+var sel_slot := ""            # 裝備頁揀中格: head/body/boots/ring/necklace/w0..w2/j0/j1
 
 
 func _init(m: Node) -> void:
 	super(m)
 	title_lbl.text = "角色"
+	set_tabs(["屬性", "裝備"])
 
 
 func open() -> void:
@@ -19,7 +22,7 @@ func open() -> void:
 
 func sig() -> String:
 	var ch: Dictionary = main.ch
-	return JSON.stringify([pending, ch.get("attrs", {}), ch.get("attrPoints", 0), ch.get("level", 1), ch.get("hp", 0),
+	return JSON.stringify([tab, sel_slot, ch.get("equip", {}), pending, ch.get("attrs", {}), ch.get("attrPoints", 0), ch.get("level", 1), ch.get("hp", 0),
 		ch.get("mp", 0), ch.get("sp", 0), ch.get("gold", 0), ch.get("karma", 0), ch.get("lilian", 0), ch.get("title", "")])
 
 
@@ -33,6 +36,9 @@ func _left() -> int:
 func _build_body() -> void:
 	var ch: Dictionary = main.ch
 	if ch.is_empty():
+		return
+	if tab == 1:
+		_build_equip(ch)
 		return
 	var row := HBoxContainer.new()
 	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -115,3 +121,105 @@ func _confirm() -> void:
 			main._send({"t": "raise_attr", "attr": k})
 	pending = {}
 	refresh(true)
+
+
+# ================= 裝備頁 (紙娃娃) =================
+func _slot_item(eq: Dictionary, key: String) -> int:
+	if key.begins_with("w"):
+		return int((eq.get("weapons", [eq.get("weapon", 0), 0, 0]) as Array)[int(key.substr(1))])
+	if key.begins_with("j"):
+		return int((eq.get("jewels", [0, 0]) as Array)[int(key.substr(1))])
+	return int(eq.get(key, 0))
+
+
+func _slot_btn(eq: Dictionary, key: String, label: String) -> Button:
+	var id := _slot_item(eq, key)
+	var b := btn("%s
+%s" % [label, item_name(id).substr(0, 4) if id > 0 else "—"], func() -> void:
+		sel_slot = key
+		refresh(true), 84)
+	b.custom_minimum_size.y = 54
+	b.add_theme_font_size_override("font_size", 13)
+	b.toggle_mode = true
+	b.set_pressed_no_signal(sel_slot == key)
+	if id > 0 and main.data.armors.has(id) and int(eq.get("dur", {}).get(str(id), 1)) <= 0:
+		b.add_theme_color_override("font_color", UiTheme.BAD)      # 耐久用盡
+	return b
+
+
+func _build_equip(ch: Dictionary) -> void:
+	var eq: Dictionary = ch.get("equip", {})
+	var row := HBoxContainer.new()
+	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	row.add_theme_constant_override("separation", 14)
+	body.add_child(row)
+	var left := VBoxContainer.new()
+	left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(left)
+	var sc := scroll()
+	row.add_child(sc)
+	var right := VBoxContainer.new()
+	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sc.add_child(right)
+	# 紙娃娃: 3 欄 (頭/項鍊/戒) (身/靴)
+	var g := GridContainer.new()
+	g.columns = 3
+	g.add_theme_constant_override("h_separation", 4)
+	g.add_theme_constant_override("v_separation", 4)
+	left.add_child(g)
+	for s in ["head", "necklace", "ring", "body", "boots"]:
+		g.add_child(_slot_btn(eq, s, slot_name(s)))
+	left.add_child(lbl("武器（★ = 現用）", 13, UiTheme.DIM))
+	var hw := HBoxContainer.new()
+	hw.add_theme_constant_override("separation", 4)
+	left.add_child(hw)
+	for i in RulesEquip.WEAPON_SLOTS:
+		hw.add_child(_slot_btn(eq, "w%d" % i, "武%d%s" % [i + 1, "★" if int(eq.get("wslot", 0)) == i else ""]))
+	var hj := HBoxContainer.new()
+	hj.add_theme_constant_override("separation", 4)
+	left.add_child(hj)
+	for i in 2:
+		hj.add_child(_slot_btn(eq, "j%d" % i, "石%d" % (i + 1)))
+	# 右: 總計 + 揀中格詳情
+	var ab: Dictionary = main.sim._armor_bonus(ch) if main.sim != null else {}
+	var lv := int(ch.get("level", 1))
+	right.add_child(lbl("物防 %d  物迴避 %d%%" % [RulesCombat.player_def(lv) + int(ab.get("def", 0)), int(ab.get("evade", 0))], 15, UiTheme.GOLD))
+	right.add_child(lbl("術防 %d  術迴避 %d%%" % [RulesStats.player_spell_def(lv, int(ch["attrs"].get("spi", 0))) + int(ab.get("sdef", 0)),
+		int(ab.get("sevade", 0))], 15, UiTheme.GOLD))
+	right.add_child(hsep())
+	if sel_slot == "":
+		right.add_child(wrap_lbl("撳左邊格睇詳情；換裝去背包揀件防具撳「裝備」。", 13, UiTheme.DIM))
+		right.add_child(btn("開背包", func() -> void:
+			close()
+			main.hud.bag_panel().open_filter("")))
+		return
+	var id := _slot_item(eq, sel_slot)
+	if id == 0:
+		right.add_child(lbl("（空格）", 15, UiTheme.DIM))
+		if sel_slot.begins_with("w"):
+			_weapon_switch_btn(right, eq, int(sel_slot.substr(1)))
+		right.add_child(btn("開背包揀", func() -> void:
+			close()
+			main.hud.bag_panel().open_filter("")))
+		return
+	right.add_child(lbl(item_name(id), 17, UiTheme.GOLD))
+	for s in item_desc(id):
+		right.add_child(wrap_lbl(str(s), 13, UiTheme.DIM))
+	if main.data.armors.has(id):
+		right.add_child(lbl(armor_dur_text(ch, id), 13))
+		right.add_child(btn("卸下", func() -> void: main._send({"t": "unequip", "part": sel_slot})))
+	elif sel_slot.begins_with("w"):
+		var ws := int(sel_slot.substr(1))
+		_weapon_switch_btn(right, eq, ws)
+		right.add_child(btn("卸下", func() -> void: main._send({"t": "unequip", "part": "weapon", "wslot": ws})))
+	elif sel_slot.begins_with("j"):
+		var js := int(sel_slot.substr(1))
+		right.add_child(btn("卸下", func() -> void: main._send({"t": "equip_jewel", "item": 0, "slot": js})))
+
+
+func _weapon_switch_btn(p: Control, eq: Dictionary, ws: int) -> void:
+	var cur := int(eq.get("wslot", 0)) == ws
+	var b := btn("現用緊" if cur else "切換做現用", func() -> void: main._send({"t": "switch_weapon", "wslot": ws}))
+	b.disabled = cur
+	p.add_child(b)
+

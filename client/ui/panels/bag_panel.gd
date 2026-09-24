@@ -121,9 +121,10 @@ func _build_grid(parent: Control, items: Array) -> void:
 	if items.is_empty():
 		parent.add_child(lbl("（空）", 14, UiTheme.DIM))
 		return
+	var worn := _worn_ids(main.ch) if tab == 0 else []
 	for b in items:
 		var id := int(b["id"])
-		var cell := btn("%s\nx%d" % [item_name(id).substr(0, 4), int(b["n"])], func() -> void:
+		var cell := btn("%s\nx%d%s" % [item_name(id).substr(0, 4), int(b["n"]), " 裝" if worn.has(id) else ""], func() -> void:
 			sel = id
 			sel_slot = ""
 			refresh(true), CELL)
@@ -135,12 +136,23 @@ func _build_grid(parent: Control, items: Array) -> void:
 		g.add_child(cell)
 
 
+# 身上著緊/裝緊嘅 item id (武器 3 槽 + 5 部位)
+func _worn_ids(ch: Dictionary) -> Array:
+	var eq: Dictionary = ch.get("equip", {})
+	var out: Array = (eq.get("weapons", []) as Array).duplicate()
+	for s in RulesEquip.SLOTS:
+		out.append(int(eq.get(s, 0)))
+	return out
+
+
 func _kind_color(id: int) -> Color:
 	var d: GameData = main.data
 	if main.quest_items.has(id):
 		return UiTheme.DIM
 	if d.weapons.has(id):
 		return Color(1, 0.7, 0.45)
+	if d.armors.has(id):
+		return Color(0.6, 0.85, 1.0)
 	if d.heals.has(id):
 		return UiTheme.GOOD
 	if d.spell_by_item.has(id):
@@ -171,7 +183,10 @@ func _build_detail(p: Control, ch: Dictionary) -> void:
 	var info := VBoxContainer.new()
 	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	sc.add_child(info)
-	for s in item_desc(sel):
+	var desc := item_desc(sel)
+	if d.armors.has(sel) and desc.size() > 0:
+		desc = [desc[0]]              # 防具數值喺下面比較行顯示，唔重複
+	for s in desc:
 		info.add_child(wrap_lbl(str(s), 13, UiTheme.DIM))
 	if main.quest_items.has(sel):
 		info.add_child(lbl("任務道具（唔賣得）", 13, UiTheme.BAD))
@@ -190,11 +205,43 @@ func _build_detail(p: Control, ch: Dictionary) -> void:
 		p.add_child(lbl("裝備緊", 14, UiTheme.GOOD))
 		return
 	var id := sel
-	if d.weapons.has(id) and int(d.cats.get(id, 0)) in [1, 2, 3]:
-		var on := int(eq.get("weapon", 0)) == id
-		var b := btn("裝備緊" if on else "裝備武器", func() -> void: main._send({"t": "equip_weapon", "item": id}))
-		b.disabled = on
-		p.add_child(b)
+	var lv_ok := int(ch.get("level", 1)) >= int(d.info.get(id, {}).get("req_lv", 0))
+	if d.weapons.has(id):
+		var cls: Dictionary = d.classes.get(str(ch.get("classId", "")), {})
+		if not (cls.get("weapons", []) as Array).has(str(d.info.get(id, {}).get("cat_label", ""))):
+			p.add_child(lbl("%s用唔到呢類武器" % str(cls.get("name", "")), 13, UiTheme.BAD))
+		else:
+			var on := int(eq.get("weapon", 0)) == id
+			var b := btn("裝備緊" if on else "裝備武器", func() -> void: main._send({"t": "equip", "item": id}))
+			b.disabled = on or not lv_ok
+			p.add_child(b)
+			# 武器 3 槽【原】: 直接裝落指定槽
+			var hw := HBoxContainer.new()
+			var ws: Array = eq.get("weapons", [eq.get("weapon", 0), 0, 0])
+			for i in ws.size():
+				var in_slot := int(ws[i]) == id
+				var bw := btn("槽%d%s" % [i + 1, "✓" if in_slot else ""], func() -> void: main._send({"t": "equip", "item": id, "wslot": i}), 56)
+				bw.disabled = in_slot or not lv_ok
+				hw.add_child(bw)
+			p.add_child(lbl("裝落武器槽:", 13))
+			p.add_child(hw)
+	if d.armors.has(id):
+		var ad: Dictionary = d.armors[id]
+		var slot := str(ad["slot"])
+		var worn := int(eq.get(slot, 0)) == id
+		var cur := int(eq.get(slot, 0))
+		p.add_child(lbl("部位: %s   %s" % [slot_name(slot), armor_dur_text(ch, id)], 13))
+		p.add_child(lbl("身上: %s" % (item_name(cur) if cur > 0 else "（空）"), 13, UiTheme.DIM))
+		for c in armor_compare(ch, id):
+			p.add_child(lbl(str(c[0]), 13, c[1]))
+		if worn:
+			p.add_child(btn("卸下%s" % slot_name(slot), func() -> void: main._send({"t": "unequip", "part": slot})))
+		else:
+			var ba := btn("裝備（%s）" % slot_name(slot), func() -> void: main._send({"t": "equip", "item": id}))
+			ba.disabled = not lv_ok
+			p.add_child(ba)
+		if not lv_ok:
+			p.add_child(lbl("等級唔夠", 13, UiTheme.BAD))
 	if d.heals.has(id):
 		p.add_child(btn("使用", func() -> void: main._send({"t": "use_item", "item": id})))
 	if d.spell_by_item.has(id):

@@ -194,6 +194,9 @@ static func load_string(game_data: GameData, s: String) -> Sim:
 		es[int(k)] = st["ents"][k]
 	st["ents"] = es
 	sim.state = st
+	for e in es.values():
+		if e.has("ch"):
+			sim._ensure_equip(e["ch"])      # 舊存檔裝備欄兼容 (Step 11.6)
 	sim._fix_positions()
 	return sim
 
