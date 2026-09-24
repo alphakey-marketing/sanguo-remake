@@ -83,7 +83,14 @@ static func run(main: Node, act: Dictionary) -> void:
 		"ask":
 			hud.open_dialog(func() -> Dictionary: return ask_dialog(main))
 		"quest_npc":
-			main._send({"t": "quest_talk", "npc": String(act.ref.id)})
+			var qn: Dictionary = act.ref
+			if bool(qn.get("comm", false)):          # 居民委託人 (Step 16)
+				var nid := String(qn.id)
+				hud.open_dialog(func() -> Dictionary: return comm_dialog(main, nid))
+			elif String(qn.get("svc", "")) == "book":  # 許昌老丈: 收集冊
+				hud.open_dialog(func() -> Dictionary: return book_npc_dialog(main))
+			else:
+				main._send({"t": "quest_talk", "npc": String(qn.id)})
 		"shop":
 			hud.shop_panel().open_shop(act.ref)
 		"inn":
@@ -110,6 +117,81 @@ static func run(main: Node, act: Dictionary) -> void:
 
 static func _leave(main: Node) -> Dictionary:
 	return {"label": "離開", "cb": func() -> void: main.hud.close_panels()}
+
+
+# 居民委託 (Step 16): 傾偈 (送信到手亦喺度交) / 接今日委託 / 覆命 / 放棄
+static func comm_dialog(main: Node, nid: String) -> Dictionary:
+	var ch: Dictionary = main.ch
+	var npc: Dictionary = main.data.quest_npcs[nid]
+	var lines: Array = []
+	var opts: Array = [{"label": "傾偈", "cb": func() -> void:
+		main._send({"t": "quest_talk", "npc": nid})
+		main.hud.close_panels()}]
+	var act := {}
+	for c in main.sim.view_commissions():
+		if String(c["giver"]) == nid:
+			act = c
+	if not act.is_empty():
+		lines.append("你接咗佢嘅委託：%s" % act["text"])
+		lines.append("報酬：%s　（仲有 %d 日）" % [act["reward"], int(act["left"])])
+		if String(act["kind"]) == "hunt" or String(act["kind"]) == "collect":
+			opts.append({"label": "覆命", "cb": func() -> void: main._send({"t": "comm_report", "giver": nid}), "disabled": not bool(act["ready"])})
+		opts.append({"label": "放棄委託", "cb": func() -> void: main._send({"t": "comm_abandon", "giver": nid})})
+	else:
+		var o: Dictionary = main.sim.comm_offer(ch, nid)
+		if o.is_empty():
+			lines.append("%s：今日冇嘢要麻煩你喇，聽日再嚟。" % npc["name"])
+		else:
+			lines.append("%s有個委託：%s" % [npc["name"], RulesCommission.describe(main.data, o)])
+			lines.append("報酬：%s" % RulesCommission.reward_text(o["reward"]))
+			var full: bool = main.sim.view_commissions().size() >= int(main.data.comm["maxActive"]) and String(o["kind"]) != "repair"
+			if full:
+				lines.append("（手上委託已滿 %d 單）" % int(main.data.comm["maxActive"]))
+			opts.append({"label": "幫佢修" if String(o["kind"]) == "repair" else "接委託",
+				"cb": func() -> void: main._send({"t": "comm_accept", "giver": nid}), "disabled": full})
+	opts.append(_leave(main))
+	return {"title": str(npc["name"]), "text": "
+".join(lines), "options": opts}
+
+
+# 許昌老丈 (Step 16): 6 屬性石換武將收集冊；有冊可以收將軍令 / 查閱
+static func book_npc_dialog(main: Node) -> Dictionary:
+	var ch: Dictionary = main.ch
+	var bk: Dictionary = main.data.comm["book"]
+	var book := int(bk["item"])
+	var has_book := RulesShop.count_item(ch["bag"], book) > 0
+	var names: Array = []
+	var ok := true
+	for s in bk["stones"]:
+		var have := RulesShop.count_item(ch["bag"], int(s)) > 0
+		ok = ok and have
+		names.append("%s%s" % [main.data.names.get(int(s), "?"), "✓" if have else "✗"])
+	var text := "老丈：「將軍令收入武將收集冊，唔佔背包位，登用時照用得。」
+換冊要：%s" % "、".join(names)
+	var opts: Array = []
+	if has_book:
+		text += "
+你已經有收集冊。"
+		opts.append({"label": "收入將軍令", "cb": func() -> void: main._send({"t": "book_put"})})
+		opts.append({"label": "查閱收集冊", "cb": func() -> void: main.hud.open_dialog(func() -> Dictionary: return book_dialog(main))})
+	else:
+		opts.append({"label": "換收集冊", "cb": func() -> void: main._send({"t": "book_exchange"}), "disabled": not ok})
+	opts.append(_leave(main))
+	return {"title": "老丈", "text": text, "options": opts}
+
+
+# 查閱武將收集冊: 每張將軍令一個「攞出」掣
+static func book_dialog(main: Node) -> Dictionary:
+	var list: Array = main.sim.view_book()
+	var opts: Array = [{"label": "收入背包嘅將軍令", "cb": func() -> void: main._send({"t": "book_put"})}]
+	var lines: Array = []
+	for b in list:
+		lines.append("・%s ×%d" % [b["name"], int(b["n"])])
+		var it := int(b["item"])
+		opts.append({"label": "攞出%s" % str(b["name"]).replace("將軍令", ""), "cb": func() -> void: main._send({"t": "book_take", "item": it})})
+	opts.append(_leave(main))
+	return {"title": "武將收集冊", "text": "（冊內未有將軍令）" if lines.is_empty() else "
+".join(lines), "options": opts}
 
 
 static func ask_dialog(main: Node) -> Dictionary:

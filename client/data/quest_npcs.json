@@ -1,5 +1,5 @@
 {
- "_note": "任務 NPC (spec 06 §1.2): 靜態 NPC，唔入 ents（唔會移動/被攻擊），由 sim.view_quest_npcs() 讀出嚟畀 UI 畫。可見性規則: minLevel/maxLevel（玩家等級）+ window（時辰窗口，startKe 含 ~ endKe 不含，endKe<=startKe = 跨日）+ 任務進行中強制常駐。service = NPC 功能（密醫免費醫療）。",
+ "_note": "任務 NPC (spec 06 §1.2): 靜態 NPC，唔入 ents（唔會移動/被攻擊），由 sim.view_quest_npcs() 讀出嚟畀 UI 畫。可見性規則: minLevel/maxLevel（玩家等級）+ window（時辰窗口，startKe 含 ~ endKe 不含，endKe<=startKe = 跨日）+ 任務進行中強制常駐。service = NPC 功能（密醫免費醫療）。 Step 16: questOnly = 只喺任務要佢嗰陣先出現 (PK boss/內應)；strictWindow = 任務進行中都要守時辰窗口；service.kind=book = 許昌老丈換武將收集冊；commission = 居民委託 NPC (data/commissions.json)。",
  "npcs": [
   {
    "id": "mystery_old",
@@ -69,7 +69,8 @@
     "賣菜嬸：「靚仔，幫襯下啦，菜好新鮮㗎。」"
    ],
    "desc": "許昌城內賣菜嘅大嬸。",
-   "map": "xuchang"
+   "map": "xuchang",
+   "commission": true
   },
   {
    "id": "citizen_2",
@@ -91,7 +92,8 @@
     "茶館老闆：「得閒嚟飲杯茶，聽下三國新聞。」"
    ],
    "desc": "城內茶館嘅老闆。",
-   "map": "xuchang"
+   "map": "xuchang",
+   "commission": true
   },
   {
    "id": "guard_captain",
@@ -175,6 +177,233 @@
    ],
    "desc": "許昌南門附近嘅驛丞，收發各地公文。",
    "map": "xuchang"
+  },
+  {
+   "id": "sunjian",
+   "name": "孫堅",
+   "x": 90,
+   "y": 20,
+   "idle": [
+    "孫堅望住白河，眉頭深鎖。"
+   ],
+   "desc": "新野城外荊州地界，為海賊之事悶悶不樂嘅孫堅【原】。",
+   "map": "jingzhou"
+  },
+  {
+   "id": "huyu",
+   "name": "胡玉",
+   "x": 45,
+   "y": 42,
+   "questOnly": true,
+   "desc": "港口渡船處嘅海賊首領【原】。",
+   "map": "gangkou"
+  },
+  {
+   "id": "wanggong",
+   "name": "王肱",
+   "x": 35,
+   "y": 27,
+   "idle": [
+    "王肱：「于毒嚟勢洶洶，點算好……」"
+   ],
+   "desc": "宛城牌樓附近嘅地方官【原】，山賊于毒正殺向宛城。",
+   "map": "wancheng"
+  },
+  {
+   "id": "caocao_cl",
+   "name": "曹操",
+   "x": 47,
+   "y": 12,
+   "idle": [
+    "曹操：「亂世之中，正是用人之際。」"
+   ],
+   "desc": "陳留城門口嘅曹都尉【原】。",
+   "map": "chenliu"
+  },
+  {
+   "id": "yudu",
+   "name": "于毒",
+   "x": 15,
+   "y": 25,
+   "questOnly": true,
+   "desc": "于毒山寨嘅山賊頭目【原】。",
+   "map": "yudu"
+  },
+  {
+   "id": "chengong",
+   "name": "陳宮",
+   "x": 37,
+   "y": 21,
+   "idle": [
+    "陳宮來回踱步，自言自語：「孟德……」"
+   ],
+   "desc": "襄陽宮宅外憂心如焚嘅陳宮【原】。",
+   "map": "xiangyang"
+  },
+  {
+   "id": "prison_clerk",
+   "name": "獄吏",
+   "x": 18,
+   "y": 2,
+   "questOnly": true,
+   "desc": "陳宮安插喺監獄嘅獄吏【自訂】，見縣官令就放行。",
+   "map": "xy_prison"
+  },
+  {
+   "id": "caocao_pr",
+   "name": "曹操（囚）",
+   "x": 6,
+   "y": 10,
+   "questOnly": true,
+   "window": {
+    "startKe": 0,
+    "endKe": 16
+   },
+   "strictWindow": true,
+   "desc": "被陳宮拘留喺襄陽監獄嘅曹操【原】；子時~丑時先見得到。",
+   "map": "xy_prison"
+  },
+  {
+   "id": "yuanshao",
+   "name": "袁紹",
+   "x": 6,
+   "y": 17,
+   "idle": [
+    "袁紹：「董卓殘暴，天下共討之！」"
+   ],
+   "desc": "小沛城門口內嘅袁太守【原】，想助司徒王允推翻董卓。",
+   "map": "xiaopei"
+  },
+  {
+   "id": "wangyun",
+   "name": "王允",
+   "x": 43,
+   "y": 32,
+   "idle": [
+    "王允長嘆：「國賊當道，漢室危矣。」"
+   ],
+   "desc": "身喺宛城嘅司徒王允【原】。",
+   "map": "wancheng"
+  },
+  {
+   "id": "liru",
+   "name": "李儒",
+   "x": 12,
+   "y": 16,
+   "idle": [
+    "李儒陰陰嘴笑，冇出聲。"
+   ],
+   "desc": "長沙城賭場旁嘅李儒【原】。",
+   "map": "changsha"
+  },
+  {
+   "id": "dongzhuo",
+   "name": "董卓",
+   "x": 91,
+   "y": 20,
+   "window": {
+    "startKe": 24,
+    "endKe": 80
+   },
+   "strictWindow": true,
+   "idle": [
+    "董卓：「哼，閒人勿近！」"
+   ],
+   "desc": "汝南城外門口嘅董卓【原】，每日卯時~酉時先出現。",
+   "map": "runan_road"
+  },
+  {
+   "id": "lisu",
+   "name": "李肅",
+   "x": 13,
+   "y": 13,
+   "idle": [
+    "李肅：「呂奉先天下無雙，可惜跟錯人。」"
+   ],
+   "desc": "汝南城李府嘅李肅【原】，代董卓招降呂布。",
+   "map": "runan_city"
+  },
+  {
+   "id": "lvbu_rn",
+   "name": "呂布",
+   "x": 30,
+   "y": 30,
+   "idle": [
+    "呂布抱住方天畫戟，睬你都傻。"
+   ],
+   "desc": "汝南城內嘅呂奉先【原】。",
+   "map": "runan_city"
+  },
+  {
+   "id": "dingyuan",
+   "name": "丁原",
+   "x": 15,
+   "y": 14,
+   "questOnly": true,
+   "desc": "丁刺史府內嘅并州刺史丁原【原】。",
+   "map": "ding_fu"
+  },
+  {
+   "id": "laozhang",
+   "name": "老丈",
+   "x": 44,
+   "y": 40,
+   "service": {
+    "kind": "book"
+   },
+   "idle": [
+    "老丈：「後生仔，收集將軍令？老夫有好嘢。」"
+   ],
+   "desc": "許昌城內嘅老丈【原】：地/水/火/風/生/無之石各 1 粒換武將收集冊。",
+   "map": "xuchang"
+  },
+  {
+   "id": "xinye_farmer",
+   "name": "新野農夫",
+   "x": 14,
+   "y": 31,
+   "commission": true,
+   "idle": [
+    "新野農夫：「今年收成都幾好。」"
+   ],
+   "desc": "新野城嘅農夫，間中有委託【自訂】。",
+   "map": "xinye"
+  },
+  {
+   "id": "wancheng_merchant",
+   "name": "宛城商人",
+   "x": 20,
+   "y": 31,
+   "commission": true,
+   "idle": [
+    "宛城商人：「貨如輪轉，客似雲來。」"
+   ],
+   "desc": "宛城行商，間中有委託【自訂】。",
+   "map": "wancheng"
+  },
+  {
+   "id": "runan_smith",
+   "name": "汝南鐵匠",
+   "x": 30,
+   "y": 24,
+   "commission": true,
+   "idle": [
+    "汝南鐵匠揮汗打鐵。"
+   ],
+   "desc": "汝南城嘅鐵匠，間中有委託【自訂】。",
+   "map": "runan_city"
+  },
+  {
+   "id": "xiangyang_scholar",
+   "name": "襄陽書生",
+   "x": 58,
+   "y": 24,
+   "commission": true,
+   "idle": [
+    "襄陽書生：「荊州學風鼎盛，名士雲集。」"
+   ],
+   "desc": "襄陽城嘅書生，間中有委託【自訂】。",
+   "map": "xiangyang"
   }
  ]
 }

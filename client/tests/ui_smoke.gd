@@ -112,6 +112,14 @@ func put(x: int, y: int) -> void:
 	m._refresh()
 
 
+# 互動掣而家指住邊個任務 NPC ("" = 唔係任務 NPC)
+func ctx_npc() -> String:
+	var r: Variant = hud.ctx.get("ref")
+	if String(hud.ctx.get("kind", "")) != "quest_npc" or not r is Dictionary:
+		return ""
+	return str(r.get("id", ""))
+
+
 # 武器店 / 客棧 門口 (全域座標, 由 data 讀)
 func shop_pos() -> Vector2i:
 	for sh in m.data.shops:
@@ -438,6 +446,48 @@ func _run() -> void:
 		check((m.sim.companion_view().get("treasures", []) as Array).size() == 1, "贈與寶物: 同伴寶物格 1 件")
 		rp.refresh(true)
 		check(_has_text(rp, "特技「"), "登用面板顯示特技")
+	hud.close_panels()
+	# 17. 居民委託 (Step 16): 行近賣菜嬸 → 委託對話框 → 接委託 → 記事有委託
+	var cn: Dictionary = m.data.quest_npcs["citizen_1"]
+	put(int(cn["x"]) + 1, int(cn["y"]))
+	check(await until(func() -> bool: return ctx_npc() == "citizen_1"), "近賣菜嬸互動掣 = 對話 (%s)" % hud.ctx)
+	await click(center("context"))
+	var dp4: GamePanel = hud.panels.get("dialog")
+	check(dp4 != null and dp4.visible and find_btn(dp4, "傾偈") != null, "委託人開委託對話框 (有「傾偈」)")
+	var offer: Dictionary = m.sim.comm_offer(ch, "citizen_1")
+	if dp4 != null and not offer.is_empty() and String(offer["kind"]) != "repair":
+		check(press(dp4, "接委託"), "委託對話框有「接委託」掣")
+		await frames(1)
+		check((ch.get("comm", {}).get("active", []) as Array).size() == 1, "撳接委託: 手上 1 單")
+		dp4.refresh(true)
+		check(find_btn(dp4, "放棄委託") != null, "接咗: 對話框有「放棄委託」")
+		hud.close_panels()
+		hud.open_panel("quest")
+		await frames(1)
+		check(_has_text(hud.panels["quest"], "委託・賣菜嬸"), "記事顯示委託")
+	elif dp4 != null:
+		check(find_btn(dp4, "幫佢修") != null or offer.is_empty(), "修理委託: 有「幫佢修」掣")
+	hud.close_panels()
+	# 18. 武將收集冊 (Step 16): 老丈 6 石換冊 → 收入將軍令 → 背包查閱
+	var lz: Dictionary = m.data.quest_npcs["laozhang"]
+	put(int(lz["x"]) + 1, int(lz["y"]))
+	for st in m.data.comm["book"]["stones"]:
+		RulesShop.add_item(ch["bag"], int(st), 1)
+	RulesShop.add_item(ch["bag"], 62093, 1)
+	check(await until(func() -> bool: return ctx_npc() == "laozhang"), "近老丈互動掣 = 對話")
+	await click(center("context"))
+	var dp5: GamePanel = hud.panels.get("dialog")
+	check(dp5 != null and press(dp5, "換收集冊"), "老丈對話框有「換收集冊」")
+	await frames(1)
+	check(RulesShop.count_item(ch["bag"], int(m.data.comm["book"]["item"])) == 1, "撳換收集冊: 得冊")
+	dp5.refresh(true)
+	check(press(dp5, "收入將軍令"), "有冊: 「收入將軍令」掣")
+	await frames(1)
+	check(int(ch.get("orderBook", {}).get("62093", 0)) == 1 and RulesShop.count_item(ch["bag"], 62093) == 0, "將軍令入咗冊")
+	dp5.refresh(true)
+	press(dp5, "查閱收集冊")
+	await frames(1)
+	check(_has_text(hud.panels["dialog"], "孫堅將軍令"), "查閱收集冊顯示孫堅將軍令")
 	hud.close_panels()
 	print("[TEST] ui_smoke: %d, fail %d" % [total, fails])
 	print("PASS: ui smoke" if fails == 0 else "FAIL: ui smoke")

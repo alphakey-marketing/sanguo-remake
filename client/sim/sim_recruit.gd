@@ -95,7 +95,7 @@ func _has_medal(ch: Dictionary) -> bool:
 
 func _has_order(ch: Dictionary, g: Dictionary) -> bool:
 	var it := int(data.general_order_item.get(String(g["name"]), 0))
-	return it != 0 and RulesShop.count_item(ch["bag"], it) > 0
+	return it != 0 and order_count(ch, it) > 0          # 背包 + 收集冊 (Step 16)
 
 
 # 登用呢位要唔要用憑證: "" = 唔使 (正常條件過)；"medal"/"order" = 要用；"x" = 用都唔得
@@ -117,16 +117,20 @@ func _recruit_why(ch: Dictionary, g: Dictionary) -> String:
 	return why if why != "" else "而家搵唔到呢位人才"
 
 
-# 背包有將軍令嘅人才: 一定入候選 (放最前)；同名揀 Tier1 (要見到或者有金牌)，否則 Tier0 最細 id
+# 背包/收集冊有將軍令嘅人才: 一定入候選 (放最前)；同名揀 Tier1 (要見到或者有金牌)，否則 Tier0 最細 id
 func _order_cands(ch: Dictionary, kind: String, gone: Dictionary, cands: Array) -> Array:
 	var names := {}
 	for g in cands:
 		names[String(g["name"])] = true
 	var front: Array = []
+	var held: Array = []                          # 背包 + 收集冊 (Step 16) 嘅將軍令
 	for b in ch["bag"]:
-		if int(b["n"]) <= 0:
-			continue
-		var gname := RulesGeneral.order_general_name(String(data.names.get(int(b["id"]), "")), String(data.gen2_cfg["orderSuffix"]))
+		if int(b["n"]) > 0:
+			held.append(int(b["id"]))
+	for k in ch.get("orderBook", {}):
+		held.append(int(k))
+	for it in held:
+		var gname := RulesGeneral.order_general_name(String(data.names.get(it, "")), String(data.gen2_cfg["orderSuffix"]))
 		if gname == "" or names.has(gname):
 			continue
 		var g := _order_general(gname)
@@ -157,7 +161,7 @@ func _consume_pass(pe: Dictionary, g: Dictionary) -> void:
 	if ps.is_empty() or int(ps["gid"]) != int(g["id"]):
 		return
 	var it := int(data.gen2_cfg["goldMedal"]) if String(ps["kind"]) == "medal" else int(data.general_order_item.get(String(g["name"]), 0))
-	if it != 0 and RulesShop.remove_item(pe["ch"]["bag"], it, 1):
+	if it != 0 and (_order_consume(pe["ch"], it) if String(ps["kind"]) == "order" else RulesShop.remove_item(pe["ch"]["bag"], it, 1)):
 		_msg(int(pe["id"]), "「%s」用咗" % data.names.get(it, str(it)))
 
 
@@ -245,16 +249,6 @@ func _arena_start(e: Dictionary, g: Dictionary) -> void:
 	_rec(e["ch"])["pending"] = {"gid": int(g["id"]), "kind": "arena", "mob": int(m["id"])}
 	_emit({"k": "arena_start", "dst": id, "gid": int(g["id"]), "name": String(g["name"]), "mob": int(m["id"])})
 	_msg(id, "%s：「想我跟你？先贏咗我再講！」擂台 PK 開始" % g["name"])
-
-
-# (x,y) 附近搵一格空位 (一圈圈向外)
-func _free_near(x: int, y: int) -> Vector2i:
-	for r in range(1, 6):
-		for dy in range(-r, r + 1):
-			for dx in range(-r, r + 1):
-				if maxi(absi(dx), absi(dy)) == r and is_free(x + dx, y + dy):
-					return Vector2i(x + dx, y + dy)
-	return Vector2i(x, y)
 
 
 # 擂台結束: 收走臨時怪 + 結算

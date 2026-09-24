@@ -9,7 +9,7 @@ func _init(m: Node) -> void:
 
 
 func sig() -> String:
-	return JSON.stringify([tab, main.sim.view_quests()])
+	return JSON.stringify([tab, main.sim.view_quests(), main.sim.view_commissions()])
 
 
 func _build_body() -> void:
@@ -29,5 +29,11 @@ func _build_body() -> void:
 		list.add_child(lbl(("● " if act else "✓ ") + str(q["name"]), 16, UiTheme.GOLD if act else UiTheme.GOOD))
 		if act and str(q.get("hint", "")) != "":
 			list.add_child(wrap_lbl("　" + str(q["hint"]), 14, UiTheme.TEXT))
+	if tab == 0:                           # 居民委託 (Step 16)
+		for c in main.sim.view_commissions():
+			n += 1
+			list.add_child(lbl("◆ 委託・%s" % c["name"], 16, UiTheme.GOLD))
+			list.add_child(wrap_lbl("　%s%s（仲有 %d 日，報酬 %s）" % [c["text"], "　可以覆命" if bool(c["ready"]) else "",
+				int(c["left"]), c["reward"]], 14, UiTheme.TEXT))
 	if n == 0:
 		list.add_child(lbl("未有任務 — 去城門口搵神秘老人" if tab == 0 else "未完成任何任務", 14, UiTheme.DIM))

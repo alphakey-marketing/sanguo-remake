@@ -13,6 +13,7 @@ run() {   # run <label> <args...>: 印出 [TEST]/[FAIL]/PASS 行，Godot exit co
 }
 run rules --script tests/run_rules.gd
 run quest --script tests/run_quest.gd
+run hist --script tests/run_hist.gd
 run spell --script tests/run_spell.gd
 run jewel_ult --script tests/run_jewel_ult.gd
 run sim --script tests/run_sim.gd

@@ -1,0 +1,21 @@
+{
+ "_note": "居民委託 (Step 16, spec 06 §4 一般任務模板)【自訂】。每個委託人 (quest_npcs.json commission=true) 每日出 1 單，由 (日, 委託人, 存檔 salt) 決定 (唔食 sim RNG)；接咗/做完嗰日唔再出。4 種: hunt 打 n 隻指定怪返嚟覆命 / collect 交 n 件材料 (池 = 打怪池啲怪 p≥collectMinP 嘅掉落) / deliver 帶信 (letterItem) 去指定 NPC，到手即完成 / repair 即場用進階技能修件嘢 (要技能 + 工具 + SP，同 Step 12 自己修理一樣條件，唔使去工房)。同時最多 maxActive 單；接咗 expireDays 日未完成 = 過期 (信收返)。獎勵公式見各 kind。book = 武將收集冊【原】(sy2_6_1): 許昌老丈收 地/水/火/風/生/無之石 各 1 換 1 本；將軍令放入冊唔佔背包重量，登用時冊入面嘅將軍令一樣用得。",
+ "maxActive": 3,
+ "expireDays": 3,
+ "fame": 1,
+ "letterItem": 62082,
+ "kindWeights": {"hunt": 4, "collect": 3, "deliver": 2, "repair": 1},
+ "hunt": {"n": [4, 8], "goldPerLvN": 3, "expMul": 1.5},
+ "collect": {"n": [3, 8], "priceMul": 2.0, "minGold": 30, "expPerN": 10, "collectMinP": 0.1},
+ "deliver": {"gold": 80, "exp": 80},
+ "repair": {"priceMul": 0.5, "minGold": 60, "workExp": 5},
+ "givers": {
+  "citizen_1": {"hunt": [1001, 1002, 1006, 1003, 1004], "deliver": ["citizen_3", "xinye_farmer"], "repair": [10001, 16001]},
+  "citizen_3": {"hunt": [1003, 1004, 1005, 11091, 11068], "deliver": ["citizen_1", "wancheng_merchant"], "repair": [12101, 20001]},
+  "xinye_farmer": {"hunt": [11091, 12005, 12011, 12021, 12029], "deliver": ["citizen_1", "xiangyang_scholar"], "repair": [10002, 16001]},
+  "wancheng_merchant": {"hunt": [11091, 12003, 12011, 12021, 12046], "deliver": ["runan_smith", "citizen_3"], "repair": [14001, 20001]},
+  "runan_smith": {"hunt": [12006, 12014, 12017, 12028, 1010], "deliver": ["wancheng_merchant", "xinye_farmer"], "repair": [10001, 14001, 12101]},
+  "xiangyang_scholar": {"hunt": [12006, 12012, 12014, 12028], "deliver": ["xinye_farmer", "runan_smith"], "repair": [16001, 20001]}
+ },
+ "book": {"item": 62103, "npc": "laozhang", "stones": [32302, 32303, 32304, 32301, 32306, 32305]}
+}

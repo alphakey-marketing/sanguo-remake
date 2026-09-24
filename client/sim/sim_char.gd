@@ -247,6 +247,9 @@ func cmd_travel(id: int, point_id: String) -> void:
 	var to_p := travel_point_by_id(String(from_p["to"]))
 	if to_p.is_empty():
 		return
+	var why := _gate_why(e, from_p.get("gate", {}))
+	if why != "":
+		return _msg(id, why)
 	e["x"] = int(to_p["x"])
 	e["y"] = int(to_p["y"])
 	e["tx"] = e["x"]
@@ -258,6 +261,18 @@ func cmd_travel(id: int, point_id: String) -> void:
 		_emit({"k": "cast_interrupted", "dst": id, "reason": "travel"})
 	_emit({"k": "travel", "dst": id, "to": String(to_p["name"]), "x": e["x"], "y": e["y"],
 		"map": map_id_at(int(e["x"]), int(e["y"]))})
+
+
+# 門禁 (Step 16 歷史任務): window = 時辰窗口先入得 (襄陽監獄子~丑)；item = 身上要有 (丁原家鑰匙)。"" = 過得
+func _gate_why(e: Dictionary, gate: Dictionary) -> String:
+	if gate.is_empty():
+		return ""
+	var w: Dictionary = gate.get("window", {})
+	if not w.is_empty() and not RulesQuest.ke_in_window(int(_clock()["ke"]), int(w["startKe"]), int(w["endKe"])):
+		return String(gate.get("msg", "而家入唔到"))
+	if gate.has("item") and RulesShop.count_item(e["ch"]["bag"], int(gate["item"])) <= 0:
+		return String(gate.get("msg", "冇%s入唔到" % data.names.get(int(gate["item"]), "")))
+	return ""
 
 
 # 行咗一格之後 (step() 叫): 踩中 auto 傳送點 = 過圖；玩家行近史蹟地標 = 第一次彈典故 (spec 12 §4~5)

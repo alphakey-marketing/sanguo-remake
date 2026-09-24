@@ -70,6 +70,7 @@ var gen_skills: Array = []        # 70 項特技
 var gen_skill_by_id: Dictionary = {}   # 特技 id -> def
 var gen_skill_override: Dictionary = {}  # 武將名 -> 特技 id (名將指定)
 var general_order_item: Dictionary = {}  # 武將名 -> 將軍令 item id
+var comm: Dictionary = {}          # 居民委託 + 武將收集冊設定 (data/commissions.json, Step 16)
 
 static var _cache: GameData
 
@@ -128,6 +129,7 @@ static func load_all() -> GameData:
 		g.quest_npc_list.append(x)
 	var qu: Dictionary = _read("res://data/quests.json")
 	g.quests = qu["quests"]
+	g.comm = _read("res://data/commissions.json")
 	var sp: Dictionary = _read("res://data/spells.json")
 	g.spells = sp["spells"]
 	for x in g.spells:

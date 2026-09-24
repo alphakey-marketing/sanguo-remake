@@ -1,5 +1,5 @@
 {
- "_note": "地圖世界 (spec 12)【自訂】。每張地圖 = data/maps/<id>.txt (一字元一格)，放喺全域格仔 (ox,oy)；地圖之間留空 = 行唔到。其他數據檔寫 map + 地圖內座標，GameData 載入時轉全域。legend.walk = 行得。areas = 地圖內命名區 (HUD 區名橫幅)。landmarks = 史蹟地標 (第一次行近彈典故)。world = 大地圖 (天下) 節點，map=null = 未開放。kind: city/field/cave/house (house = 室內，parent = 所屬城池地圖，大地圖當嗰個城)。",
+ "_note": "地圖世界 (spec 12)【自訂】。每張地圖 = data/maps/<id>.txt (一字元一格)，放喺全域格仔 (ox,oy)；地圖之間留空 = 行唔到。其他數據檔寫 map + 地圖內座標，GameData 載入時轉全域。legend.walk = 行得。areas = 地圖內命名區 (HUD 區名橫幅)。landmarks = 史蹟地標 (第一次行近彈典故)。world = 大地圖 (天下) 節點，map=null = 未開放。kind: city/field/cave/house (house = 室內，parent = 所屬城池地圖，大地圖當嗰個城)。 portal.gate (Step 16): window = 時辰窗口先入得 / item = 身上要有道具先入得 / msg = 入唔到嘅提示。",
  "legend": {
   ".": {
    "name": "草地",
@@ -1529,7 +1529,11 @@
    "x": 48,
    "y": 13,
    "to": "df_door",
-   "auto": true
+   "auto": true,
+   "gate": {
+    "item": 56018,
+    "msg": "丁府大門深鎖，要有丁原家鑰匙先入得"
+   }
   },
   {
    "id": "df_door",
@@ -1655,7 +1659,14 @@
    "x": 14,
    "y": 48,
    "to": "pr_door",
-   "auto": true
+   "auto": true,
+   "gate": {
+    "window": {
+     "startKe": 0,
+     "endKe": 16
+    },
+    "msg": "獄卒把守森嚴，要等子時~丑時夜靜先潛得入去"
+   }
   },
   {
    "id": "pr_door",

@@ -147,7 +147,7 @@ func t_monster_count(data: GameData) -> void:
 			hand += 1
 	check(data.monsters.size() >= 30, "導入: 全場怪 ≥ 30 (而家 %d)" % data.monsters.size())
 	check(imported >= 20, "導入: npc_drops 導入 ≥ 20 (而家 %d)" % imported)
-	check(hand == 11, "導入: 原裝 11 隻保留 (而家 %d)" % hand)
+	check(hand == 14, "導入: 原裝 11 隻 + Step 16 歷史任務 boss 3 隻 (而家 %d)" % hand)
 
 
 func t_item_ids(data: GameData) -> void:
@@ -160,7 +160,7 @@ func t_item_ids(data: GameData) -> void:
 
 
 # 全表: 每隻怪一係有 CSV 來源 (向量表)，一係喺【自訂】白名單；drops/rareDrops 按 0.05 分界、p 喺 (0,1]
-const CUSTOM_DROPS := [1006, 1007, 1008, 1009, 1010, 1011, 19001]
+const CUSTOM_DROPS := [1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 19001]
 
 func t_drop_rules(data: GameData) -> void:
 	var csv_ids := {}
