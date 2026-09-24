@@ -354,3 +354,223 @@ func companion_view() -> Dictionary:
 	return {"id": int(c["id"]), "gid": int(gn["gid"]), "name": c["name"], "lv": int(c["level"]), "hp": int(c["hp"]),
 		"maxHp": int(c["max_hp"]), "loyalty": int(gn["loyalty"]), "order": String(gn["order"]),
 		"daysLeft": maxi(0, int(gn["until"]) - int(_clock()["day"])), "type": g["type"], "sub": g["sub"], "face": int(c["face"])}
+
+
+func _companion_of(owner: Dictionary) -> Dictionary:
+	if not owner.has("ch"):
+		return {}
+	var c := ent(int(owner["ch"].get("recruit", {}).get("comp", 0)))
+	return c if c.has("gen") else {}
+
+
+func _cheb(a: Dictionary, b: Dictionary) -> int:
+	return maxi(absi(int(a["x"]) - int(b["x"])), absi(int(a["y"]) - int(b["y"])))
+
+
+# 同伴每 tick (之後 _think_player 負責追/打): 回血 → 跨圖跟主公 → 按指令揀目標 → 冇目標就跟隨
+func _think_companion(c: Dictionary) -> void:
+	var gn: Dictionary = c["gen"]
+	var o := ent(int(gn["owner"]))
+	if o.is_empty() or int(c["hp"]) <= 0:
+		return
+	var cfg: Dictionary = data.recruit_cfg["companion"]
+	var ch: Dictionary = c["ch"]
+	if int(c["atk_target"]) == 0 and tick % int(cfg["regenTicks"]) == 0 and int(ch["hp"]) < int(c["max_hp"]):
+		ch["hp"] = mini(int(c["max_hp"]), int(ch["hp"]) + maxi(1, int(ceil(int(c["max_hp"]) * float(cfg["regenPct"])))))
+		_sync_stats(c)
+	var omap := map_id_at(int(o["x"]), int(o["y"]))
+	if map_id_at(int(c["x"]), int(c["y"])) != omap:
+		c["atk_target"] = 0
+		if not _route_to_map(c, omap):         # 行唔到 (冇路) → 直接跳去主公隔籬
+			var p := _free_near(int(o["x"]), int(o["y"]))
+			_put_ent(c, p.x, p.y)
+		return
+	var d := _cheb(c, o)
+	var order := String(gn["order"])
+	var tgt := ent(int(c["atk_target"]))
+	if d > int(cfg["leashOwner"]) or order == "stop" or order == "follow" or not _hittable(tgt):
+		c["atk_target"] = 0
+	if order == "assist":
+		var ot := ent(int(o["atk_target"]))
+		if _hittable(ot):
+			c["atk_target"] = int(ot["id"])
+		elif int(c["atk_target"]) == 0:
+			c["atk_target"] = _attacker_of(o)      # 主公被打就幫手
+	elif order == "active" and int(c["atk_target"]) == 0 and d <= int(cfg["leashOwner"]):
+		c["atk_target"] = _hunt_target(c, int(cfg["huntRange"]))
+		if int(c["atk_target"]) == 0:
+			c["atk_target"] = _attacker_of(o)
+	if int(c["atk_target"]) != 0:
+		return
+	var want := int(cfg["farFollow"]) if order == "follow" else int(cfg["follow"])
+	if d <= want:
+		c["tx"] = c["x"]
+		c["ty"] = c["y"]
+		c.erase("path")
+	elif maxi(absi(int(c["tx"]) - int(o["x"])), absi(int(c["ty"]) - int(o["y"]))) > want \
+			or (int(c["tx"]) == int(c["x"]) and int(c["ty"]) == int(c["y"])):
+		_set_dest(c, int(o["x"]), int(o["y"]), CHASE_CAP)
+
+
+func _put_ent(e: Dictionary, x: int, y: int) -> void:
+	e["x"] = x
+	e["y"] = y
+	e["tx"] = x
+	e["ty"] = y
+	e.erase("path")
+
+
+# 同伴可以打嘅怪: 生存 + 唔係擂台 + 唔喺安全區
+func _hittable(m: Dictionary) -> bool:
+	return not m.is_empty() and m["kind"] == "mob" and int(m["hp"]) > 0 and not m["mob"].has("arena") \
+		and not is_safe(int(m["x"]), int(m["y"]))
+
+
+# 追緊 owner 嘅最近怪 (0 = 冇)
+func _attacker_of(o: Dictionary) -> int:
+	var best := 0
+	var best_d := 1 << 30
+	for m in ents.values():
+		if m["kind"] != "mob" or String(m["mob"]["state"]) != "chase" or int(m["mob"]["target"]) != int(o["id"]) or not _hittable(m):
+			continue
+		var d := _cheb(m, o)
+		if d < best_d:
+			best = int(m["id"])
+			best_d = d
+	return best
+
+
+# 主動攻擊: 同一張圖、r 格內最近嘅怪
+func _hunt_target(c: Dictionary, r: int) -> int:
+	var my_map := map_id_at(int(c["x"]), int(c["y"]))
+	var best := 0
+	var best_d := r + 1
+	for m in ents.values():
+		if not _hittable(m) or (m["kind"] == "mob" and String(m["mob"]["state"]) == "flee"):
+			continue
+		var d := _cheb(m, c)
+		if d < best_d and map_id_at(int(m["x"]), int(m["y"])) == my_map:
+			best = int(m["id"])
+			best_d = d
+	return best
+
+
+# 戰鬥指令 (spec 09 §3.3): active 主動 / assist 協助 / stop 停止 / follow 遠距跟隨
+func cmd_companion_order(id: int, order: String) -> void:
+	var c := _companion_of(ent(id))
+	if c.is_empty() or not RulesRecruit.ORDERS.has(order):
+		return
+	c["gen"]["order"] = order
+	c["atk_target"] = 0
+	_emit({"k": "companion", "dst": id, "comp": companion_view()})
+	_msg(id, "%s：遵命！(%s)" % [c["name"], RulesRecruit.ORDER_NAMES[order]])
+
+
+# 送補品: 主公背包嘅回復品用喺同伴身上，忠誠 +gift (要行近)
+func cmd_companion_gift(id: int, item: int) -> void:
+	var o := ent(id)
+	var c := _companion_of(o)
+	if c.is_empty() or int(o["hp"]) <= 0:
+		return
+	if not _near(o, int(c["x"]), int(c["y"])):
+		return _msg(id, "要行近%s先得" % c["name"])
+	var heal: Dictionary = data.heals.get(item, {})
+	if heal.is_empty():
+		return _msg(id, "呢件唔係補品")
+	if not RulesShop.remove_item(o["ch"]["bag"], item, 1):
+		return _msg(id, "背包冇呢件")
+	var ch: Dictionary = c["ch"]
+	ch["hp"] = mini(_eff_max_hp(ch), int(ch["hp"]) + int(heal.get("hp", 0)))
+	ch["mp"] = mini(_eff_max_mp(ch), int(ch["mp"]) + int(heal.get("mp", 0)))
+	ch["sp"] = mini(_eff_max_sp(ch), int(ch["sp"]) + int(heal.get("sp", 0)))
+	_sync_stats(c)
+	_msg(id, "%s收下%s" % [c["name"], data.names.get(item, str(item))])
+	_loyalty_change(c, int(data.recruit_cfg["loyalty"]["gift"]))
+
+
+# 主動解散 (唔算得罪: 返城，下次仲可以再登)
+func cmd_companion_dismiss(id: int) -> void:
+	var c := _companion_of(ent(id))
+	if not c.is_empty():
+		_companion_leave(c, "你叫佢返去", false)
+
+
+# 忠誠變動 → 0 即刻走 (spec 09 §4)；<leave 喺子時結算
+func _loyalty_change(c: Dictionary, delta: int) -> void:
+	if delta == 0:
+		return
+	var gn: Dictionary = c["gen"]
+	gn["loyalty"] = RulesRecruit.loyalty_add(int(gn["loyalty"]), delta)
+	var owner := int(gn["owner"])
+	_emit({"k": "companion", "dst": owner, "comp": companion_view()})
+	_msg(owner, "%s忠誠 %+d → %d" % [c["name"], delta, int(gn["loyalty"])])
+	if RulesRecruit.loyalty_verdict(int(gn["loyalty"]), data.recruit_cfg) == "leave_now":
+		_companion_leave(c, "忠誠盡失，拂袖而去", true)
+
+
+# 同伴離開: sulk = 唔開心走 (呢個月唔返城)；否則即刻返城
+func _companion_leave(c: Dictionary, why: String, sulk: bool) -> void:
+	var gn: Dictionary = c["gen"]
+	var gid := int(gn["gid"])
+	var st := _gen_state(gid)
+	st["serving"] = false
+	if sulk:
+		st["awayMonth"] = _month()
+	var owner := int(gn["owner"])
+	var o := ent(owner)
+	if not o.is_empty():
+		_rec(o["ch"]).erase("comp")
+	var cid := int(c["id"])
+	ents.erase(cid)
+	for e in ents.values():
+		if int(e["atk_target"]) == cid:
+			e["atk_target"] = 0
+	_emit({"k": "companion_leave", "dst": owner, "gid": gid, "name": String(c["name"]), "reason": why})
+	_msg(owner, "%s離開咗：%s" % [c["name"], why])
+
+
+# 子時 (新一日): 到期【原】第 30 日子時 0 刻離開；忠誠 < leave 離開
+func _recruit_daily(day: int) -> void:
+	for id in ents.keys():
+		var c: Dictionary = ents.get(id, {})
+		if not c.has("gen"):
+			continue
+		var gn: Dictionary = c["gen"]
+		if day >= int(gn["until"]):
+			_companion_leave(c, "登用期滿", false)
+		elif RulesRecruit.loyalty_verdict(int(gn["loyalty"]), data.recruit_cfg) != "stay":
+			_companion_leave(c, "忠誠太低", true)
+
+
+# 同伴倒下 = 唔會死: 返最近客棧回滿，忠誠 -ko
+func _kill_player(p: Dictionary) -> void:
+	if p.get("kind", "") != "gen":
+		super(p)
+		return
+	var ch: Dictionary = p["ch"]
+	_full_heal(ch)
+	ch["status"] = {}
+	p.erase("casting")
+	var inn := nearest_inn(map_id_at(int(p["x"]), int(p["y"])))
+	_put_ent(p, int(inn["x"]), int(inn["y"]))
+	p["atk_target"] = 0
+	_sync_stats(p)
+	var owner := int(p["gen"]["owner"])
+	_emit({"k": "companion_ko", "dst": owner, "id": int(p["id"])})
+	_msg(owner, "%s受傷，退返%s休養" % [p["name"], inn.get("name", "客棧")])
+	_loyalty_change(p, int(data.recruit_cfg["loyalty"]["ko"]))
+
+
+# 同伴殺怪: 掉落/金/善惡歸主公，經驗 × expShare；殺善怪 → 義理/治國同伴忠誠跌
+func _kill_mob(m: Dictionary, by: Dictionary, exp_mult: float = 1.0) -> void:
+	var d := data.mob_def(int(m["mob"]["def"]))
+	var killer := by
+	if by.get("kind", "") == "gen":
+		var o := ent(int(by["gen"]["owner"]))
+		if not o.is_empty():
+			killer = o
+			exp_mult *= float(data.recruit_cfg["companion"]["expShare"])
+	super(m, killer, exp_mult)
+	var c := _companion_of(killer)
+	if not c.is_empty():
+		_loyalty_change(c, RulesRecruit.loyalty_kill_delta(String(c["ch"]["ideology"]), float(d.get("alignment", 0)), data.recruit_cfg))

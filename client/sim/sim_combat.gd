@@ -40,7 +40,8 @@ func damage(t: Dictionary, dmg: int, by: Dictionary) -> void:
 		_kill_player(t)
 
 
-func _kill_mob(m: Dictionary, by: Dictionary) -> void:
+# exp_mult: 同伴代打 → 主公分經驗 (Step 13.5)
+func _kill_mob(m: Dictionary, by: Dictionary, exp_mult: float = 1.0) -> void:
 	var d: Dictionary = data.mob_def(int(m["mob"]["def"]))
 	# 任務 boss (PK 戰, Step 10): 唔掉落/唔重生，轉交 quest 推進
 	var quest_boss := str(m.get("mob", {}).get("quest_boss", ""))
@@ -74,7 +75,7 @@ func _kill_mob(m: Dictionary, by: Dictionary) -> void:
 	for it in items:
 		RulesShop.add_item(ch["bag"], int(it), 1)
 	ch["karma"] = RulesCombat.karma_after_kill(int(ch["karma"]), d["alignment"])
-	var exp_gain := int(d["exp"])
+	var exp_gain := MathX.js_round(float(d["exp"]) * exp_mult)
 	if by.get("kind", "") == "player":          # 福日【自訂】：生日嗰日練功 exp +10% (spec 01 §1)
 		var clk: Dictionary = data.world["clock"]
 		exp_gain = MathX.js_round(float(exp_gain) * RulesStats.birthday_exp_mult(int(_clock()["day"]),

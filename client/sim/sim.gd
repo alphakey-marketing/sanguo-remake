@@ -41,6 +41,7 @@ func _daily_hook(day: int) -> void:
 	_market_daily(season)
 	_storage_daily()
 	_ap_daily()
+	_recruit_daily(day)          # 同伴到期/忠誠低離開 (Step 13.5)
 	_emit({"k": "day", "day": day, "season": season})
 	for d in changed:
 		_emit({"k": "disaster", "name": d["name"], "city": d["city"], "size": d["size"]})
@@ -119,6 +120,8 @@ func step() -> void:
 		if e["kind"] == "mob":
 			_think_mob(e)
 		elif e.has("ch"):
+			if e["kind"] == "gen":
+				_think_companion(e)     # 登用同伴: 揀目標/跟隨 (Step 13.5)
 			_think_player(e)
 	var rs: Array = state["respawns"]
 	for i in range(rs.size() - 1, -1, -1):
