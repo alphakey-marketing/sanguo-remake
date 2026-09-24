@@ -11,13 +11,13 @@
 
 ## 現況 (2026-09-23)
 - **全部喺 `client/` (Godot 4.7, GDScript)**：`rules/`(純函數)、`sim/`(單機世界模擬，狀態可存檔、種子 RNG)、`ui/`(畫面/輸入)、`tests/`
-- 測試：`sh tools/run_tests.sh` → rules 對拍 329 向量 + quest 94 + spell 618 + jewel/ult 118 + sim 160 + world 121 + monsters 802 + maps 510 + equip 57 + hud 版面 2715 + `--autotest` 端到端 + `--uitest` 觸控煙霧 28 + 掉落導入核對 `tools/import_drops.py --check`，全 PASS
-- 功能：角色/升級/即時戰鬥/怪 AI+重生+掉落/死亡處分/10 個 bot/客棧+武器店/術法系統(Step 9)/寶石+絕招+融合(Step 10：寶石欄 2 格、屬性石 40+輔助石、元素術需特殊石、義士三招絕招任務鏈、打鐵鋪 QTE 融合)/裝備(Step 11.6：5 部位防具+武器 3 槽+耐久，`rules/equip.gd` + `data/equip.json`，裝備 = 背包參照)/防具店；手機 UI（三國群英傳M 風格）: `ui/touch/`(HudLayout 版面/搖桿/互動掣) + `ui/panels/`(背包/商店/角色/對話/記事，正式 Control 面板，玩家自己揀自己確認)；建角面板仍係舊 debug 版
+- 測試：`sh tools/run_tests.sh` → rules 對拍 363 向量 + quest 94 + spell 618 + jewel/ult 118 + sim 160 + world 121 + monsters 802 + maps 522 + equip 57 + craft 75 + hud 版面 2715 + `--autotest` 端到端 + `--uitest` 觸控煙霧 33 + 掉落導入核對 `tools/import_drops.py --check` + 配方核對 `tools/import_recipes.py --check`，全 PASS
+- 功能：角色/升級/即時戰鬥/怪 AI+重生+掉落/死亡處分/10 個 bot/客棧+武器店/術法系統(Step 9)/寶石+絕招+融合(Step 10：寶石欄 2 格、屬性石 40+輔助石、元素術需特殊石、義士三招絕招任務鏈、打鐵鋪 QTE 融合)/裝備(Step 11.6：5 部位防具+武器 3 槽+耐久，`rules/equip.gd` + `data/equip.json`，裝備 = 背包參照)/防具店/進階生產(Step 12：初階技能等級 1~100、5 進階技能 + `data/recipes.json` 2318 配方、許昌廚房/藥房/工房、武器耐久、自己修理 + 打鐵鋪修理服務、工具店)；手機 UI（三國群英傳M 風格）: `ui/touch/`(HudLayout 版面/搖桿/互動掣) + `ui/panels/`(背包/商店/角色/對話/記事，正式 Control 面板，玩家自己揀自己確認)；建角面板仍係舊 debug 版
 - **地圖世界 B2（spec 12）**：B1 之外加汝南道/昆陽/宛城道/博望坡/新野城（新野 = 第二個新手城：客棧/武器店/防具店/兩條任務）；大地圖天下頁撳節點「自動前往」= `sim.cmd_goto_map`；多客棧（`shops.json inns`），死亡返最近客棧
 - **地圖世界 B1（spec 12）**：`data/maps.json`（legend/地圖/傳送點/地標/天下節點）+ `data/maps/*.txt`（ASCII 人手地圖，一字一格）拼落 512×512 全域格仔，地圖之間隔 ≥20 格；其他數據寫 `map` + 地圖內座標，GameData 載入轉全域。A* 尋路、踩門口過圖、居民跨圖路由；UI 預渲染地圖貼圖 + 小地圖 + 地圖面板。改地圖直接改 txt（`tools/map_draft.py` 只係起稿，再跑會覆蓋；`--b2` 只起 B2 五張）；新 txt 要喺 export include_filter 範圍（`data/maps/*.txt`）
-- `client/data/`：classes.json(六職，只啟用義士)、monsters.json(34 怪+spawn，area = 地圖內座標；掉落由 `tools/import_drops.py` 從原版 npc_drops.csv 生成，唔好手改)、items.json(6068 件)、shops.json、maps.json；`data_src/general_npc.csv`(未接入)
+- `client/data/`：classes.json(六職，只啟用義士)、monsters.json(34 怪+spawn，area = 地圖內座標；掉落由 `tools/import_drops.py` 從原版 npc_drops.csv 生成，唔好手改)、items.json(6068 件)、recipes.json(由 `tools/import_recipes.py` 生成，唔好手改)、work.json、shops.json、maps.json；`data_src/general_npc.csv`(未接入)
 - `legacy/server/`：舊 Node+ws server，只作參考（23 項 TS 測試仍過；`tools/export_vectors.ts` 由佢導出向量）
-- **下一步**：跟 `docs/PLAN.md` §2 第一個未剔 Step（v5 順序：12 進階生產 → 13 → 13.5 登用 v1 …）；§1 有各 spec 核實現況
+- **下一步**：跟 `docs/PLAN.md` §2 第一個未剔 Step（v5 順序：13 天地商行自動化 + 捐獻 → 13.5 登用 v1 …）；§1 有各 spec 核實現況
 - 攻略原文 113 頁：`docs/guide/*.txt`；連結表 `docs/guide_links.tsv`
 
 ## 已定決策

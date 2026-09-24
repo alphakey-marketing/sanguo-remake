@@ -4643,5 +4643,514 @@
    0.1
   ],
   "expect": 274
+ },
+ {
+  "fn": "workExpToNext",
+  "args": [
+   1,
+   {
+    "max": 100,
+    "base": 4,
+    "perLv": 1,
+    "gainOk": 2,
+    "gainFail": 1
+   }
+  ],
+  "expect": 5
+ },
+ {
+  "fn": "workExpToNext",
+  "args": [
+   10,
+   {
+    "max": 100,
+    "base": 4,
+    "perLv": 1,
+    "gainOk": 2,
+    "gainFail": 1
+   }
+  ],
+  "expect": 14
+ },
+ {
+  "fn": "workExpToNext",
+  "args": [
+   50,
+   {
+    "max": 100,
+    "base": 4,
+    "perLv": 1,
+    "gainOk": 2,
+    "gainFail": 1
+   }
+  ],
+  "expect": 54
+ },
+ {
+  "fn": "workExpToNext",
+  "args": [
+   99,
+   {
+    "max": 100,
+    "base": 4,
+    "perLv": 1,
+    "gainOk": 2,
+    "gainFail": 1
+   }
+  ],
+  "expect": 103
+ },
+ {
+  "fn": "workGainExp",
+  "args": [
+   1,
+   0,
+   2,
+   {
+    "max": 100,
+    "base": 4,
+    "perLv": 1,
+    "gainOk": 2,
+    "gainFail": 1
+   }
+  ],
+  "expect": {
+   "lv": 1,
+   "exp": 2,
+   "ups": 0
+  }
+ },
+ {
+  "fn": "workGainExp",
+  "args": [
+   1,
+   4,
+   1,
+   {
+    "max": 100,
+    "base": 4,
+    "perLv": 1,
+    "gainOk": 2,
+    "gainFail": 1
+   }
+  ],
+  "expect": {
+   "lv": 2,
+   "exp": 0,
+   "ups": 1
+  }
+ },
+ {
+  "fn": "workGainExp",
+  "args": [
+   1,
+   0,
+   20,
+   {
+    "max": 100,
+    "base": 4,
+    "perLv": 1,
+    "gainOk": 2,
+    "gainFail": 1
+   }
+  ],
+  "expect": {
+   "lv": 4,
+   "exp": 2,
+   "ups": 3
+  }
+ },
+ {
+  "fn": "workGainExp",
+  "args": [
+   49,
+   50,
+   3,
+   {
+    "max": 100,
+    "base": 4,
+    "perLv": 1,
+    "gainOk": 2,
+    "gainFail": 1
+   }
+  ],
+  "expect": {
+   "lv": 50,
+   "exp": 0,
+   "ups": 1
+  }
+ },
+ {
+  "fn": "workGainExp",
+  "args": [
+   99,
+   0,
+   500,
+   {
+    "max": 100,
+    "base": 4,
+    "perLv": 1,
+    "gainOk": 2,
+    "gainFail": 1
+   }
+  ],
+  "expect": {
+   "lv": 100,
+   "exp": 0,
+   "ups": 1
+  }
+ },
+ {
+  "fn": "workGainExp",
+  "args": [
+   100,
+   0,
+   5,
+   {
+    "max": 100,
+    "base": 4,
+    "perLv": 1,
+    "gainOk": 2,
+    "gainFail": 1
+   }
+  ],
+  "expect": {
+   "lv": 100,
+   "exp": 0,
+   "ups": 0
+  }
+ },
+ {
+  "fn": "workGainExp",
+  "args": [
+   10,
+   3,
+   0,
+   {
+    "max": 100,
+    "base": 4,
+    "perLv": 1,
+    "gainOk": 2,
+    "gainFail": 1
+   }
+  ],
+  "expect": {
+   "lv": 10,
+   "exp": 3,
+   "ups": 0
+  }
+ },
+ {
+  "fn": "workBasicSuccess",
+  "args": [
+   1,
+   {
+    "base": 0.85,
+    "perLv": 0.005,
+    "cap": 0.98,
+    "big": 0.005
+   }
+  ],
+  "expect": 0.855
+ },
+ {
+  "fn": "workBasicSuccess",
+  "args": [
+   10,
+   {
+    "base": 0.85,
+    "perLv": 0.005,
+    "cap": 0.98,
+    "big": 0.005
+   }
+  ],
+  "expect": 0.9
+ },
+ {
+  "fn": "workBasicSuccess",
+  "args": [
+   26,
+   {
+    "base": 0.85,
+    "perLv": 0.005,
+    "cap": 0.98,
+    "big": 0.005
+   }
+  ],
+  "expect": 0.98
+ },
+ {
+  "fn": "workBasicSuccess",
+  "args": [
+   27,
+   {
+    "base": 0.85,
+    "perLv": 0.005,
+    "cap": 0.98,
+    "big": 0.005
+   }
+  ],
+  "expect": 0.98
+ },
+ {
+  "fn": "workBasicSuccess",
+  "args": [
+   100,
+   {
+    "base": 0.85,
+    "perLv": 0.005,
+    "cap": 0.98,
+    "big": 0.005
+   }
+  ],
+  "expect": 0.98
+ },
+ {
+  "fn": "workCraftChance",
+  "args": [
+   1,
+   1,
+   {
+    "base": 0.6,
+    "perLv": 0.006,
+    "perItemLv": 0.01,
+    "min": 0.05,
+    "max": 0.98,
+    "failLoseMat": 0.5
+   }
+  ],
+  "expect": 0.596
+ },
+ {
+  "fn": "workCraftChance",
+  "args": [
+   50,
+   30,
+   {
+    "base": 0.6,
+    "perLv": 0.006,
+    "perItemLv": 0.01,
+    "min": 0.05,
+    "max": 0.98,
+    "failLoseMat": 0.5
+   }
+  ],
+  "expect": 0.5999999999999999
+ },
+ {
+  "fn": "workCraftChance",
+  "args": [
+   100,
+   0,
+   {
+    "base": 0.6,
+    "perLv": 0.006,
+    "perItemLv": 0.01,
+    "min": 0.05,
+    "max": 0.98,
+    "failLoseMat": 0.5
+   }
+  ],
+  "expect": 0.98
+ },
+ {
+  "fn": "workCraftChance",
+  "args": [
+   1,
+   95,
+   {
+    "base": 0.6,
+    "perLv": 0.006,
+    "perItemLv": 0.01,
+    "min": 0.05,
+    "max": 0.98,
+    "failLoseMat": 0.5
+   }
+  ],
+  "expect": 0.05
+ },
+ {
+  "fn": "workCraftChance",
+  "args": [
+   100,
+   95,
+   {
+    "base": 0.6,
+    "perLv": 0.006,
+    "perItemLv": 0.01,
+    "min": 0.05,
+    "max": 0.98,
+    "failLoseMat": 0.5
+   }
+  ],
+  "expect": 0.2499999999999999
+ },
+ {
+  "fn": "workCraftChance",
+  "args": [
+   30,
+   90,
+   {
+    "base": 0.6,
+    "perLv": 0.006,
+    "perItemLv": 0.01,
+    "min": 0.05,
+    "max": 0.98,
+    "failLoseMat": 0.5
+   }
+  ],
+  "expect": 0.05
+ },
+ {
+  "fn": "workAdvUnlocked",
+  "args": [
+   {
+    "farming": 49,
+    "fishing": 50
+   },
+   [
+    "farming",
+    "fishing",
+    "hunting"
+   ],
+   50
+  ],
+  "expect": true
+ },
+ {
+  "fn": "workAdvUnlocked",
+  "args": [
+   {
+    "farming": 49
+   },
+   [
+    "farming",
+    "fishing",
+    "hunting"
+   ],
+   50
+  ],
+  "expect": false
+ },
+ {
+  "fn": "workAdvUnlocked",
+  "args": [
+   {},
+   [
+    "mining"
+   ],
+   50
+  ],
+  "expect": false
+ },
+ {
+  "fn": "workHasMaterials",
+  "args": [
+   {
+    "25001": 5
+   },
+   [
+    [
+     25001,
+     5
+    ]
+   ]
+  ],
+  "expect": true
+ },
+ {
+  "fn": "workHasMaterials",
+  "args": [
+   {
+    "25001": 4
+   },
+   [
+    [
+     25001,
+     5
+    ]
+   ]
+  ],
+  "expect": false
+ },
+ {
+  "fn": "workHasMaterials",
+  "args": [
+   {
+    "25001": 9,
+    "25003": 1
+   },
+   [
+    [
+     25001,
+     5
+    ],
+    [
+     25003,
+     2
+    ]
+   ]
+  ],
+  "expect": false
+ },
+ {
+  "fn": "workRepairCost",
+  "args": [
+   175,
+   30,
+   55,
+   0.3
+  ],
+  "expect": 24
+ },
+ {
+  "fn": "workRepairCost",
+  "args": [
+   175,
+   55,
+   55,
+   0.3
+  ],
+  "expect": 0
+ },
+ {
+  "fn": "workRepairCost",
+  "args": [
+   175,
+   0,
+   55,
+   0.3
+  ],
+  "expect": 53
+ },
+ {
+  "fn": "workRepairCost",
+  "args": [
+   1,
+   54,
+   55,
+   0.3
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "workRepairCost",
+  "args": [
+   1000,
+   0,
+   0,
+   0.3
+  ],
+  "expect": 0
+ },
+ {
+  "fn": "workRepairCost",
+  "args": [
+   0,
+   10,
+   55,
+   0.3
+  ],
+  "expect": 1
  }
 ]

@@ -34,7 +34,11 @@ var portal_at: Dictionary = {}    # cell (y*W+x) -> auto 傳送點 id (踩上去
 var landmarks: Array = []         # 史蹟地標 (已轉全域座標)
 var world_map: Dictionary = {}    # 大地圖 (天下) 節點/路線 (UI 用)
 var work: Dictionary = {}         # 工作技能 (data/work.json.skills, Step 7.1)
-var work_meta: Dictionary = {}    # 工作技能雜項 (data/work.json.toolDurability)
+var work_meta: Dictionary = {}    # 工作技能雜項 (data/work.json: toolDurability/level/basicRate/craftRate/repair)
+var work_adv: Dictionary = {}     # 進階技能 (data/work.json.advanced, Step 12)
+var recipes: Dictionary = {}      # 成品 item id -> {id, skill, lv, need:[[id,n]]} (data/recipes.json, Step 12)
+var recipes_by_skill: Dictionary = {}  # 進階 skill -> [recipe] (按 lv 排)
+var tool_skill: Dictionary = {}   # 工具 item id -> skill (初階 tool/starterTool + 進階 tool)
 var quiz: Array = []              # 理念測驗題庫 (data/quiz.json, Step 7.5)
 var face_parts: Dictionary = {}   # 臉譜 8 部位款式數 (data/face.json, Step 7.5)
 var quests: Array = []            # 任務定義 (data/quests.json, Step 8)
@@ -73,7 +77,19 @@ static func load_all() -> GameData:
 	g._load_maps(_read("res://data/maps.json"))
 	var wk: Dictionary = _read("res://data/work.json")
 	g.work = wk["skills"]
-	g.work_meta = {"toolDurability": wk["toolDurability"]}
+	g.work_meta = {"toolDurability": wk["toolDurability"], "level": wk["level"], "basicRate": wk["basicRate"],
+		"craftRate": wk["craftRate"], "repair": wk["repair"]}
+	g.work_adv = wk["advanced"]
+	for sk in g.work:
+		g.tool_skill[int(g.work[sk]["tool"])] = sk
+		g.tool_skill[int(g.work[sk]["starterTool"])] = sk
+	for sk in g.work_adv:
+		g.tool_skill[int(g.work_adv[sk]["tool"])] = sk
+		g.recipes_by_skill[sk] = []
+	var rc: Dictionary = _read("res://data/recipes.json")
+	for r in rc["recipes"]:
+		g.recipes[int(r["id"])] = r
+		g.recipes_by_skill[String(r["skill"])].append(r)
 	var qz: Dictionary = _read("res://data/quiz.json")
 	g.quiz = qz["questions"]
 	var fc: Dictionary = _read("res://data/face.json")
@@ -152,7 +168,8 @@ static func load_all() -> GameData:
 				"max_dur": RulesEquip.max_dur(int(it.get("req_lv", 0)), g.equip_cfg["durability"]),
 				"stats": RulesEquip.armor_stats(it.get("effects", []))}
 		if p != null:
-			g.weapons[id] = {"power": p, "hit": h if h != null else 45.0}
+			g.weapons[id] = {"power": p, "hit": h if h != null else 45.0,
+				"max_dur": RulesEquip.max_dur(int(it.get("req_lv", 0)), g.equip_cfg["durability"])}
 		if heal_hp > 0 or heal_mp > 0 or heal_sp > 0:
 			g.heals[id] = {"hp": heal_hp, "mp": heal_mp, "sp": heal_sp}
 	g._place_all()

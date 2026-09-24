@@ -12,7 +12,7 @@ var sel_slot := ""            # 裝備頁揀中格: head/body/boots/ring/necklac
 func _init(m: Node) -> void:
 	super(m)
 	title_lbl.text = "角色"
-	set_tabs(["屬性", "裝備"])
+	set_tabs(["屬性", "裝備", "技能"])
 
 
 func open() -> void:
@@ -22,7 +22,7 @@ func open() -> void:
 
 func sig() -> String:
 	var ch: Dictionary = main.ch
-	return JSON.stringify([tab, sel_slot, ch.get("equip", {}), pending, ch.get("attrs", {}), ch.get("attrPoints", 0), ch.get("level", 1), ch.get("hp", 0),
+	return JSON.stringify([tab, sel_slot, ch.get("equip", {}), ch.get("workLv", {}), ch.get("tools", {}), pending, ch.get("attrs", {}), ch.get("attrPoints", 0), ch.get("level", 1), ch.get("hp", 0),
 		ch.get("mp", 0), ch.get("sp", 0), ch.get("gold", 0), ch.get("karma", 0), ch.get("lilian", 0), ch.get("title", "")])
 
 
@@ -39,6 +39,9 @@ func _build_body() -> void:
 		return
 	if tab == 1:
 		_build_equip(ch)
+		return
+	if tab == 2:
+		_build_work(ch)
 		return
 	var row := HBoxContainer.new()
 	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -210,11 +213,41 @@ func _build_equip(ch: Dictionary) -> void:
 		right.add_child(btn("卸下", func() -> void: main._send({"t": "unequip", "part": sel_slot})))
 	elif sel_slot.begins_with("w"):
 		var ws := int(sel_slot.substr(1))
+		right.add_child(lbl(armor_dur_text(ch, id), 13))
 		_weapon_switch_btn(right, eq, ws)
 		right.add_child(btn("卸下", func() -> void: main._send({"t": "unequip", "part": "weapon", "wslot": ws})))
 	elif sel_slot.begins_with("j"):
 		var js := int(sel_slot.substr(1))
 		right.add_child(btn("卸下", func() -> void: main._send({"t": "equip_jewel", "item": 0, "slot": js})))
+
+
+# 生產技能頁 (Step 12): 初階 6 項 + 進階 5 項 等級/經驗/工具
+func _build_work(ch: Dictionary) -> void:
+	var d = main.data
+	var sc := scroll()
+	body.add_child(sc)
+	var g := GridContainer.new()
+	g.columns = 2
+	g.add_theme_constant_override("h_separation", 24)
+	g.add_theme_constant_override("v_separation", 4)
+	g.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sc.add_child(g)
+	var cfg: Dictionary = d.work_meta["level"]
+	var keys: Array = d.work.keys() + d.work_adv.keys()
+	for sk in keys:
+		var def: Dictionary = d.work.get(sk, d.work_adv.get(sk, {}))
+		var lv: int = main.sim.work_lv(ch, sk)
+		var w: Dictionary = ch.get("workLv", {}).get(sk, {})
+		var tool: Dictionary = ch.get("tools", {}).get(sk, {})
+		var t := "%s  " % def["name"]
+		if lv <= 0:
+			t += "未解鎖（初階 %d 級）" % int(def.get("unlockLv", 50))
+		else:
+			t += "Lv%d  %d/%d" % [lv, int(w.get("exp", 0)), RulesWork.exp_to_next(lv, cfg)]
+		if not tool.is_empty():
+			t += "   工具耐久 %d" % int(tool["dur"])
+		g.add_child(lbl(t, 14, UiTheme.DIM if lv <= 0 else UiTheme.GOLD if d.work_adv.has(sk) else UiTheme.TEXT))
+	body.add_child(wrap_lbl("初階: 城外用工具工作。進階: 初階 50 級解鎖，去許昌廚房/藥房/工房做；工具店有工具賣。", 13, UiTheme.DIM))
 
 
 func _weapon_switch_btn(p: Control, eq: Dictionary, ws: int) -> void:

@@ -126,7 +126,7 @@ func _think_player(p: Dictionary) -> void:
 		return     # 安全區唔畀出手 (理論上怪唔會入城，呢度做多重保險)
 	if tick < int(p["next_atk"]):
 		return
-	var w: Dictionary = data.weapons.get(int(ch["equip"].get("weapon", 0)), {"power": 0.0, "hit": 45.0})
+	var w: Dictionary = _weapon_def(ch)     # 耐久 0 = 威力減半 (Step 12)
 	p["next_atk"] = tick + RulesCombat.attack_interval(_eff_attr(ch, "agi"))
 	# 輔助石命中率 % (effect 13) (Step 10, spec 02 §4)
 	var base_hit := RulesCombat.hit_chance(w["hit"], int(ch["level"]), int(t["level"]))
@@ -145,4 +145,5 @@ func _think_player(p: Dictionary) -> void:
 	var dmg0 := RulesCombat.calc_damage(eff_str, w["power"], mdef["def"], rng_fn, atk_mult, 1.0)
 	var dmg := MathX.js_round(dmg0 * elem_mult)
 	_emit({"k": "hit", "src": p["id"], "dst": t["id"], "dmg": dmg})
+	_wear_weapon_hit(p)                     # 武器出手磨損 (Step 12)
 	damage(t, dmg, p)

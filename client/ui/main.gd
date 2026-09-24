@@ -232,6 +232,10 @@ func _send(d: Dictionary) -> void:
 		"fusion_hit": sim.cmd_fusion_hit(my_id)
 		"quest_answer": sim.cmd_quest_answer(my_id, str(d.quest), int(d.answer))
 		"debug_give": sim.cmd_debug_give(my_id, int(d.item), int(d.get("n", 1)))
+		"craft": sim.cmd_craft(my_id, int(d.item))
+		"repair": sim.cmd_repair(my_id, int(d.item))
+		"repair_service": sim.cmd_repair_service(my_id, int(d.item))
+		"debug_work_lv": sim.cmd_debug_work_lv(my_id, int(d.add))
 
 func _log(s: String) -> void:
 	log_lines.append(s)
@@ -729,6 +733,7 @@ func _on_debug_pressed(action: String) -> void:
 				_send({"t": "debug_give", "item": tool, "n": 1})
 				_send({"t": "equip_tool", "skill": "mining", "item": tool})
 			_send({"t": "work", "skill": "mining"})
+		"work_lv": _send({"t": "debug_work_lv", "add": 10})    # debug: 生產技能 +10 級 (Step 12)
 
 
 func _unhandled_input(ev: InputEvent) -> void:

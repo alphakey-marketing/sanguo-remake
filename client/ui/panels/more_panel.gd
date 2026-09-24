@@ -6,6 +6,7 @@ const DEBUG_ACTIONS := [
 	{"action": "greet", "label": "問好"},
 	{"action": "use", "label": "試食(測試)"},
 	{"action": "work_mining", "label": "採礦(測試)"},
+	{"action": "work_lv", "label": "生產+10級(測試)"},
 ]
 
 

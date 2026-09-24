@@ -266,10 +266,10 @@ func _build_detail(p: Control, ch: Dictionary) -> void:
 			h2.add_child(b)
 		p.add_child(lbl("裝落寶石欄:", 13))
 		p.add_child(h2)
-	for sk in d.work:
-		var w: Dictionary = d.work[sk]
-		if int(w.get("tool", -1)) == id or int(w.get("starterTool", -1)) == id:
-			p.add_child(btn("裝備%s工具" % str(w.get("name", sk)), func() -> void: main._send({"t": "equip_tool", "skill": sk, "item": id})))
+	if d.tool_skill.has(id):         # 初階/進階工具 (Step 12)
+		var sk := String(d.tool_skill[id])
+		var w: Dictionary = d.work.get(sk, d.work_adv.get(sk, {}))
+		p.add_child(btn("裝備%s工具" % str(w.get("name", sk)), func() -> void: main._send({"t": "equip_tool", "skill": sk, "item": id})))
 	if bool(ch.get("storageSub", false)) and not main.quest_items.has(id):
 		p.add_child(btn("存入天地商行 x1", func() -> void: main._send({"t": "storage_deposit", "item": id, "n": 1})))
 

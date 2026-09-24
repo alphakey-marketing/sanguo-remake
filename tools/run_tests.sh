@@ -20,6 +20,7 @@ run world --script tests/run_world.gd
 run monsters --script tests/run_monsters.gd
 run maps --script tests/run_maps.gd
 run equip --script tests/run_equip.gd
+run craft --script tests/run_craft.gd
 run market --script tools/market_sim.gd
 run hud --script tests/run_hud.gd
 run autotest -- --autotest
@@ -30,6 +31,11 @@ if [ -f /d/Download/sanguo/extracted/text/npc_drops.csv ]; then
   echo "$out"
   [ $code = 0 ] || { echo "!! drops exit $code"; rc=1; }
 fi
+
+# 配方導入核對 (recipes.json 要同 items.json 一致)
+out=$(PYTHONIOENCODING=utf-8 python tools/import_recipes.py --check 2>&1); code=$?
+echo "$out"
+[ $code = 0 ] || { echo "!! recipes exit $code"; rc=1; }
 
 [ $rc = 0 ] && echo "ALL OK" || echo "SOME FAILED"
 exit $rc

@@ -177,20 +177,76 @@ func cmd_storage_sell(id: int, item: int, n: int = 1) -> void:
 # ================= 工作技能 (Step 7.1) =================
 const WORK_MIN_LEVEL := 10                                # 【原】10 級可做初階工作技能
 
-# 裝備工具: 背包要有呢件工具，裝上即扣 1 件、開耐久 (starterTool 或 tool 都得)
+# 裝備工具: 背包要有呢件工具，裝上即扣 1 件、開耐久。初階 = starterTool/tool；進階 = tool (Step 12)
 func cmd_equip_tool(id: int, skill: String, item: int) -> void:
 	var e := ent(id)
 	if e.is_empty() or not e.has("ch"):
 		return
-	var sk: Dictionary = data.work.get(skill, {})
-	if sk.is_empty() or (int(sk["tool"]) != item and int(sk["starterTool"]) != item):
+	var sk: Dictionary = _skill_def(skill)
+	if sk.is_empty() or String(data.tool_skill.get(item, "")) != skill:
 		return _msg(id, "呢件唔係%s工具" % sk.get("name", skill))
 	var ch: Dictionary = e["ch"]
 	if not RulesShop.remove_item(ch["bag"], item, 1):
 		return _msg(id, "背包冇呢件工具")
-	var dur: int = int(data.work_meta.get("toolDurability", {}).get("starter" if int(sk["starterTool"]) == item else "normal", 50))
+	var dur: int = int(data.work_meta.get("toolDurability", {}).get("starter" if int(sk.get("starterTool", -1)) == item else "normal", 50))
 	ch["tools"][skill] = {"item": item, "dur": dur}
 	_msg(id, "裝備咗%s（耐久 %d）" % [data.names.get(item, str(item)), dur])
+
+
+# 初階/進階技能定義 ({} = 冇)
+func _skill_def(skill: String) -> Dictionary:
+	if data.work.has(skill):
+		return data.work[skill]
+	return data.work_adv.get(skill, {})
+
+
+# 生產技能等級 (未做過: 初階 = 1；進階 = 已解鎖 1 / 未解鎖 0)
+func work_lv(ch: Dictionary, skill: String) -> int:
+	var w: Dictionary = ch.get("workLv", {}).get(skill, {})
+	if w.is_empty():
+		return 1 if data.work.has(skill) or adv_unlocked(ch, skill) else 0
+	return int(w["lv"])
+
+
+# 進階技能解鎖咗未【原】: 對應初階 50 級
+func adv_unlocked(ch: Dictionary, skill: String) -> bool:
+	var ad: Dictionary = data.work_adv.get(skill, {})
+	if ad.is_empty():
+		return false
+	var lvs := {}
+	for s in ad["from"]:
+		lvs[s] = work_lv(ch, s)
+	return RulesWork.adv_unlocked(lvs, ad["from"], int(ad["unlockLv"]))
+
+
+# 加技能經驗 + 升級訊息；初階升到解鎖級 → 進階技能開 1 級
+func _work_gain(id: int, ch: Dictionary, skill: String, amount: int) -> void:
+	if not ch.has("workLv"):
+		ch["workLv"] = {}
+	var w: Dictionary = ch["workLv"].get(skill, {"lv": maxi(1, work_lv(ch, skill)), "exp": 0})
+	var r := RulesWork.gain_exp(int(w["lv"]), int(w["exp"]), amount, data.work_meta["level"])
+	ch["workLv"][skill] = {"lv": int(r["lv"]), "exp": int(r["exp"])}
+	if int(r["ups"]) <= 0:
+		return
+	_emit({"k": "work_lv", "id": id, "skill": skill, "lv": int(r["lv"])})
+	_msg(id, "%s 升到 %d 級！" % [_skill_def(skill).get("name", skill), int(r["lv"])])
+	_sync_adv_unlock(id, ch)
+
+
+# 啱啱夠級解鎖嘅進階技能 → 開 1 級
+func _sync_adv_unlock(id: int, ch: Dictionary) -> void:
+	for adk in data.work_adv:
+		if not ch["workLv"].has(adk) and adv_unlocked(ch, adk):
+			ch["workLv"][adk] = {"lv": 1, "exp": 0}
+			_msg(id, "解鎖進階技能「%s」！去城內%s做" % [data.work_adv[adk]["name"], _craft_fac_name(adk)])
+
+
+func _craft_fac_name(skill: String) -> String:
+	for k in data.facilities:
+		var f = data.facilities[k]
+		if f is Dictionary and (f.get("crafts", []) as Array).has(skill):
+			return str(f["name"])
+	return "工作區"
 
 
 func cmd_work(id: int, skill: String) -> void:
@@ -213,17 +269,216 @@ func cmd_work(id: int, skill: String) -> void:
 	if int(ch["sp"]) < cost:
 		return _msg(id, "體力不足 (要 %d SP)" % cost)
 	ch["sp"] = int(ch["sp"]) - cost
-	var materials: Array = sk["materials"]
-	var unlocked := RulesWork.unlocked_tiers(int(ch["level"]), sk["unlockLv"])
-	var tier := RulesWork.roll_tier(unlocked, rng_fn)
-	var item := int(materials[tier])
-	RulesShop.add_item(ch["bag"], item, 1)
+	var lv := work_lv(ch, skill)
+	var cfg: Dictionary = data.work_meta["basicRate"]
+	var ok := MathX.roll(rng_fn) < RulesWork.basic_success(lv, cfg)
+	var item := 0
+	var n := 0
+	if ok:
+		# 材料 tier 按技能等級解鎖 (Step 12；之前用角色等級)
+		var materials: Array = sk["materials"]
+		var tier := RulesWork.roll_tier(RulesWork.unlocked_tiers(lv, sk["unlockLv"]), rng_fn)
+		item = int(materials[tier])
+		n = 2 if MathX.roll(rng_fn) < float(cfg["big"]) else 1       # 大成功雙倍
+		RulesShop.add_item(ch["bag"], item, n)
 	tool["dur"] = RulesWork.durability_after_use(int(tool["dur"]))
 	var broke := int(tool["dur"]) <= 0
 	if broke:
 		ch["tools"].erase(skill)
-	_emit({"k": "work", "id": id, "skill": skill, "item": item, "spCost": cost, "toolBroke": broke})
-	_msg(id, "%s: 得到 %s%s" % [sk["name"], data.names.get(item, str(item)), "（工具用爛咗）" if broke else ""])
+	_emit({"k": "work", "id": id, "skill": skill, "item": item, "n": n, "ok": ok, "spCost": cost, "toolBroke": broke})
+	var tail := "（工具用爛咗）" if broke else ""
+	if ok:
+		_msg(id, "%s: 得到 %s%s%s" % [sk["name"], data.names.get(item, str(item)), " x2 大成功！" if n == 2 else "", tail])
+	else:
+		_msg(id, "%s: 失手，咩都冇%s" % [sk["name"], tail])
+	_work_gain(id, ch, skill, int(data.work_meta["level"]["gainOk" if ok else "gainFail"]))
+
+
+# ================= 進階生產 + 修理 (Step 12, spec 05 §4) =================
+
+# 附近有冇做呢個進階技能嘅設施
+func _near_craft(e: Dictionary, skill: String) -> bool:
+	for k in data.facilities:
+		var f = data.facilities[k]
+		if f is Dictionary and (f.get("crafts", []) as Array).has(skill) and _near(e, int(f["x"]), int(f["y"])):
+			return true
+	return false
+
+
+# 附近有冇修理服務設施 (打鐵鋪)
+func _near_repair_service(e: Dictionary) -> bool:
+	for k in data.facilities:
+		var f = data.facilities[k]
+		if f is Dictionary and bool(f.get("repair", false)) and _near(e, int(f["x"]), int(f["y"])):
+			return true
+	return false
+
+
+func _bag_counts(bag: Array) -> Dictionary:
+	var out := {}
+	for b in bag:
+		out[int(b["id"])] = int(out.get(int(b["id"]), 0)) + int(b["n"])
+	return out
+
+
+# 進階技能共通檢查 (設施/解鎖/等級/工具/SP)；回傳 "" = OK，否則錯誤訊息
+func adv_check(e: Dictionary, skill: String, need_lv: int) -> String:
+	var ch: Dictionary = e["ch"]
+	var ad: Dictionary = data.work_adv.get(skill, {})
+	if ad.is_empty():
+		return "冇呢種技能"
+	if not _near_craft(e, skill):
+		return "要喺%s先做得%s" % [_craft_fac_name(skill), ad["name"]]
+	if not adv_unlocked(ch, skill):
+		var names: Array = []
+		for s in ad["from"]:
+			names.append(data.work[s]["name"])
+		return "%s未解鎖（要%s %d 級）" % [ad["name"], "/".join(names), int(ad["unlockLv"])]
+	if work_lv(ch, skill) < need_lv:
+		return "%s要 %d 級（而家 %d）" % [ad["name"], need_lv, work_lv(ch, skill)]
+	var tool: Dictionary = ch["tools"].get(skill, {})
+	if tool.is_empty() or int(tool["dur"]) <= 0:
+		return "要裝備%s先" % data.names.get(int(ad["tool"]), "工具")
+	if int(ch["sp"]) < RulesWork.sp_cost(RulesStats.max_sp(int(ch["level"]), ch["attrs"])):
+		return "體力不足"
+	return ""
+
+
+# 用一次進階工具: 扣 SP + 工具耐久；回傳工具爛咗未
+func _adv_use(ch: Dictionary, skill: String) -> bool:
+	ch["sp"] = int(ch["sp"]) - RulesWork.sp_cost(RulesStats.max_sp(int(ch["level"]), ch["attrs"]))
+	var tool: Dictionary = ch["tools"][skill]
+	tool["dur"] = RulesWork.durability_after_use(int(tool["dur"]))
+	if int(tool["dur"]) <= 0:
+		ch["tools"].erase(skill)
+		return true
+	return false
+
+
+# 製作【原=配方/技能；自訂=成功率/失敗扣料】: 成功扣全部材料得成品；失敗 failLoseMat 機會扣材料
+func cmd_craft(id: int, item: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var r: Dictionary = data.recipes.get(item, {})
+	if r.is_empty():
+		return _msg(id, "冇呢個配方")
+	var skill := String(r["skill"])
+	var err := adv_check(e, skill, int(r["lv"]))
+	if err != "":
+		return _msg(id, err)
+	var ch: Dictionary = e["ch"]
+	if not RulesWork.has_materials(_bag_counts(ch["bag"]), r["need"]):
+		return _msg(id, "材料唔夠")
+	var cfg: Dictionary = data.work_meta["craftRate"]
+	var ok := MathX.roll(rng_fn) < RulesWork.craft_chance(work_lv(ch, skill), int(r["lv"]), cfg)
+	var lose := ok or MathX.roll(rng_fn) < float(cfg["failLoseMat"])
+	if lose:
+		for m in r["need"]:
+			RulesShop.remove_item(ch["bag"], int(m[0]), int(m[1]))
+	if ok:
+		RulesShop.add_item(ch["bag"], item, 1)
+	var broke := _adv_use(ch, skill)
+	_emit({"k": "craft", "id": id, "skill": skill, "item": item, "ok": ok, "lost": lose, "toolBroke": broke})
+	var sn: String = data.work_adv[skill]["name"]
+	var tail := "（工具用爛咗）" if broke else ""
+	if ok:
+		_msg(id, "%s成功：得到「%s」%s" % [sn, data.names.get(item, str(item)), tail])
+	else:
+		_msg(id, "%s失敗%s%s" % [sn, "，材料冇咗" if lose else "，材料保住", tail])
+	_work_gain(id, ch, skill, int(data.work_meta["level"]["gainOk" if ok else "gainFail"]))
+
+
+# 呢件裝備歸邊個技能修【原】(武器 = 冶鐵、頭/身/靴 = 修繕、戒指/項鍊 = 木匠)；"" = 唔修得
+func repair_skill(item: int) -> String:
+	var part := "weapon" if data.weapons.has(item) else String(data.armors.get(item, {}).get("slot", ""))
+	if part == "":
+		return ""
+	for sk in data.work_adv:
+		if (data.work_adv[sk].get("repairs", []) as Array).has(part):
+			return sk
+	return ""
+
+
+# 自己修理要求等級【自訂】: 有配方 = 配方等級 (識整先識修)，冇 = 1
+func repair_need_lv(item: int) -> int:
+	return int(data.recipes.get(item, {}).get("lv", 1))
+
+
+func _repair_target(ch: Dictionary, item: int) -> String:
+	if RulesShop.count_item(ch["bag"], item) <= 0:
+		return "背包冇呢件"
+	var mx := _max_dur(item)
+	if mx <= 0:
+		return "呢件唔使修"
+	if int(ch["equip"].get("dur", {}).get(str(item), mx)) >= mx:
+		return "「%s」耐久已滿" % data.names.get(item, str(item))
+	return ""
+
+
+# 自己修理【原】: 喺工房用對應進階技能，扣 SP + 工具耐久，回滿耐久
+func cmd_repair(id: int, item: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var ch: Dictionary = e["ch"]
+	var err := _repair_target(ch, item)
+	if err != "":
+		return _msg(id, err)
+	var skill := repair_skill(item)
+	err = adv_check(e, skill, repair_need_lv(item))
+	if err != "":
+		return _msg(id, err)
+	ch["equip"]["dur"][str(item)] = _max_dur(item)
+	var broke := _adv_use(ch, skill)
+	_emit({"k": "repair", "id": id, "item": item, "skill": skill, "gold": 0, "toolBroke": broke})
+	_msg(id, "用%s修好「%s」%s" % [data.work_adv[skill]["name"], data.names.get(item, str(item)), "（工具用爛咗）" if broke else ""])
+	_work_gain(id, ch, skill, int(data.work_meta["level"]["gainOk"]))
+
+
+# 修理服務費 (打鐵鋪)
+func repair_service_cost(ch: Dictionary, item: int) -> int:
+	var mx := _max_dur(item)
+	return RulesWork.repair_cost(float(data.prices.get(item, 0.0)), int(ch["equip"].get("dur", {}).get(str(item), mx)), mx,
+		float(data.work_meta["repair"]["serviceRate"]))
+
+
+# 修理服務【原】: 打鐵鋪俾錢修 (費用【自訂】)
+func cmd_repair_service(id: int, item: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	if not _near_repair_service(e):
+		return _msg(id, "要喺打鐵鋪先修得")
+	var ch: Dictionary = e["ch"]
+	var err := _repair_target(ch, item)
+	if err != "":
+		return _msg(id, err)
+	var cost := repair_service_cost(ch, item)
+	if int(ch["gold"]) < cost:
+		return _msg(id, "唔夠錢（要 %d 金）" % cost)
+	ch["gold"] = int(ch["gold"]) - cost
+	ch["equip"]["dur"][str(item)] = _max_dur(item)
+	_emit({"k": "repair", "id": id, "item": item, "skill": "", "gold": cost})
+	_msg(id, "打鐵鋪修好「%s」，收 %d 金" % [data.names.get(item, str(item)), cost])
+
+
+# debug 用: 所有初階生產技能 +add 級 (夠 50 就解鎖進階；已解鎖進階都 +add)；成品前移除
+func cmd_debug_work_lv(id: int, add: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return
+	var ch: Dictionary = e["ch"]
+	if not ch.has("workLv"):
+		ch["workLv"] = {}
+	var mx := int(data.work_meta["level"]["max"])
+	for sk in data.work_adv:
+		if ch["workLv"].has(sk):
+			ch["workLv"][sk] = {"lv": clampi(work_lv(ch, sk) + add, 1, mx), "exp": 0}
+	for sk in data.work:
+		ch["workLv"][sk] = {"lv": clampi(work_lv(ch, sk) + add, 1, mx), "exp": 0}
+	_msg(id, "（測試）生產技能 +%d 級" % add)
+	_sync_adv_unlock(id, ch)
 
 
 # ================= 裝備: 武器 3 槽 + 5 部位防具 (Step 10/11.6, spec 02 §9) =================
@@ -280,6 +535,8 @@ func cmd_equip(id: int, item: int, wslot: int = -1) -> void:
 				break
 	eq["weapons"][ws] = item
 	eq["weapon"] = int(eq["weapons"][int(eq["wslot"])])
+	if not eq["dur"].has(str(item)):
+		eq["dur"][str(item)] = _max_dur(item)          # 武器耐久 (Step 12)
 	_emit({"k": "equip", "src": id, "slot": "weapon", "wslot": ws, "item": item})
 	_msg(id, "裝備咗「%s」%s" % [nm, "" if ws == int(eq["wslot"]) else "（武器槽 %d）" % (ws + 1)])
 

@@ -121,4 +121,29 @@ func _run() -> void:
 		put(int(md["ox"]) + int(it[1]), int(md["oy"]) + int(it[2]))
 		await frames(10)
 		await shot(it[3])
+	# 進階生產 (Step 12): 工房製作頁 / 修理頁 / 打鐵鋪修理服務 / 角色技能頁
+	m._send({"t": "debug_work_lv", "add": 55})
+	for id in [26004, 25001, 25002, 25003]:
+		m._send({"t": "debug_give", "item": id, "n": 30})
+	var wf: Dictionary = m.data.facilities["workshop"]
+	put(int(wf["x"]), int(wf["y"]) + 1)
+	await frames(10)
+	m._send({"t": "equip_tool", "skill": "smithing", "item": 26004})
+	var crp: CraftPanel = hud.craft_panel()
+	crp.open_craft(str(wf["name"]), wf["crafts"])
+	crp.sel = 10002
+	crp.refresh(true)
+	await shot("craft")
+	ch["equip"]["dur"][str(int(ch["equip"]["weapon"]))] = 3
+	crp.set_tab(3)
+	crp.sel = int(ch["equip"]["weapon"])
+	crp.refresh(true)
+	await shot("craft_repair")
+	crp.open_service("打鐵鋪")
+	crp.sel = int(ch["equip"]["weapon"])
+	crp.refresh(true)
+	await shot("craft_service")
+	hud.open_panel("char")
+	(hud.panels["char"] as CharPanel).set_tab(2)
+	await shot("char_work")
 	get_tree().quit(0)
