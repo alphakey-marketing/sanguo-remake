@@ -15,6 +15,10 @@
   },
   "homeCity": "xuchang",
   "storageFee": 200,
+  "_noteTiandi": "天地商行自動化 (Step 13, spec 05 §3)【原=功能；自訂=數值】: 冇負重系統，改用「背包工作材料件數」> bagMatCap 當負重滿 → 勾咗嘅技能材料自動入倉 (倉庫總件數上限 storageCap)，其餘/入唔落 → 市集價賣。toolSellAt = 耐久剩幾多自動賣【原=2】；工具轉賣價 = 原價 × 耐久%/2。restCost = 工作區小屋休息 (客棧價 ×2)",
+  "tiandi": { "bagMatCap": 100, "storageCap": 1000, "toolSellAt": 2, "restCost": 10 },
+  "_noteAp": "行動力 (Step 13)【原=捐獻扣行動力、頭銜提高上限；自訂=上限 100、每日子時回滿】；Step 14 頭銜再加上限",
+  "ap": { "max": 100 },
   "cities": [
     {
       "id": "xuchang",

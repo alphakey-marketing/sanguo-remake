@@ -151,6 +151,8 @@ static func fac_dialog(main: Node, f: Dictionary) -> Dictionary:
 	var def: Dictionary = main.data.facilities[key]
 	if key == "forge":
 		return forge_dialog(main, def)
+	if bool(def.get("donation", false)):
+		return donate_dialog(main, def)
 	var text := str(def.get("desc", ""))
 	if key == "training":
 		text += "\n歷練 %d/100（下次升級 武/智/敏/靈 +%d）" % [int(ch.get("lilian", 0)), int(ch.get("lilian", 0)) / 10]
@@ -160,6 +162,31 @@ static func fac_dialog(main: Node, f: Dictionary) -> Dictionary:
 	text += "\n金 %d" % int(ch.get("gold", 0))
 	return {"title": str(def["name"]), "text": text,
 		"options": [{"label": "使用", "cb": func() -> void: main._send({"t": "facility", "key": key})}, _leave(main)]}
+
+
+# 捐贈官令 (Step 13): 捐金錢 3 檔 / 捐晒背包物資
+static func donate_dialog(main: Node, def: Dictionary) -> Dictionary:
+	var ch: Dictionary = main.ch
+	var cfg: Dictionary = main.data.donation
+	var gold := int(ch.get("gold", 0))
+	var ap: int = main.sim.ap_of(ch)
+	var can := ap >= int(cfg["apCost"])
+	var items: Array = main.sim.donatable_items(ch)
+	var counts := {}
+	for it in items:
+		counts[int(it[0])] = int(it[1])
+	var units := RulesTiandi.donation_units(counts, main.data.donation_rates)
+	var text := "%s\n名聲 %d　行動力 %d/%d（每次捐扣 %d）\n金 %d　可捐物資 %d 單位（%d 起）" %[str(def.get("desc", "")),
+		int(ch.get("fame", 0)), ap, main.sim.ap_max(ch), int(cfg["apCost"]), gold, units, int(cfg["unitsMin"])]
+	var opts: Array = []
+	for amt in [int(cfg["goldMin"]), 10000, int(cfg["goldMax"])]:
+		var a: int = amt
+		opts.append({"label": "捐 %d 金" % a, "cb": func() -> void: main._send({"t": "donate_gold", "amount": a}),
+			"disabled": gold < a or not can})
+	opts.append({"label": "捐晒物資 (%d 單位)" % units, "cb": func() -> void: main._send({"t": "donate_items", "items": items}),
+		"disabled": units < int(cfg["unitsMin"]) or not can})
+	opts.append(_leave(main))
+	return {"title": str(def["name"]), "text": text, "options": opts}
 
 
 # 打鐵鋪（義士融合 QTE）: 未開始 = 「開始融合」；開始咗 = 集氣棒 + 「敲！」

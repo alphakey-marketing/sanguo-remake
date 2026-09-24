@@ -23,7 +23,7 @@ func open() -> void:
 func sig() -> String:
 	var ch: Dictionary = main.ch
 	return JSON.stringify([tab, sel_slot, ch.get("equip", {}), ch.get("workLv", {}), ch.get("tools", {}), pending, ch.get("attrs", {}), ch.get("attrPoints", 0), ch.get("level", 1), ch.get("hp", 0),
-		ch.get("mp", 0), ch.get("sp", 0), ch.get("gold", 0), ch.get("karma", 0), ch.get("lilian", 0), ch.get("title", "")])
+		ch.get("mp", 0), ch.get("sp", 0), ch.get("gold", 0), ch.get("karma", 0), ch.get("lilian", 0), ch.get("title", ""), ch.get("fame", 0), ch.get("ap", 0), ch.get("chaExp", 0)])
 
 
 func _left() -> int:
@@ -111,6 +111,8 @@ func _build_body() -> void:
 		"SP %d/%d" % [int(ch["sp"]), RulesStats.max_sp(lv, attrs)],
 		"經驗 %d/%d" % [int(ch.get("exp", 0)), RulesStats.exp_to_next(lv)],
 		"歷練 %d/100" % int(ch.get("lilian", 0)),
+		"名聲 %d　行動力 %d/%d" % [int(ch.get("fame", 0)), main.sim.ap_of(ch), main.sim.ap_max(ch)],
+		"魅力經驗 %d/%d（捐獻）" % [int(ch.get("chaExp", 0)), int(main.data.donation["chaExpPerPoint"])],
 		"金 %d" % int(ch.get("gold", 0)),
 		"武器 %s" % (item_name(int(ch.get("equip", {}).get("weapon", 0))) if int(ch.get("equip", {}).get("weapon", 0)) > 0 else "（冇）"),
 	]

@@ -40,6 +40,7 @@ func _daily_hook(day: int) -> void:
 			changed.append(d)
 	_market_daily(season)
 	_storage_daily()
+	_ap_daily()
 	_emit({"k": "day", "day": day, "season": season})
 	for d in changed:
 		_emit({"k": "disaster", "name": d["name"], "city": d["city"], "size": d["size"]})
@@ -60,6 +61,13 @@ func _storage_daily() -> void:
 			continue
 		ch["gold"] = int(ch["gold"]) - cost
 		_msg(int(e["id"]), "天地商行扣 %d 金" % cost)
+
+
+# 行動力【自訂】: 子時回滿 (Step 13)
+func _ap_daily() -> void:
+	for e in ents.values():
+		if e.has("ch"):
+			e["ch"]["ap"] = ap_max(e["ch"])
 
 
 func _market_daily(season: int) -> void:
