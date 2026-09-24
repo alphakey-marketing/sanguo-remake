@@ -1,0 +1,164 @@
+class_name RulesRecruit
+extends RefCounted
+# 登用武將 (Step 13.5, spec 09 §3)。純函數；設定喺 data/generals.json cfg
+# 【原】理念相合 5×3 表 + 出仕人人可登用；唔可以登用高自己 10 級以上；調查每日 1 次、成功嗰個月封鎖；
+#       武將 = PK 擂台、文官 = 三國問答；登用 30 日，到期子時離開
+# 【自訂】擂台/同伴/忠誠數值、候選排序、問答 8/10 過關
+
+const IDEOLOGIES := ["義理", "霸權", "權謀", "隱遁", "治國"]
+const FREE_IDEO := "出仕"
+# 【原】sy1_1_2 / spec 09 §3.1: 玩家理念 → 可登用嘅武將理念
+const IDEO_OK := {
+	"義理": ["義理", "霸權", "治國"],
+	"霸權": ["霸權", "義理", "權謀"],
+	"權謀": ["權謀", "霸權", "隱遁"],
+	"隱遁": ["隱遁", "權謀", "治國"],
+	"治國": ["治國", "隱遁", "義理"],
+}
+const ARENA_DEF_BASE := 900000          # 擂台臨時怪 def id = BASE + 武將 id (唔入 monsters.json)
+const ORDERS := ["active", "assist", "stop", "follow"]   # 主動/協助/停止/遠距跟隨 (絕招/術法 = Step 15)
+const ORDER_NAMES := {"active": "主動攻擊", "assist": "協助攻擊", "stop": "停止攻擊", "follow": "遠距跟隨"}
+
+
+# 理念相合: 出仕人人得；玩家未定理念 = 只可以登用出仕
+static func ideology_ok(player_ideo: String, gen_ideo: String) -> bool:
+	if gen_ideo == FREE_IDEO:
+		return true
+	return (IDEO_OK.get(player_ideo, []) as Array).has(gen_ideo)
+
+
+# 等級: 武將戰等唔可以高過玩家 gap 級以上 (gap = 10 → 玩家 5 級最多登 15 級)
+static func level_ok(gen_lv: int, player_lv: int, gap: int) -> bool:
+	return gen_lv <= player_lv + gap
+
+
+# 頭銜【原】: 50 級以上人才，玩家頭銜唔可以低過人才 5 階以上。頭銜系統 = Step 14 → 而家 stub 永遠過
+static func title_ok(_g: Dictionary, _ch: Dictionary, _cfg: Dictionary) -> bool:
+	return true
+
+
+# 可唔可以登用呢個人 → "" = 得；否則 = 原因
+static func check(g: Dictionary, ch: Dictionary, cfg: Dictionary) -> String:
+	if not ideology_ok(String(ch.get("ideology", "")), String(g["ideo"])):
+		return "理念唔合"
+	if not level_ok(int(g["lv"]), int(ch["level"]), int(cfg["levelGap"])):
+		return "等級差太遠"
+	if not title_ok(g, ch, cfg):
+		return "頭銜唔夠"
+	return ""
+
+
+# game 月 (monthDays 日一個月)
+static func month_of(day: int, month_days: int) -> int:
+	return day / maxi(1, month_days)
+
+
+# 調查封鎖原因 → "" = 可以調查。rec = ch.recruit
+static func survey_block(rec: Dictionary, day: int, month: int) -> String:
+	if int(rec.get("lockMonth", -1)) == month:
+		return "今個月已經登用咗人才，下個月先再調查"
+	if int(rec.get("surveyDay", -1)) == day:
+		return "今日已經調查過，聽日再嚟"
+	return ""
+
+
+# 候選排序 key: 每日唔同 (同一日調查結果一樣，可重現)
+static func _order_key(gid: int, day: int) -> int:
+	return ((gid * 2654435761) ^ (day * 40503)) & 0x7FFFFFFF
+
+
+# 調查候選 (spec 09 §3.2)
+# kind = "wu"/"wen"；visible_t1 = 而家城內見到嘅 Tier1 id (Dictionary id->true)；gone = 呢個月走咗/跟緊人嘅 id
+# Tier1: 要喺城內見到；登用池 (tier 0): 戰等喺 [玩家 -poolBelow, 玩家 +levelGap]，同名只列一個
+static func candidates(gens: Array, ch: Dictionary, kind: String, day: int, visible_t1: Dictionary,
+		gone: Dictionary, cfg: Dictionary) -> Array:
+	var t1: Array = []
+	var pool: Array = []
+	var plv := int(ch["level"])
+	for g in gens:
+		var gid := int(g["id"])
+		if String(g["type"]) != kind or gone.has(gid) or not check(g, ch, cfg).is_empty():
+			continue
+		var tier := int(g["tier"])
+		if tier == 1:
+			if visible_t1.has(gid):
+				t1.append(g)
+		elif tier == 0 and int(g["lv"]) >= plv - int(cfg["poolBelow"]):
+			pool.append(g)
+	pool.sort_custom(func(a, b): return _order_key(int(a["id"]), day) < _order_key(int(b["id"]), day))
+	var out: Array = t1.duplicate()
+	var names := {}
+	for g in t1:
+		names[String(g["name"])] = true
+	for g in pool:
+		if out.size() >= int(cfg["surveyMax"]):
+			break
+		if names.has(String(g["name"])):
+			continue
+		names[String(g["name"])] = true
+		out.append(g)
+	return out
+
+
+# 擂台臨時怪 def (spec 09 §3.2 設計: HP = 戰等×20，打到 0 = 制服)
+static func arena_def(g: Dictionary, cfg: Dictionary) -> Dictionary:
+	var a: Dictionary = cfg["arena"]
+	var lv := int(g["lv"])
+	return {"id": ARENA_DEF_BASE + int(g["id"]), "name": String(g["name"]), "level": lv,
+		"hp": lv * int(a["hpPerLv"]), "atk": MathX.js_round(float(a["atkBase"]) + lv * float(a["atkPerLv"])),
+		"def": int(floor(lv * float(a["defPerLv"]))), "atkInterval": int(a["atkInterval"]),
+		"aggroRange": 0, "leash": int(a["leash"]), "flee": false, "groups": false, "boss": false,
+		"drops": [], "gold": [0, 0], "exp": 0, "alignment": 0, "element": "none"}
+
+
+# 問答過關
+static func quiz_pass(ok: int, cfg: Dictionary) -> bool:
+	return ok >= int(cfg["quizPass"])
+
+
+# 登用到期日: 第 start+serveDays 日子時 0 刻離開
+static func until_day(start_day: int, cfg: Dictionary) -> int:
+	return start_day + int(cfg["serveDays"])
+
+
+# 初始忠誠: 基本 + 同理念加成
+static func loyalty_init(player_ideo: String, gen_ideo: String, cfg: Dictionary) -> int:
+	var l: Dictionary = cfg["loyalty"]
+	return clampi(int(l["init"]) + (int(l["sameIdeo"]) if player_ideo == gen_ideo else 0), 0, 100)
+
+
+static func loyalty_add(loy: int, delta: int) -> int:
+	return clampi(loy + delta, 0, 100)
+
+
+# 殺善 (alignment > 0 = 善怪，殺咗善惡值跌) → 義理/治國武將忠誠跌 (spec 09 §4)
+static func loyalty_kill_delta(gen_ideo: String, alignment: float, cfg: Dictionary) -> int:
+	var l: Dictionary = cfg["loyalty"]
+	if alignment > 0 and (l["badKillIdeo"] as Array).has(gen_ideo):
+		return int(l["badKill"])
+	return 0
+
+
+# 忠誠結算: "stay" / "leave_now" (=0 即刻走) / "leave_daily" (<leave 子時走)
+static func loyalty_verdict(loy: int, cfg: Dictionary) -> String:
+	if loy <= 0:
+		return "leave_now"
+	if loy < int(cfg["loyalty"]["leave"]):
+		return "leave_daily"
+	return "stay"
+
+
+# 同伴屬性: 義士成長表按戰等 → 武將武力 ×strMulWu；文官武力 ×strMulWen、智力 + 戰等×intAddWen
+static func companion_attrs(cls: Dictionary, g: Dictionary, cfg: Dictionary) -> Dictionary:
+	var c: Dictionary = cfg["companion"]
+	var a := RulesStats.attrs_at(cls, int(g["lv"]))
+	if String(g["type"]) == "wu":
+		a["str"] = MathX.js_round(int(a["str"]) * float(c["strMulWu"]))
+	else:
+		a["str"] = MathX.js_round(int(a["str"]) * float(c["strMulWen"]))
+		a["int"] = int(a["int"]) + MathX.js_round(int(g["lv"]) * float(c["intAddWen"]))
+	return a
+
+
+static func type_name(t: String) -> String:
+	return "武將" if t == "wu" else "文官"

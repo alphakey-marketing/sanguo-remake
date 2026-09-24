@@ -1,5 +1,5 @@
 class_name Sim
-extends "res://sim/sim_ai.gd"
+extends "res://sim/sim_recruit.gd"
 # 單機世界模擬: 格子地圖 + 單位 + 即時戰鬥 + 怪物 AI + 設施。
 # - state 全部係純資料 (Dictionary/Array/int/String)，可直接存檔；RNG 由種子驅動 → 可重現
 # - UI 只透過 cmd_* 發意圖、透過 event_emitted 收事件、透過 view_ents()/player_ch() 讀狀態
@@ -99,7 +99,7 @@ func _sync_night_spawns() -> void:
 		else:
 			for id0 in ents.keys():
 				var e: Dictionary = ents.get(id0, {})
-				if not e.is_empty() and e["kind"] == "mob" and data.monsters[int(e["mob"]["def"])].get("night", false):
+				if not e.is_empty() and e["kind"] == "mob" and data.mob_def(int(e["mob"]["def"])).get("night", false):
 					ents.erase(id0)
 					for e2 in ents.values():
 						if int(e2["atk_target"]) == int(id0):

@@ -56,6 +56,13 @@ var ultimates: Array = []        # 絕招定義 (data/ultimates.json, Step 10, s
 var ult_by_id: Dictionary = {}   # ult id -> def
 var armors: Dictionary = {}      # item id -> {slot, req_lv, max_dur, stats} 防具 (Step 11.6, spec 02 §9)
 var equip_cfg: Dictionary = {}   # data/equip.json (部位碼/耐久/上限)
+var generals: Array = []          # 登用武將 (data/generals.json, Step 13.5)
+var general_by_id: Dictionary = {}  # id -> def
+var generals_t1: Array = []       # Tier1 城內常駐 (已轉全域座標)
+var recruit_cfg: Dictionary = {}  # generals.json cfg
+var general_skill_names: Dictionary = {}  # skill id(String) -> 名
+var quiz_generals: Array = []     # 文官問答題庫 (data/quiz_generals.json) [{q, opts[4], a}]
+var _arena_defs: Dictionary = {}  # 擂台臨時怪 def 快取 (mob_def 用)
 
 static var _cache: GameData
 
@@ -121,6 +128,17 @@ static func load_all() -> GameData:
 			j["kind"] = "stone" if cat == "stones" else "special" if cat == "special" else "support" if cat == "support" else "fusable"
 			g.jewel_by_item[int(j["id"])] = j
 	g.equip_cfg = _read("res://data/equip.json")
+	var gn: Dictionary = _read("res://data/generals.json")
+	g.recruit_cfg = gn["cfg"]
+	g.general_skill_names = gn["skillNames"]
+	for x in gn["generals"]:
+		x["id"] = int(x["id"])
+		g.generals.append(x)
+		g.general_by_id[int(x["id"])] = x
+		if int(x["tier"]) == 1:
+			g.generals_t1.append(x)
+	var qg: Dictionary = _read("res://data/quiz_generals.json")
+	g.quiz_generals = qg["questions"]
 	var ul: Dictionary = _read("res://data/ultimates.json")
 	g.ultimates = ul["ultimates"]
 	for u in g.ultimates:
@@ -250,6 +268,8 @@ func _place_all() -> void:
 			place(facilities[k])
 	for n in quest_npc_list:
 		place(n)
+	for x in generals_t1:
+		place(x)
 	for p in travel_points:
 		place(p)
 		if bool(p.get("auto", false)):
@@ -262,6 +282,18 @@ func _place_all() -> void:
 			continue
 		var a: Array = sp.get("area", [0, 0, int(md["w"]) - 1, int(md["h"]) - 1])
 		sp["area"] = [int(a[0]) + int(md["ox"]), int(a[1]) + int(md["oy"]), int(a[2]) + int(md["ox"]), int(a[3]) + int(md["oy"])]
+
+
+# 怪物 def: monsters.json；擂台臨時怪 (id ≥ ARENA_DEF_BASE) 由武將資料即時生成 (Step 13.5)
+func mob_def(def_id: int) -> Dictionary:
+	if monsters.has(def_id):
+		return monsters[def_id]
+	if not _arena_defs.has(def_id):
+		var g: Dictionary = general_by_id.get(def_id - RulesRecruit.ARENA_DEF_BASE, {})
+		if g.is_empty():
+			return {}
+		_arena_defs[def_id] = RulesRecruit.arena_def(g, recruit_cfg)
+	return _arena_defs[def_id]
 
 
 # 全域格屬邊張地圖 ({} = 虛空)

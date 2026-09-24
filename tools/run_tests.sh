@@ -22,6 +22,7 @@ run maps --script tests/run_maps.gd
 run equip --script tests/run_equip.gd
 run craft --script tests/run_craft.gd
 run tiandi --script tests/run_tiandi.gd
+run recruit --script tests/run_recruit.gd
 run market --script tools/market_sim.gd
 run hud --script tests/run_hud.gd
 run autotest -- --autotest
@@ -37,6 +38,11 @@ fi
 out=$(PYTHONIOENCODING=utf-8 python tools/import_recipes.py --check 2>&1); code=$?
 echo "$out"
 [ $code = 0 ] || { echo "!! recipes exit $code"; rc=1; }
+
+# 登用武將導入核對 (generals.json 要同 data_src/general_npc.csv + 攻略戰等表一致)
+out=$(PYTHONIOENCODING=utf-8 python tools/gen_generals.py --check 2>&1); code=$?
+echo "$out"
+[ $code = 0 ] || { echo "!! generals exit $code"; rc=1; }
 
 [ $rc = 0 ] && echo "ALL OK" || echo "SOME FAILED"
 exit $rc

@@ -97,8 +97,8 @@
 - 驗收：`tests/run_tiandi.gd` 68 項（轉換表/搬運/倉滿賣/未訂閱/任務道具/自動買賣工具/小屋/捐金範圍+換算/捐物資下限/行動力日結/存檔 roundtrip + 舊存檔/決定性）+ rules 向量 +24（387）+ `--uitest` 捐獻處 + 腳伕頁 ✅
 
 ### Step 13.5 登用武將 v1（spec 09 §2~3，spec 11 §4）★用家優先，由 Step 15 提前
-- [ ] 導入器 `tools/gen_generals.py`：`data_src/general_npc.csv`（+ Npc_table hp/mp/atk 如有）→ `client/data/generals.json`（名/武力/智力/9 技能/等級映射/理念預設表）
-- [ ] 先揀豫荊 Tier1 10~20 人放城內（按時辰出現）；其餘留登用池
+- [x] 導入器 `tools/gen_generals.py`：`data_src/general_npc.csv` → `client/data/generals.json`（名/戰等/f116/9 技能/類型/理念；`--check` 入 run_tests）。**f101 = 戰等【原】**（攻略 sy2_6_2 表 42 人全中），唔使映射公式
+- [x] 先揀豫荊 Tier1 10~20 人放城內（按時辰出現）；其餘留登用池 — 許昌 10 人（曹營）+ 新野 9 人（劉備軍）；同名多版用第一個 id，其他版 tier -1
 - [ ] 調查指令：每日 1 次、成功嗰個月封鎖；候選 = 理念相合（5×3 表）+ 等級 ≤ 玩家 +10；**頭銜條件先 stub（永遠過），Step 14 接返**
 - [ ] 武將 = 擂台 PK（打到 0 = 制服，唔會死）；文官 = 問答 10 題答啱 8（`data/quiz_generals.json`）
 - [ ] 同伴：30 game 日到期子時離開；跟隨 + 6 種戰鬥指令（先做 主動/協助/停止/跟隨）；忠誠 0~100，<30 走
