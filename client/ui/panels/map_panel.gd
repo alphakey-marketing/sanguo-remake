@@ -122,12 +122,12 @@ func _draw_world(view: Control) -> void:
 		view.draw_string(font, p + Vector2(10, 5), String(n.name), HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color.WHITE if open else Color(0.65, 0.62, 0.58))
 
 
-# 自己所在節點: 洞窟各層都算汝南
+# 自己所在節點: 洞窟各層都算汝南山洞；室內 (house) 算所屬城池 (parent)
 func _here_node() -> String:
-	var mid := String(main.cur_map.get("id", ""))
+	var mid := String(main.cur_map.get("parent", main.cur_map.get("id", "")))
 	for n in main.data.world_map.get("nodes", []):
 		var m = n.get("map")
-		if m != null and (String(m) == mid or (mid.begins_with("runan_") and String(m).begins_with("runan_"))):
+		if m != null and (String(m) == mid or (mid.begins_with("runan_f") and String(m).begins_with("runan_f"))):
 			return String(n.id)
 	return ""
 

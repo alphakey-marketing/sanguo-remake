@@ -116,7 +116,10 @@ func _run() -> void:
 	(hud.panels["map"] as MapPanel).select_node("xinye")
 	await shot("panel_world_xinye")
 	hud.close_panels()
-	for it in [["xinye", 31, 24, "map_xinye"], ["bowang", 46, 30, "map_bowang"], ["kunyang", 46, 44, "map_kunyang"], ["wancheng_road", 31, 16, "map_wancheng"], ["runan_road", 80, 22, "map_runan_road"]]:
+	for it in [["xinye", 31, 24, "map_xinye"], ["bowang", 46, 30, "map_bowang"], ["kunyang", 46, 44, "map_kunyang"], ["wancheng_road", 31, 16, "map_wancheng"], ["runan_road", 80, 22, "map_runan_road"],
+			["chenliu", 47, 16, "map_chenliu"], ["yudu", 20, 25, "map_yudu"], ["runan_city", 48, 20, "map_runan_city"],
+			["wancheng", 35, 31, "map_wancheng_city"], ["gangkou", 45, 26, "map_gangkou"], ["hanshui", 40, 14, "map_hanshui"],
+			["xiangyang", 37, 24, "map_xiangyang"], ["xy_prison", 18, 10, "map_prison"]]:   # B2.5
 		var md: Dictionary = m.data.map_by_id[it[0]]
 		put(int(md["ox"]) + int(it[1]), int(md["oy"]) + int(it[2]))
 		await frames(10)
