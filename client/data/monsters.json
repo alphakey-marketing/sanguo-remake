@@ -2841,6 +2841,54 @@
     76,
     40
    ]
+  },
+  {
+   "zone": "longzhong",
+   "monster": 12018,
+   "count": 4,
+   "respawnTicks": 260,
+   "area": [
+    26,
+    3,
+    38,
+    22
+   ]
+  },
+  {
+   "zone": "longzhong",
+   "monster": 12006,
+   "count": 3,
+   "respawnTicks": 320,
+   "area": [
+    40,
+    3,
+    58,
+    22
+   ]
+  },
+  {
+   "zone": "longzhong",
+   "monster": 12013,
+   "count": 4,
+   "respawnTicks": 260,
+   "area": [
+    4,
+    34,
+    26,
+    46
+   ]
+  },
+  {
+   "zone": "longzhong",
+   "monster": 12019,
+   "count": 3,
+   "respawnTicks": 260,
+   "area": [
+    30,
+    32,
+    56,
+    46
+   ]
   }
  ]
 }

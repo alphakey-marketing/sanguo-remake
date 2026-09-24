@@ -208,6 +208,7 @@ func _send(d: Dictionary) -> void:
 		"sell": sim.cmd_sell(my_id, int(d.item), int(d.get("n", 1)))
 		"facility": sim.cmd_facility(my_id, str(d.key))
 		"travel": sim.cmd_travel(my_id, str(d.point))
+		"station": sim.cmd_station(my_id, str(d.to))
 		"goto_map": sim.cmd_goto_map(my_id, str(d.map))
 		"work": sim.cmd_work(my_id, str(d.skill))
 		"equip_tool": sim.cmd_equip_tool(my_id, str(d.skill), int(d.item))

@@ -489,6 +489,21 @@ func _run() -> void:
 	await frames(1)
 	check(_has_text(hud.panels["dialog"], "孫堅將軍令"), "查閱收集冊顯示孫堅將軍令")
 	hud.close_panels()
+	# 19. 驛站 (Step 16.5 B3): 行近許昌驛站 → 互動掣「驛站」→ 揀襄陽 → 扣車費去到襄陽
+	var stn: Dictionary = m.data.facilities["station_xc"]
+	put(int(stn["x"]), int(stn["y"]) + 1)
+	check(await until(func() -> bool: return String(hud.ctx.get("label", "")) == "驛站"), "近驛站互動掣 = 驛站 (%s)" % hud.ctx)
+	ch["gold"] = 1000
+	await click(center("context"))
+	var dp6: GamePanel = hud.panels.get("dialog")
+	var fare := RulesStation.fare(m.sim.map_hops("xuchang", "xiangyang"), m.data.world["station"])
+	check(dp6 != null and dp6.visible and find_btn(dp6, "襄陽驛站 (%d 金)" % fare) != null, "驛站對話框列出襄陽 (%d 金)" % fare)
+	check(dp6 != null and press(dp6, "襄陽驛站"), "撳襄陽驛站")
+	await frames(2)
+	var me6: Dictionary = m.sim.ent(m.my_id)
+	check(m.sim.map_id_at(int(me6["x"]), int(me6["y"])) == "xiangyang" and int(ch["gold"]) == 1000 - fare, "搭驛站: 去到襄陽、扣 %d 金" % fare)
+	check(not dp6.visible, "搭完車對話框閂咗")
+	hud.close_panels()
 	print("[TEST] ui_smoke: %d, fail %d" % [total, fails])
 	print("PASS: ui smoke" if fails == 0 else "FAIL: ui smoke")
 	get_tree().quit(1 if fails > 0 else 0)

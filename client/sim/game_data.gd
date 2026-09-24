@@ -183,7 +183,7 @@ static func load_all() -> GameData:
 		g.names[id] = str(it.get("name", id))
 		g.prices[id] = float(it.get("price", 0))
 		g.cats[id] = int(it.get("cat", 0))
-		var gname := RulesGeneral.order_general_name(g.names[id], String(g.gen2_cfg["orderSuffix"]))
+		var gname := RulesGeneral.order_general_name(g.names[id], String(g.gen2_cfg["orderSuffix"]), g.gen2_cfg.get("orderAlias", {}))
 		if gname != "" and not g.general_order_item.has(gname):
 			g.general_order_item[gname] = id
 		var effs: Array = []

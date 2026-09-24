@@ -743,7 +743,7 @@ def hanshui():
 # ---------------- 襄陽城 76×60 (漢水南；宮宅、監獄；南門 → 長沙) ----------------
 def xiangyang():
     rng = random.Random(190)          # 初平元年 劉表單騎入荊州，治襄陽
-    c = _city_base(76, 60, [("N", 36), ("S", 36)])
+    c = _city_base(76, 60, [("N", 36), ("S", 36), ("W", 24)])   # W = 隆中 (B3)
     # 宮宅 (中北)
     c.ring(26, 8, 49, 19, "#")
     c.rect(27, 9, 48, 18, ".")
@@ -796,6 +796,56 @@ def changsha():
     c.save("changsha")
 
 
+# ================= B3 (spec 12 §1): 隆中 + 草廬 =================
+# ---------------- 隆中 72×50 (襄陽西門外；臥龍岡、草廬、竹林、隴畝) Lv14~18 ----------------
+def longzhong():
+    rng = random.Random(207)          # 建安十二年 三顧茅廬
+    c = _field_base(72, 50, rng)
+    # 官道: 東口 (71,25) → 岡下
+    c.poly([(71, 25), (52, 25), (40, 30), (30, 30)], "=", 2)
+    # 臥龍岡 (西北): 山環 + 上岡小徑 + 草廬前院 + 門 (→ 室內)
+    c.blob(16, 14, 11, "^", rng, 0.9)
+    c.rect(9, 8, 22, 18, "_")
+    c.rect(12, 9, 19, 13, "H")
+    c.put(15, 13, "+")                            # 草廬門 (傳送點 15,13)
+    c.rect(10, 16, 11, 17, "T")
+    c.rect(20, 16, 21, 17, "T")
+    c.poly([(16, 18), (16, 26), (22, 30), (30, 30)], "=", 2)
+    # 竹林 (東北)
+    for (x, y, r) in ((44, 8, 5), (58, 10, 4), (52, 16, 3)):
+        c.blob(x, y, r, "T", rng, 0.7, only=".,")
+    # 隴畝 (南): 躬耕田
+    c.rect(10, 36, 26, 44, "%")
+    c.rect(30, 38, 40, 44, "%")
+    c.rect(28, 34, 29, 45, "=")
+    # 小溪 (北 → 南)，官道過橋
+    _river(c, [(62, 2), (60, 14), (64, 26), (58, 38), (62, 47)], 2)
+    c.rect(4, 30, 6, 32, "H")                     # 農舍
+    c.rect(44, 40, 47, 42, "H")
+    c.scatter(4, 4, 68, 46, ",", 0.07, rng)
+    n = c.seal_unreachable((70, 25), "T")
+    print("longzhong sealed", n)
+    c.put(71, 26, "T")
+    c.put(71, 25, "=")                            # 東口 (傳送點 71,25)
+    c.save("longzhong")
+
+
+# ---------------- 草廬 28×18 (室內) ----------------
+def caolu():
+    c = Canvas(28, 18, "_")
+    c.ring(0, 0, 27, 17, "#")
+    c.rect(3, 2, 10, 3, "H")                      # 書架
+    c.rect(17, 2, 24, 3, "H")
+    c.rect(12, 7, 15, 8, "H")                     # 書案
+    c.rect(2, 12, 3, 14, "T")                     # 盆景
+    c.rect(24, 12, 25, 14, "T")
+    c.put(14, 17, "+")                            # 門 (傳送點 14,17)
+    c.save("caolu")
+
+
+B3 = {"longzhong": longzhong, "caolu": caolu}
+
+
 B25 = {"chenliu": chenliu, "yudu": yudu, "xiaopei": xiaopei, "runan_city": runan_city, "ding_fu": ding_fu,
        "wancheng": wancheng, "jingzhou": jingzhou, "gangkou": gangkou, "fancheng": fancheng,
        "hanshui": hanshui, "xiangyang": xiangyang, "xy_prison": xy_prison, "changsha": changsha}
@@ -803,8 +853,12 @@ B25 = {"chenliu": chenliu, "yudu": yudu, "xiaopei": xiaopei, "runan_city": runan
 
 if __name__ == "__main__":
     if "--force" not in sys.argv:
-        sys.exit("會覆蓋 data/maps/*.txt，確定就加 --force (--b2 = 只起 B2 五張；--b25 = 只起 B2.5 十三張)")
+        sys.exit("會覆蓋 data/maps/*.txt，確定就加 --force (--b2 = 只起 B2 五張；--b25 = 只起 B2.5 十三張；--b3 = 只起隆中/草廬)")
     os.makedirs(OUT, exist_ok=True)
+    if "--b3" in sys.argv:
+        for fn in B3.values():
+            fn()
+        sys.exit(0)
     if "--b25" in sys.argv:
         for fn in B25.values():
             fn()

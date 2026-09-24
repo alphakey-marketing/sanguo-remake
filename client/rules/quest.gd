@@ -241,6 +241,7 @@ static func on_npc_talk(data: GameData, ch: Dictionary, q: Dictionary, npc_id: S
 			for ti in take:                           # 交信物 (Step 16): 要帶齊先推進，推進先扣
 				if not RulesShop.has_item(ch["bag"], int(ti[0]), int(ti[1])):
 					out["msg"] = "要帶齊%s" % data.names.get(int(ti[0]), str(ti[0]))
+					out["blocked"] = true                 # 冇推進但要話畀玩家知 (唔好變閒談)
 					return out
 			for ti in take:
 				RulesShop.remove_item(ch["bag"], int(ti[0]), int(ti[1]))
@@ -261,12 +262,16 @@ static func on_npc_talk(data: GameData, ch: Dictionary, q: Dictionary, npc_id: S
 		"repeat":
 			var flags: Dictionary = st.get("flags", {})
 			if bool(stage.get("perDay", false)) and int(flags.get("lastDay", -1)) == day:
-				out["msg"] = "今晚已經跟蹤過喇，聽晚再嚟"
+				out["msg"] = String(stage.get("dayMsg", "今晚已經跟蹤過喇，聽晚再嚟"))
+				out["blocked"] = true
 				return out
 			flags["count"] = int(flags.get("count", 0)) + 1
 			flags["lastDay"] = day
 			st["flags"] = flags
 			out["changed"] = true
+			var dls: Array = stage.get("dialogs", [])     # 第 n 次嘅對白 (B3 三顧茅廬)
+			if int(flags["count"]) <= dls.size():
+				out["dialog"] = [dls[int(flags["count"]) - 1]]
 			if int(flags["count"]) >= int(stage.get("n", 1)):
 				return _advance(data, ch, q, st, stage, out)
 			out["msg"] = hint(q, ch)

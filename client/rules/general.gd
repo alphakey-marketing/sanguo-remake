@@ -6,10 +6,11 @@ extends RefCounted
 
 # ================= 將軍令 / 御賜金牌 =================
 # 物品名 → 將軍令對應嘅武將名 ("呂布將軍令" → "呂布")；唔係將軍令 = ""
-static func order_general_name(item_name: String, suffix: String) -> String:
+static func order_general_name(item_name: String, suffix: String, alias: Dictionary = {}) -> String:
 	if item_name.length() <= suffix.length() or not item_name.ends_with(suffix):
 		return ""
-	return item_name.substr(0, item_name.length() - suffix.length())
+	var n := item_name.substr(0, item_name.length() - suffix.length())
+	return String(alias.get(n, n))              # 字號 → 名 (孔明 → 諸葛亮)
 
 
 # 無視條件嘅憑證: "medal" (御賜金牌) / "order" (有該人才將軍令) / "" (冇)
