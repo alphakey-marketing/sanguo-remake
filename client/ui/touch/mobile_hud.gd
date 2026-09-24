@@ -97,6 +97,7 @@ func _panel(name_: String) -> GamePanel:
 			"more": p = MorePanel.new(main)
 			"map": p = MapPanel.new(main)
 			"craft": p = CraftPanel.new(main)
+			"recruit": p = RecruitPanel.new(main)
 			_: p = DialogPanel.new(main)
 		add_child(p)
 		panels[name_] = p
@@ -159,6 +160,8 @@ func visible_ids() -> Array:
 	ids.append_array(HudLayout.MENU)
 	ids.append("minimap")
 	ids.append("portrait")
+	if main != null and not main.comp.is_empty():
+		ids.append("companion")
 	return ids
 
 func _input(ev: InputEvent) -> void:
@@ -228,6 +231,7 @@ func _fire(id: String) -> void:
 		"menu_quest": open_panel("quest")
 		"menu_more": open_panel("more")
 		"minimap": open_panel("map")
+		"companion": open_panel("recruit")
 		_:
 			if id.begins_with("skill"):
 				var slots := skill_slots()
@@ -510,6 +514,7 @@ func _draw() -> void:
 		return
 	var sr := safe_rect()
 	_draw_status()
+	_draw_companion()
 	_draw_log(sr)
 	_draw_target(s)
 	_draw_info(sr)
@@ -556,6 +561,27 @@ func _draw_status() -> void:
 		_bar(o.x + 114, y + 1, 124, 8, rows[i][1], rows[i][2])
 	_txt(o + Vector2(6, 92), "金 %d" % int(ch.gold), Color(1, 0.9, 0.5), 11)
 
+# 同伴框 (Step 13.5): 頭像 + 名 + HP 條 + 忠誠/剩日/指令
+func _draw_companion() -> void:
+	var c: Dictionary = main.comp
+	if c.is_empty():
+		return
+	var r: Rect2 = layout["companion"]["rect"]
+	draw_rect(r, Color(0, 0, 0, 0.7 if _is_down("companion") else 0.55))
+	draw_rect(r, Color(0.5, 0.95, 0.6, 0.6), false, 1.0)
+	var pr := Rect2(r.position + Vector2(3, 3), Vector2(r.size.y - 6, r.size.y - 6))
+	var faces: Array = main.faces
+	if faces.size() > 0 and faces[int(c.face) % faces.size()] != null:
+		draw_texture_rect(faces[int(c.face) % faces.size()], pr, true)
+	else:
+		draw_rect(pr, Color(0.3, 0.6, 0.4))
+	var x := pr.end.x + 4
+	_txt(Vector2(x, r.position.y + 13), "%s Lv%d" % [c.name, int(c.lv)], Color(0.7, 1, 0.75), 11)
+	_bar(x, r.position.y + 17, r.end.x - x - 4, 6, float(c.hp) / maxi(1, int(c.maxHp)), Color(0.3, 0.8, 0.3))
+	_txt(Vector2(x, r.position.y + 34), "忠%d 剩%d日" % [int(c.loyalty), int(c.daysLeft)],
+		Color(1, 0.5, 0.45) if int(c.loyalty) < 40 else Color(0.95, 0.9, 0.75), 10)
+	_txt(Vector2(x, r.position.y + 44), str(RulesRecruit.ORDER_NAMES.get(str(c.order), "")), Color(0.8, 0.85, 1.0), 9)
+
 # 頂中目標框（揀咗怪先有）
 func _draw_target(s: Vector2) -> void:
 	var t = main.target_ent()
@@ -595,6 +621,10 @@ func _draw_info(_sr: Rect2) -> void:
 			var q := org + (Vector2(float(qn.x) - float(md.ox), float(qn.y) - float(md.oy)) + Vector2(0.5, 0.5)) * K
 			if dst.has_point(q):
 				draw_rect(Rect2(q - Vector2(1.5, 1.5), Vector2(3, 3)), Color(0.4, 0.75, 1.0))
+		for gn in main.generals:
+			var gq := org + (Vector2(float(gn.x) - float(md.ox), float(gn.y) - float(md.oy)) + Vector2(0.5, 0.5)) * K
+			if dst.has_point(gq):
+				draw_rect(Rect2(gq - Vector2(1.5, 1.5), Vector2(3, 3)), Color(1.0, 0.8, 0.3))
 		for f in main.facilities:
 			if String(f.kind) == "travel":
 				var tp := org + (Vector2(float(f.x) - float(md.ox), float(f.y) - float(md.oy)) + Vector2(0.5, 0.5)) * K

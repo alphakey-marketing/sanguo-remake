@@ -146,4 +146,35 @@ func _run() -> void:
 	hud.open_panel("char")
 	(hud.panels["char"] as CharPanel).set_tab(2)
 	await shot("char_work")
+	hud.close_panels()
+	# 登用 (Step 13.5): 皇城前武將 / 調查候選 / 問答 / 同伴框 + 同伴面板
+	ch["level"] = 5
+	ch["ideology"] = "義理"
+	m.sim.state["tick"] = 720 + 300 - 1                # 第 1 日巳時 (曹營全員喺度)
+	m.sim.step()
+	put(int(xc["ox"]) + 36, int(xc["oy"]) + 19)
+	await frames(10)
+	await shot("recruit_generals")
+	hud.open_panel("recruit")
+	m._send({"t": "recruit_survey", "kind": "wen"})
+	(hud.panels["recruit"] as GamePanel).refresh(true)
+	await shot("recruit_survey")
+	var cands: Array = m.sim.recruit_view()["cands"]
+	if not cands.is_empty():
+		m._send({"t": "recruit_pick", "gid": int(cands[0]["id"])})
+		(hud.panels["recruit"] as GamePanel).refresh(true)
+		await shot("recruit_quiz")
+		for i in 10:
+			var qv: Dictionary = m.sim.recruit_quiz_view()
+			if qv.is_empty():
+				break
+			for q in m.data.quiz_generals:
+				if String(q["q"]) == String(qv["q"]):
+					m._send({"t": "recruit_answer", "answer": int(q["a"])})
+					break
+	hud.close_panels()
+	await frames(10)
+	await shot("recruit_companion_hud")
+	hud.open_panel("recruit")
+	await shot("recruit_companion_panel")
 	get_tree().quit(0)

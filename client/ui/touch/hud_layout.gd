@@ -1,7 +1,7 @@
 class_name HudLayout
 extends RefCounted
 # 手機 HUD 版面（三國群英傳M 風格）: 純函數，畫同判定共用同一份，唔會再錯位。
-#   左上 = 角色框（撳 = 角色面板）；右上 = 選單列（背包/角色/記事/更多）+ 下面小地圖（撳 = 地圖面板）
+#   左上 = 角色框（撳 = 角色面板）+ 日誌右邊同伴框（有登用同伴先顯示，撳 = 登用面板）；右上 = 選單列（背包/角色/記事/更多）+ 下面小地圖（撳 = 地圖面板）
 #   左下 = 浮動搖桿區；右下 = 普攻大圓 + 技能扇形 4 格 + 切換目標 + 自動 + 互動掣
 # 座標 = viewport 虛擬 px（640x360 起跳，aspect=expand 會變闊）。safe = 瀏海/圓角安全區（虛擬 px）。
 # 每個元件: {"kind": "circle", "c": Vector2, "r": float} 或 {"kind": "rect", "rect": Rect2}
@@ -18,6 +18,7 @@ const MENU_LABELS := {"menu_bag": "背包", "menu_char": "角色", "menu_quest":
 const MENU_SZ := 48.0
 const MENU_GAP := 4.0
 const MINI_SZ := Vector2(112, 50)   # 小地圖 (spec 12 §6)
+const COMP_SZ := Vector2(120, 46)   # 同伴框 (Step 13.5)
 
 
 static func build(size: Vector2, safe: Rect2 = Rect2()) -> Dictionary:
@@ -30,6 +31,8 @@ static func build(size: Vector2, safe: Rect2 = Rect2()) -> Dictionary:
 	var out := {}
 	# 左上角色框（整塊撳得）
 	out["portrait"] = {"kind": "rect", "rect": Rect2(L + 6, T + 6, 244, 98)}
+	# 同伴框 (Step 13.5): 日誌右邊，搖桿區上面
+	out["companion"] = {"kind": "rect", "rect": Rect2(L + 312, T + 108, COMP_SZ.x, COMP_SZ.y)}
 	# 右上選單列（由右向左排）
 	for i in MENU.size():
 		var x := R - 6 - MENU_SZ * (i + 1) - MENU_GAP * i

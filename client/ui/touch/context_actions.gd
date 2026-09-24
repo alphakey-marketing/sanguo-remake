@@ -24,6 +24,11 @@ static func find(main: Node) -> Dictionary:
 		if d < bd:
 			bd = d
 			best = {"kind": "quest_npc", "label": "對話", "ref": qn}
+	for gn in main.generals:                  # Tier1 武將 (Step 13.5)
+		var d := _dist(me, int(gn.x), int(gn.y))
+		if d < bd:
+			bd = d
+			best = {"kind": "general", "label": "人才", "ref": gn}
 	var f := nearest_facility(main, me)
 	if not f.is_empty() and _dist(me, int(f.x), int(f.y)) < bd:
 		match String(f.kind):
@@ -35,6 +40,8 @@ static func find(main: Node) -> Dictionary:
 		return best
 	if not main.sim.is_safe(int(me.x), int(me.y)) and has_work_tool(main):
 		return {"kind": "work", "label": "工作"}
+	if String(main.cur_map.get("kind", "")) == "city":      # 城池街道【原】: 調查 (登用, Step 13.5)
+		return {"kind": "survey", "label": "調查"}
 	return {}
 
 
@@ -94,6 +101,11 @@ static func run(main: Node, act: Dictionary) -> void:
 			main._send({"t": "travel", "point": String(act.ref.point)})
 		"work":
 			hud.open_dialog(func() -> Dictionary: return work_dialog(main))
+		"general":
+			var gid := int(act.ref.id)
+			hud.open_dialog(func() -> Dictionary: return general_dialog(main, gid))
+		"survey":
+			hud.open_panel("recruit")
 
 
 static func _leave(main: Node) -> Dictionary:
@@ -135,6 +147,19 @@ static func work_dialog(main: Node) -> Dictionary:
 	opts.append(_leave(main))
 	var text := "\n".join(lines) if not lines.is_empty() else "未裝工具：撳「裝…」裝備背包入面嘅工具。"
 	return {"title": "工作", "text": text + "\nSP %d（每次扣 10%% 最大 SP）" % int(ch.get("sp", 0)), "options": opts}
+
+
+# Tier1 武將 (Step 13.5): 簡介 + 傾偈 / 登用 (開登用面板調查)
+static func general_dialog(main: Node, gid: int) -> Dictionary:
+	var g: Dictionary = main.data.general_by_id.get(gid, {})
+	if g.is_empty():
+		return {}
+	var idle: Array = g.get("idle", [])
+	var text := "戰等 %d　%s%s　理念「%s」\n「%s」\n想登用：喺城入面用「調查」（每日 1 次）。" % [int(g["lv"]),
+		RulesRecruit.type_name(String(g["type"])), g["sub"], g["ideo"], str(idle[0]) if not idle.is_empty() else "……"]
+	return {"title": str(g["name"]), "text": text, "options": [
+		{"label": "傾偈", "cb": func() -> void: main._send({"t": "general_talk", "gid": gid})},
+		{"label": "登用…", "cb": func() -> void: main.hud.open_panel("recruit")}, _leave(main)]}
 
 
 static func inn_dialog(main: Node) -> Dictionary:
