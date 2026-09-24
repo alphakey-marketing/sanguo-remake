@@ -43,8 +43,11 @@ func cmd_general_talk(id: int, gid: int) -> void:
 		return _msg(id, "呢度搵唔到%s" % g["name"])
 	if not _near(e, int(g["x"]), int(g["y"])):
 		return _msg(id, "要行近%s先得" % g["name"])
+	_office_on_talk(e, "g:%d" % gid, int(g["x"]), int(g["y"]))
 	var pool: Array = g.get("idle", [])
 	var text := String(pool[rng.below(pool.size())]) if not pool.is_empty() else "……"
+	if not _sip_thirst(e):          # 口渴 (Step 14): 只講模板客套話
+		text = THIRSTY_LINE
 	_emit({"k": "npc_say", "id": 0, "name": String(g["name"]), "text": text, "action": "greet",
 		"x": int(g["x"]), "y": int(g["y"]), "general": gid})
 	_msg(id, "%s（戰等 %d・%s%s・理念 %s）" % [g["name"], int(g["lv"]), RulesRecruit.type_name(String(g["type"])),

@@ -18,6 +18,29 @@ func cmd_rest(id: int) -> void:
 	_msg(id, "休息完畢，花 %d 金" % cost)
 
 
+# 客棧喝茶【原】: 回飲水度 50 + 回 MP (Step 14, spec 01 §9)
+func cmd_tea(id: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	if _inn_near(e).is_empty():
+		return _msg(id, "要喺客棧先有茶飲")
+	var cfg: Dictionary = data.world["thirst"]
+	var ch: Dictionary = e["ch"]
+	var cost := int(cfg["teaCost"])
+	if int(ch["gold"]) < cost:
+		return _msg(id, "飲茶要 %d 金" % cost)
+	ch["gold"] = int(ch["gold"]) - cost
+	var before := thirst_of(ch)
+	ch["thirst"] = RulesTitle.drink(before, cfg)
+	var mmp := _eff_max_mp(ch)
+	var mp := mini(mmp, int(ch["mp"]) + int(round(mmp * float(cfg["teaMp"]))))
+	var gained := mp - int(ch["mp"])
+	ch["mp"] = mp
+	_sync_stats(e)
+	_msg(id, "飲咗杯茶（%d 金）：飲水度 +%d，MP +%d" % [cost, int(ch["thirst"]) - before, maxi(0, gained)])
+
+
 func _inn_near(e: Dictionary) -> Dictionary:
 	for x in data.inns:
 		if _near(e, int(x["x"]), int(x["y"])):
@@ -93,6 +116,8 @@ func cmd_use_item(id: int, item: int) -> void:
 	var e := ent(id)
 	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
 		return
+	if item == int(data.office["pillItem"]):
+		return _use_ap_pill(e, item)
 	var heal: Dictionary = data.heals.get(item, {})
 	if heal.is_empty():
 		return _msg(id, "呢件唔可以食用")
@@ -289,12 +314,25 @@ func _tiandi_haul(id: int, ch: Dictionary) -> void:
 
 # ================= 捐贈官令 + 行動力 (Step 13, spec 05 §7 / spec 08 §1) =================
 
-func ap_max(_ch: Dictionary) -> int:
-	return int(data.world["ap"]["max"])          # Step 14 頭銜再加上限
+# 行動力上限【原】= 頭銜表 ap 欄 (Step 14)；白身 = world.ap.max
+func ap_max(ch: Dictionary) -> int:
+	return RulesTitle.ap_max(data.titles, int(ch.get("titleRank", 0)), int(data.world["ap"]["max"]))
 
 
 func ap_of(ch: Dictionary) -> int:
 	return int(ch.get("ap", ap_max(ch)))
+
+
+# 行動丹【原=回滿行動力】(Step 14)
+func _use_ap_pill(e: Dictionary, item: int) -> void:
+	var id := int(e["id"])
+	var ch: Dictionary = e["ch"]
+	if ap_of(ch) >= ap_max(ch):
+		return _msg(id, "行動力已經滿")
+	if not RulesShop.remove_item(ch["bag"], item, 1):
+		return _msg(id, "背包冇呢件")
+	ch["ap"] = ap_max(ch)
+	_msg(id, "食咗行動丹，行動力回滿 (%d)" % int(ch["ap"]))
 
 
 func _near_donation(e: Dictionary) -> bool:

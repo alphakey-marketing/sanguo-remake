@@ -217,6 +217,12 @@ func _run() -> void:
 		press(dp, "休息")
 		await frames(1)
 		check(int(ch["gold"]) == g1 - int(m.inn_cost), "休息應該扣住宿費")
+		ch["thirst"] = 10                           # 喝茶 (Step 14)
+		dp.refresh(true)
+		await frames(1)
+		press(dp, "喝茶")
+		await frames(1)
+		check(int(ch["thirst"]) == 60, "喝茶: 飲水度 +50 (%d)" % int(ch["thirst"]))
 	hud.close_panels()
 	# 7. 觸控路徑: 放手先發 / 滑走取消
 	touch(center("menu_quest"), true)
@@ -313,22 +319,44 @@ func _run() -> void:
 		var w2 := int(ch["equip"]["weapon"])
 		check(int(ch["equip"]["dur"][str(w2)]) == int(m.data.weapons[w2]["max_dur"]), "修理頁: 自己修理應該回滿耐久")
 	hud.close_panels()
-	# 13. 朝廷捐獻處 (Step 13): 互動掣 → 捐獻對話框 → 捐 3000 金 → 名聲 +3、扣行動力
+	# 13. 許昌官宅 (Step 13/14): 互動掣 → 官宅對話框 →「捐獻…」→ 捐 3000 金 → 名聲 +3、扣行動力
 	var df: Dictionary = m.data.facilities["donate_xc"]
 	put(int(df["x"]), int(df["y"]) + 1)
 	check(await until(func() -> bool: return String(hud.ctx.get("kind", "")) == "fac" and String(hud.ctx.get("ref", {}).get("fac", "")) == "donate_xc"),
-		"近捐獻處互動掣應該係捐獻處 (%s)" % hud.ctx)
+		"近官宅互動掣應該係官宅 (%s)" % hud.ctx)
 	await click(center("context"))
 	var dp2: GamePanel = hud.panels.get("dialog")
-	check(dp2 != null and dp2.visible, "捐獻處應該開對話框")
+	check(dp2 != null and dp2.visible, "官宅應該開對話框")
 	if dp2 != null:
 		ch["gold"] = 10000
 		var fame0 := int(ch.get("fame", 0))
 		dp2.refresh(true)
 		await frames(1)
+		check(press(dp2, "捐獻"), "官宅有「捐獻…」掣")
+		await frames(1)
+		dp2.refresh(true)
 		press(dp2, "捐 3000 金")
 		await frames(1)
 		check(int(ch["gold"]) == 7000 and int(ch.get("fame", 0)) == fame0 + 3 and int(ch["ap"]) == 90, "撳捐 3000 金: 扣錢 + 名聲 +3 + 扣行動力")
+	hud.close_panels()
+	# 13b. 官宅 (Step 14): 討取頭銜 → 官令… → 接黃巾軍備動員
+	await click(center("context"))
+	if dp2 != null:
+		ch["fame"] = 1200
+		dp2.refresh(true)
+		await frames(1)
+		check(press(dp2, "討取「裨將軍」"), "名聲 1200: 官宅有「討取「裨將軍」」掣")
+		await frames(1)
+		check(int(ch.get("titleRank", 0)) == 2 and int(ch["gold"]) == 6000, "撳討取: 裨將軍 + 扣 1000 資金")
+		dp2.refresh(true)
+		press(dp2, "官令")
+		await frames(1)
+		dp2.refresh(true)
+		press(dp2, "黃巾軍備動員")
+		await frames(1)
+		check(String(ch.get("office", {}).get("order", {}).get("id", "")) == "arms" and int(ch["ap"]) == 80, "撳官令: 接咗軍備動員、扣行動力 10")
+		dp2.refresh(true)
+		check(find_btn(dp2, "覆命") != null, "接咗官令: 官宅對話框有「覆命」掣")
 	hud.close_panels()
 	# 14. 背包「腳伕」頁 (Step 13): 訂閱後勾存採礦 + 自動買工具
 	ch["storageSub"] = true

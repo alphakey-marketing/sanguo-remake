@@ -244,7 +244,7 @@ func _build_detail(p: Control, ch: Dictionary) -> void:
 			p.add_child(ba)
 		if not lv_ok:
 			p.add_child(lbl("等級唔夠", 13, UiTheme.BAD))
-	if d.heals.has(id):
+	if d.heals.has(id) or id == int(d.office["pillItem"]):      # 行動丹 = 回滿行動力 (Step 14)
 		p.add_child(btn("使用", func() -> void: main._send({"t": "use_item", "item": id})))
 	if d.spell_by_item.has(id):
 		var h := HBoxContainer.new()

@@ -1,6 +1,6 @@
 extends RefCounted
 # Sim 繼承鏈 第 1 層: 核心狀態 / 讀取 / 共用 helper / 生成單位
-# 鏈: sim_core -> sim_quest -> sim_char -> sim_econ -> sim_combat -> sim_skill -> sim_ai -> sim_recruit -> sim (class_name Sim)
+# 鏈: sim_core -> sim_quest -> sim_char -> sim_econ -> sim_combat -> sim_skill -> sim_ai -> sim_recruit -> sim_office -> sim (class_name Sim)
 # 規矩: 每層只可以叫自己或者下層嘅 func (上層 func 下層睇唔到)
 
 signal event_emitted(ev: Dictionary)
@@ -427,6 +427,11 @@ func _spawn_actor(ename: String, kind: String, class_id: String = "yishi") -> Di
 	e["ch"]["tiandi"] = {"deposit": [], "buyTool": false, "sellTool": false}   # 天地商行自動化設定 (Step 13)
 	e["ch"]["ap"] = int(data.world["ap"]["max"])   # 行動力 (Step 13)，子時回滿
 	e["ch"]["chaExp"] = 0                       # 魅力經驗 (捐獻, Step 13)
+	e["ch"]["titleRank"] = 0                    # 頭銜階 0 = 白身 (Step 14, data/titles.json)
+	e["ch"]["thirst"] = int(data.world["thirst"]["max"])   # 飲水度 (Step 14, spec 01 §9)
+	e["ch"]["office"] = {}                      # 官令 {orderDay, order:{id, from, to?, met:[]}} (Step 14)
+	e["ch"]["contrib"] = 0                      # 官宅貢獻 (官令攞，換行動丹)
+	e["ch"]["polExp"] = 0                       # 政治經驗 (官令)
 	e["ch"]["equip"]["spellbooks"] = [0, 0, 0]   # 術法快捷列 3 格 (Step 9, spec 02 §3.1)
 	e["ch"]["equip"]["jewels"] = [0, 0]         # 寶石欄 2 格 (Step 10, spec 02 §4)
 	e["ch"]["ultimates"] = []                   # 已學絕招 (spec 02 §5)
@@ -494,6 +499,11 @@ func _witness_nearby(actor_e: Dictionary, actor_id: int, kind: String, weight: i
 			continue
 		if RulesCombat.in_range(actor_e["x"], actor_e["y"], w["x"], w["y"], WITNESS_RANGE):
 			NpcMemory.witness(w["mem"], actor_id, kind, tick, weight)
+
+
+# 同 NPC 傾偈 hook (官令戶口普查, Step 14)：sim_office 覆寫。key = "q:<npc>" / "g:<gid>"
+func _office_on_talk(_e: Dictionary, _key: String, _x: int, _y: int) -> void:
+	pass
 
 
 func _near(e: Dictionary, x: int, y: int) -> bool:

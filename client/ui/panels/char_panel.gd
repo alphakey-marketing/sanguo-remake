@@ -23,7 +23,8 @@ func open() -> void:
 func sig() -> String:
 	var ch: Dictionary = main.ch
 	return JSON.stringify([tab, sel_slot, ch.get("equip", {}), ch.get("workLv", {}), ch.get("tools", {}), pending, ch.get("attrs", {}), ch.get("attrPoints", 0), ch.get("level", 1), ch.get("hp", 0),
-		ch.get("mp", 0), ch.get("sp", 0), ch.get("gold", 0), ch.get("karma", 0), ch.get("lilian", 0), ch.get("title", ""), ch.get("fame", 0), ch.get("ap", 0), ch.get("chaExp", 0)])
+		ch.get("mp", 0), ch.get("sp", 0), ch.get("gold", 0), ch.get("karma", 0), ch.get("lilian", 0), ch.get("title", ""), ch.get("fame", 0), ch.get("ap", 0), ch.get("chaExp", 0),
+		ch.get("titleRank", 0), ch.get("thirst", 0), ch.get("contrib", 0), ch.get("polExp", 0)])
 
 
 func _left() -> int:
@@ -111,7 +112,10 @@ func _build_body() -> void:
 		"SP %d/%d" % [int(ch["sp"]), RulesStats.max_sp(lv, attrs)],
 		"經驗 %d/%d" % [int(ch.get("exp", 0)), RulesStats.exp_to_next(lv)],
 		"歷練 %d/100" % int(ch.get("lilian", 0)),
+		"頭銜 %s（第 %d 階）" % [RulesTitle.name_of(main.data.titles, int(ch.get("titleRank", 0))), int(ch.get("titleRank", 0))],
 		"名聲 %d　行動力 %d/%d" % [int(ch.get("fame", 0)), main.sim.ap_of(ch), main.sim.ap_max(ch)],
+		"飲水度 %d/%d　官宅貢獻 %d" % [main.sim.thirst_of(ch), int(main.data.world["thirst"]["max"]), int(ch.get("contrib", 0))],
+		"政治經驗 %d/%d（官令）" % [int(ch.get("polExp", 0)), int(main.data.office["polExpPerPoint"])],
 		"魅力經驗 %d/%d（捐獻）" % [int(ch.get("chaExp", 0)), int(main.data.donation["chaExpPerPoint"])],
 		"金 %d" % int(ch.get("gold", 0)),
 		"武器 %s" % (item_name(int(ch.get("equip", {}).get("weapon", 0))) if int(ch.get("equip", {}).get("weapon", 0)) > 0 else "（冇）"),

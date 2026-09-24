@@ -32,9 +32,9 @@ static func level_ok(gen_lv: int, player_lv: int, gap: int) -> bool:
 	return gen_lv <= player_lv + gap
 
 
-# 頭銜【原】: 50 級以上人才，玩家頭銜唔可以低過人才 5 階以上。頭銜系統 = Step 14 → 而家 stub 永遠過
-static func title_ok(_g: Dictionary, _ch: Dictionary, _cfg: Dictionary) -> bool:
-	return true
+# 頭銜【原】: 50 級以上人才，玩家頭銜唔可以低過人才 5 階以上 (Step 14；人才頭銜 = RulesTitle.general_rank)
+static func title_ok(g: Dictionary, ch: Dictionary, cfg: Dictionary) -> bool:
+	return RulesTitle.recruit_ok(int(g["lv"]), int(ch.get("titleRank", 0)), cfg)
 
 
 # 可唔可以登用呢個人 → "" = 得；否則 = 原因

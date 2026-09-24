@@ -17,8 +17,10 @@
   "storageFee": 200,
   "_noteTiandi": "天地商行自動化 (Step 13, spec 05 §3)【原=功能；自訂=數值】: 冇負重系統，改用「背包工作材料件數」> bagMatCap 當負重滿 → 勾咗嘅技能材料自動入倉 (倉庫總件數上限 storageCap)，其餘/入唔落 → 市集價賣。toolSellAt = 耐久剩幾多自動賣【原=2】；工具轉賣價 = 原價 × 耐久%/2。restCost = 工作區小屋休息 (客棧價 ×2)",
   "tiandi": { "bagMatCap": 100, "storageCap": 1000, "toolSellAt": 2, "restCost": 10 },
-  "_noteAp": "行動力 (Step 13)【原=捐獻扣行動力、頭銜提高上限；自訂=上限 100、每日子時回滿】；Step 14 頭銜再加上限",
+  "_noteAp": "行動力 (Step 13/14)【原=捐獻/官令扣行動力；上限 = 頭銜表 ap 欄 (冇頭銜 = max)；自訂=每日子時回滿】",
   "ap": { "max": 100 },
+  "_noteThirst": "飲水度 (Step 14, spec 01 §9)【原=聊天扣、客棧喝茶回 50 + 回 MP；自訂=單機改同 NPC 搭話扣 chat、茶錢 teaCost、回 MP teaMp 比例】；0 = 口渴，NPC 只講模板句",
+  "thirst": { "max": 100, "chat": 1, "tea": 50, "teaCost": 5, "teaMp": 0.3 },
   "cities": [
     {
       "id": "xuchang",
