@@ -388,8 +388,39 @@ func cmd_chat(id: int, text: String) -> void:
 	if e.is_empty() or text == "":
 		return
 	_emit({"k": "chat", "id": id, "name": e["name"], "text": text, "x": e["x"], "y": e["y"]})
+	if _has_listener(e):
+		_sip_thirst(e)          # 同居民搭話扣飲水度 (Step 14)
 	_witness_nearby(e, id, "greet", BotSys.W_GREET)
 	_npc_react(e, id)
+
+
+# ================= 飲水度 (Step 14, spec 01 §9)【原=聊天扣；單機 = 同 NPC 搭話扣】=================
+const THIRSTY_LINE := "（你口乾到講唔到幾句，對方都係客套兩句——去客棧飲杯茶先啦）"
+
+
+func thirst_of(ch: Dictionary) -> int:
+	return int(ch.get("thirst", int(data.world["thirst"]["max"])))
+
+
+# 搭話扣飲水度 → true = 傾得 (LLM 模式)；false = 口渴 (0，只講模板)。只計玩家
+func _sip_thirst(e: Dictionary) -> bool:
+	if String(e.get("kind", "")) != "player":
+		return true
+	var ch: Dictionary = e["ch"]
+	var t := thirst_of(ch)
+	if t <= 0:
+		_msg(int(e["id"]), "口渴：飲水度 0，去客棧喝茶先")
+		return false
+	ch["thirst"] = RulesTitle.sip(t, data.world["thirst"])
+	return true
+
+
+# 附近有冇居民聽到 (有記憶表嘅 NPC)
+func _has_listener(e: Dictionary) -> bool:
+	for w in ents.values():
+		if int(w["id"]) != int(e["id"]) and w.has("mem") and RulesCombat.in_range(e["x"], e["y"], w["x"], w["y"], WITNESS_RANGE):
+			return true
+	return false
 
 
 # 居民對打招呼嘅反應 (Step 5.4): brain 淨係揀白名單動作 + 生成話語，數值(好感)已經由

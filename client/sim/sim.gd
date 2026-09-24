@@ -1,5 +1,5 @@
 class_name Sim
-extends "res://sim/sim_recruit.gd"
+extends "res://sim/sim_office.gd"
 # 單機世界模擬: 格子地圖 + 單位 + 即時戰鬥 + 怪物 AI + 設施。
 # - state 全部係純資料 (Dictionary/Array/int/String)，可直接存檔；RNG 由種子驅動 → 可重現
 # - UI 只透過 cmd_* 發意圖、透過 event_emitted 收事件、透過 view_ents()/player_ch() 讀狀態
@@ -41,6 +41,7 @@ func _daily_hook(day: int) -> void:
 	_market_daily(season)
 	_storage_daily()
 	_ap_daily()
+	_salary_daily(day)           # 每月初一俸祿 (Step 14)
 	_recruit_daily(day)          # 同伴到期/忠誠低離開 (Step 13.5)
 	_emit({"k": "day", "day": day, "season": season})
 	for d in changed:

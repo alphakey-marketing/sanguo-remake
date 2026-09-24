@@ -149,7 +149,10 @@ func t_level(data: GameData) -> void:
 	check(RulesRecruit.check(g, {"level": 20, "ideology": "義理"}, cfg) == "", "check: 出仕 + 20 級登 30 級 OK")
 	check(RulesRecruit.check(g, {"level": 19, "ideology": "義理"}, cfg) == "等級差太遠", "check: 19 級登 30 級 = 等級差太遠")
 	check(RulesRecruit.check({"ideo": "權謀", "lv": 1}, {"level": 50, "ideology": "義理"}, cfg) == "理念唔合", "check: 義理登權謀 = 理念唔合")
-	check(RulesRecruit.title_ok({"lv": 90}, {"level": 1}, cfg), "頭銜: Step 14 前 stub 永遠過")
+	check(RulesRecruit.title_ok({"lv": 50}, {"level": 1}, cfg), "頭銜: 50 級人才白身都得")
+	check(not RulesRecruit.title_ok({"lv": 90}, {"level": 90}, cfg), "頭銜: 90 級人才 (40 階) 白身唔得 (Step 14)")
+	check(RulesRecruit.title_ok({"lv": 90}, {"level": 90, "titleRank": 35}, cfg), "頭銜: 90 級人才 35 階得 (差 5)")
+	check(RulesRecruit.check({"ideo": "出仕", "lv": 90}, {"level": 90, "ideology": "義理", "titleRank": 34}, cfg) == "頭銜唔夠", "check: 差 6 階 = 頭銜唔夠")
 
 
 func t_tier1_window(data: GameData) -> void:

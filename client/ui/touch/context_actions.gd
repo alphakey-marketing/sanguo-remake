@@ -166,8 +166,14 @@ static func inn_dialog(main: Node) -> Dictionary:
 	var ch: Dictionary = main.ch
 	var cost := int(main.inn_cost)
 	var gold := int(ch.get("gold", 0))
-	return {"title": "客棧", "text": "住宿 %d 金：回滿 HP / MP / SP。\n你而家有 %d 金。" % [cost, gold],
-		"options": [{"label": "休息 (%d 金)" % cost, "cb": func() -> void: main._send({"t": "rest"}), "disabled": gold < cost}, _leave(main)]}
+	var th: Dictionary = main.data.world["thirst"]
+	var tea := int(th["teaCost"])
+	var thirst: int = main.sim.thirst_of(ch)
+	return {"title": "客棧", "text": "住宿 %d 金：回滿 HP / MP / SP。\n喝茶 %d 金：飲水度 +%d、回 MP。\n你而家有 %d 金，飲水度 %d/%d。" % [cost,
+			tea, int(th["tea"]), gold, thirst, int(th["max"])],
+		"options": [{"label": "休息 (%d 金)" % cost, "cb": func() -> void: main._send({"t": "rest"}), "disabled": gold < cost},
+			{"label": "喝茶 (%d 金)" % tea, "cb": func() -> void: main._send({"t": "tea"}), "disabled": gold < tea or thirst >= int(th["max"])},
+			_leave(main)]}
 
 
 static func fac_dialog(main: Node, f: Dictionary) -> Dictionary:
@@ -176,6 +182,8 @@ static func fac_dialog(main: Node, f: Dictionary) -> Dictionary:
 	var def: Dictionary = main.data.facilities[key]
 	if key == "forge":
 		return forge_dialog(main, def)
+	if bool(def.get("office", false)):
+		return office_dialog(main, def)
 	if bool(def.get("donation", false)):
 		return donate_dialog(main, def)
 	var text := str(def.get("desc", ""))
@@ -187,6 +195,60 @@ static func fac_dialog(main: Node, f: Dictionary) -> Dictionary:
 	text += "\n金 %d" % int(ch.get("gold", 0))
 	return {"title": str(def["name"]), "text": text,
 		"options": [{"label": "使用", "cb": func() -> void: main._send({"t": "facility", "key": key})}, _leave(main)]}
+
+
+# 官宅 (Step 14): 討取頭銜 / 官令 (接/覆命/放棄) / 捐獻 / 貢獻換行動丹
+static func office_dialog(main: Node, def: Dictionary) -> Dictionary:
+	var ch: Dictionary = main.ch
+	var tt: Array = main.data.titles
+	var cur := int(ch.get("titleRank", 0))
+	var fame := int(ch.get("fame", 0))
+	var gold := int(ch.get("gold", 0))
+	var off: Dictionary = main.data.office
+	var lines: Array = [
+		"頭銜 %s（第 %d 階）　名聲 %d　金 %d" % [RulesTitle.name_of(tt, cur), cur, fame, gold],
+		"行動力 %d/%d　官宅貢獻 %d　月俸 %d" % [main.sim.ap_of(ch), main.sim.ap_max(ch), int(ch.get("contrib", 0)), RulesTitle.salary(tt, cur)]]
+	var opts: Array = []
+	# 討取: 名聲夠嘅最高階；未夠就顯示下一階要幾多
+	var best := RulesTitle.fame_rank(tt, fame)
+	if best > cur:
+		var t := RulesTitle.def_of(tt, best)
+		var rk := best
+		opts.append({"label": "討取「%s」(%d 金)" % [t["name"], int(t["gold"])], "cb": func() -> void: main._send({"t": "claim_title", "rank": rk}),
+			"disabled": gold < int(t["gold"])})
+	elif cur < tt.size():
+		var nx := RulesTitle.def_of(tt, cur + 1)
+		lines.append("下一階「%s」要名聲 %d、資金 %d" % [nx["name"], int(nx["fame"]), int(nx["gold"])])
+	var od: Dictionary = ch.get("office", {}).get("order", {})
+	if od.is_empty():
+		opts.append({"label": "官令…", "cb": func() -> void: main.hud.open_dialog(func() -> Dictionary: return order_dialog(main, def))})
+	else:
+		var o: Dictionary = main.sim.order_def(str(od["id"]))
+		lines.append("官令「%s」：%s" % [o.get("name", "?"), main.sim.order_text(ch)])
+		opts.append({"label": "覆命", "cb": func() -> void: main._send({"t": "office_turnin"})})
+		opts.append({"label": "放棄官令", "cb": func() -> void: main._send({"t": "office_abandon"})})
+	opts.append({"label": "捐獻…", "cb": func() -> void: main.hud.open_dialog(func() -> Dictionary: return donate_dialog(main, def))})
+	opts.append({"label": "換行動丹 (%d 貢獻)" % int(off["pillCost"]), "cb": func() -> void: main._send({"t": "office_pill"}),
+		"disabled": int(ch.get("contrib", 0)) < int(off["pillCost"])})
+	opts.append(_leave(main))
+	return {"title": str(def.get("name", "官宅")), "text": "\n".join(lines), "options": opts}
+
+
+# 官令清單 (每日 1 次、扣行動力 10)：未解鎖/今日接過 = 灰
+static func order_dialog(main: Node, def: Dictionary) -> Dictionary:
+	var ch: Dictionary = main.ch
+	var lines: Array = ["官令每日接 1 次，每次扣行動力 %d。" % int(main.data.office["apCost"])]
+	var opts: Array = []
+	for o in main.data.office["orders"]:
+		var oid := str(o["id"])
+		var why: String = main.sim.order_block(ch, oid)
+		lines.append("・%s（%s 起）名聲 +%d%s" % [o["name"], o["rankName"], int(o["fame"]), "" if why == "" else "　— " + why])
+		var take := func() -> void:
+			main._send({"t": "office_order", "order": oid})
+			main.hud.open_dialog(func() -> Dictionary: return office_dialog(main, def))
+		opts.append({"label": str(o["name"]), "cb": take, "disabled": why != ""})
+	opts.append({"label": "返回", "cb": func() -> void: main.hud.open_dialog(func() -> Dictionary: return office_dialog(main, def))})
+	return {"title": "官令", "text": "\n".join(lines), "options": opts}
 
 
 # 捐贈官令 (Step 13): 捐金錢 3 檔 / 捐晒背包物資

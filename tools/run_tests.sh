@@ -23,6 +23,7 @@ run equip --script tests/run_equip.gd
 run craft --script tests/run_craft.gd
 run tiandi --script tests/run_tiandi.gd
 run recruit --script tests/run_recruit.gd
+run title --script tests/run_title.gd
 run market --script tools/market_sim.gd
 run hud --script tests/run_hud.gd
 run autotest -- --autotest
@@ -43,6 +44,11 @@ echo "$out"
 out=$(PYTHONIOENCODING=utf-8 python tools/gen_generals.py --check 2>&1); code=$?
 echo "$out"
 [ $code = 0 ] || { echo "!! generals exit $code"; rc=1; }
+
+# 頭銜表核對 (titles.json 要同攻略 sy2_8_4 一致)
+out=$(PYTHONIOENCODING=utf-8 python tools/gen_titles.py --check 2>&1); code=$?
+echo "$out"
+[ $code = 0 ] || { echo "!! titles exit $code"; rc=1; }
 
 [ $rc = 0 ] && echo "ALL OK" || echo "SOME FAILED"
 exit $rc

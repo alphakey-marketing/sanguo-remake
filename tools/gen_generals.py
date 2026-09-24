@@ -42,7 +42,7 @@ GUIDE_LV = {"蔡邕": 6, "王允": 7, "劉琦": 8, "陳珪": 8, "蔣幹": 9, "�
 CFG = {
     "serveDays": 30,            # 【原】登用 30 game 日，到期子時 0 刻離開
     "levelGap": 10,             # 【原】唔可以登用比自己高 10 級以上
-    "titleGap": 5,              # 【原】50 級以上人才: 頭銜差 ≤5 階 (Step 14 接，而家 stub)
+    "titleGap": 5,              # 【原】50 級以上人才: 頭銜差 ≤5 階 (Step 14；人才頭銜【自訂】= 戰等 - titleMinLv)
     "titleMinLv": 50,
     "surveyMax": 5,             # 調查一次顯示幾多個候選
     "poolBelow": 10,            # 登用池 (非 Tier1) 只列戰等 ≥ 玩家 -10 嘅人 (spec 09 §3.2 ±10 檔)

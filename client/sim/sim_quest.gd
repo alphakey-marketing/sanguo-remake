@@ -65,6 +65,7 @@ func cmd_quest_talk(id: int, npc_id: String) -> void:
 	if not bool(state["quest_npcs"].get(npc_id, {}).get("visible", false)):
 		return _msg(id, "呢度搵唔到%s" % npc["name"])
 	var ch: Dictionary = e["ch"]
+	_office_on_talk(e, "q:" + npc_id, int(npc["x"]), int(npc["y"]))
 	# 服務 NPC（密醫免費醫療）
 	var sv: Dictionary = npc.get("service", {})
 	if not sv.is_empty():

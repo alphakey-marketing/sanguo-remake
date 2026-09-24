@@ -5555,5 +5555,296 @@
     ]
    ]
   }
+ },
+ {
+  "fn": "titleApMax",
+  "args": [
+   0,
+   100
+  ],
+  "expect": 100
+ },
+ {
+  "fn": "titleApMax",
+  "args": [
+   1,
+   100
+  ],
+  "expect": 102
+ },
+ {
+  "fn": "titleApMax",
+  "args": [
+   30,
+   100
+  ],
+  "expect": 160
+ },
+ {
+  "fn": "titleApMax",
+  "args": [
+   60,
+   100
+  ],
+  "expect": 220
+ },
+ {
+  "fn": "titleApMax",
+  "args": [
+   61,
+   100
+  ],
+  "expect": 100
+ },
+ {
+  "fn": "titleSalary",
+  "args": [
+   0
+  ],
+  "expect": 0
+ },
+ {
+  "fn": "titleSalary",
+  "args": [
+   5
+  ],
+  "expect": 0
+ },
+ {
+  "fn": "titleSalary",
+  "args": [
+   6
+  ],
+  "expect": 600
+ },
+ {
+  "fn": "titleSalary",
+  "args": [
+   41
+  ],
+  "expect": 4100
+ },
+ {
+  "fn": "titleSalary",
+  "args": [
+   60
+  ],
+  "expect": 6000
+ },
+ {
+  "fn": "titleFameRank",
+  "args": [
+   0
+  ],
+  "expect": 0
+ },
+ {
+  "fn": "titleFameRank",
+  "args": [
+   500
+  ],
+  "expect": 1
+ },
+ {
+  "fn": "titleFameRank",
+  "args": [
+   12000
+  ],
+  "expect": 20
+ },
+ {
+  "fn": "titleFameRank",
+  "args": [
+   43699
+  ],
+  "expect": 48
+ },
+ {
+  "fn": "titleFameRank",
+  "args": [
+   60000
+  ],
+  "expect": 60
+ },
+ {
+  "fn": "titleClaimCheck",
+  "args": [
+   1,
+   0,
+   500,
+   500
+  ],
+  "expect": ""
+ },
+ {
+  "fn": "titleClaimCheck",
+  "args": [
+   20,
+   5,
+   12000,
+   11999
+  ],
+  "expect": "資金不足 (要 12000 金)"
+ },
+ {
+  "fn": "titleClaimCheck",
+  "args": [
+   20,
+   5,
+   11999,
+   99999
+  ],
+  "expect": "名聲不足 (要 12000)"
+ },
+ {
+  "fn": "titleClaimCheck",
+  "args": [
+   5,
+   5,
+   99999,
+   99999
+  ],
+  "expect": "你已經係西中郎將"
+ },
+ {
+  "fn": "titleMonthStart",
+  "args": [
+   0,
+   30
+  ],
+  "expect": false
+ },
+ {
+  "fn": "titleMonthStart",
+  "args": [
+   30,
+   30
+  ],
+  "expect": true
+ },
+ {
+  "fn": "titleMonthStart",
+  "args": [
+   45,
+   30
+  ],
+  "expect": false
+ },
+ {
+  "fn": "titleGeneralRank",
+  "args": [
+   30,
+   {
+    "titleMinLv": 50,
+    "titleGap": 5
+   }
+  ],
+  "expect": 0
+ },
+ {
+  "fn": "titleGeneralRank",
+  "args": [
+   75,
+   {
+    "titleMinLv": 50,
+    "titleGap": 5
+   }
+  ],
+  "expect": 25
+ },
+ {
+  "fn": "titleGeneralRank",
+  "args": [
+   130,
+   {
+    "titleMinLv": 50,
+    "titleGap": 5
+   }
+  ],
+  "expect": 60
+ },
+ {
+  "fn": "titleRecruitOk",
+  "args": [
+   49,
+   0,
+   {
+    "titleMinLv": 50,
+    "titleGap": 5
+   }
+  ],
+  "expect": true
+ },
+ {
+  "fn": "titleRecruitOk",
+  "args": [
+   80,
+   24,
+   {
+    "titleMinLv": 50,
+    "titleGap": 5
+   }
+  ],
+  "expect": false
+ },
+ {
+  "fn": "titleRecruitOk",
+  "args": [
+   80,
+   25,
+   {
+    "titleMinLv": 50,
+    "titleGap": 5
+   }
+  ],
+  "expect": true
+ },
+ {
+  "fn": "titleDrink",
+  "args": [
+   0,
+   {
+    "max": 100,
+    "chat": 1,
+    "tea": 50
+   }
+  ],
+  "expect": 50
+ },
+ {
+  "fn": "titleDrink",
+  "args": [
+   80,
+   {
+    "max": 100,
+    "chat": 1,
+    "tea": 50
+   }
+  ],
+  "expect": 100
+ },
+ {
+  "fn": "titleSip",
+  "args": [
+   10,
+   {
+    "max": 100,
+    "chat": 1,
+    "tea": 50
+   }
+  ],
+  "expect": 9
+ },
+ {
+  "fn": "titleSip",
+  "args": [
+   0,
+   {
+    "max": 100,
+    "chat": 1,
+    "tea": 50
+   }
+  ],
+  "expect": 0
  }
 ]

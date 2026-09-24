@@ -1,0 +1,19 @@
+{
+ "_note": "官宅 (Step 14, spec 08 §3 / spec 06 §3)。【原】官令每日 1 次、扣行動力 10、頭銜解鎖；行動丹【原=商城道具】單機化 = 官令獎勵 + 官宅貢獻兌換 (spec 01 §10)。其餘數值【自訂】。官宅位置 = facilities.json 有 office:true 嘅設施 (許昌官宅/新野縣衙，兼捐獻處)",
+ "apCost": 10,
+ "pillItem": 65255,
+ "pillCost": 30,
+ "polExpPerPoint": 20,
+ "polCap": 99,
+ "orders": [
+  {"id": "arms", "name": "黃巾軍備動員", "rank": 2, "kind": "supply", "skills": ["mining", "woodcutting"], "units": 100,
+   "fame": 20, "contrib": 10,
+   "desc": "黃巾賊亂，朝廷徵集軍備：交鐵礦/木材 (採礦、伐木材料) 合共 %d 捐獻單位。"},
+  {"id": "letter", "name": "遞送軍函", "rank": 6, "kind": "deliver", "item": 30081,
+   "fame": 30, "contrib": 15,
+   "desc": "將軍函送去%s，交畀嗰度官宅就算覆命。"},
+  {"id": "census", "name": "戶口普查", "rank": 15, "kind": "census", "n": 5,
+   "fame": 30, "polExp": 10, "contrib": 15,
+   "desc": "喺%s同 %d 個唔同嘅人傾偈 (任務 NPC / 城內人才)，再返嚟覆命。"}
+ ]
+}
