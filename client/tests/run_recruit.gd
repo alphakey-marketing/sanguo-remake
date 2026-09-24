@@ -23,6 +23,16 @@ func _init() -> void:
 	t_quiz_fail(data)
 	t_save_roundtrip(data)
 	t_determinism(data)
+	t_comp_follow(data)
+	t_comp_orders(data)
+	t_comp_kill_credit(data)
+	t_comp_hunt(data)
+	t_comp_expire(data)
+	t_comp_loyalty(data)
+	t_comp_ko(data)
+	t_comp_gift_dismiss(data)
+	t_comp_cross_map(data)
+	t_comp_save(data)
 	print("[TEST] recruit scenarios: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -479,3 +489,251 @@ func _run_seq(data: GameData) -> String:
 
 func t_determinism(data: GameData) -> void:
 	check(_run_seq(data) == _run_seq(data), "決定性: 同種子同結果")
+
+
+# ---------------- C: 同伴 ----------------
+# 問答登用鍾繇 (第 1 日) → 回傳 [sim, pid, ch, msgs, evs, gid, comp]；主公同同伴搬去野外 field_1
+func _comp_setup(data: GameData, seed: int = 135, to_field: bool = true) -> Array:
+	var r := _quiz_setup(data, seed)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	for i in 10:
+		if sim.recruit_quiz_view().is_empty():
+			break
+		_answer(sim, pid, true)
+	var c := sim.ent(int(r[2]["recruit"]["comp"]))
+	r.append(c)
+	if to_field:
+		var p := _field_spot(sim)
+		_put(sim, pid, p.x, p.y)
+		var q := sim._free_near(p.x, p.y)
+		_put(sim, int(c["id"]), q.x, q.y)
+		# 清走附近嘅怪，免得干擾
+		for m in sim.ents.values():
+			if m["kind"] == "mob":
+				var f := sim._free_near(p.x + 60, p.y + 30)
+				_put(sim, int(m["id"]), f.x, f.y)
+				m["mob"]["home_x"] = f.x
+				m["mob"]["home_y"] = f.y
+				m["mob"]["state"] = "wander"
+	return r
+
+
+func _field_spot(sim: Sim) -> Vector2i:
+	var z := sim.zone_by_id("field_1")
+	return sim._free_near(int(z["x0"]) + 40, int(z["y0"]) + 30)
+
+
+# 喺 (x,y) 放一隻怪 (田鼠 1001)
+func _mob_at(sim: Sim, x: int, y: int) -> Dictionary:
+	var m: Dictionary = sim._spawn_mob(1001, "field_1")
+	var p := sim._free_near(x, y)
+	_put(sim, int(m["id"]), p.x, p.y)
+	m["mob"]["home_x"] = p.x
+	m["mob"]["home_y"] = p.y
+	return m
+
+
+func t_comp_follow(data: GameData) -> void:
+	var r := _comp_setup(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var c: Dictionary = r[6]
+	check(String(c["gen"]["order"]) == "assist", "同伴: 預設協助攻擊")
+	var o := sim.ent(pid)
+	var p := sim._free_near(int(o["x"]) + 10, int(o["y"]))
+	_put(sim, pid, p.x, p.y)
+	for i in 40:
+		sim.step()
+	check(sim._cheb(c, o) <= 2, "跟隨: 主公行開 10 格，同伴跟到 ≤2 格 (而家 %d)" % sim._cheb(c, o))
+	sim.cmd_companion_order(pid, "follow")
+	var p2 := sim._free_near(int(o["x"]) - 10, int(o["y"]))
+	_put(sim, pid, p2.x, p2.y)
+	for i in 40:
+		sim.step()
+	var d := sim._cheb(c, o)
+	check(d <= 4 and d >= 2, "遠距跟隨: 保持 ≤4 格 (而家 %d)" % d)
+
+
+func t_comp_orders(data: GameData) -> void:
+	var r := _comp_setup(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var evs: Array = r[4]
+	var c: Dictionary = r[6]
+	var o := sim.ent(pid)
+	var m := _mob_at(sim, int(o["x"]) + 3, int(o["y"]))
+	m["hp"] = 5000
+	m["max_hp"] = 5000
+	sim.cmd_attack(pid, int(m["id"]))
+	var hit := false
+	for i in 80:
+		sim.step()
+	for ev in evs:
+		if String(ev.get("k", "")) == "hit" and int(ev["src"]) == int(c["id"]) and int(ev["dst"]) == int(m["id"]):
+			hit = true
+	check(hit, "協助攻擊: 同伴打主公鎖定嗰隻怪")
+	sim.cmd_companion_order(pid, "stop")
+	sim.step()
+	check(int(c["atk_target"]) == 0, "停止攻擊: 冇目標")
+	sim.cmd_companion_order(pid, "follow")
+	sim.step()
+	check(int(c["atk_target"]) == 0, "遠距跟隨: 唔打")
+	sim.cmd_companion_order(pid, "bogus")
+	check(String(c["gen"]["order"]) == "follow", "指令: 唔合法唔改")
+
+
+func t_comp_hunt(data: GameData) -> void:
+	var r := _comp_setup(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var c: Dictionary = r[6]
+	sim.cmd_companion_order(pid, "active")
+	sim.step()
+	check(int(c["atk_target"]) == 0, "主動攻擊: 附近冇怪 = 冇目標")
+	var m := _mob_at(sim, int(c["x"]) + 4, int(c["y"]))
+	m["mob"]["state"] = "wander"
+	sim.step()
+	check(int(c["atk_target"]) == int(m["id"]), "主動攻擊: 自己搵 8 格內嘅怪")
+	# 擂台怪/安全區唔打
+	check(not sim._hittable({"kind": "mob", "hp": 10, "mob": {"arena": 1}, "x": m["x"], "y": m["y"]}), "唔打擂台怪")
+
+
+func t_comp_kill_credit(data: GameData) -> void:
+	var r := _comp_setup(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	var c: Dictionary = r[6]
+	var o := sim.ent(pid)
+	ch["level"] = 1
+	ch["exp"] = 0
+	var m := _mob_at(sim, int(o["x"]) + 3, int(o["y"]))
+	var d := data.mob_def(int(m["mob"]["def"]))
+	var cexp := int(c["ch"]["exp"])
+	var gold := int(ch["gold"])
+	sim.damage(m, 99999, c)
+	var want := MathX.js_round(float(d["exp"]) * float(data.recruit_cfg["companion"]["expShare"]))
+	check(int(ch["exp"]) == want, "同伴殺怪: 主公得 %d%% 經驗 (%d/%d)" % [int(100 * float(data.recruit_cfg["companion"]["expShare"])), int(ch["exp"]), want])
+	check(int(c["ch"]["exp"]) == cexp and int(ch["gold"]) >= gold, "同伴殺怪: 同伴唔升級，金歸主公")
+
+
+func t_comp_expire(data: GameData) -> void:
+	var r := _comp_setup(data, 135, false)
+	var sim: Sim = r[0]
+	var ch: Dictionary = r[2]
+	var gid: int = r[5]
+	var c: Dictionary = r[6]
+	var cid := int(c["id"])
+	check(int(c["gen"]["until"]) == 1 + 30, "到期: 第 1 日登用 → 第 31 日子時走")
+	_at(sim, 30, 90)
+	check(not sim.ent(cid).is_empty(), "到期: 第 30 日亥時仲喺度")
+	_at(sim, 31, 0)
+	check(sim.ent(cid).is_empty() and int(ch["recruit"].get("comp", 0)) == 0, "到期: 第 31 日子時 0 刻離開")
+	check(not bool(sim.state["generals"][str(gid)]["serving"]) and not sim._general_away(gid), "到期: 返城 (唔當走人)")
+	_at(sim, 31, 40)
+	check(sim.general_visible(data.general_by_id[gid]), "到期: Tier1 返到城內企位")
+
+
+func t_comp_loyalty(data: GameData) -> void:
+	var cfg := data.recruit_cfg
+	check(RulesRecruit.loyalty_init("治國", "治國", cfg) == 70 and RulesRecruit.loyalty_init("義理", "出仕", cfg) == 60, "忠誠: 初始 60，同理念 +10")
+	check(RulesRecruit.loyalty_verdict(30, cfg) == "stay" and RulesRecruit.loyalty_verdict(29, cfg) == "leave_daily" \
+		and RulesRecruit.loyalty_verdict(0, cfg) == "leave_now", "忠誠: ≥30 留 / <30 子時走 / 0 即走")
+	check(RulesRecruit.loyalty_kill_delta("義理", 100, cfg) < 0 and RulesRecruit.loyalty_kill_delta("霸權", 100, cfg) == 0 \
+		and RulesRecruit.loyalty_kill_delta("義理", -100, cfg) == 0, "忠誠: 殺善 → 義理/治國跌，殺惡唔影響")
+	# 殺善怪 (臨時改田鼠善惡)
+	var r := _comp_setup(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var c: Dictionary = r[6]
+	var o := sim.ent(pid)
+	var loy := int(c["gen"]["loyalty"])
+	var def: Dictionary = data.monsters[1001]
+	var al = def["alignment"]
+	def["alignment"] = 100
+	var m := _mob_at(sim, int(o["x"]) + 3, int(o["y"]))
+	sim.damage(m, 99999, o)
+	def["alignment"] = al
+	check(int(c["gen"]["loyalty"]) == loy + int(cfg["loyalty"]["badKill"]), "忠誠: 主公殺善怪，治國同伴忠誠 %d" % int(cfg["loyalty"]["badKill"]))
+	# < 30 → 子時走 (唔開心: 呢個月唔返城)
+	c["gen"]["loyalty"] = 29
+	var cid := int(c["id"])
+	var gid := int(c["gen"]["gid"])
+	_at(sim, 2, 0)
+	check(sim.ent(cid).is_empty() and sim._general_away(gid), "忠誠 <30: 子時離開，呢個月唔返城")
+	# = 0 → 即刻走
+	var r2 := _comp_setup(data, 9)
+	var sim2: Sim = r2[0]
+	var c2: Dictionary = r2[6]
+	c2["gen"]["loyalty"] = 3
+	sim2._loyalty_change(c2, -5)
+	check(sim2.ent(int(c2["id"])).is_empty(), "忠誠 0: 即刻離開")
+
+
+func t_comp_ko(data: GameData) -> void:
+	var r := _comp_setup(data)
+	var sim: Sim = r[0]
+	var c: Dictionary = r[6]
+	var loy := int(c["gen"]["loyalty"])
+	var m := _mob_at(sim, int(c["x"]) + 1, int(c["y"]))
+	var inn := sim.nearest_inn(sim.map_id_at(int(c["x"]), int(c["y"])))
+	sim.damage(c, 999999, m)
+	check(not sim.ent(int(c["id"])).is_empty() and int(c["hp"]) == int(c["max_hp"]), "同伴倒下: 唔會死，回滿")
+	check(int(c["x"]) == int(inn["x"]) and int(c["y"]) == int(inn["y"]), "同伴倒下: 返最近客棧")
+	check(int(c["gen"]["loyalty"]) == loy + int(data.recruit_cfg["loyalty"]["ko"]), "同伴倒下: 忠誠 %d" % int(data.recruit_cfg["loyalty"]["ko"]))
+
+
+func t_comp_gift_dismiss(data: GameData) -> void:
+	var r := _comp_setup(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	var gid: int = r[5]
+	var c: Dictionary = r[6]
+	var heal_id := 0
+	for k in data.heals:
+		if int(data.heals[k].get("hp", 0)) > 0:
+			heal_id = int(k)
+			break
+	RulesShop.add_item(ch["bag"], heal_id, 1)
+	c["ch"]["hp"] = 1
+	sim._sync_stats(c)
+	var loy := int(c["gen"]["loyalty"])
+	sim.cmd_companion_gift(pid, heal_id)
+	check(int(c["hp"]) > 1 and int(c["gen"]["loyalty"]) == loy + int(data.recruit_cfg["loyalty"]["gift"]) \
+		and RulesShop.count_item(ch["bag"], heal_id) == 0, "送補品: 回血 + 忠誠 +%d + 扣背包" % int(data.recruit_cfg["loyalty"]["gift"]))
+	sim.cmd_companion_dismiss(pid)
+	check(sim.companion_view().is_empty() and not sim._general_away(gid), "解散: 同伴走，返城 (唔算走人)")
+
+
+func t_comp_cross_map(data: GameData) -> void:
+	var r := _comp_setup(data, 135, false)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var c: Dictionary = r[6]
+	var p := _field_spot(sim)
+	_put(sim, pid, p.x, p.y)
+	check(sim.map_id_at(int(c["x"]), int(c["y"])) == "xuchang", "跨圖: 同伴喺許昌，主公喺野外")
+	for i in 600:
+		sim.step()
+		if sim.map_id_at(int(c["x"]), int(c["y"])) == "field_1":
+			break
+	check(sim.map_id_at(int(c["x"]), int(c["y"])) == "field_1", "跨圖: 同伴行門口過圖跟上")
+
+
+func t_comp_save(data: GameData) -> void:
+	var r := _comp_setup(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	sim.cmd_companion_order(pid, "active")
+	for i in 30:
+		sim.step()
+	var s1 := sim.save_string()
+	var l := Sim.load_string(data, s1)
+	check(l.save_string() == s1, "存檔: 同伴 (指令/忠誠/到期) roundtrip")
+	check(String(l.companion_view().get("order", "")) == "active", "存檔: 指令保留")
+	for i in 30:
+		sim.step()
+		l.step()
+	check(l.save_string() == sim.save_string(), "存檔: 讀返之後同原本一齊行 30 tick 結果一樣")
