@@ -2033,6 +2033,126 @@
     }
    ],
    "dropSrc": 11091
+  },
+  {
+   "id": 1015,
+   "name": "殺人狂",
+   "level": 10,
+   "hp": 700,
+   "atk": 32,
+   "def": 11,
+   "spellDef": 16,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 400,
+   "gold": [
+    20,
+    60
+   ],
+   "alignment": -600,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "drops": [
+    {
+     "item": 65099,
+     "p": 1.0
+    },
+    {
+     "item": 32041,
+     "p": 1.0
+    }
+   ]
+  },
+  {
+   "id": 1016,
+   "name": "殺人狂",
+   "level": 14,
+   "hp": 1100,
+   "atk": 40,
+   "def": 14,
+   "spellDef": 20,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 700,
+   "gold": [
+    30,
+    90
+   ],
+   "alignment": -650,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "drops": [
+    {
+     "item": 30565,
+     "p": 1.0
+    },
+    {
+     "item": 23073,
+     "p": 1.0
+    }
+   ]
+  },
+  {
+   "id": 1017,
+   "name": "殺人狂",
+   "level": 18,
+   "hp": 1600,
+   "atk": 48,
+   "def": 17,
+   "spellDef": 24,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 1100,
+   "gold": [
+    40,
+    120
+   ],
+   "alignment": -700,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "drops": [
+    {
+     "item": 30575,
+     "p": 1.0
+    },
+    {
+     "item": 23074,
+     "p": 1.0
+    }
+   ]
+  },
+  {
+   "id": 1018,
+   "name": "張牛角",
+   "level": 20,
+   "hp": 2400,
+   "atk": 56,
+   "def": 20,
+   "spellDef": 28,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 1800,
+   "gold": [
+    60,
+    150
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "drops": [
+    {
+     "item": 30566,
+     "p": 1.0
+    },
+    {
+     "item": 30576,
+     "p": 1.0
+    }
+   ]
   }
  ],
  "spawns": [

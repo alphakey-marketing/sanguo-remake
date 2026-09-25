@@ -19,15 +19,15 @@
 | 01 角色成長 | 🟡 | 🟡 | 建角、六屬性、HP/MP/SP、升級自由點數 + 自動分配（`rules/stats.gd`、`sim_char.cmd_raise_attr`）、理念測驗 12 題（`data/quiz.json`、`rules/quiz.gd`）、稱號/生日/臉譜、修練場所、行動力（上限跟頭銜、子時回滿、行動丹）、飲水度 + 客棧喝茶（Step 14，`rules/title.gd`） | 二轉/三轉、專長；**建角面板仍係舊 debug 版** |
 | 02 戰鬥 | 🟡 | 🟡 | 近戰即時制、術法（Step 9）、5 屬性相剋、狀態系統、寶石 2 格、義士三招絕招、義士融合 QTE、防具 5 部位 + 武器 3 槽 + 耐久（Step 11.6）+ 武器耐久/修理（Step 12） | 其他 5 職特技/絕招；組隊（同伴）；馬戰 |
 | 03 善惡死亡 | 🟡 | ✅ | 七階、死亡掉物品/跌經驗、善惡影響價格 | 天譴、幸運符/護身符/還魂丹 |
-| 04 怪物地圖 | 🟡 | ✅ | 39 怪（`data/monsters.json`，32 隻掉落由 `tools/import_drops.py` 導入 npc_drops；B2.5 加盜賊/流氓2/瘋狂小兵/海盜賊/山寨山賊）、重生、逃跑/群攻 AI、boss 每日重生、汝南洞窟 10 層 | 特殊場景；戰役場景 |
+| 04 怪物地圖 | 🟡 | ✅ | 46 怪（`data/monsters.json`，32 隻掉落由 `tools/import_drops.py` 導入 npc_drops；B2.5 加盜賊/流氓2/瘋狂小兵/海盜賊/山寨山賊；Step 19 加張牛角戰役 4 隻）、重生、逃跑/群攻 AI、boss 每日重生、汝南洞窟 10 層、戰役場景（張牛角原型，Step 19） | 特殊場景；其餘 5 場戰役實體 monster/map |
 | 05 生產經濟 | 🟡 | ✅ | 6 初階技能 + 技能等級、5 進階技能 + 2318 配方（`rules/work.gd`、`data/recipes.json`）、修理（自己修/打鐵鋪）、工具店、倉庫/代賣、天地商行自動化 + 捐獻（Step 13，`rules/tiandi.gd`、`data/donation.json`）、動態市場、商店 | 大宗師、特製/白金工具、捐義勇軍 |
-| 06 任務 | 🟡 | ✅ | 框架（`rules/quest.gd`、`data/quests.json`）、新手 5 條、義士絕招三條、官令 3 條（Step 14，`data/office.json`、`sim/sim_office.gd`）、歷史任務豫荊 6 條 + 三顧茅廬（B3）+ 門禁 + 武將收集冊 + 居民委託 4 種（Step 16，`rules/commission.gd`、`sim/sim_comm.gd`） | 其餘 4 條官令、其餘 5 條歷史（洛陽/零陵/長沙深區）、團體、戰役、專長、結婚 |
+| 06 任務 | 🟡 | ✅ | 框架（`rules/quest.gd`、`data/quests.json`）、新手 5 條、義士絕招三條、官令 3 條（Step 14，`data/office.json`、`sim/sim_office.gd`）、歷史任務豫荊 6 條 + 三顧茅廬（B3）+ 門禁 + 武將收集冊 + 居民委託 4 種（Step 16，`rules/commission.gd`、`sim/sim_comm.gd`）、戰役任務（Step 19，`rules/battle.gd`、`sim/sim_battle.gd`、`data/battles.json`：張牛角 4 層原型 playable，其餘 5 場資料殼） | 其餘 4 條官令、其餘 5 條歷史（洛陽/零陵/長沙深區）、團體、5 場戰役實裝、專長、結婚 |
 | 07 座騎戰騎 | 🟡 | 🟡 | Step 17a：馬廄（許昌/新野）買馬/寄養/領馬/馬用品、6 種馬【原】、襁褓/成熟/衰老/壽終、8 種飼養動作（原版寵物道具效果碼驅動）、子時結算（情緒/親密/疲勞/飽食）、騎乘（親密 ≥60 + 成年，移速 ×1.5~2，騎乘疲勞/頭暈落馬）、放牧（馴馬專用哨、一個時辰、成長/執嘢/受傷）、優秀值點數、馬瘟（`rules/mount.gd`、`sim/sim_mount.gd`、`data/mounts.json`、座騎面板 + HUD 騎馬掣）；Step 18：戰騎屬性/升級/戰鬥特技樹/友好特技/忠誠交易（純規則層，`rules/war_beast.gd`、`data/war_beasts.json`） | 武將特技「馴馬」；戰騎 sim 整合（獲得/裝備/UI）未做 |
 | 08 名聲義勇軍 | 🟡 | 🟡 | 任務獎勵寫 `ch.fame`；捐贈官令（Step 13）；頭銜 60 階（`data/titles.json` 由 `tools/gen_titles.py` 導入）+ 官宅（許昌官宅/新野縣衙：討取/官令/捐獻/換行動丹）+ 月俸（Step 14） | 義舉證明、城池進貢、名聲競爭（名額）、官宅內政 6 種、義勇軍、營地、救災、民心、法令 |
 | 09 登用武將 | 🟡 | 🟡 | 居民 bot、記憶/好感（`rules/npc_memory.gd`）、規則版 brain（`sim/npc_brain.gd`）；Step 13.5：1261 武將導入（`data/generals.json`）、Tier1 19 人城內按時辰出現、調查/擂台/問答、同伴 4 指令、忠誠、30 日到期、頭銜條件（Step 14）（`rules/recruit.gd`、`sim/sim_recruit.gd`、登用面板）；Step 15：將軍令/御賜金牌、武將寶物 2 格、藥膳師補品、6 指令（絕招/術法）、70 特技表 + 20 passive（`data/general_skills.json`、`rules/general.gd`） | 其餘 50 特技（主動/國戰/生產）、內政協助、帶兵、LLM 層 |
 | 10 國戰 | ❌ | ❌ | — | 全部 |
 | 11 資料對照 | 🟡 | — | items.json 6068 件、jewels.json、monsters drops（部分）、generals.json（`tools/gen_generals.py`，f101 = 戰等）、recipes | Npc_table、general_skills 效果表 |
-| 12 地圖世界 | 🟡 | 🟡 | B1：多地圖 + A* + 過圖 + 跨圖路由 + 許昌城/潁川郊外/汝南洞窟 + 小地圖/地圖面板/地標；B2：汝南道/昆陽/宛城道/博望坡/新野城 + 大地圖自動尋路 + 多客棧；B2.5：陳留郊外/于毒山寨/小沛/汝南城+丁刺史府/宛城/荊州地界/港口/樊城/漢水渡口/襄陽城+監獄/長沙（室內 kind `house`）；B3：隆中 + 草廬、驛站收費傳送（`rules/station.gd`、`sim/sim_station.gd`） | B3 ✅（隆中/草廬/驛站）；其餘州郡 |
+| 12 地圖世界 | 🟡 | 🟡 | B1：多地圖 + A* + 過圖 + 跨圖路由 + 許昌城/潁川郊外/汝南洞窟 + 小地圖/地圖面板/地標；B2：汝南道/昆陽/宛城道/博望坡/新野城 + 大地圖自動尋路 + 多客棧；B2.5：陳留郊外/于毒山寨/小沛/汝南城+丁刺史府/宛城/荊州地界/港口/樊城/漢水渡口/襄陽城+監獄/長沙（室內 kind `house`）；B3：隆中 + 草廬、驛站收費傳送（`rules/station.gd`、`sim/sim_station.gd`）；戰役實例場景：張牛角 4 層（Step 19，`instance:true`，唔計入連通檢查） | B3 ✅（隆中/草廬/驛站）；其餘州郡 |
 
 ### 已知缺口（用家 2026-09-23 指出，已核實）
 - ~~裝備欄簡陋~~ → Step 11.6 已做（2026-09-23）
@@ -174,8 +174,13 @@
 - [x] 忠誠：戰鬥死亡 −1、跌到 0 走佬【原】；交易（單機簡化=賣畀 NPC）：忠誠 <5 / 玩家 <10 級唔可以交易【原】、賣價按等級【自訂】
 - 偏離 spec：友好特技效果大部分淨係記低 learned flag，實際功能（小地圖/隱身/自動撿寶等）未接其他系統；PK（玩家打玩家/戰騎打戰騎）單機冇對手，未實作；sim 層戰騎獲得/裝備/戰鬥出手未接（純規則層 + 測試，UI/sim 整合留待後續）
 - 驗收：`tests/run_war_beast.gd` 100 項 ✅
-### Step 19 戰役場景（spec 06 §7，spec 04 §5）
-- [ ] 張牛角戰役 4 層原型 + 報名 + 死亡出場
+### ✅ Step 19 戰役場景（spec 06 §7，spec 04 §5）
+- [x] `data/battles.json`：6 場戰役資料全部落齊（跟攻略 sy3_8 原文逐場頭目/掉寶表數據化，多版本道具跟慣例揀第一個 id）；window 每 2 時辰一個 (戌張牛角/子褚飛燕/寅李大目/辰張白騎/午黃龍/申十常侍，各 8 刻)【自訂 game 日曆換算，原版現實時間 6 場相連 30 分鐘】；只有 `zhangniujiao` `playable:true`（4 層 monster+map 齊全），其餘 5 場 `playable:false` 資料殼（boss/掉寶跟攻略，monster/map 留後）
+- [x] 張牛角 4 層：`monsters.json` 1015~1018（殺人狂 ×3 + 張牛角）【自訂數值】、`maps.json`+`data/maps/zhangniujiao_f1~4.txt`（24×16 小場地，`tools/map_draft.py --battle`）、`instance:true` 標記（唔連門，唔計入「全地圖由許昌去得」連通檢查）
+- [x] 報名：許昌北門「義勇士兵」= `data/quest_npcs.json battle_herald`（常駐，唔跟原版時辰限制顯示；報名撳落先驗窗口/武等）【自訂簡化】；`rules/battle.gd`（純函數：窗口/報名資格/層數）+ `sim/sim_battle.gd`（新繼承層，夾喺 sim_econ/sim_combat 之間）：`cmd_battle_enter`/`cmd_battle_leave`/`battle_view`，打死當層 boss 自動過層/完場
+- [x] 死亡出場【原】：`sim_combat._kill_player` 加 `battle` 分支，戰役內陣亡唔跌經驗/物品（`RulesBattle.drop_on_death` 留 flag 畀日後長阪坡類例外），傳送返報名點 + 清晒殘留 boss
+- 偏離 spec：冇做 `scenes.json`（跟 spec 06 §7 原意），4 層地圖直接落 `maps.json`（同汝南洞窟多層慣例一致）；層與層之間冇門，靠 sim 直接傳送（單機教學向精簡，唔跟「戰役地圖」實體場景）；義勇士兵常駐顯示、時辰窗口淨係喺報名嗰刻驗（原版 NPC 本身淨窗口內先出現）；李大目原文只寫 4 層 (PLAN 舊估計 5 層有誤，跟攻略改正)
+- 驗收：`tests/run_battle.gd` 78 項（純函數窗口/資格/層數、資料完整性、報名成功/失敗/重複、4 層全打通掉寶齊全/完場傳送、死亡唔跌經驗物品、放棄、武等超標拒入、存檔 roundtrip、決定性）+ `tests/run_monsters.gd`/`run_maps.gd` 對應更新 ✅
 ### Step 20 LLM 層（spec 09 §5）
 - [ ] LLM brain（OpenRouter/JSON schema/白名單）；每日反思 + 記憶摘要；設定頁 key + 模型名；Tier1 武將對話（接 Step 13.5 武將）
 - 驗收：mock 全動作；無 key 照玩；LLM 唔改數值（斷言）
