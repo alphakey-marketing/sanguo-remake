@@ -32,7 +32,7 @@ static func calc_spell_damage(power: float, attr: float, spell_def: float, att_e
 
 # ================= 狀態 (spec 02 §7) =================
 # 持續(tick): 封咒 600 / 中邪 300 / buff 全部 900
-const STATUS_TICKS := {"sealed": 600, "hex": 300,
+const STATUS_TICKS := {"sealed": 600, "hex": 300, "freeze": 300,
 	"armor1": 900, "armor2": 900, "armor3": 900,
 	"mirror1": 900, "mirror2": 900, "mirror3": 900,
 	"power1": 900, "power2": 900, "power3": 900}
@@ -60,9 +60,9 @@ static func blocks_cast(status: Dictionary, tick: int) -> bool:
 	return has(status, "sealed", tick)
 
 
-# 中邪: 定身郁唔到
+# 中邪/冰凍: 定身郁唔到 (S01d 六招特效凍結【自訂】)
 static func blocks_move(status: Dictionary, tick: int) -> bool:
-	return has(status, "hex", tick)
+	return has(status, "hex", tick) or has(status, "freeze", tick)
 
 
 # buff 倍率 (無狀態 = 1.0): 聚力/強力/神力 = 物攻 +15%/30%/50%

@@ -15,6 +15,11 @@ func _init() -> void:
 	t_expert_rules(data)
 	t_expert_trade(data)
 	t_expert_weather_geo(data)
+	t_class_rules(data)
+	t_promote_flow(data)
+	t_ult_req_tier(data)
+	t_weapon_req_tier(data)
+	t_expert_tier_boost(data)
 	print("[TEST] char: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -143,3 +148,169 @@ func t_expert_weather_geo(data: GameData) -> void:
 	check(w.size() == data.world["cities"].size(), "天氣情報涵蓋全部城池")
 	RulesExpert.add_exp(ch, data.experts, "dili", 100)
 	check(sim.geo_unlocked(), "學咗地理 = 解鎖")
+
+
+# ================= S01d 二轉/三轉 (spec 01 §7) =================
+func t_class_rules(data: GameData) -> void:
+	check(RulesClass.tier_of({}) == 0, "tier_of: 舊存檔冇 tier 欄 = 0")
+	check(RulesClass.tier_of({"tier": 2}) == 2, "tier_of: 讀 ch.tier")
+	var cls: Dictionary = data.classes["yishi"]
+	check(RulesClass.title_of(cls, 0) == "義士", "職名: 初階 = 職業名")
+	check(RulesClass.title_of(cls, 1) == "武士", "職名: 二轉 = tier2")
+	check(RulesClass.title_of(cls, 2) == "猛將", "職名: 三轉 = tier3")
+	check(RulesClass.tier_name_of(1) == "二轉", "階級名")
+	check(RulesClass.tier_name_of(-3) == "初階", "階級名 clamp 下限")
+	check(RulesClass.weapon_tier_required(50) == 0, "武器職階: req_lv 50 = 初階武器")
+	check(RulesClass.weapon_tier_required(51) == 1, "武器職階: req_lv 51 = 要二轉")
+	check(RulesClass.weapon_tier_required(99) == 1, "武器職階: req_lv 99 = 要二轉")
+	check(RulesClass.weapon_tier_required(100) == 2, "武器職階: req_lv 100 = 要三轉")
+	check(RulesClass.expert_cap_bonus(0) == 0 and RulesClass.expert_cap_bonus(1) == 1 and RulesClass.expert_cap_bonus(2) == 2, "專長上限提升: +tier")
+	# 絕招資格
+	var ult1: Dictionary = data.ult_by_id["fengyi"]     # 四招: reqTier 1
+	check(RulesClass.ultimate_usable({"tier": 0, "level": 60}, ult1)["ok"] == false, "四招: 未二轉用唔到")
+	check(RulesClass.ultimate_usable({"tier": 1, "level": 60}, ult1)["ok"] == true, "四招: 二轉後用到")
+	var ult6: Dictionary = data.ult_by_id["xuanbing"]   # 六招: reqTier 2 + reqLevel 100
+	check(RulesClass.ultimate_usable({"tier": 1, "level": 100}, ult6)["ok"] == false, "六招: 要三轉")
+	check(RulesClass.ultimate_usable({"tier": 2, "level": 99}, ult6)["ok"] == false, "六招: Lv 唔夠")
+	check(RulesClass.ultimate_usable({"tier": 2, "level": 100}, ult6)["ok"] == true, "六招: 三轉 + Lv100 用到")
+	# 轉職資格
+	var ch := {"tier": 0, "level": 49, "questDone": {}}
+	check(RulesClass.promote_ok(data, ch)["ok"] == false, "Lv49 唔可以轉職")
+	ch["level"] = 50
+	check(RulesClass.promote_ok(data, ch)["ok"] == false, "Lv50 未考考試唔可以轉職")
+	ch["questDone"] = {"promote_test": true}
+	check(bool(RulesClass.promote_ok(data, ch)["ok"]) and int(RulesClass.promote_ok(data, ch)["tier"]) == 1, "Lv50 + 考試完成 = 可以二轉")
+	ch["tier"] = 1
+	check(RulesClass.promote_ok(data, ch)["ok"] == false, "二轉後 Lv50 唔可以跳三轉")
+	ch["level"] = 100
+	check(RulesClass.promote_ok(data, ch)["ok"] == false, "Lv100 無三轉任務 (S04d 接) = 唔可以轉")
+	var fake := {"id": "promote_test2", "name": "三轉考驗", "type": "general", "stages": []}
+	data.quests.append(fake)
+	var ch2 := {"tier": 1, "level": 100, "questDone": {"promote_test2": true}}
+	check(bool(RulesClass.promote_ok(data, ch2)["ok"]) and int(RulesClass.promote_ok(data, ch2)["tier"]) == 2, "三轉框架: 有任務完成就 ok")
+	data.quests.remove_at(data.quests.size() - 1)
+	var ch3 := {"tier": 2, "level": 100, "questDone": {}}
+	check(RulesClass.promote_ok(data, ch3)["ok"] == false, "已三轉: 冇得再轉")
+
+
+func t_promote_flow(data: GameData) -> void:
+	var sim := Sim.new(data, 21)
+	var id := sim.spawn_player("t")
+	var ch: Dictionary = sim.player_ch()
+	ch["level"] = 50
+	sim._sync_stats(sim.ent(id))
+	# 未完成考試 → 轉職拒絕
+	sim.cmd_class_promote(id)
+	check(bool(ch.get("tier", 0)) == false, "冇考試任務: 轉職拒絕")
+	# 接任務 (導師 NPC minLevel 50)
+	var npc: Dictionary = data.quest_npcs["promote_master"]
+	sim._sync_quest_npcs()           # 導師 minLevel 50，spawn 嗰陣唔 visible，升 50 後要 re-sync
+	_put(sim, id, int(npc["x"]) + 1, int(npc["y"]))
+	sim.cmd_quest_talk(id, "promote_master")
+	check((ch.get("quests", {}) as Dictionary).has("promote_test"), "同導師傾偈 = 接咗轉職考試")
+	# 收集 5 塊試煉之證 → 交
+	RulesShop.add_item(ch["bag"], 51100, 5)
+	_put(sim, id, int(npc["x"]) + 1, int(npc["y"]))
+	sim.cmd_quest_turnin(id, "promote_test")
+	check(int((ch.get("quests", {}) as Dictionary).get("promote_test", {}).get("stage", -1)) == 2, "交齊證 = 推進到回報階段")
+	# 最後回報導師先 done
+	_put(sim, id, int(npc["x"]) + 1, int(npc["y"]))
+	sim.cmd_quest_talk(id, "promote_master")
+	check(bool(ch.get("questDone", {}).get("promote_test", false)), "交齊證 + 回報 = 考試任務完成")
+	check(int(ch.get("fame", 0)) == 10, "考試任務獎勵名聲 10")
+	# 轉職
+	var cls: Dictionary = data.classes["yishi"]
+	check(RulesClass.title_of(cls, 0) == "義士", "轉職前職名")
+	sim.cmd_class_promote(id)
+	check(int(ch["tier"]) == 1, "完成考試 + Lv50 = 轉職成功")
+	check(RulesClass.title_of(cls, 1) == "武士", "二轉職名")
+	# 三轉框架: 唔存在任務 → 拒絕
+	ch["level"] = 100
+	sim.cmd_class_promote(id)
+	check(int(ch["tier"]) == 1, "冇三轉任務: 三轉拒絕 (S04d 接)")
+
+
+
+func _spawn_one(sim: Sim, def_id: int, except_id: int = 0) -> int:
+	sim._spawn_mob(def_id)
+	var best := 0
+	for e in sim.ents.values():
+		if e["kind"] == "mob" and int(e["mob"]["def"]) == def_id and int(e["id"]) != except_id:
+			if int(e["id"]) > best:
+				best = int(e["id"])
+	return best
+
+
+# 絶招職階: 四招要二轉 / 五·六招要三轉 (S01d) + 六招凍結特效
+func t_ult_req_tier(data: GameData) -> void:
+	var sim := Sim.new(data, 22)
+	var id := sim.spawn_player("t")
+	var ch: Dictionary = sim.player_ch()
+	ch["level"] = 60
+	sim._sync_stats(sim.ent(id))
+	ch["ultimates"] = ["fengyi", "xuanbing"]
+	sim.cmd_debug_give(id, 10042, 1)          # 矛 (cat 3)
+	sim.cmd_equip_weapon(id, 10042)
+	_put(sim, id, 60, 60)                     # 野外
+	var m := _spawn_one(sim, 1001)
+	_put(sim, m, 60, 59)
+	ch["mp"] = RulesStats.max_mp(60, ch["attrs"])
+	ch["sp"] = RulesStats.max_sp(60, ch["attrs"])
+	# 未二轉 → 四招用唔到
+	sim.cmd_use_ultimate(id, "fengyi")
+	check(int(ch["mp"]) == RulesStats.max_mp(60, ch["attrs"]), "四招: 未二轉唔扣 MP")
+	# 二轉 → 用得
+	ch["tier"] = 1
+	sim.cmd_use_ultimate(id, "fengyi")
+	check(int(ch["mp"]) < RulesStats.max_mp(60, ch["attrs"]), "四招: 二轉後成功扣 MP")
+	# 未三轉 → 六招用唔到
+	var mp1 := int(ch["mp"])
+	sim.cmd_use_ultimate(id, "xuanbing")
+	check(int(ch["mp"]) == mp1, "六招: 未三轉唔扣 MP")
+	# 三轉 + Lv100 + 特效凍結
+	ch["tier"] = 2
+	ch["level"] = 100
+	sim._sync_stats(sim.ent(id))
+	ch["mp"] = RulesStats.max_mp(100, ch["attrs"])
+	ch["sp"] = RulesStats.max_sp(100, ch["attrs"])
+	var m2 := _spawn_one(sim, 1001)
+	var m2e := sim.ent(m2)
+	m2e["hp"] = 100000
+	m2e["max_hp"] = 100000
+	_put(sim, m2, 60, 59)
+	sim.cmd_use_ultimate(id, "xuanbing")
+	check(int(m2e["hp"]) < 100000, "六招: 三轉後用到 (打到隻怪)")
+	check(RulesSpell.has(m2e.get("status", {}), "freeze", sim.tick), "六招: 特效凍結")
+
+
+# 進階武器: req_lv 51+ 要二轉 (S01d)
+func t_weapon_req_tier(data: GameData) -> void:
+	var sim := Sim.new(data, 23)
+	var id := sim.spawn_player("t")
+	var ch: Dictionary = sim.player_ch()
+	ch["level"] = 60
+	sim._sync_stats(sim.ent(id))
+	var wid := 0
+	for k in data.weapons:
+		if int(data.cats.get(int(k), 0)) == 1 and int(data.info.get(int(k), {}).get("req_lv", 0)) >= 51:
+			wid = int(k)
+			break
+	check(wid != 0, "搵到 req_lv≥51 嘅刀做測試")
+	sim.cmd_debug_give(id, wid, 1)
+	sim.cmd_equip_weapon(id, wid)
+	check(int(ch["equip"].get("weapon", 0)) != wid, "進階武器: 未二轉裝唔到")
+	ch["tier"] = 1
+	sim.cmd_equip_weapon(id, wid)
+	check(int(ch["equip"].get("weapon", 0)) == wid, "進階武器: 二轉後裝到（解鎖）")
+
+
+# 專長上限: 二轉 +1 / 三轉 +2 (S01d)
+func t_expert_tier_boost(data: GameData) -> void:
+	check(RulesExpert.cap_of(data.experts, "yishi", "kaiken", 0) == 4, "初階: 開墾上限 4")
+	check(RulesExpert.cap_of(data.experts, "yishi", "kaiken", 1) == 5, "二轉: 開墾上限 5")
+	check(RulesExpert.cap_of(data.experts, "yishi", "kaiken", 2) == 6, "三轉: 開墾上限 6")
+	check(RulesExpert.cap_of(data.experts, "yishi", "zhentan", 2) == 0, "表冇嘅專長: 轉職都唔解鎖")
+	check(RulesExpert.eff_level(data.experts, "yishi", "kaiken", 100, 0) == 4, "4 級 exp 初階封頂 4")
+	check(RulesExpert.eff_level(data.experts, "yishi", "kaiken", 150, 1) == 5, "150 exp + 二轉 = 5 級")
+	# 交易效果上限: lv6 都封頂 10%【自訂】
+	check(RulesExpert.trade_buy_discount(6) == RulesExpert.trade_buy_discount(5), "交易折扣封頂 10% (lv5+ 一樣)")

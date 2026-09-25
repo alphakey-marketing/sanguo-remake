@@ -443,7 +443,7 @@ func _skill_def(skill: String) -> Dictionary:
 
 # 專長生效等級 (S01c, spec 01 §8)
 func expert_lv(ch: Dictionary, skill_id: String) -> int:
-	return RulesExpert.eff_level(data.experts, String(ch.get("classId", "")), skill_id, int(ch.get("expert", {}).get(skill_id, 0)))
+	return RulesExpert.eff_level(data.experts, String(ch.get("classId", "")), skill_id, int(ch.get("expert", {}).get(skill_id, 0)), RulesClass.tier_of(ch))
 
 
 # 生產技能等級 (未做過: 初階 = 1；進階 = 已解鎖 1 / 未解鎖 0)
@@ -769,6 +769,10 @@ func cmd_equip(id: int, item: int, wslot: int = -1) -> void:
 		return _msg(id, "%s用唔到「%s」" % [data.classes.get(str(ch["classId"]), {}).get("name", "呢個職業"), nm])
 	if int(ch["level"]) < need_lv:
 		return _msg(id, "要 Lv%d 先用得「%s」" % [need_lv, nm])
+	# S01d 進階武器解鎖【自訂】(spec 01 §7): req_lv 51+ 武器要二轉、100+ 要三轉；承繼 = 初階武器照用
+	var treq := RulesClass.weapon_tier_required(need_lv)
+	if RulesClass.tier_of(ch) < treq:
+		return _msg(id, "要%s先用得進階武器「%s」" % [RulesClass.tier_name_of(treq), nm])
 	var ws := int(eq["wslot"]) if wslot < 0 else wslot
 	if ws < 0 or ws >= RulesEquip.WEAPON_SLOTS:
 		return _msg(id, "武器槽得 %d 格" % RulesEquip.WEAPON_SLOTS)

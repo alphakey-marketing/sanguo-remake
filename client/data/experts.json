@@ -1,26 +1,147 @@
 {
-  "_note": "專長系統（【原】sy2_1_4 六職上限表全錄；exp 門檻/效果係數【自訂】，spec 01 §8）。偵查/統御/警戒之外嘅 3 項義勇軍認證類專長（偵查/統御/補給）冇分級上限表，留返 S10 國戰另外處理（binary 認證，唔用呢個 caps 表）。",
-  "levelExp": [10, 30, 60, 100],
-  "skills": {
-    "kaiken":  { "name": "開墾", "cat": "domestic" },
-    "zhaolai": { "name": "招徠", "cat": "domestic" },
-    "siyu":    { "name": "飼育", "cat": "domestic" },
-    "tankuang":{ "name": "探礦", "cat": "domestic" },
-    "xiuzhu":  { "name": "修築", "cat": "domestic" },
-    "gongyi":  { "name": "工藝", "cat": "domestic" },
-    "jiuzai":  { "name": "救災", "cat": "other" },
-    "jiaoyi":  { "name": "交易", "cat": "militia" },
-    "xunlian": { "name": "訓練", "cat": "militia" },
-    "jingjie": { "name": "警戒", "cat": "militia" },
-    "tianwen": { "name": "天文", "cat": "other" },
-    "dili":    { "name": "地理", "cat": "other" }
+ "_note": "專長系統（【原】sy2_1_4 六職上限表全錄；exp 門檻/效果係數【自訂】，spec 01 §8）。偵查/統御/警戒之外嘅 3 項義勇軍認證類專長（偵查/統御/補給）冇分級上限表，留返 S10 國戰另外處理（binary 認證，唔用呢個 caps 表）。 S01d: levelExp 加到 6 級 [10,30,60,100,150,210]，支援二轉/三轉專長上限提升 (cap+tier)。",
+ "levelExp": [
+  10,
+  30,
+  60,
+  100,
+  150,
+  210
+ ],
+ "skills": {
+  "kaiken": {
+   "name": "開墾",
+   "cat": "domestic"
   },
-  "caps": {
-    "yishi":   { "kaiken": 4, "zhaolai": 2, "siyu": 2, "tankuang": 3, "xiuzhu": 3, "gongyi": 2, "jiuzai": 3, "jiaoyi": 2, "xunlian": 4, "jingjie": 4, "tianwen": 2, "dili": 2 },
-    "shinu":   { "kaiken": 3, "zhaolai": 2, "siyu": 2, "tankuang": 3, "xiuzhu": 4, "gongyi": 2, "jiuzai": 2, "jiaoyi": 2, "xunlian": 4, "jingjie": 4, "tianwen": 2, "dili": 3 },
-    "bianshi": { "kaiken": 2, "zhaolai": 3, "siyu": 2, "tankuang": 4, "xiuzhu": 2, "gongyi": 3, "jiuzai": 4, "jiaoyi": 3, "xunlian": 2, "jingjie": 3, "tianwen": 3, "dili": 4 },
-    "wunu":    { "kaiken": 2, "zhaolai": 3, "siyu": 4, "tankuang": 2, "xiuzhu": 2, "gongyi": 3, "jiuzai": 3, "jiaoyi": 4, "xunlian": 3, "jingjie": 2, "tianwen": 4, "dili": 3 },
-    "daoshi":  { "kaiken": 3, "zhaolai": 2, "siyu": 3, "tankuang": 2, "xiuzhu": 2, "gongyi": 4, "jiuzai": 4, "jiaoyi": 3, "xunlian": 2, "jingjie": 3, "tianwen": 4, "dili": 3 },
-    "meinu":   { "kaiken": 2, "zhaolai": 4, "siyu": 3, "tankuang": 2, "xiuzhu": 2, "gongyi": 2, "jiuzai": 3, "jiaoyi": 4, "xunlian": 3, "jingjie": 2, "tianwen": 3, "dili": 4 }
+  "zhaolai": {
+   "name": "招徠",
+   "cat": "domestic"
+  },
+  "siyu": {
+   "name": "飼育",
+   "cat": "domestic"
+  },
+  "tankuang": {
+   "name": "探礦",
+   "cat": "domestic"
+  },
+  "xiuzhu": {
+   "name": "修築",
+   "cat": "domestic"
+  },
+  "gongyi": {
+   "name": "工藝",
+   "cat": "domestic"
+  },
+  "jiuzai": {
+   "name": "救災",
+   "cat": "other"
+  },
+  "jiaoyi": {
+   "name": "交易",
+   "cat": "militia"
+  },
+  "xunlian": {
+   "name": "訓練",
+   "cat": "militia"
+  },
+  "jingjie": {
+   "name": "警戒",
+   "cat": "militia"
+  },
+  "tianwen": {
+   "name": "天文",
+   "cat": "other"
+  },
+  "dili": {
+   "name": "地理",
+   "cat": "other"
   }
+ },
+ "caps": {
+  "yishi": {
+   "kaiken": 4,
+   "zhaolai": 2,
+   "siyu": 2,
+   "tankuang": 3,
+   "xiuzhu": 3,
+   "gongyi": 2,
+   "jiuzai": 3,
+   "jiaoyi": 2,
+   "xunlian": 4,
+   "jingjie": 4,
+   "tianwen": 2,
+   "dili": 2
+  },
+  "shinu": {
+   "kaiken": 3,
+   "zhaolai": 2,
+   "siyu": 2,
+   "tankuang": 3,
+   "xiuzhu": 4,
+   "gongyi": 2,
+   "jiuzai": 2,
+   "jiaoyi": 2,
+   "xunlian": 4,
+   "jingjie": 4,
+   "tianwen": 2,
+   "dili": 3
+  },
+  "bianshi": {
+   "kaiken": 2,
+   "zhaolai": 3,
+   "siyu": 2,
+   "tankuang": 4,
+   "xiuzhu": 2,
+   "gongyi": 3,
+   "jiuzai": 4,
+   "jiaoyi": 3,
+   "xunlian": 2,
+   "jingjie": 3,
+   "tianwen": 3,
+   "dili": 4
+  },
+  "wunu": {
+   "kaiken": 2,
+   "zhaolai": 3,
+   "siyu": 4,
+   "tankuang": 2,
+   "xiuzhu": 2,
+   "gongyi": 3,
+   "jiuzai": 3,
+   "jiaoyi": 4,
+   "xunlian": 3,
+   "jingjie": 2,
+   "tianwen": 4,
+   "dili": 3
+  },
+  "daoshi": {
+   "kaiken": 3,
+   "zhaolai": 2,
+   "siyu": 3,
+   "tankuang": 2,
+   "xiuzhu": 2,
+   "gongyi": 4,
+   "jiuzai": 4,
+   "jiaoyi": 3,
+   "xunlian": 2,
+   "jingjie": 3,
+   "tianwen": 4,
+   "dili": 3
+  },
+  "meinu": {
+   "kaiken": 2,
+   "zhaolai": 4,
+   "siyu": 3,
+   "tankuang": 2,
+   "xiuzhu": 2,
+   "gongyi": 2,
+   "jiuzai": 3,
+   "jiaoyi": 4,
+   "xunlian": 3,
+   "jingjie": 2,
+   "tianwen": 3,
+   "dili": 4
+  }
+ }
 }

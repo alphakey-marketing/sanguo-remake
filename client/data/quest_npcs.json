@@ -1,5 +1,5 @@
 {
- "_note": "任務 NPC (spec 06 §1.2): 靜態 NPC，唔入 ents（唔會移動/被攻擊），由 sim.view_quest_npcs() 讀出嚟畀 UI 畫。可見性規則: minLevel/maxLevel（玩家等級）+ window（時辰窗口，startKe 含 ~ endKe 不含，endKe<=startKe = 跨日）+ 任務進行中強制常駐。service = NPC 功能（密醫免費醫療）。 Step 16: questOnly = 只喺任務要佢嗰陣先出現 (PK boss/內應)；strictWindow = 任務進行中都要守時辰窗口；service.kind=book = 許昌老丈換武將收集冊；commission = 居民委託 NPC (data/commissions.json)。",
+ "_note": "任務 NPC (spec 06 §1.2): 靜態 NPC，唔入 ents（唔會移動/被攻擊），由 sim.view_quest_npcs() 讀出嚟畀 UI 畫。可見性規則: minLevel/maxLevel（玩家等級）+ window（時辰窗口，startKe 含 ~ endKe 不含，endKe<=startKe = 跨日）+ 任務進行中強制常駐。service = NPC 功能（密醫免費醫療）。 Step 16: questOnly = 只喺任務要佢嗰陣先出現 (PK boss/內應)；strictWindow = 任務進行中都要守時辰窗口；service.kind=book = 許昌老丈換武將收集冊；commission = 居民委託 NPC (data/commissions.json)。 S01d: promote_master 轉職導師 (許昌城中心)，minLevel 50。",
  "npcs": [
   {
    "id": "mystery_old",
@@ -448,6 +448,19 @@
    ],
    "desc": "許昌城北門附近嘅義勇士兵【原 sy3_8】：戰役窗口內撳佢報名參加當時開放嗰場戰役（單機簡化：常駐，開唔開場由撳佢嗰刻嘅時辰決定）。",
    "battle": true
+  },
+  {
+   "id": "promote_master",
+   "name": "轉職導師",
+   "x": 34,
+   "y": 28,
+   "map": "xuchang",
+   "minLevel": 50,
+   "idle": [
+    "轉職導師：「有志提升境界嘅人，可以過嚟傾下。」",
+    "轉職導師打量你一眼，睇下你嘅功夫底子。"
+   ],
+   "desc": "許昌城中心嘅轉職導師【S01d 自訂】：Lv50 嘅義士可以接「轉職考試」，完成後返角色面板撳「轉職」成為武士。"
   }
  ]
 }

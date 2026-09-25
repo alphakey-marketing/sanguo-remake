@@ -20,7 +20,7 @@
 
 | Spec | 邏輯 | UI | 已做（主要檔案） | 欠缺（= §3 對應 Step 範圍） |
 |---|---|---|---|---|
-| 01 角色成長 | 🟡 | 🟡 | 建角、六屬性、HP/MP/SP、升級點數 + 自動分配、理念測驗、稱號/生日（福日 exp）/臉譜、修練場所、行動力、飲水度、專長（`rules/stats.gd` `expert.gd`、`sim_char`） | 二轉/三轉（S01d）；地理迷宮地圖效果（S01c 偏離） |
+| 01 角色成長 | 🟡 | 🟡 | 建角、六屬性、HP/MP/SP、升級點數 + 自動分配、理念測驗、稱號/生日（福日 exp）/臉譜、修練場所、行動力、飲水度、專長、二轉/三轉框架（`rules/stats.gd` `expert.gd` `class.gd`、`sim_char`、`char_panel.gd`） | 三轉考試任務接掛（S04d）；地理迷宮地圖效果（S01c 偏離） |
 | 02 戰鬥 | 🟡 | 🟡 | 近戰、術法、相剋、狀態、寶石、義士三招 + 融合、防具/武器 3 槽/耐久 | 其他 5 職武器/特技/絕招、弩箭消耗、組隊經驗分配（而家同伴 50% 歸主公）、狀態 icon 列、術法快捷列 3 本切換 UI |
 | 03 善惡死亡 | 🟡 | ✅ | 七階、死亡掉物品/跌經驗、價格加成 | 攻擊居民/紅名 NPC（而家 `cmd_attack` 只准打 mob）、反擊 +100、天譴、幸運符/護身符/還魂丹、殺人魔拒入城、罪犯拒官令 |
 | 04 怪物地圖 | 🟡 | ✅ | 46 怪 + 掉落導入、重生、逃跑/群攻、boss 每日、夜怪、汝南洞 10 層、張牛角戰役 | 地面掉落物（`dropped` 實體）、術法怪/boss 技能、特殊場景 7 個（`scenes.json`）、其餘 5 場戰役實體 |
@@ -54,9 +54,11 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
   - 完成：`data/experts.json`（12 專長 + 六職上限表 + `levelExp [10,30,60,100]`【自訂】）；`rules/expert.gd`（`cap_of/level_of_exp/eff_level/add_exp` + 交易/內政/訓練/救災 效果係數 純函數）；`ch.expert` + `sim.expert_lv()`；交易 即刻接 sim 買賣/代賣/天地商行（`RulesShop` 加 `trade_lv`）+ UI 顯示價（`main._buy_price/_sell_price` 同步）；天文 lv≥1 + 帶渾天儀(26029) → `sim.view_weather()`（各城季節/天災）；地理 lv≥1 → 小地圖顯示全部設施（`mobile_hud.gd`，非傳送點藍色）；角色面板「專長」頁（Lv 色 藍綠紅紫 + 上限 + exp 進度）；新測試入 `run_char.gd`（t_expert_rules/trade/weather_geo，已接入 `run_tests.sh`）；另修 `create_panel` LineEdit reparent（refresh 未即時脫離舊 parent 會炸）
   - 偏離：地理「迷宮地圖」效果未做（而家冇迷宮小地圖系統；小地圖顯示設施已接）
   - 延後掛鈎：內政/救災 → S08；訓練/警戒/偵查/統御/補給 → S08/S10；專長任務 → S06；渾天儀來源 → S11（見 §4）
-- [ ] **S01d 二轉 / 三轉框架**：`classes.json` `tier2/tier3`（名/武器群/承繼）；`cmd_class_promote`；轉職效果（職名、進階武器解鎖、絕招四招起解鎖、專長上限↑）；二轉「轉職考試」任務（50 級，打對應等級怪 + 任務道具）
-  - UI：角色面板顯示職階；轉職對話
-  - 延後掛鈎：三轉任務（七彩項鍊）→ S04 特殊場景做完先接
+- [x] **S01d 二轉 / 三轉框架**：`classes.json` `tier2/tier3`（名/武器群/承繼）；`rules/class.gd`（`tier_of/title_of/tier_name_of/weapon_tier_required/ultimate_usable/expert_cap_bonus/promote_ok`）；`sim.cmd_class_promote`；轉職效果（職名、進階武器解鎖 req_lv 51~99 要二轉/100+ 要三轉、絕招四招起解鎖【原】、專長上限 二轉+1/三轉+2【自訂】）；二轉「轉職考試」任務 `promote_test`（50 級，新導師 NPC `promote_master` + 3 隻試煉怪 19002~19004 掉「試煉之證」×3）
+  - 完成：`char_panel.gd` 顯示職名+階級、轉職掣（達標先顯示）；`equip.gd`/`sim_econ.gd` 武器裝備擋 req_tier；`sim_skill.gd` 絕招使用擋 reqTier/reqLevel + 六招「玄冰麒麟」freeze 特效；`experts.json` levelExp 加到 6 級；`run_char.gd` +5 個測試（t_class_rules/t_promote_flow/t_ult_req_tier/t_weapon_req_tier/t_expert_tier_boost）；`run_monsters.gd` CUSTOM_DROPS 白名單 +19002~19004
+  - 偏離：試煉怪 id 原定 21001~21003，同 CSV 現有怪物撞號，改用 19002~19004（無主 id 段，同 19001 洞窟獸王相鄰）
+  - UI：角色面板顯示職階；轉職掣（`main._send({"t":"promote"})` → `sim.cmd_class_promote`）
+  - 延後掛鈎：三轉任務 `promote_test2`（七彩項鍊）→ S04 特殊場景做完先接（見 §4）
 - 驗收：`tests/run_char.gd`（新）+ 相關舊測試 + `--uitest`
 
 ### S02 戰鬥（spec 02）

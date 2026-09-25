@@ -1,5 +1,5 @@
 {
- "_note": "任務定義 (spec 06 §1.1~§2)【原=流程/條件；自訂=數值奬勵/對話措辭】。stage 順序 = array 序；next 欄位省略（照序）。stage type: talk(同 npc 傾偈, getItem=對話中攞到道具) / talk_n(同 n 個 npc 傾偈) / repeat(重複 n 次, perDay=每日最多 1 次) / collect(交道具, 用 cmd_quest_turnin) / ask(答題, 用 cmd_quest_answer) / facility(用設施, 由 cmd_facility 推進) / fight(PK, Step 10+ 用)。hidden=true 唔顯示喺記事（service NPC）。 Step 16 歷史任務 (type=history, spec 06 §4【原】sy3_5): talk.takeItems = 對話要帶齊呢啲道具先推進 (推進時扣)；fight = 行近 npc 對話召喚 boss；pre.attr = 屬性門檻 (魅力)；reward.polExp = 政治經驗。 Step 16.5 (B3): repeat.dialogs = 第 n 次對白、repeat.dayMsg = 同日再嚟嘅提示。對話措辭【自訂】。",
+ "_note": "任務定義 (spec 06 §1.1~§2)【原=流程/條件；自訂=數值奬勵/對話措辭】。stage 順序 = array 序；next 欄位省略（照序）。stage type: talk(同 npc 傾偈, getItem=對話中攞到道具) / talk_n(同 n 個 npc 傾偈) / repeat(重複 n 次, perDay=每日最多 1 次) / collect(交道具, 用 cmd_quest_turnin) / ask(答題, 用 cmd_quest_answer) / facility(用設施, 由 cmd_facility 推進) / fight(PK, Step 10+ 用)。hidden=true 唔顯示喺記事（service NPC）。 Step 16 歷史任務 (type=history, spec 06 §4【原】sy3_5): talk.takeItems = 對話要帶齊呢啲道具先推進 (推進時扣)；fight = 行近 npc 對話召喚 boss；pre.attr = 屬性門檻 (魅力)；reward.polExp = 政治經驗。 Step 16.5 (B3): repeat.dialogs = 第 n 次對白、repeat.dayMsg = 同日再嚟嘅提示。對話措辭【自訂】。 S01d: promote_test 轉職考試（二轉 Lv50 前置，spec 01 §7），完成先可以由角色面板轉職；三轉任務 S04d 接。",
  "quests": [
   {
    "id": "newbie_mystery",
@@ -871,6 +871,48 @@
       5
      ]
     ]
+   }
+  },
+  {
+   "id": "promote_test",
+   "name": "轉職考試",
+   "type": "general",
+   "giver": "promote_master",
+   "pre": {
+    "level": 50
+   },
+   "preHint": "Lv50 後去許昌城中心搵轉職導師。（二轉考驗）",
+   "stages": [
+    {
+     "type": "talk",
+     "npc": "promote_master",
+     "dialog": [
+      "轉職導師：「你功夫已有一定火候。要成為『武士』，就要接受轉職考驗——去野外打敗試煉守衛、試煉武師同試煉魔將，集齊 5 塊『試煉之證』返嚟。」",
+      "轉職導師：「試煉怪出沒喺許昌東面高級野區，Lv45 起。小心行事！」"
+     ],
+     "hint": "同轉職導師傾偈，接受轉職考試"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 51100,
+      "n": 5
+     },
+     "hint": "去野外打試煉怪（許昌東面高級野區），收集試煉之證 (%v/%n)"
+    },
+    {
+     "type": "talk",
+     "npc": "promote_master",
+     "dialog": [
+      "轉職導師：「5 塊試煉之證，證明你實力已足。回報朝廷，你即成為武士！」",
+      "轉職導師：「返去角色面板，撳『轉職』完成儀式。」"
+     ],
+     "hint": "返去同轉職導師報告，完成考試",
+     "done": true
+    }
+   ],
+   "reward": {
+    "fame": 10
    }
   }
  ]

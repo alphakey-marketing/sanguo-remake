@@ -177,6 +177,9 @@ func cmd_use_ultimate(id: int, ult_id: String) -> void:
 		return
 	if str(ult["class"]) != str(ch["classId"]):
 		return _msg(id, "你嘅職業用唔到呢招")
+	var climit := RulesClass.ultimate_usable(ch, ult)   # S01d: 四招起要二轉/五·六招要三轉【原】
+	if not bool(climit["ok"]):
+		return _msg(id, str(climit["why"]))
 	var w := int(ch["equip"].get("weapon", 0))
 	if w == 0 or int(data.cats.get(w, 0)) != int(ult["weaponCat"]):
 		return _msg(id, "要用矛類武器先用得「%s」" % ult["name"])
@@ -215,6 +218,11 @@ func cmd_use_ultimate(id: int, ult_id: String) -> void:
 		var dmg := MathX.js_round(dmg0 * float(ult["mult"]) * elem_mult)
 		_emit({"k": "ult_hit", "src": id, "dst": o["id"], "dmg": dmg, "ult": ult_id})
 		damage(o, dmg, e)
+		var sfx := str(ult.get("sfxStatus", ""))          # 六招特效【自訂】: 玄冰麒麟凍結 (spec 02 §5 "含特效")
+		if sfx != "" and int(o["hp"]) > 0:
+			if not o.has("status"):
+				o["status"] = {}
+			RulesSpell.add_status(o["status"], sfx, int(ult.get("sfxTicks", 300)), tick)
 
 
 
