@@ -32,6 +32,14 @@
       "lv": 5,
       "quest": "skill_unlock_bianshi",
       "desc": "喺居民側邊竊聽對話，得任務情報傳聞線索（耳邊「…」）"
+    },
+    {
+      "id": "toushi",
+      "name": "透視",
+      "class": "meinu",
+      "lv": 5,
+      "quest": "skill_unlock_meinu",
+      "desc": "對 NPC/怪物用 → 顯示隱藏資訊（HP/MP/等級/弱點屬性），入洞悉狀態 +20% 攻擊力"
     }
   ]
 }

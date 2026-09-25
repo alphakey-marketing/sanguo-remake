@@ -647,6 +647,13 @@ func _run() -> void:
 	hud.skill_pressed.emit({"kind": "skill", "skill": "qieting"})
 	await frames(1)
 	check(_msg_count() == m3 + 1, "撳竊聽掣冇居民 → 有提示")
+	# S02c-美女 透視: 特技掣換 id, 撳落去 → 出提示 (有目標就透視/冇就提示, 唔炸)
+	ch["classId"] = "meinu"
+	ch["classSkill"] = "toushi"
+	var m4 := _msg_count()
+	hud.skill_pressed.emit({"kind": "skill", "skill": "toushi"})
+	await frames(1)
+	check(_msg_count() >= m4 + 1, "撳透視掣 → 有提示")
 	print("[TEST] ui_smoke: %d, fail %d" % [total, fails])
 	print("PASS: ui smoke" if fails == 0 else "FAIL: ui smoke")
 	get_tree().quit(1 if fails > 0 else 0)

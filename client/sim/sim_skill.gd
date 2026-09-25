@@ -63,7 +63,16 @@ func cmd_cast_spell(id: int, slot: int, target: int) -> void:
 	if int(ch["mp"]) < mp_cost:
 		return _msg(id, "靈力不足 (要 %d MP)" % mp_cost)
 	var tgt_id := 0
-	if str(def["kind"]) != "buff":
+	if str(def["kind"]) == "heal":
+		# 恢復術: target 0 = 自己；唔係就補同伴/玩家 (要有 ch)
+		if target != 0:
+			var th := ent(target)
+			if th.is_empty() or int(th["hp"]) <= 0 or not th.has("ch"):
+				return _msg(id, "目標唔啱（要自己或同伴）")
+			if not RulesCombat.in_range(e["x"], e["y"], th["x"], th["y"], float(def["range"])):
+				return _msg(id, "太遠，施唔到")
+			tgt_id = target
+	elif str(def["kind"]) != "buff":
 		var t := ent(target)
 		if t.is_empty() or int(t["hp"]) <= 0 or (t.get("kind", "") != "mob" and not t.has("ch")):
 			return _msg(id, "目標唔啱")
@@ -110,6 +119,29 @@ func _resolve_cast(p: Dictionary) -> void:
 			_spell_status(p, def, t2)
 		"buff":
 			_spell_buff(p, def)
+		"heal":
+			_spell_heal(p, def)
+
+
+# 恢復術 (美女系, S02c, spec 02 §3.1): 單體補 HP。目標 = 自己 (target 0) 或 同伴/玩家 (要有 ch)。
+func _spell_heal(p: Dictionary, def: Dictionary) -> void:
+	var ct := int((p.get("casting", {}) as Dictionary).get("target", 0))
+	if ct == 0:
+		ct = int(p["id"])
+	var t := ent(ct)
+	if t.is_empty() or int(t["hp"]) <= 0 or not t.has("ch"):
+		return _msg(int(p["id"]), "目標唔可以補血")
+	if not RulesCombat.in_range(p["x"], p["y"], t["x"], t["y"], 8):
+		return _msg(int(p["id"]), "目標行遠咗，術法落空")
+	var ch2: Dictionary = t["ch"]
+	var heal := maxi(1, MathX.js_round(float(def["power"]) * (1.0 + float(_jewel_bonus(ch2).get("healPct", 0.0)))))
+	var before := int(ch2["hp"])
+	var max_hp := int(t.get("max_hp", 1))
+	ch2["hp"] = mini(max_hp, before + heal)
+	var got := int(ch2["hp"]) - before
+	_sync_stats(t)
+	_emit({"k": "restore", "dst": int(t["id"]), "src": int(p["id"]), "hp": got, "name": str(def["name"])})
+	_msg(int(p["id"]), "「%s」回復 %d HP！" % [str(def["name"]), got])
 
 
 # 特殊石: 施法時裝備咗對應元素 (spells.json jewel 欄 = 元素名) 嘅 special 石先得 (Step 10)
@@ -251,6 +283,8 @@ func cmd_use_skill(id: int, skill_id: String) -> void:
 			_try_yinxing(id)
 		"qieting":
 			_try_qieting(id)
+		"toushi":
+			_try_toushi(id)
 		_:
 			_msg(id, "嗰招特技而家用唔到")
 
@@ -344,6 +378,54 @@ func _try_qieting(id: int) -> void:
 		ch["rumors"] = rumors
 	_emit({"k": "qieting", "dst": id, "who": best, "text": line, "total": rumors.size()})
 	_msg(id, "【%s 耳邊「…」】%s" % [best, line])
+
+
+# 透視 (美女, S02c, spec 02 §6【自訂】單機化): 對喺範圍內最近嘅 NPC/怪用 -> 顯示隱藏資訊
+# （HP/MP/等級/弱點屬性），並入「洞悉」狀態 +20% 攻擊力（戰鬥優勢）。有冷卻。
+func _try_toushi(id: int) -> void:
+	var e := ent(id)
+	var ch: Dictionary = e["ch"]
+	if tick < int(ch.get("toushiCd", 0)):
+		return _msg(id, "啱啱透視過，眼前仲有撻痕（%d tick 後先用得）" % [int(ch.get("toushiCd", 0)) - tick])
+	# 揀喺範圍內最近嘅目標 (怪物 或 居民/NPC 實體)
+	var best: Dictionary = {}
+	var best_d := 1 << 30
+	for o in ents.values():
+		var k := str(o.get("kind", ""))
+		if k != "mob" and k != "bot" and k != "gen":
+			continue
+		if k == "mob" and int(o["hp"]) <= 0:
+			continue
+		var d: int = maxi(absi(int(o["x"]) - int(e["x"])), absi(int(o["y"]) - int(e["y"])))
+		if d <= RulesToushi.TOUSHI_RANGE and d < best_d:
+			best_d = d
+			best = o
+	if best.is_empty():
+		return _msg(id, "附近冇可以透視嘅目標")
+	# 收集隱藏資訊
+	var k := str(best.get("kind", ""))
+	var info := {"name": str(best.get("name", "目標")), "level": int(best.get("level", 0)),
+		"hp": int(best.get("hp", 0)), "maxHp": int(best.get("max_hp", 0)),
+		"mp": 0, "maxMp": 0, "elem": "none", "weakness": ""}
+	if k == "mob":
+		var mdef: Dictionary = data.mob_def(int(best["mob"]["def"]))
+		info["elem"] = str(mdef.get("element", "none"))
+	else:
+		# 居民/NPC: 有 ch 先顯示藝/靈力 (bot 無 ch)
+		var bch: Dictionary = best.get("ch", {})
+		if not bch.is_empty():
+			info["mp"] = int(bch.get("mp", 0))
+			info["maxMp"] = RulesStats.max_mp(int(bch.get("level", 0)), bch.get("attrs", {}))
+	info["weakness"] = RulesToushi.weakness_of(String(info["elem"]))
+	ch["toushiCd"] = tick + RulesToushi.TOUSHI_CD_TICKS
+	if not ch.has("status"):
+		ch["status"] = {}
+	RulesSpell.add_status(ch["status"], "insight", RulesToushi.INSIGHT_TICKS, tick)
+	_sync_stats(e)
+	_emit({"k": "toushi", "dst": id, "info": info, "insight_until": tick + RulesToushi.INSIGHT_TICKS})
+	var wk := String(info["weakness"])
+	_msg(id, "透視【%s】Lv%d HP %d/%d · 弱點：%s（入洞悉 +%d%% 攻擊）" % [info["name"], int(info["level"]),
+			int(info["hp"]), int(info["maxHp"]), wk if wk != "" else "無", int(RulesSpell.INSIGHT_ATK_MULT * 100)])
 const REVIVE_RANGE := 5
 func _try_chaodu(id: int) -> void:
 	var e := ent(id)

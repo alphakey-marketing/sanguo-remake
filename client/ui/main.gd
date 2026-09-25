@@ -320,7 +320,7 @@ func _log(s: String) -> void:
 
 const STATUS_NAMES := {"sealed": "封咒", "hex": "中邪", "power1": "聚力", "power2": "強力", "power3": "神力",
 	"armor1": "護甲", "armor2": "金甲", "armor3": "聖鎧", "mirror1": "護鏡", "mirror2": "光鏡", "mirror3": "仙鏡",
-	"stealth": "潛行"}
+	"stealth": "潛行", "insight": "洞悉"}
 const ELEM_TAG := {"earth": "地", "water": "水", "fire": "火", "wind": "風"}
 
 func _ent_name(id: int) -> String:
@@ -477,6 +477,18 @@ func _on_event(e: Dictionary) -> void:
 				_log("【%s 耳邊「…」】%s" % [str(e.get("who", "居民")), str(e.get("text", ""))])
 				if hud != null:
 					_set_banner("耳邊「…」%s" % str(e.get("text", "")), Color(0.85, 0.85, 0.95), 5.0)
+		"toushi":                              # S02c-美女 透視: 顯示隱藏資訊 + 洞悉
+			if int(e.dst) == my_id:
+				var inf = e.get("info", {})
+				if inf is Dictionary:
+					var wk := str(inf.get("weakness", ""))
+					_log("透視【%s】Lv%d HP %d/%d 弱點：%s" % [str(inf.get("name", "")), int(inf.get("level", 0)),
+						int(inf.get("hp", 0)), int(inf.get("maxHp", 0)), wk if wk != "" else "無"])
+					if hud != null:
+						_set_banner("透視【%s】Lv%d HP %d/%d 弱點：%s（+20%% 攻擊）" % [str(inf.get("name", "")),
+							int(inf.get("level", 0)), int(inf.get("hp", 0)), int(inf.get("maxHp", 0)),
+							wk if wk != "" else "無"], Color(0.7, 0.9, 1.0), 4.5)
+
 		# ---- 登用 (Step 13.5) ----
 		"recruit_survey", "recruit_quiz":
 			if int(e.dst) == my_id and hud != null and not autotest:

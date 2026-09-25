@@ -252069,6 +252069,293 @@
   "b80": 0
  },
  {
+  "id": 30697,
+  "name": "一級恢復術",
+  "cat": 45,
+  "cat_label": "技能書/術",
+  "template": 30513,
+  "price": 500,
+  "u24": 0,
+  "weight": 5,
+  "b28": 5,
+  "req_lv": 10,
+  "pet_req_lv": 0,
+  "pet_req_loyal": 0,
+  "craft_kind": 0,
+  "craft_lv": 0,
+  "effects": [
+   {
+    "type": 50,
+    "label": "恢復術(單體補HP)",
+    "value": 50,
+    "dan": false
+   },
+   {
+    "type": 2,
+    "label": "敏捷",
+    "value": 0,
+    "dan": false
+   }
+  ],
+  "req_a": [7, 0, 0],
+  "req_b": [10, 0, 0],
+  "b47": 0,
+  "b48": 0,
+  "b49": 0,
+  "b53": 250,
+  "b54_59": [0, 2, 10, 1, 0, 0],
+  "materials": [],
+  "w76": 0,
+  "w78": 0,
+  "b80": 0
+ },
+ {
+  "id": 30698,
+  "name": "二級恢復術",
+  "cat": 45,
+  "cat_label": "技能書/術",
+  "template": 30513,
+  "price": 1000,
+  "u24": 0,
+  "weight": 5,
+  "b28": 5,
+  "req_lv": 16,
+  "pet_req_lv": 0,
+  "pet_req_loyal": 0,
+  "craft_kind": 0,
+  "craft_lv": 0,
+  "effects": [
+   {
+    "type": 50,
+    "label": "恢復術(單體補HP)",
+    "value": 120,
+    "dan": false
+   },
+   {
+    "type": 2,
+    "label": "敏捷",
+    "value": 0,
+    "dan": false
+   }
+  ],
+  "req_a": [7, 0, 0],
+  "req_b": [16, 0, 0],
+  "b47": 0,
+  "b48": 0,
+  "b49": 0,
+  "b53": 250,
+  "b54_59": [0, 2, 10, 1, 0, 0],
+  "materials": [],
+  "w76": 0,
+  "w78": 0,
+  "b80": 0
+ },
+ {
+  "id": 30699,
+  "name": "三級恢復術",
+  "cat": 45,
+  "cat_label": "技能書/術",
+  "template": 30513,
+  "price": 1600,
+  "u24": 0,
+  "weight": 5,
+  "b28": 5,
+  "req_lv": 22,
+  "pet_req_lv": 0,
+  "pet_req_loyal": 0,
+  "craft_kind": 0,
+  "craft_lv": 0,
+  "effects": [
+   {
+    "type": 50,
+    "label": "恢復術(單體補HP)",
+    "value": 220,
+    "dan": false
+   },
+   {
+    "type": 2,
+    "label": "敏捷",
+    "value": 0,
+    "dan": false
+   }
+  ],
+  "req_a": [7, 0, 0],
+  "req_b": [22, 0, 0],
+  "b47": 0,
+  "b48": 0,
+  "b49": 0,
+  "b53": 250,
+  "b54_59": [0, 2, 10, 1, 0, 0],
+  "materials": [],
+  "w76": 0,
+  "w78": 0,
+  "b80": 0
+ },
+ {
+  "id": 30700,
+  "name": "四級恢復術",
+  "cat": 45,
+  "cat_label": "技能書/術",
+  "template": 30513,
+  "price": 2400,
+  "u24": 0,
+  "weight": 5,
+  "b28": 5,
+  "req_lv": 28,
+  "pet_req_lv": 0,
+  "pet_req_loyal": 0,
+  "craft_kind": 0,
+  "craft_lv": 0,
+  "effects": [
+   {
+    "type": 50,
+    "label": "恢復術(單體補HP)",
+    "value": 400,
+    "dan": false
+   },
+   {
+    "type": 2,
+    "label": "敏捷",
+    "value": 0,
+    "dan": false
+   }
+  ],
+  "req_a": [7, 0, 0],
+  "req_b": [28, 0, 0],
+  "b47": 0,
+  "b48": 0,
+  "b49": 0,
+  "b53": 250,
+  "b54_59": [0, 2, 10, 1, 0, 0],
+  "materials": [],
+  "w76": 0,
+  "w78": 0,
+  "b80": 0
+ },
+ {
+  "id": 30701,
+  "name": "五級恢復術",
+  "cat": 45,
+  "cat_label": "技能書/術",
+  "template": 30513,
+  "price": 3400,
+  "u24": 0,
+  "weight": 5,
+  "b28": 5,
+  "req_lv": 34,
+  "pet_req_lv": 0,
+  "pet_req_loyal": 0,
+  "craft_kind": 0,
+  "craft_lv": 0,
+  "effects": [
+   {
+    "type": 50,
+    "label": "恢復術(單體補HP)",
+    "value": 700,
+    "dan": false
+   },
+   {
+    "type": 2,
+    "label": "敏捷",
+    "value": 0,
+    "dan": false
+   }
+  ],
+  "req_a": [7, 0, 0],
+  "req_b": [34, 0, 0],
+  "b47": 0,
+  "b48": 0,
+  "b49": 0,
+  "b53": 250,
+  "b54_59": [0, 2, 10, 1, 0, 0],
+  "materials": [],
+  "w76": 0,
+  "w78": 0,
+  "b80": 0
+ },
+ {
+  "id": 30702,
+  "name": "六級恢復術",
+  "cat": 45,
+  "cat_label": "技能書/術",
+  "template": 30513,
+  "price": 4800,
+  "u24": 0,
+  "weight": 5,
+  "b28": 5,
+  "req_lv": 40,
+  "pet_req_lv": 0,
+  "pet_req_loyal": 0,
+  "craft_kind": 0,
+  "craft_lv": 0,
+  "effects": [
+   {
+    "type": 50,
+    "label": "恢復術(單體補HP)",
+    "value": 1100,
+    "dan": false
+   },
+   {
+    "type": 2,
+    "label": "敏捷",
+    "value": 0,
+    "dan": false
+   }
+  ],
+  "req_a": [7, 0, 0],
+  "req_b": [40, 0, 0],
+  "b47": 0,
+  "b48": 0,
+  "b49": 0,
+  "b53": 250,
+  "b54_59": [0, 2, 10, 1, 0, 0],
+  "materials": [],
+  "w76": 0,
+  "w78": 0,
+  "b80": 0
+ },
+ {
+  "id": 30703,
+  "name": "七級恢復術",
+  "cat": 45,
+  "cat_label": "技能書/術",
+  "template": 30513,
+  "price": 6800,
+  "u24": 0,
+  "weight": 5,
+  "b28": 5,
+  "req_lv": 46,
+  "pet_req_lv": 0,
+  "pet_req_loyal": 0,
+  "craft_kind": 0,
+  "craft_lv": 0,
+  "effects": [
+   {
+    "type": 50,
+    "label": "恢復術(單體補HP)",
+    "value": 1800,
+    "dan": false
+   },
+   {
+    "type": 2,
+    "label": "敏捷",
+    "value": 0,
+    "dan": false
+   }
+  ],
+  "req_a": [7, 0, 0],
+  "req_b": [46, 0, 0],
+  "b47": 0,
+  "b48": 0,
+  "b49": 0,
+  "b53": 250,
+  "b54_59": [0, 2, 10, 1, 0, 0],
+  "materials": [],
+  "w76": 0,
+  "w78": 0,
+  "b80": 0
+ },
+ {
   "id": 31001,
   "name": "一般乾糧",
   "cat": 201,

@@ -15,9 +15,9 @@
 - 大 Step 開工先「核實」spec vs 代碼，更新 PLAN §1 同清單
 - 跨 spec 依賴：先做資料 + 掛鈎 + 測試，效果喺後面 Step 接，記入 PLAN §4
 - PLAN 標【待決】= 做到嗰步先問用家，唔好自己估
-- **下一步 = PLAN §3 第一個未剔 `[ ]`**（2026-09-25：S02c-巫女完，下一步 S02c-辯士）
+- **下一步 = PLAN §3 第一個未剔 `[ ]`**（2026-09-25：S02c-美女完，下一步 S03a 可攻擊 NPC）
 
-## 現況 (2026-09-25，S02c 道士開放完)
+## 現況 (2026-09-25，六職全開；下一步 S03 善惡死亡)
 - **全部喺 `client/` (Godot 4.7, GDScript)**：`rules/`(純函數)、`sim/`(單機世界模擬，狀態可存檔、種子 RNG)、`ui/`(`touch/` HUD 觸控 + `panels/` 正式面板)、`tests/`
 - 詳細現況 = PLAN §1；已做系統 → 檔案索引：
 
@@ -25,7 +25,7 @@
 |---|---|---|---|
 | 角色/點數/測驗/修練/行動力/飲水/專長/職階（二轉三轉） | `stats.gd` `quiz.gd` `title.gd` `expert.gd` `class.gd` | `sim_char.gd` | `classes.json` `quiz.json` `experts.json` |
 | 戰鬥/術法/寶石/絕招/融合 | `combat.gd` `spell.gd` `jewel.gd` | `sim_combat.gd` `sim_skill.gd` `sim_ai.gd` | `monsters.json`(掉落由 `tools/import_drops.py` 生成) |
-| 職業特技（義士融合內建；仕女開鎖、道士超渡、**巫女潛行、辯士竊聽**已開） | `class_skill.gd` + `stealth.gd` + `qieting.gd` + `ammo.gd` | `sim_skill.gd`（`cmd_use_skill`/`cmd_skill_pick`/`cmd_stealth_cross`/`_try_qieting`）+ `sim_ai.gd`（弩箭消耗） | `class_skills.json` `rumors.json` |
+| 職業特技（義士融合內建；仕女開鎖、道士超渡、**巫女潛行、辯士竊聽、美女透視**已開） | `class_skill.gd` + `stealth.gd` + `qieting.gd` + `ammo.gd` + `toushi.gd` | `sim_skill.gd`（`cmd_use_skill`/`cmd_skill_pick`/`cmd_stealth_cross`/`_try_qieting`/`_try_toushi`/`_spell_heal`）+ `sim_ai.gd`（弩箭消耗） | `class_skills.json` `rumors.json` `spells.json`（+恢復術一~七級） |
 | 裝備/耐久 | `equip.gd` | `sim_econ.gd` | `equip.json` |
 | 善惡 | `karma.gd` | `sim_combat.gd` | — |
 | 生產/修理/天地商行/捐獻/市場 | `work.gd` `tiandi.gd` `market.gd` `shop.gd` | `sim_econ.gd` | `work.json` `recipes.json`(生成) `shops.json` `donation.json` |
