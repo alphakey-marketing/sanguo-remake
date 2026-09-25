@@ -23,7 +23,8 @@ static func new_mount(cfg: Dictionary, breed: String, uid: int, tamed: bool = fa
 		attrs[a] = int(cfg["attrTrait"]) if String(b.get("trait", "")) == String(a) else int(cfg["attrBase"])
 	var m := {"uid": uid, "breed": breed, "nick": "", "sex": "f", "age": 0, "life": int(st["life"]),
 		"satiety": int(st["satiety"]), "intimacy": int(st["intimacy"]), "mood": int(st["mood"]), "fatigue": 0,
-		"attrs": attrs, "grow": 0, "excel": 0, "points": 0, "status": {}, "acts": {}, "where": "with", "stable": "", "back": 0, "rideAcc": 0}
+		"attrs": attrs, "grow": 0, "excel": 0, "points": 0, "status": {}, "acts": {}, "where": "with", "stable": "", "back": 0, "rideAcc": 0,
+		"bpts": 0, "totalBpts": 0, "caps": {}, "adv": false}
 	if tamed:
 		var tm: Dictionary = cfg["tamed"]
 		m["age"] = int(cfg["foalDays"])
@@ -51,7 +52,11 @@ static func display_name(cfg: Dictionary, m: Dictionary) -> String:
 	if String(m.get("nick", "")) != "":
 		return String(m["nick"])
 	var b := breed_def(cfg, String(m["breed"]))
-	return String(b.get("name" if stage(cfg, m) == "foal" else "adult", "馬"))
+	if stage(cfg, m) == "foal":
+		return String(b.get("name", "馬"))
+	if bool(m.get("adv", false)):
+		return String(b.get("advAdult", b.get("adult", "馬")))
+	return String(b.get("adult", "馬"))
 
 
 # 疲勞上限 = 基本 + 忍耐力【原=忍耐力決定上限】
@@ -59,9 +64,18 @@ static func fatigue_max(cfg: Dictionary, m: Dictionary) -> int:
 	return int(cfg["fatigueBase"]) + int(m["attrs"]["endure"])
 
 
-# 生命力上限 = 100 + 優秀值 × levelLife (放牧成長會加)
+# 生命力上限 = 100 (進階馬 ×2【原】) + 優秀值 × levelLife (放牧成長會加)
 static func life_max(cfg: Dictionary, m: Dictionary) -> int:
-	return int(cfg["start"]["life"]) + int(m.get("excel", 0)) * int(cfg["graze"]["levelLife"])
+	var base := int(cfg["start"]["life"]) * (2 if bool(m.get("adv", false)) else 1)
+	return base + int(m.get("excel", 0)) * int(cfg["graze"]["levelLife"])
+
+
+# 屬性上限: 底 attrCap + 繁衍積點兌換嘅 cap 加成 + 進階馬額外上限【原】
+static func attr_cap(cfg: Dictionary, m: Dictionary, attr: String) -> int:
+	var bonus := int((m.get("caps", {}) as Dictionary).get(attr, 0))
+	if bool(m.get("adv", false)):
+		bonus += int(cfg["breed"].get("advCapBonus", 0))
+	return int(cfg["attrCap"]) + bonus
 
 
 static func mood_name(cfg: Dictionary, m: Dictionary) -> String:
@@ -129,8 +143,8 @@ static func eff_value(v: int) -> int:
 	return v - 65536 if v > 32767 else v
 
 
-static func _clamp_attr(cfg: Dictionary, v: int) -> int:
-	return clampi(v, 0, int(cfg["attrCap"]))
+static func _clamp_attr(cfg: Dictionary, m: Dictionary, attr: String, v: int) -> int:
+	return clampi(v, 0, attr_cap(cfg, m, attr))
 
 
 # 加疲勞: 爆表 = 頭暈【原】；返 true = 啱啱頭暈
@@ -187,7 +201,7 @@ static func apply_act(cfg: Dictionary, m: Dictionary, act: String, effects: Arra
 			if not deltas.has(a):
 				continue
 			var a0 := int(m["attrs"][a])
-			m["attrs"][a] = _clamp_attr(cfg, a0 + int(deltas[a]))
+			m["attrs"][a] = _clamp_attr(cfg, m, a, a0 + int(deltas[a]))
 			if int(m["attrs"][a]) != a0:
 				changes.append("%s %+d" % [names[a], int(m["attrs"][a]) - a0])
 	elif not deltas.is_empty():
@@ -366,4 +380,131 @@ static func spend_point(cfg: Dictionary, m: Dictionary, attr: String) -> bool:
 		return false
 	m["points"] = int(m["points"]) - 1
 	m["attrs"][attr] = int(m["attrs"][attr]) + 1
+	return true
+
+
+# ================= 繁衍 (Step 17b, spec 07 §6) =================
+# 單機簡化【自訂】: 配種 = 馬廄「種馬借用」(caller 收 studPrice 金) + 揀種馬品種 sire
+# 胎教小遊戲: 落注 5 選 1，估中攞返 betOdds[中嗰個] 積點；胎氣必 +1；100 胎氣可以接生
+# 懶人胎教: 放咗 lazyDays 日自動生，積點封頂 lazyBpts
+
+static func breed_why(cfg: Dictionary, m: Dictionary) -> String:
+	if String(m["sex"]) != "f":
+		return "唔係母馬，配唔到種"
+	if stage(cfg, m) != "adult":
+		return "要成熟期先配得種"
+	if m.has("preg"):
+		return "已經有咗身孕"
+	return ""
+
+
+static func breed_start(cfg: Dictionary, m: Dictionary, sire: String) -> void:
+	var b: Dictionary = cfg["breed"]
+	m["preg"] = {"sire": sire, "motive": int(b["motiveStart"]), "taiqi": 0, "bpts": 0, "lazy": false, "lazyDay": 0}
+
+
+static func breed_ready(cfg: Dictionary, m: Dictionary) -> bool:
+	if not m.has("preg"):
+		return false
+	return int(m["preg"]["taiqi"]) >= int(cfg["breed"]["taiqiNeed"])
+
+
+static func breed_can_play(cfg: Dictionary, m: Dictionary) -> String:
+	if not m.has("preg"):
+		return "未配種"
+	if breed_ready(cfg, m):
+		return "胎氣夠喇，可以接生"
+	if int(m["preg"]["motive"]) < int(cfg["breed"]["betCost"]):
+		return "動力值唔夠，聽日先再嚟"
+	return ""
+
+
+# 擲跑馬燈: outcome 平均 5 揀 1；估中 (choice == outcome) 攞返 betOdds[outcome] 積點
+static func breed_bet(cfg: Dictionary, choice: int, r: float) -> Dictionary:
+	var b: Dictionary = cfg["breed"]
+	var n: int = (b["bets"] as Array).size()
+	var outcome := mini(n - 1, int(r * n))
+	var win := choice == outcome
+	var pts := int((b["betOdds"] as Array)[outcome]) if win else 0
+	return {"win": win, "outcome": outcome, "points": pts}
+
+
+# 落一次注: 扣動力、胎氣 +1、中咗加積點
+static func breed_play(cfg: Dictionary, m: Dictionary, choice: int, r: float) -> Dictionary:
+	var b: Dictionary = cfg["breed"]
+	var preg: Dictionary = m["preg"]
+	var res := breed_bet(cfg, choice, r)
+	preg["motive"] = maxi(0, int(preg["motive"]) - int(b["betCost"]))
+	preg["taiqi"] = int(preg["taiqi"]) + 1
+	preg["bpts"] = int(preg["bpts"]) + int(res["points"])
+	return res
+
+
+# 每日子時: 動力值回復 (<50 時 +40，否則 +20)；懶人胎教到期自動填滿。返 "ready" = 啱啱夠胎氣
+static func breed_daily(cfg: Dictionary, m: Dictionary) -> String:
+	if not m.has("preg"):
+		return ""
+	var b: Dictionary = cfg["breed"]
+	var preg: Dictionary = m["preg"]
+	var was_ready := breed_ready(cfg, m)
+	var gain := int(b["motiveGainLow"]) if int(preg["motive"]) < int(b["motiveLowThresh"]) else int(b["motiveGainHigh"])
+	preg["motive"] = clampi(int(preg["motive"]) + gain, 0, int(b["motiveCap"]))
+	if bool(preg.get("lazy", false)) and not was_ready:
+		preg["lazyDay"] = int(preg.get("lazyDay", 0)) + 1
+		if int(preg["lazyDay"]) >= int(b["lazyDays"]):
+			preg["taiqi"] = int(b["taiqiNeed"])
+			preg["bpts"] = int(b["lazyBpts"])
+	return "ready" if (not was_ready and breed_ready(cfg, m)) else ""
+
+
+# 接生: 品種 = 母血機率 damWeight : sire 血 sireWeight【原】；性別多數母【原】
+static func breed_birth(cfg: Dictionary, m: Dictionary, r1: float, r2: float) -> Dictionary:
+	var b: Dictionary = cfg["breed"]
+	var dam := String(m["breed"])
+	var sire := String(m["preg"]["sire"])
+	var dw := float(b["damWeight"])
+	var sw := float(b["sireWeight"])
+	var pick := dam if r1 * (dw + sw) < dw else sire
+	var sex := "m" if r2 < float(b["maleChance"]) else "f"
+	var bpts := int(m["preg"]["bpts"])
+	m.erase("preg")
+	return {"breed": pick, "sex": sex, "bpts": bpts}
+
+
+# 新小馬 (領走後正式加入 ch.mounts)：帶住接生嗰陣嘅積點，即刻 check 進階
+static func new_foal(cfg: Dictionary, breed: String, uid: int, sex: String, bpts: int) -> Dictionary:
+	var m := new_mount(cfg, breed, uid, false)
+	m["sex"] = sex
+	m["bpts"] = bpts
+	m["totalBpts"] = bpts
+	_check_advance(cfg, m)
+	return m
+
+
+static func _check_advance(cfg: Dictionary, m: Dictionary) -> void:
+	if bool(m.get("adv", false)):
+		return
+	var adv_need := int(breed_def(cfg, String(m["breed"])).get("advNeed", 1 << 30))
+	if int(m.get("totalBpts", 0)) >= adv_need:
+		m["adv"] = true
+
+
+# 積點分配: 照品種兌換錶，1 點換 1 個對應屬性上限【原=烏孫馬 3 點 → +1 爆發力上限】
+static func spend_bpt_why(cfg: Dictionary, m: Dictionary, attr: String) -> String:
+	if not (cfg["attrs"] as Array).has(attr):
+		return "冇呢個屬性"
+	var cost := int(breed_def(cfg, String(m["breed"])).get("exchange", {}).get(attr, 1))
+	if int(m.get("bpts", 0)) < cost:
+		return "積點唔夠 (要 %d)" % cost
+	return ""
+
+
+static func spend_bpt(cfg: Dictionary, m: Dictionary, attr: String) -> bool:
+	if spend_bpt_why(cfg, m, attr) != "":
+		return false
+	var cost := int(breed_def(cfg, String(m["breed"])).get("exchange", {}).get(attr, 1))
+	m["bpts"] = int(m["bpts"]) - cost
+	var caps: Dictionary = m.get("caps", {})
+	caps[attr] = int(caps.get(attr, 0)) + 1
+	m["caps"] = caps
 	return true

@@ -61,7 +61,12 @@ func _think_mob(m: Dictionary) -> void:
 				var caps: Dictionary = data.equip_cfg["caps"]
 				var pdef := RulesCombat.player_def(int(pch["level"])) + int(jb.get("defFlat", 0)) + int(ab["def"])
 				var pd := pdef * RulesSpell.def_mult(pch.get("status", {}), tick) * (1.0 + float(jb.get("defPct", 0.0)))
-				if rng.next() < RulesEquip.evade_chance(int(ab["evade"]), float(jb.get("evadePct", 0.0)), int(caps["evadePct"])):
+				if int(pch.get("mBlockCharges", 0)) > 0:
+					pch["mBlockCharges"] = int(pch["mBlockCharges"]) - 1
+					_emit({"k": "hit", "src": m["id"], "dst": tgt["id"], "dmg": 0})     # 馬戰「抵擋」擋咗 (Step 17b)
+				elif RulesSpell.has(pch.get("status", {}), "mshield", tick):
+					_emit({"k": "hit", "src": m["id"], "dst": tgt["id"], "dmg": 0})     # 馬戰「護盾」全防禦 (Step 17b)
+				elif rng.next() < RulesEquip.evade_chance(int(ab["evade"]), float(jb.get("evadePct", 0.0)), int(caps["evadePct"])):
 					_emit({"k": "hit", "src": m["id"], "dst": tgt["id"], "dmg": 0})     # 迴避咗
 				else:
 					var dmg := RulesEquip.reduce_dmg(RulesCombat.calc_mob_damage(d["atk"], pd, rng_fn), int(ab["dmgRed"]), int(caps["dmgRedPct"]))
@@ -127,8 +132,11 @@ func _think_player(p: Dictionary) -> void:
 		return     # 安全區唔畀出手 (登用擂台 / 任務 PK boss 例外: 丁刺史府, Step 13.5/16) (理論上怪唔會入城，呢度做多重保險)
 	if tick < int(p["next_atk"]):
 		return
-	_mount_drop(p, "attack")                # 騎馬唔用得一般武器【原】→ 落馬先打 (馬戰兵器 = Step 17b)
-	var w: Dictionary = _weapon_def(ch)     # 耐久 0 = 威力減半 (Step 12)
+	# 騎乘 + 裝備馬戰兵器 = 唔使落馬，用馬戰兵器出手【原】(Step 17b)；否則落馬用一般武器
+	var mounted_combat := is_riding(ch) and _mount_weapon_type(ch) != ""
+	if not mounted_combat:
+		_mount_drop(p, "attack")
+	var w: Dictionary = _mount_weapon_wdef(ch) if mounted_combat else _weapon_def(ch)     # 耐久 0 = 威力減半 (Step 12)
 	p["next_atk"] = tick + RulesCombat.attack_interval(_eff_attr(ch, "agi"))
 	# 輔助石命中率 % (effect 13) (Step 10, spec 02 §4)
 	var base_hit := RulesCombat.hit_chance(w["hit"], int(ch["level"]), int(t["level"]))
@@ -147,5 +155,6 @@ func _think_player(p: Dictionary) -> void:
 	var dmg0 := RulesCombat.calc_damage(eff_str, w["power"], mdef["def"], rng_fn, atk_mult, 1.0)
 	var dmg := MathX.js_round(dmg0 * elem_mult)
 	_emit({"k": "hit", "src": p["id"], "dst": t["id"], "dmg": dmg})
-	_wear_weapon_hit(p)                     # 武器出手磨損 (Step 12)
+	if not mounted_combat:
+		_wear_weapon_hit(p)                     # 武器出手磨損 (Step 12)
 	damage(t, dmg, p)

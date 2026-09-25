@@ -2,6 +2,8 @@ extends SceneTree
 # 座騎測試 (Step 17a, spec 07 §1~5): 六種馬數據【原】/ 階段 / 飼養動作 / 道具效果碼 / 子時結算 /
 # 騎乘條件 + 移速 + 騎乘疲勞 / 放牧機率 + 結果 / 優秀值點數 / 馬廄買馬寄養領馬 / 用品店 /
 # 攻擊 + 死亡落馬 / 馬瘟 / 存檔 roundtrip / 決定性
+# Step 17b (spec 07 §6~7): 繁衍 (種馬借用/胎教小遊戲/懶人胎教/積點分配/進階馬/待領小馬過期) +
+# 馬戰 (馬戰兵器/特技學習上限 3/騎乘用兵器唔落馬/aoe/combo/dash/speed/shield/block/stun)
 # 跑: Godot --headless --path client --script tests/run_mount.gd   (失敗 exit 1)
 
 var fails := 0
@@ -30,6 +32,10 @@ func _init() -> void:
 	t_daily_sim(data)
 	t_roundtrip(data)
 	t_determinism(data)
+	t_breed_pure(cfg)
+	t_breed_sim(data)
+	t_battle_pure(data)
+	t_battle_sim(data)
 	print("[TEST] mount: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -619,3 +625,239 @@ func _script(data: GameData) -> String:
 
 func t_determinism(data: GameData) -> void:
 	check(_script(data) == _script(data), "同種子同操作 → 存檔一致")
+
+
+# ---------- 繁衍 (Step 17b, spec 07 §6) ----------
+func t_breed_pure(cfg: Dictionary) -> void:
+	var m := RulesMount.new_mount(cfg, "wusun", 1, true)     # tamed 成年母馬
+	check(RulesMount.breed_why(cfg, m) == "", "成年母馬配得種")
+	var mfoal := RulesMount.new_mount(cfg, "wusun", 2, false)   # 幼馬
+	check(RulesMount.breed_why(cfg, mfoal) != "", "幼馬配唔到種")
+	RulesMount.breed_start(cfg, m, "damo")
+	check(m.has("preg") and int(m["preg"]["motive"]) == 50, "配種: 動力值 50 起【原】")
+	check(RulesMount.breed_why(cfg, m) != "", "已懷孕配唔到第二次")
+	# 落注: outcome 由 r 決定 (5 揀 1)，選中 (choice==outcome) 先得分
+	var res_win := RulesMount.breed_bet(cfg, 2, 0.41)          # r*5=2.05 → outcome=2
+	check(int(res_win["outcome"]) == 2 and bool(res_win["win"]) and int(res_win["points"]) == int(cfg["breed"]["betOdds"][2]), "估中攞返對應賠率積點")
+	var res_lose := RulesMount.breed_bet(cfg, 0, 0.41)
+	check(not bool(res_lose["win"]) and int(res_lose["points"]) == 0, "估錯冇積點")
+	var before_motive := int(m["preg"]["motive"])
+	RulesMount.breed_play(cfg, m, 2, 0.41)
+	check(int(m["preg"]["motive"]) == before_motive - int(cfg["breed"]["betCost"]) and int(m["preg"]["taiqi"]) == 1
+		and int(m["preg"]["bpts"]) == int(cfg["breed"]["betOdds"][2]), "落注: 扣動力、胎氣必 +1、估中加積點")
+	m["preg"]["motive"] = 5
+	check(RulesMount.breed_can_play(cfg, m) != "", "動力唔夠，聽日先再嚟")
+	RulesMount.breed_daily(cfg, m)
+	check(int(m["preg"]["motive"]) == 45, "動力 <50 → 每日子時 +40【原】")
+	m["preg"]["motive"] = 80
+	RulesMount.breed_daily(cfg, m)
+	check(int(m["preg"]["motive"]) == 100, "動力 >=50 → +20，封頂 100")
+	m["preg"]["taiqi"] = int(cfg["breed"]["taiqiNeed"])
+	check(RulesMount.breed_ready(cfg, m), "100 胎氣可以接生【原】")
+	check(RulesMount.breed_can_play(cfg, m) != "", "胎氣夠就唔畀再落注")
+	# 接生: 品種 = 母血機率 × damWeight : 父血 × sireWeight；性別多數母
+	var mA := RulesMount.new_mount(cfg, "wusun", 10, true)
+	RulesMount.breed_start(cfg, mA, "damo")
+	var b1 := RulesMount.breed_birth(cfg, mA, 0.1, 0.1)
+	check(not mA.has("preg"), "接生後懷孕狀態清空")
+	check(String(b1["breed"]) == "wusun" and String(b1["sex"]) == "m", "r1 細 → 母血 (機率 ×2)；r2 細 → 男")
+	var mB := RulesMount.new_mount(cfg, "wusun", 11, true)
+	RulesMount.breed_start(cfg, mB, "damo")
+	var b2 := RulesMount.breed_birth(cfg, mB, 0.99, 0.99)
+	check(String(b2["breed"]) == "damo" and String(b2["sex"]) == "f", "r1 大 → 父血；r2 大 → 女 (多數母)【原】")
+	# 懶人胎教: lazyDays 日自動填滿【自訂】
+	var m3 := RulesMount.new_mount(cfg, "wusun", 3, true)
+	RulesMount.breed_start(cfg, m3, "wusun")
+	m3["preg"]["lazy"] = true
+	for i in int(cfg["breed"]["lazyDays"]) - 1:
+		RulesMount.breed_daily(cfg, m3)
+	check(not RulesMount.breed_ready(cfg, m3), "懶人胎教未夠日未完成")
+	var ev := RulesMount.breed_daily(cfg, m3)
+	check(ev == "ready" and int(m3["preg"]["taiqi"]) == int(cfg["breed"]["taiqiNeed"])
+		and int(m3["preg"]["bpts"]) == int(cfg["breed"]["lazyBpts"]), "懶人胎教 lazyDays 日後自動完成，積點封頂 lazyBpts")
+	# 積點分配 (兌換錶) + 進階馬
+	var m4 := RulesMount.new_foal(cfg, "wusun", 4, "f", 3)
+	check(int(m4["bpts"]) == 3 and int(m4["totalBpts"]) == 3 and not bool(m4["adv"]), "新小馬帶住接生積點")
+	check(RulesMount.spend_bpt(cfg, m4, "burst") and int(m4["bpts"]) == 0
+		and RulesMount.attr_cap(cfg, m4, "burst") == int(cfg["attrCap"]) + 1, "烏孫馬 3 點換 1 爆發力上限【原】")
+	check(not RulesMount.spend_bpt(cfg, m4, "burst"), "積點用晒唔換得")
+	var m5 := RulesMount.new_foal(cfg, "wusun", 5, "f", int(RulesMount.breed_def(cfg, "wusun")["advNeed"]))
+	check(bool(m5["adv"]), "總積點 ≥ advNeed → 進階馬【原】")
+	check(RulesMount.life_max(cfg, m5) == int(cfg["start"]["life"]) * 2, "進階馬生命上限 ×2【原】")
+
+
+func t_breed_sim(data: GameData) -> void:
+	var r := _new(data, 21)
+	var sim: Sim = r[0]
+	var id: int = r[1]
+	var ch: Dictionary = r[2]
+	var msgs: Array = r[3]
+	var cfg := data.mounts
+	_at_fac(sim, id, "stable_xc")
+	sim.cmd_mount_buy(id, "dawan", true)          # tamed 成年母馬
+	var m: Dictionary = sim._mounts(ch)[0]
+	var uid := int(m["uid"])
+	var gold0 := int(ch["gold"])
+	sim.cmd_mount_breed_start(id, uid, "damo")
+	check(m.has("preg") and int(ch["gold"]) == gold0 - int(cfg["studPrice"]), "配種: 種馬借用扣 5000 金")
+	sim.cmd_mount_breed_start(id, uid, "damo")
+	check(_last(msgs).contains("身孕"), "已懷孕唔畀再配")
+	sim.cmd_mount_breed_bet(id, uid, 0)
+	check(int(m["preg"]["taiqi"]) == 1, "落注: 胎氣 +1")
+	sim.cmd_mount_breed_lazy(id, uid, true)
+	check(bool(m["preg"]["lazy"]), "懶人胎教開關")
+	m["preg"]["taiqi"] = int(cfg["breed"]["taiqiNeed"])          # 直接催熟去 claim 流程
+	sim.cmd_mount_breed_claim(id, uid)
+	check(not m.has("preg") and not (ch.get("pendingFoal", {}) as Dictionary).is_empty(), "接生: 產生待領小馬")
+	_put(sim, id, 5, 5)                                          # 唔喺馬廄
+	sim.cmd_mount_take_foal(id)
+	check(not (ch.get("pendingFoal", {}) as Dictionary).is_empty(), "唔喺馬廄領唔到")
+	_at_fac(sim, id, "stable_xc")
+	var before := sim._mounts(ch).size()
+	sim.cmd_mount_take_foal(id)
+	check(sim._mounts(ch).size() == before + 1 and (ch.get("pendingFoal", {}) as Dictionary).is_empty(), "馬廄領走小馬")
+	# 未提領過期【原=3 個月未提領死亡】
+	var m2: Dictionary = sim._mounts(ch)[0]
+	sim.cmd_mount_breed_start(id, int(m2["uid"]), "damo")
+	m2["preg"]["taiqi"] = int(cfg["breed"]["taiqiNeed"])
+	sim.cmd_mount_breed_claim(id, int(m2["uid"]))
+	for i in int(cfg["breed"]["claimDays"]) + 1:
+		_next_day(sim)
+	check((ch.get("pendingFoal", {}) as Dictionary).is_empty(), "%d 日未領走失【原】" % int(cfg["breed"]["claimDays"]))
+	# sim 指令層: 積點分配
+	var m3: Dictionary = sim._mounts(ch)[0]
+	m3["breed"] = "wusun"
+	m3["bpts"] = 3
+	sim.cmd_mount_spend_bpt(id, int(m3["uid"]), "burst")
+	check(int(m3["bpts"]) == 0 and _last(msgs).contains("爆發力"), "sim: 積點分配扣點")
+
+
+# ---------- 馬戰 (Step 17b, spec 07 §7 / spec 02 §10) ----------
+func t_battle_pure(data: GameData) -> void:
+	var cfg := data.mount_weapons
+	check(RulesMountBattle.weapon_type_of(cfg, "dao2") == "dao", "兵器種類反查")
+	check(RulesMountBattle.weapon_buy_why(cfg, 5, "dao", "dao1") != "", "等級唔夠買唔到")
+	check(RulesMountBattle.weapon_buy_why(cfg, 10, "dao", "dao1") == "", "夠 Lv 買得")
+	var learned: Array = []
+	check(RulesMountBattle.learn_why(cfg, learned, "", "dao_baoji") != "", "冇裝備對應兵器學唔到")
+	check(RulesMountBattle.learn_why(cfg, learned, "dao", "dao_baoji") == "", "有兵器就學得")
+	learned = ["dao_baoji", "dao_jiyun", "dao_didang"]
+	check(RulesMountBattle.learn_why(cfg, learned, "dao", "jian_hudun") != "", "最多學 3 招馬戰特技【原】")
+	check(RulesMountBattle.use_why(cfg, learned, false, "dao", "dao_baoji", 0, 0, 100) != "", "未騎馬用唔到")
+	check(RulesMountBattle.use_why(cfg, learned, true, "dao", "dao_baoji", 0, 0, 100) == "", "騎緊 + 裝備 + 學過 + 唔喺冷卻 + SP 夠 → 用得")
+	check(RulesMountBattle.use_why(cfg, learned, true, "dao", "dao_baoji", 100, 0, 100) != "", "冷卻中用唔到")
+	check(RulesMountBattle.use_why(cfg, learned, true, "dao", "dao_baoji", 0, 0, 1) != "", "SP 唔夠用唔到")
+	check((RulesMountBattle.skills_of(cfg, "qiang") as Array).size() == 3, "槍 3 招馬戰特技【原】")
+
+
+func t_battle_sim(data: GameData) -> void:
+	var r := _new(data, 31)
+	var sim: Sim = r[0]
+	var id: int = r[1]
+	var ch: Dictionary = r[2]
+	var msgs: Array = r[3]
+	ch["level"] = 50
+	sim._sync_stats(sim.ent(id))
+	_at_fac(sim, id, "stable_xc")
+	sim.cmd_mount_buy(id, "dawan", true)
+	sim.cmd_mount_ride(id, true)
+	check(sim.is_riding(ch), "騎住")
+	sim.cmd_mount_skill_learn(id, "dao_baoji")
+	check((ch.get("mountSkills", []) as Array).is_empty(), "未有馬戰兵器學唔到特技")
+	sim.cmd_mount_weapon_buy(id, "dao", "dao2")
+	check(String(ch.get("mountWeapon", "")) == "dao2", "買咗馬戰兵器就裝備")
+	sim.cmd_mount_skill_learn(id, "dao_baoji")
+	sim.cmd_mount_skill_learn(id, "dao_jiyun")
+	sim.cmd_mount_skill_learn(id, "dao_didang")
+	check((ch["mountSkills"] as Array).size() == 3, "學咗 3 招")
+	sim.cmd_mount_skill_learn(id, "dao_baoji")
+	check(_last(msgs).contains("已經學"), "重複學唔到")
+	sim.cmd_goto_map(id, "field_1")
+	for i in 50:
+		sim.step()
+	var mo: Dictionary = sim._spawn_mob(12012, "field_1")
+	var mob := int(mo["id"])
+	_put(sim, id, int(mo["x"]), int(mo["y"]))
+	sim.cmd_attack(id, mob)
+	for i in 20:
+		sim.step()
+	check(sim.is_riding(ch), "有馬戰兵器: 騎緊都打得，唔使落馬【原】")
+	sim.ent(id)["atk_target"] = 0        # 停低玩家自動攻擊，之後淨係試主動用特技
+	ch["mountWeapon"] = ""
+	var mo0: Dictionary = sim._spawn_mob(12012, "field_1")     # 新一隻，避免上面已經打死
+	var mob0 := int(mo0["id"])
+	_put(sim, id, int(mo0["x"]), int(mo0["y"]))
+	sim.ent(id)["next_atk"] = sim.tick
+	sim.cmd_attack(id, mob0)
+	for i in 20:
+		sim.step()
+	check(not sim.is_riding(ch), "冇馬戰兵器: 一般武器出手要落馬【原】")
+	sim.ent(id)["atk_target"] = 0
+	sim.cmd_mount_ride(id, true)
+	ch["mountWeapon"] = "dao2"
+	# 抵擋: 擋一次物理傷害 (換隻新怪，冇畀玩家自動攻擊打死)
+	var mo2: Dictionary = sim._spawn_mob(12012, "field_1")
+	_put(sim, id, int(mo2["x"]), int(mo2["y"]))
+	sim.cmd_mount_skill_use(id, "dao_didang")
+	check(int(ch.get("mBlockCharges", 0)) == 1, "抵擋: 準備擋一次")
+	mo2["mob"]["state"] = "chase"
+	mo2["mob"]["target"] = id
+	for i in 20:
+		ch["hp"] = 9999
+		sim.ent(id)["hp"] = 9999
+		sim.step()
+		if int(ch.get("mBlockCharges", 0)) == 0:
+			break
+	check(int(ch.get("mBlockCharges", 0)) == 0, "抵擋擋咗一次後清零")
+	sim.ent(id)["atk_target"] = 0
+	# 擊暈: 敵人定身 (hex) (再換隻新怪)
+	var mo3: Dictionary = sim._spawn_mob(12012, "field_1")
+	var mob3 := int(mo3["id"])
+	_put(sim, id, int(mo3["x"]), int(mo3["y"]))
+	sim.cmd_mount_skill_use(id, "dao_jiyun", mob3)
+	check(RulesSpell.has(mo3.get("status", {}), "hex", sim.tick), "擊暈: 目標定身 (hex)【自訂近似】")
+	# 爆擊: 單體高倍傷害
+	var hp1 := int(mo3["hp"])
+	sim.cmd_mount_skill_use(id, "dao_baoji", mob3)
+	check(int(mo3["hp"]) < hp1, "爆擊出傷害")
+	var hp2 := int(mo3["hp"])
+	sim.cmd_mount_skill_use(id, "dao_baoji", mob3)
+	check(int(mo3["hp"]) == hp2, "冷卻中再用唔到")
+	# 疾奔 / 護盾 / 重擊 (劍) 分開一個玩家測，避免撞學招上限
+	var r2 := _new(data, 32)
+	var sim2: Sim = r2[0]
+	var id2: int = r2[1]
+	var ch2: Dictionary = r2[2]
+	ch2["level"] = 50
+	sim2._sync_stats(sim2.ent(id2))
+	_at_fac(sim2, id2, "stable_xc")
+	sim2.cmd_mount_buy(id2, "dawan", true)
+	sim2.cmd_mount_weapon_buy(id2, "jian", "jian2")
+	sim2.cmd_mount_skill_learn(id2, "jian_jiben")     # 疾奔
+	sim2.cmd_mount_skill_learn(id2, "jian_hudun")     # 護盾
+	sim2.cmd_mount_skill_learn(id2, "jian_zhongji")   # 重擊 (aoe)
+	sim2.cmd_mount_ride(id2, true)
+	sim2.cmd_goto_map(id2, "field_1")
+	for i in 50:
+		sim2.step()
+	var base_steps := sim2._ride_steps(sim2.ent(id2))
+	sim2.cmd_mount_skill_use(id2, "jian_jiben")
+	check(RulesSpell.has(ch2.get("status", {}), "mride_speed", sim2.tick), "疾奔: 加咗移速 buff 狀態")
+	check(sim2._ride_steps(sim2.ent(id2)) >= base_steps, "疾奔: 移速加成生效")
+	sim2.cmd_mount_skill_use(id2, "jian_hudun")
+	check(RulesSpell.has(ch2.get("status", {}), "mshield", sim2.tick), "護盾: 加咗全防禦狀態")
+	var moC: Dictionary = sim2._spawn_mob(12012, "field_1")
+	_put(sim2, id2, int(moC["x"]), int(moC["y"]))
+	moC["mob"]["state"] = "chase"
+	moC["mob"]["target"] = id2
+	var hpShield := int(ch2["hp"])
+	for i in 10:
+		ch2["hp"] = maxi(int(ch2["hp"]), hpShield)
+		sim2.step()
+	check(int(ch2["hp"]) == hpShield, "護盾期間全防禦，冇食傷")
+	var moD: Dictionary = sim2._spawn_mob(12012, "field_1")
+	_put(sim2, int(moD["id"]), int(moC["x"]) + 1, int(moC["y"]))
+	var hpA := int(moC["hp"])
+	var hpB := int(moD["hp"])
+	sim2.cmd_mount_skill_use(id2, "jian_zhongji", int(moC["id"]))
+	check(int(moC["hp"]) < hpA and int(moD["hp"]) < hpB, "重擊: 範圍打中附近嘅怪")

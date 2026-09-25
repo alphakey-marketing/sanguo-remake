@@ -163,7 +163,10 @@
 - 偏離 spec：飼養動作行動力 5【自訂】；5 種異常效果【自訂】；改名 sim 有但 UI 未有輸入框；武將特技 52「馴馬」未開（開咗會打亂其他武將抽特技）
 - 驗收：`tests/run_mount.gd` 158 項 + `--uitest` 馬廄/騎馬/飼養（90）✅
 ### Step 17b 座騎繁衍 + 馬戰（spec 07 §6~7）
-- [ ] 種馬借用 5000 金 + 胎教小遊戲 + 積點分配 + 進階馬；馬戰兵器 `data/mount_weapons.json` + 馬戰特技（先 3 招）
+- [x] 繁衍【原=sy2_4_4/5】：種馬借用（馬廄代勞，5000 金）+ 配種指令 `cmd_mount_breed_start`；胎教小遊戲（5 揀 1 下注、估中賠率積點、胎氣必 +1、100 胎氣接生 `cmd_mount_breed_bet`/`cmd_mount_breed_claim`）；懶人胎教（放咗 lazyDays 日自動生，積點封頂）`cmd_mount_breed_lazy`；小馬品種 = 母血機率 ×2、性別多數母；待領小馬 90 日未領走失 `cmd_mount_take_foal`；積點分配（品種兌換錶換屬性上限）`cmd_mount_spend_bpt`；總積點夠門檻 → 進階馬（壽命/生命上限 ×2、屬性上限 +50）
+- [x] 馬戰：`data/mount_weapons.json`（劍/刀/槍 3 級馬戰兵器 + 9 招特技，spec 02 §10）；馬廄師傅教特技（最多學 3 招，需擁有對應兵器）`cmd_mount_skill_learn`；騎乘 + 裝備馬戰兵器 = 唔使落馬出手（沿用一般攻擊，換馬戰兵器數值）；`cmd_mount_skill_use`：aoe(範圍傷害)/combo(連擊)/dash(單體高倍)/speed(疾奔buff)/shield(護盾全防禦)/block(抵擋一次)/stun(擊暈≈定身)
+- 偏離 spec：馬戰特技效果簡化做狀態/傷害倍率（唔做動畫層面嘅集氣/衝刺位移）；PK「玩家主動攻擊NPC座騎食傷」單機冇 PK 對手，未實作
+- 驗收：`tests/run_mount.gd` 217 項 ✅（繁衍純函數 + sim 指令流程、馬戰兵器/特技學習上限/騎乘唔落馬/aoe/combo/dash/speed/shield/block/stun）
 ### Step 18 戰騎（spec 07 §8）
 - [ ] 10 種戰騎/升級點/戰鬥特技樹/友好特技/忠誠
 ### Step 19 戰役場景（spec 06 §7，spec 04 §5）

@@ -524,6 +524,19 @@ func _mount_drop(_e: Dictionary, _why: String) -> void:
 	pass
 
 
+# 馬戰 hook (Step 17b)：sim_mount 覆寫，畀 sim_ai (喺繼承鏈上游) 用得
+func is_riding(_ch: Dictionary) -> bool:
+	return false
+
+
+func _mount_weapon_type(_ch: Dictionary) -> String:
+	return ""
+
+
+func _mount_weapon_wdef(_ch: Dictionary) -> Dictionary:
+	return {"power": 0.0, "hit": 0.0}
+
+
 func order_count(ch: Dictionary, item: int) -> int:
 	return RulesShop.count_item(ch["bag"], item)
 

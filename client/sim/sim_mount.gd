@@ -9,6 +9,10 @@ func _mcfg() -> Dictionary:
 	return data.mounts
 
 
+func _mwcfg() -> Dictionary:
+	return data.mount_weapons
+
+
 func _mounts(ch: Dictionary) -> Array:
 	if not ch.has("mounts"):
 		ch["mounts"] = []
@@ -209,6 +213,123 @@ func cmd_mount_point(id: int, uid: int, attr: String) -> void:
 	_msg(id, "%s %s +1（%d）" % [_mname(m), cfg["attrNames"][attr], int(m["attrs"][attr])])
 
 
+# ---- 繁衍 (Step 17b, spec 07 §6): 種馬借用 + 胎教小遊戲 + 積點分配 + 進階馬 ----
+func cmd_mount_breed_start(id: int, uid: int, sire: String) -> void:
+	var r := _player_mount(id, uid)
+	if r.is_empty():
+		return
+	var e: Dictionary = r[0]
+	var m: Dictionary = r[1]
+	var ch: Dictionary = e["ch"]
+	var cfg := _mcfg()
+	if stable_near(e) == "":
+		return _msg(id, "要去馬廄先配得種")
+	var why := RulesMount.breed_why(cfg, m)
+	if why != "":
+		return _msg(id, why)
+	if RulesMount.breed_def(cfg, sire).is_empty():
+		return _msg(id, "冇呢個品種嘅種馬")
+	var price := int(cfg["studPrice"])
+	if int(ch["gold"]) < price:
+		return _msg(id, "種馬借用要 %d 金" % price)
+	ch["gold"] = int(ch["gold"]) - price
+	RulesMount.breed_start(cfg, m, sire)
+	_msg(id, "%s配咗種（%d 金），開始胎教" % [_mname(m), price])
+	_emit({"k": "mount", "dst": id, "act": "breed_start", "uid": uid})
+
+
+func cmd_mount_breed_bet(id: int, uid: int, choice: int) -> void:
+	var r := _player_mount(id, uid)
+	if r.is_empty():
+		return
+	var m: Dictionary = r[1]
+	var cfg := _mcfg()
+	var why := RulesMount.breed_can_play(cfg, m)
+	if why != "":
+		return _msg(id, why)
+	var bets: Array = cfg["breed"]["bets"]
+	if choice < 0 or choice >= bets.size():
+		return
+	var res := RulesMount.breed_play(cfg, m, choice, rng.next())
+	var preg: Dictionary = m["preg"]
+	var msg := "落注「%s」" % String(bets[choice])
+	msg += "，估中！積點 +%d" % int(res["points"]) if bool(res["win"]) else "，估錯咗"
+	msg += "（胎氣 %d/%d）" % [int(preg["taiqi"]), int(cfg["breed"]["taiqiNeed"])]
+	_msg(id, msg)
+	if RulesMount.breed_ready(cfg, m):
+		_msg(id, "胎氣夠喇，去馬廄接生啦")
+	_emit({"k": "mount", "dst": id, "act": "breed_bet", "uid": uid, "win": bool(res["win"])})
+
+
+func cmd_mount_breed_lazy(id: int, uid: int, on: bool) -> void:
+	var r := _player_mount(id, uid)
+	if r.is_empty():
+		return
+	var m: Dictionary = r[1]
+	if not m.has("preg"):
+		return _msg(id, "未配種")
+	m["preg"]["lazy"] = on
+	_msg(id, "懶人胎教：%s" % ("開" if on else "關"))
+
+
+func cmd_mount_breed_claim(id: int, uid: int) -> void:
+	var r := _player_mount(id, uid)
+	if r.is_empty():
+		return
+	var e: Dictionary = r[0]
+	var m: Dictionary = r[1]
+	var ch: Dictionary = e["ch"]
+	var cfg := _mcfg()
+	if not RulesMount.breed_ready(cfg, m):
+		return _msg(id, "胎氣未夠，未生得")
+	if not (ch.get("pendingFoal", {}) as Dictionary).is_empty():
+		return _msg(id, "仲有隻小馬未領，先去馬廄領咗佢")
+	var res := RulesMount.breed_birth(cfg, m, rng.next(), rng.next())
+	var day := int(_clock()["day"])
+	ch["pendingFoal"] = {"breed": String(res["breed"]), "sex": String(res["sex"]), "bpts": int(res["bpts"]),
+		"bornDay": day, "expireDay": day + int(cfg["breed"]["claimDays"])}
+	_msg(id, "%s誕下小馬！去馬廄「提領」啦（%d 日內要領，唔係會走失）" % [_mname(m), int(cfg["breed"]["claimDays"])])
+	_emit({"k": "mount", "dst": id, "act": "breed_born", "uid": uid})
+
+
+func cmd_mount_take_foal(id: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var ch: Dictionary = e["ch"]
+	var pf: Dictionary = ch.get("pendingFoal", {})
+	if pf.is_empty():
+		return _msg(id, "冇小馬等緊你領")
+	if stable_near(e) == "":
+		return _msg(id, "要去馬廄先領得小馬")
+	var cfg := _mcfg()
+	var ms := _mounts(ch)
+	if ms.size() >= int(cfg["maxOwned"]):
+		return _msg(id, "最多養 %d 匹馬，要先放低一匹" % int(cfg["maxOwned"]))
+	var uid := int(ch.get("mountSeq", 0)) + 1
+	ch["mountSeq"] = uid
+	var m := RulesMount.new_foal(cfg, String(pf["breed"]), uid, String(pf["sex"]), int(pf["bpts"]))
+	m["where"] = "stable"
+	m["stable"] = stable_near(e)
+	ms.append(m)
+	ch.erase("pendingFoal")
+	_msg(id, "領咗小馬（%s）返嚟，寄咗喺馬廄" % _mname(m))
+	_emit({"k": "mount", "dst": id, "act": "foal_taken", "uid": uid})
+
+
+func cmd_mount_spend_bpt(id: int, uid: int, attr: String) -> void:
+	var r := _player_mount(id, uid)
+	if r.is_empty():
+		return
+	var m: Dictionary = r[1]
+	var cfg := _mcfg()
+	var why := RulesMount.spend_bpt_why(cfg, m, attr)
+	if why != "":
+		return _msg(id, why)
+	RulesMount.spend_bpt(cfg, m, attr)
+	_msg(id, "%s%s上限 +1（上限 %d）" % [_mname(m), cfg["attrNames"][attr], RulesMount.attr_cap(cfg, m, attr)])
+
+
 # ---- 騎乘 ----
 func cmd_mount_ride(id: int, on: bool) -> void:
 	var e := ent(id)
@@ -249,14 +370,17 @@ func _mount_drop(e: Dictionary, why: String) -> void:
 		_msg(int(e["id"]), "騎馬用唔到一般武器，落馬作戰")
 
 
-# 呢個 tick 行幾多格: 騎緊 = 按移速倍數 (step() 叫)
+# 呢個 tick 行幾多格: 騎緊 = 按移速倍數 (step() 叫)；馬戰特技「疾奔」加埋 speedBonusPct (Step 17b)
 func _ride_steps(e: Dictionary) -> int:
 	if not e.has("ch") or not is_riding(e["ch"]):
 		return 1
 	var m := mount_near_me(e["ch"])
 	if m.is_empty():
 		return 1
-	return RulesMount.steps_at(RulesMount.ride_mult(_mcfg(), m), tick)
+	var mult := RulesMount.ride_mult(_mcfg(), m)
+	if RulesSpell.has(e["ch"].get("status", {}), "mride_speed", tick):
+		mult += float(_mwcfg().get("speedBonusPct", 0.0))
+	return RulesMount.steps_at(mult, tick)
 
 
 # 騎住行咗 n 格 → 座騎疲勞；頭暈 = 落馬
@@ -268,6 +392,143 @@ func _ride_moved(e: Dictionary, n: int) -> void:
 		return
 	if RulesMount.ride_tiles(_mcfg(), m, n):
 		_mount_dizzy(e, m)
+
+
+# ---- 馬戰 (Step 17b, spec 07 §7 / spec 02 §10): 馬戰兵器 + 特技 ----
+# 騎乘 + 裝備馬戰兵器 = 同一般武器互斥，唔使落馬出手【原】
+func _mount_weapon_type(ch: Dictionary) -> String:
+	var wid := String(ch.get("mountWeapon", ""))
+	if wid == "":
+		return ""
+	return RulesMountBattle.weapon_type_of(_mwcfg(), wid)
+
+
+func _mount_weapon_wdef(ch: Dictionary) -> Dictionary:
+	var cfg := _mwcfg()
+	var wid := String(ch.get("mountWeapon", ""))
+	var w := RulesMountBattle.weapon_def(cfg, RulesMountBattle.weapon_type_of(cfg, wid), wid)
+	return {"power": float(w.get("atk", 0)), "hit": float(cfg.get("hit", 55.0))}
+
+
+func cmd_mount_weapon_buy(id: int, wtype: String, wid: String) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var ch: Dictionary = e["ch"]
+	if stable_near(e) == "":
+		return _msg(id, "要去馬廄先買得馬戰兵器")
+	var cfg := _mwcfg()
+	var why := RulesMountBattle.weapon_buy_why(cfg, int(ch["level"]), wtype, wid)
+	if why != "":
+		return _msg(id, why)
+	var w := RulesMountBattle.weapon_def(cfg, wtype, wid)
+	var price := int(w["price"])
+	if int(ch["gold"]) < price:
+		return _msg(id, "要 %d 金" % price)
+	ch["gold"] = int(ch["gold"]) - price
+	ch["mountWeapon"] = wid
+	_msg(id, "買咗%s（%d 金），已裝備" % [w["name"], price])
+	_emit({"k": "mount_weapon", "dst": id, "item": wid})
+
+
+func cmd_mount_skill_learn(id: int, skill_id: String) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var ch: Dictionary = e["ch"]
+	if stable_near(e) == "":
+		return _msg(id, "要去馬廄師傅度先學得")
+	var cfg := _mwcfg()
+	var learned: Array = ch.get("mountSkills", [])
+	var why := RulesMountBattle.learn_why(cfg, learned, _mount_weapon_type(ch), skill_id)
+	if why != "":
+		return _msg(id, why)
+	var price := int(cfg["teachPrice"])
+	if int(ch["gold"]) < price:
+		return _msg(id, "拜師要 %d 金" % price)
+	ch["gold"] = int(ch["gold"]) - price
+	learned.append(skill_id)
+	ch["mountSkills"] = learned
+	var s := RulesMountBattle.skill_def(cfg, skill_id)
+	_msg(id, "學識咗馬戰特技「%s」" % s["name"])
+	_emit({"k": "mount_skill", "dst": id, "act": "learn", "skill": skill_id})
+
+
+func cmd_mount_skill_use(id: int, skill_id: String, target: int = 0) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var ch: Dictionary = e["ch"]
+	var cfg := _mwcfg()
+	var cd: Dictionary = ch.get("mountSkillCd", {})
+	var why := RulesMountBattle.use_why(cfg, ch.get("mountSkills", []), is_riding(ch), _mount_weapon_type(ch),
+		skill_id, int(cd.get(skill_id, 0)), tick, int(ch["sp"]))
+	if why != "":
+		return _msg(id, why)
+	if is_safe(int(e["x"]), int(e["y"])):
+		return _msg(id, "要出城先用得馬戰特技")
+	var s := RulesMountBattle.skill_def(cfg, skill_id)
+	var sp_cost := _sp_cost(ch, int(s.get("sp", 0)))
+	if int(ch["sp"]) < sp_cost:
+		return _msg(id, "體力不足")
+	var kind := String(s["kind"])
+	if kind in ["aoe", "combo", "dash", "stun"]:
+		var t := ent(target)
+		if t.is_empty() or int(t["hp"]) <= 0 or String(t.get("kind", "")) != "mob":
+			return _msg(id, "目標唔啱")
+		if not RulesCombat.in_range(e["x"], e["y"], t["x"], t["y"]):
+			return _msg(id, "太遠")
+	ch["sp"] = int(ch["sp"]) - sp_cost
+	cd[skill_id] = tick + int(s["cd"])
+	ch["mountSkillCd"] = cd
+	_msg(id, "「%s」！" % s["name"])
+	_emit({"k": "mount_skill", "dst": id, "act": "use", "skill": skill_id, "target": target})
+	match kind:
+		"speed":
+			if not ch.has("status"):
+				ch["status"] = {}
+			RulesSpell.add_status(ch["status"], "mride_speed", int(s["ticks"]), tick)
+		"shield":
+			if not ch.has("status"):
+				ch["status"] = {}
+			RulesSpell.add_status(ch["status"], "mshield", int(s["ticks"]), tick)
+		"block":
+			ch["mBlockCharges"] = int(ch.get("mBlockCharges", 0)) + int(s.get("hits", 1))
+		"stun":
+			var t := ent(target)
+			if not t.has("status"):
+				t["status"] = {}
+			RulesSpell.add_status(t["status"], "hex", int(s["ticks"]), tick)
+		"aoe", "combo", "dash":
+			_mount_skill_hit(e, ch, s, target)
+
+
+# 傷害類特技: aoe = 範圍打晒附近怪；combo = 單體連擊；dash = 單體高倍傷害
+func _mount_skill_hit(e: Dictionary, ch: Dictionary, s: Dictionary, target: int) -> void:
+	var t := ent(target)
+	if t.is_empty() or int(t["hp"]) <= 0:
+		return
+	var wdef := _mount_weapon_wdef(ch)
+	var atk_mult := RulesSpell.atk_mult(ch.get("status", {}), tick) * (1.0 + float(_jewel_bonus(ch).get("atkPct", 0.0)))
+	var eff_str := _eff_attr(ch, "str") + float(_jewel_bonus(ch).get("strFlat", 0))
+	var targets: Array = [t]
+	if String(s["kind"]) == "aoe":
+		targets = []
+		for o in ents.values():
+			if o["kind"] == "mob" and int(o["hp"]) > 0 \
+					and RulesCombat.in_range(t["x"], t["y"], o["x"], o["y"], float(s.get("range", 1))):
+				targets.append(o)
+	var hits := int(s["hits"]) if String(s["kind"]) == "combo" else 1
+	for o in targets:
+		var mdef: Dictionary = data.mob_def(int(o["mob"]["def"]))
+		var elem_mult := _phys_elem_mult(ch, str(mdef.get("element", "none")))
+		var dmg0 := RulesCombat.calc_damage(eff_str, wdef["power"], mdef["def"], rng_fn, atk_mult, 1.0)
+		var dmg := MathX.js_round(dmg0 * float(s["mult"]) * elem_mult)
+		for i in range(hits):
+			if int(o["hp"]) <= 0:
+				break
+			_emit({"k": "hit", "src": int(e["id"]), "dst": o["id"], "dmg": dmg})
+			damage(o, dmg, e)
 
 
 # ---- 放牧【原=馴馬專用哨；一個時辰；再吹 = 緊急召回】 ----
@@ -333,10 +594,22 @@ func _graze_return(e: Dictionary, m: Dictionary, cfg: Dictionary) -> void:
 func _mount_daily(_day: int) -> void:
 	var cfg := _mcfg()
 	for e in ents.values():
-		if not e.has("ch") or (e["ch"].get("mounts", []) as Array).is_empty():
+		if not e.has("ch"):
 			continue
 		var id := int(e["id"])
-		var ms: Array = e["ch"]["mounts"]
+		var ch: Dictionary = e["ch"]
+		# 未提領小馬過期【原=3 個月未提領死亡】
+		var pf: Dictionary = ch.get("pendingFoal", {})
+		if not pf.is_empty() and _day >= int(pf["expireDay"]):
+			ch.erase("pendingFoal")
+			_msg(id, "冇及時去馬廄領走小馬，佢已經走失咗……")
+		var ms: Array = ch.get("mounts", [])
+		if ms.is_empty():
+			continue
+		# 懷孕胎教: 動力值回復 + 懶人胎教進度
+		for m in ms:
+			if m.has("preg") and RulesMount.breed_daily(cfg, m) == "ready":
+				_msg(id, "%s胎氣夠喇，去馬廄接生啦" % _mname(m))
 		for m in ms.duplicate():
 			var ev := RulesMount.daily(cfg, m, _stable_plague(m))
 			var nm := _mname(m)
@@ -390,6 +663,19 @@ func mount_view(id: int) -> Dictionary:
 			"status": RulesMount.status_names(cfg, m), "acts": acts,
 			"rideWhy": RulesMount.ride_why(cfg, m), "grazeWhy": RulesMount.graze_why(cfg, m),
 			"grazeLeft": maxi(0, int(m["back"]) - tick) if String(m["where"]) == "graze" else 0,
-			"speed": RulesMount.ride_mult(cfg, m)})
+			"speed": RulesMount.ride_mult(cfg, m), "sex": String(m["sex"]), "adv": bool(m.get("adv", false)),
+			"bpts": int(m.get("bpts", 0)), "totalBpts": int(m.get("totalBpts", 0)),
+			"caps": (m.get("caps", {}) as Dictionary).duplicate(),
+			"breedWhy": RulesMount.breed_why(cfg, m),
+			"preg": ({} if not m.has("preg") else {"sire": String(m["preg"]["sire"]), "motive": int(m["preg"]["motive"]),
+				"taiqi": int(m["preg"]["taiqi"]), "taiqiNeed": int(cfg["breed"]["taiqiNeed"]),
+				"lazy": bool(m["preg"].get("lazy", false)), "ready": RulesMount.breed_ready(cfg, m),
+				"playWhy": RulesMount.breed_can_play(cfg, m)})})
+	var mwcfg := _mwcfg()
+	var pf: Dictionary = ch.get("pendingFoal", {})
 	return {"list": list, "riding": is_riding(ch), "stable": stable_near(e), "gold": int(ch["gold"]),
+		"pendingFoal": pf, "breeds": cfg["breeds"],
+		"mountWeapon": String(ch.get("mountWeapon", "")), "mountWeaponType": _mount_weapon_type(ch),
+		"mountSkills": (ch.get("mountSkills", []) as Array).duplicate(),
+		"mountWeapons": mwcfg["weapons"], "mountSkillDefs": mwcfg["skills"],
 		"ap": ap_of(ch), "hasWhistle": RulesShop.count_item(ch["bag"], int(cfg["whistle"])) > 0}
