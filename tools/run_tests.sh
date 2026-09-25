@@ -20,6 +20,7 @@ run war_beast --script tests/run_war_beast.gd
 run spell --script tests/run_spell.gd
 run jewel_ult --script tests/run_jewel_ult.gd
 run sim --script tests/run_sim.gd
+run char --script tests/run_char.gd
 run world --script tests/run_world.gd
 run monsters --script tests/run_monsters.gd
 run maps --script tests/run_maps.gd

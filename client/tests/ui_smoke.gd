@@ -231,6 +231,7 @@ func _run() -> void:
 	var dp: GamePanel = hud.panels.get("dialog")
 	check(dp != null and dp.visible, "客棧應該開對話框")
 	if dp != null:
+		ch["level"] = GameData.NEWBIE_LEVEL      # 5 級後先收住宿費 (S01a)
 		var g1 := int(ch["gold"])
 		press(dp, "休息")
 		await frames(1)

@@ -231,6 +231,8 @@ func t_miyi_service(data: GameData) -> void:
 	# 第二日 reset
 	for i in 720:
 		sim.step()
+	ch["hp"] = mhp - 50                    # 安全區自動回復 (S01a) 可能已回滿，扣返先試密醫
+	sim.ent(id)["hp"] = ch["hp"]
 	_talk(sim, id, "miyi")
 	check(int(ch["quests"]["service_miyi"]["used"]) == 1, "密醫: 第二日重置")
 

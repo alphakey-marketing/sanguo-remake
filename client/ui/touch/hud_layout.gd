@@ -9,9 +9,10 @@ extends RefCounted
 
 const MIN_TOUCH := 44.0        # 手指最細目標 ≈ 9mm
 const ATK_R := 46.0            # 普攻大圓
-const SKILL_R := 25.0          # 技能圓
-const SKILL_DIST := 104.0      # 技能圓心距普攻圓心
-const SKILL_ANGLES := [180.0, 210.0, 240.0, 270.0]   # 左 → 上 扇形（Godot y 向下）
+const SKILL_R := 22.0          # 技能圓
+const SKILL_DIST := 104.0      # 技能圓心距普攻圓心 (前 4 格)
+const SKILL_DIST2 := 150.0     # 額外 2 格 (S01a: 5 級後) 用大半徑，避免同前 4 格重疊
+const SKILL_ANGLES := [180.0, 210.0, 240.0, 270.0, 218.0, 248.0]   # 左 → 上 扇形（Godot y 向下）；前 4 個 = 5 級前；S01a: 5 級後開埋後 2 個 (用 SKILL_DIST2)
 const SMALL_R := 22.0          # 切換目標 / 自動
 const MENU := ["menu_bag", "menu_char", "menu_quest", "menu_more"]
 const MENU_LABELS := {"menu_bag": "背包", "menu_char": "角色", "menu_quest": "記事", "menu_more": "更多"}
@@ -19,6 +20,11 @@ const MENU_SZ := 48.0
 const MENU_GAP := 4.0
 const MINI_SZ := Vector2(112, 50)   # 小地圖 (spec 12 §6)
 const COMP_SZ := Vector2(120, 46)   # 同伴框 (Step 13.5)
+
+
+# 系統介面鍵數 (S01a, spec 01 §5): 5 級前 4 鍵，5 級後 6 鍵
+static func skill_cap(level: int) -> int:
+	return SKILL_ANGLES.size() if level >= GameData.NEWBIE_LEVEL else 4
 
 
 static func build(size: Vector2, safe: Rect2 = Rect2()) -> Dictionary:
@@ -44,7 +50,8 @@ static func build(size: Vector2, safe: Rect2 = Rect2()) -> Dictionary:
 	out["attack"] = {"kind": "circle", "c": ac, "r": ATK_R}
 	for i in SKILL_ANGLES.size():
 		var a := deg_to_rad(float(SKILL_ANGLES[i]))
-		out["skill%d" % i] = {"kind": "circle", "c": ac + Vector2(cos(a), sin(a)) * SKILL_DIST, "r": SKILL_R}
+		var d := SKILL_DIST if i < 4 else SKILL_DIST2
+		out["skill%d" % i] = {"kind": "circle", "c": ac + Vector2(cos(a), sin(a)) * d, "r": SKILL_R}
 	out["target"] = {"kind": "circle", "c": Vector2(R - 26, B - 136), "r": SMALL_R}
 	out["auto"] = {"kind": "circle", "c": Vector2(R - 28, B - 214), "r": SMALL_R}
 	# 互動掣（對話/商店/客棧/傳送…）: 技能扇形左邊一粒大 pill

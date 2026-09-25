@@ -444,6 +444,7 @@ func t_xinye(data: GameData) -> void:
 	var inn: Dictionary = data.inns.filter(func(x): return String(x["id"]) == "xinye")[0]
 	check(sim.map_id_at(int(inn["x"]), int(inn["y"])) == "xinye", "新野客棧喺新野城")
 	_put(sim, id, int(inn["x"]), int(inn["y"]))
+	ch["level"] = GameData.NEWBIE_LEVEL
 	ch["gold"] = 100
 	sim.ent(id)["hp"] = 1
 	sim.cmd_rest(id)
@@ -498,6 +499,7 @@ func t_b25(data: GameData) -> void:
 	for iid in ["runan", "wancheng", "xiangyang"]:
 		var inn: Dictionary = data.inns.filter(func(x): return String(x["id"]) == iid)[0]
 		_put(sim, id, int(inn["x"]), int(inn["y"]))
+		ch["level"] = GameData.NEWBIE_LEVEL
 		ch["gold"] = 100
 		sim.ent(id)["hp"] = 1
 		sim.cmd_rest(id)
