@@ -21,7 +21,7 @@
 | Spec | 邏輯 | UI | 已做（主要檔案） | 欠缺（= §3 對應 Step 範圍） |
 |---|---|---|---|---|
 | 01 角色成長 | 🟡 | 🟡 | 建角、六屬性、HP/MP/SP、升級點數 + 自動分配、理念測驗、稱號/生日（福日 exp）/臉譜、修練場所、行動力、飲水度、專長、二轉/三轉框架（`rules/stats.gd` `expert.gd` `class.gd`、`sim_char`、`char_panel.gd`） | 三轉考試任務接掛（S04d）；地理迷宮地圖效果（S01c 偏離） |
-| 02 戰鬥 | 🟡 | 🟡 | 近戰、術法、相剋、狀態、寶石、義士三招 + 融合、防具/武器 3 槽/耐久、組隊經驗分配（按傷害 70%/平分 30%）、狀態 icon 列、術法快捷列 3 本切換 UI、**仕女（特技開鎖 + 三招絕招）**、**道士（特技超渡 + 三招絕招 + 同伴倒下機制）** | 其餘 3 職（巫女潛行/辯士竊聽+弩箭消耗/美女透視 + 各職三招絕招）、多絕招 HUD 已通 |
+| 02 戰鬥 | 🟡 | 🟡 | 近戰、術法、相剋、狀態、寶石、義士三招 + 融合、防具/武器 3 槽/耐久、組隊經驗分配（按傷害 70%/平分 30%）、狀態 icon 列、術法快捷列 3 本切換 UI、**仕女（特技開鎖 + 三招絕招）**、**道士（特技超渡 + 三招絕招 + 同伴倒下機制）**、**巫女（特技潛行 + 行車 QTE + 三招絕招 + 潛行避仇恨）** | 其餘 2 職（辯士竊聽+弩箭消耗/美女透視 + 各職三招絕招）、多絕招 HUD 已通 |
 | 03 善惡死亡 | 🟡 | ✅ | 七階、死亡掉物品/跌經驗、價格加成 | 攻擊居民/紅名 NPC（而家 `cmd_attack` 只准打 mob）、反擊 +100、天譴、幸運符/護身符/還魂丹、殺人魔拒入城、罪犯拒官令 |
 | 04 怪物地圖 | 🟡 | ✅ | 46 怪 + 掉落導入、重生、逃跑/群攻、boss 每日、夜怪、汝南洞 10 層、張牛角戰役 | 地面掉落物（`dropped` 實體）、術法怪/boss 技能、特殊場景 7 個（`scenes.json`）、其餘 5 場戰役實體 |
 | 05 生產經濟 | 🟡 | ✅ | 6 初階 + 5 進階 + 2318 配方、修理、工具店、天地商行、捐獻、市場 | 產出 1~2 件、特製/白金/御賜工具、大宗師、4 類商店補齊、天災停進貨、城際貿易提示 |
@@ -79,7 +79,12 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
   - 完成：`class_skills.json` + `chaodu`（超渡，道士 lv5，導師任務 `skill_unlock_daoshi`）；導師 NPC `daoshi_master`（玄真道人，許昌 18,44，minLevel 5）+ 答題任務（答啱 reward skill=chaodu）；`ultimates.json` +3 招（虛無飄渺/如幻似真/神遊太虛，weaponCat 15 符咒，模板 §5）＝初階三招無 reqTier；HUD 特技掣／多絕招逐招一格（仕女已通，道士直用）；`sim_skill.gd` `cmd_use_skill` + `chaodu` 分支 + `_try_chaodu`（復活附近 5 格倒下同伴，靜清自己 HP20%+MP30%，emit `revive`）；main 接 `companion_down/revive/companion_ko` banner
   - 偏離：**同伴「倒下」機制改咗**（spec 02 §6 超渡需要「死亡復活」目標）——同伴被打低而家唔再即時飛返客棧，改為原地進入 `down` 狀態（hp 0）等道士「超渡」；超過 `world.combat.compDownTicks`(600) 未救先退返客棧（忠誠 -ko，堅忍特技豁免，兜底免得冇道士時同伴永久倒地）。`run_recruit.gd t_comp_ko` + `run_general.gd t_skill_misc` 對應更新
   - 測試：`tests/run_class.gd` +道士 3 組（三絕招定義+可用性／導師答題學超渡+非道士擋＋存檔 roundtrip／超渡使用：冇倒下唔扣血、靈力或體力唔夠阻擋、夠就復活回滿+扣自己、忠誠唔跌、超時未救返客棧+扣忠誠）；`tests/ui_smoke.gd` + 超渡特技掣煙霧
-- [ ] **S02c-巫女**：潛行特技（潛行狀態 10 分鐘避仇恨，CD 1 game 日）+ 小遊戲 + 導師；佢三招絕招
+- [x] **S02c-巫女**：潛行特技（潛行狀態 10 分鐘避仇恨，CD 1 game 日）+ 小遊戲 + 導師；佢三招絕招
+  - 完成：`classes.json` 啟用巫女（`enabled=true`）+ 起始裝備（卷軸 13038，cat 12）；`ultimates.json` +3 招（殘燈映紅/膽顫心驚/鬼哭神號，weaponCat 12）；`class_skills.json` + `yinxing`（潛行，巫女 lv5，導師任務 `skill_unlock_wunu`）；導師 NPC `wunu_master`（巫姬婆，許昌 46,34，minLevel 5）+ 答題任務；新 `rules/stealth.gd`（RulesStealth：潛行 5 tick = 10 分 / CD 720 tick = 1 game 日 / 行車 QTE pattern + 穿越判定，純函數）；`sim_skill.gd` `_try_yinxing`（開行車 QTE）+ `cmd_stealth_cross`（穿越判定：全部成功 → 入潛行 status + 設 CD；撞車 → fail）；`sim_ai.gd` 遊蕩掃描跳過潛行玩家；新 `ui/panels/stealth_panel.gd`（行車車位 + 穿梭點 + 穿過掣，`_process` update）；main 接 `stealth_open/stealth_done/stealth_fail` 事件 + `stealth_cross` 指令 + `STATUS_NAMES` 加「潛行」；HUD 註冊 stealth 面板
+  - 小遊戲設計：行車之間穿越【自訂簡化】= 3 卡車逐卡，每卡週期 10 tick 但空隙安全窗 3 tick（offset 由 SimRng 生成，可重現）；玩家要喺每卡空隙嗰吓撳「穿過」，撞車即失敗
+  - 偏離：巫女三招絕招全部用「卷軸」（weaponCat 12）【自訂】——同義士/仕女/道士先例；絶招任務鏈 → S06d 接；潛行用手身 status「stealth」（進 `view_ents().statuses`）而唔另開欄
+  - 測試：`tests/run_stealth.gd`（新，24 項 RulesStealth 純函數）+ `tests/run_class.gd` 巫女 3 組（三招絕招定義+可用性／導師答題學潛行+非巫女擋+存檔 roundtrip／行車 QTE 全穿成功+撞車失敗+CD+潛行避主動怪仇恨）；`tests/ui_smoke.gd` + 潛行特技掣煙霧（開面板）
+  - 驗收：`sh tools/run_tests.sh` 全 PASS（ALL OK）
 - [ ] **S02c-辯士**：竊聽特技（居民對話竊聽情報）+ 導師；佢三招絕招；**弩箭消耗**（箭矢 cat 49 已有 items，要消耗邏輯 + 商店賣箭/木匠製箭 = S05）
 - [ ] **S02c-美女**：透視特技（睇 NPC/怪隱藏資訊）+ 導師；佢三招絕招（美女仲有葉/針術 + 恢復術，照術書表）
 

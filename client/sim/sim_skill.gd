@@ -247,8 +247,63 @@ func cmd_use_skill(id: int, skill_id: String) -> void:
 			_msg(id, "揀真鑰匙…三支得一支啱")
 		"chaodu":
 			_try_chaodu(id)
+		"yinxing":
+			_try_yinxing(id)
 		_:
 			_msg(id, "嗰招特技而家用唔到")
+
+
+# 潛行 (巫女, S02c, spec 02 §6): 先過小遊戲「行車之間穿越」，成功先入潛行 10 分鐘 (CD 1 game 日)。
+# 行車空隙 pattern 用 SimRng 生成 (可重現)；sim 權威判定穿越成敗。
+func _try_yinxing(id: int) -> void:
+	var e := ent(id)
+	var ch: Dictionary = e["ch"]
+	if RulesSpell.has(ch.get("status", {}), "stealth", tick):
+		return _msg(id, "已喺潛行緊")
+	if tick < int(ch.get("stealthCd", 0)):
+		return _msg(id, "潛行冷卻中（%d tick 後再用得）" % [int(ch.get("stealthCd", 0)) - tick])
+	if not (ch.get("stealthGame", {}) as Dictionary).is_empty():
+		return _msg(id, "仲睇緊張車，未郁就做嘢")
+	var pattern := RulesStealth.make_pattern(rng_fn)
+	ch["stealthGame"] = {"pattern": pattern, "start": tick, "crossed": 0}
+	_emit({"k": "stealth_open", "dst": id, "pattern": pattern,
+		"period": RulesStealth.CART_PERIOD, "gaps": RulesStealth.GAP_COUNT, "gapW": RulesStealth.GAP_W, "start": tick})
+	_msg(id, "車要嚟喇——揀啱每卡車之間嗰下空隙穿過！（%d 卡）" % RulesStealth.GAP_COUNT)
+
+
+# 行車小遊戲穿越一下 (stealth_panel「穿過」掣)
+func cmd_stealth_cross(id: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var ch: Dictionary = e["ch"]
+	var g: Dictionary = ch.get("stealthGame", {})
+	if g.is_empty():
+		return _msg(id, "冇行車睇緊")
+	var pattern: Array = g["pattern"]
+	var start := int(g["start"])
+	var crossed := int(g.get("crossed", 0))
+	if crossed >= RulesStealth.GAP_COUNT:
+		ch.erase("stealthGame")
+		return _msg(id, "已經穿晒")
+	if RulesStealth.cross_pattern(pattern, start, crossed, tick):
+		g["crossed"] = crossed + 1
+		_msg(id, "穿過咗第 %d 卡車之間！" % (crossed + 1))
+		if crossed + 1 >= RulesStealth.GAP_COUNT:
+			ch.erase("stealthGame")
+			if not ch.has("status"):
+				ch["status"] = {}
+			RulesSpell.add_status(ch["status"], "stealth", RulesStealth.STEALTH_TICKS, tick)
+			ch["stealthCd"] = tick + RulesStealth.STEALTH_CD_TICKS
+			_sync_stats(e)
+			_emit({"k": "stealth_done", "dst": id, "until": tick + RulesStealth.STEALTH_TICKS})
+			_msg(id, "潛行！10 分鐘內主動怪唔會仇恨你（CD 1 日）")
+		else:
+			_emit({"k": "stealth_prog", "dst": id, "crossed": int(g["crossed"])})
+	else:
+		ch.erase("stealthGame")
+		_emit({"k": "stealth_fail", "dst": id})
+		_msg(id, "撞埋車——被發現，潛行失敗！")
 
 
 # 超渡 (道士, S02c, spec 02 §6): 復活附近倒下嘅同伴（留自己 HP + 扣 HP20% / MP30%）

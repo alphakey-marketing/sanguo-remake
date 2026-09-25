@@ -97,6 +97,7 @@ func _panel(name_: String) -> GamePanel:
 			"mount": p = MountPanel.new(main)
 			"create": p = CreatePanel.new(main)
 			"unlock": p = UnlockPanel.new(main)
+			"stealth": p = StealthPanel.new(main)
 			_: p = DialogPanel.new(main)
 		add_child(p)
 		panels[name_] = p

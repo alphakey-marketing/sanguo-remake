@@ -978,6 +978,40 @@
     "exp": 30,
     "skill": "chaodu"
    }
+  },
+
+  {
+   "id": "skill_unlock_wunu",
+   "name": "學特技：潛行",
+   "type": "general",
+   "giver": "wunu_master",
+   "pre": {
+    "classId": "wunu",
+    "minLevel": 5
+   },
+   "preHint": "巫女 5 級起，去許昌城廣場搵巫姬婆學潛行",
+   "stages": [
+    {
+     "type": "ask",
+     "npc": "wunu_master",
+     "dialog": [
+      "巫姬婆：「穿越車隊最忌乜？先答我，先教你潛行。」"
+     ],
+     "options": [
+      "硬衝過去，愈快愈好",
+      "揀啱車同車之間嘅空隙先穿",
+      "大嗌叫車停低"
+     ],
+     "answer": 1,
+     "hint": "答啱巫姬婆嘅問題（學識潛行）",
+     "done": true
+    }
+   ],
+   "reward": {
+    "exp": 30,
+    "skill": "yinxing"
+   }
   }
+
  ]
 }

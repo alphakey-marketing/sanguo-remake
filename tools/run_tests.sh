@@ -18,6 +18,7 @@ run b3 --script tests/run_b3.gd
 run mount --script tests/run_mount.gd
 run war_beast --script tests/run_war_beast.gd
 run spell --script tests/run_spell.gd
+run stealth --script tests/run_stealth.gd
 run jewel_ult --script tests/run_jewel_ult.gd
 run sim --script tests/run_sim.gd
 run char --script tests/run_char.gd

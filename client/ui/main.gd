@@ -280,6 +280,7 @@ func _send(d: Dictionary) -> void:
 		"quest_answer": sim.cmd_quest_answer(my_id, str(d.quest), int(d.answer))
 		"use_skill": sim.cmd_use_skill(my_id, str(d.skill))
 		"skill_pick": sim.cmd_skill_pick(my_id, int(d.chest), int(d.key))
+		"stealth_cross": sim.cmd_stealth_cross(my_id)
 		"debug_learn": sim.cmd_debug_learn(my_id, str(d.kind), str(d.what))
 		"debug_give": sim.cmd_debug_give(my_id, int(d.item), int(d.get("n", 1)))
 		"craft": sim.cmd_craft(my_id, int(d.item))
@@ -318,7 +319,8 @@ func _log(s: String) -> void:
 	if log_lines.size() > 6: log_lines.pop_front()
 
 const STATUS_NAMES := {"sealed": "封咒", "hex": "中邪", "power1": "聚力", "power2": "強力", "power3": "神力",
-	"armor1": "護甲", "armor2": "金甲", "armor3": "聖鎧", "mirror1": "護鏡", "mirror2": "光鏡", "mirror3": "仙鏡"}
+	"armor1": "護甲", "armor2": "金甲", "armor3": "聖鎧", "mirror1": "護鏡", "mirror2": "光鏡", "mirror3": "仙鏡",
+	"stealth": "潛行"}
 const ELEM_TAG := {"earth": "地", "water": "水", "fire": "火", "wind": "風"}
 
 func _ent_name(id: int) -> String:
@@ -458,6 +460,17 @@ func _on_event(e: Dictionary) -> void:
 				hud.open_panel("unlock")
 		"unlock_done":                        # 開鎖成功 -> 閂面板 (失敗留低再試)
 			if int(e.dst) == my_id and hud != null and bool(e.get("ok", false)):
+				hud.close_panels()
+		"stealth_open":                        # S02c 潛行: 行車 QTE 開面板
+			if int(e.dst) == my_id and hud != null:
+				hud.open_panel("stealth")
+				_set_banner("行車嚟緊——揀啱空隙穿過！", Color(0.9, 0.9, 0.6), 3.0)
+		"stealth_done":						# 成功: 閂面板 + 顯示潛行
+			if int(e.dst) == my_id and hud != null:
+				hud.close_panels()
+				_set_banner("潛行！主動怪唔會仇恨你（10 分鐘）", Color(0.6, 0.8, 1.0), 4.0)
+		"stealth_fail":                        # 失敗: 閂面板，留個 msg
+			if int(e.dst) == my_id and hud != null:
 				hud.close_panels()
 		# ---- 登用 (Step 13.5) ----
 		"recruit_survey", "recruit_quiz":

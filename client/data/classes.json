@@ -10,7 +10,7 @@
     { "id": "daoshi", "name": "道士", "gender": "M", "enabled": true, "attackRange": "melee_mid",   "spell": "destructive", "weapons": ["幡", "拂塵", "符咒"], "skill": "超渡", "tier2": {"name": "仙君", "weapons": ["幡", "拂塵", "符咒"], "inherit": true}, "tier3": {"name": "聖君", "weapons": ["幡", "拂塵", "符咒"], "inherit": true},
       "base":   { "str": 5, "agi": 6, "int": 12, "spi": 8, "pol": 6, "cha": 6 },
       "growth": { "str": 1, "agi": 1, "int": 2,  "spi": 1 } },
-    { "id": "wunu",   "name": "巫女", "gender": "F", "enabled": false, "attackRange": "melee_mid",   "spell": "status",      "weapons": ["鞭", "棍杖", "卷軸"], "skill": "潛行", "tier2": {"name": "魔女", "weapons": ["鞭", "棍杖", "卷軸"], "inherit": true}, "tier3": {"name": "妖姬", "weapons": ["鞭", "棍杖", "卷軸"], "inherit": true},
+    { "id": "wunu",   "name": "巫女", "gender": "F", "enabled": true,  "attackRange": "melee_mid",   "spell": "status",      "weapons": ["鞭", "棍杖", "卷軸"], "skill": "潛行", "tier2": {"name": "魔女", "weapons": ["鞭", "棍杖", "卷軸"], "inherit": true}, "tier3": {"name": "妖姬", "weapons": ["鞭", "棍杖", "卷軸"], "inherit": true},
       "base":   { "str": 4, "agi": 7, "int": 6, "spi": 12, "pol": 5, "cha": 8 },
       "growth": { "str": 1, "agi": 1, "int": 1, "spi": 2 } },
     { "id": "bianshi","name": "辯士", "gender": "M", "enabled": false, "attackRange": "melee_ranged","spell": "support",     "weapons": ["扇", "筆", "弩"],   "skill": "竊聽", "tier2": {"name": "策士", "weapons": ["扇", "筆", "弩"], "inherit": true}, "tier3": {"name": "諸葛", "weapons": ["扇", "筆", "弩"], "inherit": true},
@@ -23,6 +23,7 @@
   "starter": {
     "yishi": { "weapon": 10001, "boots": 22001, "items": [{ "id": 65210, "n": 5 }], "gold": 100 },
     "daoshi": { "weapon": 14001, "boots": 22001, "items": [{ "id": 65210, "n": 5 }, { "id": 30513, "n": 1 }], "gold": 100 },
-    "shinu": { "weapon": 11001, "boots": 22001, "items": [{ "id": 65210, "n": 5 }], "gold": 100 }
+    "shinu": { "weapon": 11001, "boots": 22001, "items": [{ "id": 65210, "n": 5 }], "gold": 100 },
+    "wunu": { "weapon": 13038, "boots": 22001, "items": [{ "id": 65210, "n": 5 }], "gold": 100 }
   }
 }

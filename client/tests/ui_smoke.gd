@@ -631,6 +631,15 @@ func _run() -> void:
 	hud.skill_pressed.emit({"kind": "skill", "skill": "chaodu"})
 	await frames(1)
 	check(_msg_count() == m1 + 1, "撳超渡掣冇倒下同伴 → 有提示")
+	# S02c 巫女潛行: 特技掣換 id, 撳落去 (冇 CD) → 開行車 QTE (stealth_open) + 面板
+	ch["classId"] = "wunu"
+	ch["classSkill"] = "yinxing"
+	var m2 := _msg_count()
+	hud.skill_pressed.emit({"kind": "skill", "skill": "yinxing"})
+	await frames(2)
+	check(_msg_count() == m2 + 1, "撳潛行掣 → 有提示")
+	check(hud.panels.has("stealth") and (hud.panels["stealth"] as GamePanel).visible, "潛行掣 → 開咗行車面板")
+	hud.close_panels()
 	print("[TEST] ui_smoke: %d, fail %d" % [total, fails])
 	print("PASS: ui smoke" if fails == 0 else "FAIL: ui smoke")
 	get_tree().quit(1 if fails > 0 else 0)
