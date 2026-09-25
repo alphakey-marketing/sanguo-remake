@@ -4,12 +4,12 @@ extends RefCounted
 # bag = [{id, n}]
 
 
-static func buy_price(base: float, cha: float, karma: int = 0) -> int:
-	return maxi(1, MathX.js_round(base * (1.0 - minf(0.2, cha * 0.005)) * RulesKarma.price_factor(karma)))
+static func buy_price(base: float, cha: float, karma: int = 0, trade_lv: int = 0) -> int:
+	return maxi(1, MathX.js_round(base * (1.0 - minf(0.2, cha * 0.005)) * (1.0 - RulesExpert.trade_buy_discount(trade_lv)) * RulesKarma.price_factor(karma)))
 
 
-static func sell_price(base: float) -> int:
-	return int(floor(base * 0.5))
+static func sell_price(base: float, trade_lv: int = 0) -> int:
+	return int(floor(base * 0.5 * (1.0 + RulesExpert.trade_sell_bonus(trade_lv))))
 
 
 static func add_item(bag: Array, id: int, n: int) -> void:

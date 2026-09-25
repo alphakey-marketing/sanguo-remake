@@ -78,6 +78,7 @@ var gen_skill_by_id: Dictionary = {}   # 特技 id -> def
 var gen_skill_override: Dictionary = {}  # 武將名 -> 特技 id (名將指定)
 var general_order_item: Dictionary = {}  # 武將名 -> 將軍令 item id
 var comm: Dictionary = {}          # 居民委託 + 武將收集冊設定 (data/commissions.json, Step 16)
+var experts: Dictionary = {}       # 專長 (data/experts.json, Step S01c, spec 01 §8)
 
 static var _cache: GameData
 
@@ -175,6 +176,7 @@ static func load_all() -> GameData:
 	g.ultimates = ul["ultimates"]
 	for u in g.ultimates:
 		g.ult_by_id[String(u["id"])] = u
+	g.experts = _read("res://data/experts.json")
 	for x in c["classes"]:
 		g.classes[String(x["id"])] = x
 	for x in m["monsters"]:

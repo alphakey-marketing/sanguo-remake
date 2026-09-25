@@ -543,10 +543,12 @@ func _buy_price(id: int) -> int:
 	var base: float = item_prices.get(id, 0)
 	var pf: float = sim.market_factor(id)
 	var cha := int(ch.attrs.cha) if not ch.is_empty() else 0
-	return RulesShop.buy_price(RulesMarket.price(base, pf), cha)
+	var trade_lv := sim.expert_lv(ch, "jiaoyi") if not ch.is_empty() and sim != null else 0
+	return RulesShop.buy_price(RulesMarket.price(base, pf), cha, 0, trade_lv)
 
 func _sell_price(id: int) -> int:
-	return RulesMarket.sell_price(item_prices.get(id, 0), sim.market_factor(id))
+	var trade_lv := sim.expert_lv(ch, "jiaoyi") if not ch.is_empty() and sim != null else 0
+	return RulesShop.sell_price(item_prices.get(id, 0) * sim.market_factor(id), trade_lv)
 
 func _me():
 	return _ent(my_id)
@@ -616,7 +618,7 @@ func _interactable_at(g: Vector2) -> Dictionary:
 # 每幀 UI 雜務: 行到 pending 目標就開、任務答題自動彈對話框、落點標記淡出
 func _ui_tick(delta: float) -> void:
 	marker["t"] = maxf(0.0, float(marker["t"]) - delta * 1.5)
-	if hud == null or hud.creation_mode:
+	if hud == null or hud.any_panel_open():
 		return
 	var me = _me()
 	if not pending.is_empty() and me != null:
@@ -836,7 +838,7 @@ func _on_debug_pressed(action: String) -> void:
 
 
 func _unhandled_input(ev: InputEvent) -> void:
-	if hud != null and (hud.any_panel_open() or hud.creation_mode):
+	if hud != null and hud.any_panel_open():
 		return                                     # 面板開住: 唔做世界點擊/快捷鍵
 	# 逐個事件判斷: 觸控 = ScreenTouch；由觸控模擬出嚟嘅 mouse 事件忽略（避免雙重處理）
 	# （唔用 Input.is_emulating_mouse_from_touch(): 4.7 桌面都回 true）

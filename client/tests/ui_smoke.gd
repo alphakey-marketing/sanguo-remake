@@ -174,9 +174,8 @@ func _run() -> void:
 	check(str(cch.get("ideology", "")) != "", "建角: 答完 12 題應該決定理念")
 	check(bool(cch.get("nameLocked", false)), "建角: 理念一決定，姓名應該鎖定")
 	cp.set_tab(0)
-	name_ed.text = "改極都唔得"
-	press(cp, "確定")
 	await frames(1)
+	check(not (cp as CreatePanel).body.get_children().any(func(c): return c is LineEdit), "建角: 姓名鎖定後唔應該再顯示輸入框")
 	check(str(cch.get("name", "")) == "劉備", "建角: 姓名鎖定後唔可以再改")
 	cp.set_tab(6)
 	press(cp, "✕")
@@ -202,7 +201,7 @@ func _run() -> void:
 	# 3. 角色面板: ＋ 暫存，確認先送
 	ch["attrPoints"] = 2
 	var str0 := int(ch["attrs"]["str"])
-	var cp: GamePanel = hud.panels["char"]
+	cp = hud.panels["char"]
 	cp.refresh(true)
 	await frames(1)
 	press(cp, "＋")

@@ -19,16 +19,6 @@ func _init(m: Node) -> void:
 	super(m)
 	title_lbl.text = "建角"
 	set_tabs(["姓名", "稱號", "生日", "職業", "臉譜", "理念", "確認"])
-	name_edit = LineEdit.new()
-	name_edit.max_length = 8
-	name_edit.placeholder_text = "姓名 1~8 字"
-	add_child(name_edit)
-	name_edit.hide()
-	title_edit = LineEdit.new()
-	title_edit.max_length = 8
-	title_edit.placeholder_text = "稱號 1~8 字"
-	add_child(title_edit)
-	title_edit.hide()
 
 
 func open() -> void:
@@ -43,8 +33,6 @@ func close() -> void:
 		return
 	if not _confirmed:
 		return   # 建角未完成，撳 ✕/遮罩都唔畀走（撳「出發！」先算數）
-	name_edit.hide()
-	title_edit.hide()
 	hide()
 	closed.emit()
 
@@ -57,8 +45,6 @@ func sig() -> String:
 
 
 func _build_body() -> void:
-	name_edit.hide()
-	title_edit.hide()
 	var ch: Dictionary = main.ch
 	if ch.is_empty():
 		return
@@ -79,8 +65,10 @@ func _build_name(ch: Dictionary) -> void:
 	body.add_child(lbl("而家：「%s」%s" % [str(ch.get("name", "")), "（已鎖定）" if locked else ""], 14))
 	if locked:
 		return
+	name_edit = LineEdit.new()
+	name_edit.max_length = 8
+	name_edit.placeholder_text = "姓名 1~8 字"
 	name_edit.text = str(ch.get("name", ""))
-	name_edit.show()
 	body.add_child(name_edit)
 	body.add_child(btn("確定", func() -> void: main._send({"t": "set_name", "name": name_edit.text}), 120))
 
@@ -89,8 +77,10 @@ func _build_name(ch: Dictionary) -> void:
 func _build_title(ch: Dictionary) -> void:
 	body.add_child(lbl("稱號（隨時可以改）", 15, UiTheme.GOLD))
 	body.add_child(lbl("而家：「%s」" % (str(ch.get("title", "")) if str(ch.get("title", "")) != "" else "未設"), 14))
+	title_edit = LineEdit.new()
+	title_edit.max_length = 8
+	title_edit.placeholder_text = "稱號 1~8 字"
 	title_edit.text = str(ch.get("title", ""))
-	title_edit.show()
 	body.add_child(title_edit)
 	body.add_child(btn("確定", func() -> void: main._send({"t": "set_title", "title": title_edit.text}), 120))
 
