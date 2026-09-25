@@ -946,6 +946,38 @@
     "exp": 30,
     "skill": "unlock"
    }
+  },
+  {
+   "id": "skill_unlock_daoshi",
+   "name": "學特技：超渡",
+   "type": "general",
+   "giver": "daoshi_master",
+   "pre": {
+    "classId": "daoshi",
+    "minLevel": 5
+   },
+   "preHint": "道士 5 級起，去許昌城南角搵玄真道人學超渡",
+   "stages": [
+    {
+     "type": "ask",
+     "npc": "daoshi_master",
+     "dialog": [
+      "玄真道人：「同伴倒下，靠你超渡拉佢返嚟。先答我：施超渡會點？」"
+     ],
+     "options": [
+      "用還魂丹救",
+      "扣自己體力靈力救返同伴",
+      "等佢自己爬起身"
+     ],
+     "answer": 1,
+     "hint": "答啱玄真道人嘅問題（學識超渡）",
+     "done": true
+    }
+   ],
+   "reward": {
+    "exp": 30,
+    "skill": "chaodu"
+   }
   }
  ]
 }

@@ -9,6 +9,9 @@
     { "id": "xuanbing", "name": "玄冰麒麟", "class": "yishi", "tier": 6, "mult": 4.5, "range": 4, "mp": 50, "sp": 65, "cd": 600, "weaponCat": 3, "quest": "ult_xuanbing", "reqTier": 2, "reqLevel": 100, "sfxStatus": "freeze", "sfxTicks": 300 },
     { "id": "huxiao", "name": "虎嘯龍吟", "class": "shinu", "tier": 1, "mult": 2.0, "range": 2, "mp": 15, "sp": 20, "cd": 300, "weaponCat": 6, "quest": "" },
     { "id": "jinhu", "name": "金環裂地", "class": "shinu", "tier": 2, "mult": 2.5, "range": 2, "mp": 20, "sp": 30, "cd": 360, "weaponCat": 6, "quest": "" },
-    { "id": "jinghua", "name": "鏡花水月", "class": "shinu", "tier": 3, "mult": 3.0, "range": 3, "mp": 25, "sp": 40, "cd": 420, "weaponCat": 6, "quest": "" }
+    { "id": "jinghua", "name": "鏡花水月", "class": "shinu", "tier": 3, "mult": 3.0, "range": 3, "mp": 25, "sp": 40, "cd": 420, "weaponCat": 6, "quest": "" },
+    { "id": "xuwu",    "name": "虛無飄渺", "class": "daoshi", "tier": 1, "mult": 2.0, "range": 2, "mp": 15, "sp": 20, "cd": 300, "weaponCat": 15, "quest": "" },
+    { "id": "ruhuan",  "name": "如幻似真", "class": "daoshi", "tier": 2, "mult": 2.5, "range": 2, "mp": 20, "sp": 30, "cd": 360, "weaponCat": 15, "quest": "" },
+    { "id": "shenyou", "name": "神遊太虛", "class": "daoshi", "tier": 3, "mult": 3.0, "range": 3, "mp": 25, "sp": 40, "cd": 420, "weaponCat": 15, "quest": "" }
   ]
 }

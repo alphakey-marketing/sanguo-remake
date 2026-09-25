@@ -522,10 +522,16 @@ func t_skill_misc(data: GameData) -> void:
 	_with_skill(c, 19)
 	var cid := int(c["id"])
 	sim._kill_player(c)
-	check(int(gn["loyalty"]) == 59 and not sim.ent(cid).is_empty(), "堅忍: 倒下唔扣忠誠")
+	check(not sim.ent(cid).is_empty() and bool(sim.ent(cid).get("down", false)), "堅忍: 倒落唔會死")
+	c["downAt"] = int(sim.state["tick"]) - int(data.world["combat"]["compDownTicks"]) - 5
+	sim._down_bailout()
+	check(int(gn["loyalty"]) == 59 and not sim.ent(cid).is_empty(), "堅忍: 超時未救唔扣忠誠")
 	_with_skill(c, 3)
 	sim._kill_player(c)
-	check(int(gn["loyalty"]) == 59 + int(data.recruit_cfg["loyalty"]["ko"]), "冇堅忍: 倒下扣忠誠")
+	check(bool(sim.ent(cid).get("down", false)), "冇堅忍: 又倒低")
+	c["downAt"] = int(sim.state["tick"]) - int(data.world["combat"]["compDownTicks"]) - 5
+	sim._down_bailout()
+	check(int(gn["loyalty"]) < 59, "冇堅忍: 超時未救扣忠誠")
 	# S02b: 隊伍經驗池按傷害分 — 教導特技暫時無效果(留返 Spec09)，同伴自己出晒力就自己攞晒經驗
 	_put(sim, cid, int(sim.ent(pid)["x"]) + 1, int(sim.ent(pid)["y"]))
 	_with_skill(c, 15)

@@ -8,6 +8,14 @@
       "lv": 5,
       "quest": "skill_unlock_shinu",
       "desc": "揀真鑰匙開任務寶箱/門（小遊戲：三支揀一支）"
+    },
+    {
+      "id": "chaodu",
+      "name": "超渡",
+      "class": "daoshi",
+      "lv": 5,
+      "quest": "skill_unlock_daoshi",
+      "desc": "同伴倒下後喺側邊施法復活佢（扣自己 HP 20% + MP 30%）"
     }
   ]
 }

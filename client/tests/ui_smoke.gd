@@ -625,6 +625,12 @@ func _run() -> void:
 	hud.skill_pressed.emit({"kind": "skill", "skill": "unlock"})
 	await frames(1)
 	check(_msg_count() == m0 + 1, "撳特技掣冇寶箱 → 有提示")
+	# S02c 道士超渡: 同一特技掣換 id, 撳落去 (冇同伴倒下) → 照出提示
+	ch["classSkill"] = "chaodu"
+	var m1 := _msg_count()
+	hud.skill_pressed.emit({"kind": "skill", "skill": "chaodu"})
+	await frames(1)
+	check(_msg_count() == m1 + 1, "撳超渡掣冇倒下同伴 → 有提示")
 	print("[TEST] ui_smoke: %d, fail %d" % [total, fails])
 	print("PASS: ui smoke" if fails == 0 else "FAIL: ui smoke")
 	get_tree().quit(1 if fails > 0 else 0)
