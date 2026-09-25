@@ -8,6 +8,9 @@ const TICK := 0.1                 # sim 10Hz
 const AUTOTEST_STEPS := 20        # autotest 每幀跑幾多 tick
 const FACE_DIR := "res://assets_placeholder/faces/"   # 原版頭像佔位: 私人測試，成品前換走
 const FONT_SZ := 12
+const TARGET_RANGE := 16          # 換目標: 附近幾多格 (Manhattan) 內嘅怪
+const FIELD_RETRY_TICKS := 60     # 自動掛機冇怪: 每幾多 tick 再行去野區
+const DEBUG_FOOD := 29054         # debug「試食」: 燻魚 (回 HP)
 
 var sim: Sim
 var data: GameData
@@ -58,7 +61,7 @@ var _dirty := false                # 發咗意圖/收咗事件: 下幀要 _refre
 func _ready() -> void:
 	autotest = "--autotest" in OS.get_cmdline_user_args()
 	uitest = "--uitest" in OS.get_cmdline_user_args() or "--uishot" in OS.get_cmdline_user_args()
-	for i in 12:
+	for i in Sim.FACE_COUNT:
 		var p := "%sface_%d.jpg" % [FACE_DIR, i]
 		faces.append(load(p) if ResourceLoader.exists(p) else null)   # 冇圖就畫色塊
 	data = GameData.load_all()
@@ -191,7 +194,7 @@ func _process(delta: float) -> void:
 	if not autotest:
 		_ui_tick(delta)
 	t0 += delta
-	if not autotest and not uitest and sim.tick > 0 and sim.tick % 720 == 0 and sim.tick != last_save_tick:
+	if not autotest and not uitest and sim.tick > 0 and sim.tick % _ticks_per_day() == 0 and sim.tick != last_save_tick:
 		last_save_tick = sim.tick
 		SaveSys.autosave(sim)
 	for f in floats: f.age += delta
@@ -209,6 +212,10 @@ func _process(delta: float) -> void:
 		else:
 			print("SSHOT failed (headless 冇 GPU?)")
 		sshot_file = ""
+
+# 自動存檔週期 = 1 遊戲日 (1440 遊戲分 / gameMinPerTick)
+func _ticks_per_day() -> int:
+	return maxi(1, int(1440.0 / float(int(data.world["clock"]["gameMinPerTick"]))))
 
 # 舊 ws 訊息格式 → sim 意圖
 func _send(d: Dictionary) -> void:
@@ -631,7 +638,7 @@ func _cycle_target() -> void:
 		return
 	var mobs: Array = []
 	for e in ents:
-		if e.get("mob", false) and absf(e.x - me.x) + absf(e.y - me.y) <= 16:
+		if e.get("mob", false) and absf(e.x - me.x) + absf(e.y - me.y) <= TARGET_RANGE:
 			mobs.append(e)
 	if mobs.is_empty():
 		_log("附近冇怪")
@@ -771,7 +778,7 @@ func _auto_tick() -> void:
 		target_id = int(near.id)
 		_send({"t": "attack", "target": target_id})
 		return
-	if int(sim.tick) % 60 == 0:
+	if int(sim.tick) % FIELD_RETRY_TICKS == 0:
 		_go_field()
 
 # 揀怪: 只揀同自己同一 zone (洞窟各層座標同野外相鄰，唔可以隔層鎖)；
@@ -814,7 +821,7 @@ func _on_debug_pressed(action: String) -> void:
 		"greet": _send({"t": "chat", "text": "大家好"})
 		"use":
 			if not ch.is_empty():
-				var food := 29054                            # debug: 燻魚(回 HP)，唔理背包原本有咩，直接派一件試食
+				var food := DEBUG_FOOD                       # debug: 唔理背包原本有咩，直接派一件試食
 				_send({"t": "debug_give", "item": food, "n": 1})
 				_send({"t": "use_item", "item": food})
 		"work_mining":

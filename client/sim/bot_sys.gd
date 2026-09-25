@@ -19,6 +19,7 @@ static func init_identity(e: Dictionary, rng: SimRng) -> void:
 
 
 static func think(sim) -> void:
+	var bc: Dictionary = sim.data.world["bots"]
 	var mobs_by_map := {}              # 地圖 index -> [mob]，每 tick 分組一次 (次序 = ents 插入次序)
 	for m in sim.ents.values():
 		if m["kind"] == "mob":
@@ -31,11 +32,11 @@ static func think(sim) -> void:
 		if e.is_empty() or not e.has("ch"):
 			continue
 		var ch: Dictionary = e["ch"]
-		if sim.rng.next() < 0.002:
+		if sim.rng.next() < float(bc["chatChance"]):
 			sim.cmd_chat(id, LINES[sim.rng.below(LINES.size())])
-		var low: bool = int(e["hp"]) < RulesStats.max_hp(int(ch["level"]), ch["attrs"]) * 0.4
+		var low: bool = int(e["hp"]) < RulesStats.max_hp(int(ch["level"]), ch["attrs"]) * float(bc["lowHpPct"])
 		var inn: Vector2i = sim.inn_pos
-		var near_inn := maxi(absi(int(e["x"]) - inn.x), absi(int(e["y"]) - inn.y)) <= 3
+		var near_inn := maxi(absi(int(e["x"]) - inn.x), absi(int(e["y"]) - inn.y)) <= Sim.NEAR
 		if low:                                        # 血低: 撤退返客棧休息 (跨圖就經門口行, spec 12 §4)
 			e["atk_target"] = 0
 			if sim._route_to_map(e, sim.map_id_at(inn.x, inn.y)):
@@ -54,10 +55,10 @@ static func think(sim) -> void:
 		var best := 0
 		var best_d := 1 << 30
 		for m in mobs_by_map.get(sim.data.map_index(int(e["x"]), int(e["y"])), []):
-			if int(m["level"]) > int(ch["level"]) + 2 or m["mob"].has("arena"):
+			if int(m["level"]) > int(ch["level"]) + int(bc["maxLvAbove"]) or m["mob"].has("arena"):
 				continue
 			var d := maxi(absi(int(m["x"]) - int(e["x"])), absi(int(m["y"]) - int(e["y"])))
-			if d > 14 or d >= best_d:
+			if d > int(bc["seekRange"]) or d >= best_d:
 				continue
 			best = int(m["id"])
 			best_d = d
@@ -66,6 +67,6 @@ static func think(sim) -> void:
 			continue
 		if sim._route_to_map(e, Sim.DEFAULT_ZONE):    # 唔喺野區: 經門口出城
 			continue
-		if int(e["x"]) == int(e["tx"]) and int(e["y"]) == int(e["ty"]) and sim.rng.next() < 0.15:    # 冇怪: 喺野區行吓
+		if int(e["x"]) == int(e["tx"]) and int(e["y"]) == int(e["ty"]) and sim.rng.next() < float(bc["wanderChance"]):    # 冇怪: 喺野區行吓
 			var z: Dictionary = sim.zone_by_id(Sim.DEFAULT_ZONE)
 			sim.cmd_move(id, int(z["x0"]) + sim.rng.below(int(z["x1"]) - int(z["x0"])), int(z["y0"]) + sim.rng.below(int(z["y1"]) - int(z["y0"])))

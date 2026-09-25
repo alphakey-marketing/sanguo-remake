@@ -78,7 +78,7 @@ func _think_mob(m: Dictionary) -> void:
 				m["ty"] = tgt["y"]
 		return
 	if s["state"] == "return":
-		m["hp"] = mini(int(m["max_hp"]), int(m["hp"]) + int(ceil(int(m["max_hp"]) / 20.0)))    # 脫戰回血
+		m["hp"] = mini(int(m["max_hp"]), int(m["hp"]) + int(ceil(int(m["max_hp"]) / float(data.world["combat"]["returnRegenDiv"]))))    # 脫戰回血
 		if int(m["x"]) == int(s["home_x"]) and int(m["y"]) == int(s["home_y"]):
 			s["state"] = "wander"
 		return
@@ -103,9 +103,11 @@ func _think_mob(m: Dictionary) -> void:
 			s["state"] = "chase"
 			s["target"] = best["id"]
 			return
-	if int(m["x"]) == int(m["tx"]) and int(m["y"]) == int(m["ty"]) and rng.next() < 0.05:
-		var nx := int(s["home_x"]) + rng.below(7) - 3
-		var ny := int(s["home_y"]) + rng.below(7) - 3
+	var cc: Dictionary = data.world["combat"]
+	if int(m["x"]) == int(m["tx"]) and int(m["y"]) == int(m["ty"]) and rng.next() < float(cc["wanderChance"]):
+		var wr := int(cc["wanderRadius"])
+		var nx := int(s["home_x"]) + rng.below(wr * 2 + 1) - wr
+		var ny := int(s["home_y"]) + rng.below(wr * 2 + 1) - wr
 		if is_free(nx, ny):
 			m["tx"] = nx
 			m["ty"] = ny
