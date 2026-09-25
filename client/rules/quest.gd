@@ -67,6 +67,10 @@ static func validate(data: GameData) -> Array:
 			for it in rw.get("items", []):
 				if not data.item_ids.has(int(it[0])):
 					errs.append("%s: reward item 唔存在 (%s)" % [id, it[0]])
+			if rw.has("ultimate") and not data.ult_by_id.has(String(rw["ultimate"])):
+				errs.append("%s: reward ultimate 唔存在 (%s)" % [id, rw["ultimate"]])
+			if rw.has("skill") and not (data.class_skills as Dictionary).has(String(rw["skill"])):
+				errs.append("%s: reward skill 唔存在 (%s)" % [id, rw["skill"]])
 		for k in q.get("pre", {}).get("attr", {}):
 			if not ATTR_KEYS.has(String(k)):
 				errs.append("%s: pre.attr 屬性唔啱 (%s)" % [id, k])
@@ -422,6 +426,9 @@ static func apply_reward(data: GameData, ch: Dictionary, reward: Dictionary) -> 
 			ults.append(uid)
 		ch["ultimates"] = ults
 		payload["ultimate"] = uid
+	if reward.has("skill"):             # 職業特技 (S02c, spec 02 §6): 學識 -> ch.classSkill (單一格)
+		ch["classSkill"] = String(reward["skill"])
+		payload["skill"] = String(reward["skill"])
 	for sk in ["spell", "expert"]:
 		if reward.has(sk):
 			ch[sk] = String(reward[sk])

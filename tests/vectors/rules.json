@@ -3871,6 +3871,7 @@
    "birthDay": 1,
    "birthMonth": 1,
    "classId": "yishi",
+   "classSkill": "",
    "equip": {
     "boots": 22001,
     "weapon": 10001

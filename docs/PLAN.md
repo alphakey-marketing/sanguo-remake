@@ -21,7 +21,7 @@
 | Spec | 邏輯 | UI | 已做（主要檔案） | 欠缺（= §3 對應 Step 範圍） |
 |---|---|---|---|---|
 | 01 角色成長 | 🟡 | 🟡 | 建角、六屬性、HP/MP/SP、升級點數 + 自動分配、理念測驗、稱號/生日（福日 exp）/臉譜、修練場所、行動力、飲水度、專長、二轉/三轉框架（`rules/stats.gd` `expert.gd` `class.gd`、`sim_char`、`char_panel.gd`） | 三轉考試任務接掛（S04d）；地理迷宮地圖效果（S01c 偏離） |
-| 02 戰鬥 | 🟡 | 🟡 | 近戰、術法、相剋、狀態、寶石、義士三招 + 融合、防具/武器 3 槽/耐久 | 其他 5 職武器/特技/絕招、弩箭消耗、組隊經驗分配（而家同伴 50% 歸主公）、狀態 icon 列、術法快捷列 3 本切換 UI |
+| 02 戰鬥 | 🟡 | 🟡 | 近戰、術法、相剋、狀態、寶石、義士三招 + 融合、防具/武器 3 槽/耐久、組隊經驗分配（按傷害 70%/平分 30%）、狀態 icon 列、術法快捷列 3 本切換 UI、**仕女（特技開鎖 + 三招絕招）** | 其餘 4 職（道士超渡/巫女潛行/辯士竊聽+弩箭消耗/美女透視 + 各職三招絕招）、多絕招 HUD 已通 |
 | 03 善惡死亡 | 🟡 | ✅ | 七階、死亡掉物品/跌經驗、價格加成 | 攻擊居民/紅名 NPC（而家 `cmd_attack` 只准打 mob）、反擊 +100、天譴、幸運符/護身符/還魂丹、殺人魔拒入城、罪犯拒官令 |
 | 04 怪物地圖 | 🟡 | ✅ | 46 怪 + 掉落導入、重生、逃跑/群攻、boss 每日、夜怪、汝南洞 10 層、張牛角戰役 | 地面掉落物（`dropped` 實體）、術法怪/boss 技能、特殊場景 7 個（`scenes.json`）、其餘 5 場戰役實體 |
 | 05 生產經濟 | 🟡 | ✅ | 6 初階 + 5 進階 + 2318 配方、修理、工具店、天地商行、捐獻、市場 | 產出 1~2 件、特製/白金/御賜工具、大宗師、4 類商店補齊、天災停進貨、城際貿易提示 |
@@ -70,11 +70,15 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
   - UI：HUD 同伴框加經驗條（`companion_view().exp/needExp`）；隊伍面板：而家隊伍實質淨得 1 同伴（spec09 多登用武將未做），HUD 已夠顯示，獨立隊伍面板留返多同伴嗰步先加
   - 偏離：舊「教導」特技（`expShareAdd`，主公經驗 +25%）喺舊「同伴代打全歸主公」模型先有意思；新按傷害分模型下主公冇出手就分唔到，教導特技暫時冧咗效果，留返 Spec09 補完期一齊諗點接（`general_skills.json` 15 號特技描述未改，代碼行為已改）
   - 驗收：`tests/run_general.gd`（新 `t_team_exp_split` 12 項 pure 測試）+ `tests/run_recruit.gd`/`run_general.gd` 舊同伴殺怪測試改期望值；`run_tests.sh` 全 PASS
-- [ ] **S02c 其他 5 職開放（每職一細步：仕女 → 道士 → 巫女 → 辯士 → 美女）**：`classes.json` 啟用、職業武器 18 系對應、職業特技（開鎖/超渡/潛行/竊聽/透視，單機化設計照 §6）+ 小遊戲 UI、初階三招絕招（數值模板 §5）
-  - 辯士：弩箭消耗（箭矢 cat 定義 = spec 11 open 項）
-  - 絕招「任務鏈」本身 → S06d；呢度先做招式 + debug 學招測試
-  - 【待決】五職做晒先行，定係揀 1~2 職先
-- 驗收：`tests/run_class.gd`（新）+ rules 向量更新 + `--uitest` 每職特技一項
+- [x] **S02c-仕女（用家揀：先做仕女一職試水）**：`classes.json` 啟用仕女 + 起始裝備（劍系）、職業武器對應（劍/爪/環 cat 4/5/6，`_weapon_ok` 已按 classes.weapons 檢查）、特技「開鎖」、初階三招絕招（虎嘯龍吟/金環裂地/鏡花水月）、HUD 多絕招逐招一格
+  - 完成：`classes.json` shinu `enabled=true` + `starter.shinu`（11001 越女劍）；`ultimates.json` +3 招（數值模板 §5，weaponCat 6 環，任務鏈 S06d 接，quest 暫空）；`data/class_skills.json` + `rules/class_skill.gd`（def_of/learned/can_use 純函數）+ `GameData.class_skills`；`rules/quest.gd` reward 加 `skill` key（學識 → `ch.classSkill`）＋ validator 檢查 ultimate/skill；`stats.gd`/`_spawn_actor` 加 `classSkill` 欄；導師 NPC `shinu_master`（黃師姐，許昌 52,39，minLevel 5）+ 任務 `skill_unlock_shinu`（答題 → 學識開鎖）；`sim_skill.gd` `cmd_use_skill`/`cmd_skill_pick`/`_near_locked_chest`（unlock_open/unlock_done 事件）；新 `ui/panels/unlock_panel.gd`（揀真鑰匙×3 道門）+ HUD 技能扇形加「特技」掣；main 接 `use_skill`/`skill_pick`/事件/任務獎勵顯示；`cmd_debug_learn` + 更多面板「學初階絕招/學特技」debug 掣（手機無鍵盤測招式）；新 `tests/run_class.gd`（81 項）接入 `run_tests.sh`；`--uitest` 加技能扇形多絕招 + 特技掣（冇寶箱提示）
+  - 偏離：仕女三招絕招全部用「環」（weaponCat 6）【自訂】——同義士全用槍矛先例；三轉後五/六招武器未定
+  - 延後掛鈎：開鎖效果（任務寶箱/門實體）→ S04 寶箱實體 / S06 任務寶箱（sim 指令 + 事件 + 面板已通，見 §4）；絕招任務鏈 → S06d；HUD 4 格位喺 S01a 嘅留白而家由多絕招補埋
+  - 驗收：`tests/run_class.gd`（新，81 項）+ rules 向量更新（createCharacter 加 classSkill）+ `--uitest` 技能扇形特技一項
+- [ ] **S02c-道士**：超渡特技（同伴死亡復活，扣 HP 20% + MP 30%）+ 導師 NPC；佢三招絕招
+- [ ] **S02c-巫女**：潛行特技（潛行狀態 10 分鐘避仇恨，CD 1 game 日）+ 小遊戲 + 導師；佢三招絕招
+- [ ] **S02c-辯士**：竊聽特技（居民對話竊聽情報）+ 導師；佢三招絕招；**弩箭消耗**（箭矢 cat 49 已有 items，要消耗邏輯 + 商店賣箭/木匠製箭 = S05）
+- [ ] **S02c-美女**：透視特技（睇 NPC/怪隱藏資訊）+ 導師；佢三招絕招（美女仲有葉/針術 + 恢復術，照術書表）
 
 ### S03 善惡死亡（spec 03）
 - [ ] **S03a 可攻擊 NPC**：`cmd_attack` 開放居民/紅名 NPC（安全區照禁）；居民反擊/逃跑/叫衛兵；殺善一次過 −1000、紅殺紅 +300、反擊成功 +100
@@ -168,6 +172,7 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
 | S01c | 專長任務升級 | S06e |
 | S01d | 三轉任務（七彩項鍊） | S04d |
 | S02c | 各職絕招任務鏈 | S06d |
+| S02c-仕女 | 開鎖效果（任務寶箱/門實體；sim `cmd_use_skill`/`cmd_skill_pick` + unlock 面板已通） | S04 寶箱實體 / S06 任務寶箱 |
 | S05b | 工具正式來源（團體任務） | S06c/S08f |
 | S06c | 義勇軍限定團體任務 | S08f |
 | S07c | 撿寶/幸運護身還魂/聖體 | 要 S04a/S03c/S01a 先 |

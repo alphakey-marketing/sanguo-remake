@@ -914,6 +914,38 @@
    "reward": {
     "fame": 10
    }
+  },
+  {
+   "id": "skill_unlock_shinu",
+   "name": "學特技：開鎖",
+   "type": "general",
+   "giver": "shinu_master",
+   "pre": {
+    "classId": "shinu",
+    "minLevel": 5
+   },
+   "preHint": "仕女 5 級起，去許昌城西街搵黃師姐學開鎖",
+   "stages": [
+    {
+     "type": "ask",
+     "npc": "shinu_master",
+     "dialog": [
+      "黃師姐：「開鎖最忌急，先答我：三支鑰匙點揀至係真？」"
+     ],
+     "options": [
+      "大力鋸爛個鎖口",
+      "揀啱嗰支真鑰匙",
+      "買把新鎖算數"
+     ],
+     "answer": 1,
+     "hint": "答啱黃師姐嘅問題（學識開鎖）",
+     "done": true
+    }
+   ],
+   "reward": {
+    "exp": 30,
+    "skill": "unlock"
+   }
   }
  ]
 }

@@ -56,6 +56,7 @@ var cur_map := {}                  # 玩家而家身處嘅地圖 def (spec 12)
 var _place_key := ""               # 地圖+區名: 變咗就彈區名橫幅
 var ent_by_id := {}                # id -> ents 入面嗰個視圖 (_refresh 砌)
 var ask_now := {}                  # 進行中答題 (_refresh 計，每 tick 一次)
+var _unlock_chest := 0             # 開鎖小遊戲目標寶箱实體 id (unlock_panel 用, S02c)
 var _dirty := false                # 發咗意圖/收咗事件: 下幀要 _refresh (唔使等下個 tick)
 
 func _ready() -> void:
@@ -277,6 +278,9 @@ func _send(d: Dictionary) -> void:
 		"fusion_start": sim.cmd_fusion_start(my_id)
 		"fusion_hit": sim.cmd_fusion_hit(my_id)
 		"quest_answer": sim.cmd_quest_answer(my_id, str(d.quest), int(d.answer))
+		"use_skill": sim.cmd_use_skill(my_id, str(d.skill))
+		"skill_pick": sim.cmd_skill_pick(my_id, int(d.chest), int(d.key))
+		"debug_learn": sim.cmd_debug_learn(my_id, str(d.kind), str(d.what))
 		"debug_give": sim.cmd_debug_give(my_id, int(d.item), int(d.get("n", 1)))
 		"craft": sim.cmd_craft(my_id, int(d.item))
 		"repair": sim.cmd_repair(my_id, int(d.item))
@@ -436,6 +440,9 @@ func _on_event(e: Dictionary) -> void:
 					if int(rw.get("exp", 0)) > 0: parts.append("+%d 經驗" % int(rw["exp"]))
 					if int(rw.get("lilian", 0)) > 0: parts.append("+%d 歷練" % int(rw["lilian"]))
 					if rw.has("ultimate"): parts.append("學識絕招「%s」！" % str(rw["ultimate"]))
+					if rw.has("skill"):
+						var sd: Dictionary = data.class_skills.get(str(rw["skill"]), {})
+						parts.append("學識特技「%s」！" % str(sd.get("name", rw["skill"])))
 					if rw.has("items"):
 						for it in rw["items"]:
 							parts.append("%s x%d" % [item_names.get(int(it.id), str(it.id)), int(it.n)])
@@ -445,6 +452,13 @@ func _on_event(e: Dictionary) -> void:
 		"heal":
 			if int(e.dst) == my_id:
 				_log("密醫幫你醫治，回復 %d HP" % int(e.hp))
+		"unlock_open":                        # S02c 開鎖小遊戲: sim 搵到附近鎖寶箱 -> 開揀鑰匙面板
+			if int(e.dst) == my_id and hud != null:
+				_unlock_chest = int(e.get("chest", 0))
+				hud.open_panel("unlock")
+		"unlock_done":                        # 開鎖成功 -> 閂面板 (失敗留低再試)
+			if int(e.dst) == my_id and hud != null and bool(e.get("ok", false)):
+				hud.close_panels()
 		# ---- 登用 (Step 13.5) ----
 		"recruit_survey", "recruit_quiz":
 			if int(e.dst) == my_id and hud != null and not autotest:
@@ -665,6 +679,9 @@ func _on_skill(sl: Dictionary) -> void:
 		var tgt := int(t.id) if t != null and bool(t.get("mob", false)) else 0
 		_send({"t": "cast_spell", "slot": int(sl["slot"]), "target": tgt})
 		return
+	if String(sl["kind"]) == "skill":           # S02c 職業特技掣: 而家得開鎖（sim 會檢查附近有冇鎖寶箱）
+		_send({"t": "use_skill", "skill": String(sl["skill"])})
+		return
 	if String(sl["ult"]) == "":
 		_log("未學絕招 (絕招任務: 練兵場門口禁衛大隊長)")
 		return
@@ -836,6 +853,30 @@ func _on_debug_pressed(action: String) -> void:
 				_send({"t": "equip_tool", "skill": "mining", "item": tool})
 			_send({"t": "work", "skill": "mining"})
 		"work_lv": _send({"t": "debug_work_lv", "add": 10})    # debug: 生產技能 +10 級 (Step 12)
+		"learn_ults":
+			# debug (S02c): 依家職業學晒初階三招絕招（任務鏈喺 S06d）
+			if not ch.is_empty():
+				var cid := str(ch.get("classId", ""))
+				var n := 0
+				for u in data.ultimates:
+					if String(u["class"]) == cid and int(u.get("tier", 9)) <= 3:
+						_send({"t": "debug_learn", "kind": "ult", "what": String(u["id"])})
+						n += 1
+				if n == 0:
+					_log("你嘅職業暫時冇初階絕招")
+		"learn_skill":
+			# debug (S02c): 學職業特技（導師任務同屆）
+			if not ch.is_empty():
+				var cid := str(ch.get("classId", ""))
+				var sid := ""
+				for sk in data.class_skills:
+					if String(data.class_skills[sk].get("class", "")) == cid:
+						sid = String(sk)
+						break
+				if sid == "":
+					_log("你嘅職業暫時冇特技")
+				else:
+					_send({"t": "debug_learn", "kind": "skill", "what": sid})
 
 
 func _unhandled_input(ev: InputEvent) -> void:

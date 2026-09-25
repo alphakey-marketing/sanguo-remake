@@ -63,6 +63,7 @@ var jewels: Dictionary = {}      # 寶石目錄 (data/jewels.json, Step 10): sto
 var jewel_by_item: Dictionary = {}  # item id -> jewel def (全種類)
 var ultimates: Array = []        # 絕招定義 (data/ultimates.json, Step 10, spec 02 §5)
 var ult_by_id: Dictionary = {}   # ult id -> def
+var class_skills: Dictionary = {}   # 職業特技 (data/class_skills.json, S02c, spec 02 §6): skill id -> def
 var armors: Dictionary = {}      # item id -> {slot, req_lv, max_dur, stats} 防具 (Step 11.6, spec 02 §9)
 var equip_cfg: Dictionary = {}   # data/equip.json (部位碼/耐久/上限)
 var generals: Array = []          # 登用武將 (data/generals.json, Step 13.5)
@@ -176,6 +177,9 @@ static func load_all() -> GameData:
 	g.ultimates = ul["ultimates"]
 	for u in g.ultimates:
 		g.ult_by_id[String(u["id"])] = u
+	var csk: Dictionary = _read("res://data/class_skills.json")
+	for s in csk["skills"]:
+		g.class_skills[String(s["id"])] = s
 	g.experts = _read("res://data/experts.json")
 	for x in c["classes"]:
 		g.classes[String(x["id"])] = x

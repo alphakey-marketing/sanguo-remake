@@ -112,6 +112,19 @@ func put(x: int, y: int) -> void:
 	m._refresh()
 
 
+# 玩家 msg 事件計數 (S02c 特技掣冇寶箱提示驗證用)
+var _msg_n := 0
+var _msg_hooked := false
+
+func _msg_count() -> int:
+	if not _msg_hooked:
+		_msg_hooked = true
+		m.sim.event_emitted.connect(func(ev: Dictionary) -> void:
+			if String(ev.get("k", "")) == "msg" and int(ev.get("dst", -1)) == m.my_id:
+				_msg_n += 1)
+	return _msg_n
+
+
 # 互動掣而家指住邊個任務 NPC ("" = 唔係任務 NPC)
 func ctx_npc() -> String:
 	var r: Variant = hud.ctx.get("ref")
@@ -592,6 +605,26 @@ func _run() -> void:
 	await frames(2)
 	check(hud.panels["shop"].visible, "開到馬用品店")
 	hud.close_panels()
+	# S02c 技能扇形: 學咗絕招逐招一格 + 職業特技掣（仕女開鎖；HUD 內容同職業無關，直接驗 slot 列表）
+	m._send({"t": "debug_learn", "kind": "ult", "what": "huxiao"})
+	m._send({"t": "debug_learn", "kind": "ult", "what": "jinhu"})
+	ch["classSkill"] = "unlock"
+	await frames(1)
+	var slots: Array = hud.skill_slots()
+	var n_ult := 0
+	var has_skill := false
+	for sl in slots:
+		if String(sl["kind"]) == "ult" and str(sl["ult"]) != "":
+			n_ult += 1
+		if String(sl["kind"]) == "skill" and str(sl["skill"]) == "unlock":
+			has_skill = true
+	check(n_ult >= 2, "多絕招: 技能扇形逐招一格 (得 %d 格)" % n_ult)
+	check(has_skill, "特技掣: 技能扇形有開鎖一格")
+	# 撳特技掣 → 冇寶箱 → 唔會炸，出提示 (msg 事件)
+	var m0 := _msg_count()
+	hud.skill_pressed.emit({"kind": "skill", "skill": "unlock"})
+	await frames(1)
+	check(_msg_count() == m0 + 1, "撳特技掣冇寶箱 → 有提示")
 	print("[TEST] ui_smoke: %d, fail %d" % [total, fails])
 	print("PASS: ui smoke" if fails == 0 else "FAIL: ui smoke")
 	get_tree().quit(1 if fails > 0 else 0)

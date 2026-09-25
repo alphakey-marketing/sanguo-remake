@@ -226,6 +226,78 @@ func cmd_use_ultimate(id: int, ult_id: String) -> void:
 
 
 
+# ================= 職業特技 (S02c, spec 02 §6) =================
+# 學到 -> ch.classSkill = skill id (導師任務獎勵)；而家得 開鎖（仕女）。
+# 開鎖效果（任務寶箱/門）要 S04 寶箱實體 / S06 任務寶箱先接到 — 而家 sim 指令 + 事件 + UI 已經接通。
+
+func cmd_use_skill(id: int, skill_id: String) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var ch: Dictionary = e["ch"]
+	var r := RulesClassSkill.can_use(data, ch, skill_id)
+	if not bool(r["ok"]):
+		return _msg(id, str(r["why"]))
+	match skill_id:
+		"unlock":
+			var chest := _near_locked_chest(e)
+			if chest.is_empty():
+				return _msg(id, "附近冇鎖住嘅寶箱（任務寶箱先用得開鎖）")
+			_emit({"k": "unlock_open", "dst": id, "chest": chest["id"]})
+			_msg(id, "揀真鑰匙…三支得一支啱")
+		_:
+			_msg(id, "嗰招特技而家用唔到")
+
+
+# 開鎖小遊戲揀鑰匙（unlock_panel 三掣）: key_idx 啱 -> 寶箱開，錯 -> 留喺度再試
+func cmd_skill_pick(id: int, chest_id: int, key_idx: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var ch: Dictionary = e["ch"]
+	if String(ch.get("classSkill", "")) != "unlock":
+		return _msg(id, "未學「開鎖」")
+	var chest: Dictionary = ents.get(chest_id, {})
+	if chest.is_empty() or String(chest.get("kind", "")) != "chest":
+		return _msg(id, "寶箱唔喺度")
+	if not bool(chest.get("locked", true)):
+		return _msg(id, "寶箱已經開咗")
+	if int(chest.get("key", 0)) == key_idx:
+		chest["locked"] = false
+		_emit({"k": "unlock_done", "dst": id, "chest": chest_id, "ok": true, "name": str(chest.get("name", "寶箱"))})
+		_msg(id, "咔！%s 開咗" % str(chest.get("name", "寶箱")))
+	else:
+		_msg(id, "揀錯鑰匙，%s 紋紋唔肯郁…（再試）" % str(chest.get("name", "寶箱")))
+
+
+# 附近鎖住嘅寶箱實體 (S04 地面寶箱/任務寶箱實體化後先會再有)
+func _near_locked_chest(e: Dictionary) -> Dictionary:
+	for o in ents.values():
+		if String(o.get("kind", "")) == "chest" and bool(o.get("locked", true)) \
+				and RulesCombat.in_range(e["x"], e["y"], o["x"], o["y"], 2):
+			return o
+	return {}
+
+
+# debug: 直接學絕招/特技（成品前移除；S02c 絕招任務鏈喺 S06d，先畀手機測招式）
+func cmd_debug_learn(id: int, kind: String, what: String) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var ch: Dictionary = e["ch"]
+	match kind:
+		"ult":
+			var ults: Array = ch.get("ultimates", [])
+			if not ults.has(what):
+				ults.append(what)
+				ch["ultimates"] = ults
+				_msg(id, "debug: 學識絕招「%s」" % str(data.ult_by_id.get(what, {}).get("name", what)))
+			else:
+				_msg(id, "已學過嗰招")
+		"skill":
+			ch["classSkill"] = what
+			_msg(id, "debug: 學識特技「%s」" % str((data.class_skills as Dictionary).get(what, {}).get("name", what)))
+
 # ================= 融合 (義士特技, Step 10, spec 02 §6) =================
 func _near_forge(e: Dictionary) -> bool:
 	var f: Dictionary = data.facilities.get("forge", {})

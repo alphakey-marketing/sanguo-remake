@@ -1,0 +1,2 @@
+! "D:/Download/Sengoku/godot/Godot_v4.7.2-stable_win64_console.exe" --headless --path client --export-debug "Android" build/sanguo.apk
+! D:/Android/Sdk/platform-tools/adb install -r client/build/sanguo.apk
