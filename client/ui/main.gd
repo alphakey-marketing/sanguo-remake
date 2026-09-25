@@ -472,6 +472,11 @@ func _on_event(e: Dictionary) -> void:
 		"stealth_fail":                        # 失敗: 閂面板，留個 msg
 			if int(e.dst) == my_id and hud != null:
 				hud.close_panels()
+		"qieting":                              # S02c-辯士 竊聽: 耳邊「…」傳聞線索
+			if int(e.dst) == my_id:
+				_log("【%s 耳邊「…」】%s" % [str(e.get("who", "居民")), str(e.get("text", ""))])
+				if hud != null:
+					_set_banner("耳邊「…」%s" % str(e.get("text", "")), Color(0.85, 0.85, 0.95), 5.0)
 		# ---- 登用 (Step 13.5) ----
 		"recruit_survey", "recruit_quiz":
 			if int(e.dst) == my_id and hud != null and not autotest:

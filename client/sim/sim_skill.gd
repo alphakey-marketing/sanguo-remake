@@ -249,6 +249,8 @@ func cmd_use_skill(id: int, skill_id: String) -> void:
 			_try_chaodu(id)
 		"yinxing":
 			_try_yinxing(id)
+		"qieting":
+			_try_qieting(id)
 		_:
 			_msg(id, "嗰招特技而家用唔到")
 
@@ -306,7 +308,42 @@ func cmd_stealth_cross(id: int) -> void:
 		_msg(id, "撞埋車——被發現，潛行失敗！")
 
 
-# 超渡 (道士, S02c, spec 02 §6): 復活附近倒下嘅同伴（留自己 HP + 扣 HP20% / MP30%）
+# 竊聽 (辯士, S02c, spec 02 §6【自訂】單機化): 喺居民側邊竊聽對話 -> 得傳聞線索（耳邊「…」）。
+# 居民 = 附近 bot (野區居民, bot_sys.gd) 或附近任務 NPC；傳聞記入 ch.rumors (情報冊)。
+func _try_qieting(id: int) -> void:
+	var e := ent(id)
+	var ch: Dictionary = e["ch"]
+	if tick < int(ch.get("qietingCd", 0)):
+		return _msg(id, "啱啱竊聽完，耳邊仲嗡嗡作響（%d tick 後先用得）" % [int(ch.get("qietingCd", 0)) - tick])
+	# 搵附近居民 (bot 實體 或 任務 NPC)
+	var best := ""
+	var best_d := 1 << 30
+	for o in ents.values():
+		if String(o.get("kind", "")) != "bot":
+			continue
+		var d: int = maxi(absi(int(o["x"]) - int(e["x"])), absi(int(o["y"]) - int(e["y"])))
+		if d <= RulesQieting.QIETING_RANGE and d < best_d:
+			best_d = d
+			best = str(o.get("name", "居民"))
+	for n in data.quest_npc_list:
+		if String(n.get("map", "")) != map_id_at(int(e["x"]), int(e["y"])):
+			continue
+		var d2: int = maxi(absi(int(n["x"]) - int(e["x"])), absi(int(n["y"]) - int(e["y"])))
+		if d2 <= RulesQieting.QIETING_RANGE and d2 < best_d:
+			best_d = d2
+			best = str(n.get("name", "居民"))
+	if best == "":
+		return _msg(id, "附近冇居民喺度傾偈，偷聽唔到嘢")
+	var line := RulesQieting.pick_unheard(data, ch, rng_fn)
+	if line == "":
+		return _msg(id, "冇傳聞值得竊聽")
+	ch["qietingCd"] = tick + RulesQieting.QIETING_CD_TICKS
+	var rumors: Array = ch.get("rumors", [])
+	if not rumors.has(line):
+		rumors.append(line)
+		ch["rumors"] = rumors
+	_emit({"k": "qieting", "dst": id, "who": best, "text": line, "total": rumors.size()})
+	_msg(id, "【%s 耳邊「…」】%s" % [best, line])
 const REVIVE_RANGE := 5
 func _try_chaodu(id: int) -> void:
 	var e := ent(id)

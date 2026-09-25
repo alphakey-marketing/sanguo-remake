@@ -145,6 +145,12 @@ func _think_player(p: Dictionary) -> void:
 	var mounted_combat := is_riding(ch) and _mount_weapon_type(ch) != ""
 	if not mounted_combat:
 		_mount_drop(p, "attack")
+	# ---- 弩箭消耗 (S02c-辯士, spec 02 §6【原】): 用弩射箭要有箭。冇箭 -> 唔出手 (miss 都唔燒箭) ----
+	if not mounted_combat and int(data.cats.get(int(ch["equip"].get("weapon", 0)), 0)) == RulesAmmo.NU_WEAPON_CAT:
+		if not RulesAmmo.has_arrow(data, ch):
+			p["atk_target"] = 0
+			_msg(int(p["id"]), "弩冇箭！去商店買箭 / 木匠製箭先用得弩")
+			return
 	var w: Dictionary = _mount_weapon_wdef(ch) if mounted_combat else _weapon_def(ch)     # 耐久 0 = 威力減半 (Step 12)
 	var jb := _jewel_bonus(ch)                 # 每下出手計一次 (唔用 RNG)
 	var ab := _armor_bonus(ch)
@@ -157,6 +163,9 @@ func _think_player(p: Dictionary) -> void:
 		t["mob"]["state"] = "chase"
 		t["mob"]["target"] = p["id"]
 		return
+	# 弩命中 -> 扣 1 箭（有箭先出到呢步，前面已查）
+	if not mounted_combat and int(data.cats.get(int(ch["equip"].get("weapon", 0)), 0)) == RulesAmmo.NU_WEAPON_CAT:
+		RulesAmmo.consume_arrow(data, ch, 1)
 	var mdef: Dictionary = data.mob_def(int(t["mob"]["def"]))
 	# 聚力/強力/神力 buff: 物攻 ×1.15/1.3/1.5 (spec 02 §7) + 輔助石物攻 % (effect 7)
 	var atk_mult := RulesSpell.atk_mult(ch.get("status", {}), tick)

@@ -13,12 +13,17 @@ func _init() -> void:
 	t_shinu_ultimates(data)
 	t_daoshi_ultimates(data)
 	t_wunu_ultimates(data)
+	t_bianshi_ultimates(data)
+	t_bianshi_enabled(data)
 	t_unlock_learn(data)
 	t_class_skill_use(data)
 	t_chaodu_learn(data)
 	t_chaodu_use(data)
 	t_yinxing_learn(data)
 	t_yinxing_use(data)
+	t_qieting_learn(data)
+	t_qieting_use(data)
+	t_arrow_consume(data)
 	print("[TEST] class: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -49,7 +54,7 @@ func t_shinu_enabled(data: GameData) -> void:
 	check(bool(data.classes["yishi"].get("enabled", false)), "義士仍然開放")
 	check(bool(data.classes["daoshi"].get("enabled", false)), "道士維持開放")
 	check(bool(data.classes["wunu"].get("enabled", false)), "巫女已開放")
-	check(not bool(data.classes["bianshi"].get("enabled", false)), "辯士未開放")
+	check(bool(data.classes["bianshi"].get("enabled", false)), "辯士已開放")
 	check(not bool(data.classes["meinu"].get("enabled", false)), "美女未開放")
 	var st: Dictionary = data.starter.get("shinu", {})
 	check(not st.is_empty(), "仕女有起始裝備")
@@ -481,3 +486,168 @@ func t_yinxing_use(data: GameData) -> void:
 	var m3e := sim3.ent(int(m3["id"]))
 	check(String(m3e["mob"]["state"]) == "wander", "潛行中: 主動怪唔會仇恨玩家 (仍遊蕩)")
 	check(int(m3e["mob"]["target"]) == 0, "潛行中: 冇設仇恨目標")
+
+
+# ===== 辯士 (S02c): 初階三招絕招 (琴? 弩 cat 9) + 起始弩 =====
+func t_bianshi_ultimates(data: GameData) -> void:
+	check(data.ult_by_id.has("tiandao") and data.ult_by_id.has("tuohuo") and data.ult_by_id.has("sanfen"), "辯士初階三招已定義")
+	var tmpl := {"tiandao": {"tier": 1, "mult": 2.0, "range": 2, "mp": 15, "sp": 20, "cd": 300},
+		"tuohuo": {"tier": 2, "mult": 2.5, "range": 2, "mp": 20, "sp": 30, "cd": 360},
+		"sanfen": {"tier": 3, "mult": 3.0, "range": 3, "mp": 25, "sp": 40, "cd": 420}}
+	for uid in tmpl:
+		var u: Dictionary = data.ult_by_id.get(String(uid), {})
+		var t: Dictionary = tmpl[String(uid)]
+		check(String(u.get("class", "")) == "bianshi", "%s 係辯士招式" % u.get("name", uid))
+		check(int(u.get("tier", 0)) == int(t["tier"]), "%s tier = %d" % [u.get("name", uid), int(t["tier"])])
+		check(absf(float(u.get("mult", 0)) - float(t["mult"])) < 0.001, "%s 倍率 x%.1f" % [u.get("name", uid), float(t["mult"])])
+		check(int(u.get("range", 0)) == int(t["range"]), "%s 範圍 %d" % [u.get("name", uid), int(t["range"])])
+		check(int(u.get("mp", 0)) == int(t["mp"]) and int(u.get("sp", 0)) == int(t["sp"]), "%s MP/SP 消耗" % u.get("name", uid))
+		check(int(u.get("cd", 0)) == int(t["cd"]), "%s 冷卻 %d" % [u.get("name", uid), int(t["cd"])])
+		check(int(u.get("weaponCat", 0)) == 9, "%s 需要弩武器 (cat 9)" % u.get("name", uid))
+	var ch := {"tier": 0, "level": 1}
+	check(bool(RulesClass.ultimate_usable(ch, data.ult_by_id["tiandao"])["ok"]), "辯士一招: 初階 Lv1 用得")
+	check(bool(RulesClass.ultimate_usable(ch, data.ult_by_id["sanfen"])["ok"]), "辯士三招: 初階都用得 (冇 reqTier)")
+
+
+func t_bianshi_enabled(data: GameData) -> void:
+	check(bool(data.classes["bianshi"].get("enabled", false)), "辯士職業已開放")
+	var st: Dictionary = data.starter.get("bianshi", {})
+	check(not st.is_empty(), "辯士有起始裝備")
+	check(int(data.cats.get(int(st.get("weapon", 0)), 0)) == 9, "辯士起始武器係弩系 (cat 9)")
+	var has_arrow := false
+	for it in st.get("items", []):
+		if int(data.cats.get(int(it["id"]), 0)) == RulesAmmo.ARROW_CAT and int(it["n"]) > 0:
+			has_arrow = true
+	check(has_arrow, "辯士起始帶箭矢")
+
+
+# ===== 辯士特技「竊聽」: 導師學習 =====
+func t_qieting_learn(data: GameData) -> void:
+	var sim := Sim.new(data, 51)
+	var id := sim.spawn_player("t", "bianshi")
+	var ch: Dictionary = sim.player_ch()
+	# 初始: classSkill 空 + rumors 有 array
+	check(String(ch.get("classSkill", "")) == "", "辯士: 初始未學竊聽")
+	check(ch.get("rumors", null) is Array, "辯士: rumors 有初始 []")
+	check(not bool((sim.state["quest_npcs"] as Dictionary).get("bianshi_master", {}).get("visible", false)), "Lv1: 睇唔到蔡師傅")
+	ch["level"] = 5
+	sim._sync_stats(sim.ent(id))
+	sim._sync_quest_npcs()
+	check(bool((sim.state["quest_npcs"] as Dictionary).get("bianshi_master", {}).get("visible", false)), "Lv5: 蔡師傅出現")
+	sim.cmd_use_skill(id, "qieting")
+	check(String(ch.get("classSkill", "")) == "", "未學竊聽: 冇學到嘢")
+	check(bool(RulesClassSkill.can_use(data, ch, "qieting").get("ok", false)) == false, "未學竊聽: Rules 擋")
+	var npc: Dictionary = data.quest_npcs["bianshi_master"]
+	_put(sim, id, int(npc["x"]) + 1, int(npc["y"]))
+	sim.cmd_quest_talk(id, "bianshi_master")
+	check((ch.get("quests", {}) as Dictionary).has("skill_unlock_bianshi"), "傾偈 = 接咗竊聽任務")
+	sim.cmd_quest_answer(id, "skill_unlock_bianshi", 0)          # 答錯
+	check(not bool(ch.get("questDone", {}).get("skill_unlock_bianshi", false)), "答錯: 未完成")
+	sim.cmd_quest_answer(id, "skill_unlock_bianshi", 1)          # 答啱
+	check(bool(ch.get("questDone", {}).get("skill_unlock_bianshi", false)), "答啱: 任務完成")
+	check(String(ch.get("classSkill", "")) == "qieting", "任務獎勵: 學識竊聽")
+	check(RulesClassSkill.learned(ch, "qieting"), "learned() 讀到")
+	# 非辯士學唔到 (pre classId 擋)
+	var sim2 := Sim.new(data, 52)
+	var id2 := sim2.spawn_player("t2", "yishi")
+	var ch2: Dictionary = sim2.player_ch()
+	ch2["level"] = 5
+	sim2._sync_stats(sim2.ent(id2))
+	sim2._sync_quest_npcs()
+	var npc2: Dictionary = data.quest_npcs["bianshi_master"]
+	_put(sim2, id2, int(npc2["x"]) + 1, int(npc2["y"]))
+	sim2.cmd_quest_talk(id2, "bianshi_master")
+	check(not (ch2.get("quests", {}) as Dictionary).has("skill_unlock_bianshi"), "義士同蔡師傅傾偈: 唔接竊聽任務")
+	# 存檔 roundtrip: classSkill + rumors 保留
+	var s := sim.save_string()
+	var sim3 := Sim.load_string(data, s)
+	check(sim3 != null and String(sim3.player_ch().get("classSkill", "")) == "qieting", "存檔 roundtrip: classSkill 保留")
+
+
+# ===== 辯士特技「竊聽」: 附近居民竊聽得傳聞線索 =====
+func t_qieting_use(data: GameData) -> void:
+	var sim := Sim.new(data, 53)
+	var id := sim.spawn_player("t", "bianshi")
+	var ch: Dictionary = sim.player_ch()
+	ch["level"] = 5
+	ch["classSkill"] = "qieting"
+	_put(sim, id, 27, 30)                                       # 野外居民聚集處
+	# 附近冇居民 -> 竊聽唔到
+	sim.cmd_use_skill(id, "qieting")
+	check((ch.get("rumors", []) as Array).is_empty(), "冇居民: 竊聽唔到嘢 (rumors 仍空)")
+	# 放一隻 bot 居民喺側邊 (哨坊)
+	var bot := sim._spawn_actor("路人甲", "bot")
+	BotSys.init_identity(bot, sim.rng)
+	_put(sim, bot["id"], 28, 30)
+	var got: Array = [false, ""]
+	sim.event_emitted.connect(func(ev: Dictionary) -> void:
+		if String(ev.get("k", "")) == "qieting" and int(ev.get("dst", 0)) == id and str(ev.get("text", "")) != "":
+			got[0] = true
+			got[1] = str(ev.get("text", "")))
+	sim.cmd_use_skill(id, "qieting")
+	check(bool(got[0]), "有居民: 竊聽發出 qieting 事件")
+	check((ch.get("rumors", []) as Array).has(String(got[1])), "竊聽: 傳聞記入 rumors")
+	check(int(ch.get("qietingCd", 0)) > sim.tick, "竊聽: 設咗冷卻")
+	# 冷卻未完 -> 擋
+	var n0 := (ch.get("rumors", []) as Array).size()
+	sim.cmd_use_skill(id, "qieting")
+	check((ch.get("rumors", []) as Array).size() == n0, "冷卻中: 唔會再加傳聞")
+	# 過冷卻再偷 -> 去重: 全聽晒之前每條都唔重複
+	for i in (data.rumors as Array).size() + 2:
+		ch["qietingCd"] = 0
+		sim.state["tick"] += 10
+		sim.cmd_use_skill(id, "qieting")
+	var heard: Array = ch.get("rumors", [])
+	check(heard.size() <= (data.rumors as Array).size(), "重複偷: rumors 唔會超池大小 (去重)")
+	# 聽晒 → 全池都喺情報冊 (假設池唔細)
+	check(not heard.is_empty(), "重複偷: 情報冊有傳聞")
+	# 存檔 roundtrip: rumors 保留
+	var s := sim.save_string()
+	var sim2 := Sim.load_string(data, s)
+	check(sim2 != null, "竊聽後存檔: 讀得返")
+	if sim2 != null:
+		check((sim2.player_ch().get("rumors", []) as Array).size() == heard.size(), "存檔 roundtrip: rumors 保留")
+
+
+# ===== 弩箭消耗 (S02c-辯士, spec 02 §6【原】): 用弩射箭扣箭 / 冇箭出手唔到 =====
+func t_arrow_consume(data: GameData) -> void:
+	var sim := Sim.new(data, 54)
+	var id := sim.spawn_player("t", "bianshi")
+	var pe: Dictionary = sim.ent(id)
+	var ch: Dictionary = sim.player_ch()
+	check(int(data.cats.get(int(ch["equip"]["weapon"]), 0)) == RulesAmmo.NU_WEAPON_CAT, "辯士裝備弩 (cat %d)" % RulesAmmo.NU_WEAPON_CAT)
+	var n0 := RulesAmmo.arrow_count(data, ch)
+	check(n0 > 0, "起始有箭 (n=%d)" % n0)
+	_put(sim, id, 30, 30)
+	sim._sync_stats(pe)
+	var m: Variant = sim._spawn_mob(1005, "field_1")            # 最強嗰隻, 捱得幾下
+	_put(sim, int(m["id"]), 31, 30)
+	m["mob"]["home_x"] = 31
+	m["mob"]["home_y"] = 30
+	check(RulesAmmo.arrow_count(data, ch) == n0, "未出手: 箭未扣")
+	sim.cmd_attack(id, int(m["id"]))
+	for _i in 80:
+		sim.step()
+		if RulesAmmo.arrow_count(data, ch) < n0:
+			break
+	check(RulesAmmo.arrow_count(data, ch) < n0, "用弩射箭: 扣咗箭")
+	check(RulesAmmo.consume_arrow(data, ch, 1) == true and RulesAmmo.arrow_count(data, ch) < n0, "consume_arrow 扣咗箭")
+	# 冇箭 -> 出手唔到 (clear atk_target): 用新 sim 撇清上一輪狀態
+	var simB := Sim.new(data, 55)
+	var idB := simB.spawn_player("tB", "bianshi")
+	var peB: Dictionary = simB.ent(idB)
+	var chB: Dictionary = simB.player_ch()
+	chB["bag"] = []                                 # 冇箭
+	_put(simB, idB, 30, 30)
+	simB._sync_stats(peB)
+	var mB: Variant = simB._spawn_mob(1005, "field_1")
+	_put(simB, int(mB["id"]), 31, 30)
+	mB["mob"]["home_x"] = 31
+	mB["mob"]["home_y"] = 30
+	peB["atk_target"] = int(mB["id"])
+	peB["next_atk"] = 0
+	simB.step()
+	check(int(simB.ent(idB)["atk_target"]) == 0, "冇箭: 出手唔到 (取消攻擊)")
+	check(RulesAmmo.arrow_count(data, chB) == 0, "冇箭: 箭仍然是 0")
+	check(RulesAmmo.consume_arrow(data, chB, 1) == false, "冇箭: consume_arrow 回 false")
+

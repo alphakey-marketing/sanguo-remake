@@ -1011,6 +1011,38 @@
     "exp": 30,
     "skill": "yinxing"
    }
+  },
+  {
+   "id": "skill_unlock_bianshi",
+   "name": "學特技：竊聽",
+   "type": "general",
+   "giver": "bianshi_master",
+   "pre": {
+    "classId": "bianshi",
+    "minLevel": 5
+   },
+   "preHint": "辯士 5 級起，去許昌城十字街搵蔡師傅學竊聽",
+   "stages": [
+    {
+     "type": "ask",
+     "npc": "bianshi_master",
+     "dialog": [
+      "蔡師傅：「竊聽傳聞，最緊要點？先答我，先教你。」"
+     ],
+     "options": [
+      "大聲問人，光明正大",
+      "靜靜雞埋去居民側邊，豎耳細聽",
+      "偷本簿睇下人哋寫咩"
+     ],
+     "answer": 1,
+     "hint": "答啱蔡師傅嘅問題（學識竊聽）",
+     "done": true
+    }
+   ],
+   "reward": {
+    "exp": 30,
+    "skill": "qieting"
+   }
   }
 
  ]
