@@ -9,6 +9,12 @@ func damage(t: Dictionary, dmg: int, by: Dictionary) -> void:
 		t.erase("casting")
 		_emit({"k": "cast_interrupted", "dst": t["id"], "reason": "hit"})
 	t["hp"] = maxi(0, int(t["hp"]) - dmg)
+	if t["kind"] == "mob" and by.has("id") and dmg > 0:
+		# 隊伍經驗池 (S02b): 記低邊個對隻怪出過幾多傷害，死嗰陣按比例分經驗
+		var dmg_log: Dictionary = t.get("dmg", {})
+		var tid := str(int(by["id"]))
+		dmg_log[tid] = int(dmg_log.get(tid, 0)) + dmg
+		t["dmg"] = dmg_log
 	if t["kind"] == "mob" and by.has("ch"):
 		t["mob"]["state"] = "chase"
 		t["mob"]["target"] = by["id"]
@@ -72,19 +78,32 @@ func _kill_mob(m: Dictionary, by: Dictionary, exp_mult: float = 1.0) -> void:
 	for it in items:
 		RulesShop.add_item(ch["bag"], int(it), 1)
 	ch["karma"] = RulesCombat.karma_after_kill(int(ch["karma"]), d["alignment"])
-	var exp_gain := MathX.js_round(float(d["exp"]) * exp_mult)
-	if by.get("kind", "") == "player":          # 福日【自訂】：生日嗰日練功 exp +10% (spec 01 §1)
-		var clk: Dictionary = data.world["clock"]
-		exp_gain = MathX.js_round(float(exp_gain) * RulesStats.birthday_exp_mult(int(_clock()["day"]),
-			int(clk.get("yearDays", 360)), int(clk.get("monthDays", 30)),
-			int(ch.get("birthMonth", 1)), int(ch.get("birthDay", 1))))
-	var ups := RulesStats.gain_exp(data, ch, exp_gain)
+	var base_exp := MathX.js_round(float(d["exp"]) * exp_mult)
+	var dmg_log: Dictionary = m.get("dmg", {})
+	if dmg_log.is_empty():           # 冇打過就死 (即死/狀態致死等)：全歸擊殺者
+		dmg_log = {str(int(by["id"])): 1}
+	var shares := RulesGeneral.team_exp_split(base_exp, dmg_log)   # 隊伍經驗池 (S02b, spec 02 §8)
+	var ups := 0
+	for id_str in shares.keys():
+		var member := ent(int(id_str))
+		if member.is_empty() or not member.has("ch"):
+			continue
+		var mch: Dictionary = member["ch"]
+		var e := int(shares[id_str])
+		if member.get("kind", "") == "player":   # 福日【自訂】：生日嗰日練功 exp +10% (spec 01 §1)
+			var clk: Dictionary = data.world["clock"]
+			e = MathX.js_round(float(e) * RulesStats.birthday_exp_mult(int(_clock()["day"]),
+				int(clk.get("yearDays", 360)), int(clk.get("monthDays", 30)),
+				int(mch.get("birthMonth", 1)), int(mch.get("birthDay", 1))))
+		var mups := RulesStats.gain_exp(data, mch, e)
+		if mups > 0 and member.get("kind", "") in ["bot", "gen"]:   # 機械人/同伴冇人幫手派點: 直接按建議比例自動派
+			RulesStats.auto_assign_points(mch, data.classes[mch["classId"]])
+		_sync_stats(member)
+		if int(member["id"]) == int(by["id"]):
+			ups = mups
 	_comm_on_kill(by, int(m["mob"]["def"]))      # 居民委託打怪計數 (Step 16)
 	if ups > 0:
 		_sync_quest_npcs()          # 升級可能改變任務 NPC 可見性 (神秘老人/流浪狗)
-	if ups > 0 and by.get("kind", "") == "bot":   # 機械人冇人幫手派點: 直接按建議比例自動派
-		RulesStats.auto_assign_points(ch, data.classes[ch["classId"]])
-	_sync_stats(by)
 	_emit({"k": "kill", "src": by["id"], "dst": m["id"], "exp": int(d["exp"]), "gold": gold, "items": items,
 		"lvUp": int(ch["level"]) if ups > 0 else 0})
 	if battle_id != "":

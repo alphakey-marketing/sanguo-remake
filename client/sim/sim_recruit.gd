@@ -442,7 +442,8 @@ func companion_view() -> Dictionary:
 		trs.append({"item": int(t["item"]), "name": data.names.get(int(t["item"]), ""), "value": int(t["value"]),
 			"type": String(data.gen2_cfg["treasure"][String(t["type"])]["name"])})
 	return {"id": int(c["id"]), "gid": int(gn["gid"]), "name": c["name"], "lv": int(c["level"]), "hp": int(c["hp"]),
-		"maxHp": int(c["max_hp"]), "loyalty": int(gn["loyalty"]), "order": String(gn["order"]),
+		"maxHp": int(c["max_hp"]), "exp": int(ch["exp"]), "needExp": RulesStats.exp_to_next(int(c["level"])),
+		"loyalty": int(gn["loyalty"]), "order": String(gn["order"]),
 		"daysLeft": maxi(0, int(gn["until"]) - int(_clock()["day"])), "type": g["type"], "sub": g["sub"], "face": int(c["face"]),
 		"mp": int(ch["mp"]), "maxMp": _eff_max_mp(ch), "sp": int(ch["sp"]), "maxSp": _eff_max_sp(ch),
 		"skill": String(sk.get("name", "")), "skillDesc": String(sk.get("desc", "")),
@@ -722,15 +723,14 @@ func _kill_player(p: Dictionary) -> void:
 		_loyalty_change(p, int(data.recruit_cfg["loyalty"]["ko"]))
 
 
-# 同伴殺怪: 掉落/金/善惡歸主公，經驗 × expShare；殺善怪 → 義理/治國同伴忠誠跌
+# 同伴殺怪: 掉落/金/善惡歸主公，經驗按隊伍經驗池分 (S02b, 同伴有自己 exp/level)；殺善怪 → 義理/治國同伴忠誠跌
 func _kill_mob(m: Dictionary, by: Dictionary, exp_mult: float = 1.0) -> void:
 	var d := data.mob_def(int(m["mob"]["def"]))
 	var killer := by
 	if by.get("kind", "") == "gen":
 		var o := ent(int(by["gen"]["owner"]))
 		if not o.is_empty():
-			killer = o
-			exp_mult *= RulesGeneral.exp_share(float(data.recruit_cfg["companion"]["expShare"]), _comp_eff(by))   # 教導
+			killer = o                # 掉落/金/善惡仍然歸主公【原】；經驗喺 super() 按各自傷害分（教導特技留返 Spec09 補完期再接）
 	super(m, killer, exp_mult)
 	var c := _companion_of(killer)
 	if not c.is_empty():

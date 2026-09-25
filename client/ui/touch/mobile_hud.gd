@@ -396,9 +396,10 @@ func _draw_companion() -> void:
 	var x := pr.end.x + 4
 	_txt(Vector2(x, r.position.y + 13), "%s Lv%d" % [c.name, int(c.lv)], Color(0.7, 1, 0.75), 11)
 	_bar(x, r.position.y + 17, r.end.x - x - 4, 6, float(c.hp) / maxi(1, int(c.maxHp)), Color(0.3, 0.8, 0.3))
-	_txt(Vector2(x, r.position.y + 34), "忠%d 剩%d日" % [int(c.loyalty), int(c.daysLeft)],
+	_bar(x, r.position.y + 25, r.end.x - x - 4, 4, float(c.exp) / maxi(1, int(c.needExp)), Color(0.5, 0.6, 0.95))   # 經驗條 (S02b)
+	_txt(Vector2(x, r.position.y + 42), "忠%d 剩%d日" % [int(c.loyalty), int(c.daysLeft)],
 		Color(1, 0.5, 0.45) if int(c.loyalty) < 40 else Color(0.95, 0.9, 0.75), 10)
-	_txt(Vector2(x, r.position.y + 44), str(RulesRecruit.ORDER_NAMES.get(str(c.order), "")), Color(0.8, 0.85, 1.0), 9)
+	_txt(Vector2(x, r.position.y + 52), str(RulesRecruit.ORDER_NAMES.get(str(c.order), "")), Color(0.8, 0.85, 1.0), 9)
 
 # 頂中目標框（揀咗怪先有）
 func _draw_target(s: Vector2) -> void:

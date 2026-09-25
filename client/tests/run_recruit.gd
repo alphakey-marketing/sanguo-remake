@@ -612,14 +612,16 @@ func t_comp_kill_credit(data: GameData) -> void:
 	var o := sim.ent(pid)
 	ch["level"] = 1
 	ch["exp"] = 0
+	c["ch"]["level"] = 1
+	c["ch"]["exp"] = 0
 	var m := _mob_at(sim, int(o["x"]) + 3, int(o["y"]))
 	var d := data.mob_def(int(m["mob"]["def"]))
-	var cexp := int(c["ch"]["exp"])
 	var gold := int(ch["gold"])
 	sim.damage(m, 99999, c)
-	var want := MathX.js_round(float(d["exp"]) * float(data.recruit_cfg["companion"]["expShare"]))
-	check(int(ch["exp"]) == want, "同伴殺怪: 主公得 %d%% 經驗 (%d/%d)" % [int(100 * float(data.recruit_cfg["companion"]["expShare"])), int(ch["exp"]), want])
-	check(int(c["ch"]["exp"]) == cexp and int(ch["gold"]) >= gold, "同伴殺怪: 同伴唔升級，金歸主公")
+	# S02b: 隊伍經驗池按傷害分 — 冇打過嘅主公分唔到，同伴自己出晒力就自己攞晒經驗/升自己級
+	check(int(ch["exp"]) == 0, "同伴殺怪: 主公冇分傷害 = 冇經驗")
+	check(int(c["ch"]["exp"]) == int(d["exp"]), "同伴殺怪: 同伴自己有經驗 (S02b)")
+	check(int(ch["gold"]) >= gold, "同伴殺怪: 金歸主公")
 
 
 func t_comp_expire(data: GameData) -> void:

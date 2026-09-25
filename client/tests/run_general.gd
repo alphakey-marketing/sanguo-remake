@@ -20,6 +20,7 @@ func _init() -> void:
 	t_skill_misc(data)
 	t_comp_ult(data)
 	t_comp_spell(data)
+	t_team_exp_split()
 	t_view(data)
 	t_save(data)
 	t_old_save(data)
@@ -159,6 +160,25 @@ func _order_target(sim: Sim, kind: String) -> Dictionary:
 		if not g.is_empty() and String(g["type"]) == kind and int(g["lv"]) >= 40 and int(g["tier"]) == 0:
 			return g
 	return {}
+
+
+# ---------------- S02b: 隊伍經驗池 (spec 02 §8) ----------------
+func t_team_exp_split() -> void:
+	check(RulesGeneral.team_exp_split(100, {}).is_empty(), "隊伍經驗: 冇傷害紀錄 = 空")
+	check(RulesGeneral.team_exp_split(0, {"1": 5}).is_empty(), "隊伍經驗: total<=0 = 空")
+	var solo := RulesGeneral.team_exp_split(100, {"1": 50})
+	check(int(solo["1"]) == 100, "隊伍經驗: 單人打晒 = 攞晒 100%")
+	var half := RulesGeneral.team_exp_split(100, {"1": 50, "2": 50})
+	check(int(half["1"]) == 50 and int(half["2"]) == 50, "隊伍經驗: 傷害對半 = exp 對半")
+	var skew := RulesGeneral.team_exp_split(100, {"1": 90, "2": 10})   # 70%按 9:1 分 + 30%對半
+	check(int(skew["1"]) == MathX.js_round(70.0 * 0.9) + 15 and int(skew["2"]) == MathX.js_round(70.0 * 0.1) + 15,
+		"隊伍經驗: 70%%按傷害比例 + 30%%平分 (%d/%d)" % [int(skew["1"]), int(skew["2"])])
+	var many := {}
+	for i in range(8):
+		many[str(i)] = 10 * (i + 1)     # 8 個貢獻者，only top 6 by dmg 分到
+	var capped := RulesGeneral.team_exp_split(120, many)
+	check(capped.size() == 6 and not capped.has("0") and not capped.has("1"),
+		"隊伍經驗: 貢獻者多過上限 6 = 淨取傷害最高 6 個")
 
 
 # ---------------- A: 資料 ----------------
@@ -506,15 +526,18 @@ func t_skill_misc(data: GameData) -> void:
 	_with_skill(c, 3)
 	sim._kill_player(c)
 	check(int(gn["loyalty"]) == 59 + int(data.recruit_cfg["loyalty"]["ko"]), "冇堅忍: 倒下扣忠誠")
-	# 教導: 經驗分成 0.5 → 0.75
+	# S02b: 隊伍經驗池按傷害分 — 教導特技暫時無效果(留返 Spec09)，同伴自己出晒力就自己攞晒經驗
 	_put(sim, cid, int(sim.ent(pid)["x"]) + 1, int(sim.ent(pid)["y"]))
 	_with_skill(c, 15)
 	ch["level"] = 1
 	ch["exp"] = 0
+	c["ch"]["level"] = 1
+	c["ch"]["exp"] = 0
 	var m := _mob_at(sim, int(sim.ent(pid)["x"]) + 3, int(sim.ent(pid)["y"]), 10)
 	var d := data.mob_def(int(m["mob"]["def"]))
 	sim.damage(m, 99999, c)
-	check(int(ch["exp"]) == MathX.js_round(float(d["exp"]) * 0.75), "教導: 主公得 75%% 經驗 (%d)" % int(ch["exp"]))
+	check(int(ch["exp"]) == 0, "S02b: 主公冇分傷害 = 冇經驗")
+	check(int(c["ch"]["exp"]) == int(d["exp"]), "S02b: 同伴自己攞晒經驗 (%d)" % int(c["ch"]["exp"]))
 
 
 # ---------------- E: 絕招 / 術法指令 ----------------

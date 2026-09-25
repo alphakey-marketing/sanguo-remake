@@ -19,7 +19,7 @@ const MENU_LABELS := {"menu_bag": "背包", "menu_char": "角色", "menu_quest":
 const MENU_SZ := 48.0
 const MENU_GAP := 4.0
 const MINI_SZ := Vector2(112, 50)   # 小地圖 (spec 12 §6)
-const COMP_SZ := Vector2(120, 46)   # 同伴框 (Step 13.5)
+const COMP_SZ := Vector2(120, 54)   # 同伴框 (Step 13.5；S02b 加多一行 exp 條)
 const STATUS_ROW_H := 18.0     # 角色框底部狀態 icon 列高度 (S02a)
 
 
