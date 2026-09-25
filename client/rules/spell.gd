@@ -35,7 +35,11 @@ static func calc_spell_damage(power: float, attr: float, spell_def: float, att_e
 const STATUS_TICKS := {"sealed": 600, "hex": 300, "freeze": 300,
 	"armor1": 900, "armor2": 900, "armor3": 900,
 	"mirror1": 900, "mirror2": 900, "mirror3": 900,
-	"power1": 900, "power2": 900, "power3": 900}
+	"power1": 900, "power2": 900, "power3": 900,
+	"insight": 150}
+
+# 美女特技「透視」洞悉狀態：對已透視目標 +20% 攻擊力（RulesToushi 用）【自訂】
+const INSIGHT_ATK_MULT := 0.2
 
 
 static func status_ticks(id: String) -> int:
@@ -65,15 +69,18 @@ static func blocks_move(status: Dictionary, tick: int) -> bool:
 	return has(status, "hex", tick) or has(status, "freeze", tick)
 
 
-# buff 倍率 (無狀態 = 1.0): 聚力/強力/神力 = 物攻 +15%/30%/50%
+# buff 倍率 (無狀態 = 1.0): 聚力/強力/神力 = 物攻 +15%/30%/50%；透視釋領洞悉 = +20%【自訂】
 static func atk_mult(status: Dictionary, tick: int) -> float:
+	var m := 1.0
+	if has(status, "insight", tick):
+		m *= 1.0 + INSIGHT_ATK_MULT
 	if has(status, "power3", tick):
-		return 1.5
-	if has(status, "power2", tick):
-		return 1.3
-	if has(status, "power1", tick):
-		return 1.15
-	return 1.0
+		m *= 1.5
+	elif has(status, "power2", tick):
+		m *= 1.3
+	elif has(status, "power1", tick):
+		m *= 1.15
+	return m
 
 
 # 護甲/金甲/聖鎧 = 物防 +20%/40%/60%

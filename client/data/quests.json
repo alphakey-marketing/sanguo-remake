@@ -1043,7 +1043,38 @@
     "exp": 30,
     "skill": "qieting"
    }
+  },
+  {
+   "id": "skill_unlock_meinu",
+   "name": "學特技：透視",
+   "type": "general",
+   "giver": "meinu_master",
+   "pre": {
+    "classId": "meinu",
+    "minLevel": 5
+   },
+   "preHint": "美女 5 級起，去許昌城南街搵夢韶華學透視",
+   "stages": [
+    {
+     "type": "ask",
+     "npc": "meinu_master",
+     "dialog": [
+      "夢韶華：「透視要睇穿對方虛實，先答我，先教你。」"
+     ],
+     "options": [
+      "憑直覺亂咁估人哋幾多血",
+      "細心觀察對方狀態，睇穿 HP/MP/等級同弱點",
+      "怕醜烳烳，咩都唔想望"
+     ],
+     "answer": 1,
+     "hint": "答啱夢韶華嘅問題（學識透視）",
+     "done": true
+    }
+   ],
+   "reward": {
+    "exp": 30,
+    "skill": "toushi"
+   }
   }
-
  ]
 }

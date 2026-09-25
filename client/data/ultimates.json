@@ -18,6 +18,9 @@
     { "id": "guiku",   "name": "鬼哭神號", "class": "wunu", "tier": 3, "mult": 3.0, "range": 3, "mp": 25, "sp": 40, "cd": 420, "weaponCat": 12, "quest": "" },
     { "id": "tiandao", "name": "天道循環", "class": "bianshi", "tier": 1, "mult": 2.0, "range": 2, "mp": 15, "sp": 20, "cd": 300, "weaponCat": 9, "quest": "" },
     { "id": "tuohuo", "name": "吐火羅語", "class": "bianshi", "tier": 2, "mult": 2.5, "range": 2, "mp": 20, "sp": 30, "cd": 360, "weaponCat": 9, "quest": "" },
-    { "id": "sanfen", "name": "三分天下", "class": "bianshi", "tier": 3, "mult": 3.0, "range": 3, "mp": 25, "sp": 40, "cd": 420, "weaponCat": 9, "quest": "" }
+    { "id": "sanfen", "name": "三分天下", "class": "bianshi", "tier": 3, "mult": 3.0, "range": 3, "mp": 25, "sp": 40, "cd": 420, "weaponCat": 9, "quest": "" },
+    { "id": "xiaobo", "name": "笑撥弦步", "class": "meinu", "tier": 1, "mult": 2.0, "range": 2, "mp": 15, "sp": 20, "cd": 300, "weaponCat": 18, "quest": "" },
+    { "id": "songzhu", "name": "松竹聽雨", "class": "meinu", "tier": 2, "mult": 2.5, "range": 2, "mp": 20, "sp": 30, "cd": 360, "weaponCat": 18, "quest": "" },
+    { "id": "feihua", "name": "飛花點翠", "class": "meinu", "tier": 3, "mult": 3.0, "range": 3, "mp": 25, "sp": 40, "cd": 420, "weaponCat": 18, "quest": "" }
   ]
 }

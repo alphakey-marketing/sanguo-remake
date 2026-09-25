@@ -35,6 +35,13 @@
     { "id": "hujia",   "item": 30529, "name": "護甲術",     "kind": "buff",   "status": "armor1", "elem": "none", "mp": 15, "castTicks": 10, "range": 0, "aoe": 0, "lv": 15, "jewel": "", "classes": ["bianshi", "meinu"] },
     { "id": "jinjia",  "item": 30530, "name": "金甲術",     "kind": "buff",   "status": "armor2", "elem": "none", "mp": 30, "castTicks": 15, "range": 0, "aoe": 0, "lv": 30, "jewel": "", "classes": ["bianshi", "meinu"] },
     { "id": "hujing",  "item": 30531, "name": "護鏡術",     "kind": "buff",   "status": "mirror1", "elem": "none", "mp": 15, "castTicks": 10, "range": 0, "aoe": 0, "lv": 15, "jewel": "", "classes": ["bianshi", "meinu"] },
-    { "id": "guangjing", "item": 30532, "name": "光鏡術",   "kind": "buff",   "status": "mirror2", "elem": "none", "mp": 30, "castTicks": 15, "range": 0, "aoe": 0, "lv": 30, "jewel": "", "classes": ["bianshi", "meinu"] }
+    { "id": "guangjing", "item": 30532, "name": "光鏡術",   "kind": "buff",   "status": "mirror2", "elem": "none", "mp": 30, "castTicks": 15, "range": 0, "aoe": 0, "lv": 30, "jewel": "", "classes": ["bianshi", "meinu"] },
+    { "id": "huifu1",  "item": 30697, "name": "一級恢復術", "kind": "heal", "power": 50,   "mp": 25, "castTicks": 10, "range": 6, "aoe": 0, "lv": 10, "jewel": "", "classes": ["meinu"] },
+    { "id": "huifu2",  "item": 30698, "name": "二級恢復術", "kind": "heal", "power": 120,  "mp": 30, "castTicks": 12, "range": 6, "aoe": 0, "lv": 16, "jewel": "", "classes": ["meinu"] },
+    { "id": "huifu3",  "item": 30699, "name": "三級恢復術", "kind": "heal", "power": 220,  "mp": 35, "castTicks": 14, "range": 6, "aoe": 0, "lv": 22, "jewel": "", "classes": ["meinu"] },
+    { "id": "huifu4",  "item": 30700, "name": "四級恢復術", "kind": "heal", "power": 400,  "mp": 40, "castTicks": 16, "range": 6, "aoe": 0, "lv": 28, "jewel": "", "classes": ["meinu"] },
+    { "id": "huifu5",  "item": 30701, "name": "五級恢復術", "kind": "heal", "power": 700,  "mp": 45, "castTicks": 18, "range": 6, "aoe": 0, "lv": 34, "jewel": "", "classes": ["meinu"] },
+    { "id": "huifu6",  "item": 30702, "name": "六級恢復術", "kind": "heal", "power": 1100, "mp": 50, "castTicks": 20, "range": 6, "aoe": 0, "lv": 40, "jewel": "", "classes": ["meinu"] },
+    { "id": "huifu7",  "item": 30703, "name": "七級恢復術", "kind": "heal", "power": 1800, "mp": 55, "castTicks": 22, "range": 6, "aoe": 0, "lv": 46, "jewel": "", "classes": ["meinu"] }
   ]
 }

@@ -24,6 +24,11 @@ func _init() -> void:
 	t_qieting_learn(data)
 	t_qieting_use(data)
 	t_arrow_consume(data)
+	t_meinu_enabled(data)
+	t_meinu_ultimates(data)
+	t_toushi_learn(data)
+	t_toushi_use(data)
+	t_restore(data)
 	print("[TEST] class: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -55,7 +60,7 @@ func t_shinu_enabled(data: GameData) -> void:
 	check(bool(data.classes["daoshi"].get("enabled", false)), "道士維持開放")
 	check(bool(data.classes["wunu"].get("enabled", false)), "巫女已開放")
 	check(bool(data.classes["bianshi"].get("enabled", false)), "辯士已開放")
-	check(not bool(data.classes["meinu"].get("enabled", false)), "美女未開放")
+	check(bool(data.classes["meinu"].get("enabled", false)), "美女已開放")
 	var st: Dictionary = data.starter.get("shinu", {})
 	check(not st.is_empty(), "仕女有起始裝備")
 	check(int(data.cats.get(int(st.get("weapon", 0)), 0)) == 4, "仕女起始武器係劍系 (cat 4)")
@@ -651,3 +656,143 @@ func t_arrow_consume(data: GameData) -> void:
 	check(RulesAmmo.arrow_count(data, chB) == 0, "冇箭: 箭仍然是 0")
 	check(RulesAmmo.consume_arrow(data, chB, 1) == false, "冇箭: consume_arrow 回 false")
 
+
+
+# ===== 美女 (S02c): 初階三招絕招 (琴 cat 18) =====
+func t_meinu_ultimates(data: GameData) -> void:
+	check(data.ult_by_id.has("xiaobo") and data.ult_by_id.has("songzhu") and data.ult_by_id.has("feihua"), "美女初階三招已定義")
+	var tmpl := {"xiaobo": {"tier": 1, "mult": 2.0, "range": 2, "mp": 15, "sp": 20, "cd": 300},
+		"songzhu": {"tier": 2, "mult": 2.5, "range": 2, "mp": 20, "sp": 30, "cd": 360},
+		"feihua": {"tier": 3, "mult": 3.0, "range": 3, "mp": 25, "sp": 40, "cd": 420}}
+	for uid in tmpl:
+		var u: Dictionary = data.ult_by_id.get(String(uid), {})
+		var t: Dictionary = tmpl[String(uid)]
+		check(String(u.get("class", "")) == "meinu", "%s 係美女招式" % u.get("name", uid))
+		check(int(u.get("tier", 0)) == int(t["tier"]), "%s tier = %d" % [u.get("name", uid), int(t["tier"])])
+		check(absf(float(u.get("mult", 0)) - float(t["mult"])) < 0.001, "%s 倍率 x%.1f" % [u.get("name", uid), float(t["mult"])])
+		check(int(u.get("range", 0)) == int(t["range"]), "%s 範圍 %d" % [u.get("name", uid), int(t["range"])])
+		check(int(u.get("mp", 0)) == int(t["mp"]) and int(u.get("sp", 0)) == int(t["sp"]), "%s MP/SP 消耗" % u.get("name", uid))
+		check(int(u.get("cd", 0)) == int(t["cd"]), "%s 冷卻 %d" % [u.get("name", uid), int(t["cd"])])
+		check(int(u.get("weaponCat", 0)) == 18, "%s 需要琴武器 (cat 18)" % u.get("name", uid))
+
+
+func t_meinu_enabled(data: GameData) -> void:
+	check(bool(data.classes["meinu"].get("enabled", false)), "美女職業已開放")
+	var st: Dictionary = data.starter.get("meinu", {})
+	check(not st.is_empty(), "美女有起始裝備")
+	check(int(data.cats.get(int(st.get("weapon", 0)), 0)) == 18, "美女起始武器係琴系 (cat 18, %d)" % int(st.get("weapon", 0)))
+	check(not (st.get("items", []) as Array).is_empty(), "美女起始背包有嘢")
+	check(int(st["gold"]) >= 100, "美女起始金錢正常")
+
+
+# ===== 美女特技「透視」: 導師學習 =====
+func t_toushi_learn(data: GameData) -> void:
+	var sim := Sim.new(data, 56)
+	var id := sim.spawn_player("t", "meinu")
+	var ch: Dictionary = sim.player_ch()
+	check(String(ch.get("classSkill", "")) == "", "美女: 初始未學透視")
+	check(not bool((sim.state["quest_npcs"] as Dictionary).get("meinu_master", {}).get("visible", false)), "Lv1: 睇唔到夢韶華")
+	ch["level"] = 5
+	sim._sync_stats(sim.ent(id))
+	sim._sync_quest_npcs()
+	check(bool((sim.state["quest_npcs"] as Dictionary).get("meinu_master", {}).get("visible", false)), "Lv5: 夢韶華出現")
+	sim.cmd_use_skill(id, "toushi")
+	check(String(ch.get("classSkill", "")) == "", "未學透視: 冇學到嘢")
+	check(bool(RulesClassSkill.can_use(data, ch, "toushi").get("ok", false)) == false, "未學透視: Rules 擋")
+	var npc: Dictionary = data.quest_npcs["meinu_master"]
+	_put(sim, id, int(npc["x"]) + 1, int(npc["y"]))
+	sim.cmd_quest_talk(id, "meinu_master")
+	check((ch.get("quests", {}) as Dictionary).has("skill_unlock_meinu"), "傾偈 = 接咗透視任務")
+	sim.cmd_quest_answer(id, "skill_unlock_meinu", 0)          # 答錯
+	check(not bool(ch.get("questDone", {}).get("skill_unlock_meinu", false)), "答錯: 未完成")
+	sim.cmd_quest_answer(id, "skill_unlock_meinu", 1)          # 答啱
+	check(bool(ch.get("questDone", {}).get("skill_unlock_meinu", false)), "答啱: 任務完成")
+	check(String(ch.get("classSkill", "")) == "toushi", "任務獎勵: 學識透視")
+	check(RulesClassSkill.learned(ch, "toushi"), "learned() 讀到")
+	# 非美女學唔到 (pre classId 擋)
+	var sim2 := Sim.new(data, 57)
+	var id2 := sim2.spawn_player("t2", "yishi")
+	var ch2: Dictionary = sim2.player_ch()
+	ch2["level"] = 5
+	sim2._sync_stats(sim2.ent(id2))
+	sim2._sync_quest_npcs()
+	var npc2: Dictionary = data.quest_npcs["meinu_master"]
+	_put(sim2, id2, int(npc2["x"]) + 1, int(npc2["y"]))
+	sim2.cmd_quest_talk(id2, "meinu_master")
+	check(not (ch2.get("quests", {}) as Dictionary).has("skill_unlock_meinu"), "義士同夢韶華傾偈: 唔接透視任務")
+	# 存檔 roundtrip: classSkill 保留
+	var s := sim.save_string()
+	var sim3 := Sim.load_string(data, s)
+	check(sim3 != null and String(sim3.player_ch().get("classSkill", "")) == "toushi", "存檔 roundtrip: classSkill 保留")
+# ===== 美女特技「透視」: 目標隱藏資訊 + 洞悉 +20% 攻擊 =====
+func t_toushi_use(data: GameData) -> void:
+	var sim := Sim.new(data, 58)
+	var id := sim.spawn_player("t", "meinu")
+	var ch: Dictionary = sim.player_ch()
+	ch["level"] = 5
+	ch["classSkill"] = "toushi"
+	_put(sim, id, 30, 30)
+	sim._sync_stats(sim.ent(id))
+	# 附近冇目標 -> 透視唔到 (提示)
+	sim.cmd_use_skill(id, "toushi")
+	check(not RulesSpell.has(ch.get("status", {}), "insight", sim.tick), "冇目標: 唔會入洞悉")
+	# 放一隻怪喺側邊 (有元素屬性)
+	var m: Variant = sim._spawn_mob(1005, "field_1")
+	_put(sim, int(m["id"]), 31, 30)
+	var got: Array = [false, {}]
+	sim.event_emitted.connect(func(ev: Dictionary) -> void:
+		if String(ev.get("k", "")) == "toushi" and int(ev.get("dst", 0)) == id:
+			got[0] = true
+			got[1] = ev.get("info", {}))
+	sim.cmd_use_skill(id, "toushi")
+	check(bool(got[0]), "透視: 發出 toushi 事件")
+	check(RulesSpell.has(ch.get("status", {}), "insight", sim.tick), "透視: 入咗洞悉狀態")
+	check(int(ch.get("toushiCd", 0)) > sim.tick, "透視: 設咗冷卻")
+	var inf: Dictionary = got[1] as Dictionary
+	check(int(inf.get("level", 0)) > 0, "透視: 有目標等級")
+	check(RulesSpell.atk_mult(ch.get("status", {}), sim.tick) > 1.0, "洞悉: atk_mult > 1 (+20%)")
+	check(RulesToushi.is_insight(ch.get("status", {}), sim.tick), "洞悉: is_insight() 讀到")
+	# CD 未完再試 -> 擋
+	var n0 := int(ch["toushiCd"])
+	sim.cmd_use_skill(id, "toushi")
+	check(int(ch.get("toushiCd", 0)) == n0, "冷卻中: 唔會重置 CD")
+
+
+# ===== 美女系「恢復術」: 一~七級定義 + 施法補 HP =====
+func t_restore(data: GameData) -> void:
+	# 七級恢復術 book 有 spell 定義, 全美女系 + item id 存在
+	for g in range(1, 8):
+		var sid := "huifu%d" % g
+		var d2: Dictionary = data.spell_by_id.get(sid, {})
+		check(not d2.is_empty(), "%s 有定義" % sid)
+		if d2.is_empty():
+			continue
+		check(String(d2.get("kind", "")) == "heal", "%s 係 heal 類" % sid)
+		check((d2["classes"] as Array).has("meinu"), "%s 美女可用" % sid)
+		check(data.item_ids.has(int(d2["item"])), "%s item id 存在" % sid)
+	# 施法: 美女裝備一級恢復術, 打傷自己再補
+	var sim := Sim.new(data, 59)
+	var id := sim.spawn_player("t", "meinu")
+	var ch: Dictionary = sim.player_ch()
+	ch["level"] = 12
+	sim._sync_stats(sim.ent(id))
+	var book := 30697                                   # 一級恢復術
+	var dd: Dictionary = data.spell_by_item.get(book, {})
+	check(not dd.is_empty(), "恢復術 item 載入 spell_by_item")
+	# 裝備術書去快捷列 slot 0
+	ch["bag"].append({"id": book, "n": 1})
+	sim.cmd_equip_spellbook(id, book, 0)
+	check(int(ch["equip"]["spellbooks"][0]) == book, "一級恢復術已裝備快捷列")
+	# 打傷自己
+	var max_h := int(sim.ent(id)["max_hp"])
+	ch["hp"] = maxi(1, max_h - 100)
+	sim._sync_stats(sim.ent(id))
+	var before := int(ch["hp"])
+	# 施法 target 0 = 自己
+	sim.cmd_cast_spell(id, 0, 0)
+	for _i in 20:
+		sim.step()
+		if int(ch["hp"]) > before:
+			break
+	check(int(ch["hp"]) > before, "恢復術: 自己補到 HP")
+	check(int(ch["hp"]) <= max_h, "恢復術: 唔會超上限")
