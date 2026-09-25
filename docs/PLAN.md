@@ -65,8 +65,11 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
 - [x] **S02a 核實 + 狀態 icon 列 + 術法快捷列**：血條下 status icon；術書 3 本切換 UI（`ch.equip.spellbook` 已有）
   - 核實：物理/術法/寶石/相剋/絕招/狀態/組隊 rules 已有齊全測試（見 §1 表）；術法快捷列 3 本切換 UI 已喺 `bag_panel.gd`（裝備/卸下 spellbook slot）做咗，冇缺
   - 完成：角色框底部加狀態 icon 列（`HudLayout.STATUS_ROW_H`、`mobile_hud._draw_status_icons`）— 逐個 active status 顯示短名 + 剩餘秒數；`log_rect`/`joy_zone` 相應落移 18px 讓位；`run_tests.sh` 全 PASS（`run_hud.gd` 4195 條）
-- [ ] **S02b 組隊經驗**：隊伍上限 6；經驗池 70% 按傷害 / 30% 平分【自訂】取代「同伴 50% 歸主公」；同伴自己有 exp/等級【待決：同伴要唔要升級】
-  - UI：HUD 同伴框顯示 exp；隊伍面板
+- [x] **S02b 組隊經驗**：隊伍上限 6；經驗池 70% 按傷害 / 30% 平分【自訂】取代「同伴 50% 歸主公」；同伴自己有 exp/等級（用家確認：要）
+  - 完成：`RulesGeneral.team_exp_split(total, dmg_by_id, cap=6)` 純函數（`rules/general.gd`）；`damage()` 記低邊個對隻怪出過幾多傷害（`m["dmg"]`）；`sim_combat._kill_mob` 死嗰陣按呢個 map 逐個隊員 `gain_exp`（掉落/金/善惡仍歸擊殺者，唔跟隊伍池分）；單一貢獻者=攞晒 100%，向下兼容舊單人/單同伴打法
+  - UI：HUD 同伴框加經驗條（`companion_view().exp/needExp`）；隊伍面板：而家隊伍實質淨得 1 同伴（spec09 多登用武將未做），HUD 已夠顯示，獨立隊伍面板留返多同伴嗰步先加
+  - 偏離：舊「教導」特技（`expShareAdd`，主公經驗 +25%）喺舊「同伴代打全歸主公」模型先有意思；新按傷害分模型下主公冇出手就分唔到，教導特技暫時冧咗效果，留返 Spec09 補完期一齊諗點接（`general_skills.json` 15 號特技描述未改，代碼行為已改）
+  - 驗收：`tests/run_general.gd`（新 `t_team_exp_split` 12 項 pure 測試）+ `tests/run_recruit.gd`/`run_general.gd` 舊同伴殺怪測試改期望值；`run_tests.sh` 全 PASS
 - [ ] **S02c 其他 5 職開放（每職一細步：仕女 → 道士 → 巫女 → 辯士 → 美女）**：`classes.json` 啟用、職業武器 18 系對應、職業特技（開鎖/超渡/潛行/竊聽/透視，單機化設計照 §6）+ 小遊戲 UI、初階三招絕招（數值模板 §5）
   - 辯士：弩箭消耗（箭矢 cat 定義 = spec 11 open 項）
   - 絕招「任務鏈」本身 → S06d；呢度先做招式 + debug 學招測試

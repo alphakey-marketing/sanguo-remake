@@ -111,6 +111,28 @@ static func exp_share(base: float, eff: Dictionary) -> float:
 	return base + float(eff.get("expShareAdd", 0.0))
 
 
+# 隊伍經驗池 (S02b, spec 02 §8)【自訂】: 70% 按傷害比例分 + 30% 平分俾有貢獻者 (dmg>0)
+# dmg = {"id字串": 累積傷害}；貢獻者多過隊伍上限 6 → 只取傷害最高 6 個【原 隊伍上限 6】
+# 回 {"id字串": exp}；dmg 空/total<=0 = {}
+static func team_exp_split(total: int, dmg: Dictionary, cap: int = 6) -> Dictionary:
+	var out := {}
+	if dmg.is_empty() or total <= 0:
+		return out
+	var ids: Array = dmg.keys()
+	if ids.size() > cap:
+		ids.sort_custom(func(a, b): return float(dmg[a]) > float(dmg[b]))
+		ids = ids.slice(0, cap)
+	var total_dmg := 0.0
+	for id in ids:
+		total_dmg += float(dmg[id])
+	if total_dmg <= 0.0:
+		return out
+	for id in ids:
+		out[id] = MathX.js_round(float(total) * 0.7 * float(dmg[id]) / total_dmg) \
+			+ MathX.js_round(float(total) * 0.3 / float(ids.size()))
+	return out
+
+
 # ================= 同伴絕招 / 術法 =================
 # 同伴術法: 由武將戰術揀最高等級嘅攻擊戰術 → {name, elem}；冇 = 「計略」無屬性
 static func spell_of(g: Dictionary, tactic_elems: Dictionary, names: Dictionary) -> Dictionary:
