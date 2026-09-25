@@ -13,6 +13,7 @@ const GROUP_RANGE := 5                                 # 群居怪同類仇恨�
 const DEFAULT_ZONE := "field_1"
 const PATH_CAP := 6000                                 # cmd_move A* 節點上限 (spec 12 §3)
 const CHASE_CAP := 800                                 # 追擊 A* 節點上限
+const FACE_COUNT := 12                                 # 頭像款數 (UI 佔位頭像 face_0..11)
 
 var data: GameData
 var rng: SimRng
@@ -228,7 +229,7 @@ func _new_ent(ename: String, kind: String, pos: Vector2i) -> Dictionary:
 	state["next_id"] = id + 1
 	var e := {
 		"id": id, "name": ename, "kind": kind, "x": pos.x, "y": pos.y, "tx": pos.x, "ty": pos.y,
-		"face": id % 12, "hp": 0, "max_hp": 0, "level": 1, "atk_target": 0, "next_atk": 0,
+		"face": id % FACE_COUNT, "hp": 0, "max_hp": 0, "level": 1, "atk_target": 0, "next_atk": 0,
 	}
 	ents[id] = e
 	return e

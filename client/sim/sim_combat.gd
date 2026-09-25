@@ -3,8 +3,9 @@ extends "res://sim/sim_battle.gd"
 
 # ================= 戰鬥 =================
 func damage(t: Dictionary, dmg: int, by: Dictionary) -> void:
-	# 吟唱中受擊: 30% 有機率中斷【自訂】(spec 02 §3.1)
-	if t.has("casting") and MathX.roll(rng_fn) < 0.3:
+	var cc: Dictionary = data.world["combat"]
+	# 吟唱中受擊: castInterruptPct 機率中斷【自訂】(spec 02 §3.1)
+	if t.has("casting") and MathX.roll(rng_fn) < float(cc["castInterruptPct"]):
 		t.erase("casting")
 		_emit({"k": "cast_interrupted", "dst": t["id"], "reason": "hit"})
 	t["hp"] = maxi(0, int(t["hp"]) - dmg)
@@ -21,10 +22,10 @@ func damage(t: Dictionary, dmg: int, by: Dictionary) -> void:
 						and RulesCombat.in_range(t["x"], t["y"], o["x"], o["y"], GROUP_RANGE):
 					o["mob"]["state"] = "chase"
 					o["mob"]["target"] = int(by["id"])
-		# 逃跑【自訂】(spec 04 §3): HP<20% 有 15% 機會逃跑；boss/PK 怪 flee=false 唔逃
+		# 逃跑【自訂】(spec 04 §3): HP<fleeHpPct 有 fleeChance 機會逃跑；boss/PK 怪 flee=false 唔逃
 		if dmg > 0 and int(t["hp"]) > 0 and bool(md.get("flee", true)) \
 				and not t["mob"].has("quest_boss") and String(t["mob"]["state"]) != "flee" \
-				and int(t["hp"]) < int(t["max_hp"]) * 0.2 and MathX.roll(rng_fn) < 0.15:
+				and int(t["hp"]) < int(t["max_hp"]) * float(cc["fleeHpPct"]) and MathX.roll(rng_fn) < float(cc["fleeChance"]):
 			t["mob"]["state"] = "flee"
 			t["mob"]["target"] = int(by["id"])
 			_emit({"k": "flee", "src": int(t["id"]), "dst": int(by["id"]), "name": str(t["name"])})
@@ -93,7 +94,7 @@ func _kill_mob(m: Dictionary, by: Dictionary, exp_mult: float = 1.0) -> void:
 # 重生排期: 普通怪定時重生，boss 每日一次【自訂】(spec 04 §3)。zone 用 mob spawn 嗰層，免得同 def 多層混亂
 func _schedule_respawn(m: Dictionary, d: Dictionary) -> void:
 	var zone_id := String(m.get("mob", {}).get("zone", DEFAULT_ZONE))
-	var delay := 200
+	var delay := int(data.world["combat"]["respawnTicksDefault"])
 	for sp in data.spawns:
 		if int(sp["monster"]) == int(d["id"]) and String(sp.get("zone", DEFAULT_ZONE)) == zone_id:
 			delay = int(sp["respawnTicks"])
