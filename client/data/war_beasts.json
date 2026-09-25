@@ -1,0 +1,155 @@
+{
+  "_note": "戰騎 (Step 18, spec 07 §8：sy2_5_1~7)。8 種已開放戰騎【原】十種戰騎屬性表全表數據化 (§8.1)；聖麒麟/仙靈鶴【原=後期開放】未開放 (enabled:false，等後續 Phase)。獸力=攻擊、獸體=HP/防、獸靈=術攻/術迴/術防/MP、獸敏=物迴/攻速【原】。升級點數表 (§8.2)【原】；exp 曲線【自訂】跟 RulesStats.exp_to_next 同款公式，數值調過畀戰騎升得慢過玩家。attrCap【自訂=原文冇寫上限，畀個合理封頂}。",
+  "attrs": ["pow", "body", "spirit", "agi"],
+  "attrNames": {"pow": "獸力", "body": "獸體", "spirit": "獸靈", "agi": "獸敏"},
+  "maxOwned": 3,
+  "maxLevel": 100,
+  "attrCap": 300,
+  "expBase": 30.0,
+  "expPow": 1.8,
+  "breeds": [
+    {"id": "niujiao", "name": "巨角牛", "element": "地", "attrs": {"pow": 6, "body": 9, "spirit": 1, "agi": 3}, "bonusAttr": "body", "suggest": [2, 3, 1, 1], "enabled": true},
+    {"id": "jifeng", "name": "疾風狼", "element": "風", "attrs": {"pow": 4, "body": 4, "spirit": 7, "agi": 4}, "bonusAttr": "spirit", "suggest": [1, 1, 2, 1], "enabled": true},
+    {"id": "canying", "name": "殘影豹", "element": "無", "attrs": {"pow": 1, "body": 3, "spirit": 6, "agi": 9}, "bonusAttr": "agi", "suggest": [1, 1, 2, 3], "enabled": true},
+    {"id": "jiuwei", "name": "九尾狐", "element": "水", "attrs": {"pow": 3, "body": 1, "spirit": 9, "agi": 6}, "bonusAttr": "spirit", "suggest": [1, 1, 3, 2], "enabled": true},
+    {"id": "yanya", "name": "焰牙虎", "element": "火", "attrs": {"pow": 7, "body": 4, "spirit": 4, "agi": 4}, "bonusAttr": "pow", "suggest": [2, 1, 1, 1], "enabled": true},
+    {"id": "bawang", "name": "霸王熊", "element": "力", "attrs": {"pow": 9, "body": 6, "spirit": 3, "agi": 1}, "bonusAttr": "pow", "suggest": [3, 2, 1, 1], "enabled": true},
+    {"id": "changya", "name": "長牙象", "element": "地、力", "attrs": {"pow": 9, "body": 5, "spirit": 3, "agi": 2}, "bonusAttr": "pow", "suggest": [4, 3, 2, 1], "enabled": true},
+    {"id": "shixue", "name": "嗜血獅", "element": "無、火", "attrs": {"pow": 5, "body": 5, "spirit": 4, "agi": 5}, "bonusAttr": "pow", "suggest": [1, 1, 1, 1], "enabled": true},
+    {"id": "shenglin", "name": "聖麒麟", "element": "法", "attrs": {"pow": 5, "body": 5, "spirit": 5, "agi": 4}, "bonusAttr": "spirit", "suggest": [1, 1, 2, 1], "enabled": false},
+    {"id": "xianling", "name": "仙靈鶴", "element": "靈", "attrs": {"pow": 4, "body": 4, "spirit": 7, "agi": 4}, "bonusAttr": "spirit", "suggest": [1, 1, 3, 1], "enabled": false}
+  ],
+  "_noteLevel": "升級點數表【原】：區間 → 每級 屬性點/戰鬥技點/友好技點。1~25/26~50/51~75/76~100。",
+  "levelPoints": [
+    {"lo": 1, "hi": 25, "attrPts": 2, "battlePts": 1, "friendPts": 2},
+    {"lo": 26, "hi": 50, "attrPts": 3, "battlePts": 1, "friendPts": 3},
+    {"lo": 51, "hi": 75, "attrPts": 6, "battlePts": 1, "friendPts": 6},
+    {"lo": 76, "hi": 100, "attrPts": 9, "battlePts": 1, "friendPts": 9}
+  ],
+  "_noteBattle": "戰鬥特技表 (Step 18b, spec 07 §8.3)【原=各戰騎 6 招；「*」需上一招 5 級先學得 + 唔可以高過上一招等級；每級 1 點、最高 10 級】。招式名跟 spec 例子 (疾風狼/殘影豹/九尾狐/焰牙虎/霸王熊/長牙象/嗜血獅)；巨角牛 spec 冇例子，自己合理補齊【自訂】；聖麒麟/仙靈鶴未開放，暫冇招式表。kind 種類【自訂寫法】：atk(單體傷害)/aoe(範圍傷害)/combo(連擊)/mpNuke(耗晒 MP 換傷害)/heal(回血)/buff(自 buff)/debuff(降敵屬性)/passive(常駐加成，唔使 SP/冷卻)。數值 = val + valStep×(等級-1)【自訂，spec 淨係得效果文字冇數值】。",
+  "battleMaxLv": 10,
+  "battleStarNeedLv": 5,
+  "battleSkills": {
+    "niujiao": [
+      {"id": "niujiao_dingzhuang", "name": "頂撞", "kind": "atk", "val": 1.3, "valStep": 0.08, "sp": 10, "cd": 60},
+      {"id": "niujiao_dilie", "name": "地裂", "star": true, "kind": "atk", "val": 2.2, "valStep": 0.12, "sp": 20, "cd": 120},
+      {"id": "niujiao_jianta", "name": "踐踏", "kind": "aoe", "range": 3, "val": 1.1, "valStep": 0.06, "sp": 15, "cd": 100},
+      {"id": "niujiao_niupi", "name": "牛皮", "kind": "buff", "stat": "def", "val": 0.15, "valStep": 0.02, "ticks": 300, "sp": 15, "cd": 300},
+      {"id": "niujiao_nuhou", "name": "怒吼", "kind": "debuff", "stat": "atk", "val": -0.15, "valStep": -0.015, "ticks": 300, "sp": 15, "cd": 200},
+      {"id": "niujiao_zhuangti", "name": "壯體", "kind": "passive", "stat": "hpMax", "val": 0.05, "valStep": 0.01}
+    ],
+    "jifeng": [
+      {"id": "jifeng_langzhao", "name": "狼爪", "kind": "atk", "val": 1.3, "valStep": 0.08, "sp": 10, "cd": 60},
+      {"id": "jifeng_fengren", "name": "風刃", "star": true, "kind": "atk", "val": 2.2, "valStep": 0.12, "sp": 20, "cd": 120},
+      {"id": "jifeng_liaoshang", "name": "療傷", "kind": "heal", "val": 0.2, "valStep": 0.015, "sp": 20, "cd": 200},
+      {"id": "jifeng_shengxue", "name": "聖血", "kind": "buff", "stat": "lifesteal", "val": 0.1, "valStep": 0.01, "ticks": 300, "sp": 15, "cd": 300},
+      {"id": "jifeng_langying", "name": "狼影", "kind": "debuff", "stat": "spellDef", "val": -0.15, "valStep": -0.015, "ticks": 300, "sp": 15, "cd": 200},
+      {"id": "jifeng_busi", "name": "不死", "kind": "passive", "stat": "hpMax", "val": 0.05, "valStep": 0.01}
+    ],
+    "canying": [
+      {"id": "canying_lianji", "name": "連擊", "kind": "combo", "hits": 2, "val": 0.9, "valStep": 0.04, "sp": 15, "cd": 80},
+      {"id": "canying_luanji", "name": "亂擊", "star": true, "kind": "combo", "hits": 4, "val": 0.8, "valStep": 0.05, "sp": 25, "cd": 150},
+      {"id": "canying_sugong", "name": "速攻", "kind": "atk", "val": 1.4, "valStep": 0.08, "sp": 10, "cd": 50},
+      {"id": "canying_cuojue", "name": "錯覺", "kind": "debuff", "stat": "hit", "val": -0.15, "valStep": -0.015, "ticks": 300, "sp": 15, "cd": 200},
+      {"id": "canying_ningshi", "name": "凝視", "kind": "debuff", "stat": "evade", "val": -0.15, "valStep": -0.015, "ticks": 300, "sp": 15, "cd": 200},
+      {"id": "canying_canying", "name": "殘影", "kind": "passive", "stat": "evade", "val": 0.05, "valStep": 0.01}
+    ],
+    "jiuwei": [
+      {"id": "jiuwei_xuanwo", "name": "漩渦", "kind": "aoe", "range": 3, "val": 1.2, "valStep": 0.07, "sp": 15, "cd": 100},
+      {"id": "jiuwei_hanbing", "name": "寒冰", "star": true, "kind": "aoe", "range": 4, "val": 1.8, "valStep": 0.1, "sp": 25, "cd": 150},
+      {"id": "jiuwei_huxian", "name": "狐仙", "kind": "buff", "stat": "spellAtk", "val": 0.15, "valStep": 0.02, "ticks": 300, "sp": 15, "cd": 300},
+      {"id": "jiuwei_jieshen", "name": "解神", "kind": "mpNuke", "val": 1.5, "valStep": 0.1, "sp": 0, "cd": 200},
+      {"id": "jiuwei_ningshen", "name": "凝神", "kind": "buff", "stat": "mpRegen", "val": 0.2, "valStep": 0.02, "ticks": 300, "sp": 15, "cd": 300},
+      {"id": "jiuwei_shenyou", "name": "神佑", "kind": "passive", "stat": "mpMax", "val": 0.05, "valStep": 0.01}
+    ],
+    "yanya": [
+      {"id": "yanya_yanya", "name": "炎牙", "kind": "atk", "val": 1.3, "valStep": 0.08, "sp": 10, "cd": 60},
+      {"id": "yanya_yanzhao", "name": "焰爪", "star": true, "kind": "atk", "val": 2.2, "valStep": 0.12, "sp": 20, "cd": 120},
+      {"id": "yanya_raoluan", "name": "擾亂", "kind": "debuff", "stat": "atk", "val": -0.15, "valStep": -0.015, "ticks": 300, "sp": 15, "cd": 200},
+      {"id": "yanya_hunluan", "name": "混亂", "kind": "debuff", "stat": "spellAtk", "val": -0.15, "valStep": -0.015, "ticks": 300, "sp": 15, "cd": 200},
+      {"id": "yanya_yankai", "name": "焰鎧", "kind": "buff", "stat": "def", "val": 0.15, "valStep": 0.02, "ticks": 300, "sp": 15, "cd": 300},
+      {"id": "yanya_chiti", "name": "赤體", "kind": "passive", "stat": "hpMax", "val": 0.05, "valStep": 0.01}
+    ],
+    "bawang": [
+      {"id": "bawang_zhongji", "name": "重擊", "kind": "atk", "val": 1.4, "valStep": 0.09, "sp": 10, "cd": 60},
+      {"id": "bawang_baji", "name": "霸擊", "star": true, "kind": "atk", "val": 3.0, "valStep": 0.15, "sp": 25, "cd": 150},
+      {"id": "bawang_poji", "name": "破擊", "kind": "debuff", "stat": "evade", "val": -0.15, "valStep": -0.015, "ticks": 300, "sp": 15, "cd": 200},
+      {"id": "bawang_kuanghou", "name": "狂吼", "kind": "debuff", "stat": "def", "val": -0.15, "valStep": -0.015, "ticks": 300, "sp": 15, "cd": 200},
+      {"id": "bawang_xiongnu", "name": "熊怒", "kind": "buff", "stat": "atk", "val": 0.15, "valStep": 0.02, "ticks": 300, "sp": 15, "cd": 300},
+      {"id": "bawang_juli", "name": "巨力", "kind": "passive", "stat": "atk", "val": 0.05, "valStep": 0.01}
+    ],
+    "changya": [
+      {"id": "changya_xiangwen", "name": "象吻", "kind": "atk", "val": 1.4, "valStep": 0.09, "sp": 10, "cd": 60},
+      {"id": "changya_jingang", "name": "金剛", "star": true, "kind": "atk", "val": 4.0, "valStep": 0.18, "sp": 30, "cd": 180},
+      {"id": "changya_gonghuo", "name": "攻惑", "kind": "debuff", "stat": "hit", "val": -0.15, "valStep": -0.015, "ticks": 300, "sp": 15, "cd": 200},
+      {"id": "changya_dunji", "name": "噸擊", "kind": "aoe", "range": 3, "val": 1.2, "valStep": 0.07, "sp": 15, "cd": 100},
+      {"id": "changya_jiangshu", "name": "降術", "kind": "debuff", "stat": "spellAtk", "val": -0.15, "valStep": -0.015, "ticks": 300, "sp": 15, "cd": 200},
+      {"id": "changya_zhendi", "name": "震地", "kind": "aoe", "range": 4, "stun": true, "val": 0.8, "valStep": 0.05, "sp": 25, "cd": 250}
+    ],
+    "shixue": [
+      {"id": "shixue_shihou", "name": "獅吼", "kind": "debuff", "stat": "atk", "val": -0.15, "valStep": -0.015, "ticks": 300, "sp": 15, "cd": 200},
+      {"id": "shixue_xueya", "name": "血牙", "kind": "atk", "stat": "lifesteal", "val": 1.3, "valStep": 0.08, "sp": 10, "cd": 60},
+      {"id": "shixue_qiankun", "name": "乾坤", "star": true, "kind": "aoe", "range": 4, "val": 2.0, "valStep": 0.12, "sp": 30, "cd": 200},
+      {"id": "shixue_xufa", "name": "虛法", "kind": "debuff", "stat": "spellDef", "val": -0.15, "valStep": -0.015, "ticks": 300, "sp": 15, "cd": 200},
+      {"id": "shixue_shenghua", "name": "昇華", "kind": "buff", "stat": "spellAtk", "val": 0.15, "valStep": 0.02, "ticks": 300, "sp": 15, "cd": 300},
+      {"id": "shixue_shouti", "name": "獸體", "kind": "passive", "stat": "hpMax", "val": 0.05, "valStep": 0.01}
+    ]
+  },
+  "_noteFriend": "友好特技表 (Step 18c, spec 07 §8.4)【原=4 階，消耗友好技點；每種戰騎第四階獨家】。表跟 spec 例子 (巨角牛/疾風狼/殘影豹/九尾狐/焰牙虎/霸王熊)；長牙象/嗜血獅 spec 冇例子，自己合理補齊【自訂】。學階數要順序（先學初階先學到二階）【自訂，spec 冇明講但合理】；成本 friendCosts[階-1]，跨戰騎學（唔係呢隻戰騎本身嘅表）× friendCrossMult【原】。大部分效果淨係記低 learned flag，實際功能 (小地圖/隱身/自動撿寶等) 未接其他系統，留返之後 UI/系統接通先算，跟 mount_weapons 馬戰特技做法一樣淨做數值層。",
+  "friendCosts": [3, 6, 12, 24],
+  "friendCrossMult": 3,
+  "friendSkills": {
+    "niujiao": [
+      {"id": "niujiao_daohang", "name": "導航", "tier": 1, "effect": "map_city"},
+      {"id": "niujiao_tianyan", "name": "天眼", "tier": 2, "effect": "show_npc"},
+      {"id": "niujiao_dundi", "name": "遁地", "tier": 3, "effect": "tunnel_scroll"},
+      {"id": "niujiao_qimen", "name": "奇門", "tier": 4, "effect": "stealth_noncombat"}
+    ],
+    "jifeng": [
+      {"id": "jifeng_tuochu", "name": "脫出", "tier": 1, "effect": "maze_escape"},
+      {"id": "jifeng_zhaohuan", "name": "召喚", "tier": 2, "effect": "summon_friend"},
+      {"id": "jifeng_shenxing", "name": "神行", "tier": 3, "effect": "haste_scroll"},
+      {"id": "jifeng_huicheng", "name": "回城", "tier": 4, "effect": "return_scroll"}
+    ],
+    "canying": [
+      {"id": "canying_jianbao", "name": "撿寶", "tier": 1, "effect": "auto_loot"},
+      {"id": "canying_xingyun", "name": "幸運", "tier": 2, "effect": "lucky_charm"},
+      {"id": "canying_hushen", "name": "護身", "tier": 3, "effect": "protect_charm"},
+      {"id": "canying_huanhun", "name": "還魂", "tier": 4, "effect": "revive_elixir"}
+    ],
+    "jiuwei": [
+      {"id": "jiuwei_jingang", "name": "金剛", "tier": 1, "effect": "armor_skill"},
+      {"id": "jiuwei_shouhu", "name": "守護", "tier": 2, "effect": "mirror_skill"},
+      {"id": "jiuwei_shengti", "name": "聖體", "tier": 3, "effect": "auto_heal_2x"},
+      {"id": "jiuwei_shengling", "name": "聖靈", "tier": 4, "effect": "holy_elixir"}
+    ],
+    "yanya": [
+      {"id": "yanya_huoyan", "name": "火焰", "tier": 1, "effect": "light"},
+      {"id": "yanya_feiying", "name": "飛影", "tier": 2, "effect": "agi_plus3"},
+      {"id": "yanya_kuangli", "name": "狂力", "tier": 3, "effect": "str_plus3"},
+      {"id": "yanya_kaiguang", "name": "開光", "tier": 4, "effect": "int_spi_plus3"}
+    ],
+    "bawang": [
+      {"id": "bawang_beifu", "name": "背負", "tier": 1, "effect": "bag_capacity"},
+      {"id": "bawang_shenqi", "name": "神奇", "tier": 2, "effect": "bank"},
+      {"id": "bawang_xuanmiao", "name": "玄妙", "tier": 3, "effect": "station"},
+      {"id": "bawang_zhongcheng", "name": "忠誠", "tier": 4, "effect": "pain_shield", "needLoyalty": 50}
+    ],
+    "changya": [
+      {"id": "changya_juli", "name": "巨力", "tier": 1, "effect": "carry_heavy"},
+      {"id": "changya_wenzhong", "name": "穩重", "tier": 2, "effect": "stun_resist"},
+      {"id": "changya_dixing", "name": "地行", "tier": 3, "effect": "tunnel_scroll"},
+      {"id": "changya_shenshou", "name": "神獸", "tier": 4, "effect": "double_exp_buff", "needLoyalty": 50}
+    ],
+    "shixue": [
+      {"id": "shixue_xiuxue", "name": "嗅血", "tier": 1, "effect": "show_low_hp"},
+      {"id": "shixue_yesheng", "name": "野性", "tier": 2, "effect": "atk_speed_buff"},
+      {"id": "shixue_shihun", "name": "獅魂", "tier": 3, "effect": "protect_charm"},
+      {"id": "shixue_wangzhe", "name": "王者", "tier": 4, "effect": "double_exp_buff", "needLoyalty": 50}
+    ]
+  },
+  "_noteLoyalty": "忠誠 / 交易 (Step 18c, spec 07 §8.5)【原=戰鬥死亡 −1；交易 −5；忠誠 <5 唔可以交易；玩家 <10 級唔可以交易；過低走佬】。PK 單機冇對手，唔實作 (同馬戰 PK 一樣偏離)。交易 = 單機簡化做「賣畀 NPC」，賣價【自訂，spec 冇寫金額】。",
+  "loyalty": {"start": 100, "deathLoss": 1, "tradeLoss": 5, "desertAt": 0, "tradeMinLoyalty": 5, "tradeMinPlayerLevel": 10},
+  "sellBase": 500,
+  "sellPerLevel": 50
+}
