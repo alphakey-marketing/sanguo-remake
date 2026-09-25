@@ -44,6 +44,7 @@ var donation: Dictionary = {}     # 捐贈官令設定 (data/donation.json, Step
 var donation_rates: Dictionary = {}  # item id -> 捐獻單位【原】
 var titles: Array = []            # 頭銜 60 階 (data/titles.json, Step 14)【原】
 var office: Dictionary = {}       # 官宅/官令設定 (data/office.json, Step 14)
+var mounts: Dictionary = {}       # 座騎設定 (data/mounts.json, Step 17a)
 var quiz: Array = []              # 理念測驗題庫 (data/quiz.json, Step 7.5)
 var face_parts: Dictionary = {}   # 臉譜 8 部位款式數 (data/face.json, Step 7.5)
 var quests: Array = []            # 任務定義 (data/quests.json, Step 8)
@@ -117,6 +118,7 @@ static func load_all() -> GameData:
 	var tt: Dictionary = _read("res://data/titles.json")
 	g.titles = tt["titles"]
 	g.office = _read("res://data/office.json")
+	g.mounts = _read("res://data/mounts.json")
 	for o in g.office["orders"]:
 		o["rankName"] = RulesTitle.name_of(g.titles, int(o["rank"]))
 	var qz: Dictionary = _read("res://data/quiz.json")

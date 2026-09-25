@@ -21,6 +21,7 @@ func sig() -> String:
 
 func _build_body() -> void:
 	body.add_child(btn("登用人才 / 同伴", func() -> void: main.hud.open_panel("recruit")))
+	body.add_child(btn("座騎", func() -> void: main.hud.mount_panel().open_tab(0)))
 	body.add_child(hsep())
 	body.add_child(lbl("設定", 16, UiTheme.GOLD))
 	var hud = main.hud

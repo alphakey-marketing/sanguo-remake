@@ -1,5 +1,5 @@
 class_name Sim
-extends "res://sim/sim_station.gd"
+extends "res://sim/sim_mount.gd"
 # 單機世界模擬: 格子地圖 + 單位 + 即時戰鬥 + 怪物 AI + 設施。
 # - state 全部係純資料 (Dictionary/Array/int/String)，可直接存檔；RNG 由種子驅動 → 可重現
 # - UI 只透過 cmd_* 發意圖、透過 event_emitted 收事件、透過 view_ents()/player_ch() 讀狀態
@@ -44,6 +44,7 @@ func _daily_hook(day: int) -> void:
 	_salary_daily(day)           # 每月初一俸祿 (Step 14)
 	_recruit_daily(day)          # 同伴到期/忠誠低離開 (Step 13.5)
 	_comm_daily(day)             # 居民委託過期 (Step 16)
+	_mount_daily(day)            # 座騎子時結算 (Step 17a)
 	_emit({"k": "day", "day": day, "season": season})
 	for d in changed:
 		_emit({"k": "disaster", "name": d["name"], "city": d["city"], "size": d["size"]})
@@ -115,6 +116,7 @@ func step() -> void:
 	_advance_clock()
 	BotSys.think(self)
 	_recruit_tick()             # 擂台勝負 (Step 13.5)
+	_mount_tick()               # 放牧返嚟 (Step 17a)
 	for id in ents.keys():
 		var e: Dictionary = ents.get(id, {})
 		if e.is_empty():
@@ -133,8 +135,13 @@ func step() -> void:
 	for e in ents.values():
 		# 逃跑怪 sprint: tick%2=0 嗰陣郁兩格 → 平均 1.5× 移速 (spec 04 §3)
 		var mv := 2 if (e["kind"] == "mob" and (e.get("mob", {}) as Dictionary).get("state", "") == "flee" and tick % 2 == 0) else 1
+		if e.has("ch"):
+			mv = _ride_steps(e)       # 騎馬: 移速 ×1.5~2 (Step 17a, spec 07 §7)
 		var moved := false
+		var moved_n := 0
 		for _k in mv:
+			if _k > 0 and data.portal_at.has(int(e["y"]) * W + int(e["x"])):
+				break                  # 一 tick 行多格 (騎馬) 踩中傳送點就停，唔好跨過咗
 			# A* 路徑 (spec 12 §3): 終點 = 目的地 + 下一格相鄰先有效，否則作廢行直線
 			var path: Array = e.get("path", [])
 			if not path.is_empty():
@@ -147,6 +154,7 @@ func step() -> void:
 					if path.is_empty():
 						e.erase("path")
 					moved = true
+					moved_n += 1
 					continue
 				e.erase("path")
 			var n := _greedy_step(int(e["x"]), int(e["y"]), int(e["tx"]), int(e["ty"]))
@@ -154,7 +162,9 @@ func step() -> void:
 				e["x"] = n.x
 				e["y"] = n.y
 				moved = true
+				moved_n += 1
 		if moved:
+			_ride_moved(e, moved_n)
 			_on_moved(e)
 
 

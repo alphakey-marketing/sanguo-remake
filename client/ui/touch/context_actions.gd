@@ -36,7 +36,8 @@ static func find(main: Node) -> Dictionary:
 			"inn": best = {"kind": "inn", "label": "客棧", "ref": f}
 			"fac":
 				var fd: Dictionary = main.data.facilities[f.fac]
-				best = {"kind": "fac", "label": "驛站" if bool(fd.get("station", false)) else str(fd["name"]).substr(0, 3), "ref": f}
+				var lab := "驛站" if bool(fd.get("station", false)) else "馬廄" if bool(fd.get("stable", false)) else str(fd["name"]).substr(0, 3)
+				best = {"kind": "fac", "label": lab, "ref": f}
 			"travel": best = {"kind": "travel", "label": "傳送", "ref": f}
 	if not best.is_empty():
 		return best
@@ -100,7 +101,9 @@ static func run(main: Node, act: Dictionary) -> void:
 		"fac":
 			var f: Dictionary = act.ref
 			var def: Dictionary = main.data.facilities[f.fac]
-			if def.has("crafts"):                 # 廚房/藥房/工房 (Step 12)
+			if bool(def.get("stable", false)):    # 馬廄 (Step 17a)
+				hud.mount_panel().open_tab(1)
+			elif def.has("crafts"):               # 廚房/藥房/工房 (Step 12)
 				hud.craft_panel().open_craft(str(def["name"]), def["crafts"])
 			elif bool(def.get("repair", false)) and String(f.fac) != "forge":
 				hud.craft_panel().open_service(str(def["name"]))

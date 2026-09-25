@@ -2,7 +2,7 @@ class_name HudLayout
 extends RefCounted
 # 手機 HUD 版面（三國群英傳M 風格）: 純函數，畫同判定共用同一份，唔會再錯位。
 #   左上 = 角色框（撳 = 角色面板）+ 日誌右邊同伴框（有登用同伴先顯示，撳 = 登用面板）；右上 = 選單列（背包/角色/記事/更多）+ 下面小地圖（撳 = 地圖面板）
-#   左下 = 浮動搖桿區；右下 = 普攻大圓 + 技能扇形 4 格 + 切換目標 + 自動 + 互動掣
+#   左下 = 浮動搖桿區；右下 = 普攻大圓 + 技能扇形 4 格 + 切換目標 + 自動 + 互動掣 (上面 = 騎馬掣)
 # 座標 = viewport 虛擬 px（640x360 起跳，aspect=expand 會變闊）。safe = 瀏海/圓角安全區（虛擬 px）。
 # 每個元件: {"kind": "circle", "c": Vector2, "r": float} 或 {"kind": "rect", "rect": Rect2}
 # 測試: tests/run_hud.gd（冇重疊、夠大、喺安全區內、唔入搖桿區）
@@ -50,6 +50,9 @@ static func build(size: Vector2, safe: Rect2 = Rect2()) -> Dictionary:
 	# 互動掣（對話/商店/客棧/傳送…）: 技能扇形左邊一粒大 pill
 	var s0: Vector2 = out["skill0"]["c"]
 	out["context"] = {"kind": "rect", "rect": Rect2(s0.x - SKILL_R - 10 - 92, B - 72 - 26, 92, 52)}
+	# 騎馬/落馬掣 (Step 17a): 互動掣上面，身邊有座騎先顯示
+	var cr: Rect2 = out["context"]["rect"]
+	out["mount"] = {"kind": "circle", "c": Vector2(cr.position.x + 46, cr.position.y - 30), "r": SMALL_R}
 	return out
 
 
