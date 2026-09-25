@@ -160,7 +160,7 @@ func t_item_ids(data: GameData) -> void:
 
 
 # 全表: 每隻怪一係有 CSV 來源 (向量表)，一係喺【自訂】白名單；drops/rareDrops 按 0.05 分界、p 喺 (0,1]
-const CUSTOM_DROPS := [1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 19001, 1015, 1016, 1017, 1018]
+const CUSTOM_DROPS := [1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 19001, 1015, 1016, 1017, 1018, 19002, 19003, 19004]   # S01d: 19002~3 試煉怪（轉職考試）【自訂】
 
 func t_drop_rules(data: GameData) -> void:
 	var csv_ids := {}

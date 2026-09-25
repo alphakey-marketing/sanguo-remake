@@ -24,7 +24,8 @@ func sig() -> String:
 	var ch: Dictionary = main.ch
 	return JSON.stringify([tab, sel_slot, ch.get("equip", {}), ch.get("workLv", {}), ch.get("tools", {}), pending, ch.get("attrs", {}), ch.get("attrPoints", 0), ch.get("level", 1), ch.get("hp", 0),
 		ch.get("mp", 0), ch.get("sp", 0), ch.get("gold", 0), ch.get("karma", 0), ch.get("lilian", 0), ch.get("title", ""), ch.get("fame", 0), ch.get("ap", 0), ch.get("chaExp", 0),
-		ch.get("titleRank", 0), ch.get("thirst", 0), ch.get("contrib", 0), ch.get("polExp", 0), ch.get("expert", {})])
+		ch.get("titleRank", 0), ch.get("thirst", 0), ch.get("contrib", 0), ch.get("polExp", 0), ch.get("expert", {}),
+		ch.get("tier", 0), ch.get("quests", {}), ch.get("questDone", {})])
 
 
 func _left() -> int:
@@ -103,7 +104,10 @@ func _build_body() -> void:
 	# 右: 資料
 	var lv := int(ch["level"])
 	var cls: Dictionary = main.data.classes.get(str(ch.get("classId", "")), {})
-	right.add_child(lbl("%s  Lv%d %s" % [str(ch.get("name", "")), lv, str(cls.get("name", ""))], 17, UiTheme.GOLD))
+	var tier := RulesClass.tier_of(ch)
+	right.add_child(lbl("%s  Lv%d %s（%s）" % [str(ch.get("name", "")), lv, RulesClass.title_of(cls, tier), RulesClass.tier_name_of(tier)], 17, UiTheme.GOLD))
+	if tier >= 1:
+		right.add_child(lbl("已轉職（二轉 Lv50 / 三轉 Lv100）", 12, UiTheme.DIM))
 	var lines := [
 		"稱號「%s」" % (str(ch.get("title", "")) if str(ch.get("title", "")) != "" else "未設"),
 		"善惡 %s (%d)" % [RulesKarma.tier_name(int(ch.get("karma", 0))), int(ch.get("karma", 0))],
@@ -125,6 +129,16 @@ func _build_body() -> void:
 	]
 	for l in lines:
 		right.add_child(lbl(str(l), 14))
+	# S01d 轉職 (spec 01 §7): 夠等級 + 完成轉職考試任務先顯示
+	var prom := RulesClass.promote_ok(main.data, ch)
+	if bool(prom["ok"]):
+		right.add_child(hsep())
+		var nb := btn("轉職為「%s」！" % RulesClass.title_of(cls, tier + 1), func() -> void:
+			main._send({"t": "promote"})
+			pending = {}, 160)
+		right.add_child(nb)
+	elif str(prom["why"]) != "" and tier < 2:
+		right.add_child(lbl(str(prom["why"]), 12, UiTheme.DIM))
 
 
 func _confirm() -> void:
@@ -245,9 +259,10 @@ func _build_expert(ch: Dictionary) -> void:
 	g.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	sc.add_child(g)
 	var exp: Dictionary = ch.get("expert", {})
+	var tier := RulesClass.tier_of(ch)
 	for sk in d.experts.get("skills", {}):
 		var def: Dictionary = d.experts["skills"][sk]
-		var cap: int = RulesExpert.cap_of(d.experts, cls_id, sk)
+		var cap: int = RulesExpert.cap_of(d.experts, cls_id, sk, tier)
 		var lv: int = main.sim.expert_lv(ch, sk) if main.sim != null else 0
 		g.add_child(lbl(String(def["name"]), 14))
 		if cap <= 0:

@@ -2153,6 +2153,84 @@
      "p": 1.0
     }
    ]
+  },
+  {
+   "id": 19002,
+   "name": "試煉守衛",
+   "level": 45,
+   "hp": 2000,
+   "atk": 48,
+   "def": 22,
+   "spellDef": 60,
+   "atkInterval": 22,
+   "moveSpeed": 1,
+   "exp": 1200,
+   "gold": [
+    40,
+    80
+   ],
+   "alignment": -600,
+   "aggroRange": 6,
+   "leash": 12,
+   "element": "none",
+   "drops": [
+    {
+     "item": 51100,
+     "p": 0.25
+    }
+   ]
+  },
+  {
+   "id": 19003,
+   "name": "試煉武師",
+   "level": 50,
+   "hp": 2800,
+   "atk": 56,
+   "def": 27,
+   "spellDef": 60,
+   "atkInterval": 22,
+   "moveSpeed": 1,
+   "exp": 1800,
+   "gold": [
+    60,
+    120
+   ],
+   "alignment": -600,
+   "aggroRange": 6,
+   "leash": 12,
+   "element": "none",
+   "drops": [
+    {
+     "item": 51100,
+     "p": 0.25
+    }
+   ]
+  },
+  {
+   "id": 19004,
+   "name": "試煉魔將",
+   "level": 55,
+   "hp": 4000,
+   "atk": 65,
+   "def": 33,
+   "spellDef": 60,
+   "atkInterval": 22,
+   "moveSpeed": 1,
+   "exp": 2600,
+   "gold": [
+    90,
+    180
+   ],
+   "alignment": -600,
+   "aggroRange": 6,
+   "leash": 12,
+   "element": "none",
+   "drops": [
+    {
+     "item": 51100,
+     "p": 0.25
+    }
+   ]
   }
  ],
  "spawns": [
@@ -3008,6 +3086,42 @@
     32,
     56,
     46
+   ]
+  },
+  {
+   "zone": "field_1",
+   "monster": 19002,
+   "count": 3,
+   "respawnTicks": 400,
+   "area": [
+    52,
+    60,
+    108,
+    80
+   ]
+  },
+  {
+   "zone": "field_1",
+   "monster": 19003,
+   "count": 2,
+   "respawnTicks": 500,
+   "area": [
+    52,
+    60,
+    108,
+    80
+   ]
+  },
+  {
+   "zone": "field_1",
+   "monster": 19004,
+   "count": 1,
+   "respawnTicks": 600,
+   "area": [
+    52,
+    60,
+    108,
+    80
    ]
   }
  ]

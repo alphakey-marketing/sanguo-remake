@@ -64,7 +64,7 @@ static func create_character(data: GameData, char_name: String, class_id: String
 	for part in data.face_parts:
 		face[part] = 1
 	return {
-		"name": char_name, "classId": class_id, "level": 1, "exp": 0, "attrs": attrs,
+		"name": char_name, "classId": class_id, "level": 1, "exp": 0, "tier": 0, "attrs": attrs,
 		"hp": max_hp(1, attrs), "mp": max_mp(1, attrs), "sp": max_sp(1, attrs),
 		"gold": int(st.get("gold", 0)), "karma": 0, "bag": bag, "equip": equip, "status": {},
 		# Step 7.5 建角欄位 (spec 01 §1/§11)

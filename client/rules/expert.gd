@@ -5,8 +5,12 @@ extends RefCounted
 
 
 # 呢個職業該專長嘅等級上限 (1~4)；表冇 (偵查/統御/補給) = 0 (未解鎖，S10 先做)
-static func cap_of(data: Dictionary, class_id: String, skill_id: String) -> int:
-	return int(data.get("caps", {}).get(class_id, {}).get(skill_id, 0))
+# tier = 職階 (S01d, spec 01 §7): 二轉 +1 / 三轉 +2【自訂】，封頂喺 levelExp 表長度 (現 6 級)
+static func cap_of(data: Dictionary, class_id: String, skill_id: String, tier: int = 0) -> int:
+	var base := int(data.get("caps", {}).get(class_id, {}).get(skill_id, 0))
+	if base <= 0:
+		return 0
+	return mini(base + tier, int((data.get("levelExp", []) as Array).size()))
 
 
 # exp 對應嘅生嘅級 (唔理上限)：levelExp = 每級門檻 (累積)
@@ -18,9 +22,9 @@ static func level_of_exp(exp: int, level_exp: Array) -> int:
 	return lv
 
 
-# 實際生效等級 = min(exp 對應級, 職業上限)
-static func eff_level(data: Dictionary, class_id: String, skill_id: String, exp: int) -> int:
-	return mini(level_of_exp(exp, data.get("levelExp", [])), cap_of(data, class_id, skill_id))
+# 實際生效等級 = min(exp 對應級, 職業上限)；tier = 職階 (S01d 二轉/三轉上限提升)
+static func eff_level(data: Dictionary, class_id: String, skill_id: String, exp: int, tier: int = 0) -> int:
+	return mini(level_of_exp(exp, data.get("levelExp", [])), cap_of(data, class_id, skill_id, tier))
 
 
 # 加專長 exp，封頂喺「呢職業上限」嘅門檻 (加多都冇用，唔使囤)

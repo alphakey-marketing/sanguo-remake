@@ -157,6 +157,26 @@ func cmd_select_class(id: int, class_id: String) -> void:
 	_msg(int(ne["id"]), "轉職做「%s」" % cls["name"])
 
 
+# 轉職 (S01d, spec 01 §7): 等級 + 對應轉職考試任務完成 → 職階 +1。
+# 效果: 職名變化、進階武器解鎖、四招起絶招解鎖、專長上限提升（規則層 RulesClass/RulesExpert）
+func cmd_class_promote(id: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var ch: Dictionary = e["ch"]
+	var ok := RulesClass.promote_ok(data, ch)
+	if not bool(ok["ok"]):
+		return _msg(id, str(ok["why"]))
+	var tier := int(ok["tier"])
+	ch["tier"] = tier
+	var cls: Dictionary = data.classes.get(str(ch["classId"]), {})
+	var name := RulesClass.title_of(cls, tier)
+	_sync_stats(e)
+	_emit({"k": "promote", "src": id, "tier": tier, "title": name, "lv": int(ch["level"])})
+	_msg(id, "恭喜！你已經轉職做「%s」！（%s）" % [name, RulesClass.tier_name_of(tier)])
+	_msg(id, "進階武器解鎖，四招起絕招解鎖，專長上限提升！")
+
+
 # 姓名【原】: 1~8 字，決定後（理念測驗一交）唔可以改
 func cmd_set_name(id: int, name: String) -> void:
 	var e := ent(id)
