@@ -141,6 +141,50 @@ func free_away(c: Vector2i, dmin: int) -> Vector2i:
 func _run() -> void:
 	await frames(3)
 	hud = m.hud
+	# 0. 建角面板 (S01b): 姓名 → 稱號 → 生日 → 職業 → 臉譜 → 理念測驗 → 確認，撳出發先完成
+	hud.open_panel("create")
+	var cp: GamePanel = hud.panels["create"]
+	check(cp.visible, "開建角面板應該顯示")
+	var cch: Dictionary = m.ch
+	var name_ed: LineEdit = (cp as CreatePanel).name_edit
+	name_ed.text = "劉備"
+	press(cp, "確定")
+	await frames(1)
+	check(str(cch.get("name", "")) == "劉備", "建角: 確定姓名後 ch.name 應該改咗 (而家 %s)" % str(cch.get("name", "")))
+	cp.set_tab(1)
+	var title_ed: LineEdit = (cp as CreatePanel).title_edit
+	title_ed.text = "遊俠"
+	press(cp, "確定")
+	await frames(1)
+	check(str(cch.get("title", "")) == "遊俠", "建角: 確定稱號後 ch.title 應該改咗")
+	cp.set_tab(2)
+	var bm0 := int(cch.get("birthMonth", 1))
+	press(cp, "＋")
+	await frames(1)
+	check(int(cch.get("birthMonth", 1)) != bm0, "建角: 生日月＋應該改咗 birthMonth")
+	cp.set_tab(4)
+	var hair0 := int(cch.get("face", {}).get("hair", 1))
+	press(cp, "頭髮")
+	await frames(1)
+	check(int(cch.get("face", {}).get("hair", 1)) != hair0, "建角: 撳臉譜部位應該循環款式")
+	cp.set_tab(5)
+	for i in (m.data.quiz as Array).size():
+		(cp as CreatePanel)._quiz_pick(0)
+		await frames(1)
+	check(str(cch.get("ideology", "")) != "", "建角: 答完 12 題應該決定理念")
+	check(bool(cch.get("nameLocked", false)), "建角: 理念一決定，姓名應該鎖定")
+	cp.set_tab(0)
+	name_ed.text = "改極都唔得"
+	press(cp, "確定")
+	await frames(1)
+	check(str(cch.get("name", "")) == "劉備", "建角: 姓名鎖定後唔可以再改")
+	cp.set_tab(6)
+	press(cp, "✕")
+	await frames(1)
+	check(cp.visible, "建角未撳出發，撳 ✕ 唔應該關到面板")
+	press(cp, "出發！")
+	await frames(1)
+	check(not cp.visible, "建角: 撳出發後面板應該關咗")
 	var ch: Dictionary = m.ch
 	# 1. 選單列: 背包 / 角色(頭像) / 記事 / 更多
 	await click(center("menu_bag"))

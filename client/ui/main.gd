@@ -114,7 +114,7 @@ func _ready() -> void:
 	hud.context_pressed.connect(func(act: Dictionary) -> void: ContextActions.run(self, act))
 	hud.create_done.connect(_on_create_done)
 	if fresh and not autotest and not uitest:
-		hud.creation_mode = true
+		hud.open_panel("create")
 	for a in OS.get_cmdline_user_args():
 		if a == "--sshot":
 			sshot_file = "user://sshot_ui.png"
@@ -258,6 +258,7 @@ func _send(d: Dictionary) -> void:
 		"use_item": sim.cmd_use_item(my_id, int(d.item))
 		"raise_attr": sim.cmd_raise_attr(my_id, str(d.attr))
 		"auto_assign": sim.cmd_auto_assign(my_id)
+		"set_name": sim.cmd_set_name(my_id, str(d.name))
 		"set_title": sim.cmd_set_title(my_id, str(d.title))
 		"set_birth": sim.cmd_set_birth(my_id, int(d.month), int(d.day))
 		"set_face": sim.cmd_set_face(my_id, str(d.part), int(d.value))
