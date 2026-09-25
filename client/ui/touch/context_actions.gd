@@ -4,7 +4,7 @@ extends RefCounted
 # 任務答題最優先；其餘揀最近嗰個 NPC/設施（同距離 NPC 先）；野外有初階工具 (裝咗/背包) = 工作
 # 全部經 main._send 發意圖；對話框內容由 source Callable 即時計（sim 權威）。
 
-const NEAR := 3               # 同 sim_core.NEAR 一致
+const NEAR := Sim.NEAR        # 同 sim 互動距離一致
 
 
 static func find(main: Node) -> Dictionary:

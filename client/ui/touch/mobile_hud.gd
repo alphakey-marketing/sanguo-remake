@@ -48,7 +48,9 @@ func setup(m: Node2D) -> void:
 	joy.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(joy)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	get_viewport().size_changed.connect(_relayout)   # 版面只喺 viewport 變大細先重計
 	_relayout()
+	sim_refreshed()
 
 func set_auto(v: bool) -> void:
 	auto = v
@@ -140,7 +142,6 @@ func any_panel_open() -> bool:
 # ================= 輸入 =================
 func _process(delta: float) -> void:
 	_t += delta
-	_relayout()
 	_ctx_t += delta
 	if _ctx_t >= 0.2 and main != null and not creation_mode:
 		_ctx_t = 0.0
@@ -171,8 +172,21 @@ func visible_ids() -> Array:
 		ids.append("mount")
 	return ids
 
-# 騎馬掣狀態 (Step 17a): 身邊有座騎 (唔計放牧中) 先有；{} = 唔顯示
+# main._refresh 每 tick 叫: 技能扇形 / 騎馬掣狀態快取 (繪畫每幀讀，唔使每幀重計)
+var _slots_cache: Array = []
+var _mount_cache: Dictionary = {}
+
+func sim_refreshed() -> void:
+	_slots_cache = _calc_skill_slots()
+	_mount_cache = _calc_mount_btn()
+
+
 func mount_btn() -> Dictionary:
+	return _mount_cache
+
+
+# 騎馬掣狀態 (Step 17a): 身邊有座騎 (唔計放牧中) 先有；{} = 唔顯示
+func _calc_mount_btn() -> Dictionary:
 	if main == null or main.ch.is_empty():
 		return {}
 	for m in main.ch.get("mounts", []):
@@ -265,8 +279,12 @@ func _fire(id: String) -> void:
 					skill_pressed.emit(slots[i])
 	queue_redraw()
 
-# 技能扇形內容: 術書 3 格（職業用得術法先有）+ 絕招 1 格（職業有絕招先有）
 func skill_slots() -> Array:
+	return _slots_cache
+
+
+# 技能扇形內容: 術書 3 格（職業用得術法先有）+ 絕招 1 格（職業有絕招先有）
+func _calc_skill_slots() -> Array:
 	var out: Array = []
 	if main == null or main.ch.is_empty():
 		return out
@@ -542,7 +560,7 @@ func _draw() -> void:
 	_draw_companion()
 	_draw_log(sr)
 	_draw_target(s)
-	_draw_info(sr)
+	_draw_info()
 	_draw_menu()
 	_draw_combat()
 	if _t < 12.0:                       # 開場提示，12 秒後淡出
@@ -621,7 +639,7 @@ func _draw_target(s: Vector2) -> void:
 	_bar(r.position.x + 8, r.position.y + 25, w - 16, 6, float(t.hp) / max_hp, Color(0.9, 0.25, 0.15))
 
 # 右上小地圖: 當前地圖縮圖 (以自己為中心) + 怪/NPC/自己點 + 區名/時辰 (spec 12 §6)
-func _draw_info(_sr: Rect2) -> void:
+func _draw_info() -> void:
 	var r: Rect2 = layout["minimap"]["rect"]
 	draw_rect(r, Color(0, 0, 0, 0.75 if _is_down("minimap") else 0.6))
 	var me = main._me()
