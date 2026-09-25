@@ -266,6 +266,14 @@ func _send(d: Dictionary) -> void:
 		"companion_gift": sim.cmd_companion_gift(my_id, int(d.item))
 		"companion_treasure": sim.cmd_companion_treasure(my_id, int(d.item))
 		"companion_dismiss": sim.cmd_companion_dismiss(my_id)
+		"mount_buy": sim.cmd_mount_buy(my_id, str(d.breed), bool(d.get("tamed", false)))
+		"mount_stable": sim.cmd_mount_stable(my_id, int(d.uid))
+		"mount_take": sim.cmd_mount_take(my_id, int(d.uid))
+		"mount_act": sim.cmd_mount_act(my_id, int(d.uid), str(d.act), int(d.get("item", 0)))
+		"mount_abandon": sim.cmd_mount_abandon(my_id, int(d.uid))
+		"mount_point": sim.cmd_mount_point(my_id, int(d.uid), str(d.attr))
+		"mount_ride": sim.cmd_mount_ride(my_id, bool(d.on))
+		"mount_graze": sim.cmd_mount_graze(my_id)
 
 func _log(s: String) -> void:
 	log_lines.append(s)
@@ -871,6 +879,8 @@ func _draw() -> void:
 		if ismob:
 			draw_rect(Rect2(p, Vector2(TILE, TILE)), Color(0.8, 0.25, 0.2))    # 怪物色塊
 		else:
+			if isme:
+				_draw_my_mount(p)                     # 座騎 (Step 17a): 騎緊 = 墊喺腳底，跟身 = 企隔籬
 			var f = faces[int(e.face) % faces.size()] if faces.size() > 0 else null
 			if f != null: draw_texture_rect(f, Rect2(p - Vector2(4, 8), Vector2(24, 26)), false)
 			else: draw_rect(Rect2(p, Vector2(TILE, TILE)), Color.RED if isme else Color.ORANGE)
@@ -924,6 +934,29 @@ func _draw() -> void:
 
 
 # 時辰/日/季節 (右上) + 夜晚示意
+
+
+# 座騎佔位圖 (色塊 = 品種顏色；成品前換 sprite)
+func _draw_my_mount(p: Vector2) -> void:
+	for m in ch.get("mounts", []):
+		if String(m["where"]) != "with":
+			continue
+		var col: Array = RulesMount.breed_def(data.mounts, String(m["breed"])).get("color", [0.5, 0.35, 0.2])
+		var c := Color(float(col[0]), float(col[1]), float(col[2]))
+		if bool(ch.get("riding", false)):
+			draw_rect(Rect2(p + Vector2(-8, 8), Vector2(32, 11)), c)                 # 馬身
+			draw_rect(Rect2(p + Vector2(20, 2), Vector2(8, 9)), c)                   # 馬頭
+			for lx in [-6, 0, 14, 20]:
+				draw_rect(Rect2(p + Vector2(lx, 19), Vector2(3, 6)), c.darkened(0.3))  # 馬腳
+			draw_rect(Rect2(p + Vector2(-8, 8), Vector2(32, 11)), Color(0, 0, 0, 0.6), false, 1.0)
+		else:
+			var q := p + Vector2(18, 6)
+			draw_rect(Rect2(q, Vector2(16, 8)), c)
+			draw_rect(Rect2(q + Vector2(13, -5), Vector2(5, 6)), c)
+			for lx in [1, 11]:
+				draw_rect(Rect2(q + Vector2(lx, 8), Vector2(2, 5)), c.darkened(0.3))
+			draw_rect(Rect2(q, Vector2(16, 8)), Color(0, 0, 0, 0.6), false, 1.0)
+		return
 
 
 # 設施招牌: 門口一格框 + 上面招牌 (屋已經畫喺地圖貼圖)

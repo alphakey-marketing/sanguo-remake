@@ -98,6 +98,7 @@ func _panel(name_: String) -> GamePanel:
 			"map": p = MapPanel.new(main)
 			"craft": p = CraftPanel.new(main)
 			"recruit": p = RecruitPanel.new(main)
+			"mount": p = MountPanel.new(main)
 			_: p = DialogPanel.new(main)
 		add_child(p)
 		panels[name_] = p
@@ -113,6 +114,10 @@ func shop_panel() -> ShopPanel:
 func craft_panel() -> CraftPanel:
 	close_panels()
 	return _panel("craft") as CraftPanel
+
+func mount_panel() -> MountPanel:
+	close_panels()
+	return _panel("mount") as MountPanel
 
 func open_panel(name_: String) -> void:
 	close_panels()
@@ -162,7 +167,19 @@ func visible_ids() -> Array:
 	ids.append("portrait")
 	if main != null and not main.comp.is_empty():
 		ids.append("companion")
+	if not mount_btn().is_empty():
+		ids.append("mount")
 	return ids
+
+# 騎馬掣狀態 (Step 17a): 身邊有座騎 (唔計放牧中) 先有；{} = 唔顯示
+func mount_btn() -> Dictionary:
+	if main == null or main.ch.is_empty():
+		return {}
+	for m in main.ch.get("mounts", []):
+		if String(m["where"]) == "with":
+			var riding := bool(main.ch.get("riding", false))
+			return {"riding": riding, "ok": riding or RulesMount.ride_why(main.data.mounts, m) == ""}
+	return {}
 
 func _input(ev: InputEvent) -> void:
 	if creation_mode:
@@ -232,6 +249,14 @@ func _fire(id: String) -> void:
 		"menu_more": open_panel("more")
 		"minimap": open_panel("map")
 		"companion": open_panel("recruit")
+		"mount":
+			var mb := mount_btn()
+			if mb.is_empty():
+				pass
+			elif bool(mb["ok"]):
+				main._send({"t": "mount_ride", "on": not bool(mb["riding"])})
+			else:
+				mount_panel().open_tab(0)           # 騎唔到 → 開座騎面板睇原因
 		_:
 			if id.begins_with("skill"):
 				var slots := skill_slots()
@@ -691,6 +716,13 @@ func _draw_combat() -> void:
 	var ab: Vector2 = layout["auto"]["c"]
 	_circle_btn("auto", Color(0.9, 0.18, 0.1, 0.75) if auto else Color(0.12, 0.12, 0.12, 0.8), Color(1, 0.85, 0.3) if auto else Color(1, 1, 1, 0.7))
 	_txt_center(ab.y + 5, "自動", Color.WHITE, 13, 44, ab.x - 22)
+	# 騎馬掣 (Step 17a)
+	var mb := mount_btn()
+	if not mb.is_empty():
+		var mc: Vector2 = layout["mount"]["c"]
+		var ring := Color(1, 0.85, 0.3) if bool(mb["ok"]) else Color(0.5, 0.5, 0.5)
+		_circle_btn("mount", Color(0.45, 0.28, 0.12, 0.85) if bool(mb["riding"]) else Color(0.12, 0.12, 0.12, 0.8), ring)
+		_txt_center(mc.y + 5, "落馬" if bool(mb["riding"]) else "騎馬", Color.WHITE if bool(mb["ok"]) else Color(0.65, 0.65, 0.65), 13, 44, mc.x - 22)
 	# 互動掣（行近先出）
 	if not ctx.is_empty():
 		var cr: Rect2 = layout["context"]["rect"]

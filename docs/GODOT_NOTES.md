@@ -43,3 +43,6 @@ Godot 路徑: `D:\Download\Sengoku\godot\Godot_v4.7.2-stable_win64_console.exe`�
 - SDK `D:/Android/Sdk`、JDK 21 `D:/Program Files/Eclipse Adoptium/jdk-21`（editor_settings-4.7.tres）；debug keystore `%APPDATA%/Godot/keystores/debug.keystore`（pass android）
 - 安裝: `D:/Android/Sdk/platform-tools/adb install -r client/build/sanguo.apk`
 - `client/build/`（APK / web 匯出）已 gitignore
+
+- Godot 4.7: `trait` 係保留字，唔可以做變數名 (Parse Error: Expected variable name after "var")。
+- headless 跑 `--uitest`/`--autotest` 如果 script parse error，timer 未掛上 → process 唔會自己退出；見到 hang 先 check-only: `Godot --headless --path client --check-only --script <file>`。

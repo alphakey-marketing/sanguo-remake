@@ -52,6 +52,10 @@ func _shop_for(e: Dictionary) -> Dictionary:
 	for s in data.shops:
 		if _near(e, int(s["x"]), int(s["y"])):
 			return s
+	for k in data.facilities:              # 馬廄賣馬用品 (Step 17a)
+		var f = data.facilities[k]
+		if f is Dictionary and bool(f.get("stable", false)) and _near(e, int(f["x"]), int(f["y"])):
+			return {"id": k, "name": f["name"], "stock": data.mounts["stableStock"]}
 	return {}
 
 

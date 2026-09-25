@@ -1,0 +1,72 @@
+{
+  "_note": "座騎 (Step 17a, spec 07 §1~5)。【原】= 攻略 sy2_4_1/2/5/6：六種馬 (幼馬/成馬/進階/兌換表/進階門檻)、最多 5 匹、親密度 >=60 先騎得、襁褓期 30 日、壽命 365 日、衰老期 = 死前 30 日、飽食度 <50 疲勞唔降、放馬廄過子時疲勞/頭暈恢復、襁褓期要帶喺身邊先加親密度、放牧 = 一個時辰 + 馴馬專用哨、爆發力愈高放牧好結果愈多。道具效果碼 (items.json effects type 201~218) 由原版表推：201 學習/202 爆發/203 奔跑/204 忍耐/205 體力/206 飽食/207 疲勞(+ = 攰)/208~212 治異常/214 情緒/218 生命力。其餘數值全部【自訂】。",
+  "maxOwned": 5,
+  "rideIntimacy": 60,
+  "foalDays": 30,
+  "lifeDays": 365,
+  "oldDays": 30,
+  "attrs": ["learn", "burst", "run", "endure", "stamina"],
+  "attrNames": {"learn": "學習力", "burst": "爆發力", "run": "奔跑力", "endure": "忍耐力", "stamina": "體力"},
+  "attrBase": 10,
+  "attrTrait": 20,
+  "attrCap": 100,
+  "attrCapPoints": 150,
+  "fatigueBase": 50,
+  "_noteFatigue": "疲勞上限 = fatigueBase + 忍耐力【原=忍耐力決定上限】；滿 = 頭暈 (落馬、唔做得動作)",
+  "breeds": [
+    {"id": "wusun", "name": "烏孫馬", "adult": "銀甲黑馬", "trait": "learn", "color": [0.18, 0.18, 0.2], "adv": "皇極馬", "advAdult": "極甲皇馬", "advNeed": 500, "exchange": {"learn": 1, "burst": 3, "run": 3, "endure": 3, "stamina": 2}},
+    {"id": "damo", "name": "大漠馬", "adult": "狂風棕馬", "trait": "run", "color": [0.72, 0.58, 0.32], "adv": "炎陽馬", "advAdult": "極風炎馬", "advNeed": 900, "exchange": {"learn": 3, "burst": 3, "run": 1, "endure": 2, "stamina": 3}},
+    {"id": "huangbiao", "name": "黃膘馬", "adult": "流星黃馬", "trait": "stamina", "color": [0.9, 0.78, 0.3], "adv": "震地馬", "advAdult": "極星地馬", "advNeed": 800, "exchange": {"learn": 3, "burst": 3, "run": 2, "endure": 3, "stamina": 1}},
+    {"id": "dawan", "name": "大宛馬", "adult": "火焰紅馬", "trait": "", "color": [0.8, 0.25, 0.2], "adv": "流雲馬", "advAdult": "極焰雲馬", "advNeed": 1000, "exchange": {"learn": 2, "burst": 2, "run": 2, "endure": 2, "stamina": 2}},
+    {"id": "shenshan", "name": "深山馬", "adult": "雷光灰馬", "trait": "burst", "color": [0.55, 0.55, 0.58], "adv": "瘦金馬", "advAdult": "極光金馬", "advNeed": 600, "exchange": {"learn": 2, "burst": 1, "run": 3, "endure": 3, "stamina": 3}},
+    {"id": "zhongyuan", "name": "中原馬", "adult": "冰雪白馬", "trait": "endure", "color": [0.94, 0.94, 0.96], "adv": "靈仙馬", "advAdult": "極冰仙馬", "advNeed": 700, "exchange": {"learn": 3, "burst": 2, "run": 3, "endure": 1, "stamina": 3}}
+  ],
+  "_noteShop": "馬廄【自訂】價錢：幼馬 foalPrice；成年馬 = 大宛馬已養大 (30 日、親密度 60、屬性平均 40) 貴價，畀新手即刻有得騎",
+  "foalPrice": 3000,
+  "tamed": {"breed": "dawan", "price": 20000, "attr": 40, "intimacy": 60},
+  "start": {"life": 100, "satiety": 60, "intimacy": 20, "mood": 60},
+  "_noteActs": "飼養動作【原=8 種】；每日次數 limit (0 = 無限)【自訂】(spec 07 §4)；apCost = 行動力；attr = 動作本身嘅屬性變化 (襁褓期先升)；items = 用得嘅道具 (原版寵物飼料/玩具/藥，戰騎專用嘅唔喺度)",
+  "apCost": 5,
+  "acts": {
+    "feed":  {"name": "餵食食物", "limit": 5, "items": [31001, 31002, 31003, 31004, 31208, 31209, 31227], "mood": 0, "fatigue": 0},
+    "play":  {"name": "陪伴玩耍", "limit": 5, "attr": {"run": 2}, "mood": 15, "fatigue": 10},
+    "scold": {"name": "責備處罰", "limit": 5, "attr": {"endure": 2}, "mood": -15, "fatigue": 5},
+    "gift":  {"name": "贈送禮物", "limit": 3, "items": [31101, 31102, 31103, 31104, 31105, 31106, 31107, 31108, 31210, 31211, 31212], "mood": 5, "fatigue": 0},
+    "train": {"name": "教導訓練", "limit": 3, "items": [31109, 31110, 31111, 31112, 31113, 31114, 31115, 31116, 31213, 31214, 31215], "mood": 5, "fatigue": 0},
+    "heal":  {"name": "醫療治病", "limit": 0, "items": [31005, 31006, 31201, 31202, 31203, 31204, 31205, 31206, 31207, 31216, 31217, 31218, 31219, 31220, 31221, 31222], "mood": 0, "fatigue": 0}
+  },
+  "effectKeys": {"201": "learn", "202": "burst", "203": "run", "204": "endure", "205": "stamina", "206": "satiety", "207": "fatigue", "214": "mood", "218": "life",
+    "208": "cure:scared", "209": "cure:dizzy", "210": "cure:fracture", "211": "cure:bleed", "212": "cure:coma"},
+  "statuses": {
+    "dizzy":    {"name": "頭暈", "noRide": true, "noAct": true, "life": 0},
+    "scared":   {"name": "驚嚇", "noRide": true, "noAct": false, "life": 0},
+    "fracture": {"name": "骨折", "noRide": true, "noAct": false, "life": 5},
+    "bleed":    {"name": "流血", "noRide": false, "noAct": false, "life": 10},
+    "coma":     {"name": "昏迷", "noRide": true, "noAct": true, "life": 5}
+  },
+  "moods": [[80, "高興"], [60, "很好"], [45, "普通"], [30, "一般"], [15, "難過"], [0, "生氣"]],
+  "_noteDaily": "子時結算【原=情緒必降；親密度看情緒 (高興 +2)；襁褓期要帶身邊；馬廄 = 疲勞清零 + 頭暈好返】。數值【自訂】",
+  "daily": {"satiety": -25, "mood": -10, "moodHungry": -10, "moodTired": -10, "tiredFrac": 0.8,
+    "intimacy": [[80, 2], [60, 1], [45, 0], [0, -1]], "recoverBase": 5, "recoverPerStamina": 0.2, "plagueLife": 20},
+  "_noteRide": "騎乘移速【原=+50%，奔跑力調】= rideSpeed + run × runSpeed (倍數)；每行 N 格疲勞 +1，N = rideTiles + 體力 × rideTilesPerStamina",
+  "rideSpeed": 1.5,
+  "runSpeed": 0.005,
+  "rideTiles": 20,
+  "rideTilesPerStamina": 0.3,
+  "_noteGraze": "放牧【原=一個時辰、爆發力影響結果、馴馬專用哨】；機率/成長/疲勞【自訂】。成長值夠 growNeed → 優秀值 +1、生命力 +2、1 點分配 (學習力加成成長值)",
+  "whistle": 62060,
+  "grazeTicks": 60,
+  "graze": {
+    "pGood": [0.3, 0.002], "pFind": [0.12, 0.001], "pHurt": [0.2, -0.0015],
+    "fatigue": {"none": 10, "good": 20, "find": 15, "hurt": 30, "recall": 5},
+    "grow": 40, "growNeed": 100, "levelLife": 2, "hurtLife": 15, "hurtStatus": ["bleed", "fracture", "scared"],
+    "loot": [[31001, 30], [31003, 15], [31101, 10], [16001, 10], [19001, 10], [22001, 10], [10002, 8], [61314, 2]]
+  },
+  "stableStock": [31001, 31002, 31003, 31004, 31005, 31006, 31101, 31102, 31104, 31105, 31109, 31110, 31111, 31112, 31201, 31202, 31203, 31204, 31205, 31206, 31207, 62060],
+  "tips": [
+    "襁褓期 (頭 30 日) 屬性靠飼養動作升，成年之後定型，淨係放牧成長先加得。",
+    "每過子時情緒一定會跌；情緒高興 (80+) 親密度 +2，很好 +1。襁褓期一定要帶喺身邊先加親密度。",
+    "親密度 60 以上、成年先騎得。疲勞滿會頭暈：寄喺馬廄過子時就好返。",
+    "飽食度低過 50 疲勞唔會回；責備可以升忍耐力 (疲勞上限)，但情緒會跌，記住陪佢玩返。"
+  ]
+}

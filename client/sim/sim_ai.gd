@@ -127,6 +127,7 @@ func _think_player(p: Dictionary) -> void:
 		return     # 安全區唔畀出手 (登用擂台 / 任務 PK boss 例外: 丁刺史府, Step 13.5/16) (理論上怪唔會入城，呢度做多重保險)
 	if tick < int(p["next_atk"]):
 		return
+	_mount_drop(p, "attack")                # 騎馬唔用得一般武器【原】→ 落馬先打 (馬戰兵器 = Step 17b)
 	var w: Dictionary = _weapon_def(ch)     # 耐久 0 = 威力減半 (Step 12)
 	p["next_atk"] = tick + RulesCombat.attack_interval(_eff_attr(ch, "agi"))
 	# 輔助石命中率 % (effect 13) (Step 10, spec 02 §4)
