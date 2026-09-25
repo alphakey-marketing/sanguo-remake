@@ -20,6 +20,7 @@ const MENU_SZ := 48.0
 const MENU_GAP := 4.0
 const MINI_SZ := Vector2(112, 50)   # 小地圖 (spec 12 §6)
 const COMP_SZ := Vector2(120, 46)   # 同伴框 (Step 13.5)
+const STATUS_ROW_H := 18.0     # 角色框底部狀態 icon 列高度 (S02a)
 
 
 # 系統介面鍵數 (S01a, spec 01 §5): 5 級前 4 鍵，5 級後 6 鍵
@@ -35,8 +36,8 @@ static func build(size: Vector2, safe: Rect2 = Rect2()) -> Dictionary:
 	var R := safe.end.x
 	var B := safe.end.y
 	var out := {}
-	# 左上角色框（整塊撳得）
-	out["portrait"] = {"kind": "rect", "rect": Rect2(L + 6, T + 6, 244, 98)}
+	# 左上角色框（整塊撳得，底部一行 = 狀態 icon 列 S02a）
+	out["portrait"] = {"kind": "rect", "rect": Rect2(L + 6, T + 6, 244, 98 + STATUS_ROW_H)}
 	# 同伴框 (Step 13.5): 日誌右邊，搖桿區上面
 	out["companion"] = {"kind": "rect", "rect": Rect2(L + 312, T + 108, COMP_SZ.x, COMP_SZ.y)}
 	# 右上選單列（由右向左排）
@@ -68,14 +69,14 @@ static func joy_zone(size: Vector2, safe: Rect2 = Rect2()) -> Rect2:
 	if safe.size == Vector2.ZERO:
 		safe = Rect2(Vector2.ZERO, size)
 	var ctx: Rect2 = build(size, safe)["context"]["rect"]
-	var top := safe.position.y + 156.0            # 角色框 + 日誌下面
+	var top := safe.position.y + 156.0 + STATUS_ROW_H   # 角色框 + 日誌下面
 	var right := minf(safe.position.x + size.x * 0.5, ctx.position.x - 8.0)
 	return Rect2(safe.position.x, top, right - safe.position.x, safe.end.y - top)
 
 
 # 日誌（唔撳得，淨係畫）: 角色框下面
 static func log_rect(safe: Rect2) -> Rect2:
-	return Rect2(safe.position.x + 6, safe.position.y + 108, 300, 44)
+	return Rect2(safe.position.x + 6, safe.position.y + 108 + STATUS_ROW_H, 300, 44)
 
 
 static func contains(el: Dictionary, p: Vector2) -> bool:
