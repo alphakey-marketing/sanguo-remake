@@ -684,10 +684,18 @@ func t_comp_ko(data: GameData) -> void:
 	var loy := int(c["gen"]["loyalty"])
 	var m := _mob_at(sim, int(c["x"]) + 1, int(c["y"]))
 	var inn := sim.nearest_inn(sim.map_id_at(int(c["x"]), int(c["y"])))
+	var cx := int(c["x"])
+	var cy := int(c["y"])
 	sim.damage(c, 999999, m)
-	check(not sim.ent(int(c["id"])).is_empty() and int(c["hp"]) == int(c["max_hp"]), "同伴倒下: 唔會死，回滿")
-	check(int(c["x"]) == int(inn["x"]) and int(c["y"]) == int(inn["y"]), "同伴倒下: 返最近客棧")
-	check(int(c["gen"]["loyalty"]) == loy + int(data.recruit_cfg["loyalty"]["ko"]), "同伴倒下: 忠誠 %d" % int(data.recruit_cfg["loyalty"]["ko"]))
+	check(not sim.ent(int(c["id"])).is_empty() and bool(c.get("down", false)) and int(c["hp"]) == 0, "同伴倒下: 原地進入倒下狀態 (等道士超渡)")
+	check(int(c["x"]) == cx and int(c["y"]) == cy, "同伴倒下: 留喺原地")
+	check(int(c["gen"]["loyalty"]) == loy, "倒下未救: 忠誠暫時唔跌")
+	# 超時未救兜底 → 退返客棧回滿 + 忠誠扣減 (冇道士 / 玩家走咗)
+	c["downAt"] = int(sim.state["tick"]) - int(data.world["combat"]["compDownTicks"]) - 5
+	sim._down_bailout()
+	check(not bool(c.get("down", false)) and int(c["hp"]) == int(c["max_hp"]), "超時未救: 回滿")
+	check(int(c["x"]) == int(inn["x"]) and int(c["y"]) == int(inn["y"]), "超時未救: 返最近客棧")
+	check(int(c["gen"]["loyalty"]) < loy, "超時未救: 忠誠扣減 (忠義特技減半)")
 
 
 func t_comp_gift_dismiss(data: GameData) -> void:

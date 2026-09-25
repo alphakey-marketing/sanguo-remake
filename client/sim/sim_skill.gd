@@ -245,8 +245,48 @@ func cmd_use_skill(id: int, skill_id: String) -> void:
 				return _msg(id, "附近冇鎖住嘅寶箱（任務寶箱先用得開鎖）")
 			_emit({"k": "unlock_open", "dst": id, "chest": chest["id"]})
 			_msg(id, "揀真鑰匙…三支得一支啱")
+		"chaodu":
+			_try_chaodu(id)
 		_:
 			_msg(id, "嗰招特技而家用唔到")
+
+
+# 超渡 (道士, S02c, spec 02 §6): 復活附近倒下嘅同伴（留自己 HP + 扣 HP20% / MP30%）
+const REVIVE_RANGE := 5
+func _try_chaodu(id: int) -> void:
+	var e := ent(id)
+	var ch: Dictionary = e["ch"]
+	var target: Dictionary = {}
+	for o in ents.values():
+		if String(o.get("kind", "")) == "gen" and bool(o.get("down", false)) and int(o["hp"]) <= 0 \
+				and RulesCombat.in_range(e["x"], e["y"], o["x"], o["y"], REVIVE_RANGE):
+			target = o
+			break
+	if target.is_empty():
+		return _msg(id, "附近冇倒下嘅同伴（同伴倒下先可以超渡）")
+	var max_hp := maxi(1, int(e.get("max_hp", 1)))
+	var max_mp := maxi(1, RulesStats.max_mp(int(ch["level"]), ch["attrs"]))
+	var hp_cost := int(ceil(max_hp * 0.2))
+	var mp_cost := int(ceil(max_mp * 0.3))
+	if int(ch["hp"]) <= hp_cost:
+		return _msg(id, "自己體力唔夠做超渡（要留 %d HP）" % hp_cost)
+	if int(ch["mp"]) < mp_cost:
+		return _msg(id, "自己靈力唔夠做超渡（要 %d MP）" % mp_cost)
+	ch["hp"] = int(ch["hp"]) - hp_cost
+	ch["mp"] = int(ch["mp"]) - mp_cost
+	_sync_stats(e)
+	var tch: Dictionary = target["ch"]
+	_full_heal(tch)
+	tch["status"] = {}
+	target.erase("down")
+	target.erase("downAt")
+	target.erase("casting")
+	target.erase("path")
+	target.erase("goto")
+	target["atk_target"] = 0
+	_sync_stats(target)
+	_emit({"k": "revive", "dst": id, "id": int(target["id"]), "name": str(target["name"])})
+	_msg(id, "超渡！「%s」起返身回滿血（扣自己 %d HP．%d MP）" % [target["name"], hp_cost, mp_cost])
 
 
 # 開鎖小遊戲揀鑰匙（unlock_panel 三掣）: key_idx 啱 -> 寶箱開，錯 -> 留喺度再試

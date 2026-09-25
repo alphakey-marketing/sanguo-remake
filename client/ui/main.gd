@@ -477,6 +477,15 @@ func _on_event(e: Dictionary) -> void:
 		"companion_leave":
 			if int(e.dst) == my_id:
 				_set_banner("%s離開咗（%s）" % [str(e.name), str(e.reason)], Color(1, 0.7, 0.4), 6.0)
+		"companion_down":                       # S02c 超渡: 同伴倒下
+			if int(e.dst) == my_id and hud != null:
+				_set_banner("%s倒低咗！快啲超渡" % str(e.name), Color(1, 0.6, 0.6), 5.0)
+		"revive":                               # S02c 超渡: 道士復活同伴（sim 已 _msg, 呢度純通標）
+			if int(e.dst) == my_id and hud != null:
+				_set_banner("超渡！%s 起返身" % str(e.name), Color(0.65, 1, 0.65), 4.0)
+		"companion_ko":
+			if int(e.dst) == my_id and hud != null:
+				_set_banner("%s受傷退返客棧休養" % str(e.name), Color(1, 0.7, 0.4), 5.0)
 		"day":
 			var season := int(e.season)
 			if last_season >= 0 and season != last_season:

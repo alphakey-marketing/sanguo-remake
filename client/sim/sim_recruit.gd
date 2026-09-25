@@ -290,6 +290,7 @@ func damage(t: Dictionary, dmg: int, by: Dictionary) -> void:
 
 # 每 tick: 擂台走甩 (距離 > maxDist) / 武將脫戰 = 輸
 func _recruit_tick() -> void:
+	_down_bailout()                     # 同伴倒下超時未救 → 返客棧 (S02c)
 	var pe := ent(int(state["player_id"]))
 	if pe.is_empty():
 		return
@@ -703,24 +704,52 @@ func _recruit_daily(day: int) -> void:
 			_companion_leave(c, "忠誠太低", true)
 
 
-# 同伴倒下 = 唔會死: 返最近客棧回滿，忠誠 -ko
+# 同伴倒下 = 唔會死: 原地進入「倒下」狀態 (hp 0, flags down) 等道士「超渡」復活 (S02c)；
+# 超過 koTicks 未救 → 當佢退返客棧 (忠誠 -ko, 兜底免得冇道士時同伴永遠倒地)。
 func _kill_player(p: Dictionary) -> void:
 	if p.get("kind", "") != "gen":
 		super(p)
 		return
+	if bool(p.get("down", false)):
+		return                    # 已倒低, 唔重複觸發
 	var ch: Dictionary = p["ch"]
-	_full_heal(ch)
+	ch["hp"] = 0
 	ch["status"] = {}
 	p.erase("casting")
-	var inn := nearest_inn(map_id_at(int(p["x"]), int(p["y"])))
-	_put_ent(p, int(inn["x"]), int(inn["y"]))
+	p.erase("path")
+	p.erase("goto")
 	p["atk_target"] = 0
+	p["down"] = true
+	p["downAt"] = tick
 	_sync_stats(p)
 	var owner := int(p["gen"]["owner"])
-	_emit({"k": "companion_ko", "dst": owner, "id": int(p["id"])})
-	_msg(owner, "%s受傷，退返%s休養" % [p["name"], inn.get("name", "客棧")])
-	if not bool(_comp_eff(p).get("noKoLoss", false)):     # 堅忍 (Step 15)
-		_loyalty_change(p, int(data.recruit_cfg["loyalty"]["ko"]))
+	_emit({"k": "companion_down", "dst": owner, "id": int(p["id"]), "name": str(p["name"])})
+	_msg(owner, "「%s」倒下咗！搵道士用超渡救返佢…" % p["name"])
+
+
+# 醫生
+func _down_bailout() -> void:
+	for id in ents.keys():
+		var e := ent(int(id))
+		if e.is_empty() or e.get("kind", "") != "gen" or not bool(e.get("down", false)):
+			continue
+		if tick < int(e.get("downAt", 0)) + int(data.world["combat"].get("compDownTicks", 600)):
+			continue
+		var ch: Dictionary = e["ch"]
+		ch["status"] = {}
+		_full_heal(ch)
+		e.erase("casting")
+		e.erase("down")
+		e.erase("downAt")
+		var inn := nearest_inn(map_id_at(int(e["x"]), int(e["y"])))
+		_put_ent(e, int(inn["x"]), int(inn["y"]))
+		e["atk_target"] = 0
+		_sync_stats(e)
+		var owner := int(e["gen"]["owner"])
+		_emit({"k": "companion_ko", "dst": owner, "id": int(e["id"])})
+		_msg(owner, "%s未及搶救，退返%s休養" % [e["name"], inn.get("name", "客棧")])
+		if not bool(_comp_eff(e).get("noKoLoss", false)):     # 堅忍 (Step 15)
+			_loyalty_change(e, int(data.recruit_cfg["loyalty"]["ko"]))
 
 
 # 同伴殺怪: 掉落/金/善惡歸主公，經驗按隊伍經驗池分 (S02b, 同伴有自己 exp/level)；殺善怪 → 義理/治國同伴忠誠跌
