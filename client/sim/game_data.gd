@@ -46,6 +46,7 @@ var titles: Array = []            # 頭銜 60 階 (data/titles.json, Step 14)【
 var office: Dictionary = {}       # 官宅/官令設定 (data/office.json, Step 14)
 var mounts: Dictionary = {}       # 座騎設定 (data/mounts.json, Step 17a)
 var mount_weapons: Dictionary = {}  # 馬戰兵器 + 特技 (data/mount_weapons.json, Step 17b)
+var war_beasts: Dictionary = {}   # 戰騎屬性/升級 (data/war_beasts.json, Step 18)
 var quiz: Array = []              # 理念測驗題庫 (data/quiz.json, Step 7.5)
 var face_parts: Dictionary = {}   # 臉譜 8 部位款式數 (data/face.json, Step 7.5)
 var quests: Array = []            # 任務定義 (data/quests.json, Step 8)
@@ -121,6 +122,7 @@ static func load_all() -> GameData:
 	g.office = _read("res://data/office.json")
 	g.mounts = _read("res://data/mounts.json")
 	g.mount_weapons = _read("res://data/mount_weapons.json")
+	g.war_beasts = _read("res://data/war_beasts.json")
 	for o in g.office["orders"]:
 		o["rankName"] = RulesTitle.name_of(g.titles, int(o["rank"]))
 	var qz: Dictionary = _read("res://data/quiz.json")
