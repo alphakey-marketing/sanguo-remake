@@ -62,7 +62,9 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
 - 驗收：`tests/run_char.gd`（新）+ 相關舊測試 + `--uitest`
 
 ### S02 戰鬥（spec 02）
-- [ ] **S02a 核實 + 狀態 icon 列 + 術法快捷列**：血條下 status icon；術書 3 本切換 UI（`ch.equip.spellbook` 已有）
+- [x] **S02a 核實 + 狀態 icon 列 + 術法快捷列**：血條下 status icon；術書 3 本切換 UI（`ch.equip.spellbook` 已有）
+  - 核實：物理/術法/寶石/相剋/絕招/狀態/組隊 rules 已有齊全測試（見 §1 表）；術法快捷列 3 本切換 UI 已喺 `bag_panel.gd`（裝備/卸下 spellbook slot）做咗，冇缺
+  - 完成：角色框底部加狀態 icon 列（`HudLayout.STATUS_ROW_H`、`mobile_hud._draw_status_icons`）— 逐個 active status 顯示短名 + 剩餘秒數；`log_rect`/`joy_zone` 相應落移 18px 讓位；`run_tests.sh` 全 PASS（`run_hud.gd` 4195 條）
 - [ ] **S02b 組隊經驗**：隊伍上限 6；經驗池 70% 按傷害 / 30% 平分【自訂】取代「同伴 50% 歸主公」；同伴自己有 exp/等級【待決：同伴要唔要升級】
   - UI：HUD 同伴框顯示 exp；隊伍面板
 - [ ] **S02c 其他 5 職開放（每職一細步：仕女 → 道士 → 巫女 → 辯士 → 美女）**：`classes.json` 啟用、職業武器 18 系對應、職業特技（開鎖/超渡/潛行/竊聽/透視，單機化設計照 §6）+ 小遊戲 UI、初階三招絕招（數值模板 §5）

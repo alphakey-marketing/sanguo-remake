@@ -360,6 +360,24 @@ func _draw_status() -> void:
 		_txt(Vector2(o.x + 78, y + 9), rows[i][0], Color(0.95, 0.95, 0.95), 11)
 		_bar(o.x + 114, y + 1, 124, 8, rows[i][1], rows[i][2])
 	_txt(o + Vector2(6, 92), "金 %d" % int(ch.gold), Color(1, 0.9, 0.5), 11)
+	_draw_status_icons(o, fr, main.sim.tick)
+
+# 狀態 icon 列 (S02a, spec 02 §7): 角色框底部一行，短名 + 剩餘秒數
+func _draw_status_icons(o: Vector2, fr: Rect2, tick: int) -> void:
+	var me = main._ent(main.my_id)
+	var status: Dictionary = {} if me == null else me.get("status", {})
+	var y := fr.end.y - HudLayout.STATUS_ROW_H
+	draw_line(Vector2(o.x + 2, y), Vector2(fr.end.x - 2, y), Color(1, 1, 1, 0.15), 1.0)
+	var x := o.x + 6
+	for sid in status.keys():
+		var left := int(status[sid]) - tick
+		if left <= 0:
+			continue
+		var label: String = main.STATUS_NAMES.get(str(sid), str(sid))
+		var w := 8.0 * label.length() + 20.0
+		draw_rect(Rect2(x, y + 2, w, 14), Color(0.5, 0.15, 0.55, 0.75))
+		_txt(Vector2(x + 3, y + 13), "%s %ds" % [label, int(left / 10.0)], Color(1, 0.9, 1), 10)
+		x += w + 4
 
 # 同伴框 (Step 13.5): 頭像 + 名 + HP 條 + 忠誠/剩日/指令
 func _draw_companion() -> void:
