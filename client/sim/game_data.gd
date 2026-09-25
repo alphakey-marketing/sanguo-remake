@@ -31,6 +31,9 @@ var legend: Dictionary = {}       # 地形字元 -> {name, walk}
 var tiles := PackedByteArray()    # 全域地形字元 (ASCII)，0 = 虛空 (唔喺任何地圖)
 var walk := PackedByteArray()     # 全域行得表 1/0
 var portal_at: Dictionary = {}    # cell (y*W+x) -> auto 傳送點 id (踩上去就過圖)
+var map_idx := PackedByteArray()  # cell -> maps index + 1 (0 = 虛空)；map_at/zone 查表用 (地圖唔重疊)
+var tp_by_id: Dictionary = {}     # 傳送點 id -> def
+var zone_by_id: Dictionary = {}   # zone (= 地圖) id -> zone
 var landmarks: Array = []         # 史蹟地標 (已轉全域座標)
 var world_map: Dictionary = {}    # 大地圖 (天下) 節點/路線 (UI 用)
 var work: Dictionary = {}         # 工作技能 (data/work.json.skills, Step 7.1)
@@ -247,6 +250,8 @@ func _load_maps(mj: Dictionary) -> void:
 		walk_code[String(k).unicode_at(0)] = bool(legend[k]["walk"])
 	tiles.resize(WORLD_W * WORLD_H)
 	walk.resize(WORLD_W * WORLD_H)
+	map_idx.resize(WORLD_W * WORLD_H)
+	assert(mj["maps"].size() < 255, "map_idx 用 byte，地圖太多")
 	for md in mj["maps"]:
 		var id := String(md["id"])
 		var rows := FileAccess.get_file_as_string("res://data/maps/%s.txt" % id).replace("\r", "").split("\n", false)
@@ -273,9 +278,15 @@ func _load_maps(mj: Dictionary) -> void:
 				a[k] = int(a[k]) + oy
 		maps.append(md)
 		map_by_id[id] = md
+		for y in int(md["h"]):
+			for x in int(md["w"]):
+				map_idx[(oy + y) * WORLD_W + ox + x] = maps.size()
 		zones.append({"id": id, "name": String(md["name"]), "safe": bool(md["safe"]), "map": id,
 			"x0": ox, "y0": oy, "x1": ox + int(md["w"]) - 1, "y1": oy + int(md["h"]) - 1})
+		zone_by_id[id] = zones[-1]
 	travel_points = mj.get("portals", [])
+	for p in travel_points:
+		tp_by_id[String(p["id"])] = p
 	landmarks = mj.get("landmarks", [])
 	world_map = mj.get("world", {})
 
@@ -332,7 +343,12 @@ func mob_def(def_id: int) -> Dictionary:
 
 # 全域格屬邊張地圖 ({} = 虛空)
 func map_at(x: int, y: int) -> Dictionary:
-	for md in maps:
-		if x >= int(md["ox"]) and y >= int(md["oy"]) and x < int(md["ox"]) + int(md["w"]) and y < int(md["oy"]) + int(md["h"]):
-			return md
-	return {}
+	var i := map_index(x, y)
+	return maps[i] if i >= 0 else {}
+
+
+# 全域格屬 maps/zones 第幾個 (-1 = 虛空/出界)；zones 同 maps 一一對應同次序
+func map_index(x: int, y: int) -> int:
+	if x < 0 or y < 0 or x >= WORLD_W or y >= WORLD_H:
+		return -1
+	return map_idx[y * WORLD_W + x] - 1

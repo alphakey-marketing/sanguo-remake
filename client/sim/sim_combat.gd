@@ -52,21 +52,15 @@ func _kill_mob(m: Dictionary, by: Dictionary, exp_mult: float = 1.0) -> void:
 			var res := RulesQuest.on_fight_win(data, by["ch"], q)
 			if bool(res.get("changed", false)):
 				_quest_emit(by, q, res)
-		ents.erase(m["id"])
-		for e in ents.values():
-			if int(e["atk_target"]) == int(m["id"]):
-				e["atk_target"] = 0
+		_remove_ent(int(m["id"]))
 		return
 	var battle_id := str(m.get("mob", {}).get("battle_id", ""))   # 戰役 boss (Step 19): 掉落照常，但唔重生 + 打完自動過層
 	if by.has("ch"):
 		var w := BotSys.W_SEE_KILL if RulesKarma.tier(int(by["ch"]["karma"])) < 5 else -BotSys.W_SEE_KILL
 		_witness_nearby(m, int(by["id"]), "see_kill", w)
-	ents.erase(m["id"])
+	_remove_ent(int(m["id"]))
 	if battle_id == "":
 		_schedule_respawn(m, d)
-	for e in ents.values():
-		if int(e["atk_target"]) == int(m["id"]):
-			e["atk_target"] = 0
 	if not by.has("ch"):
 		return
 	var ch: Dictionary = by["ch"]
@@ -153,8 +147,4 @@ func _kill_player(p: Dictionary) -> void:
 # 逃跑怪消失: 排重生 + 清 atk_target (冇掉落/善惡/經驗)
 func _erase_flee(m: Dictionary, d: Dictionary) -> void:
 	_schedule_respawn(m, d)
-	var id := int(m["id"])
-	ents.erase(id)
-	for e in ents.values():
-		if int(e["atk_target"]) == id:
-			e["atk_target"] = 0
+	_remove_ent(int(m["id"]))

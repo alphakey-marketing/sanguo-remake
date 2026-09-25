@@ -40,11 +40,7 @@ func is_riding(ch: Dictionary) -> bool:
 
 # 企喺邊個馬廄隔籬 → facility key ("" = 唔喺)
 func stable_near(e: Dictionary) -> String:
-	for k in data.facilities:
-		var f = data.facilities[k]
-		if f is Dictionary and bool(f.get("stable", false)) and _near(e, int(f["x"]), int(f["y"])):
-			return String(k)
-	return ""
+	return _fac_near(e, "stable")
 
 
 func _mname(m: Dictionary) -> String:

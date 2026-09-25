@@ -52,10 +52,9 @@ func _shop_for(e: Dictionary) -> Dictionary:
 	for s in data.shops:
 		if _near(e, int(s["x"]), int(s["y"])):
 			return s
-	for k in data.facilities:              # 馬廄賣馬用品 (Step 17a)
-		var f = data.facilities[k]
-		if f is Dictionary and bool(f.get("stable", false)) and _near(e, int(f["x"]), int(f["y"])):
-			return {"id": k, "name": f["name"], "stock": data.mounts["stableStock"]}
+	var k := _fac_near(e, "stable")        # 馬廄賣馬用品 (Step 17a)
+	if k != "":
+		return {"id": k, "name": data.facilities[k]["name"], "stock": data.mounts["stableStock"]}
 	return {}
 
 
@@ -340,11 +339,7 @@ func _use_ap_pill(e: Dictionary, item: int) -> void:
 
 
 func _near_donation(e: Dictionary) -> bool:
-	for k in data.facilities:
-		var f = data.facilities[k]
-		if f is Dictionary and bool(f.get("donation", false)) and _near(e, int(f["x"]), int(f["y"])):
-			return true
-	return false
+	return _fac_near(e, "donation") != ""
 
 
 # 捐金錢【原】3000~50000
@@ -556,11 +551,7 @@ func _near_craft(e: Dictionary, skill: String) -> bool:
 
 # 附近有冇修理服務設施 (打鐵鋪)
 func _near_repair_service(e: Dictionary) -> bool:
-	for k in data.facilities:
-		var f = data.facilities[k]
-		if f is Dictionary and bool(f.get("repair", false)) and _near(e, int(f["x"]), int(f["y"])):
-			return true
-	return false
+	return _fac_near(e, "repair") != ""
 
 
 func _bag_counts(bag: Array) -> Dictionary:
