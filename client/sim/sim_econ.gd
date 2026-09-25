@@ -70,7 +70,7 @@ func cmd_buy(id: int, item: int, n: int = 1) -> void:
 	if not stock.has(item) and not stock.has(float(item)):
 		return _msg(id, "呢間店唔賣呢件")
 	var ch: Dictionary = e["ch"]
-	var cost := RulesShop.buy_price(data.prices.get(item, 0.0) * market_factor(item), ch["attrs"]["cha"], int(ch["karma"])) * n
+	var cost := RulesShop.buy_price(data.prices.get(item, 0.0) * market_factor(item), ch["attrs"]["cha"], int(ch["karma"]), expert_lv(ch, "jiaoyi")) * n
 	if int(ch["gold"]) < cost:
 		return _msg(id, "金錢不足，要 %d" % cost)
 	ch["gold"] = int(ch["gold"]) - cost
@@ -99,7 +99,7 @@ func cmd_sell(id: int, item: int, n: int = 1) -> void:
 		return _msg(id, "快捷列裝備中，唔可以賣")
 	if not RulesShop.remove_item(ch["bag"], item, n):
 		return _msg(id, "背包冇咁多")
-	var gain := RulesShop.sell_price(data.prices.get(item, 0.0) * market_factor(item)) * n
+	var gain := RulesShop.sell_price(data.prices.get(item, 0.0) * market_factor(item), expert_lv(ch, "jiaoyi")) * n
 	ch["gold"] = int(ch["gold"]) + gain
 	_cleanup_dur(ch)
 	_cleanup_fused(ch)                    # 賣晒融合武器 → 清嵌石記錄
@@ -199,7 +199,7 @@ func cmd_storage_sell(id: int, item: int, n: int = 1) -> void:
 		return _msg(id, "裝備中，唔可以賣 (先卸下)")
 	if not RulesShop.remove_item(ch["bag"], item, n):
 		return _msg(id, "背包冇咁多")
-	var gain := RulesShop.sell_price(data.prices.get(item, 0.0) * market_factor(item)) * n
+	var gain := RulesShop.sell_price(data.prices.get(item, 0.0) * market_factor(item), expert_lv(ch, "jiaoyi")) * n
 	ch["gold"] = int(ch["gold"]) + gain
 	_cleanup_dur(ch)
 	_msg(id, "天地商行代賣 %d 件，得 %d 金" % [n, gain])
@@ -277,7 +277,7 @@ func _tiandi_tools(id: int, ch: Dictionary, skill: String, item: int) -> void:
 		_msg(id, "天地商行: 代賣%s，得 %d 金" % [data.names.get(item, str(item)), gain])
 	if not bool(td.get("buyTool", false)) or ch["tools"].has(skill):
 		return
-	var cost := RulesShop.buy_price(data.prices.get(item, 0.0) * market_factor(item), ch["attrs"]["cha"], int(ch["karma"]))
+	var cost := RulesShop.buy_price(data.prices.get(item, 0.0) * market_factor(item), ch["attrs"]["cha"], int(ch["karma"]), expert_lv(ch, "jiaoyi"))
 	if int(ch["gold"]) < cost:
 		return _msg(id, "天地商行: 買新%s要 %d 金，唔夠錢" % [data.names.get(item, str(item)), cost])
 	ch["gold"] = int(ch["gold"]) - cost
@@ -308,7 +308,7 @@ func _tiandi_haul(id: int, ch: Dictionary) -> void:
 		dep_n += int(d[1])
 	for d in plan["sell"]:
 		RulesShop.remove_item(ch["bag"], int(d[0]), int(d[1]))
-		gold += RulesShop.sell_price(data.prices.get(int(d[0]), 0.0) * market_factor(int(d[0]))) * int(d[1])
+		gold += RulesShop.sell_price(data.prices.get(int(d[0]), 0.0) * market_factor(int(d[0])), expert_lv(ch, "jiaoyi")) * int(d[1])
 		sell_n += int(d[1])
 	ch["gold"] = int(ch["gold"]) + gold
 	_emit({"k": "tiandi_haul", "id": id, "deposit": dep_n, "sell": sell_n, "gold": gold})
@@ -439,6 +439,11 @@ func _skill_def(skill: String) -> Dictionary:
 	if data.work.has(skill):
 		return data.work[skill]
 	return data.work_adv.get(skill, {})
+
+
+# 專長生效等級 (S01c, spec 01 §8)
+func expert_lv(ch: Dictionary, skill_id: String) -> int:
+	return RulesExpert.eff_level(data.experts, String(ch.get("classId", "")), skill_id, int(ch.get("expert", {}).get(skill_id, 0)))
 
 
 # 生產技能等級 (未做過: 初階 = 1；進階 = 已解鎖 1 / 未解鎖 0)

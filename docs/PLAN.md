@@ -20,7 +20,7 @@
 
 | Spec | 邏輯 | UI | 已做（主要檔案） | 欠缺（= §3 對應 Step 範圍） |
 |---|---|---|---|---|
-| 01 角色成長 | 🟡 | 🟡 | 建角、六屬性、HP/MP/SP、升級點數 + 自動分配、理念測驗、稱號/生日（福日 exp）/臉譜、修練場所、行動力、飲水度（`rules/stats.gd`、`sim_char`） | 城內自動回復、練兵場小兵回 SP、5 級前 4 鍵、二轉/三轉、專長；**建角面板仍係 debug 版** |
+| 01 角色成長 | 🟡 | 🟡 | 建角、六屬性、HP/MP/SP、升級點數 + 自動分配、理念測驗、稱號/生日（福日 exp）/臉譜、修練場所、行動力、飲水度、專長（`rules/stats.gd` `expert.gd`、`sim_char`） | 二轉/三轉（S01d）；地理迷宮地圖效果（S01c 偏離） |
 | 02 戰鬥 | 🟡 | 🟡 | 近戰、術法、相剋、狀態、寶石、義士三招 + 融合、防具/武器 3 槽/耐久 | 其他 5 職武器/特技/絕招、弩箭消耗、組隊經驗分配（而家同伴 50% 歸主公）、狀態 icon 列、術法快捷列 3 本切換 UI |
 | 03 善惡死亡 | 🟡 | ✅ | 七階、死亡掉物品/跌經驗、價格加成 | 攻擊居民/紅名 NPC（而家 `cmd_attack` 只准打 mob）、反擊 +100、天譴、幸運符/護身符/還魂丹、殺人魔拒入城、罪犯拒官令 |
 | 04 怪物地圖 | 🟡 | ✅ | 46 怪 + 掉落導入、重生、逃跑/群攻、boss 每日、夜怪、汝南洞 10 層、張牛角戰役 | 地面掉落物（`dropped` 實體）、術法怪/boss 技能、特殊場景 7 個（`scenes.json`）、其餘 5 場戰役實體 |
@@ -48,11 +48,12 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
   - UI：HUD 鍵數跟等級；練兵場互動掣加「回復體力」
   - 完成：`world.json regen`(每 6 tick 回 1% max hp/mp/sp，`Sim._safe_regen_tick`)；`facilities.json trainer` + `cmd_facility(id,"trainer")`→`_fac_restsp`(免費回滿 SP，150 tick 冷卻)；`cmd_rest` 5 級前(`GameData.NEWBIE_LEVEL`)免費、5 級後收 `inn.restCost`；`HudLayout.SKILL_ANGLES` 擴到 6 格(後 2 格用 `SKILL_DIST2` 較大半徑避免重疊)、`HudLayout.skill_cap(level)` 5 級前 4/後 6，`_calc_skill_slots` 用嚟 cap；新 `tests/run_char.gd`(已接入 `run_tests.sh`)
   - 偏離：義士職業內容而家最多只用到 4 格技能位（3 術書+1 絕招，只顯示最後學嘅絕招），5/6 格容量已接好但未有內容填滿——留返 S02c 多職業/多絕招顯示時再接
-- [ ] **S01b 建角面板正式化**（由舊 Step 27 提前）：姓名 → 稱號 → 生日 → 職業（六職顯示，未開放灰）→ 臉譜 8 部位 → 理念測驗 12 題 → 確認；全部 `ui/panels/` 正式 Control，觸控
-  - 驗收：`--uitest` 建角全流程 + 返回上一步；舊 debug 建角移除
-- [ ] **S01c 專長框架**：`data/experts.json`（六職上限表【原】全錄 + 效果係數【自訂】）、`rules/expert.gd`（等級/上限/效果係數純函數）、`ch.expert` + exp 掛鈎 API；**交易** 專長即刻接買賣價；天文/地理 lv≥1 效果（天災情報 / 小地圖顯示設施）即刻接
-  - UI：角色面板「專長」頁（等級色 藍綠紅紫 + 上限）
-  - 延後掛鈎：內政/救災 → S08；訓練/警戒/偵查/統御/補給 → S08/S10；專長任務 → S06
+- [x] **S01b 建角面板正式化**（由舊 Step 27 提前）：姓名 → 稱號 → 生日 → 職業（六職顯示，未開放灰）→ 臉譜 8 部位 → 理念測驗 12 題 → 確認；全部 `ui/panels/` 正式 Control，觸控
+  - 完成：`ui/panels/create_panel.gd`（7 頁 tab：姓名/稱號/生日/職業/臉譜/理念/確認，撳「出發！」先完成）；`tests/ui_smoke.gd` 覆蓋全流程（改名/改稱號/答理念測驗）；舊 debug 建角已移除，代碼冇殘留
+- [x] **S01c 專長框架**：`data/experts.json`（六職上限表【原】全錄 + 效果係數【自訂】）、`rules/expert.gd`（等級/上限/效果係數純函數）、`ch.expert` + exp 掛鈎 API；**交易** 專長即刻接買賣價；天文/地理 lv≥1 效果（天災情報 / 小地圖顯示設施）即刻接
+  - 完成：`data/experts.json`（12 專長 + 六職上限表 + `levelExp [10,30,60,100]`【自訂】）；`rules/expert.gd`（`cap_of/level_of_exp/eff_level/add_exp` + 交易/內政/訓練/救災 效果係數 純函數）；`ch.expert` + `sim.expert_lv()`；交易 即刻接 sim 買賣/代賣/天地商行（`RulesShop` 加 `trade_lv`）+ UI 顯示價（`main._buy_price/_sell_price` 同步）；天文 lv≥1 + 帶渾天儀(26029) → `sim.view_weather()`（各城季節/天災）；地理 lv≥1 → 小地圖顯示全部設施（`mobile_hud.gd`，非傳送點藍色）；角色面板「專長」頁（Lv 色 藍綠紅紫 + 上限 + exp 進度）；新測試入 `run_char.gd`（t_expert_rules/trade/weather_geo，已接入 `run_tests.sh`）；另修 `create_panel` LineEdit reparent（refresh 未即時脫離舊 parent 會炸）
+  - 偏離：地理「迷宮地圖」效果未做（而家冇迷宮小地圖系統；小地圖顯示設施已接）
+  - 延後掛鈎：內政/救災 → S08；訓練/警戒/偵查/統御/補給 → S08/S10；專長任務 → S06；渾天儀來源 → S11（見 §4）
 - [ ] **S01d 二轉 / 三轉框架**：`classes.json` `tier2/tier3`（名/武器群/承繼）；`cmd_class_promote`；轉職效果（職名、進階武器解鎖、絕招四招起解鎖、專長上限↑）；二轉「轉職考試」任務（50 級，打對應等級怪 + 任務道具）
   - UI：角色面板顯示職階；轉職對話
   - 延後掛鈎：三轉任務（七彩項鍊）→ S04 特殊場景做完先接
@@ -164,6 +165,7 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
 | S06c | 義勇軍限定團體任務 | S08f |
 | S07c | 撿寶/幸運護身還魂/聖體 | 要 S04a/S03c/S01a 先 |
 | S08g | 民心/法令要有城池 | S10c |
+| S01c | 渾天儀來源（商城道具單機化定案，`sim.gd WEATHER_ITEM 26029` 已資料有、冇商店賣） | S11 |
 | S09c | 國戰類特技/寶物 | S10 |
 
 ---

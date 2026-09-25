@@ -15,7 +15,7 @@
 - 大 Step 開工先「核實」spec vs 代碼，更新 PLAN §1 同清單
 - 跨 spec 依賴：先做資料 + 掛鈎 + 測試，效果喺後面 Step 接，記入 PLAN §4
 - PLAN 標【待決】= 做到嗰步先問用家，唔好自己估
-- **下一步 = PLAN §3 第一個未剔 `[ ]`**（2026-09-24：S01a）
+- **下一步 = PLAN §3 第一個未剔 `[ ]`**（2026-10-01：S01d 二轉/三轉）
 
 ## 現況 (2026-09-24，v5 Step 19 完)
 - **全部喺 `client/` (Godot 4.7, GDScript)**：`rules/`(純函數)、`sim/`(單機世界模擬，狀態可存檔、種子 RNG)、`ui/`(`touch/` HUD 觸控 + `panels/` 正式面板)、`tests/`
@@ -23,7 +23,7 @@
 
 | 系統 | rules | sim | data |
 |---|---|---|---|
-| 角色/點數/測驗/修練/行動力/飲水 | `stats.gd` `quiz.gd` `title.gd` | `sim_char.gd` | `classes.json` `quiz.json` |
+| 角色/點數/測驗/修練/行動力/飲水/專長 | `stats.gd` `quiz.gd` `title.gd` `expert.gd` | `sim_char.gd` | `classes.json` `quiz.json` `experts.json` |
 | 戰鬥/術法/寶石/絕招/融合 | `combat.gd` `spell.gd` `jewel.gd` | `sim_combat.gd` `sim_skill.gd` `sim_ai.gd` | `monsters.json`(掉落由 `tools/import_drops.py` 生成) |
 | 裝備/耐久 | `equip.gd` | `sim_econ.gd` | `equip.json` |
 | 善惡 | `karma.gd` | `sim_combat.gd` | — |

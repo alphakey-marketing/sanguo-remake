@@ -188,6 +188,31 @@ func step() -> void:
 			_on_moved(e)
 
 
+# 天文專長 lv≥1 + 帶渾天儀(26029): 各城池現時天氣/天災情報 (S01c, spec 01 §8)
+const WEATHER_ITEM := 26029
+
+func view_weather() -> Array:
+	var ch := player_ch()
+	if ch.is_empty() or not RulesExpert.weather_unlocked(expert_lv(ch, "tianwen")) or not RulesShop.has_item(ch.get("bag", []), WEATHER_ITEM, 1):
+		return []
+	var season := RulesClock.season_of_day(int(_clock()["day"]), int(data.world["clock"]["seasonDays"]))
+	var out: Array = []
+	for c in data.world["cities"]:
+		var d := {}
+		for x in state["disasters"]:
+			if String(x["city"]) == String(c.id):
+				d = x
+				break
+		out.append({"city": String(c.id), "name": String(c.get("name", c.id)), "season": season, "disaster": (String(d.get("name", "")) if not d.is_empty() else "")})
+	return out
+
+
+# 地理專長 lv≥1: 小地圖顯示全部設施 (唔止傳送點)；UI 讀呢個 gate 小地圖畫法 (spec 01 §8)
+func geo_unlocked() -> bool:
+	var ch := player_ch()
+	return not ch.is_empty() and RulesExpert.geo_unlocked(expert_lv(ch, "dili"))
+
+
 # ================= UI 讀取 / 存檔 =================
 # UI 用嘅單位視圖 (camelCase，同舊 server snapshot 一致)
 func view_ents() -> Array:

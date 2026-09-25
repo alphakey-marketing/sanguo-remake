@@ -12,7 +12,7 @@ var sel_slot := ""            # 裝備頁揀中格: head/body/boots/ring/necklac
 func _init(m: Node) -> void:
 	super(m)
 	title_lbl.text = "角色"
-	set_tabs(["屬性", "裝備", "技能"])
+	set_tabs(["屬性", "裝備", "技能", "專長"])
 
 
 func open() -> void:
@@ -24,7 +24,7 @@ func sig() -> String:
 	var ch: Dictionary = main.ch
 	return JSON.stringify([tab, sel_slot, ch.get("equip", {}), ch.get("workLv", {}), ch.get("tools", {}), pending, ch.get("attrs", {}), ch.get("attrPoints", 0), ch.get("level", 1), ch.get("hp", 0),
 		ch.get("mp", 0), ch.get("sp", 0), ch.get("gold", 0), ch.get("karma", 0), ch.get("lilian", 0), ch.get("title", ""), ch.get("fame", 0), ch.get("ap", 0), ch.get("chaExp", 0),
-		ch.get("titleRank", 0), ch.get("thirst", 0), ch.get("contrib", 0), ch.get("polExp", 0)])
+		ch.get("titleRank", 0), ch.get("thirst", 0), ch.get("contrib", 0), ch.get("polExp", 0), ch.get("expert", {})])
 
 
 func _left() -> int:
@@ -43,6 +43,9 @@ func _build_body() -> void:
 		return
 	if tab == 2:
 		_build_work(ch)
+		return
+	if tab == 3:
+		_build_expert(ch)
 		return
 	var row := HBoxContainer.new()
 	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -225,6 +228,42 @@ func _build_equip(ch: Dictionary) -> void:
 	elif sel_slot.begins_with("j"):
 		var js := int(sel_slot.substr(1))
 		right.add_child(btn("卸下", func() -> void: main._send({"t": "equip_jewel", "item": 0, "slot": js})))
+
+
+# 專長頁 (S01c, spec 01 §8): 12 項專長，等級 1~4 = 藍/綠/紅/紫，顯示上限；天文 lv≥1 + 帶渾天儀顯示各城天氣
+const EXPERT_LV_COLOR := [Color(0.6, 0.6, 0.6), Color(0.4, 0.6, 1.0), Color(0.4, 0.85, 0.4), Color(0.95, 0.35, 0.3), Color(0.75, 0.4, 0.95)]
+
+func _build_expert(ch: Dictionary) -> void:
+	var d = main.data
+	var cls_id := str(ch.get("classId", ""))
+	var sc := scroll()
+	body.add_child(sc)
+	var g := GridContainer.new()
+	g.columns = 3
+	g.add_theme_constant_override("h_separation", 18)
+	g.add_theme_constant_override("v_separation", 4)
+	g.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sc.add_child(g)
+	var exp: Dictionary = ch.get("expert", {})
+	for sk in d.experts.get("skills", {}):
+		var def: Dictionary = d.experts["skills"][sk]
+		var cap: int = RulesExpert.cap_of(d.experts, cls_id, sk)
+		var lv: int = main.sim.expert_lv(ch, sk) if main.sim != null else 0
+		g.add_child(lbl(String(def["name"]), 14))
+		if cap <= 0:
+			g.add_child(lbl("未解鎖", 13, UiTheme.DIM))
+			g.add_child(lbl("", 13))
+		else:
+			g.add_child(lbl("Lv%d / 上限%d" % [lv, cap], 14, EXPERT_LV_COLOR[lv]))
+			g.add_child(lbl("%d/%d exp" % [int(exp.get(sk, 0)), int(d.experts["levelExp"][cap - 1])], 12, UiTheme.DIM))
+	body.add_child(hsep())
+	var weather: Array = main.sim.view_weather() if main.sim != null else []
+	if weather.is_empty():
+		body.add_child(wrap_lbl("天文 lv≥1 + 帶渾天儀（可睇各城天氣/天災情報）", 13, UiTheme.DIM))
+	else:
+		body.add_child(lbl("各城天氣（渾天儀）", 15, UiTheme.GOLD))
+		for w in weather:
+			body.add_child(lbl("%s：%s" % [str(w["name"]), str(w["disaster"]) if str(w["disaster"]) != "" else "平靜"], 13))
 
 
 # 生產技能頁 (Step 12): 初階 6 項 + 進階 5 項 等級/經驗/工具

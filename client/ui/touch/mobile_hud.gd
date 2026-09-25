@@ -425,11 +425,12 @@ func _draw_info() -> void:
 			var gq := org + (Vector2(float(gn.x) - float(md.ox), float(gn.y) - float(md.oy)) + Vector2(0.5, 0.5)) * K
 			if dst.has_point(gq):
 				draw_rect(Rect2(gq - Vector2(1.5, 1.5), Vector2(3, 3)), Color(1.0, 0.8, 0.3))
+		var geo: bool = main.sim.geo_unlocked()      # 地理專長 lv≥1: 全部設施顯示，唔止傳送點 (S01c, spec 01 §8)
 		for f in main.facilities:
-			if String(f.kind) == "travel":
+			if String(f.kind) == "travel" or geo:
 				var tp := org + (Vector2(float(f.x) - float(md.ox), float(f.y) - float(md.oy)) + Vector2(0.5, 0.5)) * K
 				if dst.has_point(tp):
-					draw_circle(tp, 2.5, Color(0.5, 1.0, 0.4))
+					draw_circle(tp, 2.5, Color(0.5, 1.0, 0.4) if String(f.kind) == "travel" else Color(0.6, 0.8, 1.0))
 		draw_circle(org + (Vector2(mx, my) + Vector2(0.5, 0.5)) * K, 2.5, Color(1, 0.9, 0.2))
 		var zv: Dictionary = main.sim.zone_view(int(me.x), int(me.y))
 		var nm := str(zv.get("area", "")) if str(zv.get("area", "")) != "" else str(zv.get("name", ""))
