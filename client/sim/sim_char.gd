@@ -157,6 +157,22 @@ func cmd_select_class(id: int, class_id: String) -> void:
 	_msg(int(ne["id"]), "轉職做「%s」" % cls["name"])
 
 
+# 姓名【原】: 1~8 字，決定後（理念測驗一交）唔可以改
+func cmd_set_name(id: int, name: String) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return
+	var ch: Dictionary = e["ch"]
+	if bool(ch.get("nameLocked", false)):
+		return _msg(id, "姓名已經決定咗，唔可以改")
+	name = name.strip_edges()
+	if name.length() < 1 or name.length() > 8:
+		return _msg(id, "姓名要 1~8 字")
+	ch["name"] = name
+	e["name"] = name
+	_msg(id, "姓名改做「%s」" % name)
+
+
 # 稱號【原】: ≤8 字，隨時可改
 func cmd_set_title(id: int, title: String) -> void:
 	var e := ent(id)
@@ -206,6 +222,7 @@ func cmd_submit_quiz(id: int, answers: Array) -> void:
 		return _msg(id, "答卷唔啱 (要 %d 題)" % (data.quiz as Array).size())
 	var res := RulesQuiz.score(data, answers)
 	ch["ideology"] = str(res["ideology"])
+	ch["nameLocked"] = true
 	ch["quizAnswers"] = []
 	for a in answers:
 		ch["quizAnswers"].append(int(a))
