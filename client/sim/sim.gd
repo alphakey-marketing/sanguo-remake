@@ -88,26 +88,26 @@ func _market_daily(season: int) -> void:
 
 # 入夜: 補夜怪；天光: 夜怪消失
 func _sync_night_spawns() -> void:
-	var night := bool(_clock()["is_night"])
+	if not bool(_clock()["is_night"]):
+		var gone: Array = []
+		for e in ents.values():
+			if e["kind"] == "mob" and data.mob_def(int(e["mob"]["def"])).get("night", false):
+				gone.append(int(e["id"]))
+		_remove_ents(gone)
+		return
+	var have := {}                  # def -> 現有隻數 (數一次，補完再加)
+	for e in ents.values():
+		if e["kind"] == "mob":
+			var k := int(e["mob"]["def"])
+			have[k] = int(have.get(k, 0)) + 1
 	for sp in data.spawns:
 		if not sp.get("night", false):
 			continue
-		if night:
-			var have := 0
-			for e in ents.values():
-				if e["kind"] == "mob" and int(e["mob"]["def"]) == int(sp["monster"]):
-					have += 1
-			for i in int(sp["count"]) - have:
-				if _spawn_mob(int(sp["monster"]), String(sp.get("zone", DEFAULT_ZONE))) == null:
-					break
-		else:
-			for id0 in ents.keys():
-				var e: Dictionary = ents.get(id0, {})
-				if not e.is_empty() and e["kind"] == "mob" and data.mob_def(int(e["mob"]["def"])).get("night", false):
-					ents.erase(id0)
-					for e2 in ents.values():
-						if int(e2["atk_target"]) == int(id0):
-							e2["atk_target"] = 0
+		var def_id := int(sp["monster"])
+		for i in int(sp["count"]) - int(have.get(def_id, 0)):
+			if _spawn_mob(def_id, String(sp.get("zone", DEFAULT_ZONE))) == null:
+				break
+			have[def_id] = int(have.get(def_id, 0)) + 1
 
 
 # 每 tick: 時鐘 -> 日結(天災/市場) -> 夜怪 -> 機械人思考 -> 戰鬥/AI -> 重生 -> 移動 (一格)

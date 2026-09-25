@@ -6,10 +6,6 @@ static func js_round(x: float) -> int:
 	return int(floor(x + 0.5))
 
 
-static func clampf_(x: float, lo: float, hi: float) -> float:
-	return minf(hi, maxf(lo, x))
-
-
 # rng: Callable 回傳 [0,1)；冇傳就用全域隨機
 static func roll(rng: Callable) -> float:
 	if rng.is_null():

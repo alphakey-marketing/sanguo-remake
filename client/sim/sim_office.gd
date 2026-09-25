@@ -6,11 +6,7 @@ extends "res://sim/sim_recruit.gd"
 
 # 企喺邊間官宅隔籬 → facility key ("" = 唔喺)
 func office_near(e: Dictionary) -> String:
-	for k in data.facilities:
-		var f = data.facilities[k]
-		if f is Dictionary and bool(f.get("office", false)) and _near(e, int(f["x"]), int(f["y"])):
-			return String(k)
-	return ""
+	return _fac_near(e, "office")
 
 
 func office_keys() -> Array:

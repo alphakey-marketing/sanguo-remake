@@ -85,14 +85,18 @@ func _think_mob(m: Dictionary) -> void:
 	if RulesSpell.blocks_move(m.get("status", {}), tick):   # 中邪: 遊蕩都要停
 		return
 	# wander: 搵仇恨目標，否則隨機遊蕩
-	if int(d["aggroRange"]) > 0:
+	var aggro := int(d["aggroRange"])
+	if aggro > 0:
 		var best := {}
 		var best_d := 1 << 30
-		for p in ents.values():
-			if not p.has("ch") or int(p["hp"]) <= 0:
+		var mx := int(m["x"])
+		var my := int(m["y"])
+		for pid in _actor_ids_on_map(data.map_index(mx, my)):
+			var p: Dictionary = ents.get(pid, {})
+			if p.is_empty():
 				continue
-			var dist := maxi(absi(int(p["x"]) - int(m["x"])), absi(int(p["y"]) - int(m["y"])))
-			if dist <= int(d["aggroRange"]) and dist < best_d:
+			var dist := maxi(absi(int(p["x"]) - mx), absi(int(p["y"]) - my))
+			if dist <= aggro and dist < best_d and int(p["hp"]) > 0:
 				best = p
 				best_d = dist
 		if not best.is_empty():
@@ -137,10 +141,12 @@ func _think_player(p: Dictionary) -> void:
 	if not mounted_combat:
 		_mount_drop(p, "attack")
 	var w: Dictionary = _mount_weapon_wdef(ch) if mounted_combat else _weapon_def(ch)     # 耐久 0 = 威力減半 (Step 12)
-	p["next_atk"] = tick + RulesCombat.attack_interval(_eff_attr(ch, "agi"))
+	var jb := _jewel_bonus(ch)                 # 每下出手計一次 (唔用 RNG)
+	var ab := _armor_bonus(ch)
+	p["next_atk"] = tick + RulesCombat.attack_interval(_eff_attr(ch, "agi", ab))
 	# 輔助石命中率 % (effect 13) (Step 10, spec 02 §4)
 	var base_hit := RulesCombat.hit_chance(w["hit"], int(ch["level"]), int(t["level"]))
-	var hit := base_hit + float(_jewel_bonus(ch).get("hitPct", 0.0))
+	var hit := base_hit + float(jb.get("hitPct", 0.0))
 	if rng.next() >= hit:
 		_emit({"k": "hit", "src": p["id"], "dst": t["id"], "dmg": 0})     # miss
 		t["mob"]["state"] = "chase"
@@ -149,8 +155,8 @@ func _think_player(p: Dictionary) -> void:
 	var mdef: Dictionary = data.mob_def(int(t["mob"]["def"]))
 	# 聚力/強力/神力 buff: 物攻 ×1.15/1.3/1.5 (spec 02 §7) + 輔助石物攻 % (effect 7)
 	var atk_mult := RulesSpell.atk_mult(ch.get("status", {}), tick)
-	atk_mult = atk_mult * (1.0 + float(_jewel_bonus(ch).get("atkPct", 0.0)))
-	var eff_str := _eff_attr(ch, "str") + float(_jewel_bonus(ch).get("strFlat", 0))
+	atk_mult = atk_mult * (1.0 + float(jb.get("atkPct", 0.0)))
+	var eff_str := _eff_attr(ch, "str", ab) + float(jb.get("strFlat", 0))
 	var elem_mult := _phys_elem_mult(ch, str(mdef.get("element", "none")))
 	var dmg0 := RulesCombat.calc_damage(eff_str, w["power"], mdef["def"], rng_fn, atk_mult, 1.0)
 	var dmg := MathX.js_round(dmg0 * elem_mult)

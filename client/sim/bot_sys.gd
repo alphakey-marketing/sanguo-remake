@@ -19,6 +19,13 @@ static func init_identity(e: Dictionary, rng: SimRng) -> void:
 
 
 static func think(sim) -> void:
+	var mobs_by_map := {}              # 地圖 index -> [mob]，每 tick 分組一次 (次序 = ents 插入次序)
+	for m in sim.ents.values():
+		if m["kind"] == "mob":
+			var k: int = sim.data.map_index(int(m["x"]), int(m["y"]))
+			if not mobs_by_map.has(k):
+				mobs_by_map[k] = []
+			mobs_by_map[k].append(m)
 	for id in sim.state["bots"]:
 		var e: Dictionary = sim.ent(id)
 		if e.is_empty() or not e.has("ch"):
@@ -44,14 +51,13 @@ static func think(sim) -> void:
 		if int(e["atk_target"]) != 0:                  # 戰鬥中
 			continue
 		# 揀附近最近嘅怪 (等級唔好高過自己太多；只揀同一張地圖)
-		var my_map: String = sim.map_id_at(int(e["x"]), int(e["y"]))
 		var best := 0
 		var best_d := 1 << 30
-		for m in sim.ents.values():
-			if m["kind"] != "mob" or int(m["level"]) > int(ch["level"]) + 2 or m["mob"].has("arena"):
+		for m in mobs_by_map.get(sim.data.map_index(int(e["x"]), int(e["y"])), []):
+			if int(m["level"]) > int(ch["level"]) + 2 or m["mob"].has("arena"):
 				continue
 			var d := maxi(absi(int(m["x"]) - int(e["x"])), absi(int(m["y"]) - int(e["y"])))
-			if d > 14 or d >= best_d or sim.map_id_at(int(m["x"]), int(m["y"])) != my_map:
+			if d > 14 or d >= best_d:
 				continue
 			best = int(m["id"])
 			best_d = d

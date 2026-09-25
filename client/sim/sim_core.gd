@@ -58,13 +58,6 @@ func clock_view() -> Dictionary:
 	return {"ke": int(clk["ke"]), "day": int(clk["day"]), "season": season, "is_night": bool(clk["is_night"]),
 		"text": RulesClock.format(int(clk["ke"]), int(clk["day"]), int(data.world["clock"]["seasonDays"]))}
 
-func active_disasters() -> Array:
-	var out: Array = []
-	for d in state["disasters"]:
-		if str(d["city"]) == str(data.world["homeCity"]):
-			out.append({"name": d["name"], "size": d["size"], "endDay": d["endDay"]})
-	return out
-
 # 物品價格因子 (商店用): 每城每 cat 一個 market 狀態；唔喺市場 cat 內 = 1.0
 func market_factor(item_id: int) -> float:
 	var home := str(data.world["homeCity"])
@@ -144,37 +137,67 @@ func _set_dest(e: Dictionary, x: int, y: int, cap: int = PATH_CAP) -> void:
 
 # ---- 安全區 / 戰鬥區 (data/zones.json) ----
 func zone_by_id(zone_id: String) -> Dictionary:
-	for z in data.zones:
-		if String(z["id"]) == zone_id:
-			return z
-	return {}
+	return data.zone_by_id.get(zone_id, {})
 
 
 # 某格所在 zone (UI 用: 渲染顏色/顯示區名)。搵唔到 = {}
 func zone_view(x: int, y: int) -> Dictionary:
-	for z in data.zones:
-		if x >= int(z["x0"]) and x <= int(z["x1"]) and y >= int(z["y0"]) and y <= int(z["y1"]):
-			return {"id": str(z["id"]), "name": str(z.get("name", z["id"])), "area": area_name(x, y)}
-	return {}
+	var i := data.map_index(x, y)
+	if i < 0:
+		return {}
+	var z: Dictionary = data.zones[i]
+	return {"id": str(z["id"]), "name": str(z.get("name", z["id"])), "area": area_name(x, y)}
 
 
 # 邊界內第一個匹配嘅 zone；搵唔到當安全 (例如冇定義嘅角落)
 func is_safe(x: int, y: int) -> bool:
-	for z in data.zones:
-		if x >= int(z["x0"]) and x <= int(z["x1"]) and y >= int(z["y0"]) and y <= int(z["y1"]):
-			return bool(z["safe"])
-	return true
+	var i := data.map_index(x, y)
+	return bool(data.zones[i]["safe"]) if i >= 0 else true
 
 
 func travel_point_by_id(point_id: String) -> Dictionary:
-	for p in data.travel_points:
-		if String(p["id"]) == point_id:
-			return p
-	return {}
+	return data.tp_by_id.get(point_id, {})
 
 
 func ent(id: int) -> Dictionary:
 	return ents.get(id, {})
+
+
+# 有角色 (ch) 嘅單位 id，按所在地圖分組，每 tick 砌一次 (怪物揀仇恨目標用；怪佔大多數，唔使逐隻行晒全部單位)
+# 地圖之間隔 ≥20 格 > 最大 aggroRange，所以只睇同一張地圖夠晒。
+# 次序 = ents 插入次序 (同行 ents.values() 一致 → 決定性)；用嗰陣要再 check 單位仲喺度
+var _actors_tick := -1
+var _actors_by_map: Dictionary = {}
+const _NO_ACTORS: Array = []
+
+func _actor_ids_on_map(map_i: int) -> Array:
+	if _actors_tick != tick:
+		_actors_tick = tick
+		_actors_by_map.clear()
+		for e in ents.values():
+			if e.has("ch"):
+				var k := data.map_index(int(e["x"]), int(e["y"]))
+				if not _actors_by_map.has(k):
+					_actors_by_map[k] = []
+				_actors_by_map[k].append(int(e["id"]))
+	return _actors_by_map.get(map_i, _NO_ACTORS)
+
+
+# 刪單位 + 清走所有人對佢嘅 atk_target
+func _remove_ent(id: int) -> void:
+	_remove_ents([id])
+
+
+func _remove_ents(ids: Array) -> void:
+	if ids.is_empty():
+		return
+	var gone := {}
+	for id in ids:
+		ents.erase(int(id))
+		gone[int(id)] = true
+	for e in ents.values():
+		if gone.has(int(e["atk_target"])):
+			e["atk_target"] = 0
 
 
 func player_ch() -> Dictionary:
@@ -333,8 +356,11 @@ func _armor_bonus(ch: Dictionary) -> Dictionary:
 
 
 # 戰鬥用有效屬性 = 基礎 + 防具加成 (只影響戰鬥，唔改 HP/MP/SP 上限【自訂】)
-func _eff_attr(ch: Dictionary, k: String) -> float:
-	return float(ch["attrs"].get(k, 0)) + float(_armor_bonus(ch).get(k, 0))
+# ab: 已計好嘅 _armor_bonus (同一下出手重用)；{} = 即場計
+func _eff_attr(ch: Dictionary, k: String, ab: Dictionary = {}) -> float:
+	if ab.is_empty():
+		ab = _armor_bonus(ch)
+	return float(ch["attrs"].get(k, 0)) + float(ab.get(k, 0))
 
 
 # 受擊磨損: 每 hitsPerWear 下有傷害 → 身上每件防具耐久 -1 (spec 02 §9)
@@ -443,8 +469,6 @@ func _spawn_actor(ename: String, kind: String, class_id: String = "yishi") -> Di
 	return e
 
 
-
-
 # 新手城地圖 (world.homeCity)
 func _home_map() -> Dictionary:
 	for md in data.maps:
@@ -489,7 +513,6 @@ func _spawn_mob(def_id: int, zone_id: String = DEFAULT_ZONE) -> Variant:
 	e["level"] = int(d["level"])
 	e["mob"] = {"def": def_id, "home_x": p.x, "home_y": p.y, "state": "wander", "target": 0, "next_atk": 0, "zone": zone_id}
 	return e
-
 
 
 # 目擊/傳聞入口 (Step 5.2): actor_id 做咗一件事，附近有記憶表嘅 NPC (bot) 記低 + 調好感
@@ -557,6 +580,15 @@ func _free_near(x: int, y: int) -> Vector2i:
 
 func _near(e: Dictionary, x: int, y: int) -> bool:
 	return RulesCombat.in_range(e["x"], e["y"], x, y, NEAR)
+
+
+# 企喺邊個有 flag (stable/office/donation/repair…) 嘅設施隔籬 → facility key ("" = 唔喺)
+func _fac_near(e: Dictionary, flag: String) -> String:
+	for k in data.facilities:
+		var f = data.facilities[k]
+		if f is Dictionary and bool(f.get(flag, false)) and _near(e, int(f["x"]), int(f["y"])):
+			return String(k)
+	return ""
 
 
 func _full_heal(ch: Dictionary) -> void:

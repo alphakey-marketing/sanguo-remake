@@ -348,8 +348,20 @@ func _goto_tick(e: Dictionary) -> bool:
 	return false
 
 
+# 地圖圖 BFS 結果快取 (傳送點資料固定；唔入存檔)
+var _hops_cache := {}
+var _portal_cache := {}
+
+
 # 兩張地圖之間最少過幾次圖 (BFS；-1 = 去唔到)
 func map_hops(from_map: String, to_map: String) -> int:
+	var key := from_map + ">" + to_map
+	if not _hops_cache.has(key):
+		_hops_cache[key] = _map_hops_bfs(from_map, to_map)
+	return _hops_cache[key]
+
+
+func _map_hops_bfs(from_map: String, to_map: String) -> int:
 	var dist := {from_map: 0}
 	var q: Array = [from_map]
 	while not q.is_empty():
@@ -380,6 +392,13 @@ func nearest_inn(map_id: String) -> Dictionary:
 
 # 由 from_map 去 to_map 嘅第一個傳送點 (BFS，傳送點次序固定 → 決定性)
 func next_portal(from_map: String, to_map: String) -> Dictionary:
+	var key := from_map + ">" + to_map
+	if not _portal_cache.has(key):
+		_portal_cache[key] = _next_portal_bfs(from_map, to_map)
+	return _portal_cache[key]
+
+
+func _next_portal_bfs(from_map: String, to_map: String) -> Dictionary:
 	var first := {from_map: {}}
 	var q: Array = [from_map]
 	while not q.is_empty():

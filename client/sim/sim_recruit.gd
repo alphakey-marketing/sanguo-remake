@@ -258,10 +258,7 @@ func _arena_end(pe: Dictionary, win: bool) -> void:
 	if pend.is_empty() or String(pend.get("kind", "")) != "arena":
 		return
 	var mid := int(pend["mob"])
-	ents.erase(mid)
-	for o in ents.values():
-		if int(o["atk_target"]) == mid:
-			o["atk_target"] = 0
+	_remove_ent(mid)
 	rec.erase("pending")
 	var g: Dictionary = data.general_by_id[int(pend["gid"])]
 	_emit({"k": "arena_end", "dst": int(pe["id"]), "gid": int(g["id"]), "win": win})
@@ -687,10 +684,7 @@ func _companion_leave(c: Dictionary, why: String, sulk: bool) -> void:
 	if not o.is_empty():
 		_rec(o["ch"]).erase("comp")
 	var cid := int(c["id"])
-	ents.erase(cid)
-	for e in ents.values():
-		if int(e["atk_target"]) == cid:
-			e["atk_target"] = 0
+	_remove_ent(cid)
 	_emit({"k": "companion_leave", "dst": owner, "gid": gid, "name": String(c["name"]), "reason": why})
 	_msg(owner, "%s離開咗：%s" % [c["name"], why])
 
@@ -800,8 +794,8 @@ func _jewel_bonus(ch: Dictionary) -> Dictionary:
 
 
 # 同伴屬性: 寶物 (速度 → 敏捷、術攻 → 智力) + 特技 flat (疾風)
-func _eff_attr(ch: Dictionary, k: String) -> float:
-	var v := super(ch, k)
+func _eff_attr(ch: Dictionary, k: String, ab: Dictionary = {}) -> float:
+	var v := super(ch, k, ab)
 	if ch.has("genTreasures"):
 		v += float(RulesGeneral.treasure_bonus(ch["genTreasures"], data.gen2_cfg)["flat"].get(k, 0))
 		v += float(_skill_eff_of(ch).get("flat", {}).get(k, 0))
