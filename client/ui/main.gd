@@ -274,6 +274,15 @@ func _send(d: Dictionary) -> void:
 		"mount_point": sim.cmd_mount_point(my_id, int(d.uid), str(d.attr))
 		"mount_ride": sim.cmd_mount_ride(my_id, bool(d.on))
 		"mount_graze": sim.cmd_mount_graze(my_id)
+		"mount_breed_start": sim.cmd_mount_breed_start(my_id, int(d.uid), str(d.sire))
+		"mount_breed_bet": sim.cmd_mount_breed_bet(my_id, int(d.uid), int(d.choice))
+		"mount_breed_lazy": sim.cmd_mount_breed_lazy(my_id, int(d.uid), bool(d.on))
+		"mount_breed_claim": sim.cmd_mount_breed_claim(my_id, int(d.uid))
+		"mount_take_foal": sim.cmd_mount_take_foal(my_id)
+		"mount_spend_bpt": sim.cmd_mount_spend_bpt(my_id, int(d.uid), str(d.attr))
+		"mount_weapon_buy": sim.cmd_mount_weapon_buy(my_id, str(d.wtype), str(d.wid))
+		"mount_skill_learn": sim.cmd_mount_skill_learn(my_id, str(d.skill))
+		"mount_skill_use": sim.cmd_mount_skill_use(my_id, str(d.skill), int(d.get("target", 0)))
 
 func _log(s: String) -> void:
 	log_lines.append(s)

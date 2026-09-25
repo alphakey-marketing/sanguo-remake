@@ -1,0 +1,36 @@
+{
+  "_note": "馬戰兵器 + 馬戰特技 (Step 17b, spec 07 §7 / spec 02 §10)。騎乘先用得，同一般武器互斥【原】。馬廄「師傅」教特技，最多學 3 招，需擁有對應兵器種類。特技數值【自訂】(spec 02 §10 只列效果文字)：kind 定寫法 = speed(自 buff 移速)/shield(自 buff 全防禦)/block(擋一次)/stun(定身敵人)/aoe(範圍傷害)/combo(單體連擊)/dash(單體爆衝傷害)。",
+  "hit": 55.0,
+  "teachPrice": 3000,
+  "maxSkills": 3,
+  "speedBonusPct": 0.2,
+  "types": {"jian": "劍", "dao": "刀", "qiang": "槍"},
+  "weapons": {
+    "jian": [
+      {"id": "jian1", "name": "破劍", "lv": 10, "atk": 50, "price": 2000},
+      {"id": "jian2", "name": "斷岳劍", "lv": 40, "atk": 150, "price": 9000},
+      {"id": "jian3", "name": "七星劍", "lv": 100, "atk": 300, "price": 20000}
+    ],
+    "dao": [
+      {"id": "dao1", "name": "破刀", "lv": 10, "atk": 50, "price": 2000},
+      {"id": "dao2", "name": "斬風刀", "lv": 40, "atk": 150, "price": 9000},
+      {"id": "dao3", "name": "掩月刀", "lv": 100, "atk": 300, "price": 20000}
+    ],
+    "qiang": [
+      {"id": "qiang1", "name": "破槍", "lv": 10, "atk": 50, "price": 2000},
+      {"id": "qiang2", "name": "裂空槍", "lv": 40, "atk": 150, "price": 9000},
+      {"id": "qiang3", "name": "龍膽槍", "lv": 100, "atk": 300, "price": 20000}
+    ]
+  },
+  "skills": [
+    {"id": "jian_zhongji", "weapon": "jian", "name": "重擊", "kind": "aoe", "range": 3, "mult": 1.3, "sp": 15, "cd": 80},
+    {"id": "jian_jiben", "weapon": "jian", "name": "疾奔", "kind": "speed", "ticks": 2400, "sp": 10, "cd": 600},
+    {"id": "jian_hudun", "weapon": "jian", "name": "護盾", "kind": "shield", "ticks": 40, "sp": 15, "cd": 300},
+    {"id": "dao_baoji", "weapon": "dao", "name": "爆擊", "kind": "dash", "mult": 3.0, "sp": 20, "cd": 150},
+    {"id": "dao_jiyun", "weapon": "dao", "name": "擊暈", "kind": "stun", "ticks": 600, "sp": 15, "cd": 200},
+    {"id": "dao_didang", "weapon": "dao", "name": "抵擋", "kind": "block", "hits": 1, "sp": 10, "cd": 180},
+    {"id": "qiang_saoji", "weapon": "qiang", "name": "掃擊", "kind": "aoe", "range": 5, "mult": 1.2, "sp": 15, "cd": 80},
+    {"id": "qiang_lianji", "weapon": "qiang", "name": "連擊", "kind": "combo", "hits": 3, "mult": 1.0, "sp": 20, "cd": 120},
+    {"id": "qiang_chongci", "weapon": "qiang", "name": "衝刺", "kind": "dash", "mult": 2.0, "sp": 15, "cd": 100}
+  ]
+}

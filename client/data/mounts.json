@@ -62,6 +62,20 @@
     "grow": 40, "growNeed": 100, "levelLife": 2, "hurtLife": 15, "hurtStatus": ["bleed", "fracture", "scared"],
     "loot": [[31001, 30], [31003, 15], [31101, 10], [16001, 10], [19001, 10], [22001, 10], [10002, 8], [61314, 2]]
   },
+  "_noteBreed": "繁衍【原=sy2_4_4/5】：種馬借用（馬廄代勞，免第二玩家）；胎教小遊戲下注 5 選 1，估中得積點(賠率)、胎氣必 +1；100 胎氣接生；懶人胎教 = 放咗 lazyDays 日自動生（積點封頂 lazyBpts）；小馬品種 = 母血機率×damWeight、父血×sireWeight；性別多數母；claimDays 日未去馬廄領走 = 走失",
+  "studPrice": 5000,
+  "breed": {
+    "motiveStart": 50, "motiveCap": 100, "motiveGainLow": 40, "motiveGainHigh": 20, "motiveLowThresh": 50,
+    "betCost": 10,
+    "bets": ["奔跑", "睡眠", "鞭打", "喝水", "訓練"],
+    "betOdds": [2, 3, 4, 5, 6],
+    "taiqiNeed": 100,
+    "lazyDays": 30, "lazyBpts": 50,
+    "damWeight": 2, "sireWeight": 1,
+    "maleChance": 0.2,
+    "claimDays": 90,
+    "advCapBonus": 50
+  },
   "stableStock": [31001, 31002, 31003, 31004, 31005, 31006, 31101, 31102, 31104, 31105, 31109, 31110, 31111, 31112, 31201, 31202, 31203, 31204, 31205, 31206, 31207, 62060],
   "tips": [
     "襁褓期 (頭 30 日) 屬性靠飼養動作升，成年之後定型，淨係放牧成長先加得。",
