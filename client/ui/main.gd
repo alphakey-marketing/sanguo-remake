@@ -51,6 +51,9 @@ var marker := {"pos": Vector2.ZERO, "t": 0.0}   # 點地行路落點標記
 var _ask_seen := ""                # 任務答題對話框已自動彈過 (唔好一直彈)
 var cur_map := {}                  # 玩家而家身處嘅地圖 def (spec 12)
 var _place_key := ""               # 地圖+區名: 變咗就彈區名橫幅
+var ent_by_id := {}                # id -> ents 入面嗰個視圖 (_refresh 砌)
+var ask_now := {}                  # 進行中答題 (_refresh 計，每 tick 一次)
+var _dirty := false                # 發咗意圖/收咗事件: 下幀要 _refresh (唔使等下個 tick)
 
 func _ready() -> void:
 	autotest = "--autotest" in OS.get_cmdline_user_args()
@@ -118,7 +121,11 @@ func _ready() -> void:
 		add_child(load("res://tests/ui_shot.gd").new())
 
 func _refresh() -> void:
+	_dirty = false
 	ents = sim.view_ents()
+	ent_by_id.clear()
+	for e in ents:
+		ent_by_id[int(e.id)] = e
 	ch = sim.player_ch()
 	quest_npcs = sim.view_quest_npcs()
 	generals = sim.view_generals()
@@ -133,8 +140,9 @@ func _refresh() -> void:
 	var cv: Variant = sim.clock_view()
 	clock_str = str(cv["text"])
 	night_on = bool(cv["is_night"])
-	if float(banner["t"]) > 0:
-		banner["t"] = float(banner["t"]) - 0.016
+	ask_now = _calc_active_ask()
+	if hud != null:
+		hud.sim_refreshed()
 
 # 鏡頭限喺當前地圖入面；地圖細過畫面就置中 (spec 12 §6)
 func _clamp_cam(c: Vector2) -> Vector2:
@@ -167,6 +175,7 @@ func _check_place(me: Dictionary) -> void:
 func _process(delta: float) -> void:
 	if autotest:
 		for i in AUTOTEST_STEPS: sim.step()
+		_dirty = true
 	else:
 		acc += delta
 		while acc >= TICK:
@@ -174,7 +183,11 @@ func _process(delta: float) -> void:
 			sim.step()
 			_steer_tick()
 			_auto_tick()
-	_refresh()
+			_refresh()                  # 視圖跟 sim tick (10Hz) 更新，唔使每幀砌
+	if _dirty:
+		_refresh()
+	if float(banner["t"]) > 0:
+		banner["t"] = float(banner["t"]) - delta
 	if not autotest:
 		_ui_tick(delta)
 	t0 += delta
@@ -199,6 +212,7 @@ func _process(delta: float) -> void:
 
 # 舊 ws 訊息格式 → sim 意圖
 func _send(d: Dictionary) -> void:
+	_dirty = true
 	match d.t:
 		"move": sim.cmd_move(my_id, int(d.x), int(d.y))
 		"attack": sim.cmd_attack(my_id, int(d.target))
@@ -304,6 +318,7 @@ func _exp_total() -> int:
 	return t + int(ch.get("exp", 0))
 
 func _on_event(e: Dictionary) -> void:
+	_dirty = true
 	match e.k:
 		"chat":
 			_log("%s: %s" % [e.name, e.text])
@@ -525,8 +540,6 @@ func _buy_price(id: int) -> int:
 func _sell_price(id: int) -> int:
 	return RulesMarket.sell_price(item_prices.get(id, 0), sim.market_factor(id))
 
-
-
 func _me():
 	return _ent(my_id)
 
@@ -605,8 +618,8 @@ func _ui_tick(delta: float) -> void:
 			var it := pending
 			pending = {}
 			ContextActions.run(self, it)
-	var ask := _active_ask()
-	var key := JSON.stringify(ask)
+	var ask := ask_now
+	var key := "%s:%d" % [ask.get("q", ""), int(ask.get("stage", 0))]
 	if not ask.is_empty() and key != _ask_seen and not hud.any_panel_open():
 		_ask_seen = key
 		ContextActions.run(self, {"kind": "ask"})
@@ -646,19 +659,29 @@ func _on_skill(sl: Dictionary) -> void:
 		return
 	_send({"t": "use_ultimate", "ult": String(sl["ult"])})
 
-func class_has_spells() -> bool:
+var _class_caps := {}               # classId -> {spells, ults} (HUD 每幀問，按職業快取)
+
+func _class_cap(k: String) -> bool:
 	var cid := str(ch.get("classId", ""))
-	for sp in data.spells:
-		if (sp["classes"] as Array).has(cid):
-			return true
-	return false
+	if not _class_caps.has(cid):
+		var sp_ok := false
+		for sp in data.spells:
+			if (sp["classes"] as Array).has(cid):
+				sp_ok = true
+				break
+		var ult_ok := false
+		for u in data.ultimates:
+			if str(u["class"]) == cid:
+				ult_ok = true
+				break
+		_class_caps[cid] = {"spells": sp_ok, "ults": ult_ok}
+	return bool(_class_caps[cid][k])
+
+func class_has_spells() -> bool:
+	return _class_cap("spells")
 
 func class_has_ults() -> bool:
-	var cid := str(ch.get("classId", ""))
-	for u in data.ultimates:
-		if str(u["class"]) == cid:
-			return true
-	return false
+	return _class_cap("ults")
 
 # Android 返回鍵: 有面板就關面板（唔會一撳就退出遊戲）
 func _notification(what: int) -> void:
@@ -737,7 +760,7 @@ func _auto_tick() -> void:
 	if me == null:
 		return
 	var t = target_ent()
-	var near = _nearest_mob_safe(me)
+	var near = _pick_mob(me, true)
 	if t != null and t.get("mob", false):
 		# 貼身 / 打緊我 → 繼續打；否則有更近嘅就轉 (例如目標逃走咗)
 		if _mob_dist(me, t) <= 1 or int(t.get("aggro", 0)) == int(me.id):
@@ -750,9 +773,6 @@ func _auto_tick() -> void:
 		return
 	if int(sim.tick) % 60 == 0:
 		_go_field()
-
-func _nearest_mob_safe(me: Dictionary):
-	return _pick_mob(me, true)
 
 # 揀怪: 只揀同自己同一 zone (洞窟各層座標同野外相鄰，唔可以隔層鎖)；
 # 打緊我嘅怪優先 (唔理等級)；其次最近 (Chebyshev = 實際步數，同距離再比 Manhattan)
@@ -781,9 +801,7 @@ func _mob_dist(a: Dictionary, b: Dictionary) -> int:
 	return maxi(absi(int(a.x) - int(b.x)), absi(int(a.y) - int(b.y)))
 
 func _ent(id: int):
-	for e in ents:
-		if int(e.id) == id: return e
-	return null
+	return ent_by_id.get(id)
 
 func _ent_at(g: Vector2):
 	for e in ents:
@@ -942,11 +960,6 @@ func _draw() -> void:
 		draw_arc(mc, 4.0 + 10.0 * k, 0, TAU, 24, Color(1, 0.9, 0.4, k), 2.0)
 	_draw_banner(vs)
 
-
-
-# 時辰/日/季節 (右上) + 夜晚示意
-
-
 # 座騎佔位圖 (色塊 = 品種顏色；成品前換 sprite)
 func _draw_my_mount(p: Vector2) -> void:
 	for m in ch.get("mounts", []):
@@ -1016,6 +1029,10 @@ func _draw_banner(vs: Vector2) -> void:
 
 # ===== 任務答題 (ask stage, Step 10 絕招任務) =====
 func _active_ask() -> Dictionary:
+	return ask_now
+
+
+func _calc_active_ask() -> Dictionary:
 	if ch.is_empty():
 		return {}
 	for q in data.quests:
@@ -1026,21 +1043,10 @@ func _active_ask() -> Dictionary:
 			continue
 		var stage := RulesQuest.stage_of(ch, q)
 		if not stage.is_empty() and String(stage.get("type", "")) == "ask":
-			return {"q": str(q["id"]), "dialog": stage.get("dialog", []), "options": stage.get("options", [])}
+			return {"q": str(q["id"]), "stage": int(st.get("stage", 0)), "dialog": stage.get("dialog", []), "options": stage.get("options", [])}
 	return {}
-
-
-
-
-
-
-
-
-# 記事面板 (Step 8, spec 06 §1.2): 進行中任務 + 提示；完成記錄
 
 
 # 建角面板完成（mobile_hud)_on_create_done 用
 func _on_create_done() -> void:
 	_log("建角完成，出發！")
-
-# 升級點數 / 理念 / 生日 / 稱號 狀態列 (Step 7.5 debug UI)
