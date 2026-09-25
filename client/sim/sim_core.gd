@@ -1,6 +1,6 @@
 extends RefCounted
 # Sim 繼承鏈 第 1 層: 核心狀態 / 讀取 / 共用 helper / 生成單位
-# 鏈: sim_core -> sim_quest -> sim_char -> sim_econ -> sim_combat -> sim_skill -> sim_ai -> sim_recruit -> sim_office -> sim_comm -> sim_station -> sim_mount -> sim (class_name Sim)
+# 鏈: sim_core -> sim_quest -> sim_char -> sim_econ -> sim_battle -> sim_combat -> sim_skill -> sim_ai -> sim_recruit -> sim_office -> sim_comm -> sim_station -> sim_mount -> sim (class_name Sim)
 # 規矩: 每層只可以叫自己或者下層嘅 func (上層 func 下層睇唔到)
 
 signal event_emitted(ev: Dictionary)

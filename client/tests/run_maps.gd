@@ -350,6 +350,8 @@ func t_b2_links(data: GameData) -> void:
 			bad.append(p["id"])
 	check(bad.is_empty(), "傳送點全部成對 (%s)" % [bad])
 	for md in data.maps:
+		if bool(md.get("instance", false)):
+			continue     # 戰役等實例場景 (Step 19): 冇門連去，靠 sim 直接傳送
 		check(sim.map_hops("xuchang", String(md["id"])) >= 0, "由許昌去得 %s" % md["id"])
 	for n in data.world_map["nodes"]:
 		if n.get("map") != null:

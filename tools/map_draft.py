@@ -851,10 +851,28 @@ B25 = {"chenliu": chenliu, "yudu": yudu, "xiaopei": xiaopei, "runan_city": runan
        "hanshui": hanshui, "xiangyang": xiangyang, "xy_prison": xy_prison, "changsha": changsha}
 
 
+# ---------------- 戰役 (spec 06 §7): 張牛角戰役 4 層 24×16 小場地 (單機教學版，即場傳送唔行門) ----------------
+def battle_floor(n):
+    w, h = 24, 16
+    c = Canvas(w, h, "_")
+    c.ring(0, 0, w - 1, h - 1, "^")
+    rng = random.Random(9000 + n)
+    c.scatter(2, 2, w - 3, h - 3, "^", 0.05, rng, only="_")
+    c.seal_unreachable((2, 2), "^")
+    c.save("zhangniujiao_f%d" % n)
+
+
+BATTLE_ZNJ = {"zhangniujiao_f%d" % i: (lambda i=i: battle_floor(i)) for i in range(1, 5)}
+
+
 if __name__ == "__main__":
     if "--force" not in sys.argv:
-        sys.exit("會覆蓋 data/maps/*.txt，確定就加 --force (--b2 = 只起 B2 五張；--b25 = 只起 B2.5 十三張；--b3 = 只起隆中/草廬)")
+        sys.exit("會覆蓋 data/maps/*.txt，確定就加 --force (--b2 = 只起 B2 五張；--b25 = 只起 B2.5 十三張；--b3 = 只起隆中/草廬；--battle = 只起張牛角戰役 4 層)")
     os.makedirs(OUT, exist_ok=True)
+    if "--battle" in sys.argv:
+        for fn in BATTLE_ZNJ.values():
+            fn()
+        sys.exit(0)
     if "--b3" in sys.argv:
         for fn in B3.values():
             fn()

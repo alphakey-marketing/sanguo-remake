@@ -92,6 +92,8 @@ static func run(main: Node, act: Dictionary) -> void:
 				hud.open_dialog(func() -> Dictionary: return comm_dialog(main, nid))
 			elif String(qn.get("svc", "")) == "book":  # 許昌老丈: 收集冊
 				hud.open_dialog(func() -> Dictionary: return book_npc_dialog(main))
+			elif bool(qn.get("battle", false)):        # 義勇士兵: 戰役報名 (Step 19)
+				hud.open_dialog(func() -> Dictionary: return battle_dialog(main))
 			else:
 				main._send({"t": "quest_talk", "npc": String(qn.id)})
 		"shop":
@@ -395,3 +397,22 @@ static func forge_dialog(main: Node, def: Dictionary) -> Dictionary:
 	return {"title": "融合中", "text": "%s → %s\n指針入金色窗口就撳「敲！」" % [jd.get("name", "?"), main.item_names.get(int(fs["weapon"]), "?")],
 		"qte": func() -> float: return RulesJewel.fusion_pos(main.sim.tick - start),
 		"options": [{"label": "敲！", "cb": func() -> void: main._send({"t": "fusion_hit"})}]}
+
+
+# 義勇士兵: 戰役報名 (Step 19，spec 06 §7)
+static func battle_dialog(main: Node) -> Dictionary:
+	var v: Dictionary = main.sim.battle_view(main.my_id)
+	var lines: Array = []
+	var opts: Array = []
+	if bool(v.get("inBattle", false)):
+		lines.append("進行中：%s　第 %d/%d 層" % [str(v.get("battleName", "")), int(v.get("floor", 0)), int(v.get("totalFloors", 0))])
+		opts.append({"label": "放棄戰役", "cb": func() -> void: main._send({"t": "battle_leave"}); main.hud.close_panels()})
+	elif String(v.get("open", "")).is_empty():
+		lines.append("而家冇戰役開放，聽日再嚟。")
+	else:
+		lines.append("開放中：%s（武等 ≤%d）" % [str(v.get("name", "")), int(v.get("maxLevel", 0))])
+		if not bool(v.get("playable", false)):
+			lines.append("（原型只做張牛角戰役，其餘場次未開放）")
+		opts.append({"label": "報名參戰", "cb": func() -> void: main._send({"t": "battle_enter"}); main.hud.close_panels()})
+	opts.append(_leave(main))
+	return {"title": "義勇士兵", "text": "\n".join(lines), "options": opts}

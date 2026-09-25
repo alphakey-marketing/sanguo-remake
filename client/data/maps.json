@@ -1,5 +1,5 @@
 {
- "_note": "地圖世界 (spec 12)【自訂】。每張地圖 = data/maps/<id>.txt (一字元一格)，放喺全域格仔 (ox,oy)；地圖之間留空 = 行唔到。其他數據檔寫 map + 地圖內座標，GameData 載入時轉全域。legend.walk = 行得。areas = 地圖內命名區 (HUD 區名橫幅)。landmarks = 史蹟地標 (第一次行近彈典故)。world = 大地圖 (天下) 節點，map=null = 未開放。kind: city/field/cave/house (house = 室內，parent = 所屬城池地圖，大地圖當嗰個城)。 portal.gate (Step 16): window = 時辰窗口先入得 / item = 身上要有道具先入得 / msg = 入唔到嘅提示。",
+ "_note": "地圖世界 (spec 12)【自訂】。每張地圖 = data/maps/<id>.txt (一字元一格)，放喺全域格仔 (ox,oy)；地圖之間留空 = 行唔到。其他數據檔寫 map + 地圖內座標，GameData 載入時轉全域。legend.walk = 行得。areas = 地圖內命名區 (HUD 區名橫幅)。landmarks = 史蹟地標 (第一次行近彈典故)。world = 大地圖 (天下) 節點，map=null = 未開放。kind: city/field/cave/house (house = 室內，parent = 所屬城池地圖，大地圖當嗰個城)。 portal.gate (Step 16): window = 時辰窗口先入得 / item = 身上要有道具先入得 / msg = 入唔到嘅提示。 instance=true (Step 19): 戰役等單機教學實例場景，冇門連去，靠 sim 直接傳送入/出，唔計入「由許昌去得」嘅連通檢查。",
  "legend": {
   ".": {
    "name": "草地",
@@ -728,6 +728,42 @@
    "kind": "house",
    "parent": "longzhong",
    "areas": []
+  },
+  {
+   "id": "zhangniujiao_f1",
+   "name": "張牛角戰役 1F",
+   "ox": 320,
+   "oy": 196,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "zhangniujiao_f2",
+   "name": "張牛角戰役 2F",
+   "ox": 364,
+   "oy": 196,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "zhangniujiao_f3",
+   "name": "張牛角戰役 3F",
+   "ox": 408,
+   "oy": 196,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "zhangniujiao_f4",
+   "name": "張牛角戰役 4F",
+   "ox": 452,
+   "oy": 196,
+   "safe": false,
+   "kind": "field",
+   "instance": true
   }
  ],
  "landmarks": [

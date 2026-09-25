@@ -230,6 +230,8 @@ func _send(d: Dictionary) -> void:
 		"office_abandon": sim.cmd_office_abandon(my_id)
 		"office_pill": sim.cmd_office_pill(my_id)
 		"tea": sim.cmd_tea(my_id)
+		"battle_enter": sim.cmd_battle_enter(my_id)
+		"battle_leave": sim.cmd_battle_leave(my_id)
 		"donate_gold": sim.cmd_donate_gold(my_id, int(d.amount))
 		"donate_items": sim.cmd_donate_items(my_id, d.items)
 		"use_item": sim.cmd_use_item(my_id, int(d.item))

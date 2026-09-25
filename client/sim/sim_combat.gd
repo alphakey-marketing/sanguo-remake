@@ -1,5 +1,5 @@
-extends "res://sim/sim_econ.gd"
-# Sim 繼承鏈 第 5 層: 傷害 / 死亡 / 掉落 / 重生排期
+extends "res://sim/sim_battle.gd"
+# Sim 繼承鏈 第 6 層: 傷害 / 死亡 / 掉落 / 重生排期
 
 # ================= 戰鬥 =================
 func damage(t: Dictionary, dmg: int, by: Dictionary) -> void:
@@ -57,11 +57,13 @@ func _kill_mob(m: Dictionary, by: Dictionary, exp_mult: float = 1.0) -> void:
 			if int(e["atk_target"]) == int(m["id"]):
 				e["atk_target"] = 0
 		return
+	var battle_id := str(m.get("mob", {}).get("battle_id", ""))   # 戰役 boss (Step 19): 掉落照常，但唔重生 + 打完自動過層
 	if by.has("ch"):
 		var w := BotSys.W_SEE_KILL if RulesKarma.tier(int(by["ch"]["karma"])) < 5 else -BotSys.W_SEE_KILL
 		_witness_nearby(m, int(by["id"]), "see_kill", w)
 	ents.erase(m["id"])
-	_schedule_respawn(m, d)
+	if battle_id == "":
+		_schedule_respawn(m, d)
 	for e in ents.values():
 		if int(e["atk_target"]) == int(m["id"]):
 			e["atk_target"] = 0
@@ -90,6 +92,8 @@ func _kill_mob(m: Dictionary, by: Dictionary, exp_mult: float = 1.0) -> void:
 	_sync_stats(by)
 	_emit({"k": "kill", "src": by["id"], "dst": m["id"], "exp": int(d["exp"]), "gold": gold, "items": items,
 		"lvUp": int(ch["level"]) if ups > 0 else 0})
+	if battle_id != "":
+		_battle_on_boss_kill(by, battle_id, int(m["mob"].get("battle_floor", 0)))
 
 
 # 重生排期: 普通怪定時重生，boss 每日一次【自訂】(spec 04 §3)。zone 用 mob spawn 嗰層，免得同 def 多層混亂
@@ -108,17 +112,22 @@ func _schedule_respawn(m: Dictionary, d: Dictionary) -> void:
 
 func _kill_player(p: Dictionary) -> void:
 	var ch: Dictionary = p["ch"]
-	ch["exp"] = maxi(0, int(ch["exp"]) - RulesCombat.death_exp_loss(int(ch["karma"]), RulesStats.exp_to_next(int(ch["level"]))))
-	# 身上裝備唔會跌【自訂】: 只喺「未裝備」嘅件數入面擲
-	var loose: Array = []
-	for b in ch["bag"]:
-		var free := int(b["n"]) - _equipped_n(ch, int(b["id"]))
-		if free > 0:
-			loose.append({"id": int(b["id"]), "n": free})
-	var lost := RulesCombat.roll_death_drop(int(ch["karma"]), loose, rng_fn)
-	if lost > 0:
-		RulesShop.remove_item(ch["bag"], lost, 1)
-		_cleanup_dur(ch)
+	var bt: Dictionary = p.get("battle", {})
+	# 戰役內陣亡唔跌經驗/物品【原 sy3_8】(除非個別場 dropOnDeath=true, Step 19)
+	var skip_drop := not bt.is_empty() and not RulesBattle.drop_on_death(RulesBattle.find(data.battles, String(bt.get("id", ""))))
+	var lost := 0
+	if not skip_drop:
+		ch["exp"] = maxi(0, int(ch["exp"]) - RulesCombat.death_exp_loss(int(ch["karma"]), RulesStats.exp_to_next(int(ch["level"]))))
+		# 身上裝備唔會跌【自訂】: 只喺「未裝備」嘅件數入面擲
+		var loose: Array = []
+		for b in ch["bag"]:
+			var free := int(b["n"]) - _equipped_n(ch, int(b["id"]))
+			if free > 0:
+				loose.append({"id": int(b["id"]), "n": free})
+		lost = RulesCombat.roll_death_drop(int(ch["karma"]), loose, rng_fn)
+		if lost > 0:
+			RulesShop.remove_item(ch["bag"], lost, 1)
+			_cleanup_dur(ch)
 	_wear_armor_death(ch)           # 死亡每件防具扣 10% 耐久 (spec 03 §4.3)
 	_cleanup_fused(ch)              # 跌走咗武器 → 清除融合記錄
 	_full_heal(ch)
@@ -126,11 +135,14 @@ func _kill_player(p: Dictionary) -> void:
 	p.erase("casting")
 	ch.erase("fusing")
 	_mount_drop(p, "die")           # 死亡落馬 (Step 17a)
-	var inn := nearest_inn(map_id_at(int(p["x"]), int(p["y"])))    # 返最近客棧 (過圖次數最少) (Step 11.7)
-	p["x"] = int(inn["x"])
-	p["tx"] = int(inn["x"])
-	p["y"] = int(inn["y"])
-	p["ty"] = int(inn["y"])
+	if bt.is_empty():
+		var inn := nearest_inn(map_id_at(int(p["x"]), int(p["y"])))    # 返最近客棧 (過圖次數最少) (Step 11.7)
+		p["x"] = int(inn["x"])
+		p["tx"] = int(inn["x"])
+		p["y"] = int(inn["y"])
+		p["ty"] = int(inn["y"])
+	else:
+		_battle_exit(p, "died")     # 戰役內死亡: 傳送返報名點 + 清晒呢場遺留 boss (Step 19)
 	p.erase("path")
 	p.erase("goto")
 	p["atk_target"] = 0

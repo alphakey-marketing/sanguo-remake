@@ -226,7 +226,8 @@ func view_quest_npcs() -> Array:
 		if bool(qv.get("visible", false)):
 			out.append({"id": n["id"], "name": n["name"], "x": n["x"], "y": n["y"], "desc": n.get("desc", ""),
 				"service": (n.get("service", {}) as Dictionary).size() > 0,
-				"svc": String(n.get("service", {}).get("kind", "")), "comm": bool(n.get("commission", false))})
+				"svc": String(n.get("service", {}).get("kind", "")), "comm": bool(n.get("commission", false)),
+				"battle": bool(n.get("battle", false))})
 	return out
 
 
