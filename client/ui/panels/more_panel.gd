@@ -7,6 +7,8 @@ const DEBUG_ACTIONS := [
 	{"action": "use", "label": "試食(測試)"},
 	{"action": "work_mining", "label": "採礦(測試)"},
 	{"action": "work_lv", "label": "生產+10級(測試)"},
+	{"action": "learn_ults", "label": "學分階絕招(測試)"},
+	{"action": "learn_skill", "label": "學特技(測試)"},
 ]
 
 

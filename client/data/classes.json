@@ -4,7 +4,7 @@
     { "id": "yishi",  "name": "義士", "gender": "M", "enabled": true,  "attackRange": "melee",       "spell": null,          "weapons": ["刀", "錘", "槍矛"], "skill": "融合", "tier2": {"name": "武士", "weapons": ["刀", "錘", "槍矛"], "inherit": true}, "tier3": {"name": "猛將", "weapons": ["刀", "錘", "槍矛"], "inherit": true},
       "base":   { "str": 12, "agi": 8, "int": 4, "spi": 4, "pol": 6, "cha": 6 },
       "growth": { "str": 2,  "agi": 1, "int": 1, "spi": 1 } },
-    { "id": "shinu",  "name": "仕女", "gender": "F", "enabled": false, "attackRange": "melee",       "spell": null,          "weapons": ["劍", "爪", "環"],   "skill": "開鎖", "tier2": {"name": "俠女", "weapons": ["劍", "爪", "環"], "inherit": true}, "tier3": {"name": "女將", "weapons": ["劍", "爪", "環"], "inherit": true},
+    { "id": "shinu",  "name": "仕女", "gender": "F", "enabled": true,  "attackRange": "melee",       "spell": null,          "weapons": ["劍", "爪", "環"],   "skill": "開鎖", "tier2": {"name": "俠女", "weapons": ["劍", "爪", "環"], "inherit": true}, "tier3": {"name": "女將", "weapons": ["劍", "爪", "環"], "inherit": true},
       "base":   { "str": 10, "agi": 10, "int": 4, "spi": 4, "pol": 6, "cha": 8 },
       "growth": { "str": 2,  "agi": 1, "int": 1, "spi": 1 } },
     { "id": "daoshi", "name": "道士", "gender": "M", "enabled": true, "attackRange": "melee_mid",   "spell": "destructive", "weapons": ["幡", "拂塵", "符咒"], "skill": "超渡", "tier2": {"name": "仙君", "weapons": ["幡", "拂塵", "符咒"], "inherit": true}, "tier3": {"name": "聖君", "weapons": ["幡", "拂塵", "符咒"], "inherit": true},
@@ -22,6 +22,7 @@
   ],
   "starter": {
     "yishi": { "weapon": 10001, "boots": 22001, "items": [{ "id": 65210, "n": 5 }], "gold": 100 },
-    "daoshi": { "weapon": 14001, "boots": 22001, "items": [{ "id": 65210, "n": 5 }, { "id": 30513, "n": 1 }], "gold": 100 }
+    "daoshi": { "weapon": 14001, "boots": 22001, "items": [{ "id": 65210, "n": 5 }, { "id": 30513, "n": 1 }], "gold": 100 },
+    "shinu": { "weapon": 11001, "boots": 22001, "items": [{ "id": 65210, "n": 5 }], "gold": 100 }
   }
 }

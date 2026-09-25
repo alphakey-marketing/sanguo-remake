@@ -96,6 +96,7 @@ func _panel(name_: String) -> GamePanel:
 			"recruit": p = RecruitPanel.new(main)
 			"mount": p = MountPanel.new(main)
 			"create": p = CreatePanel.new(main)
+			"unlock": p = UnlockPanel.new(main)
 			_: p = DialogPanel.new(main)
 		add_child(p)
 		panels[name_] = p
@@ -275,7 +276,7 @@ func skill_slots() -> Array:
 	return _slots_cache
 
 
-# 技能扇形內容: 術書 3 格（職業用得術法先有）+ 絕招 1 格（職業有絕招先有）
+# 技能扇形內容: 術書 3 格（職業用得術法先有）+ 絕招逐招一格（已學嘅全部）+ 職業特技 1 格（學咗先有）
 func _calc_skill_slots() -> Array:
 	var out: Array = []
 	if main == null or main.ch.is_empty():
@@ -299,12 +300,18 @@ func _calc_skill_slots() -> Array:
 		if ults.is_empty():
 			out.append({"kind": "ult", "ult": "", "label": "絕", "sub": "未學", "ready": false, "cd": 0.0, "casting": false})
 		else:
-			var uid := str(ults[ults.size() - 1])
-			var u: Dictionary = d.ult_by_id.get(uid, {})
-			var left := int(ch.get("ultCd", {}).get(uid, 0)) - tick
-			var ready := left <= 0 and int(ch["mp"]) >= int(u.get("mp", 0)) and int(ch["sp"]) >= int(u.get("sp", 0))
-			out.append({"kind": "ult", "ult": uid, "label": str(u.get("name", "絕")).substr(0, 2), "sub": "絕招",
-				"ready": ready, "cd": clampf(float(left) / maxf(1.0, float(u.get("cd", 1))), 0.0, 1.0), "casting": false})
+			for uidk in ults:                  # S02c: 已學絕招逐招一格（義士三招 = 絕招 3 格，唔只最後一招）
+				var uid := str(uidk)
+				var u: Dictionary = d.ult_by_id.get(uid, {})
+				var left := int(ch.get("ultCd", {}).get(uid, 0)) - tick
+				var ready := left <= 0 and int(ch["mp"]) >= int(u.get("mp", 0)) and int(ch["sp"]) >= int(u.get("sp", 0))
+				out.append({"kind": "ult", "ult": uid, "label": str(u.get("name", "絕")).substr(0, 2), "sub": "絕招",
+					"ready": ready, "cd": clampf(float(left) / maxf(1.0, float(u.get("cd", 1))), 0.0, 1.0), "casting": false})
+	var sk := str(ch.get("classSkill", ""))
+	if sk != "":                                # S02c: 職業特技掣（學咗先有；而家 = 開鎖）
+		var sd: Dictionary = d.class_skills.get(sk, {})
+		out.append({"kind": "skill", "skill": sk, "label": str(sd.get("name", "技")).substr(0, 2), "sub": "特技",
+			"ready": bool(RulesClassSkill.can_use(d, ch, sk).get("ok", false)), "cd": 0.0, "casting": false})
 	return out.slice(0, HudLayout.skill_cap(int(ch["level"])))
 
 # ================= 繪畫 =================

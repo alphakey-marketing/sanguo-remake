@@ -6,6 +6,9 @@
     { "id": "libashan", "name": "力拔山河", "class": "yishi", "tier": 3, "mult": 3.0, "range": 3, "mp": 25, "sp": 40, "cd": 420, "weaponCat": 3, "quest": "ult_libashan" },
     { "id": "fengyi",   "name": "鳳翼天翔", "class": "yishi", "tier": 4, "mult": 3.5, "range": 3, "mp": 30, "sp": 50, "cd": 480, "weaponCat": 3, "quest": "ult_fengyi",   "reqTier": 1, "reqLevel": 50 },
     { "id": "qingtian", "name": "擎天一擊", "class": "yishi", "tier": 5, "mult": 4.0, "range": 4, "mp": 45, "sp": 65, "cd": 540, "weaponCat": 3, "quest": "ult_qingtian", "reqTier": 2, "reqLevel": 100 },
-    { "id": "xuanbing", "name": "玄冰麒麟", "class": "yishi", "tier": 6, "mult": 4.5, "range": 4, "mp": 50, "sp": 65, "cd": 600, "weaponCat": 3, "quest": "ult_xuanbing", "reqTier": 2, "reqLevel": 100, "sfxStatus": "freeze", "sfxTicks": 300 }
+    { "id": "xuanbing", "name": "玄冰麒麟", "class": "yishi", "tier": 6, "mult": 4.5, "range": 4, "mp": 50, "sp": 65, "cd": 600, "weaponCat": 3, "quest": "ult_xuanbing", "reqTier": 2, "reqLevel": 100, "sfxStatus": "freeze", "sfxTicks": 300 },
+    { "id": "huxiao", "name": "虎嘯龍吟", "class": "shinu", "tier": 1, "mult": 2.0, "range": 2, "mp": 15, "sp": 20, "cd": 300, "weaponCat": 6, "quest": "" },
+    { "id": "jinhu", "name": "金環裂地", "class": "shinu", "tier": 2, "mult": 2.5, "range": 2, "mp": 20, "sp": 30, "cd": 360, "weaponCat": 6, "quest": "" },
+    { "id": "jinghua", "name": "鏡花水月", "class": "shinu", "tier": 3, "mult": 3.0, "range": 3, "mp": 25, "sp": 40, "cd": 420, "weaponCat": 6, "quest": "" }
   ]
 }

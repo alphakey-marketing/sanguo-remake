@@ -72,6 +72,8 @@ static func create_character(data: GameData, char_name: String, class_id: String
 		"ideology": "", "quizAnswers": [], "attrPoints": 0, "raised": {},
 		# Step 8 任務欄位 (spec 06 §1.2): 進行中 questId -> {stage, startDay, flags}；完成記錄
 		"quests": {}, "questDone": {},
+		# S02c 職業特技 (spec 02 §6): 學到 = ch.classSkill = skill id（單一格；未學 = ""）
+		"classSkill": "",
 	}
 
 

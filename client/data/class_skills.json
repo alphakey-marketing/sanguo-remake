@@ -1,0 +1,13 @@
+{
+  "_note": "職業特技 (spec 02 §6)【自訂】單機化: 義士「融合」內建喺 sim_skill.gd (Step 10)；呢檔做其餘五職 (S02c 起)。learn 方式: 導師 NPC 任務 (quest 欄) 學到 -> ch.classSkill (單一格, 未學 = \"\")。開鎖效果（任務寶箱/門）要 S04 寶箱實體 / S06 任務寶箱先接到，記 PLAN §4。",
+  "skills": [
+    {
+      "id": "unlock",
+      "name": "開鎖",
+      "class": "shinu",
+      "lv": 5,
+      "quest": "skill_unlock_shinu",
+      "desc": "揀真鑰匙開任務寶箱/門（小遊戲：三支揀一支）"
+    }
+  ]
+}
