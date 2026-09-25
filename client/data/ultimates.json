@@ -12,6 +12,9 @@
     { "id": "jinghua", "name": "鏡花水月", "class": "shinu", "tier": 3, "mult": 3.0, "range": 3, "mp": 25, "sp": 40, "cd": 420, "weaponCat": 6, "quest": "" },
     { "id": "xuwu",    "name": "虛無飄渺", "class": "daoshi", "tier": 1, "mult": 2.0, "range": 2, "mp": 15, "sp": 20, "cd": 300, "weaponCat": 15, "quest": "" },
     { "id": "ruhuan",  "name": "如幻似真", "class": "daoshi", "tier": 2, "mult": 2.5, "range": 2, "mp": 20, "sp": 30, "cd": 360, "weaponCat": 15, "quest": "" },
-    { "id": "shenyou", "name": "神遊太虛", "class": "daoshi", "tier": 3, "mult": 3.0, "range": 3, "mp": 25, "sp": 40, "cd": 420, "weaponCat": 15, "quest": "" }
+    { "id": "shenyou", "name": "神遊太虛", "class": "daoshi", "tier": 3, "mult": 3.0, "range": 3, "mp": 25, "sp": 40, "cd": 420, "weaponCat": 15, "quest": "" },
+    { "id": "candeng", "name": "殘燈映紅", "class": "wunu", "tier": 1, "mult": 2.0, "range": 2, "mp": 15, "sp": 20, "cd": 300, "weaponCat": 12, "quest": "" },
+    { "id": "danchan", "name": "膽顫心驚", "class": "wunu", "tier": 2, "mult": 2.5, "range": 2, "mp": 20, "sp": 30, "cd": 360, "weaponCat": 12, "quest": "" },
+    { "id": "guiku",   "name": "鬼哭神號", "class": "wunu", "tier": 3, "mult": 3.0, "range": 3, "mp": 25, "sp": 40, "cd": 420, "weaponCat": 12, "quest": "" }
   ]
 }

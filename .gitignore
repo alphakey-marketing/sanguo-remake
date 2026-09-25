@@ -5,3 +5,4 @@ client/build/
 proc.txt
 scratchpad/
 __pycache__/
+/.pi-web/

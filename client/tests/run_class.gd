@@ -12,10 +12,13 @@ func _init() -> void:
 	t_weapon_families(data)
 	t_shinu_ultimates(data)
 	t_daoshi_ultimates(data)
+	t_wunu_ultimates(data)
 	t_unlock_learn(data)
 	t_class_skill_use(data)
 	t_chaodu_learn(data)
 	t_chaodu_use(data)
+	t_yinxing_learn(data)
+	t_yinxing_use(data)
 	print("[TEST] class: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -45,7 +48,7 @@ func t_shinu_enabled(data: GameData) -> void:
 	check(bool(data.classes["shinu"].get("enabled", false)), "仕女已開放")
 	check(bool(data.classes["yishi"].get("enabled", false)), "義士仍然開放")
 	check(bool(data.classes["daoshi"].get("enabled", false)), "道士維持開放")
-	check(not bool(data.classes["wunu"].get("enabled", false)), "巫女未開放")
+	check(bool(data.classes["wunu"].get("enabled", false)), "巫女已開放")
 	check(not bool(data.classes["bianshi"].get("enabled", false)), "辯士未開放")
 	check(not bool(data.classes["meinu"].get("enabled", false)), "美女未開放")
 	var st: Dictionary = data.starter.get("shinu", {})
@@ -319,3 +322,162 @@ func t_chaodu_use(data: GameData) -> void:
 	check(not bool(c_after.get("down", false)) and int(c_after["hp"]) == int(c_after["max_hp"]), "超時未救: 退返客棧回滿")
 	check(int(c_after["x"]) == int(inn["x"]) and int(c_after["y"]) == int(inn["y"]), "超時未救: 返最近客棧")
 	check(int(c_after["gen"]["loyalty"]) < loy2, "超時未救: 忠誠扣減 (忠義特技會減半)")
+
+# ===== 巫女 (S02c): 初階三招絕招 (卷軸 cat 12) =====
+func t_wunu_ultimates(data: GameData) -> void:
+	check(data.ult_by_id.has("candeng") and data.ult_by_id.has("danchan") and data.ult_by_id.has("guiku"), "巫女初階三招已定義")
+	var tmpl := {"candeng": {"tier": 1, "mult": 2.0, "range": 2, "mp": 15, "sp": 20, "cd": 300},
+		"danchan": {"tier": 2, "mult": 2.5, "range": 2, "mp": 20, "sp": 30, "cd": 360},
+		"guiku": {"tier": 3, "mult": 3.0, "range": 3, "mp": 25, "sp": 40, "cd": 420}}
+	for uid in tmpl:
+		var u: Dictionary = data.ult_by_id.get(String(uid), {})
+		var t: Dictionary = tmpl[String(uid)]
+		check(String(u.get("class", "")) == "wunu", "%s 係巫女招式" % u.get("name", uid))
+		check(int(u.get("tier", 0)) == int(t["tier"]), "%s tier = %d" % [u.get("name", uid), int(t["tier"])])
+		check(absf(float(u.get("mult", 0)) - float(t["mult"])) < 0.001, "%s 倍率 x%.1f" % [u.get("name", uid), float(t["mult"])])
+		check(int(u.get("range", 0)) == int(t["range"]), "%s 範圍 %d" % [u.get("name", uid), int(t["range"])])
+		check(int(u.get("mp", 0)) == int(t["mp"]) and int(u.get("sp", 0)) == int(t["sp"]), "%s MP/SP 消耗" % u.get("name", uid))
+		check(int(u.get("cd", 0)) == int(t["cd"]), "%s 冷卻 %d" % [u.get("name", uid), int(t["cd"])])
+		check(int(u.get("weaponCat", 0)) == 12, "%s 需要卷軸武器 (cat 12)" % u.get("name", uid))
+	# 初階三招 = 無職階/等級要求
+	var ch := {"tier": 0, "level": 1}
+	check(bool(RulesClass.ultimate_usable(ch, data.ult_by_id["candeng"])["ok"]), "巫女一招: 初階 Lv1 用得")
+	check(bool(RulesClass.ultimate_usable(ch, data.ult_by_id["guiku"])["ok"]), "巫女三招: 初階都用得 (冇 reqTier)")
+
+
+# ===== 巫女特技「潛行」: 導師學習 =====
+func t_yinxing_learn(data: GameData) -> void:
+	var sim := Sim.new(data, 41)
+	var id := sim.spawn_player("t", "wunu")
+	var ch: Dictionary = sim.player_ch()
+	check(not bool((sim.state["quest_npcs"] as Dictionary).get("wunu_master", {}).get("visible", false)), "Lv1: 睇唔到巫姬婆")
+	ch["level"] = 5
+	sim._sync_stats(sim.ent(id))
+	sim._sync_quest_npcs()
+	check(bool((sim.state["quest_npcs"] as Dictionary).get("wunu_master", {}).get("visible", false)), "Lv5: 巫姬婆出現")
+	check(int(data.starter.get("wunu", {}).get("weapon", 0)) == 13038, "巫女起始武器係卷軸 (13038)")
+	sim.cmd_use_skill(id, "yinxing")
+	check(String(ch.get("classSkill", "")) == "", "未學潛行: 冇學到嘢")
+	check(bool(RulesClassSkill.can_use(data, ch, "yinxing").get("ok", false)) == false, "未學潛行: Rules 擋")
+	var npc: Dictionary = data.quest_npcs["wunu_master"]
+	_put(sim, id, int(npc["x"]) + 1, int(npc["y"]))
+	sim.cmd_quest_talk(id, "wunu_master")
+	check((ch.get("quests", {}) as Dictionary).has("skill_unlock_wunu"), "傾偈 = 接咗潛行任務")
+	sim.cmd_quest_answer(id, "skill_unlock_wunu", 0)          # 答錯
+	check(not bool(ch.get("questDone", {}).get("skill_unlock_wunu", false)), "答錯: 未完成")
+	sim.cmd_quest_answer(id, "skill_unlock_wunu", 1)          # 答啱
+	check(bool(ch.get("questDone", {}).get("skill_unlock_wunu", false)), "答啱: 任務完成")
+	check(String(ch.get("classSkill", "")) == "yinxing", "任務獎勵: 學識潛行")
+	check(RulesClassSkill.learned(ch, "yinxing"), "learned() 讀到")
+	# 非巫女學唔到 (pre classId 擋)
+	var sim2 := Sim.new(data, 42)
+	var id2 := sim2.spawn_player("t2", "yishi")
+	var ch2: Dictionary = sim2.player_ch()
+	ch2["level"] = 5
+	sim2._sync_stats(sim2.ent(id2))
+	sim2._sync_quest_npcs()
+	var npc2: Dictionary = data.quest_npcs["wunu_master"]
+	_put(sim2, id2, int(npc2["x"]) + 1, int(npc2["y"]))
+	sim2.cmd_quest_talk(id2, "wunu_master")
+	check(not (ch2.get("quests", {}) as Dictionary).has("skill_unlock_wunu"), "義士同巫姬婆傾偈: 唔接潛行任務")
+	# 存檔 roundtrip: classSkill + stealthCd 保留
+	var s := sim.save_string()
+	var sim3 := Sim.load_string(data, s)
+	check(sim3 != null and String(sim3.player_ch().get("classSkill", "")) == "yinxing", "存檔 roundtrip: classSkill 保留")
+
+
+# ===== 巫女特技「潛行」: 行車 QTE + 潛行避免仇恨 =====
+func t_yinxing_use(data: GameData) -> void:
+	var sim := Sim.new(data, 43)
+	var id := sim.spawn_player("t", "wunu")
+	var pe: Dictionary = sim.ent(id)
+	var ch: Dictionary = sim.player_ch()
+	ch["level"] = 5
+	ch["classSkill"] = "yinxing"
+	_put(sim, id, 60, 60)                                     # 野外
+	sim._sync_stats(pe)
+	# 用一次: 開行車 QTE (emit stealth_open + 記錄 stealthCd)
+	var got_open: Array = [false, 0]
+	sim.event_emitted.connect(func(ev: Dictionary) -> void:
+		if String(ev.get("k", "")) == "stealth_open" and int(ev.get("dst", 0)) == id:
+			got_open[0] = true
+			got_open[1] = int(ev.get("gaps", 0)))
+	sim.cmd_use_skill(id, "yinxing")
+	check(bool(got_open[0]) and got_open[1] == RulesStealth.GAP_COUNT, "潛行: 發出 stealth_open (3 卡車)")
+	var g: Dictionary = ch.get("stealthGame", {})
+	check(not g.is_empty(), "潛行: 起咗行車小遊戲")
+	# 未開始前撳穿 -> 而家喺 pattern 週期, gap0 window 未到 -> fail
+	var pat: Array = g["pattern"]
+	var start := int(g["start"])
+	var crossed0 := 0
+	# 逐卡車喺 gap window 入面穿 -> 成功
+	var got_done: Array = [false, 0]
+	sim.event_emitted.connect(func(ev: Dictionary) -> void:
+		if String(ev.get("k", "")) == "stealth_done" and int(ev.get("dst", 0)) == id:
+			got_done[0] = true
+			got_done[1] = int(ev.get("until", 0)))
+	for i in RulesStealth.GAP_COUNT:
+		var off := int(pat[i])
+		sim.state["tick"] = start + i * RulesStealth.CART_PERIOD + off
+		sim.cmd_stealth_cross(id)
+	check(bool(got_done[0]), "穿晒 %d 卡: 發出 stealth_done" % RulesStealth.GAP_COUNT)
+	check((ch.get("stealthGame", {}) as Dictionary).is_empty(), "穿晒: 小遊戲完結")
+	check(RulesSpell.has(ch.get("status", {}), "stealth", sim.tick), "穿晒: 入咗潛行狀態")
+	check(int(ch.get("stealthCd", 0)) > sim.tick, "穿晒: 設咗 CD (1 game 日)")
+	check(RulesStealth.is_stealth(ch.get("status", {}), sim.tick), "is_stealth() 讀到")
+	# 潛行中再用 -> 擋 (已潛行)
+	sim.cmd_use_skill(id, "yinxing")
+	check(RulesSpell.has(ch.get("status", {}), "stealth", sim.tick), "潛行中: 再撳唔會重開")
+	# CD 未完再試: 取消潛行狀態 + 留 CD -> 擋 (CD 未過)
+	ch["status"] = {}
+	sim.cmd_use_skill(id, "yinxing")
+	check((ch.get("stealthGame", {}) as Dictionary).is_empty(), "CD 未過: 唔會開新遊戲")
+	# 過 CD 再試 + 撞車失敗
+	ch["stealthCd"] = 0
+	sim.cmd_use_skill(id, "yinxing")
+	var g2: Dictionary = ch.get("stealthGame", {})
+	var start2 := int(g2["start"])
+	var pat2: Array = g2["pattern"]
+	var got_fail: Array = [false]
+	sim.event_emitted.connect(func(ev: Dictionary) -> void:
+		if String(ev.get("k", "")) == "stealth_fail" and int(ev.get("dst", 0)) == id:
+			got_fail[0] = true)
+	# 撞車: 揀 gap0 空隙之前嗰格 (空隙前 1 tick)
+	var before := start2 + int(pat2[0]) - 1
+	sim.state["tick"] = before
+	sim.cmd_stealth_cross(id)
+	check(bool(got_fail[0]), "撞車: 發出 stealth_fail")
+	check((ch.get("stealthGame", {}) as Dictionary).is_empty(), "撞車: 遊戲終止")
+	check(not RulesSpell.has(ch.get("status", {}), "stealth", sim.tick), "撞車: 唔會入潛行")
+
+	# ---- 潛行避免主動怪仇恨 ----
+	var sim2 := Sim.new(data, 44)
+	var pid2 := sim2.spawn_player("t2", "wunu")
+	var pe2: Dictionary = sim2.ent(pid2)
+	var ch2: Dictionary = sim2.player_ch()
+	_put(sim2, pid2, 28, 30)
+	sim2._sync_stats(pe2)
+	var m: Variant = sim2._spawn_mob(1005, "field_1")          # 野狼 aggroRange 6
+	_put(sim2, int(m["id"]), 30, 30)
+	m["mob"]["home_x"] = 30
+	m["mob"]["home_y"] = 30
+	# 冇潛行: step 後會 aggro 追
+	sim2.step()
+	check(String(sim2.ent(int(m["id"]))["mob"]["state"]) == "chase", "冇潛行: 主動怪仇恨玩家")
+
+	var sim3 := Sim.new(data, 45)
+	var pid3 := sim3.spawn_player("t3", "wunu")
+	var pe3: Dictionary = sim3.ent(pid3)
+	var ch3: Dictionary = sim3.player_ch()
+	_put(sim3, pid3, 28, 30)
+	sim3._sync_stats(pe3)
+	var m3: Variant = sim3._spawn_mob(1005, "field_1")
+	_put(sim3, int(m3["id"]), 30, 30)
+	m3["mob"]["home_x"] = 30
+	m3["mob"]["home_y"] = 30
+	# 直接設潛行狀態 (等效 QTE 成功)
+	ch3["status"] = {"stealth": sim3.tick + RulesStealth.STEALTH_TICKS}
+	sim3.step()
+	var m3e := sim3.ent(int(m3["id"]))
+	check(String(m3e["mob"]["state"]) == "wander", "潛行中: 主動怪唔會仇恨玩家 (仍遊蕩)")
+	check(int(m3e["mob"]["target"]) == 0, "潛行中: 冇設仇恨目標")

@@ -16,6 +16,14 @@
       "lv": 5,
       "quest": "skill_unlock_daoshi",
       "desc": "同伴倒下後喺側邊施法復活佢（扣自己 HP 20% + MP 30%）"
+    },
+    {
+      "id": "yinxing",
+      "name": "潛行",
+      "class": "wunu",
+      "lv": 5,
+      "quest": "skill_unlock_wunu",
+      "desc": "行車之間穿越小遊戲成功後進入潛行 10 分鐘，主動怪唔會仇恨（CD 1 game 日）"
     }
   ]
 }

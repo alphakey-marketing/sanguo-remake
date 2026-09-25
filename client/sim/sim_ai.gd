@@ -95,6 +95,9 @@ func _think_mob(m: Dictionary) -> void:
 			var p: Dictionary = ents.get(pid, {})
 			if p.is_empty():
 				continue
+			# 潛行 (巫女): 主動怪唔會揀佢做仇恨目標 (S02c)
+			if p.has("ch") and RulesSpell.has(p["ch"].get("status", {}), "stealth", tick):
+				continue
 			var dist := maxi(absi(int(p["x"]) - mx), absi(int(p["y"]) - my))
 			if dist <= aggro and dist < best_d and int(p["hp"]) > 0:
 				best = p
