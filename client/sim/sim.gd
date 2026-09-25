@@ -27,6 +27,25 @@ func _advance_clock() -> void:
 		_sync_quest_npcs()          # 時辰窗口 NPC (Step 8): 每刻 check 一次
 
 
+# 城內安全區自動回復 (S01a, spec 01 §4)【自訂】: 每 regen.ticks tick 回 max(hp/mp/sp) × regen.pct；野外唔回
+func _safe_regen_tick() -> void:
+	var cfg: Dictionary = data.world["regen"]
+	if tick % int(cfg["ticks"]) != 0:
+		return
+	var pct: float = float(cfg["pct"])
+	for e in ents.values():
+		if not e.has("ch") or int(e["hp"]) <= 0:
+			continue
+		if not is_safe(int(e["x"]), int(e["y"])):
+			continue
+		var ch: Dictionary = e["ch"]
+		var lv := int(ch["level"])
+		ch["hp"] = mini(RulesStats.max_hp(lv, ch["attrs"]), int(ch["hp"]) + maxi(1, MathX.js_round(RulesStats.max_hp(lv, ch["attrs"]) * pct)))
+		ch["mp"] = mini(RulesStats.max_mp(lv, ch["attrs"]), int(ch["mp"]) + maxi(1, MathX.js_round(RulesStats.max_mp(lv, ch["attrs"]) * pct)))
+		ch["sp"] = mini(RulesStats.max_sp(lv, ch["attrs"]), int(ch["sp"]) + maxi(1, MathX.js_round(RulesStats.max_sp(lv, ch["attrs"]) * pct)))
+		_sync_stats(e)
+
+
 # 每日子時: 天災擲骰 -> 市場日結 -> 通知 UI
 func _daily_hook(day: int) -> void:
 	var disas: Array = state["disasters"]
@@ -117,6 +136,7 @@ func step() -> void:
 	BotSys.think(self)
 	_recruit_tick()             # 擂台勝負 (Step 13.5)
 	_mount_tick()               # 放牧返嚟 (Step 17a)
+	_safe_regen_tick()          # 城內安全區自動回復 (S01a, spec 01 §4)
 	for id in ents.keys():
 		var e: Dictionary = ents.get(id, {})
 		if e.is_empty():

@@ -280,6 +280,10 @@ static func fac_dialog(main: Node, f: Dictionary) -> Dictionary:
 	var text := str(def.get("desc", ""))
 	if key == "training":
 		text += "\n歷練 %d/100（下次升級 武/智/敏/靈 +%d）" % [int(ch.get("lilian", 0)), int(ch.get("lilian", 0)) / 10]
+	elif key == "trainer":
+		text += "\n體力 %d" % int(ch.get("sp", 0))
+		return {"title": str(def["name"]), "text": text,
+			"options": [{"label": "回復體力", "cb": func() -> void: main._send({"t": "facility", "key": key})}, _leave(main)]}
 	else:
 		var attr := str(def.get("attr", ""))
 		text += "\n%s 而家 %d" % ["政治" if attr == "pol" else "魅力", int(ch["attrs"].get(attr, 0))]

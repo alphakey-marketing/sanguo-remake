@@ -313,7 +313,7 @@ func _calc_skill_slots() -> Array:
 			var ready := left <= 0 and int(ch["mp"]) >= int(u.get("mp", 0)) and int(ch["sp"]) >= int(u.get("sp", 0))
 			out.append({"kind": "ult", "ult": uid, "label": str(u.get("name", "絕")).substr(0, 2), "sub": "絕招",
 				"ready": ready, "cd": clampf(float(left) / maxf(1.0, float(u.get("cd", 1))), 0.0, 1.0), "casting": false})
-	return out.slice(0, HudLayout.SKILL_ANGLES.size())
+	return out.slice(0, HudLayout.skill_cap(int(ch["level"])))
 
 # ================= 建角面板 (Step 8; Step 7.5 UI 遺留: 稱號/生日/臉譜/理念測驗) =================
 # sim 權威: 所有改動經 main._send 行 sim.cmd_set_*；呢度淨係輸入/顯示。

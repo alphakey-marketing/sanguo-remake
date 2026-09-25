@@ -153,8 +153,12 @@ func t_facilities(data: GameData) -> void:
 	_put(sim, id, sim.inn_pos.x, sim.inn_pos.y)
 	ch["hp"] = 1
 	sim.cmd_rest(id)
-	check(int(ch["gold"]) == 100 - int(data.inn["restCost"]), "休息: 扣住宿費")
+	check(int(ch["gold"]) == 100, "休息: 5 級前免費補 HP (S01a)")
 	check(int(ch["hp"]) == RulesStats.max_hp(int(ch["level"]), ch["attrs"]), "休息: 回滿 HP")
+	ch["level"] = GameData.NEWBIE_LEVEL
+	ch["hp"] = 1
+	sim.cmd_rest(id)
+	check(int(ch["gold"]) == 100 - int(data.inn["restCost"]), "休息: 5 級後收費")
 	var shop: Dictionary = data.shops[0]
 	_put(sim, id, int(shop["x"]), int(shop["y"]))
 	var item := int(shop["stock"][1])

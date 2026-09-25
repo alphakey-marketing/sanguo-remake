@@ -16,6 +16,7 @@ func cmd_facility(id: int, key: String) -> void:
 	var ch: Dictionary = e["ch"]
 	match key:
 		"training": _fac_training(e, ch, f)
+		"trainer": _fac_restsp(e, ch, f)
 		"school":
 			var qid := _fac_ensure_quest(ch, "school")
 			if _fac_attr(e, ch, f, "pol", qid != ""):
@@ -60,6 +61,20 @@ func _fac_training(e: Dictionary, ch: Dictionary, f: Dictionary) -> void:
 	ch["lilian"] = lilian + int(f["lilian"])
 	e["train_cd"] = tick + int(f["cooldownTicks"])
 	_emit({"k": "train", "src": id, "partner": partner["name"], "lilian": int(ch["lilian"])})
+
+
+# 練兵場小兵【原】: 免費回滿 SP (S01a, spec 01 §6)
+func _fac_restsp(e: Dictionary, ch: Dictionary, f: Dictionary) -> void:
+	var id := int(e["id"])
+	if tick < int(e.get("restsp_cd", 0)):
+		return _msg(id, "小兵啱啱幫你回復完，抖陣先")
+	var msp := RulesStats.max_sp(int(ch["level"]), ch["attrs"])
+	if int(ch["sp"]) >= msp:
+		return _msg(id, "體力已滿")
+	ch["sp"] = msp
+	e["restsp_cd"] = tick + int(f["cooldownTicks"])
+	_sync_stats(e)
+	_msg(id, "小兵幫你回復晒體力")
 
 
 # 私塾/寺廟【原】: 政治/魅力 +1, 扣 SP (+MP) + 金。free=true = 新手修練退款 (spec 06 §2，第一次唔使金)。
