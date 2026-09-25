@@ -640,6 +640,13 @@ func _run() -> void:
 	check(_msg_count() == m2 + 1, "撳潛行掣 → 有提示")
 	check(hud.panels.has("stealth") and (hud.panels["stealth"] as GamePanel).visible, "潛行掣 → 開咗行車面板")
 	hud.close_panels()
+	# S02c-辯士 竊聽: 特技掣換 id, 撳落去 (冇居民) → 出提示 (唔炸)
+	ch["classId"] = "bianshi"
+	ch["classSkill"] = "qieting"
+	var m3 := _msg_count()
+	hud.skill_pressed.emit({"kind": "skill", "skill": "qieting"})
+	await frames(1)
+	check(_msg_count() == m3 + 1, "撳竊聽掣冇居民 → 有提示")
 	print("[TEST] ui_smoke: %d, fail %d" % [total, fails])
 	print("PASS: ui smoke" if fails == 0 else "FAIL: ui smoke")
 	get_tree().quit(1 if fails > 0 else 0)

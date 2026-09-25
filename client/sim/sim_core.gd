@@ -467,6 +467,7 @@ func _spawn_actor(ename: String, kind: String, class_id: String = "yishi") -> Di
 	e["ch"]["fusing"] = {}                      # 進行中融合 QTE {weapon, jewel, start} (Step 10)
 	e["ch"]["expert"] = {}                      # 專長 skillId -> exp (S01c, spec 01 §8)
 	e["ch"]["classSkill"] = ""                  # 職業特技 (S02c, spec 02 §6): 學咗 = skill id (未學 = "")
+	e["ch"]["rumors"] = []                      # 辯士竊聽傳聞線索/情報冊 (S02c-辯士, spec 02 §6)
 	_ensure_equip(e["ch"])                      # 武器 3 槽 + 5 部位防具 + 耐久 (Step 11.6)
 	_sync_stats(e)
 	return e

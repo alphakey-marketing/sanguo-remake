@@ -25,7 +25,7 @@
 |---|---|---|---|
 | 角色/點數/測驗/修練/行動力/飲水/專長/職階（二轉三轉） | `stats.gd` `quiz.gd` `title.gd` `expert.gd` `class.gd` | `sim_char.gd` | `classes.json` `quiz.json` `experts.json` |
 | 戰鬥/術法/寶石/絕招/融合 | `combat.gd` `spell.gd` `jewel.gd` | `sim_combat.gd` `sim_skill.gd` `sim_ai.gd` | `monsters.json`(掉落由 `tools/import_drops.py` 生成) |
-| 職業特技（義士融合內建；仕女開鎖、道士超渡、**巫女潛行**已開） | `class_skill.gd` + `stealth.gd` | `sim_skill.gd`（`cmd_use_skill`/`cmd_skill_pick`/`cmd_stealth_cross`） | `class_skills.json` |
+| 職業特技（義士融合內建；仕女開鎖、道士超渡、**巫女潛行、辯士竊聽**已開） | `class_skill.gd` + `stealth.gd` + `qieting.gd` + `ammo.gd` | `sim_skill.gd`（`cmd_use_skill`/`cmd_skill_pick`/`cmd_stealth_cross`/`_try_qieting`）+ `sim_ai.gd`（弩箭消耗） | `class_skills.json` `rumors.json` |
 | 裝備/耐久 | `equip.gd` | `sim_econ.gd` | `equip.json` |
 | 善惡 | `karma.gd` | `sim_combat.gd` | — |
 | 生產/修理/天地商行/捐獻/市場 | `work.gd` `tiandi.gd` `market.gd` `shop.gd` | `sim_econ.gd` | `work.json` `recipes.json`(生成) `shops.json` `donation.json` |

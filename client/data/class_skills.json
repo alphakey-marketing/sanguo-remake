@@ -24,6 +24,14 @@
       "lv": 5,
       "quest": "skill_unlock_wunu",
       "desc": "行車之間穿越小遊戲成功後進入潛行 10 分鐘，主動怪唔會仇恨（CD 1 game 日）"
+    },
+    {
+      "id": "qieting",
+      "name": "竊聽",
+      "class": "bianshi",
+      "lv": 5,
+      "quest": "skill_unlock_bianshi",
+      "desc": "喺居民側邊竊聽對話，得任務情報傳聞線索（耳邊「…」）"
     }
   ]
 }
