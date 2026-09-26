@@ -120,7 +120,7 @@ func t_validate(data: GameData) -> void:
 	var e2 := RulesCommission.validate(data)
 	check(e2.is_empty(), "commissions 驗證 (errors: %s)" % str(e2))
 	var hist := data.quests.filter(func(q): return String(q["type"]) == "history")
-	check(hist.size() == 7, "歷史任務 7 條 (B3 加三顧茅廬) (而家 %d)" % hist.size())
+	check(hist.size() == 12, "歷史任務 12 條 (S06b 加齊 5 條：孫堅匿璽/張公公謀害何進/黃蓋/曹阿瞞/討伐張角) (而家 %d)" % hist.size())
 	for q in hist:
 		var items: Array = (q["reward"]["items"] as Array).map(func(x): return int(x[0]))
 		check(items.has(int(ORDERS[String(q["id"])])), "%s 獎勵有將軍令" % q["id"])

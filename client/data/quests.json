@@ -1075,6 +1075,369 @@
     "exp": 30,
     "skill": "toushi"
    }
+  },
+  {
+   "id": "hist_sunjian_seal",
+   "name": "孫堅匿璽",
+   "type": "history",
+   "giver": "sunwentai",
+   "preHint": "去洛陽城內宮宅旁搵孫文臺",
+   "stages": [
+    {
+     "type": "talk",
+     "npc": "sunwentai",
+     "dialog": [
+      "孫文臺：「呢口古井古怪得很，小兵話見到異象。拎住呢盞特亮蠟燭同打撈工具，落去皇城井底睇下係咩一回事！」"
+     ],
+     "getItem": {
+      "id": 56491,
+      "n": 1
+     },
+     "hint": "帶特亮蠟燭去皇城井底"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 56494,
+      "n": 10
+     },
+     "hint": "皇城井底打木乃伊/殭屍，儲齊玉璽錦囊 %v/%n"
+    },
+    {
+     "type": "talk",
+     "npc": "sunwentai",
+     "dialog": [
+      "孫文臺打開錦囊逐個檢查：「十個入面，九個都係假嘅……呢個先係真玉璽！壯士大功一件，呢張委託函你收好。」"
+     ],
+     "takeItems": [
+      [
+       56491,
+       1
+      ]
+     ],
+     "getItem": {
+      "id": 56495,
+      "n": 1
+     },
+     "hint": "帶文臺委託函去程府（洛陽城內）"
+    },
+    {
+     "type": "fight",
+     "npc": "chengpu",
+     "monster": 1089,
+     "dialog": [
+      "程普：「主公委託？哼，我程德謀從未聽聞，你想騙我！」"
+     ],
+     "takeItems": [
+      [
+       56495,
+       1
+      ]
+     ],
+     "done": true,
+     "hint": "喺程府同程普 PK（行近程普對話開打）"
+    }
+   ],
+   "reward": {
+    "polExp": 30,
+    "items": [
+     [
+      31902,
+      1
+     ]
+    ]
+   }
+  },
+  {
+   "id": "hist_zhanggong",
+   "name": "張公公謀害何進",
+   "type": "history",
+   "giver": "zhanggong",
+   "pre": {
+    "karmaMax": 0
+   },
+   "preHint": "PK 值為 0（未曾濫殺），去下邳城內搵張公公",
+   "stages": [
+    {
+     "type": "talk",
+     "npc": "zhanggong",
+     "dialog": [
+      "張公公：「咱家受宮中所託，要秘密殺害何進。呢個係何府通行牌，快啲去！」"
+     ],
+     "getItem": {
+      "id": 56497,
+      "n": 1
+     },
+     "hint": "帶何府通行牌去下邳何府"
+    },
+    {
+     "type": "talk",
+     "npc": "hefu_guard",
+     "dialog": [
+      "何府守衛：「通行牌？……唔得，何將軍有令，任何人都唔准放行。你返去搵返嗰個張公公啦。」"
+     ],
+     "hint": "返去搵張公公"
+    },
+    {
+     "type": "talk",
+     "npc": "zhanggong",
+     "dialog": [
+      "張公公陰陰嘴笑：「守衛唔放行？咁就用呢張假懿旨令，睇佢敢唔放你入去！」"
+     ],
+     "getItem": {
+      "id": 56498,
+      "n": 1
+     },
+     "hint": "帶假懿旨令返何府畀守衛睇"
+    },
+    {
+     "type": "talk",
+     "npc": "hefu_guard",
+     "dialog": [
+      "何府守衛見到懿旨令，臉色一變：「……是，恭送貴人。」"
+     ],
+     "takeItems": [
+      [
+       56498,
+       1
+      ]
+     ],
+     "hint": "入何府搵何進"
+    },
+    {
+     "type": "fight",
+     "npc": "hejin",
+     "monster": 1090,
+     "dialog": [
+      "何進：「何人擅闖大將軍府？！」"
+     ],
+     "takeItems": [
+      [
+       56497,
+       1
+      ]
+     ],
+     "done": true,
+     "hint": "喺何府同何進 PK（行近何進對話開打）"
+    }
+   ],
+   "reward": {
+    "polExp": 30,
+    "items": [
+     [
+      32203,
+      1
+     ]
+    ]
+   }
+  },
+  {
+   "id": "hist_huanggai",
+   "name": "玩家打黃蓋一個願打一個願挨",
+   "type": "history",
+   "giver": "yuji",
+   "pre": {
+    "minLevel": 10
+   },
+   "preHint": "武功 10 級以上，去長沙城賭場附近搵于吉",
+   "stages": [
+    {
+     "type": "talk",
+     "npc": "yuji",
+     "dialog": [
+      "于吉：「黃公覆武功蓋世，可惜隱世不出。拎住呢張重出江湖令，去佢屋企（城池左側竹林民房）勸佢！」"
+     ],
+     "getItem": {
+      "id": 56499,
+      "n": 1
+     },
+     "hint": "帶重出江湖令去黃蓋家民房（長沙城內）"
+    },
+    {
+     "type": "fight",
+     "npc": "huanggai",
+     "monster": 1091,
+     "dialog": [
+      "黃蓋劈頭就是一擊：「多說無益，先過我呢關再講！」"
+     ],
+     "takeItems": [
+      [
+       56499,
+       1
+      ]
+     ],
+     "getItem": {
+      "id": 56500,
+      "n": 1
+     },
+     "hint": "解決黃蓋後，帶賣身契返去搵于吉"
+    },
+    {
+     "type": "talk",
+     "npc": "yuji",
+     "dialog": [
+      "于吉：「壯士好本事！黃公覆既然肯服軟，往後定必再闖一番事業，多謝你嘞！」"
+     ],
+     "takeItems": [
+      [
+       56500,
+       1
+      ]
+     ],
+     "done": true,
+     "hint": "帶黃蓋賣身契返去搵于吉"
+    }
+   ],
+   "reward": {
+    "fame": 30,
+    "items": [
+     [
+      22006,
+      1
+     ],
+     [
+      29017,
+      10
+     ]
+    ]
+   }
+  },
+  {
+   "id": "hist_caoamang",
+   "name": "找尋曹阿瞞任務",
+   "type": "history",
+   "giver": "caosong",
+   "pre": {
+    "attr": {
+     "pol": 10
+    }
+   },
+   "preHint": "政治 10 級以上，去零陵城客棧門口搵曹阿嵩",
+   "stages": [
+    {
+     "type": "talk",
+     "npc": "caosong",
+     "dialog": [
+      "曹阿嵩：「阿瞞呢個死仔又唔知走咗去邊玩，麻煩你去練兵場門口幫我搵下佢！」"
+     ],
+     "hint": "去零陵練兵場門口街道搵曹阿瞞"
+    },
+    {
+     "type": "talk",
+     "npc": "caoamang",
+     "dialog": [
+      "曹阿瞞：「知道喇知道喇，即刻返去！呢張感謝函，麻煩你交返畀阿爹。」"
+     ],
+     "getItem": {
+      "id": 56501,
+      "n": 1
+     },
+     "hint": "帶曹操感謝函返去搵曹阿嵩"
+    },
+    {
+     "type": "talk",
+     "npc": "caosong",
+     "dialog": [
+      "曹阿嵩鬆一口氣：「多得你幫手勸返阿瞞，真係唔該晒！」"
+     ],
+     "takeItems": [
+      [
+       56501,
+       1
+      ]
+     ],
+     "done": true,
+     "hint": "交曹操感謝函畀曹阿嵩"
+    }
+   ],
+   "reward": {
+    "fame": 10
+   }
+  },
+  {
+   "id": "hist_zhangjiao",
+   "name": "替天行道討伐張角",
+   "type": "history",
+   "giver": "zhangjiao",
+   "pre": {
+    "minLevel": 20,
+    "attr": {
+     "cha": 10,
+     "pol": 10
+    }
+   },
+   "preHint": "武功 20 級、魅力/政治/採藥 10 級以上，去洛陽私塾黃巾道場搵張角",
+   "stages": [
+    {
+     "type": "talk",
+     "npc": "zhangjiao",
+     "dialog": [
+      "張角捧住天書，喃喃自語：「太平要術……南華老仙嘅寶物，遲早歸我。」你隱約覺得唔妥，決定去竹林搵南華小童問個究竟。"
+     ],
+     "hint": "去洛陽城外南華竹林搵南華小童"
+    },
+    {
+     "type": "ask",
+     "npc": "nanhua_child",
+     "dialog": [
+      "南華小童：「『推敲』典故你識唔識？呢位詩人喺驢背上反覆思量『僧敲月下門』定係『僧推月下門』——係邊個？」"
+     ],
+     "options": [
+      "杜甫",
+      "賈島",
+      "李白"
+     ],
+     "answer": 1,
+     "getItem": {
+      "id": 56502,
+      "n": 1
+     },
+     "hint": "答啱南華小童嘅問題（得太平要術）"
+    },
+    {
+     "type": "fight",
+     "npc": "zhangjiao",
+     "monster": 1092,
+     "dialog": [
+      "張角厲聲道：「太平要術落我手上，天下就係我嘅！」"
+     ],
+     "takeItems": [
+      [
+       56502,
+       1
+      ]
+     ],
+     "getItem": {
+      "id": 56502,
+      "n": 1
+     },
+     "hint": "擊敗張角，攞返太平要術"
+    },
+    {
+     "type": "talk",
+     "npc": "nanhua_old",
+     "dialog": [
+      "南華老仙接過太平要術：「多謝壯士，替天行道，功德無量。呢本天書你收好。」"
+     ],
+     "takeItems": [
+      [
+       56502,
+       1
+      ]
+     ],
+     "done": true,
+     "hint": "帶太平要術返去搵南華老仙"
+    }
+   ],
+   "reward": {
+    "fame": 50,
+    "items": [
+     [
+      56027,
+      1
+     ]
+    ]
+   }
   }
  ]
 }
