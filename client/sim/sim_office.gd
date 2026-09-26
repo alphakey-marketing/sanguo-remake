@@ -1041,3 +1041,548 @@ func militia_view(id: int) -> Dictionary:
 		"homeName": _settle_city_name(home),
 		"conditions": conds,
 	}
+
+
+# ================= S08f 營地建設 + 義勇軍工作 22 項 + 評定會議 (spec 08 §7~§8 / 攻略 sy2_8_6、sy2_8_8) =================
+# m["camp"] = {facilities:{id:level}, build:{fac,target,progress,need}, stores:{}, trade:{city:0~100}, train:0}
+# m["merit"] / m["performance"] (0~900+) / m["eval"] = {kinds:[], lastMerit, lastDay, settledPeriod}
+# m["role"] (單機玩家固定頭目 banner) / m["hasCity"] (S10 佔城前 false → 淨得監督/商情)。
+
+func camp_cfg() -> Dictionary:
+	return data.camp
+
+
+func _camp_read(m: Dictionary) -> Dictionary:
+	var c = m.get("camp", {})
+	return c if c is Dictionary else {"facilities": {}, "build": {}, "stores": {}, "trade": {}, "train": 0}
+
+
+# 寫入用: 補齊 camp/eval 預設欄 (舊存檔兼容)
+func _camp_of(ch: Dictionary) -> Dictionary:
+	var m := _militia_of(ch)
+	if not m.has("camp") or not (m["camp"] is Dictionary):
+		m["camp"] = {}
+	var c: Dictionary = m["camp"]
+	if not c.has("facilities") or not (c["facilities"] is Dictionary):
+		c["facilities"] = {}
+	for f in camp_cfg().get("facilities", []):
+		var fid := String(f["id"])
+		if not c["facilities"].has(fid):
+			c["facilities"][fid] = int(f.get("initial", 0))
+	if not c.has("build") or not (c["build"] is Dictionary):
+		c["build"] = {}
+	if not c.has("stores") or not (c["stores"] is Dictionary):
+		c["stores"] = {}
+	for k in ["gold", "grain", "militaryGrain", "soldiers", "horses", "resource", "medicine", "products", "arms", "officers"]:
+		if not c["stores"].has(k):
+			c["stores"][k] = 0
+	if not c.has("trade") or not (c["trade"] is Dictionary):
+		c["trade"] = {}
+	if not c.has("train"):
+		c["train"] = 0
+	if not m.has("merit"):
+		m["merit"] = 0
+	if not m.has("performance"):
+		m["performance"] = 0
+	if not m.has("eval") or not (m["eval"] is Dictionary):
+		m["eval"] = {}
+	var ev: Dictionary = m["eval"]
+	if not ev.has("kinds"):
+		ev["kinds"] = []
+	if not ev.has("lastMerit"):
+		ev["lastMerit"] = 0
+	if not ev.has("lastDay"):
+		ev["lastDay"] = -1
+	if not ev.has("settledPeriod"):
+		ev["settledPeriod"] = ""
+	if not m.has("role"):
+		m["role"] = "banner"
+	if not m.has("hasCity"):
+		m["hasCity"] = false
+	return c
+
+
+func militia_role(ch: Dictionary) -> String:
+	return String(_militia_read(ch).get("role", "banner"))
+
+
+func militia_has_city(ch: Dictionary) -> bool:
+	return bool(_militia_read(ch).get("hasCity", false))
+
+
+func _at_home(e: Dictionary, m: Dictionary) -> bool:
+	var city := String(m.get("city", ""))
+	return city != "" and city_at(e) == city
+
+
+func _fac_level(m: Dictionary, fac_id: String) -> int:
+	var facs = _camp_read(m).get("facilities", {})
+	if facs is Dictionary and facs.has(fac_id):
+		return int(facs[fac_id])
+	return RulesCamp.initial_level(camp_cfg(), fac_id)
+
+
+func _stores(m: Dictionary) -> Dictionary:
+	var s = _camp_read(m).get("stores", {})
+	return s if s is Dictionary else {}
+
+
+func _store_facility(store: String) -> String:
+	match store:
+		"gold":
+			return "treasury"
+		"grain", "militaryGrain":
+			return "granary"
+		"soldiers", "horses":
+			return "barracks"
+		"resource", "medicine", "products":
+			return "resstore"
+		"arms":
+			return "armsstore"
+	return ""
+
+
+func _store_cap(m: Dictionary, store: String) -> int:
+	var fac := _store_facility(store)
+	if fac == "":
+		return -1
+	return RulesCamp.facility_cap(camp_cfg(), fac, _fac_level(m, fac), store)
+
+
+# 加物資入義勇軍倉庫 (受設施上限封頂)；回傳實際加咗幾多
+func _store_add(c: Dictionary, m: Dictionary, store: String, amount: int) -> int:
+	var cur := int((c.get("stores", {}) as Dictionary).get(store, 0))
+	var cap := _store_cap(m, store)
+	var add := amount
+	if cap >= 0:
+		add = mini(add, maxi(0, cap - cur))
+	c["stores"][store] = cur + add
+	return add
+
+
+# 營地 read-model (UI 用)
+func camp_view(id: int) -> Dictionary:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return {}
+	var ch: Dictionary = e["ch"]
+	var cfg := camp_cfg()
+	var m := _militia_read(ch)
+	var c := _camp_read(m)
+	var founded := bool(m.get("founded", false))
+	var at_home := founded and _at_home(e, m)
+	var level := _fac_level(m, "camp")
+	var facs: Array = []
+	var cfacs: Dictionary = c.get("facilities", {})
+	for f in cfg.get("facilities", []):
+		var fid := String(f["id"])
+		var lv := int(cfacs.get(fid, int(f.get("initial", 0))))
+		var row := {"id": fid, "name": String(f["name"]), "level": lv, "func": String(f.get("func", "")), "initial": int(f.get("initial", 0))}
+		if lv < RulesCamp.max_level(cfg):
+			var t := lv + 1
+			row["nextLevel"] = t
+			row["cost"] = RulesCamp.upgrade_cost(cfg, fid, t)
+		facs.append(row)
+	return {
+		"founded": founded, "atHome": at_home, "city": String(m.get("city", "")),
+		"cityName": _settle_city_name(String(m.get("city", ""))),
+		"level": level, "maxLevel": RulesCamp.max_level(cfg), "workCap": RulesCamp.work_cap(cfg, level),
+		"roles": cfg.get("roles", []), "role": String(m.get("role", "banner")), "roleName": RulesCamp.role_name(cfg, String(m.get("role", "banner"))),
+		"positions": RulesCamp.positions_at(cfg, level), "facilities": facs, "build": c.get("build", {}),
+		"stores": c.get("stores", {}), "train": int(c.get("train", 0)), "trade": c.get("trade", {}),
+		"merit": int(m.get("merit", 0)), "performance": int(m.get("performance", 0)),
+		"canUpgradeRole": RulesCamp.can_upgrade_role(cfg, String(m.get("role", "banner"))),
+	}
+
+
+func _camp_upgrade_block(e: Dictionary, ch: Dictionary, fac_id: String) -> String:
+	var cfg := camp_cfg()
+	var m := _militia_read(ch)
+	if not bool(m.get("founded", false)):
+		return "未成立義勇軍，起唔到營地"
+	if not RulesCamp.can_upgrade_role(cfg, String(m.get("role", "banner"))):
+		return "得頭目/參軍先指定到升級"
+	if not _at_home(e, m):
+		return "要返根據地「%s」先指定到升級" % _settle_city_name(String(m.get("city", "")))
+	var f := RulesCamp.def_of(cfg, fac_id)
+	if f.is_empty():
+		return "冇呢個設施"
+	var lv := _fac_level(m, fac_id)
+	if lv >= RulesCamp.max_level(cfg):
+		return "「%s」已經封頂" % String(f["name"])
+	if not (_camp_read(m).get("build", {}) as Dictionary).is_empty():
+		return "仲有建設緊，監督完先"
+	var cost := RulesCamp.upgrade_cost(cfg, fac_id, lv + 1)
+	if int(ch.get("gold", 0)) < int(cost["gold"]):
+		return "軍資唔夠 (要 %d 兩)" % int(cost["gold"])
+	for iid in cost["materials"]:
+		var need := int(cost["materials"][iid])
+		if RulesShop.count_item(ch["bag"], int(iid)) < need:
+			return "材料唔夠：%s ×%d" % [String(data.names.get(int(iid), str(iid))), need]
+	return ""
+
+
+# 頭目/參軍指定升級：即扣軍資 + 材料，開一個建設（等成員監督到 100 完成度）
+func cmd_camp_upgrade(id: int, fac_id: String) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var ch: Dictionary = e["ch"]
+	var why := _camp_upgrade_block(e, ch, fac_id)
+	if why != "":
+		return _msg(id, why)
+	var cfg := camp_cfg()
+	var m := _militia_of(ch)
+	var c := _camp_of(ch)
+	var lv := int(c["facilities"][fac_id])
+	var t := lv + 1
+	var cost := RulesCamp.upgrade_cost(cfg, fac_id, t)
+	ch["gold"] = int(ch["gold"]) - int(cost["gold"])
+	for iid in cost["materials"]:
+		RulesShop.remove_item(ch["bag"], int(iid), int(cost["materials"][iid]))
+	c["build"] = {"fac": fac_id, "target": t, "progress": 0.0, "need": RulesCamp.supervise_target(cfg)}
+	_emit({"k": "camp_upgrade", "id": id, "fac": fac_id, "target": t, "gold": int(cost["gold"])})
+	_msg(id, "指定升級「%s」到 %d 級：扣 %d 兩 + 材料，等成員監督建設。" % [String(RulesCamp.def_of(cfg, fac_id).get("name", fac_id)), t, int(cost["gold"])])
+
+
+# 設施升級完成度 +1 次（評定「監督」工作之一）；fac_id 要同 build 對上
+func cmd_camp_supervise(id: int, fac_id: String) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return
+	var m := _militia_read(e["ch"])
+	var build: Dictionary = _camp_read(m).get("build", {})
+	if build.is_empty() or String(build.get("fac", "")) != fac_id:
+		return _msg(id, "而家冇建設緊呢個設施")
+	cmd_militia_work(id, "jiandu")
+
+
+# ---- 義勇軍工作 ----
+func _work_expert_lv(ch: Dictionary, w: Dictionary) -> int:
+	var e := String(w.get("expert", ""))
+	return expert_lv(ch, e) if e != "" else 0
+
+
+# 工作可唔做得："" = 得
+func _work_block(e: Dictionary, ch: Dictionary, work_id: String) -> String:
+	var cfg := camp_cfg()
+	var m := _militia_read(ch)
+	if not bool(m.get("founded", false)):
+		return "未成立義勇軍"
+	var w := RulesMilitiaWork.def_of(cfg, work_id)
+	if w.is_empty() or not RulesMilitiaWork.is_available(cfg, bool(m.get("hasCity", false)), work_id):
+		return "冇呢種工作 (或者未擁有城池)"
+	if ap_of(ch) < _office_ap_cost(ch):
+		return "行動力不足 (要 %d)" % _office_ap_cost(ch)
+	var c := _camp_read(m)
+	match String(w.get("kind", "")):
+		"supervise":
+			if (c.get("build", {}) as Dictionary).is_empty():
+				return "冇設施喺建設緊"
+		"internal":
+			if RulesCity.attr_of(city_attrs(String(m.get("city", ""))), String(w["attr"]), _city_attr_cfg()) >= 100:
+				return "城池「%s」已經封頂 (100)" % RulesCity.name_of(_city_attr_cfg(), String(w["attr"]))
+		"recruit":
+			var cap := _store_cap(m, "soldiers")
+			if cap >= 0 and int(_stores(m).get("soldiers", 0)) >= cap:
+				return "士兵已經滿咗 (上限 %d)" % cap
+		"armament", "donate":
+			if w.has("costGold") and int(ch.get("gold", 0)) < int(w["costGold"]):
+				return "軍費唔夠 (要 %d 兩)" % int(w["costGold"])
+			for ci in w.get("costItems", []):
+				var need := int(ci[1])
+				if RulesShop.count_item(ch["bag"], int(ci[0])) < need:
+					return "物資唔夠：%s ×%d" % [String(data.names.get(int(ci[0]), str(ci[0]))), need]
+			for cs in w.get("costStore", []):
+				if int(_stores(m).get(String(cs[0]), 0)) < int(cs[1]):
+					return "義勇軍庫存唔夠：%s" % String(cs[0])
+	return ""
+
+
+# 執行一件工作效果；回傳描述字串。會 mutate ch/m/c
+func _work_apply(e: Dictionary, ch: Dictionary, m: Dictionary, c: Dictionary, w: Dictionary) -> String:
+	var cfg := camp_cfg()
+	var kind := String(w.get("kind", ""))
+	var wid := String(w["id"])
+	var lv := _work_expert_lv(ch, w)
+	var exp_id := String(w.get("expert", ""))
+	match kind:
+		"internal":
+			var city := String(m.get("city", ""))
+			var attrs := city_attrs(city)
+			var key := String(w["attr"])
+			var cur := RulesCity.attr_of(attrs, key, _city_attr_cfg())
+			var g := RulesCity.attr_gain(int(data.office.get("domestic", {}).get("baseGain", 2)), _work_mult(w, lv))
+			g = mini(g, 100 - cur)
+			attrs[key] = cur + g
+			city_attrs_set(city, attrs)
+			if exp_id != "":
+				RulesExpert.add_exp(ch, data.experts, exp_id, 3)
+			return "%s +%d（而家 %d）" % [RulesCity.name_of(_city_attr_cfg(), key), g, cur + g]
+		"supervise":
+			var build: Dictionary = c["build"]
+			var pts := RulesCamp.supervise_points(cfg, int((ch.get("attrs", {}) as Dictionary).get("pol", 0)), work_lv(ch, "carpentry"), String(m.get("role", "banner")))
+			build["progress"] = minf(float(build.get("need", 100)), float(build.get("progress", 0.0)) + pts)
+			c["build"] = build
+			var fac_id := String(build["fac"])
+			var tail := "完成度 %.1f/%.1f" % [float(build["progress"]), float(build["need"])]
+			if float(build["progress"]) >= float(build["need"]):
+				c["facilities"][fac_id] = int(build["target"])
+				c["build"] = {}
+				_emit({"k": "camp_built", "id": int(e["id"]), "fac": fac_id, "level": int(c["facilities"][fac_id])})
+				tail = "「%s」升到 %d 級！" % [String(RulesCamp.def_of(cfg, fac_id).get("name", fac_id)), int(c["facilities"][fac_id])]
+			return tail
+		"trade":
+			var city2 := String(m.get("city", ""))
+			var t2: Dictionary = c["trade"]
+			var nv := mini(100, int(t2.get(city2, 0)) + 5)
+			t2[city2] = nv
+			c["trade"] = t2
+			if exp_id != "":
+				RulesExpert.add_exp(ch, data.experts, exp_id, 3)
+			return "%s 商情情報值 %d" % [_settle_city_name(city2), nv]
+		"train":
+			var add_t := maxi(1, int(round(RulesExpert.militia_mult(lv))))
+			c["train"] = mini(100, int(c.get("train", 0)) + add_t)
+			if exp_id != "":
+				RulesExpert.add_exp(ch, data.experts, exp_id, 3)
+			return "營地訓練度 +%d（而家 %d）" % [add_t, int(c["train"])]
+		"recruit":
+			var got := _store_add(c, m, "soldiers", 10000)
+			return "招募士兵 +%d（而家 %d）" % [got, int(c["stores"]["soldiers"])]
+		"armament", "donate":
+			if w.has("costGold"):
+				ch["gold"] = int(ch["gold"]) - int(w["costGold"])
+			for ci2 in w.get("costItems", []):
+				RulesShop.remove_item(ch["bag"], int(ci2[0]), int(ci2[1]))
+			for cs2 in w.get("costStore", []):
+				var sk := String(cs2[0])
+				c["stores"][sk] = int(c["stores"].get(sk, 0)) - int(cs2[1])
+			var store := String(w["store"])
+			var got2 := _store_add(c, m, store, int(w.get("amount", 0)))
+			if exp_id != "":
+				RulesExpert.add_exp(ch, data.experts, exp_id, 3)
+			return "%s +%d（而家 %d）" % [store, got2, int(c["stores"][store])]
+	return ""
+
+
+func _work_mult(w: Dictionary, lv: int) -> float:
+	match String(w.get("mult", "domestic")):
+		"militia":
+			return RulesExpert.militia_mult(lv)
+		"relief":
+			return RulesExpert.relief_mult(lv)
+	return RulesExpert.domestic_mult(lv)
+
+
+func _eval_assigned(m: Dictionary, work_id: String) -> bool:
+	var kinds: Array = (m.get("eval", {}) as Dictionary).get("kinds", [])
+	var a := RulesMilitiaWork.assignment_of(camp_cfg(), work_id)
+	return a != "" and kinds.has(a)
+
+
+# 工作 read-model
+func militia_work_view(id: int) -> Dictionary:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return {}
+	var ch: Dictionary = e["ch"]
+	var cfg := camp_cfg()
+	var m := _militia_read(ch)
+	var founded := bool(m.get("founded", false))
+	var has_city := bool(m.get("hasCity", false))
+	var rows: Array = []
+	for w in RulesMilitiaWork.available(cfg, has_city):
+		var wid := String(w["id"])
+		var why := _work_block(e, ch, wid)
+		var assigned := _eval_assigned(m, wid)
+		rows.append({"id": wid, "name": String(w["name"]), "series": String(w["series"]), "kind": String(w["kind"]),
+			"assignment": RulesMilitiaWork.assignment_of(cfg, wid), "assigned": assigned,
+			"expert": String(w.get("expert", "")), "perf": RulesMilitiaWork.performance_gain(cfg, wid, _work_expert_lv(ch, w), assigned),
+			"can": why == "", "why": why})
+	return {"founded": founded, "hasCity": has_city, "city": String(m.get("city", "")),
+		"cityName": _settle_city_name(String(m.get("city", ""))), "apCost": _office_ap_cost(ch),
+		"works": rows, "allWorks": RulesMilitiaWork.works(cfg).size()}
+
+
+# 執行義勇軍工作（每日一次扣行動力 10）
+func cmd_militia_work(id: int, work_id: String) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var ch: Dictionary = e["ch"]
+	var why := _work_block(e, ch, work_id)
+	if why != "":
+		return _msg(id, why)
+	var cfg := camp_cfg()
+	var m := _militia_of(ch)
+	var c := _camp_of(ch)
+	var w := RulesMilitiaWork.def_of(cfg, work_id)
+	var assigned := _eval_assigned(m, work_id)
+	var gain := RulesMilitiaWork.performance_gain(cfg, work_id, _work_expert_lv(ch, w), assigned)
+	var detail := _work_apply(e, ch, m, c, w)
+	ch["ap"] = ap_of(ch) - _office_ap_cost(ch)
+	m["performance"] = int(m.get("performance", 0)) + gain
+	_emit({"k": "militia_work", "id": id, "work": work_id, "perf": gain, "assigned": assigned})
+	_msg(id, "義勇軍工作「%s」完成：%s；績效 +%d%s" % [String(w["name"]), detail, gain, "（獲指派加成）" if assigned else ""])
+
+
+# ---- 評定會議 (spec 08 §4 / 攻略 sy2_8_5) ----
+func _period_of(day: int) -> String:
+	var md := int(data.world["clock"].get("monthDays", 30))
+	return str(int((day - 1) / md))
+
+
+func eval_view(id: int) -> Dictionary:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return {}
+	var ch: Dictionary = e["ch"]
+	var cfg := camp_cfg()
+	var m := _militia_read(ch)
+	var ev: Dictionary = m.get("eval", {})
+	return {"founded": bool(m.get("founded", false)), "kinds": ev.get("kinds", []),
+		"assignmentKinds": RulesMilitiaWork.assignment_kinds(cfg), "maxAssignments": RulesMilitiaWork.max_assignments(cfg),
+		"performance": int(m.get("performance", 0)), "merit": int(m.get("merit", 0)),
+		"lastMerit": int(ev.get("lastMerit", 0)), "lastDay": int(ev.get("lastDay", -1)),
+		"nextDelta": RulesMilitiaWork.merit_delta(cfg, int(m.get("performance", 0))),
+		"table": cfg.get("meritTable", [])}
+
+
+func _eval_set_kinds(id: int, ch: Dictionary, kinds: Array) -> String:
+	var cfg := camp_cfg()
+	var allow := RulesMilitiaWork.assignment_kinds(cfg)
+	var seen := {}
+	var out: Array = []
+	for k in kinds:
+		var ks := String(k)
+		if not allow.has(ks):
+			return "唔可以指派「%s」" % ks
+		if seen.has(ks):
+			continue
+		seen[ks] = true
+		out.append(ks)
+	if out.size() > RulesMilitiaWork.max_assignments(cfg):
+		return "最多指派 %d 種工作" % RulesMilitiaWork.max_assignments(cfg)
+	_camp_of(ch)    # 確保 _camp_of 已補 camp 欄
+	var m := _militia_of(ch)
+	var ev: Dictionary = m["eval"]
+	ev["kinds"] = out
+	return ""
+
+
+# 指派本月工作 (捐獻/監督/商情)
+func cmd_eval_assign(id: int, kinds: Array) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var ch: Dictionary = e["ch"]
+	var m := _militia_read(ch)
+	if not bool(m.get("founded", false)):
+		return _msg(id, "未成立義勇軍，開唔到評定會議")
+	var why := _eval_set_kinds(id, ch, kinds)
+	if why != "":
+		return _msg(id, why)
+	_emit({"k": "eval_assign", "id": id, "kinds": kinds})
+	_msg(id, "指派本月工作：%s" % ("、".join(_kind_names(kinds)) if not kinds.is_empty() else "（無）"))
+
+
+func _kind_names(kinds: Array) -> Array:
+	var names := {"donate": "捐獻", "supervise": "監督", "trade": "商情"}
+	var out: Array = []
+	for k in kinds:
+		out.append(String(names.get(String(k), k)))
+	return out
+
+
+# 召開評定會議：結算上期績效 → 功績、績效歸 0、指派新工作
+func cmd_eval_meeting(id: int, kinds: Array) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var ch: Dictionary = e["ch"]
+	var cfg := camp_cfg()
+	var m := _militia_read(ch)
+	if not bool(m.get("founded", false)):
+		return _msg(id, "未成立義勇軍，開唔到評定會議")
+	if String(m.get("role", "banner")) != "banner":
+		return _msg(id, "得頭目先召開到評定會議")
+	var why := _eval_set_kinds(id, ch, kinds)
+	if why != "":
+		return _msg(id, why)
+	var mm := _militia_of(ch)
+	var perf := int(mm.get("performance", 0))
+	var delta := RulesMilitiaWork.merit_delta(cfg, perf)
+	mm["merit"] = int(mm.get("merit", 0)) + delta
+	mm["performance"] = 0
+	var ev: Dictionary = mm["eval"]
+	ev["lastMerit"] = delta
+	ev["lastDay"] = int(_clock()["day"])
+	ev["settledPeriod"] = _period_of(int(_clock()["day"]))
+	_emit({"k": "eval_meeting", "id": id, "performance": perf, "merit": delta, "total": int(mm["merit"])})
+	_msg(id, "召開評定會議：上期績效 %d → 功績 %+d（總功績 %d）；績效歸零，重新指派。" % [perf, delta, int(mm["merit"])])
+
+
+# 每月初一自動結算各義勇軍成員績效 → 功績 (spec 08 §4)
+func _eval_daily(day: int) -> void:
+	if not RulesTitle.is_month_start(day, int(data.world["clock"].get("monthDays", 30))):
+		return
+	var period := _period_of(day)
+	for e in ents.values():
+		if not e.has("ch"):
+			continue
+		var ch: Dictionary = e["ch"]
+		var m = ch.get("militia", {})
+		if not (m is Dictionary) or not bool(m.get("founded", false)):
+			continue
+		var ev: Dictionary = m.get("eval", {})
+		if String(ev.get("settledPeriod", "")) == period:
+			continue
+		var perf := int(m.get("performance", 0))
+		var delta := RulesMilitiaWork.merit_delta(camp_cfg(), perf)
+		m["merit"] = int(m.get("merit", 0)) + delta
+		ev["lastMerit"] = delta
+		ev["lastDay"] = day
+		ev["settledPeriod"] = period
+		m["eval"] = ev
+		ch["militia"] = m
+		_emit({"k": "eval_merit", "id": int(e["id"]), "performance": perf, "merit": delta, "total": int(m["merit"])})
+		_msg(int(e["id"]), "月初評定：上期績效 %d → 功績 %+d（總功績 %d）" % [perf, delta, int(m["merit"])])
+
+
+# 團體任務完成 → 義勇軍績效 (spec 06 §6 / spec 08 §8 接軌)
+func _on_militia_quest_done(q: Dictionary) -> void:
+	if String(q.get("type", "")) != "group":
+		return
+	var pid := int(state["player_id"])
+	var p := ent(pid)
+	if p.is_empty() or not p.has("ch"):
+		return
+	var m = p["ch"].get("militia", {})
+	if not (m is Dictionary) or not bool(m.get("founded", false)):
+		return
+	m["performance"] = int(m.get("performance", 0)) + int(camp_cfg().get("questPerf", 30))
+	p["ch"]["militia"] = m
+
+
+# 每月/每日重複任務：完成旗標到期清零 (S06c 延後：每月重複/日窗口)
+func _militia_quest_reset(day: int) -> void:
+	var md := int(data.world["clock"].get("monthDays", 30))
+	var month_start := RulesTitle.is_month_start(day, md)
+	for e in ents.values():
+		if not e.has("ch"):
+			continue
+		var ch: Dictionary = e["ch"]
+		var qd = ch.get("questDone", {})
+		if not (qd is Dictionary) or qd.is_empty():
+			continue
+		for q in data.quests:
+			var rp := String(q.get("repeat", ""))
+			if rp == "":
+				continue
+			var qid := String(q["id"])
+			if not bool(qd.get(qid, false)):
+				continue
+			if rp == "daily" or (rp == "monthly" and month_start):
+				qd.erase(qid)
+		ch["questDone"] = qd

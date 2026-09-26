@@ -1,6 +1,6 @@
 extends SceneTree
 # 團體任務 16 項 (S06c, spec 06 §6): 任務資料 + 義勇軍門檻 (pre.militia) + 非義勇軍版 (紫虛上人)。
-# 義勇軍任務靠 ch.militia.founded 開關 (S08e 先正式 set，呢度注入測試)；每月/每日重複 → S08f。
+# 義勇軍任務靠 ch.militia.founded 開關 (S08e 先正式 set，呢度注入測試)；每月/每日重複 + NPC 日窗口 → S08f。
 # 跑: Godot --headless --path client --script tests/run_group.gd   (失敗 exit 1)
 
 var fails := 0
@@ -206,6 +206,8 @@ func t_ghost(data: GameData) -> void:
 	var sim: Sim = r[0]
 	var id: int = r[1]
 	var ch: Dictionary = r[2]
+	sim.state["clock"]["day"] = 18      # S08f: 神經老人 16~21 日先現身
+	sim._sync_quest_npcs()
 	_talk(sim, id, "shenjing_lao")
 	check(_stage(ch, "group_ghost") == 1, "鬼域: 神經老人觸發任務")
 	check(_vis(sim, "ghost_guard"), "鬼域: 巨魎出現 (洞窟三層)")

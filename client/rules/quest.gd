@@ -115,6 +115,12 @@ static func validate(data: GameData) -> Array:
 			var e := int(w.get("endKe", -1))
 			if s < 0 or s > 95 or e < 0 or e > 96:
 				errs.append("%s: window 範圍唔啱 (%d~%d)" % [nid, s, e])
+		var dw: Dictionary = n.get("dayWindow", {})
+		if not dw.is_empty():
+			var ds := int(dw.get("startDay", -1))
+			var de := int(dw.get("endDay", -1))
+			if ds < 1 or de > 30 or ds > de:
+				errs.append("%s: dayWindow 範圍唔啱 (%d~%d)" % [nid, ds, de])
 	return errs
 
 
@@ -126,7 +132,12 @@ static func ke_in_window(ke: int, start_ke: int, end_ke: int) -> bool:
 	return ke >= start_ke or ke < end_ke
 
 
-static func npc_visible(npc: Dictionary, ch: Dictionary, ke: int) -> bool:
+# dayWindow = 每月第幾日到第幾日出現 (含頭尾)；day < 0 = 唔檢查
+static func day_in_window(day: int, start_day: int, end_day: int) -> bool:
+	return day >= start_day and day <= end_day
+
+
+static func npc_visible(npc: Dictionary, ch: Dictionary, ke: int, day: int = -1) -> bool:
 	if ch.is_empty() or bool(npc.get("questOnly", false)):
 		return false
 	if npc.has("maxLevel") and int(ch["level"]) > int(npc["maxLevel"]):
@@ -136,18 +147,24 @@ static func npc_visible(npc: Dictionary, ch: Dictionary, ke: int) -> bool:
 	var w: Dictionary = npc.get("window", {})
 	if not w.is_empty() and not ke_in_window(ke, int(w["startKe"]), int(w["endKe"])):
 		return false
+	var dw: Dictionary = npc.get("dayWindow", {})
+	if day >= 0 and not dw.is_empty() and not day_in_window(day, int(dw["startDay"]), int(dw["endDay"])):
+		return false
 	return true
 
 
 # 最終顯示: 平時規則 或 任務強制常駐；strictWindow = 任務進行中都要守時辰 (Step 16 董卓卯~酉/獄中曹操子~丑)
-static func npc_shown(npc: Dictionary, ch: Dictionary, ke: int, quests: Array) -> bool:
-	if npc_visible(npc, ch, ke):
+static func npc_shown(npc: Dictionary, ch: Dictionary, ke: int, quests: Array, day: int = -1) -> bool:
+	if npc_visible(npc, ch, ke, day):
 		return true
 	if ch.is_empty() or not quest_locks_npc(ch, String(npc.get("id", "")), quests):
 		return false
 	var w: Dictionary = npc.get("window", {})
 	if bool(npc.get("strictWindow", false)) and not w.is_empty():
 		return ke_in_window(ke, int(w["startKe"]), int(w["endKe"]))
+	var dw: Dictionary = npc.get("dayWindow", {})
+	if day >= 0 and not dw.is_empty() and not day_in_window(day, int(dw["startDay"]), int(dw["endDay"])):
+		return false
 	return true
 
 
