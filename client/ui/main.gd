@@ -111,7 +111,7 @@ func _ready() -> void:
 			print("載入自動存檔 (日 %d)" % int(sim.clock_view()["day"]))
 	if fresh:
 		sim.init_mobs()
-		sim.add_bots(10)
+		sim.add_residents()
 		my_id = sim.spawn_player("玩家")
 	sim.event_emitted.connect(_on_event)
 	_refresh()

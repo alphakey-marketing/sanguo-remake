@@ -28,7 +28,7 @@
 | 06 任務 | 🟡 | ✅ | 框架、新手 5 條、義士絕招 3 條、官令 7 條、歷史 11+1 條、委託、戰役、團體任務 17 條（16 條義勇軍限定 + 紫虛上人非義勇軍版，S06c）、其他職絕招 15 條（S06d）、**專長任務 8 條（天文/地理認證 1~4 級，S06e）** | 四~六招、結婚、左慈渾天儀任務、國戰專長（→S10） |
 | 07 座騎戰騎 | 🟡 | 🟡 | 17a 座騎全套 + UI；17b 繁衍/馬戰 **sim 有、`main.gd` 有派送、面板未有掣**；18 戰騎純規則；**S07b（leg 5）戰騎 sim 整合**（`sim/sim_war_beast.gd`：馬廄馴養買獸/最多 3 隻/出戰跟隨+自動攻擊+戰鬥特技/吸 exp/死亡忠誠−1/走佬/寄馬廄）；**S07c（leg 6）友好特技效果接系統**；**S07d（leg 7）NPC 拍賣場 + 武將特技「馴馬」+ 抽技固定池** | 繁衍/馬戰/改名 UI；戰騎 UI 面板；原版捕獲途徑；其餘友好技效果（聖靈/遁地/奇門/脫出/召喚/神行/回城/火焰/飛影/狂力/開光/忠誠/巨力/穩重/地行/神獸/嗅血/野性/獅魂/王者） |
 | 08 名聲義勇軍 | 🟡 | ✅ | 名聲、頭銜 60 階、官宅（討取/官令/捐獻/月俸/行動丹）、**義舉證明（四類 20 項）+ 城池進貢/好感（S08a）**、**城池屬性 8 項 + 官宅內政 6 種（S08b）**、**救災（S08c）**、**名額競爭（S08d）**、**義勇軍成立 + 定居 + 帶兵量（S08e）**、**營地建設 10 設施 + 義勇軍工作 22 項 + 評定會議（S08f）**、**民心 + 6 條城池法令（S08g；邏輯層，城池佔領啟動留 S10c）** | 佔城啟動（→S10c）、法令下游（山洞商店/PK/善惡入城） |
-| 09 登用武將 | 🟡 | 🟡 | 居民 bot/記憶/brain、登用 v1+v2、同伴 6 指令、20 passive 特技 | `residents.json` 居民化、傳聞擴散、忠誠事件規則、其餘 50 特技、內政協助、LLM 層（原 Step 20） |
+| 09 登用武將 | 🟡 | 🟡 | 居民 bot/記憶/brain、**居民化 `residents.json`（性格/日程/role，每城 12~20，S09a）**、登用 v1+v2、同伴 6 指令、20 passive 特技 | 傳聞擴散、忠誠事件規則、其餘 50 特技、內政協助、LLM 層（原 Step 20） |
 | 10 國戰 | ❌ | ❌ | — | 全部（D-3【待決】） |
 | 11 資料對照 | 🟡 | — | items/monsters/generals/recipes/titles 導入器 | `material_ids.json`、箭矢定義、商城道具單機化定案、recruitinfo 說明頁、warbtl 對照 |
 | 12 地圖世界 | ✅(B1~B3) | ✅ | 多地圖/A*/過圖/大地圖/驛站/戰役實例 | 各 Step 需要嘅新地圖（隨 S04/S06/S08 加）；B4 其餘州郡【待決】 |
@@ -239,7 +239,9 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
 - 驗收：`tests/run_title.gd` 擴充 + `tests/run_militia.gd`（新）+ `tests/run_civic.gd`（新）
 
 ### S09 登用武將 / NPC / LLM（spec 09）
-- [ ] **S09a 居民化**：`data/residents.json`（性格/日程/role），bot → 居民；每城 12~20 人
+- [x] **S09a 居民化**：`data/residents.json`（性格/日程/role），bot → 居民；每城 12~20 人
+  - 完成：新 `data/residents.json`（cfg 人數/性格 5 維/理念/日程 12 時辰 + 5 role 權重 + 10 城 homeZone + 姓氏/名字池）；新 `rules/resident.gd`（`role_def`/`role_total`/`pick_role`/`personality`/`city_count`/`activity_at`/`home_zone`/`make_name` 純函數）；`GameData` +`residents`；`sim_core.gd` +`add_residents()`（每張 kind:city 地圖生 12~20 人，大城多）/+`resident_inn_pos()`/`_spawn_actor` +`spawn_range`；`BotSys.init_resident`（派 role/性格/理念/善惡/homeCity/homeZone/mem）+ `think` 用 `ch.homeZone`（居民行自己城最近野區，低血返自己城客棧）；`view_ents` +`resident`/`role`；`sim.resident_view()` read-model（role/性格/理念/當前時辰活動）；`ui/main.gd` 開場改 `add_residents()`；新 `tests/run_residents.gd` 83 項接入 `run_tests.sh`；`sh tools/run_tests.sh` **ALL OK**。
+  - 偏離【自訂】/【待決→推薦方針】：人數公式 = `round(pop/popPerResident=30)` 夾 12~20（許昌 800→20、襄陽 700→20、新野 450→15、邊城 350→12），攻略只寫「每城 12~20，大城多」冇公式。居民善惡 = `align:"good"`（spec「正 300+ 檔」用 role 欄表示，唔硬改 karma 免影響 S03a）。日程 12 時辰（子..亥）→ sleep/work/eat/home；**S09a 只做資料 + read-model，日程驅動行動留 S09b**（§4）。legacy `add_bots(n)` 保留（測試用，行為不變，唔設 resident flag）。homeZone 由 portal BFS 揀最近 field（xuchang→field_1 等）；洛陽/長沙/小沛/下邳/零陵冇客棧 → 低血唔撤退。
 - [ ] **S09b 傳聞擴散 + 忠誠事件**：跨城延遲 1~3 日；殺善 NPC → 義理武將忠誠 −15 等
 - [ ] **S09c 其餘 50 特技**（主動/生產；國戰類 → S10）+ 內政協助
 - [ ] **S09d LLM 層**（原 Step 20）：OpenRouter/JSON schema/白名單；每日反思 + 記憶摘要；設定頁 key + 模型名；Tier1 武將對話；飲水度控制 LLM/模板
@@ -314,6 +316,9 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
 | S08f | 商情情報值（`camp.trade` 0~100）未有下游（原版：85 睇商店 / 80 睇武將情報）| S09/S10 |
 | S08f | 「杉竹 / 白石礦石」items.json 冇 → 用箭竹 25054 / 石頭 25001 代替（營地升級材料）| 後續道具批次（如要忠於原作名） |
 | S08b | 內政武將政治協助（同伴/部將加成）：`_domestic_assist_bonus` hook 已備（暫 0.0），`RulesExpert.domestic_mult` 已食專長 lv | S09c |
+| S09a | 居民日程（各時辰 sleep/work/eat/home）只做資料 + `resident_view` read-model，未驅動實際行動（居民仍行現有野區戰鬥 AI，只改用自己城 homeZone） | S09b（傳聞/忠誠）或後續 |
+| S09a | role 嘅 `work` 種類（field/shop/gate/stable/office）未有下游工作點/功能（商販買賣、衛兵攔路、馬夫等） | S09b/S09c 或設施批次 |
+| S09a | 洛陽/長沙/小沛/下邳/零陵冇客棧/市場/設施；居民低血唔撤退、冇商店互動 | 後續設施批次（同 S08 各城設施） |
 | S08g | 民心/法令邏輯做完；城池佔領（`state["cityGov"]` 啟動入口 `city_gov_init`）要接城池勢力/攻城 | S10c |
 | S08g | 法令下游未有系統嘅先存落 gov：`caveShops` 山洞商店（現冇山洞商店）、`cityPk` 城內 PK（原作未開放）、`dangerEntry` 善惡 ≥1001 非本勢力入城（單機玩家 = 定居者豁免） | S10（佔城/勢力）或後續場景批次 |
 | S01c | 渾天儀來源（商城道具單機化定案，`sim.gd WEATHER_ITEM 26029` 已資料有、冇商店賣） | S11 |

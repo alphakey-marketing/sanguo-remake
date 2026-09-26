@@ -3,11 +3,14 @@
 > 對應攻略: sy1_1_2(理念)、sy2_6_1~6(登用全頁)、sy2_7_*(結婚)、sy2_8_5(制度)、sy3_5(歷史任務→將軍令)
 > 原始資料: `D:\Download\sanguo\extracted\text\general_npc.csv`(1261 武將: 名/武力/智力/9 技能)、`general_skills.csv`、`Npc_table.tsv`(hp/mp/atk)、`recruitinfo.txt`(官方新手說明)
 > 現有實作: `sim/npc_brain.gd`(規則版決策)、`rules/npc_memory.gd`、`bot_sys.gd`(居民)、Step 6 未做 LLM
+> **現狀 (2026-09-26, S09a)**: 居民化完成 —— `data/residents.json`（性格 5 維/理念/日程 12 時辰/role/名字池/每城 homeZone）+ `rules/resident.gd`（純函數）+ `sim.add_residents()`（每張 kind:city 地圖 12~20 人，大城多）+ `BotSys.init_resident`（bot → 居民身份）+ `sim.resident_view()` read-model；對話 still 規則版 (`NpcBrain`)，LLM 未接。測試 `tests/run_residents.gd`。
 > 【原】= 攻略明文；【自訂】= 自己設計。
 
 ## 1. 居民 NPC（現有 bot → 居民化）
 
 `data/residents.json`（由 bot 升級）：名字/性格/理念/日程（各時辰去邊）/喜好/商店（商販係居民）/好感表/記憶表冚唪唥已有。
+
+> **實裝 (S09a)**：`residents.json` = `cfg`（`minPerCity:12`/`maxPerCity:20`/`popPerResident:30`/`borderPop:350`/`personalityDims` 5 維/`personalityMax:10`/`ideologies` 5 個/`schedule` 12 時辰）+ `roles` 5 種（villager/merchant/guard/stableman/official，`weight`+`work`+`align`）+ `cities`（10 城 → `homeZone`）+ `names`（姓氏/名字池）。`rules/resident.gd` 純函數；`sim.add_residents()` 每城生 12~20 人（`round(pop/30)` 夾 12~20）；`ch` 存 `resident/role/personality/align/homeCity/homeZone`；`resident_view()` read-model。日程暫時只出 read-model，未驅動行動（S09b）。
 
 | 欄位 | 說明 |
 |---|---|

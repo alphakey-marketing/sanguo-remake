@@ -1,0 +1,38 @@
+{
+  "_note": "居民 NPC 資料 (S09a, spec 09 §1)。bot → 居民: 性格 5 維 / 理念 / 日程 (各時辰去邊) / role / 善惡 / homeZone。每城 12~20 人 (大城多)。名字由 surnames+given 池決定性生成。",
+  "_noteSchedule": "schedule 索引 = 時辰 0(子)..11(亥) → 活動: sleep/work/eat/home。S09a 只做資料 + read-model；真正用日程驅動行動留 S09b/S09d。",
+  "_noteRole": "roles[].work = 工作區種類 (field/shop/gate/stable/office)，下游 (S09b) 會用嚟揀工作點。",
+  "cfg": {
+    "minPerCity": 12,
+    "maxPerCity": 20,
+    "popPerResident": 30,
+    "borderPop": 350,
+    "personalityDims": ["outgoing", "friendly", "shrewd", "brave", "steady"],
+    "personalityMax": 10,
+    "ideologies": ["義理", "霸權", "權謀", "隱遁", "治國"],
+    "schedule": ["sleep", "sleep", "sleep", "work", "work", "work", "eat", "work", "work", "work", "home", "sleep"]
+  },
+  "roles": [
+    {"id": "villager", "name": "村民", "weight": 5, "work": "field", "align": "good"},
+    {"id": "merchant", "name": "商販", "weight": 3, "work": "shop", "align": "good"},
+    {"id": "guard", "name": "衛兵", "weight": 2, "work": "gate", "align": "good"},
+    {"id": "stableman", "name": "馬夫", "weight": 1, "work": "stable", "align": "good"},
+    {"id": "official", "name": "朝廷官員", "weight": 1, "work": "office", "align": "good"}
+  ],
+  "cities": {
+    "xuchang": {"homeZone": "field_1"},
+    "xinye": {"homeZone": "bowang"},
+    "xiangyang": {"homeZone": "hanshui"},
+    "changsha": {"homeZone": "hanshui"},
+    "xiaopei": {"homeZone": "chenliu"},
+    "wancheng": {"homeZone": "wancheng_road"},
+    "runan": {"homeZone": "runan_road"},
+    "luoyang": {"homeZone": "chenliu"},
+    "xiapi": {"homeZone": "chenliu"},
+    "lingling": {"homeZone": "hanshui"}
+  },
+  "names": {
+    "surnames": ["陳", "林", "黃", "張", "李", "王", "吳", "劉", "蔡", "楊", "許", "鄭", "謝", "郭", "洪", "邱", "曾", "廖", "賴", "徐", "周", "葉", "蘇", "莊", "江", "呂", "何", "羅", "高", "蕭"],
+    "given": ["志明", "美玲", "家豪", "淑芬", "建宏", "雅婷", "文雄", "秀英", "金龍", "麗華", "國棟", "玉蘭", "俊傑", "美華", "宗翰", "怡君", "天賜", "月娥", "明德", "春嬌", "永昌", "秋香", "偉成", "鳳珠", "政雄", "雪梅", "信宏", "桂英", "宏達", "寶珠", "清輝", "素貞", "武雄", "麗珠", "福生", "美玉", "阿財", "阿福", "水蓮", "添丁"]
+  }
+}

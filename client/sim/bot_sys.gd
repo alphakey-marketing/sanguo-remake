@@ -15,9 +15,29 @@ const W_KILL_NPC := -4        # 目擊玩家殺善居民 (大惡: NpcMemory 好�
 const W_KILL_RED := 2         # 目擊玩家殺紅名(殺人魔): 除害 (正面)
 
 
-# 新居民入場: 派理念 + 開一張記憶表 (供 sim.add_bots 用)
+# 新居民入場: 派理念 + 開一張記憶表 (供 sim.add_bots / 測試用)
 static func init_identity(e: Dictionary, rng: SimRng) -> void:
 	e["ch"]["ideology"] = IDEOLOGIES[rng.below(IDEOLOGIES.size())]
+	e["mem"] = NpcMemory.init_memory()
+
+
+# S09a: bot → 居民。派身份 (性格/理念/role/善惡/homeCity/homeZone) + 記憶表。
+# city_id/home_zone 由 sim.add_residents 用 residents.json 傳入；legacy add_bots 唔會叫呢個。
+static func init_resident(e: Dictionary, rng: SimRng, residents: Dictionary, city_id: String, home_zone: String) -> void:
+	var ch: Dictionary = e["ch"]
+	ch["ideology"] = RulesResident.ideology_at(residents, rng.below(maxi(1, RulesResident.ideologies(residents).size())))
+	ch["resident"] = true
+	var role := RulesResident.pick_role(residents, rng.below(RulesResident.role_total(residents)))
+	ch["role"] = String(role.get("id", "villager"))
+	ch["align"] = String(role.get("align", "good"))
+	ch["homeCity"] = city_id
+	ch["homeZone"] = home_zone
+	var dims := RulesResident.personality_dims(residents)
+	var maxv := int(RulesResident.cfg(residents).get("personalityMax", 10))
+	var rolls: Array = []
+	for _i in dims.size():
+		rolls.append(rng.below(maxv + 1))
+	ch["personality"] = RulesResident.personality(dims, rolls, maxv)
 	e["mem"] = NpcMemory.init_memory()
 
 
@@ -44,9 +64,10 @@ static func think(sim) -> void:
 		if sim.rng.next() < float(bc["chatChance"]):
 			sim.cmd_chat(id, LINES[sim.rng.below(LINES.size())])
 		var low: bool = int(e["hp"]) < RulesStats.max_hp(int(ch["level"]), ch["attrs"]) * float(bc["lowHpPct"])
-		var inn: Vector2i = sim.inn_pos
-		var near_inn := maxi(absi(int(e["x"]) - inn.x), absi(int(e["y"]) - inn.y)) <= Sim.NEAR
-		if low:                                        # 血低: 撤退返客棧休息 (跨圖就經門口行, spec 12 §4)
+		var zone_id := String(ch.get("homeZone", Sim.DEFAULT_ZONE))    # S09a: 居民屬自己城最近野區；legacy = 預設
+		var inn: Vector2i = sim.resident_inn_pos(e)      # S09a: 居民返自己城客棧 (冇 = 唔撤退)
+		if low and inn.x >= 0:                          # 血低: 撤退返客棧休息 (跨圖就經門口行, spec 12 §4)
+			var near_inn := maxi(absi(int(e["x"]) - inn.x), absi(int(e["y"]) - inn.y)) <= Sim.NEAR
 			e["atk_target"] = 0
 			if sim._route_to_map(e, sim.map_id_at(inn.x, inn.y)):
 				continue
@@ -74,10 +95,12 @@ static func think(sim) -> void:
 		if best != 0:
 			sim.cmd_attack(id, best)
 			continue
-		if sim._route_to_map(e, Sim.DEFAULT_ZONE):    # 唔喺野區: 經門口出城
+		if sim._route_to_map(e, zone_id):    # 唔喺野區: 經門口出城 (居民去自己城最近嘅野區)
 			continue
 		if int(e["x"]) == int(e["tx"]) and int(e["y"]) == int(e["ty"]) and sim.rng.next() < float(bc["wanderChance"]):    # 冇怪: 喺野區行吓
-			var z: Dictionary = sim.zone_by_id(Sim.DEFAULT_ZONE)
+			var z: Dictionary = sim.zone_by_id(zone_id)
+			if z.is_empty():
+				continue
 			sim.cmd_move(id, int(z["x0"]) + sim.rng.below(int(z["x1"]) - int(z["x0"])), int(z["y0"]) + sim.rng.below(int(z["y1"]) - int(z["y0"])))
 	for did in dead:                                  # 打完循環先清已經走去叫衛兵嘅居民 (避免中途改行緊嘅 list)
 		sim.state["bots"].erase(int(did))

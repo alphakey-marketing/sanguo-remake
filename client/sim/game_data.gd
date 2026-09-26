@@ -88,6 +88,7 @@ var general_order_item: Dictionary = {}  # 武將名 -> 將軍令 item id
 var comm: Dictionary = {}          # 居民委託 + 武將收集冊設定 (data/commissions.json, Step 16)
 var experts: Dictionary = {}       # 專長 (data/experts.json, Step S01c, spec 01 §8)
 var master: Dictionary = {}        # 大宗師合成術 (data/master_recipes.json, S05c, spec 05 §5)
+var residents: Dictionary = {}     # 居民 NPC 設定/角色/日程/名字池 (data/residents.json, S09a, spec 09 §1)
 
 static var _cache: GameData
 
@@ -204,6 +205,7 @@ static func load_all() -> GameData:
 	g.rumors = (_read("res://data/rumors.json") as Dictionary).get("rumors", [])
 	g.experts = _read("res://data/experts.json")
 	g.master = _read("res://data/master_recipes.json")
+	g.residents = _read("res://data/residents.json")
 	for x in c["classes"]:
 		g.classes[String(x["id"])] = x
 	for x in m["monsters"]:
