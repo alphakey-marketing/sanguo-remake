@@ -28,16 +28,18 @@ func _advance_clock() -> void:
 
 
 # 城內安全區自動回復 (S01a, spec 01 §4)【自訂】: 每 regen.ticks tick 回 max(hp/mp/sp) × regen.pct；野外唔回
+# S07c: 戰騎「聖體」友好技 → 回復倍率 ×2 (_friend_regen_mult)
 func _safe_regen_tick() -> void:
 	var cfg: Dictionary = data.world["regen"]
 	if tick % int(cfg["ticks"]) != 0:
 		return
-	var pct: float = float(cfg["pct"])
+	var base_pct: float = float(cfg["pct"])
 	for e in ents.values():
 		if not e.has("ch") or int(e["hp"]) <= 0:
 			continue
 		if not is_safe(int(e["x"]), int(e["y"])):
 			continue
+		var pct: float = base_pct * _friend_regen_mult(e)
 		var ch: Dictionary = e["ch"]
 		var lv := int(ch["level"])
 		ch["hp"] = mini(RulesStats.max_hp(lv, ch["attrs"]), int(ch["hp"]) + maxi(1, MathX.js_round(RulesStats.max_hp(lv, ch["attrs"]) * pct)))

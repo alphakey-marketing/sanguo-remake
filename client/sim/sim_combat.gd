@@ -165,18 +165,23 @@ func _kill_player(p: Dictionary) -> void:
 	# 0. 還魂丹【原】「死亡啱復活」: 死亡即喺客棧復活，物品/經驗照常掉；冇死唔消耗；天譴無效 (唔消耗)
 	#    (正常死亡流已經返客棧，故消耗係可見效果；天譴唔行 _kill_player，invariant 由 _tianqian_reprisal 保證)
 	var revived := false
-	if not bool(ch.get("tianqian", false)) and RulesShop.has_item(ch["bag"], RulesCombat.REVIVE_PILL, 1):
-		RulesShop.remove_item(ch["bag"], RulesCombat.REVIVE_PILL, 1)
-		revived = true
+	if not bool(ch.get("tianqian", false)):
+		if _friend_effect_active(p, "revive_elixir"):        # S07c 殘影豹「還魂」友好技
+			revived = true
+		elif RulesShop.has_item(ch["bag"], RulesCombat.REVIVE_PILL, 1):
+			RulesShop.remove_item(ch["bag"], RulesCombat.REVIVE_PILL, 1)
+			revived = true
 
-	# 1. 扣經驗 (護身符減半，消耗 1)
+	# 1. 扣經驗 (護身符 / 戰騎「護身」減半，道具先扣)
 	var exp_lost := 0
 	var huhushen := false
+	var prot_friend := false
 	if not skip_drop:
-		huhushen = RulesShop.has_item(ch["bag"], RulesCombat.PROTECTION_CHARM, 1)
+		prot_friend = _friend_effect_active(p, "protect_charm")
+		huhushen = prot_friend or RulesShop.has_item(ch["bag"], RulesCombat.PROTECTION_CHARM, 1)
 		exp_lost = RulesCombat.death_exp_loss_protected(int(ch["karma"]), RulesStats.exp_to_next(int(ch["level"])), huhushen)
 		ch["exp"] = maxi(0, int(ch["exp"]) - exp_lost)
-		if huhushen:
+		if huhushen and not prot_friend:
 			RulesShop.remove_item(ch["bag"], RulesCombat.PROTECTION_CHARM, 1)
 
 	# 2. 掉物品 (幸運符擋，消耗 1)
@@ -189,7 +194,9 @@ func _kill_player(p: Dictionary) -> void:
 			var free := int(b["n"]) - _equipped_n(ch, int(b["id"]))
 			if free > 0:
 				loose.append({"id": int(b["id"]), "n": free})
-		if RulesShop.has_item(ch["bag"], RulesCombat.LUCKY_CHARM, 1):
+		if _friend_effect_active(p, "lucky_charm"):        # S07c 殘影豹「幸運」友好技
+			lucky = true
+		elif RulesShop.has_item(ch["bag"], RulesCombat.LUCKY_CHARM, 1):
 			lucky = true
 			RulesShop.remove_item(ch["bag"], RulesCombat.LUCKY_CHARM, 1)
 		else:
@@ -311,7 +318,7 @@ func cmd_pick(id: int, drop_id: int) -> void:
 		return _msg(id, "太遠喎，行埋啲先")
 	var ch: Dictionary = e["ch"]
 	var cfg: Dictionary = data.world.get("dropped", {})
-	var cap := int(cfg.get("capBagWeight", 1000))
+	var cap := _bag_cap(ch)
 	var wfn := func(i: int) -> int: return int(data.weights.get(i, 0))
 	var picked: Array = []
 	var leftover: Array = []

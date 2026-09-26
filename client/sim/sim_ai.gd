@@ -103,7 +103,7 @@ func _think_mob(m: Dictionary) -> void:
 				elif rng.next() < RulesEquip.evade_chance(int(ab["evade"]), float(jb.get("evadePct", 0.0)), int(caps["evadePct"])):
 					_emit({"k": "hit", "src": m["id"], "dst": tgt["id"], "dmg": 0})     # 迴避咗
 				else:
-					var dmg := RulesEquip.reduce_dmg(RulesCombat.calc_mob_damage(d["atk"], pd, rng_fn), int(ab["dmgRed"]), int(caps["dmgRedPct"]))
+					var dmg := RulesEquip.reduce_dmg(RulesCombat.calc_mob_damage(RulesCombat.debuffed(d["atk"], m.get("beastDebuff", {}), "atk", tick), pd, rng_fn), int(ab["dmgRed"]), int(caps["dmgRedPct"]))
 					_emit({"k": "hit", "src": m["id"], "dst": tgt["id"], "dmg": dmg})
 					damage(tgt, dmg, m)
 		else:

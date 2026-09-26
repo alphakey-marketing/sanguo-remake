@@ -50,6 +50,36 @@ func _beast_stats(wb: Dictionary) -> Dictionary:
 	return RulesWarBeast.stats_for(_wbcfg(), wb)
 
 
+# ================= 友好特技效果 (S07c) =================
+# 出戰戰騎學咗嘅效果集；畀其他 sim 系統經 hook 查 (_friend_effect_active/_bag_cap/_friend_regen_mult)
+func _friend_effects(e: Dictionary) -> Dictionary:
+	if e.is_empty() or not e.has("ch"):
+		return {}
+	var wb := active_beast(e["ch"])
+	if wb.is_empty():
+		return {}
+	return RulesWarBeast.active_effects(_wbcfg(), wb)
+
+
+func _friend_effect_active(e: Dictionary, effect: String) -> bool:
+	return bool(_friend_effects(e).get(effect, false))
+
+
+func _friend_regen_mult(e: Dictionary) -> float:
+	if e.is_empty() or not e.has("ch"):
+		return 1.0
+	return RulesWarBeast.regen_mult(_wbcfg(), active_beast(e["ch"]))
+
+
+# 霸王熊「背負」: 背包負重上限加成 (底 = world.dropped.capBagWeight)
+func _bag_cap(ch: Dictionary) -> int:
+	var base := int(data.world.get("dropped", {}).get("capBagWeight", 1000))
+	var wb := active_beast(ch)
+	if wb.is_empty():
+		return base
+	return int(MathX.js_round(float(base) * RulesWarBeast.bag_cap_mult(_wbcfg(), wb)))
+
+
 # 出戰戰騎實體 (owner 嘅 active beast entity)，冇 = {}
 func beast_ent(owner_id: int) -> Dictionary:
 	for e in ents.values():
@@ -288,13 +318,72 @@ func _beast_tick() -> void:
 			if int(be["hp"]) < int(st["hpMax"]):
 				be["hp"] = mini(int(st["hpMax"]), int(be["hp"]) + maxi(1, int(ceil(int(st["hpMax"]) * regen_pct))))
 			if int(be["ch"]["mp"]) < int(st["mpMax"]):
-				be["ch"]["mp"] = mini(int(st["mpMax"]), int(be["ch"]["mp"]) + maxi(1, int(ceil(int(st["mpMax"]) * regen_pct))))
+				var mpg := maxi(1, int(ceil(int(st["mpMax"]) * regen_pct * (1.0 + _beast_buff_sum(be, "mpRegen")))))
+				be["ch"]["mp"] = mini(int(st["mpMax"]), int(be["ch"]["mp"]) + mpg)
 			if int(be["ch"]["sp"]) < int(st["spMax"]):
 				be["ch"]["sp"] = mini(int(st["spMax"]), int(be["ch"]["sp"]) + maxi(1, int(ceil(int(st["spMax"]) * regen_pct))))
 			wb["hp"] = int(be["hp"])
 			wb["mp"] = int(be["ch"]["mp"])
 			wb["sp"] = int(be["ch"]["sp"])
 		_sync_beast_ent(be, wb)
+		_apply_friend_passives(e)
+		if _friend_effect_active(e, "auto_loot"):
+			_beast_auto_loot(e)
+
+
+# 友好特技被動效果 (S07c): 九尾狐「金剛」→ 護甲術 (armor1)；「守護」→ 護鏡術 (mirror1)
+# 【自訂簡化】出戰期間持續刷新（每 tick 補回狀態 time），等於常駐。
+func _apply_friend_passives(e: Dictionary) -> void:
+	var fx := _friend_effects(e)
+	if fx.is_empty():
+		return
+	var status: Dictionary = (e["ch"] as Dictionary).get("status", {})
+	if bool(fx.get("armor_skill", false)):
+		RulesSpell.add_status(status, "armor1", RulesSpell.status_ticks("armor1"), tick)
+	if bool(fx.get("mirror_skill", false)):
+		RulesSpell.add_status(status, "mirror1", RulesSpell.status_ticks("mirror1"), tick)
+	(e["ch"] as Dictionary)["status"] = status
+
+
+# 殘影豹「撿寶」: 主人附近嘅地面掉落物自動收進背包 (受負重上限限制)
+func _beast_auto_loot(o: Dictionary) -> void:
+	var rng_cells := int((_wbcfg().get("friendEffects", {}) as Dictionary).get("autoLootRange", 3))
+	var drops: Array = []
+	for d in ents.values():
+		if d.get("kind", "") == "dropped" and int(d.get("hp", 1)) > 0 \
+				and RulesCombat.in_range(int(o["x"]), int(o["y"]), int(d["x"]), int(d["y"]), rng_cells):
+			drops.append(int(d["id"]))
+	if drops.is_empty():
+		return
+	var oid := int(o["id"])
+	var ch: Dictionary = o["ch"]
+	var cap := _bag_cap(ch)
+	var wfn := func(i: int) -> int: return int(data.weights.get(i, 0))
+	var cfg: Dictionary = data.world.get("dropped", {})
+	for did in drops:
+		var d := ent(int(did))
+		if d.is_empty() or d.get("kind", "") != "dropped":
+			continue
+		var picked: Array = []
+		var leftover: Array = []
+		for it in d["drop"]["items"] as Array:
+			var iid := int(it["id"])
+			var n := int(it["n"])
+			if RulesShop.bag_fits(ch["bag"], iid, n, wfn, cap):
+				RulesShop.add_item(ch["bag"], iid, n)
+				picked.append({"id": iid, "n": n})
+			else:
+				leftover.append({"id": iid, "n": n})
+		if picked.is_empty():
+			continue
+		if leftover.is_empty():
+			_remove_ent(int(d["id"]))
+		else:
+			d["drop"]["items"] = leftover
+			d["drop"]["until"] = tick + int(cfg.get("capTicks", 300))
+		for it in picked:
+			_msg(oid, "戰騎執到 %s ×%d" % [data.names.get(int(it["id"]), str(it["id"])), int(it["n"])])
+		_emit({"k": "beast_loot", "dst": oid, "items": picked})
 
 
 # 無主實體清理 (主人走佬/死)
@@ -356,9 +445,12 @@ func _think_beast(e: Dictionary) -> void:
 
 
 func _beast_target_def(t: Dictionary) -> float:
+	var base: float
 	if t.get("kind", "") == "mob":
-		return float(data.mob_def(int(t["mob"]["def"]))["def"])
-	return float(RulesCombat.player_def(int(t.get("level", 1))))
+		base = float(data.mob_def(int(t["mob"]["def"]))["def"])
+	else:
+		base = float(RulesCombat.player_def(int(t.get("level", 1))))
+	return RulesCombat.debuffed(base, t.get("beastDebuff", {}), "def", tick)
 
 
 func _beast_fire(e: Dictionary, wb: Dictionary, t: Dictionary) -> void:
@@ -386,6 +478,7 @@ func _beast_normal_hit(e: Dictionary, st: Dictionary, t: Dictionary) -> void:
 	var dmg := RulesCombat.calc_mob_damage(float(st["atk"]), _beast_target_def(t), rng_fn, atk_mult)
 	_emit({"k": "hit", "src": int(e["id"]), "dst": int(t["id"]), "dmg": dmg})
 	damage(t, dmg, e)
+	_beast_on_deal(e, dmg)
 
 
 func _beast_use_skill(e: Dictionary, wb: Dictionary, st: Dictionary, t: Dictionary, pick: Dictionary, cd: Dictionary) -> void:
@@ -405,19 +498,26 @@ func _beast_use_skill(e: Dictionary, wb: Dictionary, st: Dictionary, t: Dictiona
 		_msg(int(e.get("owner", 0)), "%s「%s」回復 %d HP" % [String(e["name"]), s["name"], heal])
 		return
 	if kind in ["buff", "debuff"]:
-		# 【自訂簡化】buff/debuff 淨係套現有狀態 (atk→強力/def→護甲)；其他 stat 暫無下游效果
+		# S07b/S07c: buff 對自己（atk/def → 現有狀態；spellAtk/lifesteal/mpRegen → beastBuff）；
+		# debuff 對目標（存 t.beastDebuff，def/atk 有下游效果）
 		var stat := String(s.get("stat", ""))
-		var status: Dictionary = e["ch"]["status"]
-		if stat == "atk" and kind == "buff":
-			RulesSpell.add_status(status, "power2", int(s.get("ticks", 300)), tick)
-		elif stat == "def" and kind == "buff":
-			RulesSpell.add_status(status, "armor2", int(s.get("ticks", 300)), tick)
+		var ticks := int(s.get("ticks", 300))
+		if kind == "buff":
+			var status: Dictionary = e["ch"]["status"]
+			if stat == "atk":
+				RulesSpell.add_status(status, "power2", ticks, tick)
+			elif stat == "def":
+				RulesSpell.add_status(status, "armor2", ticks, tick)
+			else:
+				_beast_add_buff(e, stat, val, ticks)
+		else:
+			_apply_beast_debuff(t, stat, val, ticks)
 		return
 	var atk_mult := RulesSpell.atk_mult((e["ch"] as Dictionary).get("status", {}), tick)
 	if kind == "mpNuke":
 		var mp := int(e["ch"]["mp"])
 		(e["ch"] as Dictionary)["mp"] = 0
-		_beast_dmg(e, st, t, val, atk_mult, mp)
+		_beast_dmg(e, st, t, val, atk_mult, float(mp) * (1.0 + _beast_buff_sum(e, "spellAtk")))
 		return
 	if kind == "aoe":
 		var r := float(s.get("range", 3))
@@ -446,6 +546,38 @@ func _beast_dmg(e: Dictionary, st: Dictionary, target: Dictionary, val: float, a
 	var dmg := RulesCombat.calc_mob_damage(atk, _beast_target_def(target), rng_fn, atk_mult)
 	_emit({"k": "hit", "src": int(e["id"]), "dst": int(target["id"]), "dmg": dmg})
 	damage(target, dmg, e)
+	_beast_on_deal(e, dmg)
+
+
+# ================= S07b 戰鬥特技 buff/debuff 下游 (beastBuff / beastDebuff) =================
+func _beast_add_buff(e: Dictionary, stat: String, pct: float, ticks: int) -> void:
+	var bf: Dictionary = e.get("beastBuff", {})
+	bf[stat] = {"val": pct, "until": tick + ticks}
+	e["beastBuff"] = bf
+
+
+# 未過期嘅 buff 值 (冇 = 0.0)
+func _beast_buff_sum(e: Dictionary, stat: String) -> float:
+	var d = (e.get("beastBuff", {}) as Dictionary).get(stat)
+	if d is Dictionary and tick < int(d.get("until", 0)):
+		return float(d.get("val", 0.0))
+	return 0.0
+
+
+func _apply_beast_debuff(t: Dictionary, stat: String, pct: float, ticks: int) -> void:
+	var db: Dictionary = t.get("beastDebuff", {})
+	db[stat] = {"val": pct, "until": tick + ticks}
+	t["beastDebuff"] = db
+
+
+# 「聖血」等吸血 buff: 戰騎造成傷害就回血
+func _beast_on_deal(e: Dictionary, dmg: int) -> void:
+	var ls := _beast_buff_sum(e, "lifesteal")
+	if ls <= 0.0 or dmg <= 0:
+		return
+	var heal := maxi(1, MathX.js_round(float(dmg) * ls))
+	e["hp"] = mini(int(e["max_hp"]), int(e["hp"]) + heal)
+	(e["ch"] as Dictionary)["hp"] = int(e["hp"])
 
 
 # ================= 死亡 / 忠誠 / 吸 exp =================
@@ -533,7 +665,9 @@ func beast_view(id: int) -> Dictionary:
 			"atk": int(st["atk"]), "def": int(st["def"]), "attrs": (wb["attrs"] as Dictionary).duplicate(),
 			"attrPts": int(wb.get("attrPts", 0)), "battlePts": int(wb.get("battlePts", 0)), "friendPts": int(wb.get("friendPts", 0)),
 			"loyalty": int(wb.get("loyalty", 0)), "skills": skills, "friends": friends,
+			"effects": RulesWarBeast.active_effects(cfg, wb),
 			"sellPrice": RulesWarBeast.sell_price(cfg, wb), "sellWhy": RulesWarBeast.sell_why(cfg, wb, int(ch["level"]))})
 	return {"list": list, "maxOwned": int(cfg["maxOwned"]), "active": int(active_beast(ch).get("uid", 0)),
 		"stable": stable_near(e), "gold": int(ch["gold"]), "breeds": RulesWarBeast.breeds_enabled(cfg),
-		"attrs": cfg["attrs"], "attrNames": cfg["attrNames"]}
+		"attrs": cfg["attrs"], "attrNames": cfg["attrNames"],
+		"effects": RulesWarBeast.active_effects(cfg, active_beast(ch))}

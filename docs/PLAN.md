@@ -26,7 +26,7 @@
 | 04 怪物地圖 | ✅ | ✅ | 46 怪 + 掉落導入、重生、逃跑/群攻、boss 每日、夜怪、汝南洞 10 層、張牛角戰役、**地面掉落物（`dropped` 實體：300 tick 消失 + 撳地拾取 + 背包滿 + 存檔 roundtrip，S04a）**、**術法怪/boss 技能（遠程吟唱+走位可躲+吟唱線索+`skills`表輪流，S04b）**、**其餘 5 場戰役實體（褚飛燕→李大目→張白騎→黃龍→十常侍 26 層 monster+多層 map+掉寶齊，記事戰役頁+大地圖標示，S04c）** 、**特殊場景首批**（桃花渡 5 層 + 七彩奪寶陣 7 層，game 日曆開門 + 記事場景頁 + 入口對話 + 大地圖標示，S04d） | 通天關/黑山寨/安定戰場/雪山/異族禁地（留返後續批次） |
 | 05 生產經濟 | 🟡 | ✅ | 6 初階 + 5 進階 + 2318 配方、修理、工具店、天地商行、捐獻、市場 | 產出 1~2 件、特製/白金/御賜工具、大宗師、4 類商店補齊、天災停進貨、城際貿易提示 |
 | 06 任務 | 🟡 | ✅ | 框架、新手 5 條、義士絕招 3 條、官令 7 條、歷史 11+1 條、委託、戰役、團體任務 17 條（16 條義勇軍限定 + 紫虛上人非義勇軍版，S06c）、其他職絕招 15 條（S06d）、**專長任務 8 條（天文/地理認證 1~4 級，S06e）** | 四~六招、結婚、左慈渾天儀任務、國戰專長（→S10） |
-| 07 座騎戰騎 | 🟡 | 🟡 | 17a 座騎全套 + UI；17b 繁衍/馬戰 **sim 有、`main.gd` 有派送、面板未有掣**；18 戰騎純規則；**S07b（leg 5）戰騎 sim 整合**（`sim/sim_war_beast.gd`：馬廄馴養買獸/最多 3 隻/出戰跟隨+自動攻擊+戰鬥特技/吸 exp/死亡忠誠−1/走佬/寄馬廄） | 繁衍/馬戰/改名 UI；戰騎 UI 面板；友好技效果（S07c）；NPC 拍賣場（S07d）；特技「馴馬」；原版捕獲途徑 |
+| 07 座騎戰騎 | 🟡 | 🟡 | 17a 座騎全套 + UI；17b 繁衍/馬戰 **sim 有、`main.gd` 有派送、面板未有掣**；18 戰騎純規則；**S07b（leg 5）戰騎 sim 整合**（`sim/sim_war_beast.gd`：馬廄馴養買獸/最多 3 隻/出戰跟隨+自動攻擊+戰鬥特技/吸 exp/死亡忠誠−1/走佬/寄馬廄）；**S07c（leg 6）友好特技效果接系統**（`RulesWarBeast.active_effects` + sim hook：撿寶/聖體/背負/神奇/玄妙/幸運護身還魂/金剛守護/導航天眼 read-model；戰鬥特技 buff/debuff spellAtk/lifesteal/mpRegen + 降敵物防/物攻下游） | 繁衍/馬戰/改名 UI；戰騎 UI 面板；NPC 拍賣場（S07d）；特技「馴馬」；原版捕獲途徑；其餘友好技效果（聖靈/遁地/奇門/脫出/召喚/神行/回城/火焰/飛影/狂力/開光/忠誠/巨力/穩重/地行/神獸/嗅血/野性/獅魂/王者） |
 | 08 名聲義勇軍 | 🟡 | 🟡 | 名聲、頭銜 60 階、官宅（討取/官令/捐獻/月俸/行動丹） | 義舉證明、城池進貢、名額競爭、官宅內政 6 種 + 城池屬性、救災、義勇軍、帶兵量、營地、團體工作、民心、法令 |
 | 09 登用武將 | 🟡 | 🟡 | 居民 bot/記憶/brain、登用 v1+v2、同伴 6 指令、20 passive 特技 | `residents.json` 居民化、傳聞擴散、忠誠事件規則、其餘 50 特技、內政協助、LLM 層（原 Step 20） |
 | 10 國戰 | ❌ | ❌ | — | 全部（D-3【待決】） |
@@ -193,9 +193,14 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
   - 驗收：`tests/run_mount.gd` 217 項（PASS）
 - [x] **S07b 戰騎 sim 整合**：獲得途徑【待決，攻略：捕獲/任務/商店？】、最多 3 隻、出戰跟隨 + 自動攻擊、吸 exp 升級、戰鬥特技出手、死亡忠誠 −1/走佬、寄馬廄
   - 完成：新繼承層 `sim/sim_war_beast.gd`（夾喺 sim_mount 同 sim 之間）：`ch.warBeasts`（最多 `maxOwned`=3）+ `beastSeq`；出戰戰騎 = kind `beast` 實體（`owner`/`uid`），跟主人跨圖（`_route_to_map`）、幫主人打/護主/自行搵附近怪（`_think_beast`）；`rules/war_beast.gd` 加 `stats_for`（四維→HP/MP/攻/防/術攻防/命中/迴避/SP/攻速；passive 特技加成）、`exp_share`、`pick_skill`（血少優先補血，否則揀數值最高嘅主動傷害招）；`data/war_beasts.json` 加 `stats`/`beastExpShare`/各品種 `price`。指令：`cmd_beast_adopt/deploy/rename/point/train/friend_train/sell` + `beast_view`；主人（或同伴/戰騎）殺怪 → 出戰戰騎吸 `base_exp × beastExpShare`（`sim_combat._kill_mob` 經 `_beast_on_mob_kill` hook）；死亡 → `RulesWarBeast.on_death` 忠誠 −1 + 送返馬廄，忠誠 0 = 走佬消失。
-  - **偏離／【待決：獲得途徑】處理**：原版捕獲/任務/商店【待決】→ 推薦方針「馬廄『戰騎馴養』買幼獸（按品種價）+ 每隻出戰」先做；原版捕獲、NPC 拍賣場（隨機上架）留 S07d；怪物掉落唔做（避免改生成檔）。戰鬥特技 buff/debuff 效果【自訂簡化，同馬戰特技做法】：只映射 atk→「強力」/def→「護甲」狀態，其餘 stat（spellAtk/lifesteal/mpRegen）暫無下游效果（S07c 友好特技一齊接系統）。PK（戰騎打戰騎）單機冇對手，唔做。只做邏輯，戰騎面板 + 掣未有（UI 欠債）。
+  - **偏離／【待決：獲得途徑】處理**：原版捕獲/任務/商店【待決】→ 推薦方針「馬廄『戰騎馴養』買幼獸（按品種價）+ 每隻出戰」先做；原版捕獲、NPC 拍賣場（隨機上架）留 S07d；怪物掉落唔做（避免改生成檔）。戰鬥特技 buff/debuff 效果【自訂簡化，同馬戰特技做法】：只映射 atk→「強力」/def→「護甲」狀態，其餘 stat（spellAtk/lifesteal/mpRegen）**leg 6 已接**（見 S07c）。PK（戰騎打戰騎）單機冇對手，唔做。只做邏輯，戰騎面板 + 掣未有（UI 欠債）。
   - 驗收：`tests/run_war_beast.gd` 100→145 項；`sh tools/run_tests.sh` ALL OK（mount 217、war_beast 145、hud 4195、uitest 129、導入器 --check 全過）
-- [ ] **S07c 友好特技效果接系統**：導航/天眼/撿寶（接 S04a）/幸運護身還魂（接 S03c）/金剛守護/聖體（×2 回復，接 S01a）/背負/神奇（錢莊）/玄妙（驛站）等
+- [x] **S07c 友好特技效果接系統**：導航/天眼/撿寶（接 S04a）/幸運護身還魂（接 S03c）/金剛守護/聖體（×2 回復，接 S01a）/背負/神奇（錢莊）/玄妙（驛站）等
+  - 完成：`rules/war_beast.gd` 加 `active_effects`/`has_effect`（friendSkills learned flag → effect id 集，跨品種學都算）+ `bag_cap_mult`/`regen_mult`；`data/war_beasts.json` 加 `friendEffects`（`autoLootRange`/`bagCapacityPct`/`regenMult`）。sim hook（`sim_core`）：`_friend_effect_active`/`_friend_regen_mult`/`_bag_cap`，由 `sim_war_beast` 按出戰戰騎覆寫。
+  - 接落去嘅系統：**撿寶**（`_beast_auto_loot` 喺 `_beast_tick` 自動執主人附近掉落物，受負重上限限制）接 S04a；**幸運/護身/還魂**（`sim_combat._kill_player` 三個死亡道具效果，友好技生效就唔消耗道具）接 S03c；**聖體**（`sim.gd._safe_regen_tick` 回復 ×2）接 S01a；**金剛/守護**（`_apply_friend_passives` 常駐 armor1/mirror1）接 spec 02 §7 狀態；**背負**（`_bag_cap` ×1.5，`sim_combat.cmd_pick` 用）；**神奇**（`sim_econ` 存/攞倉庫免訂閱天地商行）【待決：錢莊介面 → 單機化 = 天地商行倉庫】；**玄妙**（`sim_station` 唔喺驛站都用得到，車費由所在地圖起計）；**導航/天眼**（read-model `beast_view.effects`，等 UI 用）。
+  - **同時清 S07b 遺留**：戰鬥特技 buff/debuff 其餘 stat 下游 — beast 自身 buff `spellAtk`（加 mpNuke 傷害）/`lifesteal`（傷害回血）/`mpRegen`（脫戰回魔加成）存 `e.beastBuff`；debuff 對目標存 `t.beastDebuff`，`def`（`_beast_target_def` 降敵物防）/`atk`（`sim_ai` 怪打人降攻）有下游效果；`RulesCombat.debuffed` 純函數。
+  - **偏離／【自訂簡化】**：金剛/守護 = 常駐狀態（唔係施放一次）；神奇【待決：錢莊】→ 免訂閱用天地商行倉庫；導航/天眼只出 read-model flag（UI 延後）；debuff 嘅 spellDef/hit/evade 對物理怪冇下游（記 PLAN §4）；聖靈/遁地/奇門/脫出/召喚/神行/回城/火焰/飛影/狂力/開光/忠誠/巨力/穩重/地行/神獸/嗅血/野性/獅魂/王者等其餘友好技效果留後續（記 PLAN §4）。
+  - 驗收：`tests/run_war_beast.gd` 145→185 項；`sh tools/run_tests.sh` ALL OK
 - [ ] **S07d 戰騎面板 + NPC 拍賣場**（馬/戰騎隨機上架）；武將特技 52「馴馬」（處理抽特技打亂問題）
 - 驗收：`tests/run_mount.gd`/`run_war_beast.gd` 擴充 + `--uitest` 繁衍/馬戰/戰騎
 
@@ -263,7 +268,7 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
 | S03b | 城門「拒入城」採用「城內服務拒絶 + 定期 guard_warn」而非硬閂城門（連續地圖 + 死亡返客棧先天衝突；見樣 ·3 完成註）——若日後 spec 08 法令 7「善惡法令容許殺人魔入城」要放寬，接 `world.json bots.guardWarnTicks` / `cmd_rest` / `_city_guard_check` 開關 | S08g |
 | S05b | 工具正式來源（團體任務） | S06c/S08f |
 | S06c | 義勇軍限定團體任務 | S08f |
-| S07c | 撿寶/幸運護身還魂/聖體 | 要 S04a/S03c/S01a 先（**S04a 已接**：`sim.dropped` 實體 + `cmd_pick` 有；撿寶友好技喺 S07c 自動執 `_drop_items` 產出） |
+| S07c | 撿寶/幸運護身還魂/聖體 | 要 S04a/S03c/S01a 先（**已接**：撿寶自動執 `_drop_items` 產出、幸運/護身/還魂 friendly 代替死亡道具、聖體 `_safe_regen_tick` ×2） |
 | S03c | 死亡道具正式來源：三件（65016 幸運符/65029 護身符/65030 還魂丹）淨返票先入藥膳師庫存（價 500/800/1500）；代 11 商城道具定案時再改價/改來源（`data/shops.json` herbalist + `data/items.json`） | **S11（已接過渡：藥膳師庫存）** |
 | S04a | 「背包滿」負重上限：本事步先用 `world.json dropped.capBagWeight=1000`（items.json weight×件數）【待決→用推薦方針】；真正負重系統（上限公式/稱號加成/搬運）S05 城際貿易做時確定 + 重用 `RulesShop.bag_weight/bag_fits` | S05 |
 | S08g | 民心/法令要有城池 | S10c |
@@ -272,8 +277,12 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
 | S05c | 白晝之珠正式來源（神秘洞窟打怪掉落，v1 後期新場景）；過渡用官宅貢獻兌換（`cmd_master_redeem_baizhu`） | 後續批次（同 通天關/黑山寨 等一齊考慮） |
 | S05c | 大宗師合成場景開唔開放由城主法令決定；而家常開 | S08 法令 |
 | S07b | 戰騎獲得途徑【待決→推薦方針】原版捕獲/任務/商店；而家用馬廄「戰騎馴養」買幼獸 + 每隻出戰；原版捕獲機制未做 | S07d（NPC 拍賣場隨機上架）/ 後續捕獲批次 |
-| S07b | 戰騎戰鬥特技 buff/debuff 部分 stat（spellAtk/lifesteal/mpRegen 等）淨記狀態、冇下游效果（同馬戰特技做法） | S07c（友好特技效果接系統） |
-| S07b | 戰騎 UI 面板 + 出戰/訓練/友好/賣掣未有（`beast_view` read-model 已備） | 後續專 UI Step |
+| S07b | 戰騎戰鬥特技 buff/debuff 部分 stat：**leg 6 已接** spellAtk/lifesteal/mpRegen（beastBuff 下游）+ 降敵 def/atk（beastDebuff 下游）；debuff 嘅 spellDef/hit/evade 對物理怪冇下游效果 | 後續（有需要先） |
+| S07c | 友好技導航/天眼只出 read-model flag（`beast_view.effects`），小地圖/顯示 NPC 嘅 UI 延後 | 後續專 UI Step |
+| S07c | 神奇【待決：錢莊介面】→ 單機化 = 免訂閱用天地商行倉庫（存/攞）；原版錢莊（存款/提款）未做 | 後續（有需要先） |
+| S07c | 金剛/守護【自訂簡化】= 出戰期間常駐 armor1/mirror1（唔係施放一次） | 後續（有需要先） |
+| S07c | 其餘友好技效果未接：聖靈/遁地/奇門/脫出/召喚/神行/回城/火焰/飛影/狂力/開光/忠誠/巨力/穩重/地行/神獸/嗅血/野性/獅魂/王者（多數係道具/UI 功能） | 後續批次 / 專 UI Step |
+| S07b | 戰騎 UI 面板 + 出戰/訓練/友好/賣掣未有（`beast_view` read-model 已備，`effects` 欄亦備） | 後續專 UI Step |
 | 2026-09-25 討論 | 多存檔 + 共享世界隊友（方向 2.5，見下）| S02c 做完後開新 Step |
 
 ---

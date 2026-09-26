@@ -18,9 +18,9 @@ static func keys(facilities: Dictionary) -> Array:
 	return out
 
 
-# 傳送得唔得: "" = 得；否則係原因
-static func check(from_key: String, to_key: String, facilities: Dictionary, hops: int, gold: int, cfg: Dictionary) -> String:
-	if from_key == "":
+# 傳送得唔得: "" = 得；否則係原因。remote = 戰騎「玄妙」效果（唔喺驛站都用到驛站介面）
+static func check(from_key: String, to_key: String, facilities: Dictionary, hops: int, gold: int, cfg: Dictionary, remote: bool = false) -> String:
+	if from_key == "" and not remote:
 		return "要去驛站先得"
 	var t = facilities.get(to_key, {})
 	if not (t is Dictionary) or not bool(t.get("station", false)):

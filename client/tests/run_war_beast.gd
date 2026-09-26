@@ -25,6 +25,16 @@ func _init() -> void:
 	t_sim_death(data)
 	t_sim_roundtrip(data)
 	t_sim_determinism(data)
+	t_friend_effects_rules(cfg)
+	t_sim_friend_loot(data)
+	t_sim_friend_bag(data)
+	t_sim_friend_bank(data)
+	t_sim_friend_station(data)
+	t_sim_friend_death(data)
+	t_sim_friend_regen(data)
+	t_sim_friend_passives(data)
+	t_sim_skill_buff_debuff(data)
+	t_sim_friend_view(data)
 	print("[TEST] war_beast: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -445,3 +455,198 @@ func _script(data: GameData) -> String:
 	for i in 200:
 		sim.step()
 	return sim.save_string()
+
+# ================= S07c 友好特技效果接系統 =================
+func t_friend_effects_rules(cfg: Dictionary) -> void:
+	var wb := RulesWarBeast.new_beast(cfg, "niujiao", 1)
+	wb["friendSkills"] = {"niujiao_daohang": true}
+	check(RulesWarBeast.has_effect(cfg, wb, "map_city"), "導航 → map_city 效果")
+	check(not RulesWarBeast.has_effect(cfg, wb, "auto_loot"), "未學撿寶 → 冇 auto_loot")
+	check(is_equal_approx(RulesWarBeast.bag_cap_mult(cfg, wb), 1.0), "冇背負 → 負重倍率 1.0")
+	# 跨品種學：殘影豹一階撿寶
+	var wb2 := RulesWarBeast.new_beast(cfg, "niujiao", 2)
+	wb2["friendSkills"] = {"canying_jianbao": true}
+	check(RulesWarBeast.has_effect(cfg, wb2, "auto_loot"), "跨品種學撿寶 → auto_loot")
+	# 背負 / 聖體 數值
+	var bear := RulesWarBeast.new_beast(cfg, "bawang", 3)
+	bear["friendSkills"] = {"bawang_beifu": true}
+	check(is_equal_approx(RulesWarBeast.bag_cap_mult(cfg, bear), 1.5), "背負 → 負重上限 ×1.5")
+	var fox := RulesWarBeast.new_beast(cfg, "jiuwei", 4)
+	fox["friendSkills"] = {"jiuwei_shengti": true}
+	check(is_equal_approx(RulesWarBeast.regen_mult(cfg, fox), 2.0), "聖體 → 回復 ×2")
+	# 效果集
+	var fx := RulesWarBeast.active_effects(cfg, bear)
+	check(bool(fx.get("bag_capacity", false)) and not bool(fx.get("bank", false)), "效果集只含已學")
+
+
+func _learn(sim: Sim, id: int, uid: int, breed: String, skill_id: String) -> void:
+	sim._beasts(sim.player_ch())[0]["friendPts"] = 999
+	sim.cmd_beast_friend_train(id, uid, breed, skill_id)
+
+
+func _adopt(data: GameData, seed: int, breed: String) -> Array:
+	var r := _new(data, seed)
+	var sim: Sim = r[0]
+	var id: int = r[1]
+	_at_fac(sim, id, "stable_xc")
+	sim.cmd_beast_adopt(id, breed)
+	return r
+
+
+func t_sim_friend_loot(data: GameData) -> void:
+	var r := _adopt(data, 31, "canying")
+	var sim: Sim = r[0]
+	var id: int = r[1]
+	var ch: Dictionary = r[2]
+	var uid := int(sim._beasts(ch)[0]["uid"])
+	_learn(sim, id, uid, "canying", "canying_jianbao")
+	_put(sim, id, 30, 30)
+	var d := sim._drop_items(31, 30, [{"id": 65008, "n": 2}])
+	check(not d.is_empty(), "跌咗件嘢落地")
+	var looted: Array = []
+	sim.event_emitted.connect(func(ev: Dictionary) -> void:
+		if ev["k"] == "beast_loot":
+			looted.append(ev))
+	sim.step()
+	check(not looted.is_empty(), "戰騎自動執咗地下寶物")
+	check(RulesShop.count_item(ch["bag"], 65008) == 2, "執到嘅嘢入咗玩家背包")
+	check(sim.ents.get(int(d["id"]), {}).is_empty(), "執晒 → 掉落物消失")
+
+
+func t_sim_friend_bag(data: GameData) -> void:
+	var r := _adopt(data, 32, "bawang")
+	var sim: Sim = r[0]
+	var id: int = r[1]
+	var ch: Dictionary = r[2]
+	var base := int(sim.data.world["dropped"]["capBagWeight"])
+	check(sim._bag_cap(ch) == base, "冇背負 → 負重上限 = 底值")
+	var uid := int(sim._beasts(ch)[0]["uid"])
+	_learn(sim, id, uid, "bawang", "bawang_beifu")
+	check(sim._bag_cap(ch) == int(round(float(base) * 1.5)), "背負 → 負重上限 ×1.5")
+
+
+func t_sim_friend_bank(data: GameData) -> void:
+	var r := _adopt(data, 33, "bawang")
+	var sim: Sim = r[0]
+	var id: int = r[1]
+	var ch: Dictionary = r[2]
+	RulesShop.add_item(ch["bag"], 65016, 2)
+	sim.cmd_storage_deposit(id, 65016, 1)
+	check(RulesShop.count_item(ch["storage"], 65016) == 0, "冇神奇 + 冇訂閱 → 存唔到")
+	var uid := int(sim._beasts(ch)[0]["uid"])
+	_learn(sim, id, uid, "bawang", "bawang_beifu")
+	_learn(sim, id, uid, "bawang", "bawang_shenqi")
+	sim.cmd_storage_deposit(id, 65016, 1)
+	check(RulesShop.count_item(ch["storage"], 65016) == 1, "學咗神奇 → 免訂閱存得")
+	sim.cmd_storage_withdraw(id, 65016, 1)
+	check(RulesShop.count_item(ch["storage"], 65016) == 0, "學咗神奇 → 免訂閱攞返")
+
+
+func t_sim_friend_station(data: GameData) -> void:
+	var r := _adopt(data, 34, "bawang")
+	var sim: Sim = r[0]
+	var id: int = r[1]
+	var ch: Dictionary = r[2]
+	var e := sim.ent(id)
+	check(sim.station_near(e) == "", "企喺非驛站位置")
+	sim.cmd_station(id, "station_xy")
+	check(sim.map_id_at(int(e["x"]), int(e["y"])) != String(sim.data.facilities["station_xy"]["map"]) \
+		or sim.station_near(e) != "station_xy", "冇玄妙 → 去唔到 (仍喺原地)")
+	var uid := int(sim._beasts(ch)[0]["uid"])
+	_learn(sim, id, uid, "bawang", "bawang_beifu")
+	_learn(sim, id, uid, "bawang", "bawang_shenqi")
+	_learn(sim, id, uid, "bawang", "bawang_xuanmiao")
+	var gold0 := int(ch["gold"])
+	check(sim.station_view(id).get("remote", false), "station_view 標示 remote")
+	sim.cmd_station(id, "station_xy")
+	check(sim.station_near(e) == "station_xy", "學咗玄妙 → 喺任何地方去得到驛站")
+	check(int(ch["gold"]) < gold0, "遠程驛站照收車費")
+
+
+func t_sim_friend_death(data: GameData) -> void:
+	var r := _adopt(data, 35, "canying")
+	var sim: Sim = r[0]
+	var id: int = r[1]
+	var ch: Dictionary = r[2]
+	var uid := int(sim._beasts(ch)[0]["uid"])
+	_learn(sim, id, uid, "canying", "canying_jianbao")
+	_learn(sim, id, uid, "canying", "canying_xingyun")
+	_learn(sim, id, uid, "canying", "canying_hushen")
+	_learn(sim, id, uid, "canying", "canying_huanhun")
+	RulesShop.add_item(ch["bag"], 65008, 3)
+	ch["exp"] = 100000
+	var dies: Array = []
+	sim.event_emitted.connect(func(ev: Dictionary) -> void:
+		if ev["k"] == "die":
+			dies.append(ev))
+	sim._kill_player(sim.ent(id))
+	check(dies.size() == 1, "死咗一次")
+	var ev: Dictionary = dies[0]
+	check(bool(ev["lucky"]), "幸運 → 死亡唔跌物品")
+	check(bool(ev["huhushen"]), "護身 → 經驗損失減半")
+	check(bool(ev["revived"]), "還魂 → 復活效果")
+	check((ev["dropped"] as Array).is_empty(), "冇跌任何嘢")
+	check(RulesShop.count_item(ch["bag"], 65008) == 3, "友好技唔消耗道具")
+
+
+func t_sim_friend_regen(data: GameData) -> void:
+	var r := _adopt(data, 36, "jiuwei")
+	var sim: Sim = r[0]
+	var id: int = r[1]
+	var ch: Dictionary = r[2]
+	check(is_equal_approx(sim._friend_regen_mult(sim.ent(id)), 1.0), "冇聖體 → 回復倍率 1.0")
+	var uid := int(sim._beasts(ch)[0]["uid"])
+	_learn(sim, id, uid, "jiuwei", "jiuwei_jingang")
+	_learn(sim, id, uid, "jiuwei", "jiuwei_shouhu")
+	_learn(sim, id, uid, "jiuwei", "jiuwei_shengti")
+	check(is_equal_approx(sim._friend_regen_mult(sim.ent(id)), 2.0), "聖體 → 回復倍率 2.0")
+
+
+func t_sim_friend_passives(data: GameData) -> void:
+	var r := _adopt(data, 37, "jiuwei")
+	var sim: Sim = r[0]
+	var id: int = r[1]
+	var ch: Dictionary = r[2]
+	var uid := int(sim._beasts(ch)[0]["uid"])
+	_learn(sim, id, uid, "jiuwei", "jiuwei_jingang")
+	_learn(sim, id, uid, "jiuwei", "jiuwei_shouhu")
+	sim.step()
+	var status: Dictionary = ch["status"]
+	check(RulesSpell.has(status, "armor1", sim.tick + 1), "金剛 → 護甲術 (armor1) 常駐")
+	check(RulesSpell.has(status, "mirror1", sim.tick + 1), "守護 → 護鏡術 (mirror1) 常駐")
+
+
+func t_sim_skill_buff_debuff(data: GameData) -> void:
+	var r := _adopt(data, 38, "jifeng")
+	var sim: Sim = r[0]
+	var id: int = r[1]
+	var be := sim.beast_ent(id)
+	sim._beast_add_buff(be, "lifesteal", 0.2, 300)
+	sim._beast_add_buff(be, "spellAtk", 0.15, 300)
+	check(is_equal_approx(sim._beast_buff_sum(be, "lifesteal"), 0.2), "聖血 → lifesteal buff 生效")
+	check(is_equal_approx(sim._beast_buff_sum(be, "spellAtk"), 0.15), "狐仙 → spellAtk buff 生效")
+	sim._beast_add_buff(be, "mpRegen", 0.3, 300)
+	check(is_equal_approx(sim._beast_buff_sum(be, "mpRegen"), 0.3), "凝神 → mpRegen buff 生效")
+	# 過期
+	be["beastBuff"]["lifesteal"]["until"] = sim.tick - 1
+	check(is_equal_approx(sim._beast_buff_sum(be, "lifesteal"), 0.0), "buff 過期 → 0")
+	# debuff 對目標
+	var mob := {"kind": "mob", "mob": {"def": 1009}, "level": 5}
+	var base := float(data.mob_def(1009)["def"])
+	check(base > 0.0, "測試怪有物防")
+	sim._apply_beast_debuff(mob, "def", -0.2, 300)
+	check(sim._beast_target_def(mob) < base, "破擊/狂吼 → 降敵物防")
+	check(is_equal_approx(RulesCombat.debuffed(100.0, {"atk": {"val": -0.2, "until": sim.tick + 10}}, "atk", sim.tick), 80.0),
+		"降敵物攻公式 ×0.8")
+
+
+func t_sim_friend_view(data: GameData) -> void:
+	var r := _adopt(data, 39, "bawang")
+	var sim: Sim = r[0]
+	var id: int = r[1]
+	var ch: Dictionary = r[2]
+	var uid := int(sim._beasts(ch)[0]["uid"])
+	_learn(sim, id, uid, "bawang", "bawang_beifu")
+	var v := sim.beast_view(id)
+	check(bool((v["effects"] as Dictionary).get("bag_capacity", false)), "beast_view 透出友好效果")
+	check(bool(((v["list"] as Array)[0]["effects"] as Dictionary).get("bag_capacity", false)), "每個戰騎有 effects 欄")

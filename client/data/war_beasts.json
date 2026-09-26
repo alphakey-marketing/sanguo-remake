@@ -110,6 +110,8 @@
   "_noteFriend": "友好特技表 (Step 18c, spec 07 §8.4)【原=4 階，消耗友好技點；每種戰騎第四階獨家】。表跟 spec 例子 (巨角牛/疾風狼/殘影豹/九尾狐/焰牙虎/霸王熊)；長牙象/嗜血獅 spec 冇例子，自己合理補齊【自訂】。學階數要順序（先學初階先學到二階）【自訂，spec 冇明講但合理】；成本 friendCosts[階-1]，跨戰騎學（唔係呢隻戰騎本身嘅表）× friendCrossMult【原】。大部分效果淨係記低 learned flag，實際功能 (小地圖/隱身/自動撿寶等) 未接其他系統，留返之後 UI/系統接通先算，跟 mount_weapons 馬戰特技做法一樣淨做數值層。",
   "friendCosts": [3, 6, 12, 24],
   "friendCrossMult": 3,
+  "_noteFriendEffects": "友好特技效果接系統 (S07c, spec 07 §8.4)【自訂數值】: autoLootRange = 殘影豹『撿寶』自動執地上寶物嘅半徑 (格)；bagCapacityPct = 霸王熊『背負』背包負重上限加成 (0.5 = +50%)；regenMult = 九尾狐『聖體』每刻自動回復倍率 (2.0 = ×2)。學習門檻之外嘅效果對應見 friendSkills[].effect。",
+  "friendEffects": {"autoLootRange": 3, "bagCapacityPct": 0.5, "regenMult": 2.0},
   "friendSkills": {
     "niujiao": [
       {"id": "niujiao_daohang", "name": "導航", "tier": 1, "effect": "map_city"},

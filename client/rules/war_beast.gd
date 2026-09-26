@@ -209,6 +209,53 @@ static func friend_train(cfg: Dictionary, wb: Dictionary, breed: String, skill_i
 	return true
 
 
+# ================= 友好特技效果接系統 (S07c, spec 07 §8.4) =================
+# friendSkills = {skill_id: true}（可以跨品種學）→ 實際效果集。呢度只做「有咩效果」查詢 + 幾個
+# 效果參數查詢；實際接系統喺 sim（撿寶/聖體/背負/神奇(錢莊)/玄妙(驛站)/死亡符/金剛守護）。
+
+
+# 由 skill id 搵返招式定義（friendSkills 表係 per-breed，跨品種學要逐個品種搵）
+static func _friend_skill_by_id(cfg: Dictionary, skill_id: String) -> Dictionary:
+	for breed in (cfg["friendSkills"] as Dictionary):
+		for s in (cfg["friendSkills"][breed] as Array):
+			if String(s["id"]) == skill_id:
+				return s
+	return {}
+
+
+# 戰騎學晒嘅友好特技效果集 (effect id → true)；跨品種學嘅都算
+static func active_effects(cfg: Dictionary, wb: Dictionary) -> Dictionary:
+	var out: Dictionary = {}
+	if wb.is_empty():
+		return out
+	for sid in (wb.get("friendSkills", {}) as Dictionary):
+		if not bool((wb["friendSkills"] as Dictionary)[sid]):
+			continue
+		var d := _friend_skill_by_id(cfg, String(sid))
+		if d.is_empty():
+			continue
+		out[String(d["effect"])] = true
+	return out
+
+
+static func has_effect(cfg: Dictionary, wb: Dictionary, effect: String) -> bool:
+	return bool(active_effects(cfg, wb).get(effect, false))
+
+
+# 背負: 背包負重上限倍率 (1.0 = 冇效果)；數值喺 cfg.friendEffects.bagCapacityPct
+static func bag_cap_mult(cfg: Dictionary, wb: Dictionary) -> float:
+	if not has_effect(cfg, wb, "bag_capacity"):
+		return 1.0
+	return 1.0 + float((cfg.get("friendEffects", {}) as Dictionary).get("bagCapacityPct", 0.5))
+
+
+# 聖體: 每刻自動回復倍率 (×2)；數值喺 cfg.friendEffects.regenMult
+static func regen_mult(cfg: Dictionary, wb: Dictionary) -> float:
+	if not has_effect(cfg, wb, "auto_heal_2x"):
+		return 1.0
+	return float((cfg.get("friendEffects", {}) as Dictionary).get("regenMult", 2.0))
+
+
 # ================= 忠誠 / 交易 (Step 18c, spec 07 §8.5) =================
 # 戰鬥死亡: 忠誠 −1；跌到 desertAt 或以下 = 走佬(離隊消失)【原】。回 true = 走咗
 

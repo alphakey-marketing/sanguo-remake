@@ -18,35 +18,49 @@ func _station_hops(from_key: String, to_key: String) -> int:
 	return map_hops(map_id_at(int(a["x"]), int(a["y"])), map_id_at(int(b["x"]), int(b["y"])))
 
 
-# 驛站面板視圖 (UI): 喺邊個驛站 + 其他驛站車費 (唔喺驛站 = from "")
+# 驛站面板視圖 (UI): 喺邊個驛站 + 其他驛站車費 (唔喺驛站 = from "")；S07c「玄妙」→ 唔喺驛站都用到
 func station_view(id: int) -> Dictionary:
 	var e := ent(id)
 	if e.is_empty() or not e.has("ch"):
 		return {}
 	var from := station_near(e)
+	var remote := from == "" and _friend_effect_active(e, "station")
 	var gold := int(e["ch"]["gold"])
 	var cfg: Dictionary = data.world["station"]
 	var list: Array = []
 	for k in RulesStation.keys(data.facilities):
 		if k == from:
 			continue
-		var hops := _station_hops(from, k) if from != "" else -1
+		var hops := -1
+		if from != "":
+			hops = _station_hops(from, k)
+		elif remote:
+			var f: Dictionary = data.facilities[k]
+			hops = map_hops(map_id_at(int(e["x"]), int(e["y"])), map_id_at(int(f["x"]), int(f["y"])))
 		list.append({"key": k, "name": String(data.facilities[k]["name"]), "hops": hops,
 			"fare": RulesStation.fare(hops, cfg) if hops >= 0 else 0,
-			"why": RulesStation.check(from, k, data.facilities, hops, gold, cfg)})
-	return {"from": from, "gold": gold, "list": list}
+			"why": RulesStation.check(from, k, data.facilities, hops, gold, cfg, remote)})
+	return {"from": from, "remote": remote, "gold": gold, "list": list}
 
 
 # 搭驛站去 to_key: 扣車費 → 即時去到目的驛站 (同伴一齊跟過去)；斷吟唱/自動尋路/攻擊目標
+# S07c「玄妙」: 唔喺驛站但學咗效果 → remote 傳送 (車費由所在地圖起計)
 func cmd_station(id: int, to_key: String) -> void:
 	var e := ent(id)
 	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
 		return
 	var ch: Dictionary = e["ch"]
 	var from := station_near(e)
-	var hops := _station_hops(from, to_key) if from != "" and data.facilities.has(to_key) else -1
+	var remote := from == "" and _friend_effect_active(e, "station")
+	var hops := -1
+	if data.facilities.has(to_key):
+		if from != "":
+			hops = _station_hops(from, to_key)
+		elif remote:
+			var tt: Dictionary = data.facilities[to_key]
+			hops = map_hops(map_id_at(int(e["x"]), int(e["y"])), map_id_at(int(tt["x"]), int(tt["y"])))
 	var cfg: Dictionary = data.world["station"]
-	var why := RulesStation.check(from, to_key, data.facilities, hops, int(ch["gold"]), cfg)
+	var why := RulesStation.check(from, to_key, data.facilities, hops, int(ch["gold"]), cfg, remote)
 	if why != "":
 		return _msg(id, why)
 	var fare := RulesStation.fare(hops, cfg)
