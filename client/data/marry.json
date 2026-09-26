@@ -1,0 +1,20 @@
+{
+ "_note": "結婚系統設定 (S09e, spec 06 §9 / 09 §6)。流程: 御賜函任務(quests.json type=marry) → 買喜餅 → 開餅盒 → 分餅(點心回 HP/MP/SP) → 預約禮堂+主婚人 → 婚禮 → 婚戒(無限召喚, 50 SP) → 配偶頁/叮嚀/離婚。結婚對象 = 登用武將同伴。相關 NPC 喺 quest_npcs.json (結婚村, 許昌 20,33~21,34)。數值【自訂】(攻略只寫流程), 價位沿用 items.json 原有 51623~51626。",
+ "cfg": {
+  "affinityLock": 90,
+  "summonSp": 50,
+  "divorceGold": 500000,
+  "ringItem": 23030,
+  "letters": {"M": 51627, "F": 51628},
+  "messageMaxLen": 40,
+  "festiveDays": 1,
+  "shareAffinity": 10,
+  "cakes": [
+   {"tier": 1, "buy": 51623, "price": 1000, "open": 51619, "contents": [[29106, 3], [29108, 2]]},
+   {"tier": 2, "buy": 51624, "price": 2000, "open": 51620, "contents": [[29107, 2], [29108, 2], [29109, 1]]},
+   {"tier": 3, "buy": 51625, "price": 3000, "open": 51621, "contents": [[29109, 2], [29110, 1], [29112, 1], [29114, 1]]},
+   {"tier": 4, "buy": 51626, "price": 5000, "open": 51622, "contents": [[29107, 1], [29110, 1], [29111, 1], [29113, 1], [29115, 1]]}
+  ]
+ },
+ "npcs": {"baker": "marry_baker", "box": "marry_box", "official": "marry_official", "divorce": "marry_divorce"}
+}

@@ -829,6 +829,8 @@ func _recruit_daily(day: int) -> void:
 		if not c.has("gen"):
 			continue
 		var gn: Dictionary = c["gen"]
+		if bool(gn.get("married", false)):
+			continue                              # S09e 配偶唔會期滿/因忠誠離開 (好感鎖 90+)
 		if day >= int(gn["until"]):
 			_companion_leave(c, "登用期滿", false)
 		elif RulesRecruit.loyalty_verdict(int(gn["loyalty"]), data.recruit_cfg) != "stay":

@@ -90,6 +90,7 @@ var experts: Dictionary = {}       # 專長 (data/experts.json, Step S01c, spec 
 var master: Dictionary = {}        # 大宗師合成術 (data/master_recipes.json, S05c, spec 05 §5)
 var residents: Dictionary = {}     # 居民 NPC 設定/角色/日程/名字池 (data/residents.json, S09a, spec 09 §1)
 var llm: Dictionary = {}           # LLM 層設定 (data/llm.json, S09d, spec 09 §5)；key 唔喺度
+var marry: Dictionary = {}         # 結婚系統設定 (data/marry.json, S09e, spec 06 §9 / 09 §6)
 
 static var _cache: GameData
 
@@ -208,6 +209,7 @@ static func load_all() -> GameData:
 	g.master = _read("res://data/master_recipes.json")
 	g.residents = _read("res://data/residents.json")
 	g.llm = _read("res://data/llm.json")
+	g.marry = _read("res://data/marry.json")
 	for x in c["classes"]:
 		g.classes[String(x["id"])] = x
 	for x in m["monsters"]:
@@ -250,6 +252,8 @@ static func load_all() -> GameData:
 				heal_hp += int(e["value"])
 			elif et == 16:
 				heal_mp += int(e["value"])
+			elif et == 19:              # 回復氣力 (SP)【原=喜餅點心等食物藥水】
+				heal_sp += int(e["value"])
 			elif et in [73, 74, 75]:    # 【自訂】73/74/75 = 戰騎藥水系 (紅/藍/綠藥水): value × 100 固定回復 (I=300, II=200, III=100)
 				var v := int(e["value"]) * 100
 				if et == 73:

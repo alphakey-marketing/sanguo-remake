@@ -35,7 +35,8 @@ func _init(game_data: GameData, seed_value: int = 1) -> void:
 		"cityAttrs": {}, "quest_npcs": {}, "cityGov": {}, "cityPop": {},
 		"rumors": [], "rumorSeq": 0,		# S09b 傳聞 (spec 09 §4)
 		"llm": {"enabled": false, "model": "",
-			"used": {"day": -1, "calls": 0, "reflect": 0}, "cd": {}, "lastError": ""}}
+			"used": {"day": -1, "calls": 0, "reflect": 0}, "cd": {}, "lastError": ""},
+		"marry": {"festive": {}}}          # S09e 結婚/婚慶氛圍 (spec 06 §9)
 	inn_pos = Vector2i(int(data.inn["x"]), int(data.inn["y"]))
 	_init_markets()
 	_init_city_attrs()

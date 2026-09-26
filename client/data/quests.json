@@ -2004,6 +2004,22 @@
     {"type": "talk", "npc": "yuji", "dialog": ["于吉：「地之精華、生之石，攞齊十級地石同一粒生之石，地理四級圓滿。」"], "takeItems": [[32011, 1], [32012, 1], [32013, 1], [32014, 1], [32015, 1], [32016, 1], [32017, 1], [32018, 1], [32019, 1], [32020, 1], [32306, 1]], "hint": "帶齊地屬性石 10%~100% + 生之石搵于吉", "done": true}
    ],
    "reward": {"fame": 40, "expert": {"skill": "dili", "level": 4}}
+  },
+  {
+   "id": "marry_letter_m", "name": "御賜函（男）", "type": "marry", "giver": "marry_official",
+   "pre": {"gender": "M", "minLevel": 10}, "preHint": "男性角色 10 級+, 去許昌結婚村搵朝廷官員拎男方御賜函",
+   "stages": [
+    {"type": "talk", "npc": "marry_official", "dialog": ["朝廷官員：「男婚女嫁，天作之合。呢封男方御賜函，攞去用喇。」"], "done": true}
+   ],
+   "reward": {"items": [[51627, 1]], "fame": 5}
+  },
+  {
+   "id": "marry_letter_f", "name": "御賜函（女）", "type": "marry", "giver": "marry_official",
+   "pre": {"gender": "F", "minLevel": 10}, "preHint": "女性角色 10 級+, 去許昌結婚村搵朝廷官員拎女方御賜函",
+   "stages": [
+    {"type": "talk", "npc": "marry_official", "dialog": ["朝廷官員：「佳偶天成，呢封女方御賜函，攞去用喇。」"], "done": true}
+   ],
+   "reward": {"items": [[51628, 1]], "fame": 5}
   }
  ]
 }

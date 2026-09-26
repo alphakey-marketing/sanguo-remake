@@ -207,6 +207,10 @@ static func pre_ok(data: GameData, q: Dictionary, ch: Dictionary) -> bool:
 		return false
 	if pre.has("ideology") and String(ch.get("ideology", "")) != String(pre["ideology"]):
 		return false
+	if pre.has("gender"):            # 男/女限定 (S09e 御賜函任務): 由職業表 gender 讀
+		var gc: Dictionary = data.classes.get(String(ch.get("classId", "")), {})
+		if String(gc.get("gender", "")) != String(pre["gender"]):
+			return false
 	for k in pre.get("attr", {}):   # 屬性門檻 (Step 16 歷史任務: 魅力 10+)
 		if int(ch["attrs"].get(k, 0)) < int(pre["attr"][k]):
 			return false
