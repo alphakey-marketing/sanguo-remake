@@ -602,3 +602,10 @@ func _full_heal(ch: Dictionary) -> void:
 	ch["hp"] = _eff_max_hp(ch)
 	ch["mp"] = _eff_max_mp(ch)
 	ch["sp"] = _eff_max_sp(ch)
+
+
+# 死亡復活回一半【自訂】(spec 03 §4.3 第 3 步: 原版復活後唔滿，要訓覺/食)
+func _half_heal(ch: Dictionary) -> void:
+	ch["hp"] = maxi(1, MathX.js_round(_eff_max_hp(ch) / 2.0))
+	ch["mp"] = maxi(0, MathX.js_round(_eff_max_mp(ch) / 2.0))
+	ch["sp"] = maxi(0, MathX.js_round(_eff_max_sp(ch) / 2.0))

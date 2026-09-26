@@ -140,26 +140,49 @@ func _kill_player(p: Dictionary) -> void:
 	var bt: Dictionary = p.get("battle", {})
 	# 戰役內陣亡唔跌經驗/物品【原 sy3_8】(除非個別場 dropOnDeath=true, Step 19)
 	var skip_drop := not bt.is_empty() and not RulesBattle.drop_on_death(RulesBattle.find(data.battles, String(bt.get("id", ""))))
-	var lost := 0
+	# S03c 死亡道具 (spec 03 §4)【自訂】——死亡流程 6 步順序照 §4.3:
+	# 1 扣經驗 → 2 掉物品(幸運符擋) → 3 傳客棧回一半 → 4 目擊好感 → 5 耐久-10% → 6 天譴先判
+
+	# 0. 還魂丹【原】「死亡啱復活」: 死亡即喺客棧復活，物品/經驗照常掉；冇死唔消耗；天譴無效 (唔消耗)
+	#    (正常死亡流已經返客棧，故消耗係可見效果；天譴唔行 _kill_player，invariant 由 _tianqian_reprisal 保證)
+	var revived := false
+	if not bool(ch.get("tianqian", false)) and RulesShop.has_item(ch["bag"], RulesCombat.REVIVE_PILL, 1):
+		RulesShop.remove_item(ch["bag"], RulesCombat.REVIVE_PILL, 1)
+		revived = true
+
+	# 1. 扣經驗 (護身符減半，消耗 1)
+	var exp_lost := 0
+	var huhushen := false
 	if not skip_drop:
-		ch["exp"] = maxi(0, int(ch["exp"]) - RulesCombat.death_exp_loss(int(ch["karma"]), RulesStats.exp_to_next(int(ch["level"]))))
-		# 身上裝備唔會跌【自訂】: 只喺「未裝備」嘅件數入面擲
+		huhushen = RulesShop.has_item(ch["bag"], RulesCombat.PROTECTION_CHARM, 1)
+		exp_lost = RulesCombat.death_exp_loss_protected(int(ch["karma"]), RulesStats.exp_to_next(int(ch["level"])), huhushen)
+		ch["exp"] = maxi(0, int(ch["exp"]) - exp_lost)
+		if huhushen:
+			RulesShop.remove_item(ch["bag"], RulesCombat.PROTECTION_CHARM, 1)
+
+	# 2. 掉物品 (幸運符擋，消耗 1)
+	var lucky := false
+	var dropped: Array = []
+	if not skip_drop:
+		# 身上裝備唔會跌【自訂】: 只喺「未裝備」嘅件數入面擲 (spec 03 §4.1「優先裝備槽」→ 單機化唔跌裝)
 		var loose: Array = []
 		for b in ch["bag"]:
 			var free := int(b["n"]) - _equipped_n(ch, int(b["id"]))
 			if free > 0:
 				loose.append({"id": int(b["id"]), "n": free})
-		lost = RulesCombat.roll_death_drop(int(ch["karma"]), loose, rng_fn)
-		if lost > 0:
-			RulesShop.remove_item(ch["bag"], lost, 1)
+		if RulesShop.has_item(ch["bag"], RulesCombat.LUCKY_CHARM, 1):
+			lucky = true
+			RulesShop.remove_item(ch["bag"], RulesCombat.LUCKY_CHARM, 1)
+		else:
+			dropped = RulesCombat.roll_death_drop_items(int(ch["karma"]), loose, rng_fn)
+			for it in dropped:
+				RulesShop.remove_item(ch["bag"], int(it["id"]), int(it["n"]))
 			_cleanup_dur(ch)
-	_wear_armor_death(ch)           # 死亡每件防具扣 10% 耐久 (spec 03 §4.3)
-	_cleanup_fused(ch)              # 跌走咗武器 → 清除融合記錄
-	_full_heal(ch)
-	ch["status"] = {}
-	p.erase("casting")
-	ch.erase("fusing")
-	_mount_drop(p, "die")           # 死亡落馬 (Step 17a)
+
+	# 3. 傳送返客棧: HP/MP/SP 回復一半【自訂】(原版復活後唔滿，要訓覺/食)
+	var die_x := int(p["x"])
+	var die_y := int(p["y"])
+	_half_heal(ch)
 	if bt.is_empty():
 		var inn := nearest_inn(map_id_at(int(p["x"]), int(p["y"])))    # 返最近客棧 (過圖次數最少) (Step 11.7)
 		p["x"] = int(inn["x"])
@@ -168,11 +191,22 @@ func _kill_player(p: Dictionary) -> void:
 		p["ty"] = int(inn["y"])
 	else:
 		_battle_exit(p, "died")     # 戰役內死亡: 傳送返報名點 + 清晒呢場遺留 boss (Step 19)
+	# 4. 目擊死亡: 死亡嗰位附近有記憶表嘅 NPC 記低 (好感微升: 同情 +2【自訂】, spec 03 §4.3)
+	_witness_nearby({"x": die_x, "y": die_y}, int(p["id"]), "die", BotSys.W_SEE_DIE)
+
+	# 5. 裝備耐久: 每件扣 10% 耐久 (spec 03 §4.3, 同時係修理服務需求根源)
+	_wear_armor_death(ch)
+	_cleanup_fused(ch)              # 跌走咗武器 → 清除融合記錄
+	ch["status"] = {}
+	p.erase("casting")
+	ch.erase("fusing")
+	_mount_drop(p, "die")           # 死亡落馬 (Step 17a)
 	p.erase("path")
 	p.erase("goto")
 	p["atk_target"] = 0
 	_sync_stats(p)
-	_emit({"k": "die", "dst": p["id"], "lost": lost})
+	_emit({"k": "die", "dst": p["id"], "exp_lost": exp_lost, "dropped": dropped,
+		"revived": revived, "lucky": lucky, "huhushen": huhushen})
 
 
 # S03a: 殺死居民/紅名(殺人魔) NPC (spec 03 §2, §4)。
