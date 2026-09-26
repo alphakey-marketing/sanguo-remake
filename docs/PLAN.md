@@ -27,7 +27,7 @@
 | 05 生產經濟 | 🟡 | ✅ | 6 初階 + 5 進階 + 2318 配方、修理、工具店、天地商行、捐獻、市場 | 產出 1~2 件、特製/白金/御賜工具、大宗師、4 類商店補齊、天災停進貨、城際貿易提示 |
 | 06 任務 | 🟡 | ✅ | 框架、新手 5 條、義士絕招 3 條、官令 7 條、歷史 11+1 條、委託、戰役、團體任務 17 條（16 條義勇軍限定 + 紫虛上人非義勇軍版，S06c）、其他職絕招 15 條（S06d）、**專長任務 8 條（天文/地理認證 1~4 級，S06e）** | 四~六招、結婚、左慈渾天儀任務、國戰專長（→S10） |
 | 07 座騎戰騎 | 🟡 | 🟡 | 17a 座騎全套 + UI；17b 繁衍/馬戰 **sim 有、`main.gd` 有派送、面板未有掣**；18 戰騎純規則；**S07b（leg 5）戰騎 sim 整合**（`sim/sim_war_beast.gd`：馬廄馴養買獸/最多 3 隻/出戰跟隨+自動攻擊+戰鬥特技/吸 exp/死亡忠誠−1/走佬/寄馬廄）；**S07c（leg 6）友好特技效果接系統**；**S07d（leg 7）NPC 拍賣場 + 武將特技「馴馬」+ 抽技固定池** | 繁衍/馬戰/改名 UI；戰騎 UI 面板；原版捕獲途徑；其餘友好技效果（聖靈/遁地/奇門/脫出/召喚/神行/回城/火焰/飛影/狂力/開光/忠誠/巨力/穩重/地行/神獸/嗅血/野性/獅魂/王者） |
-| 08 名聲義勇軍 | 🟡 | 🟡 | 名聲、頭銜 60 階、官宅（討取/官令/捐獻/月俸/行動丹）、**義舉證明（四類 20 項）+ 城池進貢/好感（S08a）**、**城池屬性 8 項 + 官宅內政 6 種（S08b）**、**救災（S08c：公佈欄/救災官令/7 種救災物品/救災區 N 次工作/覆命，天災強度遞減）** | 名額競爭、義勇軍、帶兵量、營地、團體工作、民心、法令 |
+| 08 名聲義勇軍 | 🟡 | 🟡 | 名聲、頭銜 60 階、官宅（討取/官令/捐獻/月俸/行動丹）、**義舉證明（四類 20 項）+ 城池進貢/好感（S08a）**、**城池屬性 8 項 + 官宅內政 6 種（S08b）**、**救災（S08c：公佈欄/救災官令/7 種救災物品/救災區 N 次工作/覆命，天災強度遞減）**、**名額競爭（S08d：每月初一 3 NPC 挑戰者鬥名望，輸跌一階）** | 義勇軍、帶兵量、營地、團體工作、民心、法令 |
 | 09 登用武將 | 🟡 | 🟡 | 居民 bot/記憶/brain、登用 v1+v2、同伴 6 指令、20 passive 特技 | `residents.json` 居民化、傳聞擴散、忠誠事件規則、其餘 50 特技、內政協助、LLM 層（原 Step 20） |
 | 10 國戰 | ❌ | ❌ | — | 全部（D-3【待決】） |
 | 11 資料對照 | 🟡 | — | items/monsters/generals/recipes/titles 導入器 | `material_ids.json`、箭矢定義、商城道具單機化定案、recruitinfo 說明頁、warbtl 對照 |
@@ -221,7 +221,10 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
   - 完成：`data/world.json` 天災 7 種各加 `reliefItem`（蝗蟲 26022 農藥／瘟疫 26023 補藥／旱災 26024 水桶／颶風 26025 榔頭／洪水 26026 青泥／暴風雪 26027 鏟子／地震 26028 地動儀，全用 items.json 原有檔）；`data/office.json` +`relief`（`minTitleRank:0`/`spCost:10`/`fame:10`/`polExp:20`/`expert:jiuzai`/`expertExp:12`/`workPerSize` 大 30 中 20 細 10【自訂】）；`data/facilities.json` +3 城門 `bulletin` 公佈欄（許昌 37,49／新野 33,45／襄陽 39,57）+3 腹地 `relief` 救災區（許昌→`field_1` 104,10／新野→`bowang` 62,10／襄陽→`longzhong` 38,10）；`data/shops.json` 3 間工具店 +7 種救災物品。`rules/disaster.gd` +`relief_item_of`/`relief_items`/`relief_need`/`relief_weaken`（天災 supply factor 由 `baseSupply` 向 1.0 靠，令市場影響遞減）；`roll_day` +`baseSupply`（原值備份）。`sim_office.gd` +`relief_cfg`/`_active_disaster`/`bulletin_near`/`relief_near`/`bulletin_view`/`relief_block`/`relief_view`/`cmd_office_relief`/`cmd_relief_work`/`_relief_reward`，`order_text`/`cmd_office_turnin` 加 relief 專屬流程。`sim_econ.gd` `_shop_shutdown_reason` 豁免救災物品（天災期間照買得到）。清 S01c 延後：`RulesExpert.relief_mult` 已備但今次 spec 未用（見偏離）。測試 `tests/run_militia.gd` 73→131（資料/規則/公佈欄/流程/停進貨豁免/存檔 roundtrip/舊存檔/決定性）。
   - 【自訂】次數 小 10／中 20／大 30；名聲 +10【原】、政治 exp 20、救災專長 exp 12；行動力 −10【原】喺**接令時**扣（同其他官令一致）；每次工作扣 SP 10 + 用 1 份對應物品。救災官令共用 `ch.office.order`（每日 1 條），動態綁 `{city, disaster, need, done}`，唔入 `office.orders` 表。
   - 偏離：原作單一「腹地東北」救災區 → 【待決→推薦方針】每城各一個腹地救災區（許昌/新野/襄陽），唔新開地圖。spec §6「多人救災加快（武將同伴助攻）」未接 → §4 留 S09c。`RulesExpert.relief_mult` 未有下游（spec §6 只寫「增加救災專長」，冇寫倍率效果）→ §4 記 S08f/S09 需要時接。
-- [ ] **S08d 名額競爭**【待決：簡化方案】
+- [x] **S08d 名額競爭**【待決：簡化方案】
+  - 完成（spec 08 §2 / 攻略 sy2_8_3）：`data/office.json` +`competition`（`enabled`/`minRank:1`/`competitors:3`/`npcLo:0.85`/`npcHi:1.05`/`defenderBonus:0`）；`rules/title.gd` +`comp_cfg`/`comp_score`（= 名聲 + defenderBonus）/`npc_score`（該階名聲需求 × [npcLo,npcHi] 隨機）/`defend_ok`（≥ 全部挑戰者最高分）純函數；`sim/sim_office.gd` +`competition_cfg`/`title_competing`/`_title_contest_daily`/`_title_contest`/`title_contest_view`。每月初一（`sim.gd _daily_hook` 喺 `_salary_daily` 之後叫）對有 `ch.titleCompete` 嘅頭銜做守位考驗：3 NPC 挑戰者分數用**獨立 SimRng**（`800001 + day*3181 + rank*101`，唔佔主 rng 流），玩家 ≥ 全部 → 守位成功，否則 `titleRank -= 1`（跌返上一階）+ 發 `title_contest` 事件/訊息。`cmd_claim_title` 成功後設 `ch.titleCompete = true` 入競爭系統。
+  - **偏離／【待決→推薦方針】**：原版「玩家之間每月競爭」→ 單機化 = 3 個 NPC 挑戰者模擬，競爭方式由「武將 PK（弱化版）」**再簡化為「比名望」**（spec 講「武將 PK」，但單機冇其他玩家；用名聲分數比併最簡單可測、唔郁戰鬥系統）。只對經官宅朝廷討取得嚟嘅頭銜生效（`titleCompete` 旗標）；舊存檔／直接設 `titleRank` 唔競爭（保兼容）。守位失敗跌一階而唔清空（spec【自訂】「跌返上一階」）；名聲唔下降（spec §1）。
+  - 驗收：`tests/run_militia.gd` 131→158（資料/規則邊界/討取入系統/必贏必輸守位/月中唔考驗/舊存檔兼容/存檔 roundtrip/決定性）；`sh tools/run_tests.sh` ALL OK。
 - [ ] **S08e 義勇軍成立**：條件 4 項（擁護 NPC 數【自訂】、20 萬、定居非新手城 → 要「定居」功能）；品階/帶兵量公式（`titles.json soldiers`）
 - [ ] **S08f 營地 + 義勇軍工作 22 項 + 評定會議**：`data/camp.json`、監督建設、功績表；團體任務接軌（清 S06c 延後）
 - [ ] **S08g 民心 + 法令**（要有城池 → 可能要等 S10 攻城；先做資料 + 規則 + 測試）
@@ -292,6 +295,8 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
 | S08b | 城池「治安」「防災」屬性提升途徑（官宅內政唔包）：迷信 → S08f（義勇軍工作 治安/防災）；**S08c 救災實裝 = 直接減弱生效中天災 effect（非提升防災 attr）** | S08f |
 | S08c | 襄陽冇官宅（同 S08a 捐獻處問題）→ 襄陽救災官令暫時冇得領；救災區（longzhong）已備 | 後續設施批次（S08e 定居/設施一齊考慮） |
 | S08c | 「多人救災加快（武將同伴助攻）」未接（單人做 N 次） | S09c（武將協助 hook） |
+| S08d | 名額競爭 UI：`title_contest_view` read-model 已備（競爭狀態 + 上次結果）；官宅面板未有顯示 | 後續專 UI Step（官宅面板分頁） |
+| S08d | NPC 挑戰者有分數冇 NPC 實體/名號；原版「武將 PK（弱化版）」再簡化成「比名望」 | 後續（若要真 PK/有名有姓先做） |
 | S01c | 救災專長倍率 `RulesExpert.relief_mult` 未有下游（spec §6 只寫「增加救災專長」，冇定義倍率效果）| S08f/S09 需要時接 |
 | S08b | 內政武將政治協助（同伴/部將加成）：`_domestic_assist_bonus` hook 已備（暫 0.0），`RulesExpert.domestic_mult` 已食專長 lv | S09c |
 | S08g | 民心/法令要有城池 | S10c |
