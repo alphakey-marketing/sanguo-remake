@@ -49,6 +49,7 @@ var donation: Dictionary = {}     # 捐贈官令設定 (data/donation.json, Step
 var donation_rates: Dictionary = {}  # item id -> 捐獻單位【原】
 var titles: Array = []            # 頭銜 60 階 (data/titles.json, Step 14)【原】
 var office: Dictionary = {}       # 官宅/官令設定 (data/office.json, Step 14)
+var camp: Dictionary = {}         # 義勇軍營地建設/工作 (data/camp.json, S08f)
 var mounts: Dictionary = {}       # 座騎設定 (data/mounts.json, Step 17a)
 var mount_weapons: Dictionary = {}  # 馬戰兵器 + 特技 (data/mount_weapons.json, Step 17b)
 var war_beasts: Dictionary = {}   # 戰騎屬性/升級 (data/war_beasts.json, Step 18)
@@ -142,6 +143,7 @@ static func load_all() -> GameData:
 	var tt: Dictionary = _read("res://data/titles.json")
 	g.titles = tt["titles"]
 	g.office = _read("res://data/office.json")
+	g.camp = _read("res://data/camp.json")
 	g.mounts = _read("res://data/mounts.json")
 	g.mount_weapons = _read("res://data/mount_weapons.json")
 	g.war_beasts = _read("res://data/war_beasts.json")

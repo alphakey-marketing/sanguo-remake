@@ -15,11 +15,12 @@ func spawn_player(pname: String, class_id: String = "yishi") -> int:
 func _sync_quest_npcs() -> void:
 	var ch := player_ch()
 	var ke := int(_clock()["ke"])
+	var day := int(_clock()["day"])
 	var qn: Dictionary = state["quest_npcs"]
 	var changed := false
 	for n in data.quest_npc_list:
 		var nid := String(n["id"])
-		var vis := RulesQuest.npc_shown(n, ch, ke, data.quests)
+		var vis := RulesQuest.npc_shown(n, ch, ke, data.quests, day)
 		var cur := bool(qn.get(nid, {}).get("visible", false))
 		if vis != cur:
 			qn[nid] = {"visible": vis}
@@ -45,6 +46,7 @@ func _quest_emit(e: Dictionary, q: Dictionary, res: Dictionary) -> void:
 	elif bool(res.get("done", false)):
 		_sync_stats(e)
 		_emit({"k": "quest", "dst": id, "quest": q["id"], "done": true, "reward": res.get("reward", {})})
+		_on_militia_quest_done(q)      # S08f: 團體任務完成 → 義勇軍績效 (sim_office override)
 	else:
 		_emit({"k": "quest", "dst": id, "quest": q["id"], "stage": int(res.get("stage", 0))})
 	_sync_quest_npcs()          # 開始/推進/完成都可能改 NPC 常駐 (questOnly boss/內應, Step 16)
@@ -216,6 +218,11 @@ func _finish_fac_quest(e: Dictionary, ch: Dictionary, qid: String, key: String) 
 	var res := RulesQuest.on_facility(data, ch, q, key, int(_clock()["day"]))
 	if bool(res.get("changed", false)):
 		_quest_emit(e, q, res)
+
+
+# S08f hook: 團體任務完成 → 義勇軍績效；sim_quest 唔識 militia，預設 no-op，由 sim_office override。
+func _on_militia_quest_done(_q: Dictionary) -> void:
+	pass
 
 
 # ================= 任務讀取 (UI 記事用) =================

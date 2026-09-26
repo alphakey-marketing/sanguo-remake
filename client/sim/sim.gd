@@ -87,6 +87,8 @@ func _daily_hook(day: int) -> void:
 	_ap_daily()
 	_salary_daily(day)           # 每月初一俸祿 (Step 14)
 	_title_contest_daily(day)    # S08d 每月初一頭銜名額競爭 (spec 08 §2)
+	_eval_daily(day)             # S08f 每月初一義勇軍績效 → 功績 (spec 08 §4)
+	_militia_quest_reset(day)    # S08f 團體任務每月/每日重複 (清 S06c 延後)
 	_recruit_daily(day)          # 同伴到期/忠誠低離開 (Step 13.5)
 	_comm_daily(day)             # 居民委託過期 (Step 16)
 	_mount_daily(day)            # 座騎子時結算 (Step 17a)
