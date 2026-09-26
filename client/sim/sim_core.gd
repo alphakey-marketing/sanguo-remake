@@ -597,6 +597,21 @@ func _beast_on_mob_kill(_by: Dictionary, _base_exp: int) -> void:
 	pass
 
 
+# 友好特技 hook (S07c)：sim_war_beast 覆寫。出戰戰騎學咗邊啲效果 (effect id → true)
+func _friend_effect_active(_e: Dictionary, _effect: String) -> bool:
+	return false
+
+
+# 友好特技「聖體」: 每刻自動回復倍率 (sim_war_beast 覆寫；1.0 = 冇效果)
+func _friend_regen_mult(_e: Dictionary) -> float:
+	return 1.0
+
+
+# 背包負重上限 (S04a)；sim_war_beast 覆寫加上霸王熊「背負」加成
+func _bag_cap(ch: Dictionary) -> int:
+	return int(data.world.get("dropped", {}).get("capBagWeight", 1000))
+
+
 func order_count(ch: Dictionary, item: int) -> int:
 	return RulesShop.count_item(ch["bag"], item)
 

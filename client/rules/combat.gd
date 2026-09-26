@@ -29,6 +29,15 @@ static func calc_mob_damage(atk: float, def: float, rng: Callable = Callable(), 
 	return maxi(1, MathX.js_round(atk * atk_mult * (0.9 + MathX.roll(rng) * 0.2) - def * def_mult))
 
 
+# 戰騎降敵屬性 (S07c, spec 07 §8.3 debuff)：debuff = {stat: {val, until}}
+# 未過期就先乘 (1 + val)；val 係負數（降）。stat 唔喺入面 = 原值。
+static func debuffed(value: float, debuff: Dictionary, stat: String, tick: int) -> float:
+	var d = debuff.get(stat)
+	if d is Dictionary and tick < int(d.get("until", 0)):
+		return value * (1.0 + float(d.get("val", 0.0)))
+	return value
+
+
 # 命中率: 武器命中率(45 = 基準) + 等級差
 static func hit_chance(weapon_hit: float, atk_lv: float, def_lv: float) -> float:
 	return minf(0.98, maxf(0.3, 0.8 + (weapon_hit - 45.0) / 200.0 + (atk_lv - def_lv) * 0.02))

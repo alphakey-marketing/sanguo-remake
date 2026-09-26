@@ -180,7 +180,7 @@ func cmd_storage_deposit(id: int, item: int, n: int = 1) -> void:
 	if e.is_empty() or not e.has("ch") or n < 1:
 		return
 	var ch: Dictionary = e["ch"]
-	if not bool(ch.get("storageSub", false)):
+	if not bool(ch.get("storageSub", false)) and not _friend_effect_active(e, "bank"):
 		return _msg(id, "要先訂閱天地商行")
 	if _locked_by_equip(ch, item, n):
 		return _msg(id, "裝備中，唔可以存 (先卸下)")
@@ -199,7 +199,7 @@ func cmd_storage_withdraw(id: int, item: int, n: int = 1) -> void:
 	if e.is_empty() or not e.has("ch") or n < 1:
 		return
 	var ch: Dictionary = e["ch"]
-	if not bool(ch.get("storageSub", false)):
+	if not bool(ch.get("storageSub", false)) and not _friend_effect_active(e, "bank"):
 		return _msg(id, "要先訂閱天地商行")
 	if not RulesShop.remove_item(ch["storage"], item, n):
 		return _msg(id, "倉庫冇咁多")
