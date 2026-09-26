@@ -180,7 +180,7 @@ func t_monster_count(data: GameData) -> void:
 			hand += 1
 	check(data.monsters.size() >= 30, "導入: 全場怪 ≥ 30 (而家 %d)" % data.monsters.size())
 	check(imported >= 20, "導入: npc_drops 導入 ≥ 20 (而家 %d)" % imported)
-	check(hand == 64, "導入: 原裝 11 隻 + Step 16 boss 3 隻 + Step 19 戰役 boss 4 隻 + S04 補怪 20 隻 + S04c 戰役 boss 26 隻 (而家 %d)" % hand)
+	check(hand == 86, "導入: 原裝 11 隻 + Step 16 boss 3 隻 + Step 19 戰役 boss 4 隻 + S04 補怪 20 隻 + S04c 戰役 boss 26 隻 + S04d 場景怪 22 隻 (而家 %d)" % hand)
 
 
 func t_item_ids(data: GameData) -> void:
@@ -196,6 +196,8 @@ func t_item_ids(data: GameData) -> void:
 const CUSTOM_DROPS := [1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 19001, 1015, 1016, 1017, 1018, 19002, 19003, 19004]   # S01d: 19002~3 試煉怪（轉職考試）【自訂】
 # S04c: 戰役 boss 1039~1064 (褚飛燕→十常侍 5 場 26 層，gen_battles.py 生成)【自訂】
 const CUSTOM_BATTLE := [1039, 1040, 1041, 1042, 1043, 1044, 1045, 1046, 1047, 1048, 1049, 1050, 1051, 1052, 1053, 1054, 1055, 1056, 1057, 1058, 1059, 1060, 1061, 1062, 1063, 1064]
+# S04d: 特殊場景怪物 1065~1086 (桃花渡 15 隻 + 七彩奪寶陣 7 色孟獲，gen_scenes.py 生成)【自訂】
+const CUSTOM_SCENE := [1065, 1066, 1067, 1068, 1069, 1070, 1071, 1072, 1073, 1074, 1075, 1076, 1077, 1078, 1079, 1080, 1081, 1082, 1083, 1084, 1085, 1086]
 
 func t_drop_rules(data: GameData) -> void:
 	var csv_ids := {}
@@ -205,7 +207,7 @@ func t_drop_rules(data: GameData) -> void:
 	var bad_split: Array = []
 	for d in data.monsters.values():
 		var src := int(d.get("dropSrc", d["id"]))
-		if not csv_ids.has(src) and not CUSTOM_DROPS.has(int(d["id"])) and not CUSTOM_BATTLE.has(int(d["id"])):
+		if not csv_ids.has(src) and not CUSTOM_DROPS.has(int(d["id"])) and not CUSTOM_BATTLE.has(int(d["id"])) and not CUSTOM_SCENE.has(int(d["id"])):
 			no_src.append(int(d["id"]))
 		for x in d.get("drops", []):
 			if float(x["p"]) < 0.05 or float(x["p"]) > 1.0:

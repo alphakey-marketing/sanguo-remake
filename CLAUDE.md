@@ -15,9 +15,9 @@
 - 大 Step 開工先「核實」spec vs 代碼，更新 PLAN §1 同清單
 - 跨 spec 依賴：先做資料 + 掛鈎 + 測試，效果喺後面 Step 接，記入 PLAN §4
 - PLAN 標【待決】= 做到嗰步先問用家，唔好自己估
-- **下一步 = PLAN §3 第一個未剔 `[ ]`**（2026-09-25：S04c 其餘 5 場戰役實裝完，下一步 S04d 特殊場景框架 + 首批）
+- **下一步 = PLAN §3 第一個未剔 `[ ]`**（2026-09-26：S04d 特殊場景首批完，S04 全剔 ✅，下一步 S05a 生產經濟小缺口）
 
-## 現況 (2026-09-25，六職全開；S03c 死亡道具完；S04a 地面掉落物完；S04b 術法怪/boss 技能完；S04c 其餘 5 場戰役實裝完；下一步 S04d 特殊場景)
+## 現況 (2026-09-26，六職全開；S03c 死亡道具完；S04a 地面掉落物完；S04b 術法怪/boss 技能完；S04c 其餘 5 場戰役實裝完；S04d 特殊場景首批（桃花渡+七彩奪寶陣）完，S04 全剔 ✅；下一步 S05a 生產經濟小缺口)
 - **全部喺 `client/` (Godot 4.7, GDScript)**：`rules/`(純函數)、`sim/`(單機世界模擬，狀態可存檔、種子 RNG)、`ui/`(`touch/` HUD 觸控 + `panels/` 正式面板)、`tests/`
 - 詳細現況 = PLAN §1；已做系統 → 檔案索引：
 
@@ -35,6 +35,7 @@
 | 座騎/繁衍/馬戰 | `mount.gd` `mount_battle.gd` | `sim_mount.gd` | `mounts.json` `mount_weapons.json` |
 | 戰騎（**純規則，sim/UI 未接**） | `war_beast.gd` | — | `war_beasts.json` |
 | 戰役（**6 場全部 playable**：張牛角 + 褚飛燕/李大目/張白騎/黃龍/十常侍 26 層，monster+多層 map+掉寶齊；記事「戰役」頁 + 大地圖標示） | `battle.gd` | `sim_battle.gd`(夾喺 sim_econ/sim_combat 之間；`view_battles()` read-model) | `battles.json` + `tools/gen_battles.py` |
+| 特殊場景（**首批 2 個**：桃花渡 5 層 + 七彩奪寶陣 7 層，game 日曆開門 + 入口對話 + 記事「場景」頁 + 大地圖標示；其餘 5 個留後續批次） | `scene.gd` | `sim_scene.gd`(企喺 sim_battle 之上、sim_combat 之下；`cmd_scene_enter/leave`/`view_scenes`/`scene_view`) | `scenes.json` + `tools/gen_scenes.py` |
 | 地圖/驛站/天災/時鐘 | `path.gd` `station.gd` `disaster.gd` `clock.gd` | `sim_core.gd` `sim_station.gd` | `maps.json` + `maps/*.txt` `world.json` `facilities.json` |
 | 居民/記憶/brain | `npc_memory.gd` | `bot_sys.gd` `npc_brain.gd` | — |
 

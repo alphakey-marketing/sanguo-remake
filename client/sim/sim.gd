@@ -84,6 +84,14 @@ func _daily_hook(day: int) -> void:
 	_recruit_daily(day)          # 同伴到期/忠誠低離開 (Step 13.5)
 	_comm_daily(day)             # 居民委託過期 (Step 16)
 	_mount_daily(day)            # 座騎子時結算 (Step 17a)
+	# S04d: 特殊場景開門日公告（game 日曆窗口）
+	var md := int(data.world["clock"].get("monthDays", 30))
+	var mdow := RulesScene.day_of_month(day, md)
+	for s in data.scenes:
+		if RulesScene.is_open(s, day, md) and int(s.get("lastAnnounceDay", -1)) != mdow:
+			s["lastAnnounceDay"] = mdow
+			_emit({"k": "scene_open", "name": String(s["name"]), "minLevel": int(s.get("minLevel", 1)),
+				"openDays": RulesScene.open_days_text(s)})
 	_emit({"k": "day", "day": day, "season": season})
 	for d in changed:
 		_emit({"k": "disaster", "name": d["name"], "city": d["city"], "size": d["size"]})

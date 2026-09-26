@@ -115,6 +115,22 @@ func _draw_world(view: Control) -> void:
 				break
 	view.draw_rect(Rect2(Vector2(10, 8), Vector2(230, 26)), Color(0.12, 0.1, 0.07, 0.85))
 	view.draw_string(font, Vector2(16, 24), btxt, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, bcol)
+	# 特殊場景標示 (S04d): 而家開住邊啲場景入口 (荊州港口)
+	var vs: Dictionary = main.sim.view_scenes(main.my_id)
+	var scols := Color(0.7, 0.85, 0.55)
+	var stxt := "特殊場景：而家冇開門…"
+	var sopen: Array = []
+	for s in vs["list"]:
+		if bool(s["open"]):
+			sopen.append(str(s["name"]))
+	if bool(vs["inScene"]):
+		stxt = "特殊場景：喺 %s 第 %d/%d 層" % [str(vs.get("sceneName", "")), int(vs.get("layer", 0)), int(vs.get("totalLayers", 0))]
+		scols = Color(0.8, 0.95, 0.6)
+	elif not sopen.is_empty():
+		stxt = "特殊場景：%s 開緊（荊州港口）" % "、".join(sopen)
+		scols = Color(0.8, 0.95, 0.6)
+	view.draw_rect(Rect2(Vector2(10, 36), Vector2(230, 26)), Color(0.1, 0.12, 0.09, 0.85))
+	view.draw_string(font, Vector2(16, 52), stxt, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, scols)
 	for e in w["edges"]:
 		var a: Dictionary = nodes[String(e[0])]
 		var b: Dictionary = nodes[String(e[1])]

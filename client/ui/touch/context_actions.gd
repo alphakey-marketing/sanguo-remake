@@ -102,6 +102,9 @@ static func run(main: Node, act: Dictionary) -> void:
 				hud.open_dialog(func() -> Dictionary: return book_npc_dialog(main))
 			elif bool(qn.get("battle", false)):        # 義勇士兵: 戰役報名 (Step 19)
 				hud.open_dialog(func() -> Dictionary: return battle_dialog(main))
+			elif not str(qn.get("scene", "")).is_empty():  # S04d 特殊場景入口 NPC
+				var sid := String(qn.scene)
+				hud.open_dialog(func() -> Dictionary: return scene_dialog(main, sid))
 			else:
 				main._send({"t": "quest_talk", "npc": String(qn.id)})
 		"shop":
@@ -413,7 +416,25 @@ static func forge_dialog(main: Node, def: Dictionary) -> Dictionary:
 		"options": [{"label": "敲！", "cb": func() -> void: main._send({"t": "fusion_hit"})}]}
 
 
-# 義勇士兵: 戰役報名 (Step 19，spec 06 §7)
+# 特殊場景入口 NPC (S04d，spec 04 §4): 桃花渡/七彩奪寶陣（game 日曆開門）
+static func scene_dialog(main: Node, sid: String) -> Dictionary:
+	var v: Dictionary = main.sim.scene_view(main.my_id, sid)
+	var lines: Array = []
+	var opts: Array = []
+	if bool(v.get("inScene", false)):
+		lines.append("進行中：%s　第 %d/%d 層" % [str(v.get("name", "")), int(v.get("layer", 0)), int(v.get("totalLayers", 0))])
+		opts.append({"label": "離開場景", "cb": func() -> void: main._send({"t": "scene_leave"}); main.hud.close_panels()})
+	else:
+		lines.append("%s　（武等 ≥%d，每月%s）" % [str(v.get("name", "")), int(v.get("minLevel", 0)), str(v.get("openDays", ""))])
+		if String(v.get("err", "")) != "":
+			lines.append(str(v["err"]))
+		else:
+			lines.append("今日開門！")
+			opts.append({"label": "進入場景", "cb": func() -> void: main._send({"t": "scene_enter", "sid": sid}); main.hud.close_panels()})
+	opts.append(_leave(main))
+	return {"title": String(v.get("name", "特殊場景")) + "入口", "text": "\n".join(lines), "options": opts}
+
+
 static func battle_dialog(main: Node) -> Dictionary:
 	var v: Dictionary = main.sim.battle_view(main.my_id)
 	var lines: Array = []
