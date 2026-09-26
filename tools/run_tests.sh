@@ -41,6 +41,7 @@ run recruit --script tests/run_recruit.gd
 run general --script tests/run_general.gd
 run title --script tests/run_title.gd
 run militia --script tests/run_militia.gd
+run civic --script tests/run_civic.gd
 run camp --script tests/run_camp.gd
 run battle --script tests/run_battle.gd
 run scene --script tests/run_scene.gd

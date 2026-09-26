@@ -109,6 +109,32 @@
   "guardAttr": "fangyu",
   "crimeAttr": "zhian"
  },
+ "_noteCityMorale": "民心 (S08g, spec 08 §9 / 攻略 sy2_8_14)【原】：玩家攻佔城池先啟動；初始 100；每月初一評比，高稅率 → 民心 −4。民心低 → 人口流失 + 市場 prod × 民心/100 + 兵源減。【自訂】救災/捐贈官令 +民心（每 10 名聲 +0.1，上限 +10/月）。真值存喺 sim state[\"cityGov\"]（城池被佔先有；接城池勢力留 S10c）。",
+ "cityMorale": {
+  "initial": 100,
+  "cap": 100,
+  "defaultTax": "low",
+  "taxDrop": { "low": 0, "normal": 0, "high": 4 },
+  "famePerMorale": 0.01,
+  "monthlyGainCap": 10.0,
+  "lowThreshold": 50,
+  "popLossRate": 0.05,
+  "recruitFloor": 0.3
+ },
+ "_noteCityLaw": "城池法令 (S08g, spec 08 §10 / 攻略 sy2_8_5 尾)：城主每月可改 1 次、需行動力 100、立即生效。原作 8 條，單機化刪『開放軍營俾外人』（冇外人）→ spec 頭寫『保留 4 條』但表 ✔ 咗 6 條，照表全部實裝。真值存喺 sim state[\"cityGov\"][city].laws（城池被佔先有；接城池勢力留 S10c）。",
+ "cityLaw": {
+  "apCost": 100,
+  "perMonth": 1,
+  "monthDays": 30,
+  "laws": [
+   { "id": "crafts", "name": "開放修藝場", "default": true, "desc": "大宗師合成術可用" },
+   { "id": "guard", "name": "城口護衛 + 保護令牌", "default": true, "desc": "城門/山洞口僱護衛，殺人魔唔准入城" },
+   { "id": "caveShops", "name": "山洞客棧/藥房夥計", "default": true, "desc": "山洞內商店開" },
+   { "id": "cityPk", "name": "城內 PK", "default": false, "desc": "安全區戰鬥許可（原作尚未開放）" },
+   { "id": "dangerEntry", "name": "善惡 1001 以上唔准入城", "default": true, "desc": "非本勢力善惡 ≥1001 唔准入城" },
+   { "id": "cityDrop", "name": "城內丟物品", "default": true, "desc": "室外/工作區/腹地可丟地面物品" }
+  ]
+ },
  "market": {
   "minFactor": 0.5,
   "maxFactor": 2.0,

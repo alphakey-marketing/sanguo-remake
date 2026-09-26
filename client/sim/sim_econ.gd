@@ -455,9 +455,31 @@ func _donate_reward(e: Dictionary, ch: Dictionary, fame: int, what: String) -> v
 	ch["attrs"]["cha"] = int(r["cha"])
 	ch["chaExp"] = int(r["exp"])
 	_sync_stats(e)
+	# S08g：捐贈官令 → 所屬城池民心【自訂】（每 10 名聲 +0.1，上限 +10/月）
+	var mg := civic_fame_gain(ch, fame)
 	_emit({"k": "donate", "id": id, "what": what, "fame": fame, "chaUps": int(r["ups"])})
 	var tail := "，魅力 +%d" % int(r["ups"]) if int(r["ups"]) > 0 else ""
+	if mg > 0.0:
+		tail += "，城池民心 +%.1f" % mg
 	_msg(id, "捐獻 %s：名聲 +%d%s" % [what, fame, tail])
+
+
+# S08g 城內丟物品（法令 cityDrop；未佔城 = 照舊可丟）。丟低一件/一堆落地面（S04a 掉落物）。
+func cmd_drop_item(id: int, item: int, count: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var ch: Dictionary = e["ch"]
+	if not law_allows(city_id_at(int(e["x"]), int(e["y"])), "cityDrop"):
+		return _msg(id, "呢座城法令未開城內丟物品")
+	var have := RulesShop.count_item(ch["bag"], item)
+	if have <= 0:
+		return _msg(id, "背包冇呢件物品")
+	var n := mini(maxi(1, int(count)), have)
+	RulesShop.remove_item(ch["bag"], item, n)
+	_drop_items(int(e["x"]), int(e["y"]), [{"id": int(item), "n": n}])
+	_emit({"k": "drop_item", "id": id, "item": int(item), "n": n})
+	_msg(id, "丟低「%s」×%d" % [data.names.get(int(item), str(item)), n])
 
 
 # ================= 工作技能 (Step 7.1) =================
@@ -705,6 +727,9 @@ func cmd_master_gem(id: int, skill: String) -> void:
 	var e := ent(id)
 	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
 		return
+	# S08g 法令：城池未開放修藝場 → 唔用得大宗師（未佔城 = 照舊）
+	if not law_allows(city_id_at(int(e["x"]), int(e["y"])), "crafts"):
+		return _msg(id, "呢座城法令未開放修藝場（大宗師）")
 	var gc: Dictionary = data.master["gems"].get(skill, {})
 	if gc.is_empty():
 		return _msg(id, "冇呢種大宗師寶石")
@@ -730,6 +755,9 @@ func cmd_master_treasure(id: int, skill: String, gems: Array) -> void:
 	var e := ent(id)
 	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
 		return
+	# S08g 法令：城池未開放修藝場 → 唔用得大宗師（未佔城 = 照舊）
+	if not law_allows(city_id_at(int(e["x"]), int(e["y"])), "crafts"):
+		return _msg(id, "呢座城法令未開放修藝場（大宗師）")
 	if not data.work_adv.has(skill):
 		return _msg(id, "冇呢種技能")
 	var cfg: Dictionary = data.master["synth"]

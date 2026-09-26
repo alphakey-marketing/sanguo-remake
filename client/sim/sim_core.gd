@@ -28,7 +28,7 @@ func _init(game_data: GameData, seed_value: int = 1) -> void:
 	rng_fn = Callable(rng, "next")
 	state = {"tick": 0, "next_id": 1, "ents": {}, "respawns": [], "player_id": -1, "bots": [],
 		"clock": {"day": 0, "ke": 0, "lastShichen": -1, "is_night": false}, "market": {}, "disasters": [],
-		"cityAttrs": {}, "quest_npcs": {}}		# npc_id -> {"visible": bool} (Step 8)
+		"cityAttrs": {}, "quest_npcs": {}, "cityGov": {}, "cityPop": {}}		# npc_id -> {"visible": bool} (Step 8)
 	inn_pos = Vector2i(int(data.inn["x"]), int(data.inn["y"]))
 	_init_markets()
 	_init_city_attrs()
@@ -72,11 +72,114 @@ func city_attrs_set(city_id: String, attrs: Dictionary) -> void:
 	_ensure_city_attrs()
 	state["cityAttrs"][city_id] = attrs
 
-# world city + 現時 attrs (市場/天災規則用)
+# world city + 現時 attrs + 現時人口 (市場/天災規則用)
 func _city_with_attrs(c: Dictionary) -> Dictionary:
 	var o := c.duplicate()
 	o["attrs"] = city_attrs(String(c.id))
+	o["pop"] = city_pop(String(c.id))
 	return o
+
+
+# ---- 城池民心 + 法令 (S08g, spec 08 §9/§10) ----
+# 民心/法令要有城池（城主）先啟動；單機未有佔城系統（S10）→ state["cityGov"] 預設空 =
+# 未啟動，全部 helper 回兼容值。佔城入口留 S10c。
+func _civic_cfg() -> Dictionary:
+	return data.world.get("cityMorale", {})
+
+
+func _law_cfg() -> Dictionary:
+	return data.world.get("cityLaw", {})
+
+
+func _city_gov_read(city_id: String) -> Dictionary:
+	var g = (state.get("cityGov", {}) as Dictionary).get(city_id, {})
+	return g if g is Dictionary else {}
+
+
+# 城池係唔係已經被玩家佔領（民心/法令已啟動）
+func city_gov_active(city_id: String) -> bool:
+	return not _city_gov_read(city_id).is_empty()
+
+
+# 建立城池治理狀態（佔城時叫；S08g 淨係測試/預留 S10c 用）
+func city_gov_init(city_id: String, tax: String = "") -> Dictionary:
+	if city_id == "":
+		return {}
+	var govs: Dictionary = state.get("cityGov", {})
+	if not govs.has(city_id):
+		govs[city_id] = {
+			"morale": RulesCivic.initial(_civic_cfg()),
+			"tax": tax if tax != "" else String(_civic_cfg().get("defaultTax", "low")),
+			"laws": RulesCivic.default_laws(_law_cfg()),
+			"lastLawDay": -1,
+			"moraleGain": 0.0,
+		}
+		state["cityGov"] = govs
+	return govs[city_id]
+
+
+func city_gov(city_id: String) -> Dictionary:
+	return _city_gov_read(city_id)
+
+
+func city_morale(city_id: String) -> int:
+	var g := _city_gov_read(city_id)
+	if g.is_empty():
+		return RulesCivic.initial(_civic_cfg())
+	return int(round(clampf(float(g.get("morale", 100)), 0.0, float(RulesCivic.cap(_civic_cfg())))))
+
+
+func city_morale_set(city_id: String, v: Variant) -> void:
+	var g := city_gov_init(city_id)
+	if not g.is_empty():
+		g["morale"] = clampf(float(v), 0.0, float(RulesCivic.cap(_civic_cfg())))
+
+
+# 救災/捐贈官令名聲 → 所屬（有城池）義勇軍民心【自訂】。回傳今次實際加幾多。
+func civic_fame_gain(ch: Dictionary, fame: int) -> float:
+	var m = ch.get("militia", {})
+	if not (m is Dictionary) or not bool((m as Dictionary).get("hasCity", false)):
+		return 0.0
+	var city := String((m as Dictionary).get("city", ""))
+	if city == "" or not city_gov_active(city):
+		return 0.0
+	var g := city_gov(city)
+	var gain := RulesCivic.morale_gain(fame, float(g.get("moraleGain", 0.0)), _civic_cfg())
+	if gain <= 0.0:
+		return 0.0
+	g["morale"] = clampf(float(g.get("morale", 100)) + gain, 0.0, float(RulesCivic.cap(_civic_cfg())))
+	g["moraleGain"] = float(g.get("moraleGain", 0.0)) + gain
+	return gain
+
+
+# 城池法令係唔係開（未啟動 = 全部照舊 = true，舊行為零改變）
+func law_allows(city_id: String, law_id: String) -> bool:
+	var g := _city_gov_read(city_id)
+	if g.is_empty():
+		return true
+	return bool((g.get("laws", {}) as Dictionary).get(law_id, true))
+
+
+# 現時人口（動態，market/demand 用）；唔喺 state 就回 world 初值
+func city_pop(city_id: String) -> int:
+	var pn: Dictionary = state.get("cityPop", {})
+	if pn.has(city_id):
+		return int(pn[city_id])
+	for c in data.world["cities"]:
+		if String(c.id) == city_id:
+			return int(c["pop"])
+	return 0
+
+
+func city_pop_set(city_id: String, v: int) -> void:
+	var pn: Dictionary = state.get("cityPop", {})
+	pn[city_id] = maxi(0, v)
+	state["cityPop"] = pn
+
+
+# 座標 → 城池 id（"" = 唔喺城池）；各層共用（法令 gate 用）
+func city_id_at(x: int, y: int) -> String:
+	return String(data.map_at(x, y).get("city", ""))
 
 
 # ---- 讀取 ----

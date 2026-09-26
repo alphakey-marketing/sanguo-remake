@@ -64,6 +64,9 @@ func _city_guard_check() -> void:
 	var last: int = int(ch.get("lastGuardWarn", -99999))
 	# S08b：城池「防禦」屬性影響衛兵警告間隔（城牆越好 → 衛兵越密）
 	var map_city := String(data.map_by_id.get(map_id_at(int(p["x"]), int(p["y"])), {}).get("city", ""))
+	# S08g 法令：冇僱護衛（guard 關）→ 冇衛兵攔路（未佔城 = 照舊）
+	if not law_allows(map_city, "guard"):
+		return
 	var ticks := RulesCity.guard_warn_ticks(city_attrs(map_city), int(data.world["bots"].get("guardWarnTicks", 120)), _city_attr_cfg())
 	if tick - last < ticks:
 		return
@@ -88,6 +91,7 @@ func _daily_hook(day: int) -> void:
 	_salary_daily(day)           # 每月初一俸祿 (Step 14)
 	_title_contest_daily(day)    # S08d 每月初一頭銜名額競爭 (spec 08 §2)
 	_eval_daily(day)             # S08f 每月初一義勇軍績效 → 功績 (spec 08 §4)
+	_morale_daily(day)           # S08g 每月初一民心評比（稅率 → 民心 −4 / 人口流失）
 	_militia_quest_reset(day)    # S08f 團體任務每月/每日重複 (清 S06c 延後)
 	_recruit_daily(day)          # 同伴到期/忠誠低離開 (Step 13.5)
 	_comm_daily(day)             # 居民委託過期 (Step 16)
@@ -139,6 +143,11 @@ func _market_daily(season: int) -> void:
 				city_dis.append(d)
 		var sm := RulesMarket.supply_mods(season, cfg["seasonSupply"], city_dis, _city_with_attrs(c))
 		var dm := RulesMarket.demand_mods(season, cfg["seasonDemand"])
+		# S08g 民心 → 市場 prod 乘數（未佔城 = morale 100 → ×1.0，零改變）
+		var mm := RulesCivic.prod_mult(city_morale(String(c.id)), _civic_cfg())
+		if not is_equal_approx(mm, 1.0):
+			for k in sm:
+				sm[k] = float(sm[k]) * mm
 		RulesMarket.daily(_city_with_attrs(c), state["market"][c.id], cfg, sm, dm, _city_attr_cfg())
 
 
