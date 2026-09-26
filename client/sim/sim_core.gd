@@ -28,9 +28,10 @@ func _init(game_data: GameData, seed_value: int = 1) -> void:
 	rng_fn = Callable(rng, "next")
 	state = {"tick": 0, "next_id": 1, "ents": {}, "respawns": [], "player_id": -1, "bots": [],
 		"clock": {"day": 0, "ke": 0, "lastShichen": -1, "is_night": false}, "market": {}, "disasters": [],
-		"quest_npcs": {}}		# npc_id -> {"visible": bool} (Step 8)
+		"cityAttrs": {}, "quest_npcs": {}}		# npc_id -> {"visible": bool} (Step 8)
 	inn_pos = Vector2i(int(data.inn["x"]), int(data.inn["y"]))
 	_init_markets()
+	_init_city_attrs()
 
 # 每城每類物資: 庫存 = vol, 價格因子 = 1.0
 func _init_markets() -> void:
@@ -42,6 +43,40 @@ func _init_markets() -> void:
 			var g: Dictionary = cats[k]
 			cm[k] = {"stock": float(g["vol"]), "pf": 1.0}
 		mkt[c.id] = cm
+
+
+# ---- 城池屬性 (S08b, spec 08 §3) ----
+func _city_attr_cfg() -> Dictionary:
+	return data.world.get("cityAttrs", {})
+
+func _init_city_attrs() -> void:
+	var out := {}
+	for c in data.world["cities"]:
+		out[String(c.id)] = RulesCity.init_attrs(c, _city_attr_cfg())
+	state["cityAttrs"] = out
+
+# 舊存檔冇 cityAttrs → 用 world 初值補返 (現有嘅保留)
+func _ensure_city_attrs() -> void:
+	var ca: Dictionary = state.get("cityAttrs", {})
+	for c in data.world["cities"]:
+		if not ca.has(String(c.id)):
+			ca[String(c.id)] = RulesCity.init_attrs(c, _city_attr_cfg())
+	state["cityAttrs"] = ca
+
+# 某城現時屬性 (冇 = 初始化)
+func city_attrs(city_id: String) -> Dictionary:
+	_ensure_city_attrs()
+	return (state["cityAttrs"] as Dictionary).get(city_id, {})
+
+func city_attrs_set(city_id: String, attrs: Dictionary) -> void:
+	_ensure_city_attrs()
+	state["cityAttrs"][city_id] = attrs
+
+# world city + 現時 attrs (市場/天災規則用)
+func _city_with_attrs(c: Dictionary) -> Dictionary:
+	var o := c.duplicate()
+	o["attrs"] = city_attrs(String(c.id))
+	return o
 
 
 # ---- 讀取 ----
@@ -486,7 +521,9 @@ func add_bots(n: int) -> void:
 		var nm: String = BotSys.NAMES[i % BotSys.NAMES.size()] + (str(i) if i >= BotSys.NAMES.size() else "")
 		var e := _spawn_actor(nm, "bot")
 		BotSys.init_identity(e, rng)
-		if rng.next() < float(data.world["bots"]["criminalPct"]):   # S03a: 部分居民係紅名(殺人魔)「殺人魔 NPC」
+		# S08b：城治安屬性影響居民犯案率（治安 50 = 原本）
+		var crime_mul := RulesCity.crime_mult(city_attrs(String(data.world["homeCity"])), _city_attr_cfg())
+		if rng.next() < float(data.world["bots"]["criminalPct"]) * crime_mul:   # S03a: 部分居民係紅名(殺人魔)「殺人魔 NPC」
 			e["ch"]["criminal"] = true
 		state["bots"].append(int(e["id"]))
 
@@ -600,6 +637,11 @@ func _beast_on_mob_kill(_by: Dictionary, _base_exp: int) -> void:
 # 友好特技 hook (S07c)：sim_war_beast 覆寫。出戰戰騎學咗邊啲效果 (effect id → true)
 func _friend_effect_active(_e: Dictionary, _effect: String) -> bool:
 	return false
+
+
+# 內政武將協助 hook (S08b 掛鈎；S09c 同伴政治/專長協助 override)。回傳完成度加成 (0.0 = 冇)
+func _domestic_assist_bonus(_ch: Dictionary) -> float:
+	return 0.0
 
 
 # 友好特技「聖體」: 每刻自動回復倍率 (sim_war_beast 覆寫；1.0 = 冇效果)

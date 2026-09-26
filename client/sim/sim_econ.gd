@@ -60,6 +60,17 @@ func _shop_for(e: Dictionary) -> Dictionary:
 	return {}
 
 
+# S08b：城池「鑄造」屬性影響商店貨單（attr ≥ min → 多啲貨）。呢件貨商店賣唔賣
+func shop_sells(shop: Dictionary, item: int) -> bool:
+	var stock: Array = shop.get("stock", [])
+	if stock.has(item) or stock.has(float(item)):
+		return true
+	var city := String(shop.get("map", ""))
+	if city == "":
+		return false
+	return RulesCity.shop_extra_items(city_attrs(city), _city_attr_cfg()).has(item)
+
+
 # 天災大/中停進貨 (spec 05 §6【自訂】): 商店所屬城市有生效中天災、且天災 supply cat 蓋到呢件貨嘅 cat → 缺貨
 func _shop_shutdown_reason(shop: Dictionary, item: int) -> String:
 	var city_id := String(shop.get("map", ""))
@@ -87,7 +98,7 @@ func cmd_buy(id: int, item: int, n: int = 1) -> void:
 	if shop.is_empty():
 		return _msg(id, "附近冇商店")
 	var stock: Array = shop["stock"]
-	if not stock.has(item) and not stock.has(float(item)):
+	if not shop_sells(shop, item):
 		return _msg(id, "呢間店唔賣呢件")
 	var shut := _shop_shutdown_reason(shop, item)
 	if shut != "":

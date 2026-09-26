@@ -62,7 +62,10 @@ func _city_guard_check() -> void:
 		return
 	var ch: Dictionary = p["ch"]
 	var last: int = int(ch.get("lastGuardWarn", -99999))
-	if tick - last < int(data.world["bots"].get("guardWarnTicks", 120)):
+	# S08b：城池「防禦」屬性影響衛兵警告間隔（城牆越好 → 衛兵越密）
+	var map_city := String(data.map_by_id.get(map_id_at(int(p["x"]), int(p["y"])), {}).get("city", ""))
+	var ticks := RulesCity.guard_warn_ticks(city_attrs(map_city), int(data.world["bots"].get("guardWarnTicks", 120)), _city_attr_cfg())
+	if tick - last < ticks:
 		return
 	ch["lastGuardWarn"] = tick
 	_emit({"k": "guard_warn", "dst": pid, "name": str(p["name"]), "karma": karma, "text": RulesKarma.guard_warn_text(karma)})
@@ -131,9 +134,9 @@ func _market_daily(season: int) -> void:
 		for d in state["disasters"]:
 			if str(d["city"]) == str(c.id):
 				city_dis.append(d)
-		var sm := RulesMarket.supply_mods(season, cfg["seasonSupply"], city_dis, c)
+		var sm := RulesMarket.supply_mods(season, cfg["seasonSupply"], city_dis, _city_with_attrs(c))
 		var dm := RulesMarket.demand_mods(season, cfg["seasonDemand"])
-		RulesMarket.daily(c, state["market"][c.id], cfg, sm, dm)
+		RulesMarket.daily(_city_with_attrs(c), state["market"][c.id], cfg, sm, dm, _city_attr_cfg())
 
 
 # 入夜: 補夜怪；天光: 夜怪消失
@@ -335,6 +338,7 @@ static func load_string(game_data: GameData, s: String) -> Sim:
 	for e in es.values():
 		if e.has("ch"):
 			sim._ensure_equip(e["ch"])      # 舊存檔裝備欄兼容 (Step 11.6)
+	sim._ensure_city_attrs()                # 舊存檔城池屬性兼容 (S08b)
 	sim._fix_positions()
 	return sim
 

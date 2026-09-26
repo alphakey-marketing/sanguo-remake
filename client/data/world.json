@@ -78,23 +78,37 @@
    "name": "許昌",
    "province": "豫州",
    "pop": 800,
-   "defense": 50
+   "defense": 50,
+   "attrs": { "kaiken": 50, "shangye": 50, "xumu": 50, "kuangchan": 50, "duanzao": 50, "fangyu": 50, "fangzai": 50, "zhian": 50 }
   },
   {
    "id": "xiangyang",
    "name": "襄陽",
    "province": "荊州",
    "pop": 700,
-   "defense": 45
+   "defense": 45,
+   "attrs": { "kaiken": 50, "shangye": 50, "xumu": 50, "kuangchan": 50, "duanzao": 50, "fangyu": 50, "fangzai": 45, "zhian": 50 }
   },
   {
    "id": "xinye",
    "name": "新野",
    "province": "荊州",
    "pop": 450,
-   "defense": 30
+   "defense": 30,
+   "attrs": { "kaiken": 50, "shangye": 50, "xumu": 50, "kuangchan": 50, "duanzao": 50, "fangyu": 50, "fangzai": 30, "zhian": 50 }
   }
  ],
+ "_noteCityAttrs": "城池屬性 (S08b, spec 08 §3)【自訂數值】：8 項 0~100。開墾/商業/畜牧/礦產 → 市場 prod (prodCats 對應 cat，per = 每點偏離 default 嘅倍率)；防災 → 天災減弱；鑄造 → 商店貨單 (shopGoods：attr ≥ min 就賣嗰批貨)；防禦 → 城門衛兵警告間隔 (guardAttr)；治安 → 居民犯案率 (crimeAttr)。真值存喺 sim state[\"cityAttrs\"]（官宅內政/義勇軍工作會改）；world 呢度只係開局初值 + 連動設定。",
+ "cityAttrs": {
+  "default": 50,
+  "per": 0.006,
+  "order": ["kaiken", "shangye", "xumu", "kuangchan", "duanzao", "fangyu", "fangzai", "zhian"],
+  "names": { "kaiken": "開墾", "shangye": "商業", "xumu": "畜牧", "kuangchan": "礦產", "duanzao": "鑄造", "fangyu": "防禦", "fangzai": "防災", "zhian": "治安" },
+  "prodCats": { "43": "shangye", "44": "shangye", "38": "kaiken", "37": "kaiken", "36": "kaiken", "33": "xumu", "35": "xumu", "32": "kuangchan" },
+  "shopGoods": [ { "attr": "duanzao", "min": 60, "items": [10037, 10044, 11002, 11044] } ],
+  "guardAttr": "fangyu",
+  "crimeAttr": "zhian"
+ },
  "market": {
   "minFactor": 0.5,
   "maxFactor": 2.0,
