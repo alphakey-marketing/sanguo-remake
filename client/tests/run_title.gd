@@ -1,6 +1,7 @@
 extends SceneTree
-# Step 14 測試 (spec 08 §1~3, spec 06 §3, spec 01 §9~10): 頭銜 60 階 + 官宅討取/俸祿 + 官令 3 條 + 行動力/行動丹 + 飲水度/喝茶
-#   + 登用頭銜條件 + 存檔 roundtrip/舊存檔 + 決定性
+# Step 14 測試 (spec 08 §1~3, spec 06 §3, spec 01 §9~10): 頭銜 60 階 + 官宅討取/俸祿 + 官令 7 條 + 行動力/行動丹 + 飲水度/喝茶
+#   + 登用頭銜條件 + S08a 義舉證明 20 項 + 存檔 roundtrip/舊存檔 + 決定性
+#   (城池進貢/好感 → tests/run_militia.gd)
 # 跑: Godot --headless --path client --script tests/run_title.gd  (失敗 exit 1)
 
 var fails := 0
@@ -23,6 +24,8 @@ func _init() -> void:
 	t_order_recruit(data)
 	t_order_escort(data)
 	t_order_rescue(data)
+	t_merit(data)
+	t_merit_turnin(data)
 	t_thirst(data)
 	t_recruit_title(data)
 	t_save_roundtrip(data)
@@ -474,6 +477,58 @@ func t_order_rescue(data: GameData) -> void:
 	sim._kill_player(npc2)
 	sim._office_tick()
 	check((ch["office"]["order"] as Dictionary).is_empty() and _last(msgs).begins_with("官令「流落官員」失敗"), "流落官員死咗 → 官令自動失敗")
+
+
+# S08a (spec 08 §1): 義舉證明四類 20 項 + 頭銜限制 + 固定名聲值
+func t_merit(data: GameData) -> void:
+	var cfg: Dictionary = data.office["merit"]
+	check(String(cfg["imperialOffice"]) == "donate_xc", "義舉證明 = 許昌官宅 (朝廷直轄)")
+	check((cfg["items"] as Array).size() == 20, "義舉證明 20 項 (got %d)" % (cfg["items"] as Array).size())
+	var per := {}
+	for it in cfg["items"]:
+		per[String(it["cat"])] = int(per.get(String(it["cat"]), 0)) + 1
+	check(int(per["a"]) == 5 and int(per["b"]) == 5 and int(per["c"]) == 5 and int(per["d"]) == 5, "四類各 5 項")
+	check(String(RulesMerit.item_def(cfg, 61501)["name"]) == "田鼠碎骨" and RulesMerit.fame_of(cfg, 61501) == 5, "田鼠碎骨 名聲 5")
+	check(RulesMerit.item_def(cfg, 99999).is_empty() and RulesMerit.fame_of(cfg, 99999) == 0, "非義舉物品 = 空")
+	# 頭銜需求: 為民除害類冇、其餘照攻略表
+	check(RulesMerit.block(cfg, 61501, 0, data.titles) == "", "田鼠碎骨白身都收得")
+	check(RulesMerit.block(cfg, 61506, 5, data.titles).begins_with("要南中郎將"), "賊寇錦囊要南中郎將")
+	check(RulesMerit.block(cfg, 61506, 6, data.titles) == "", "賊寇錦囊 6 階得")
+	check(RulesMerit.block(cfg, 61510, 14, data.titles).begins_with("要威南將軍"), "要塞地形圖要威南將軍 (15)")
+	check(RulesMerit.block(cfg, 61046, 39, data.titles).begins_with("要左將軍"), "仕女圖要左將軍 (40)")
+	check(RulesMerit.block(cfg, 61038, 20, data.titles) == "", "前朝槍兵裝 = 領軍將軍 (20)")
+	check(RulesMerit.block(cfg, 99999, 60, data.titles).begins_with("呢件唔係"), "非義舉物品唔收")
+
+
+func t_merit_turnin(data: GameData) -> void:
+	var r := _new(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	var msgs: Array = r[3]
+	var cfg: Dictionary = data.office["merit"]
+	# 喺新野縣衙繳唔到 (唔屬朝廷直轄)
+	_put_fac(sim, pid, data, "donate_xy")
+	RulesShop.add_item(ch["bag"], 61501, 1)
+	sim.cmd_merit_turnin(pid, 61501)
+	check(RulesShop.count_item(ch["bag"], 61501) == 1 and _last(msgs).contains("只有許昌"), "新野繳唔到義舉證明")
+	# 許昌官宅
+	_put_fac(sim, pid, data, "donate_xc")
+	var ml := sim.merit_list(ch)
+	check(ml.size() == 20 and bool(ml[0]["can"]) and int(ml[5]["reqRank"]) == 6, "merit_list read-model")
+	sim.cmd_merit_turnin(pid, 61506)
+	check(RulesShop.count_item(ch["bag"], 61506) == 0 and _last(msgs).contains("要南中郎將"), "頭銜唔夠唔收")
+	sim.cmd_merit_turnin(pid, 99999)
+	check(_last(msgs).contains("唔係義舉證明"), "非義舉物品唔收")
+	sim.cmd_merit_turnin(pid, 61503)
+	check(_last(msgs).contains("背包冇"), "冇貨唔收")
+	ch["fame"] = 0
+	sim.cmd_merit_turnin(pid, 61501)
+	check(RulesShop.count_item(ch["bag"], 61501) == 0 and int(ch["fame"]) == 5, "繳田鼠碎骨: 名聲 +5")
+	ch["titleRank"] = 6
+	RulesShop.add_item(ch["bag"], 61506, 1)
+	sim.cmd_merit_turnin(pid, 61506)
+	check(RulesShop.count_item(ch["bag"], 61506) == 0 and int(ch["fame"]) == 25, "6 階繳賊寇錦囊: 名聲 +20")
 
 
 func t_thirst(data: GameData) -> void:
