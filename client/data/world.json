@@ -250,6 +250,7 @@
   {
    "id": "locust",
    "name": "蝗災",
+   "reliefItem": 26022,
    "seasons": [
     1,
     2
@@ -284,6 +285,7 @@
   {
    "id": "plague",
    "name": "瘟疫",
+   "reliefItem": 26023,
    "seasons": [
     0,
     1,
@@ -320,6 +322,7 @@
   {
    "id": "drought",
    "name": "旱災",
+   "reliefItem": 26024,
    "seasons": [
     0,
     1
@@ -354,6 +357,7 @@
   {
    "id": "typhoon",
    "name": "颶風",
+   "reliefItem": 26025,
    "seasons": [
     1
    ],
@@ -388,6 +392,7 @@
   {
    "id": "flood",
    "name": "洪水",
+   "reliefItem": 26026,
    "seasons": [
     1,
     2
@@ -423,6 +428,7 @@
   {
    "id": "blizzard",
    "name": "暴風雪",
+   "reliefItem": 26027,
    "seasons": [
     3
    ],
@@ -457,6 +463,7 @@
   {
    "id": "quake",
    "name": "地震",
+   "reliefItem": 26028,
    "seasons": [
     0,
     1,

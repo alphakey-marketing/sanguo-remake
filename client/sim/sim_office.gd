@@ -133,6 +133,9 @@ func order_text(ch: Dictionary) -> String:
 			return String(o["desc"]) + ("（已有文官跟隨）" if _office_recruit_ok(ch) else "（未登用文官）")
 		"escort", "rescue":
 			return String(o["desc"]) % String(data.map_by_id[String(o["zone"])]["name"]) + "　" + _office_npc_status(od)
+		_:
+			if String(od.get("id", "")) == "relief":
+				return "救災：%s（%d/%d）" % [_city_name(String(od.get("city", ""))), int(od.get("done", 0)), int(od.get("need", 0))]
 	return ""
 
 
@@ -164,6 +167,15 @@ func cmd_office_turnin(id: int) -> void:
 	if here == "":
 		return _msg(id, "要去官宅先覆命得")
 	var o := order_def(String(od["id"]))
+	# 救災官令 (S08c) 唔喺 orders 表，專屬流程: 要返接令嗰間官宅 + 做完次數
+	if String(od.get("id", "")) == "relief":
+		if here != String(od.get("from", "")):
+			return _msg(id, "返%s官宅先覆命得" % _city_name(String(od.get("city", ""))))
+		if int(od.get("done", 0)) < int(od.get("need", 0)):
+			return _msg(id, "救災仲未做完 (%d/%d)" % [int(od.get("done", 0)), int(od.get("need", 0))])
+		off["order"] = {}
+		_relief_reward(e, ch, od)
+		return
 	match String(o["kind"]):
 		"supply":
 			var need := int(o["units"])
@@ -577,3 +589,195 @@ func cmd_domestic(id: int, job_id: String) -> void:
 	_emit({"k": "domestic", "id": id, "job": job_id, "city": city, "attr": key, "gain": gain, "val": int(attrs[key]),
 		"expert": String(j["expert"]), "expertExp": int(cfg.get("expertExp", 3))})
 	_msg(id, "內政「%s」完成：%s 屬性 +%d（而家 %d）%s" % [j["name"], RulesCity.name_of(_city_attr_cfg(), key), gain, int(attrs[key]), tail])
+
+
+# ================= 救災 (S08c, spec 08 §6 / 攻略 sy2_8_12) =================
+# 流程【原 sy2_8_12】: 公佈欄睇天災 → 官宅功曹領救災官令 (扣行動力 10) → 買對應救災物品 →
+#   去救災區做 N 次 (每次扣 SP + 用 1 份物品；小 10/中 20/大 30【自訂】) → 返官宅覆命
+#   (名聲 +10【原】/ 政治 exp / 救災專長 exp【自訂】)。做嘅次數令該城天災強度遞減。
+# 救災官令共用 ch.office.order，但唔喺 office.orders 表 (動態綁城池/天災)，有專屬 cmd。
+
+func relief_cfg() -> Dictionary:
+	return data.office.get("relief", {})
+
+
+func _relief_item(disaster_id: String) -> int:
+	return RulesDisaster.relief_item_of(data.world["disasters"], disaster_id)
+
+
+# 城池而家生效中嘅天災 (第一條；冇 = {})
+func _active_disaster(city_id: String) -> Dictionary:
+	for d in state["disasters"]:
+		if String(d.get("city", "")) == city_id:
+			return d
+	return {}
+
+
+func _disaster_name(disaster_id: String) -> String:
+	for d in data.world["disasters"]:
+		if String(d["id"]) == disaster_id:
+			return String(d["name"])
+	return disaster_id
+
+
+# 企喺邊個城門公佈欄隔籬 → facility key ("" = 唔喺)
+func bulletin_near(e: Dictionary) -> String:
+	return _fac_near(e, "bulletin")
+
+
+# 企喺邊個救災區隔籬 → {key, cityId, name} ({}=唔喺)
+func relief_near(e: Dictionary) -> Dictionary:
+	for k in data.facilities:
+		var f = data.facilities[k]
+		if f is Dictionary and bool(f.get("relief", false)) and _near(e, int(f["x"]), int(f["y"])):
+			return {"key": String(k), "cityId": String(f.get("cityId", "")), "name": String(f.get("name", ""))}
+	return {}
+
+
+# 公佈欄: 各城現時天災 + 對應救災物品 (S08c 步驟 1)
+func bulletin_view(id: int) -> Dictionary:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return {}
+	var cities: Array = []
+	for c in data.world["cities"]:
+		var cid := String(c["id"])
+		var rows: Array = []
+		for d in state["disasters"]:
+			if String(d.get("city", "")) != cid:
+				continue
+			var iid := _relief_item(String(d["id"]))
+			rows.append({"id": String(d["id"]), "name": String(d["name"]), "size": String(d["size"]),
+				"endDay": int(d.get("endDay", 0)), "item": iid, "itemName": String(data.names.get(iid, ""))})
+		cities.append({"id": cid, "name": String(c["name"]), "disasters": rows})
+	return {"at": bulletin_near(e) != "", "bulletin": bulletin_near(e), "cities": cities}
+
+
+# 領救災官令檢查 ("" = 得)
+func relief_block(ch: Dictionary, city_id: String) -> String:
+	if city_id == "":
+		return "要喺城內官宅先領得救災官令"
+	if RulesKarma.office_blocked(int(ch.get("karma", 0))):
+		return "罪犯以下唔接得官令"
+	var cfg := relief_cfg()
+	if int(ch.get("titleRank", 0)) < int(cfg.get("minTitleRank", 0)):
+		return "要官身（頭銜 ≥ %d 階）先領得救災官令" % int(cfg.get("minTitleRank", 0))
+	if _active_disaster(city_id).is_empty():
+		return "呢個城而家冇天災"
+	if not (_office_of(ch).get("order", {}) as Dictionary).is_empty():
+		return "仲有官令喺手，做完先接得"
+	if ap_of(ch) < _office_ap_cost(ch):
+		return "行動力不足 (要 %d)" % _office_ap_cost(ch)
+	return ""
+
+
+# 救災 read-model (官宅 UI 用)
+func relief_view(id: int) -> Dictionary:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return {}
+	var ch: Dictionary = e["ch"]
+	var here := office_near(e)
+	var city := _facility_city_id(here) if here != "" else ""
+	var d := _active_disaster(city) if city != "" else {}
+	var need := RulesDisaster.relief_need(String(d.get("size", "")), relief_cfg()) if not d.is_empty() else 0
+	var iid := _relief_item(String(d.get("id", ""))) if not d.is_empty() else 0
+	var od: Dictionary = _office_of(ch).get("order", {})
+	var active := String(od.get("id", "")) == "relief"
+	return {"city": city, "cityName": _city_name(city), "cityHasDisaster": not d.is_empty(),
+		"disaster": d, "need": need, "item": iid, "itemName": String(data.names.get(iid, "")),
+		"owned": RulesShop.count_item(ch["bag"], iid) if iid > 0 else 0,
+		"hasOrder": active, "done": int(od.get("done", 0)) if active else 0,
+		"apCost": _office_ap_cost(ch), "spCost": int(relief_cfg().get("spCost", 10)), "block": relief_block(ch, city)}
+
+
+# 領救災官令 (官宅功曹): 扣行動力 10，記低該城目標天災
+func cmd_office_relief(id: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var here := office_near(e)
+	if here == "":
+		return _msg(id, "要去官宅先領得救災官令")
+	var city := _facility_city_id(here)
+	var ch: Dictionary = e["ch"]
+	var why := relief_block(ch, city)
+	if why != "":
+		return _msg(id, why)
+	var d := _active_disaster(city)
+	var need := RulesDisaster.relief_need(String(d["size"]), relief_cfg())
+	var off := _office_of(ch)
+	off["orderDay"] = int(_clock()["day"])
+	off["order"] = {"id": "relief", "from": here, "city": city, "disaster": String(d["id"]), "need": need, "done": 0}
+	ch["ap"] = ap_of(ch) - _office_ap_cost(ch)
+	var iid := _relief_item(String(d["id"]))
+	_emit({"k": "office_order", "id": id, "order": "relief", "started": true})
+	_msg(id, "領咗救災官令：%s 正發生「%s」(規模 %s)，去救災區做 %d 次；記住買「%s」。" % [
+		_city_name(city), String(d["name"]), String(d["size"]), need, String(data.names.get(iid, "救災物品"))])
+
+
+# 喺救災區執行一次救災 (扣 SP + 用 1 份物品；令天災強度遞減)
+func cmd_relief_work(id: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var ch: Dictionary = e["ch"]
+	var od: Dictionary = _office_of(ch).get("order", {})
+	if String(od.get("id", "")) != "relief":
+		return _msg(id, "手上冇救災官令")
+	var near := relief_near(e)
+	if near.is_empty():
+		return _msg(id, "要去救災區先做到救災工作")
+	var city := String(od.get("city", ""))
+	if String(near["cityId"]) != city:
+		return _msg(id, "呢度唔係%s嘅救災區" % _city_name(city))
+	var need := int(od.get("need", 0))
+	var done := int(od.get("done", 0))
+	if done >= need:
+		return _msg(id, "救災工作做完，返官宅覆命啦")
+	var d := _active_disaster(city)
+	if d.is_empty() or String(d.get("id", "")) != String(od.get("disaster", "")):
+		return _msg(id, "天災已經過去，唔使再救（可以放棄官令）")
+	var iid := _relief_item(String(od.get("disaster", "")))
+	if iid <= 0 or RulesShop.count_item(ch["bag"], iid) <= 0:
+		return _msg(id, "冇「%s」做唔到救災 (去工具店買)" % String(data.names.get(iid, "救災物品")))
+	var sp_cost := maxi(1, int(relief_cfg().get("spCost", 10)))
+	if int(ch.get("sp", 0)) < sp_cost:
+		return _msg(id, "氣力不足 (要 %d SP)" % sp_cost)
+	RulesShop.remove_item(ch["bag"], iid, 1)
+	ch["sp"] = maxi(0, int(ch["sp"]) - sp_cost)
+	done += 1
+	od["done"] = done
+	RulesDisaster.relief_weaken(d, done, need)
+	_emit({"k": "relief_work", "id": id, "city": city, "done": done, "need": need, "item": iid})
+	if done >= need:
+		_msg(id, "「%s」救災工作完成 (%d/%d)！返官宅覆命。" % [String(d["name"]), done, need])
+	else:
+		_msg(id, "救災進度 %d/%d（%s 災情減弱咗）" % [done, need, String(d["name"])])
+
+
+# 覆命獎勵: 名聲 +10 + 政治 exp + 救災專長 exp (行動力喺接令時已扣)
+func _relief_reward(e: Dictionary, ch: Dictionary, od: Dictionary) -> void:
+	var id := int(e["id"])
+	var cfg := relief_cfg()
+	var fame := int(cfg.get("fame", 10))
+	ch["fame"] = int(ch.get("fame", 0)) + fame
+	var tail := ""
+	var pe := int(cfg.get("polExp", 0))
+	if pe > 0:
+		var r := RulesTiandi.cha_gain(int(ch["attrs"]["pol"]), int(ch.get("polExp", 0)), pe,
+			{"chaExpPerPoint": data.office["polExpPerPoint"], "chaCap": data.office["polCap"]})
+		ch["attrs"]["pol"] = int(r["cha"])
+		ch["polExp"] = int(r["exp"])
+		tail += "，政治經驗 +%d" % pe + ("，政治 +%d" % int(r["ups"]) if int(r["ups"]) > 0 else "")
+		_sync_stats(e)
+	var skill := String(cfg.get("expert", "jiuzai"))
+	var before_lv := expert_lv(ch, skill)
+	RulesExpert.add_exp(ch, data.experts, skill, int(cfg.get("expertExp", 0)))
+	var after_lv := expert_lv(ch, skill)
+	if after_lv > before_lv:
+		var nm := String((data.experts["skills"] as Dictionary).get(skill, {}).get("name", skill))
+		tail += "，「%s」專長升到 %d 級！" % [nm, after_lv]
+	_emit({"k": "office_order", "id": id, "order": "relief", "done": true, "fame": fame, "contrib": 0})
+	_msg(id, "救災官令完成：%s「%s」災情已緩，名聲 +%d%s" % [
+		_city_name(String(od.get("city", ""))), _disaster_name(String(od.get("disaster", ""))), fame, tail])

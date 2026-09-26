@@ -26,7 +26,8 @@ static func roll_day(rng: Callable, day: int, season: int, city_id: String, defs
 		var out := {
 			"id": d["id"], "name": d["name"], "city": city_id, "size": sz["size"],
 			"startDay": day, "endDay": day + int(sz["days"]),
-			"supply": sz["supply"],
+			"supply": (sz["supply"] as Dictionary).duplicate(),
+			"baseSupply": (sz["supply"] as Dictionary).duplicate(),   # 救災減弱用原值 (S08c)
 		}
 		if idx < 2 and not shutdown_cfg.is_empty():          # 大(0)/中(1) 先停進貨；細(2) 唔停
 			var lo := int(shutdown_cfg.get("min", 1))
@@ -37,6 +38,44 @@ static func roll_day(rng: Callable, day: int, season: int, city_id: String, defs
 			out["shutdownCats"] = (sz["supply"] as Dictionary).keys()
 		return out
 	return {}
+
+
+# 救災 (S08c, spec 08 §6 / 攻略 sy2_8_12) ─────────────────────────────
+
+# 天災 id → 對應救災物品 (world.json disasters[].reliefItem；0 = 未有)
+static func relief_item_of(defs: Array, disaster_id: String) -> int:
+	for d in defs:
+		if String(d["id"]) == disaster_id:
+			return int(d.get("reliefItem", 0))
+	return 0
+
+
+# 全部救災物品 id (停進貨豁免 / UI)
+static func relief_items(defs: Array) -> Array:
+	var out: Array = []
+	for d in defs:
+		var iid := int(d.get("reliefItem", 0))
+		if iid > 0 and not out.has(iid):
+			out.append(iid)
+	return out
+
+
+# 救災工作次數需求 (spec 08 §6【自訂】: 小 10 / 中 20 / 大 30)
+static func relief_need(size: String, cfg: Dictionary) -> int:
+	return maxi(1, int((cfg.get("workPerSize", {}) as Dictionary).get(size, 1)))
+
+
+# 救災進度令天災強度遞減: supply factor 由 baseSupply 向 1.0 靠攏 frac (原地改 d["supply"])
+static func relief_weaken(disaster: Dictionary, done: int, need: int) -> void:
+	if need <= 0:
+		return
+	var frac := clampf(float(done) / float(need), 0.0, 1.0)
+	var base: Dictionary = disaster.get("baseSupply", disaster.get("supply", {}))
+	var s := {}
+	for k in base:
+		var f := float(base[k])
+		s[k] = f + (1.0 - f) * frac
+	disaster["supply"] = s
 
 
 # 過期天災移除 (原地)

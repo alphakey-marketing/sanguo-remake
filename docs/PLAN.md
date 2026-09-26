@@ -27,7 +27,7 @@
 | 05 生產經濟 | 🟡 | ✅ | 6 初階 + 5 進階 + 2318 配方、修理、工具店、天地商行、捐獻、市場 | 產出 1~2 件、特製/白金/御賜工具、大宗師、4 類商店補齊、天災停進貨、城際貿易提示 |
 | 06 任務 | 🟡 | ✅ | 框架、新手 5 條、義士絕招 3 條、官令 7 條、歷史 11+1 條、委託、戰役、團體任務 17 條（16 條義勇軍限定 + 紫虛上人非義勇軍版，S06c）、其他職絕招 15 條（S06d）、**專長任務 8 條（天文/地理認證 1~4 級，S06e）** | 四~六招、結婚、左慈渾天儀任務、國戰專長（→S10） |
 | 07 座騎戰騎 | 🟡 | 🟡 | 17a 座騎全套 + UI；17b 繁衍/馬戰 **sim 有、`main.gd` 有派送、面板未有掣**；18 戰騎純規則；**S07b（leg 5）戰騎 sim 整合**（`sim/sim_war_beast.gd`：馬廄馴養買獸/最多 3 隻/出戰跟隨+自動攻擊+戰鬥特技/吸 exp/死亡忠誠−1/走佬/寄馬廄）；**S07c（leg 6）友好特技效果接系統**；**S07d（leg 7）NPC 拍賣場 + 武將特技「馴馬」+ 抽技固定池** | 繁衍/馬戰/改名 UI；戰騎 UI 面板；原版捕獲途徑；其餘友好技效果（聖靈/遁地/奇門/脫出/召喚/神行/回城/火焰/飛影/狂力/開光/忠誠/巨力/穩重/地行/神獸/嗅血/野性/獅魂/王者） |
-| 08 名聲義勇軍 | 🟡 | 🟡 | 名聲、頭銜 60 階、官宅（討取/官令/捐獻/月俸/行動丹）、**義舉證明（四類 20 項）+ 城池進貢/好感（S08a）**、**城池屬性 8 項 + 官宅內政 6 種（S08b）** | 名額競爭、救災、義勇軍、帶兵量、營地、團體工作、民心、法令 |
+| 08 名聲義勇軍 | 🟡 | 🟡 | 名聲、頭銜 60 階、官宅（討取/官令/捐獻/月俸/行動丹）、**義舉證明（四類 20 項）+ 城池進貢/好感（S08a）**、**城池屬性 8 項 + 官宅內政 6 種（S08b）**、**救災（S08c：公佈欄/救災官令/7 種救災物品/救災區 N 次工作/覆命，天災強度遞減）** | 名額競爭、義勇軍、帶兵量、營地、團體工作、民心、法令 |
 | 09 登用武將 | 🟡 | 🟡 | 居民 bot/記憶/brain、登用 v1+v2、同伴 6 指令、20 passive 特技 | `residents.json` 居民化、傳聞擴散、忠誠事件規則、其餘 50 特技、內政協助、LLM 層（原 Step 20） |
 | 10 國戰 | ❌ | ❌ | — | 全部（D-3【待決】） |
 | 11 資料對照 | 🟡 | — | items/monsters/generals/recipes/titles 導入器 | `material_ids.json`、箭矢定義、商城道具單機化定案、recruitinfo 說明頁、warbtl 對照 |
@@ -217,7 +217,10 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
   - 完成：`world.json` +`cities[].attrs`（8 項，`fangzai` 初值 = 舊 `defense` 保兼容；其餘 = 50）+`cityAttrs`（`default/per/order/names/prodCats/shopGoods/guardAttr/crimeAttr`）；新 `rules/city.gd`（`init_attrs`/`attr_of`/`prod_mult`/`disaster_mitigation`/`shop_extra_items`/`guard_warn_ticks`/`crime_mult`/`attr_gain` 純函數）；城池屬性真值存 `state.cityAttrs`（官宅內政會改，存檔 roundtrip + 舊存檔 `_ensure_city_attrs` 補初值）；`rules/market.gd`（`daily` +可選 `attr_cfg` → 開墾/商業/畜牧/礦產 影響 prod；`supply_mods` 防災改用 `attrs.fangzai`，冇 attrs fallback 舊 `defense`）；`sim.gd`（`_market_daily` 傳合併 attrs 嘅 city；`_city_guard_check` 防禦 → 衛兵間隔）；`sim_core.gd`（`city_attrs`/`city_attrs_set`/`_city_with_attrs` 讀寫 + `add_bots` 治安 → 犯案率）；`sim_econ.gd`（`shop_sells`：鑄造 ≥ min → 商店多賣 `shopGoods`）；`data/office.json` +`domestic`（6 工：墾荒種地/商業開發/照顧牲畜/探索礦能/增強防禦/技術開發，`baseGain:2`/`expertExp:3`/`minTitleRank:1`）；`sim_office.gd` +`domestic_def`/`domestic_block`/`domestic_view`/`cmd_domestic`（官宅做，扣行動力 = 官令價，城池 attr +`RulesExpert.domestic_mult(專長lv)`、專長 exp，封頂 100）；`sim_core.gd` +`_domestic_assist_bonus` hook（0.0，S09c override）；測試 `tests/run_militia.gd` 24→73（資料/規則/內政執行/專長增量/4 連動/存檔 roundtrip/舊存檔/決定性）
   - 【自訂】屬性初值全 50（`fangzai` = 舊 defense 50/45/30）→ 開局零行為改變；連動 shape：prod `1+(attr−50)×0.006`、防禦/治安 `1.5−attr/100`、鑄造門檻 60 多 4 件貨（10037/10044/11002/11044）。需有官身（頭銜 ≥1 階）【原 sy2_8_8「需有身份」】。內政扣行動力 = `_office_ap_cost`（武將協助 S09c 可減）。
   - 偏離：`sy2_8_8` 商業/礦產官令名採用「商業開發/探索礦能」（非 spec §3 表嘅「商業開業/探索礦產」）。防禦 attr 下游（城牆/攻城）未有系統 → 記 §4 留 S10；治安/防災 attr 只可由義勇軍工作/救災提升（S08f/S08c）。
-- [ ] **S08c 救災**：公佈欄設施、救災官令、救災物品 7 種、救災區 N 次工作、覆命（名聲 +10/政治 exp/專長）
+- [x] **S08c 救災**：公佈欄設施、救災官令、救災物品 7 種、救災區 N 次工作、覆命（名聲 +10/政治 exp/專長）
+  - 完成：`data/world.json` 天災 7 種各加 `reliefItem`（蝗蟲 26022 農藥／瘟疫 26023 補藥／旱災 26024 水桶／颶風 26025 榔頭／洪水 26026 青泥／暴風雪 26027 鏟子／地震 26028 地動儀，全用 items.json 原有檔）；`data/office.json` +`relief`（`minTitleRank:0`/`spCost:10`/`fame:10`/`polExp:20`/`expert:jiuzai`/`expertExp:12`/`workPerSize` 大 30 中 20 細 10【自訂】）；`data/facilities.json` +3 城門 `bulletin` 公佈欄（許昌 37,49／新野 33,45／襄陽 39,57）+3 腹地 `relief` 救災區（許昌→`field_1` 104,10／新野→`bowang` 62,10／襄陽→`longzhong` 38,10）；`data/shops.json` 3 間工具店 +7 種救災物品。`rules/disaster.gd` +`relief_item_of`/`relief_items`/`relief_need`/`relief_weaken`（天災 supply factor 由 `baseSupply` 向 1.0 靠，令市場影響遞減）；`roll_day` +`baseSupply`（原值備份）。`sim_office.gd` +`relief_cfg`/`_active_disaster`/`bulletin_near`/`relief_near`/`bulletin_view`/`relief_block`/`relief_view`/`cmd_office_relief`/`cmd_relief_work`/`_relief_reward`，`order_text`/`cmd_office_turnin` 加 relief 專屬流程。`sim_econ.gd` `_shop_shutdown_reason` 豁免救災物品（天災期間照買得到）。清 S01c 延後：`RulesExpert.relief_mult` 已備但今次 spec 未用（見偏離）。測試 `tests/run_militia.gd` 73→131（資料/規則/公佈欄/流程/停進貨豁免/存檔 roundtrip/舊存檔/決定性）。
+  - 【自訂】次數 小 10／中 20／大 30；名聲 +10【原】、政治 exp 20、救災專長 exp 12；行動力 −10【原】喺**接令時**扣（同其他官令一致）；每次工作扣 SP 10 + 用 1 份對應物品。救災官令共用 `ch.office.order`（每日 1 條），動態綁 `{city, disaster, need, done}`，唔入 `office.orders` 表。
+  - 偏離：原作單一「腹地東北」救災區 → 【待決→推薦方針】每城各一個腹地救災區（許昌/新野/襄陽），唔新開地圖。spec §6「多人救災加快（武將同伴助攻）」未接 → §4 留 S09c。`RulesExpert.relief_mult` 未有下游（spec §6 只寫「增加救災專長」，冇寫倍率效果）→ §4 記 S08f/S09 需要時接。
 - [ ] **S08d 名額競爭**【待決：簡化方案】
 - [ ] **S08e 義勇軍成立**：條件 4 項（擁護 NPC 數【自訂】、20 萬、定居非新手城 → 要「定居」功能）；品階/帶兵量公式（`titles.json soldiers`）
 - [ ] **S08f 營地 + 義勇軍工作 22 項 + 評定會議**：`data/camp.json`、監督建設、功績表；團體任務接軌（清 S06c 延後）
@@ -261,7 +264,7 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
 | 來源 | 內容 | 喺邊步接 |
 |---|---|---|
 | S01c | 內政專長效果 | **S08b（已接：`RulesExpert.domestic_mult` × 官宅內政增量）** |
-| S01c | 救災專長效果 | S08c |
+| S01c | 救災專長效果 | **S08c（救災已實裝）；`relief_mult` 倍率未有下游 → S08f/S09（需要時接）** |
 | S01c | 訓練/警戒/偵查/統御/補給 | S08f/S10 |
 | S01c | 專長任務升級 | **S06e（已接）** |
 | S06e | 專長任務地點：原作襄平（左慈）/北平（于吉）/廬江（南華老仙）/江夏山洞（甘德一級洞）/小沛八卦台 全屬豫荊以外【待決→已用推薦方針】——唔新開地圖，搬現有豫荊地圖（長沙/洛陽/汝南洞窟/襄陽），同 S06d 做法；出豫荊新地圖留返地圖批次 | 後續地圖批次（spec 12 B4） |
@@ -286,7 +289,10 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
 | S08a | 城池好感下游效果未接（`ch.cityFavor` 已存 + `city_favor_view` read-model）；影響居民/NPC 打招呼、登用好感、任務解鎖等 | S08b/S09 |
 | S08a | 襄陽冇捐獻處（只有許昌官宅/新野縣衙），暫時進貢唔到；要加襄陽捐獻處 | 後續設施批次（S08e 定居/設施一齊考慮） |
 | S08b | 城池「防禦」屬性下游（城牆/守城/攻城）未有系統，只出 read-model；要 S10 城池攻防接 | S10 |
-| S08b | 城池「治安」「防災」屬性只可由義勇軍工作/救災提升（官宅內政唔包），而家只出規則/效果，未接提升途徑 | S08f/S08c |
+| S08b | 城池「治安」「防災」屬性提升途徑（官宅內政唔包）：迷信 → S08f（義勇軍工作 治安/防災）；**S08c 救災實裝 = 直接減弱生效中天災 effect（非提升防災 attr）** | S08f |
+| S08c | 襄陽冇官宅（同 S08a 捐獻處問題）→ 襄陽救災官令暫時冇得領；救災區（longzhong）已備 | 後續設施批次（S08e 定居/設施一齊考慮） |
+| S08c | 「多人救災加快（武將同伴助攻）」未接（單人做 N 次） | S09c（武將協助 hook） |
+| S01c | 救災專長倍率 `RulesExpert.relief_mult` 未有下游（spec §6 只寫「增加救災專長」，冇定義倍率效果）| S08f/S09 需要時接 |
 | S08b | 內政武將政治協助（同伴/部將加成）：`_domestic_assist_bonus` hook 已備（暫 0.0），`RulesExpert.domestic_mult` 已食專長 lv | S09c |
 | S08g | 民心/法令要有城池 | S10c |
 | S01c | 渾天儀來源（商城道具單機化定案，`sim.gd WEATHER_ITEM 26029` 已資料有、冇商店賣） | S11 |

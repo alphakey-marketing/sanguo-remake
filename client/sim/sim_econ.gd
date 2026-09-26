@@ -73,6 +73,9 @@ func shop_sells(shop: Dictionary, item: int) -> bool:
 
 # 天災大/中停進貨 (spec 05 §6【自訂】): 商店所屬城市有生效中天災、且天災 supply cat 蓋到呢件貨嘅 cat → 缺貨
 func _shop_shutdown_reason(shop: Dictionary, item: int) -> String:
+	# 救災物品唔停賣 (S08c): 天災期間都要買得到先救到災
+	if RulesDisaster.relief_items(data.world["disasters"]).has(item):
+		return ""
 	var city_id := String(shop.get("map", ""))
 	if city_id == "":
 		return ""
