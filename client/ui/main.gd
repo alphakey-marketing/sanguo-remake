@@ -420,6 +420,14 @@ func _on_event(e: Dictionary) -> void:
 		"guard_alert":            # S03a: 被襲居民走去叫衛兵
 			if int(e.dst) == my_id:
 				_log("%s走去叫衛兵！" % str(e.name))
+		"tianqian":               # S03b: 殺善居民後天譴雷劈 -> 世界公告 + 傳送客棧
+			if int(e.dst) == my_id:
+				_set_banner(str(e.announce), Color(1, 0.3, 0.9), 6.0)
+				_log("天譴雷劈！%s（現有 HP×50%%，被傳返客棧）" % str(e.announce))
+				target_id = -1
+		"guard_warn":             # S03b: 殺人魔喺城內 -> 城門衛兵警告
+			if int(e.dst) == my_id:
+				_log(str(e.get("text", "城門衛兵攔住你：唔准入城！")))
 		"msg":
 			if int(e.dst) == my_id: _log(str(e.text))
 		"travel":

@@ -72,6 +72,8 @@ func order_block(ch: Dictionary, order_id: String) -> String:
 	var o := order_def(order_id)
 	if o.is_empty():
 		return "冇呢條官令"
+	if RulesKarma.office_blocked(int(ch.get("karma", 0))):
+		return "罪犯以下唔接得官令"
 	return RulesTitle.order_block(o, int(ch.get("titleRank", 0)), ap_of(ch), int(_clock()["day"]), _office_of(ch),
 		_office_ap_cost(ch))
 

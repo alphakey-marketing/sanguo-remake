@@ -58,3 +58,39 @@ static func karma_after_kill_npc(karma: int, victim: Dictionary) -> int:
 # 反擊成功加成（被先攻擊後反殺，疊加喺 karma_after_kill_npc 之上）
 static func counter_kill(karma: int) -> int:
 	return int(clampf(karma + COUNTER_KILL, -30000, 30000))
+
+
+# ============ S03b 天譴 + 城門 (spec 03 §3, §5) ============
+# 【原】山洞殺善良玩家 → 天譴即死，還魂丹/超渡冇效；【自訂】單機化:
+#   殺善居民(非自衛/非紅名) → 雷劈現有 HP×50% + 傳送返客棧 + 公告「…遭到天譴」，還魂丹無效（有測試）
+const TIANQIAN_HP_FRAC := 0.5
+
+
+# 天譴雷劈後 HP: 現有 HP ×50%，最少留 1（唔會因天譴即死，係趕返客棧嘅懲罰）
+static func tianqian_hp(hp: int) -> int:
+	return maxi(1, int(float(hp) * TIANQIAN_HP_FRAC))
+
+
+# 天譴公告文案（世界公告）
+static func tianqian_announce(name: String) -> String:
+	return "%s因作惡多端遭到天譴" % name
+
+
+# 天譴無辦法用還魂丹化解（S03c 還魂丹 logic 要檢查呢個 invariant; spec 03 §3「冇得用還魂丹」）
+static func tianqian_blocks_revive() -> bool:
+	return true
+
+
+# 殺人魔 (tier 6, ≤ −16001) → 城門衛兵拒入城 (城內服務拒絶)（spec 03 §5）
+static func city_banned(karma: int) -> bool:
+	return tier(karma) >= 6
+
+
+# 罪犯及以下 (tier ≥4, ≤ −1001) → 唔接受官令 (spec 03 §5)
+static func office_blocked(karma: int) -> bool:
+	return tier(karma) >= 4
+
+
+# 城門衛兵警告文案
+static func guard_warn_text(karma: int) -> String:
+	return "城門衛兵攔住你：「%s」唔准入城！" % tier_name(karma)

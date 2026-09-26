@@ -46,6 +46,26 @@ func _safe_regen_tick() -> void:
 		_sync_stats(e)
 
 
+# S03b 城門衛兵 (spec 03 §5): 殺人魔 (tier 6) 喺城內/安全區 → 衛兵警告「唔准入城」+ 發 guard_warn 事件
+# （單機連續地圖，城內冇硬閂；用「城內服務拒絶 + 定期警告」代表「拒入城」，見 status/log。定時節流。）
+func _city_guard_check() -> void:
+	var pid := int(state["player_id"])
+	var p := ent(pid)
+	if p.is_empty() or not p.has("ch") or int(p["hp"]) <= 0:
+		return
+	var karma := int(p["ch"]["karma"])
+	if not RulesKarma.city_banned(karma):
+		return
+	if not is_safe(int(p["x"]), int(p["y"])):
+		return
+	var ch: Dictionary = p["ch"]
+	var last: int = int(ch.get("lastGuardWarn", -99999))
+	if tick - last < int(data.world["bots"].get("guardWarnTicks", 120)):
+		return
+	ch["lastGuardWarn"] = tick
+	_emit({"k": "guard_warn", "dst": pid, "name": str(p["name"]), "karma": karma, "text": RulesKarma.guard_warn_text(karma)})
+
+
 # 每日子時: 天災擲骰 -> 市場日結 -> 通知 UI
 func _daily_hook(day: int) -> void:
 	var disas: Array = state["disasters"]
@@ -137,6 +157,7 @@ func step() -> void:
 	_recruit_tick()             # 擂台勝負 (Step 13.5)
 	_mount_tick()               # 放牧返嚟 (Step 17a)
 	_safe_regen_tick()          # 城內安全區自動回復 (S01a, spec 01 §4)
+	_city_guard_check()         # S03b: 殺人魔喺城內/安全區 → 城門衛兵警告 (拒入城)
 	for id in ents.keys():
 		var e: Dictionary = ents.get(id, {})
 		if e.is_empty():
