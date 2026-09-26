@@ -658,6 +658,21 @@ func _run() -> void:
 	hud.skill_pressed.emit({"kind": "skill", "skill": "toushi"})
 	await frames(1)
 	check(_msg_count() >= m4 + 1, "撳透視掣 → 有提示")
+	# S03c 死亡: 死亡算式文言 + 真實死一次 (uitest 唔彈窗但處理唔炸 + 還魂丹消耗)
+	var dr_test: String = m._death_report({"exp_lost": 12, "dropped": [{"id": 65210, "n": 1}], "lucky": false, "huhushen": true, "revived": false})
+	check(dr_test.contains("扣經驗 12") and dr_test.contains("跌咗物品") and dr_test.contains("護身符令經驗損失減半"), "死亡結算: _death_report 文言")
+	m._send({"t": "debug_give", "item": 65030, "n": 1})
+	ch["karma"] = -30000
+	var died0: Array = [0]
+	var pid_d: int = int(m.my_id)
+	m.sim.event_emitted.connect(func(ev: Dictionary) -> void:
+		if String(ev.get("k", "")) == "die" and int(ev.get("dst", 0)) == pid_d:
+			died0[0] += 1)
+	m.sim.damage(m.sim.ent(pid_d), 99999, {})
+	check(int(died0[0]) == 1, "死亡: die 事件觸發")
+	check(int(ch["hp"]) > 0, "死亡: 復活返客棧 (HP>0)")
+	check(int(m.sim.ent(pid_d)["x"]) == m.sim.inn_pos.x and int(m.sim.ent(pid_d)["y"]) == m.sim.inn_pos.y, "死亡: 傳返客棧")
+	check(RulesShop.count_item(ch["bag"], 65030) == 0, "死亡: 還魂丹消耗")
 	print("[TEST] ui_smoke: %d, fail %d" % [total, fails])
 	print("PASS: ui smoke" if fails == 0 else "FAIL: ui smoke")
 	get_tree().quit(1 if fails > 0 else 0)

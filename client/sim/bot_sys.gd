@@ -10,6 +10,7 @@ const IDEOLOGIES := ["義理", "霸權", "權謀", "隱遁", "治國"]         #
 # 目擊/交流權重【自訂】: 幾件初步事件先，Step 5.3 先接善惡反應
 const W_GREET := 2            # 玩家打招呼 (chat 喺附近)
 const W_SEE_KILL := 1         # 目擊玩家打怪 (中性偏正面，佩服)
+const W_SEE_DIE := 2          # 目擊玩家陣亡 (善 NPC 同情好感 +2, spec 03 §4.3)
 const W_KILL_NPC := -4        # 目擊玩家殺善居民 (大惡: NpcMemory 好感大跌, Spec 09/S03b 用)
 const W_KILL_RED := 2         # 目擊玩家殺紅名(殺人魔): 除害 (正面)
 

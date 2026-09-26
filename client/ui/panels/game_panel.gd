@@ -218,7 +218,8 @@ func item_desc(id: int) -> Array:
 		var lab := str(e["label"])
 		if lab == "" or int(e["type"]) in [14, 16]:
 			continue
-		out.append("%s %d" % [lab, int(e["value"])])
+		var val := int(e["value"])
+		out.append(lab if val == 0 else "%s %d" % [lab, val])
 	return out
 
 

@@ -64,9 +64,49 @@ static func death_exp_loss(karma: int, exp_to_next_lv: float) -> int:
 
 
 # 死亡掉背包物品【原】1 件機率掉落；機率自訂 (善惡 ≥ -1000: 20%，否則 50%)。回傳 item id，冇掉 = 0
+# (舊簡單規則，向量對拍用；spec 03 §4.1 表格版改用 roll_death_drop_items)
 static func roll_death_drop(karma: int, bag: Array, rng: Callable = Callable()) -> int:
 	if bag.is_empty():
 		return 0
 	if MathX.roll(rng) >= (0.2 if karma >= -1000 else 0.5):
 		return 0
 	return int(bag[int(floor(MathX.roll(rng) * bag.size()))]["id"])
+
+
+# ============ S03c 死亡道具 (spec 03 §4)【自訂】============
+# 死亡道具 id (items.json cat 250 消耗/特殊): 幸運符 / 護身符 / 還魂丹
+const LUCKY_CHARM := 65016      # 死亡唔掉物品 (消耗 1)
+const PROTECTION_CHARM := 65029 # 經驗損失減半 (消耗 1)
+const REVIVE_PILL := 65030      # 死亡即喺客棧復活，物品/經驗照掉；天譴無效
+
+# 死亡掉物品表【原】spec 03 §4.1: 按善惡階返 {max 最高掉落件數, p 每件獨立機率}
+# 機率【自訂】善劣兩邊 0.8/0.6/0.4/0.3/0.25/0.2 檔 (惡越高跌得越多件 × 每件機率越高)
+static func death_drop_table(karma: int) -> Dictionary:
+	if karma <= -16001: return {"max": 7, "p": 0.8}
+	if karma <= -8001:  return {"max": 6, "p": 0.8}
+	if karma <= -1001:  return {"max": 3, "p": 0.6}
+	if karma <= 1000:   return {"max": 1, "p": 0.4}
+	if karma <= 8000:   return {"max": 1, "p": 0.3}
+	if karma <= 16000:  return {"max": 1, "p": 0.25}
+	return {"max": 1, "p": 0.2}
+
+# 死亡掉物品表格版: 逐「件」獨立擲骰，上限 = 善惡階最高件數。bag = 未裝上身嘅件。
+# 回傳 [{id, n}] (每項 n=1)；幸運符出手前由 sim 擋。
+static func roll_death_drop_items(karma: int, bag: Array, rng: Callable = Callable()) -> Array:
+	var tb := death_drop_table(karma)
+	var out: Array = []
+	var mx := int(tb["max"])
+	for b in bag:
+		var id := int(b["id"])
+		var n := int(b["n"])
+		for _i in n:
+			if out.size() >= mx:
+				return out
+			if MathX.roll(rng) < float(tb["p"]):
+				out.append({"id": id, "n": 1})
+	return out
+
+# 護身符: 經驗損失減半 (spec 03 §4.2)【自訂】
+static func death_exp_loss_protected(karma: int, exp_to_next_lv: float, has_protection: bool) -> int:
+	var base := death_exp_loss(karma, exp_to_next_lv)
+	return MathX.js_round(base / 2.0) if has_protection else base

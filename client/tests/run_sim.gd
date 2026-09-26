@@ -139,7 +139,7 @@ func t_death(data: GameData) -> void:
 	var e := sim.ent(id)
 	check(died.size() == 1, "死亡: 收到 die 事件")
 	check(int(e["x"]) == sim.inn_pos.x and int(e["y"]) == sim.inn_pos.y, "死亡: 返客棧")
-	check(int(e["hp"]) == int(e["max_hp"]), "死亡: 回滿血")
+	check(int(e["hp"]) == maxi(1, MathX.js_round(int(e["max_hp"]) / 2.0)), "死亡: 回一半 (spec 03 §4.3)")
 
 
 func t_facilities(data: GameData) -> void:

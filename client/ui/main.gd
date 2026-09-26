@@ -436,11 +436,15 @@ func _on_event(e: Dictionary) -> void:
 				_log("傳送到 %s" % str(e.to))
 		"die":
 			if int(e.dst) == my_id:
-				_log("你死咗，返客棧" + ("，跌咗 %s" % item_names.get(int(e.lost), str(e.lost)) if int(e.get("lost", 0)) > 0 else ""))
+				var dr := _death_report(e)
+				_log(dr.split("\n")[0])
 				target_id = -1
 				if not uitest:
 					SaveSys.autosave(sim)       # 死完即存
 				ch["status"] = {}              # 死亡清狀態 (sim 權威，UI 同步)
+				if hud != null and not autotest and not uitest:
+					hud.open_dialog(func() -> Dictionary: return {
+						"title": "你死咗", "text": dr, "options": [{"label": "繼續", "cb": func() -> void: hud.close_panels()}]})
 		"flee":
 			if int(e.get("dst", -1)) == my_id:
 				_log("%s 見你唔夠打，逃咗！" % str(e.get("name", "")))
@@ -552,6 +556,25 @@ func _on_event(e: Dictionary) -> void:
 		"disaster":
 			if str(e.city) == str(data.world["homeCity"]):
 				_set_banner("天災：%s (%s)！物資價格波動" % [e.name, e.size], Color(1, 0.55, 0.3), 15.0)
+
+# S03c 死亡結算彈窗文案: 跌咗邊啲物品/扣幾多/道具消耗 (spec 03 §4)
+func _death_report(e: Dictionary) -> String:
+	var lines: Array = ["你死咗，精神返到客棧（HP/MP/SP 回一半）"]
+	if int(e.get("exp_lost", 0)) > 0:
+		lines.append("扣經驗 %d" % int(e["exp_lost"]))
+	var dn: Array = []
+	for it in e.get("dropped", []):
+		dn.append(item_names.get(int(it.id), str(it.id)))
+	if not dn.is_empty():
+		lines.append("跌咗物品：%s" % "、".join(dn))
+	if bool(e.get("lucky", false)):
+		lines.append("幸運符擋住，冇跌物品（消耗 1）")
+	if bool(e.get("huhushen", false)):
+		lines.append("護身符令經驗損失減半（消耗 1）")
+	if bool(e.get("revived", false)):
+		lines.append("還魂丹令你復活返客棧（消耗 1）")
+	lines.append("每件裝備耐久扣 10%%")
+	return "\n".join(lines)
 
 func _set_banner(text: String, col: Color, secs: float) -> void:
 	banner = {"text": text, "t": secs, "color": col}
