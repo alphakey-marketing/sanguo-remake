@@ -6026,6 +6026,24 @@
    "leash": 16,
    "element": "none",
    "drops": []
+  },
+  {
+   "id": 1105,
+   "name": "地理圖守護者",
+   "level": 28,
+   "hp": 1600,
+   "atk": 46,
+   "def": 18,
+   "spellDef": 30,
+   "atkInterval": 16,
+   "moveSpeed": 1,
+   "exp": 0,
+   "gold": [0, 0],
+   "alignment": -500,
+   "aggroRange": 6,
+   "leash": 12,
+   "element": "none",
+   "drops": []
   }
  ],
  "spawns": [

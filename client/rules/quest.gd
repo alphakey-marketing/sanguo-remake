@@ -60,6 +60,9 @@ static func validate(data: GameData) -> Array:
 			var gi: Dictionary = st.get("getItem", {})
 			if not gi.is_empty() and not data.item_ids.has(int(gi.get("id", -1))):
 				errs.append("%s.s%d: getItem 唔存在" % [id, si])
+			for gii in st.get("getItems", []):   # 一次派多件 (S06e 地理圖×4)
+				if not data.item_ids.has(int(gii[0])):
+					errs.append("%s.s%d: getItems 道具唔存在 (%s)" % [id, si, gii[0]])
 			if si > 0 and not bool(st.get("done", false)) and stages[si - 1].get("done", false):
 				errs.append("%s: stage %d 之後仲有 stage，但 %d 已 done" % [id, si - 1, si - 1])
 		var rw: Dictionary = q.get("reward", {})
@@ -71,9 +74,29 @@ static func validate(data: GameData) -> Array:
 				errs.append("%s: reward ultimate 唔存在 (%s)" % [id, rw["ultimate"]])
 			if rw.has("skill") and not (data.class_skills as Dictionary).has(String(rw["skill"])):
 				errs.append("%s: reward skill 唔存在 (%s)" % [id, rw["skill"]])
+			if rw.has("expert"):            # 專長認證 (S06e): {skill, level}
+				var ex: Dictionary = rw["expert"]
+				if not (data.experts.get("skills", {}) as Dictionary).has(String(ex.get("skill", ""))):
+					errs.append("%s: reward.expert skill 唔啱 (%s)" % [id, ex.get("skill", "")])
+				var ex_lv := int(ex.get("level", 0))
+				if ex_lv < 1 or ex_lv > (data.experts.get("levelExp", []) as Array).size():
+					errs.append("%s: reward.expert level 唔啱 (%d)" % [id, ex_lv])
 		for k in q.get("pre", {}).get("attr", {}):
 			if not ATTR_KEYS.has(String(k)):
 				errs.append("%s: pre.attr 屬性唔啱 (%s)" % [id, k])
+		var pre_v: Dictionary = q.get("pre", {})
+		for cid in pre_v.get("classAny", []):       # 允好多個職業之一 (S06e 專長任務)
+			if not data.classes.has(String(cid)):
+				errs.append("%s: pre.classAny 職業唔啱 (%s)" % [id, cid])
+		for k in pre_v.get("expert", {}):           # 專長等級門檻 (S06e)
+			if not (data.experts.get("skills", {}) as Dictionary).has(String(k)):
+				errs.append("%s: pre.expert 專長唔啱 (%s)" % [id, k])
+		for k in pre_v.get("expertAny", {}):        # 任一專長達標 (S06e)
+			if not (data.experts.get("skills", {}) as Dictionary).has(String(k)):
+				errs.append("%s: pre.expertAny 專長唔啱 (%s)" % [id, k])
+		for it in pre_v.get("hasItemAny", []):       # 任一物品都可以觸發 (S06e)
+			if not data.item_ids.has(int(it.get("id", -1))):
+				errs.append("%s: pre.hasItemAny 道具唔存在 (%s)" % [id, it.get("id", -1)])
 		var gv := String(q.get("giver", ""))
 		if gv != "" and not data.quest_npcs.has(gv):
 			errs.append("%s: giver npc 唔存在 (%s)" % [id, gv])
@@ -173,6 +196,32 @@ static func pre_ok(data: GameData, q: Dictionary, ch: Dictionary) -> bool:
 	if pre.has("hasItem"):          # 身上要有道具先觸發 (Step 10 絕招三: 呂代槍文集)
 		var need: Dictionary = pre["hasItem"]
 		if not RulesShop.has_item(ch["bag"], int(need.get("id", 0)), int(need.get("n", 1))):
+			return false
+	if pre.has("hasItemAny"):       # 列出多件道具，有其中一件就觸發 (S06e 天文/地理一級)
+		var any_item := false
+		for it in pre["hasItemAny"]:
+			if RulesShop.has_item(ch["bag"], int(it.get("id", 0)), int(it.get("n", 1))):
+				any_item = true
+				break
+		if not any_item:
+			return false
+	if pre.has("classAny"):         # 職業屬其中一款先觸發 (S06e 天文/地理三四級)
+		if not (pre["classAny"] as Array).has(String(ch.get("classId", ""))):
+			return false
+	var tier := RulesClass.tier_of(ch)
+	if pre.has("expert"):           # 專長等級門檻 (S06e 二/三/四級)
+		for k in pre["expert"]:
+			var elv := RulesExpert.eff_level(data.experts, String(ch.get("classId", "")), String(k), int(ch.get("expert", {}).get(k, 0)), tier)
+			if elv < int(pre["expert"][k]):
+				return false
+	if pre.has("expertAny"):        # 任一專長達標 (S06e 二級)
+		var any_ok := false
+		for k in pre["expertAny"]:
+			var elv2 := RulesExpert.eff_level(data.experts, String(ch.get("classId", "")), String(k), int(ch.get("expert", {}).get(k, 0)), tier)
+			if elv2 >= int(pre["expertAny"][k]):
+				any_ok = true
+				break
+		if not any_ok:
 			return false
 	for qid in pre.get("questDone", []):
 		if not bool(ch.get("questDone", {}).get(String(qid), false)):
@@ -364,6 +413,11 @@ static func _advance(data: GameData, ch: Dictionary, q: Dictionary, st: Dictiona
 	if not gi.is_empty():
 		RulesShop.add_item(ch["bag"], int(gi["id"]), int(gi["n"]))
 		out["getItem"] = gi
+	var gis: Array = stage.get("getItems", [])
+	if not gis.is_empty():          # 一次派多件 (S06e 地理圖×4)
+		for g in gis:
+			RulesShop.add_item(ch["bag"], int(g[0]), int(g[1]))
+		out["getItems"] = gis
 	if bool(stage.get("done", false)):
 		ch["quests"].erase(String(q["id"]))
 		if not ch.has("questDone"):
@@ -432,10 +486,16 @@ static func apply_reward(data: GameData, ch: Dictionary, reward: Dictionary) -> 
 	if reward.has("skill"):             # 職業特技 (S02c, spec 02 §6): 學識 -> ch.classSkill (單一格)
 		ch["classSkill"] = String(reward["skill"])
 		payload["skill"] = String(reward["skill"])
-	for sk in ["spell", "expert"]:
-		if reward.has(sk):
-			ch[sk] = String(reward[sk])
-			payload[sk] = String(reward[sk])
+	if reward.has("spell"):             # 學術書 (spec 02 §6): 識得某術法
+		ch["spell"] = String(reward["spell"])
+		payload["spell"] = String(reward["spell"])
+	if reward.has("expert"):            # 專長認證 (S06e, spec 06 §8): {skill, level} 直接升到嗰級
+		var ex: Dictionary = reward["expert"]
+		var before := int((ch.get("expert", {}) as Dictionary).get(String(ex.get("skill", "")), 0))
+		var after := RulesExpert.certify(ch, data.experts, String(ex.get("skill", "")), int(ex.get("level", 0)), RulesClass.tier_of(ch))
+		payload["expert"] = {"skill": String(ex.get("skill", "")), "level": int(ex.get("level", 0)), "exp": after}
+		if after == before:
+			payload["expert"]["noop"] = true
 	return payload
 
 

@@ -65,6 +65,24 @@ static func relief_mult(lv: int) -> float:
 	return 1.0 + 0.25 * lv
 
 
+# 專長任務認證 (S06e, spec 06 §8): 直接將專長提升到指定等級 (唔降級，封頂喺職業上限)。
+# 用 exp 門檻代表「已達 N 級」；回傳最終 exp。tier = 職階 (二轉/三轉上限提升)
+static func certify(ch: Dictionary, data: Dictionary, skill_id: String, level: int, tier: int = 0) -> int:
+	var exp: Dictionary = ch.get("expert", {})
+	var cur := int(exp.get(skill_id, 0))
+	var cap := cap_of(data, String(ch.get("classId", "")), skill_id, tier)
+	if cap <= 0 or level <= 0:
+		return cur
+	var lv := mini(level, cap)
+	var level_exp: Array = data.get("levelExp", [])
+	var target := int(level_exp[lv - 1]) if lv >= 1 and lv <= level_exp.size() else 0
+	if target > cur:
+		exp[skill_id] = target
+		ch["expert"] = exp
+		return target
+	return cur
+
+
 static func weather_unlocked(lv: int) -> bool:
 	return lv >= 1
 

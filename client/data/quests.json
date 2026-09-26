@@ -1887,6 +1887,106 @@
     {"type": "talk", "npc": "meinu_master", "dialog": ["夢韶華：「考驗合格，飛花點翠傳你！」"], "getItem": {"id": 58054, "n": 1}, "hint": "返去搵夢韶華覆命", "done": true}
    ],
    "reward": {"exp": 8000, "gold": 2000, "ultimate": "feihua"}
+  },
+  {
+   "id": "expert_tianwen_1",
+   "name": "天文一級認證",
+   "type": "expert",
+   "giver": "gande",
+   "pre": {"questDone": ["hist_zhangjiao"], "hasItemAny": [{"id": 56027, "n": 1}, {"id": 56028, "n": 1}]},
+   "preHint": "完成討伐張角 + 身上有太平天文書或太平地理書，去長沙城搵甘德",
+   "stages": [
+    {"type": "talk", "npc": "gande", "dialog": ["甘德：「你身上有天書之氣！想認證天文一級，就去汝南洞窟深處搵喬玄仙人請教。」"], "hint": "去汝南洞窟深處搵喬玄"},
+    {"type": "talk", "npc": "qiaoxuan", "dialog": ["喬玄：「觀星先要明曆法。呢本《甘石星經》你拿去，返去搵甘德認證。」"], "getItem": {"id": 56045, "n": 1}, "hint": "攞到甘石星經，返去搵甘德"},
+    {"type": "talk", "npc": "gande", "dialog": ["甘德：「星經得手，天文一級認證！」"], "takeItems": [[56045, 1]], "hint": "帶甘石星經返去搵甘德", "done": true}
+   ],
+   "reward": {"fame": 10, "expert": {"skill": "tianwen", "level": 1}}
+  },
+  {
+   "id": "expert_dili_1",
+   "name": "地理一級認證",
+   "type": "expert",
+   "giver": "gande",
+   "pre": {"questDone": ["hist_zhangjiao"], "hasItemAny": [{"id": 56027, "n": 1}, {"id": 56028, "n": 1}]},
+   "preHint": "完成討伐張角 + 身上有太平天文書或太平地理書，去長沙城搵甘德",
+   "stages": [
+    {"type": "talk", "npc": "gande", "dialog": ["甘德：「地理一級要通曉四方地脈。入汝南洞窟打低地理圖守護者，攞四張地理圖返嚟。」"], "hint": "入汝南洞窟打低地理圖守護者"},
+    {"type": "fight", "npc": "geo_guardian", "monster": 1105, "dialog": ["地理圖守護者：「冇本事就唔好想攞地理圖！」"], "getItems": [[56066, 1], [56067, 1], [56068, 1], [56069, 1]], "hint": "打敗守護者，攞齊四張地理圖"},
+    {"type": "talk", "npc": "gande", "dialog": ["甘德：「四圖齊全，地理一級認證！」"], "takeItems": [[56066, 1], [56067, 1], [56068, 1], [56069, 1]], "hint": "帶四張地理圖返去搵甘德", "done": true}
+   ],
+   "reward": {"fame": 10, "expert": {"skill": "dili", "level": 1}}
+  },
+  {
+   "id": "expert_tianwen_2",
+   "name": "天文二級認證",
+   "type": "expert",
+   "giver": "nanhua_immortal",
+   "pre": {"expert": {"tianwen": 1}},
+   "preHint": "天文一級 + 帶彩虹鑽石，去洛陽南華竹林搵南華老仙",
+   "stages": [
+    {"type": "talk", "npc": "nanhua_immortal", "dialog": ["南華老仙：「彩虹鑽石乃天地精華，投入池中，天文二級送你。」"], "takeItems": [[25011, 1]], "hint": "帶彩虹鑽石搵南華老仙", "done": true}
+   ],
+   "reward": {"fame": 20, "expert": {"skill": "tianwen", "level": 2}}
+  },
+  {
+   "id": "expert_dili_2",
+   "name": "地理二級認證",
+   "type": "expert",
+   "giver": "nanhua_immortal",
+   "pre": {"expert": {"dili": 1}},
+   "preHint": "地理一級 + 帶彩虹鑽石，去洛陽南華竹林搵南華老仙",
+   "stages": [
+    {"type": "talk", "npc": "nanhua_immortal", "dialog": ["南華老仙：「彩虹鑽石乃天地精華，投入池中，地理二級送你。」"], "takeItems": [[25011, 1]], "hint": "帶彩虹鑽石搵南華老仙", "done": true}
+   ],
+   "reward": {"fame": 20, "expert": {"skill": "dili", "level": 2}}
+  },
+  {
+   "id": "expert_tianwen_3",
+   "name": "天文三級認證",
+   "type": "expert",
+   "giver": "zuoci",
+   "pre": {"classAny": ["daoshi", "wunu", "bianshi", "meinu"], "questDone": ["expert_tianwen_2"]},
+   "preHint": "道士/巫女/辯士/美女 + 天文二級，去襄陽搵左慈仙人",
+   "stages": [
+    {"type": "talk", "npc": "zuoci", "dialog": ["左慈：「水之精華、生之石，攞齊十級水石同一粒生之石，天文三級認證。」"], "takeItems": [[32021, 1], [32022, 1], [32023, 1], [32024, 1], [32025, 1], [32026, 1], [32027, 1], [32028, 1], [32029, 1], [32030, 1], [32306, 1]], "hint": "帶齊水屬性石 10%~100% + 生之石搵左慈", "done": true}
+   ],
+   "reward": {"fame": 30, "expert": {"skill": "tianwen", "level": 3}}
+  },
+  {
+   "id": "expert_tianwen_4",
+   "name": "天文四級認證",
+   "type": "expert",
+   "giver": "zuoci",
+   "pre": {"classAny": ["daoshi", "wunu"], "questDone": ["expert_tianwen_3"]},
+   "preHint": "道士/巫女 + 天文三級，去襄陽搵左慈仙人",
+   "stages": [
+    {"type": "talk", "npc": "zuoci", "dialog": ["左慈：「風之精華、生之石，攞齊十級風石同一粒生之石，天文四級圓滿。」"], "takeItems": [[32001, 1], [32002, 1], [32003, 1], [32004, 1], [32005, 1], [32006, 1], [32007, 1], [32008, 1], [32009, 1], [32010, 1], [32306, 1]], "hint": "帶齊風屬性石 10%~100% + 生之石搵左慈", "done": true}
+   ],
+   "reward": {"fame": 40, "expert": {"skill": "tianwen", "level": 4}}
+  },
+  {
+   "id": "expert_dili_3",
+   "name": "地理三級認證",
+   "type": "expert",
+   "giver": "yuji",
+   "pre": {"classAny": ["shinu", "daoshi", "wunu", "bianshi", "meinu"], "questDone": ["expert_dili_2"]},
+   "preHint": "仕女/道士/巫女/辯士/美女 + 地理二級，去長沙搵于吉仙人",
+   "stages": [
+    {"type": "talk", "npc": "yuji", "dialog": ["于吉：「火之精華、生之石，攞齊十級火石同一粒生之石，地理三級認證。」"], "takeItems": [[32031, 1], [32032, 1], [32033, 1], [32034, 1], [32035, 1], [32036, 1], [32037, 1], [32038, 1], [32039, 1], [32040, 1], [32306, 1]], "hint": "帶齊火屬性石 10%~100% + 生之石搵于吉", "done": true}
+   ],
+   "reward": {"fame": 30, "expert": {"skill": "dili", "level": 3}}
+  },
+  {
+   "id": "expert_dili_4",
+   "name": "地理四級認證",
+   "type": "expert",
+   "giver": "yuji",
+   "pre": {"classAny": ["bianshi", "meinu"], "questDone": ["expert_dili_3"]},
+   "preHint": "辯士/美女 + 地理三級，去長沙搵于吉仙人",
+   "stages": [
+    {"type": "talk", "npc": "yuji", "dialog": ["于吉：「地之精華、生之石，攞齊十級地石同一粒生之石，地理四級圓滿。」"], "takeItems": [[32011, 1], [32012, 1], [32013, 1], [32014, 1], [32015, 1], [32016, 1], [32017, 1], [32018, 1], [32019, 1], [32020, 1], [32306, 1]], "hint": "帶齊地屬性石 10%~100% + 生之石搵于吉", "done": true}
+   ],
+   "reward": {"fame": 40, "expert": {"skill": "dili", "level": 4}}
   }
  ]
 }
