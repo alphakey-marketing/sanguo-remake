@@ -27,5 +27,43 @@
   {"id": "rescue", "name": "流落官員", "rank": 25, "kind": "rescue", "zone": "field_1",
    "fame": 50, "contrib": 25,
    "desc": "去%s打怪區搵返流落嘅官員，帶佢生還返官宅覆命。"}
- ]
+ ],
+ "_noteMerit": "義舉證明 (S08a, spec 08 §1)【原 sy2_8_3】: 四類 20 項物品，只有許昌 (朝廷直轄) 嘅朝廷官員受理 → imperialOffice。為民除害類冇頭銜限制；其餘三類要對應頭銜【原】。每項固定名聲值【自訂】。",
+ "merit": {
+  "imperialOffice": "donate_xc",
+  "cats": [
+   {"id": "a", "name": "為民除害類"},
+   {"id": "b", "name": "機密情報類"},
+   {"id": "c", "name": "古董軍備類"},
+   {"id": "d", "name": "特殊收藏品"}
+  ],
+  "items": [
+   {"id": 61501, "name": "田鼠碎骨", "cat": "a", "reqRank": 0, "fame": 5},
+   {"id": 61502, "name": "獸骨", "cat": "a", "reqRank": 0, "fame": 5},
+   {"id": 61503, "name": "獸肉", "cat": "a", "reqRank": 0, "fame": 5},
+   {"id": 61504, "name": "獸皮", "cat": "a", "reqRank": 0, "fame": 8},
+   {"id": 61505, "name": "猛獸皮", "cat": "a", "reqRank": 0, "fame": 12},
+   {"id": 61506, "name": "賊寇錦囊", "cat": "b", "reqRank": 6, "fame": 20},
+   {"id": 61507, "name": "軍事密函", "cat": "b", "reqRank": 8, "fame": 25},
+   {"id": 61508, "name": "機密文件", "cat": "b", "reqRank": 10, "fame": 30},
+   {"id": 61509, "name": "賊首令牌", "cat": "b", "reqRank": 12, "fame": 35},
+   {"id": 61510, "name": "要塞地形圖", "cat": "b", "reqRank": 15, "fame": 45},
+   {"id": 61037, "name": "前朝步兵裝", "cat": "c", "reqRank": 17, "fame": 50},
+   {"id": 61038, "name": "前朝槍兵裝", "cat": "c", "reqRank": 20, "fame": 60},
+   {"id": 61039, "name": "前朝騎兵裝", "cat": "c", "reqRank": 22, "fame": 65},
+   {"id": 61040, "name": "古董連弩", "cat": "c", "reqRank": 25, "fame": 75},
+   {"id": 61042, "name": "前朝藤甲", "cat": "c", "reqRank": 27, "fame": 80},
+   {"id": 61041, "name": "巨象瓷器", "cat": "d", "reqRank": 30, "fame": 90},
+   {"id": 61043, "name": "紅瓦壺", "cat": "d", "reqRank": 32, "fame": 95},
+   {"id": 61044, "name": "城塞圖", "cat": "d", "reqRank": 35, "fame": 105},
+   {"id": 61045, "name": "山水圖", "cat": "d", "reqRank": 37, "fame": 110},
+   {"id": 61046, "name": "仕女圖", "cat": "d", "reqRank": 40, "fame": 120}
+  ]
+ },
+ "_noteTribute": "城池進貢 (S08a, spec 08 §1)【自訂】: 捐獻處進貢物資 (捐獻單位)，唔扣行動力，提升該城好感 + 名聲。好感/名聲 = 捐獻單位 × 0.01 (unitsPerFavor/unitsPerFame = 100)。好感封頂 favorCap。",
+ "tribute": {
+  "favorCap": 100,
+  "unitsPerFavor": 100,
+  "unitsPerFame": 100
+ }
 }

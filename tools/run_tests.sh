@@ -40,6 +40,7 @@ run tiandi --script tests/run_tiandi.gd
 run recruit --script tests/run_recruit.gd
 run general --script tests/run_general.gd
 run title --script tests/run_title.gd
+run militia --script tests/run_militia.gd
 run battle --script tests/run_battle.gd
 run scene --script tests/run_scene.gd
 run pk --script tests/run_pk.gd

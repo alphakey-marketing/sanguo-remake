@@ -351,3 +351,127 @@ func _office_tick() -> void:
 		if not npc.is_empty():
 			_remove_ent(int(npc["id"]))
 		_msg(int(pe["id"]), "官令「%s」失敗：官員遇害，官令自動取消（行動力唔退）" % String(o.get("name", "?")))
+
+
+# ================= 義舉證明 (S08a, spec 08 §1)【原 sy2_8_3 四類 20 項；名聲值自訂】 =================
+# 只有許昌嘅朝廷官員 (data.office.merit.imperialOffice) 受理。
+func _merit_cfg() -> Dictionary:
+	return data.office["merit"]
+
+
+# 20 項義舉證明清單 (read-model；owned/can/why 供 UI 灰掣用)
+func merit_list(ch: Dictionary) -> Array:
+	var cfg := _merit_cfg()
+	var cat_names := {}
+	for c in cfg["cats"]:
+		cat_names[String(c["id"])] = String(c["name"])
+	var rank := int(ch.get("titleRank", 0))
+	var out: Array = []
+	for it in cfg["items"]:
+		var iid := int(it["id"])
+		var why := RulesMerit.block(cfg, iid, rank, data.titles)
+		out.append({"id": iid, "name": String(it["name"]), "cat": String(it["cat"]),
+			"catName": String(cat_names.get(String(it["cat"]), "")), "reqRank": int(it["reqRank"]),
+			"fame": int(it["fame"]), "owned": RulesShop.count_item(ch["bag"], iid),
+			"can": why == "", "why": why})
+	return out
+
+
+# 繳交 1 件義舉證明 → 名聲 (冇行動力成本，spec 08 §1)
+func cmd_merit_turnin(id: int, item_id: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var cfg := _merit_cfg()
+	var off_key := String(cfg["imperialOffice"])
+	if office_near(e) != off_key:
+		return _msg(id, "義舉證明只有許昌嘅朝廷官員受理，要去%s" % String(data.facilities[off_key]["name"]))
+	var ch: Dictionary = e["ch"]
+	var why := RulesMerit.block(cfg, item_id, int(ch.get("titleRank", 0)), data.titles)
+	if why != "":
+		return _msg(id, why)
+	if RulesShop.count_item(ch["bag"], item_id) <= 0:
+		return _msg(id, "背包冇呢件義舉證明")
+	RulesShop.remove_item(ch["bag"], item_id, 1)
+	var fame := RulesMerit.fame_of(cfg, item_id)
+	ch["fame"] = int(ch.get("fame", 0)) + fame
+	_emit({"k": "merit", "id": id, "item": item_id, "fame": fame})
+	_msg(id, "繳交義舉證明「%s」：名聲 +%d" % [String(RulesMerit.item_def(cfg, item_id).get("name", str(item_id))), fame])
+
+
+# ================= 城池進貢 (S08a, spec 08 §1)【自訂】 =================
+func _tribute_cfg() -> Dictionary:
+	return data.office["tribute"]
+
+
+# 設施 key → world city id ("" = 唔屬 any 城池)
+func _facility_city_id(key: String) -> String:
+	var mp := String((data.facilities.get(key, {}) as Dictionary).get("map", ""))
+	for c in data.world["cities"]:
+		if String(c["id"]) == mp:
+			return mp
+	return ""
+
+
+func _city_name(city_id: String) -> String:
+	for c in data.world["cities"]:
+		if String(c["id"]) == city_id:
+			return String(c["name"])
+	return String(data.map_by_id.get(city_id, {}).get("name", city_id))
+
+
+# 玩家喺某城嘅好感 (舊存檔冇 → 0)
+func city_favor(ch: Dictionary, city_id: String) -> int:
+	return int((ch.get("cityFavor", {}) as Dictionary).get(city_id, 0))
+
+
+# 各城好感 read-model
+func city_favor_view(ch: Dictionary) -> Array:
+	var out: Array = []
+	for c in data.world["cities"]:
+		var cid := String(c["id"])
+		out.append({"id": cid, "name": String(c["name"]), "favor": city_favor(ch, cid)})
+	return out
+
+
+# 進貢物資 (捐獻處): 唔扣行動力，提升該城好感 + 名聲【自訂】。items = [[item id, n], ...]
+func cmd_city_tribute(id: int, items: Array) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var here := _fac_near(e, "donation")
+	if here == "":
+		return _msg(id, "要去捐獻處先進貢得")
+	var city := _facility_city_id(here)
+	if city == "":
+		return _msg(id, "呢度唔屬任何城池，進貢唔到")
+	var ch: Dictionary = e["ch"]
+	var counts := {}
+	for it in items:
+		var iid := int(it[0])
+		var n := int(it[1])
+		if n <= 0 or not data.donation_rates.has(iid) or RulesQuest.is_quest_item(data, iid):
+			continue
+		counts[iid] = int(counts.get(iid, 0)) + n
+	if counts.is_empty():
+		return _msg(id, "冇物資可以進貢")
+	for iid in counts:
+		if RulesShop.count_item(ch["bag"], iid) < int(counts[iid]):
+			return _msg(id, "背包冇咁多%s" % data.names.get(iid, str(iid)))
+	var units := RulesTiandi.donation_units(counts, data.donation_rates)
+	if units <= 0:
+		return _msg(id, "冇物資可以進貢")
+	for iid in counts:
+		RulesShop.remove_item(ch["bag"], iid, int(counts[iid]))
+	var cfg := _tribute_cfg()
+	var old := city_favor(ch, city)
+	var nf := RulesMerit.favor_cap(old + RulesMerit.favor_gain(units, cfg), cfg)
+	var gain := nf - old
+	var fame := RulesMerit.tribute_fame(units, cfg)
+	if not ch.has("cityFavor"):
+		ch["cityFavor"] = {}
+	ch["cityFavor"][city] = nf
+	ch["fame"] = int(ch.get("fame", 0)) + fame
+	_emit({"k": "city_tribute", "id": id, "city": city, "units": units, "favor": gain, "fame": fame})
+	var tail := "，名聲 +%d" % fame if fame > 0 else ""
+	_msg(id, "進貢 %d 單位物資入%s：好感 +%d%s" % [units, _city_name(city), gain, tail])
