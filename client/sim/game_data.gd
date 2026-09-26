@@ -43,6 +43,7 @@ var work_adv: Dictionary = {}     # 進階技能 (data/work.json.advanced, Step 
 var recipes: Dictionary = {}      # 成品 item id -> {id, skill, lv, need:[[id,n]]} (data/recipes.json, Step 12)
 var recipes_by_skill: Dictionary = {}  # 進階 skill -> [recipe] (按 lv 排)
 var tool_skill: Dictionary = {}   # 工具 item id -> skill (初階 tool/starterTool + 進階 tool)
+var tool_tier: Dictionary = {}    # 工具 item id -> "special"/"platinum"/"godgiven" (S05b, 普通/新手 tool 冇 entry)
 var mat_skill: Dictionary = {}    # 初階工作材料 item id -> skill (天地商行自動存, Step 13)
 var donation: Dictionary = {}     # 捐贈官令設定 (data/donation.json, Step 13)
 var donation_rates: Dictionary = {}  # item id -> 捐獻單位【原】
@@ -83,6 +84,7 @@ var gen_skill_override: Dictionary = {}  # 武將名 -> 特技 id (名將指定)
 var general_order_item: Dictionary = {}  # 武將名 -> 將軍令 item id
 var comm: Dictionary = {}          # 居民委託 + 武將收集冊設定 (data/commissions.json, Step 16)
 var experts: Dictionary = {}       # 專長 (data/experts.json, Step S01c, spec 01 §8)
+var master: Dictionary = {}        # 大宗師合成術 (data/master_recipes.json, S05c, spec 05 §5)
 
 static var _cache: GameData
 
@@ -108,16 +110,25 @@ static func load_all() -> GameData:
 	var wk: Dictionary = _read("res://data/work.json")
 	g.work = wk["skills"]
 	g.work_meta = {"toolDurability": wk["toolDurability"], "level": wk["level"], "basicRate": wk["basicRate"],
-		"craftRate": wk["craftRate"], "repair": wk["repair"]}
+		"craftRate": wk["craftRate"], "repair": wk["repair"], "tierBonus": wk.get("tierBonus", {}),
+		"toolRedeemContrib": wk.get("toolRedeemContrib", {})}
 	g.work_adv = wk["advanced"]
 	for sk in g.work:
 		g.tool_skill[int(g.work[sk]["tool"])] = sk
 		g.tool_skill[int(g.work[sk]["starterTool"])] = sk
 		for mid in g.work[sk]["materials"]:
 			g.mat_skill[int(mid)] = sk
+		for tier in g.work[sk].get("tiers", {}):
+			var tid := int(g.work[sk]["tiers"][tier])
+			g.tool_skill[tid] = sk
+			g.tool_tier[tid] = tier
 	for sk in g.work_adv:
 		g.tool_skill[int(g.work_adv[sk]["tool"])] = sk
 		g.recipes_by_skill[sk] = []
+		for tier in g.work_adv[sk].get("tiers", {}):
+			var tid2 := int(g.work_adv[sk]["tiers"][tier])
+			g.tool_skill[tid2] = sk
+			g.tool_tier[tid2] = tier
 	var rc: Dictionary = _read("res://data/recipes.json")
 	for r in rc["recipes"]:
 		g.recipes[int(r["id"])] = r
@@ -186,6 +197,7 @@ static func load_all() -> GameData:
 		g.class_skills[String(s["id"])] = s
 	g.rumors = (_read("res://data/rumors.json") as Dictionary).get("rumors", [])
 	g.experts = _read("res://data/experts.json")
+	g.master = _read("res://data/master_recipes.json")
 	for x in c["classes"]:
 		g.classes[String(x["id"])] = x
 	for x in m["monsters"]:

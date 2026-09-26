@@ -32,6 +32,7 @@ run monsters --script tests/run_monsters.gd
 run maps --script tests/run_maps.gd
 run equip --script tests/run_equip.gd
 run craft --script tests/run_craft.gd
+run master --script tests/run_master.gd
 run tiandi --script tests/run_tiandi.gd
 run recruit --script tests/run_recruit.gd
 run general --script tests/run_general.gd

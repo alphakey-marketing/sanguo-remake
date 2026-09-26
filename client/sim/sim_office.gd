@@ -102,6 +102,10 @@ func cmd_office_order(id: int, order_id: String) -> void:
 		RulesShop.add_item(ch["bag"], int(o["item"]), 1)
 	elif String(o["kind"]) == "census":
 		od["met"] = []
+	elif String(o["kind"]) == "escort":
+		od["npc"] = int(_spawn_office_npc(e, "escort")["id"])
+	elif String(o["kind"]) == "rescue":
+		od["npc"] = int(_spawn_office_npc(e, "rescue")["id"])
 	ch["ap"] = ap_of(ch) - _office_ap_cost(ch)
 	off["orderDay"] = int(_clock()["day"])
 	off["order"] = od
@@ -123,6 +127,12 @@ func order_text(ch: Dictionary) -> String:
 		"census":
 			return String(o["desc"]) % [String(data.facilities[String(od["from"])].get("city", "城")), int(o["n"])] + \
 				"（%d/%d）" % [(od.get("met", []) as Array).size(), int(o["n"])]
+		"buy":
+			return String(o["desc"]) % data.names.get(int(o["item"]), "武器") + "（背包 %d 件）" % RulesShop.count_item(ch["bag"], int(o["item"]))
+		"recruit":
+			return String(o["desc"]) + ("（已有文官跟隨）" if _office_recruit_ok(ch) else "（未登用文官）")
+		"escort", "rescue":
+			return String(o["desc"]) % String(data.map_by_id[String(o["zone"])]["name"]) + "　" + _office_npc_status(od)
 	return ""
 
 
@@ -178,6 +188,26 @@ func cmd_office_turnin(id: int) -> void:
 				return _msg(id, "返%s覆命" % data.facilities[String(od["from"])]["name"])
 			if (od.get("met", []) as Array).size() < int(o["n"]):
 				return _msg(id, "仲未訪問夠 %d 個人" % int(o["n"]))
+		"buy":
+			if not RulesShop.remove_item(ch["bag"], int(o["item"]), 1):
+				return _msg(id, "仲未買到指定武器：%s" % data.names.get(int(o["item"]), "武器"))
+		"recruit":
+			if not _office_recruit_ok(ch):
+				return _msg(id, "要登用緊 1 位文官先覆命得")
+		"escort":
+			var enpc := ent(int(od.get("npc", 0)))
+			if enpc.is_empty() or bool(enpc.get("down", false)):
+				return _msg(id, "護送對象已經唔喺度……放棄官令再接過啦")
+			if map_id_at(int(enpc["x"]), int(enpc["y"])) != String(o["zone"]):
+				return _msg(id, "仲未護送到%s" % String(data.map_by_id[String(o["zone"])]["name"]))
+			_remove_ent(int(enpc["id"]))
+		"rescue":
+			var rnpc := ent(int(od.get("npc", 0)))
+			if rnpc.is_empty() or bool(rnpc.get("down", false)):
+				return _msg(id, "流落官員已經唔喺度……放棄官令再接過啦")
+			if not bool(rnpc["gen"].get("rescued", false)) or here != String(od["from"]):
+				return _msg(id, "帶流落官員返%s先覆命得" % String(data.facilities[String(od["from"])]["name"]))
+			_remove_ent(int(rnpc["id"]))
 	off["order"] = {}
 	_order_reward(e, ch, o)
 
@@ -197,8 +227,47 @@ func _order_reward(e: Dictionary, ch: Dictionary, o: Dictionary) -> void:
 		ch["polExp"] = int(r["exp"])
 		tail = "，政治經驗 +%d" % pe + ("，政治 +%d" % int(r["ups"]) if int(r["ups"]) > 0 else "")
 		_sync_stats(e)
+	var pay := 0
+	if String(o.get("kind", "")) == "escort":
+		pay = RulesTitle.salary(data.titles, int(ch.get("titleRank", 0))) * int(o.get("salaryMult", 1))
+		ch["gold"] = int(ch["gold"]) + pay
+		tail += "，俸祿獎勵 +%d 金" % pay
 	_emit({"k": "office_order", "id": id, "order": String(o["id"]), "done": true, "fame": fame, "contrib": contrib})
 	_msg(id, "官令「%s」完成：名聲 +%d，官宅貢獻 +%d%s" % [o["name"], fame, contrib, tail])
+
+
+# 御賜工具清單 (S05b spec 05 §5)：真任務 (S06c 團體任務) 未接前，暫用官宅貢獻兌換
+func godgiven_tools() -> Array:
+	var out: Array = []
+	var contrib_cfg: Dictionary = data.work_meta["toolRedeemContrib"]
+	for tid in data.tool_tier:
+		if String(data.tool_tier[tid]) != "godgiven":
+			continue
+		var skill := String(data.tool_skill.get(tid, ""))
+		var cost := int(contrib_cfg["basic"]) if data.work.has(skill) else int(contrib_cfg["advanced"])
+		out.append({"item": int(tid), "skill": skill, "cost": cost})
+	return out
+
+
+# 兌換御賜工具: 扣官宅貢獻換 1 件入背包 (暫代過渡，真任務來源等 S06c 團體任務)
+func cmd_office_redeem_tool(id: int, item_id: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	if office_near(e) == "":
+		return _msg(id, "要去官宅先兌換得御賜工具")
+	if String(data.tool_tier.get(item_id, "")) != "godgiven":
+		return _msg(id, "呢件唔係御賜工具")
+	var ch: Dictionary = e["ch"]
+	var skill := String(data.tool_skill.get(item_id, ""))
+	var contrib_cfg: Dictionary = data.work_meta["toolRedeemContrib"]
+	var cost := int(contrib_cfg["basic"]) if data.work.has(skill) else int(contrib_cfg["advanced"])
+	if int(ch.get("contrib", 0)) < cost:
+		return _msg(id, "官宅貢獻不足 (要 %d，而家 %d)" % [cost, int(ch.get("contrib", 0))])
+	ch["contrib"] = int(ch["contrib"]) - cost
+	RulesShop.add_item(ch["bag"], item_id, 1)
+	_emit({"k": "office_redeem_tool", "id": id, "item": item_id, "contrib": cost})
+	_msg(id, "兌換咗「%s」，扣官宅貢獻 %d" % [data.names.get(item_id, str(item_id)), cost])
 
 
 # 放棄: 收返軍函；行動力唔退、今日唔可以再接
@@ -214,6 +283,10 @@ func cmd_office_abandon(id: int) -> void:
 	var o := order_def(String(od["id"]))
 	if String(o.get("kind", "")) == "deliver":
 		RulesShop.remove_item(ch["bag"], int(o["item"]), 1)
+	elif String(o.get("kind", "")) in ["escort", "rescue"]:
+		var npc := ent(int(od.get("npc", 0)))
+		if not npc.is_empty():
+			_remove_ent(int(npc["id"]))
 	off["order"] = {}
 	_msg(id, "放棄咗官令「%s」" % o.get("name", "?"))
 
@@ -251,3 +324,30 @@ func cmd_office_pill(id: int) -> void:
 	var item := int(data.office["pillItem"])
 	RulesShop.add_item(ch["bag"], item, 1)
 	_msg(id, "用 %d 貢獻換咗 1 粒%s" % [cost, data.names.get(item, "行動丹")])
+
+# 朝廷求才: 而家係咪跟緊一位文官同伴
+func _office_recruit_ok(ch: Dictionary) -> bool:
+	var comp := ent(int(ch.get("recruit", {}).get("comp", 0)))
+	if comp.is_empty() or not comp.has("gen"):
+		return false
+	var g: Dictionary = data.general_by_id.get(int(comp["gen"]["gid"]), {})
+	return String(g.get("type", "")) == "wen"
+
+
+# 每 tick: 護衛/救援官令嘅 NPC 死咗 (down) → 官令自動失敗，唔退行動力 (Step S06a)
+func _office_tick() -> void:
+	var pe := ent(int(state["player_id"]))
+	if pe.is_empty() or not pe.has("ch"):
+		return
+	var ch: Dictionary = pe["ch"]
+	var off := _office_of(ch)
+	var od: Dictionary = off.get("order", {})
+	if od.is_empty() or not od.has("npc"):
+		return
+	var o := order_def(String(od["id"]))
+	var npc := ent(int(od["npc"]))
+	if npc.is_empty() or bool(npc.get("down", false)):
+		off["order"] = {}
+		if not npc.is_empty():
+			_remove_ent(int(npc["id"]))
+		_msg(int(pe["id"]), "官令「%s」失敗：官員遇害，官令自動取消（行動力唔退）" % String(o.get("name", "?")))

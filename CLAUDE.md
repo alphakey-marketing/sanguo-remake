@@ -15,9 +15,9 @@
 - 大 Step 開工先「核實」spec vs 代碼，更新 PLAN §1 同清單
 - 跨 spec 依賴：先做資料 + 掛鈎 + 測試，效果喺後面 Step 接，記入 PLAN §4
 - PLAN 標【待決】= 做到嗰步先問用家，唔好自己估
-- **下一步 = PLAN §3 第一個未剔 `[ ]`**（2026-09-26：S04d 特殊場景首批完，S04 全剔 ✅，下一步 S05a 生產經濟小缺口）
+- **下一步 = PLAN §3 第一個未剔 `[ ]`**（2026-09-26：S06a 官令補齊完，下一步 S06b 歷史任務其餘 5 條）
 
-## 現況 (2026-09-26，六職全開；S03c 死亡道具完；S04a 地面掉落物完；S04b 術法怪/boss 技能完；S04c 其餘 5 場戰役實裝完；S04d 特殊場景首批（桃花渡+七彩奪寶陣）完，S04 全剔 ✅；S05a 生產經濟小缺口完（產出 1~2 件 doubleChance、5 城 4 類商店補齊、天災停進貨 shopShutdown、地圖面板市價頁），下一步 S05b 特製/白金/御賜工具)
+## 現況 (2026-09-26，六職全開；S03c 死亡道具完；S04a 地面掉落物完；S04b 術法怪/boss 技能完；S04c 其餘 5 場戰役實裝完；S04d 特殊場景首批（桃花渡+七彩奪寶陣）完，S04 全剔 ✅；S05a 生產經濟小缺口完（產出 1~2 件 doubleChance、5 城 4 類商店補齊、天災停進貨 shopShutdown、地圖面板市價頁）；S05b 特製/白金/御賜工具完（沿用 items.json 原有 26041~26073，御賜暫用官宅貢獻兌換過渡，等 S06c 團體任務接正式來源）；S05c 大宗師合成術完（新增 22 件 item：新初階/進階材料 11 + 白晝之珠 + 5 合成寶石 + 5 虛擬寶物；靠御賜工具工作時額外機會夾埋材料、白晝之珠暫用官宅貢獻兌換過渡、工房/廚房/藥房「大宗師」頁），S05 全剔 ✅；S06a 官令補齊完（官令 3→7 條：訂製軍備/朝廷求才/官員護衛/流落官員；護衛/救援 NPC 借用同伴 `gen` kind 過圖/HP/倒下機制，唔佔 `ch.recruit.comp`，死咗 `_office_tick()` 自動失敗），下一步 S06b 歷史任務其餘 5 條)
 - **全部喺 `client/` (Godot 4.7, GDScript)**：`rules/`(純函數)、`sim/`(單機世界模擬，狀態可存檔、種子 RNG)、`ui/`(`touch/` HUD 觸控 + `panels/` 正式面板)、`tests/`
 - 詳細現況 = PLAN §1；已做系統 → 檔案索引：
 
@@ -28,7 +28,7 @@
 | 職業特技（義士融合內建；仕女開鎖、道士超渡、**巫女潛行、辯士竊聽、美女透視**已開） | `class_skill.gd` + `stealth.gd` + `qieting.gd` + `ammo.gd` + `toushi.gd` | `sim_skill.gd`（`cmd_use_skill`/`cmd_skill_pick`/`cmd_stealth_cross`/`_try_qieting`/`_try_toushi`/`_spell_heal`）+ `sim_ai.gd`（弩箭消耗） | `class_skills.json` `rumors.json` `spells.json`（+恢復術一~七級） |
 | 裝備/耐久 | `equip.gd` | `sim_econ.gd` | `equip.json` |
 | 善惡/可攻擊 NPC + 死亡道具 | `karma.gd`（+`karma_after_kill_npc`/`counter_kill`/`tianqian_*`/`city_banned`/`office_blocked`）+ `combat.gd`（`death_drop_table`/`roll_death_drop_items`/`death_exp_loss_protected` + 三件 `LUCKY_CHARM`/`PROTECTION_CHARM`/`REVIVE_PILL`） | `sim_combat.gd`（`_kill_bot`/`_tianqian_reprisal`/`_kill_player` 六步）+ `bot_sys.gd`（`_pk_flee`/`_crime_find_player`/`W_SEE_DIE`）+ `sim.gd` `_city_guard_check` + `sim_econ.gd` `cmd_rest`(拒住) + `sim_office.gd` `order_block`(罪犯拒官令) + `sim_core.gd` `_half_heal` | `world.json`（`bots.criminalPct/fleeChance/crimeAggro/guardWarnTicks`） `items.json`(65016/65029/65030) `shops.json`(herbalist) |
-| 生產/修理/天地商行/捐獻/市場 | `work.gd` `tiandi.gd` `market.gd` `shop.gd` | `sim_econ.gd` | `work.json` `recipes.json`(生成) `shops.json` `donation.json` |
+| 生產/修理/天地商行/捐獻/市場/大宗師合成術 | `work.gd` `tiandi.gd` `market.gd` `shop.gd` `master.gd` | `sim_econ.gd` | `work.json` `recipes.json`(生成) `shops.json` `donation.json` `master_recipes.json` |
 | 任務/歷史/委託/收集冊 | `quest.gd` `commission.gd` | `sim_quest.gd` `sim_comm.gd` | `quests.json` `quest_npcs.json` `commissions.json` |
 | 頭銜/官宅/官令 | `title.gd` | `sim_office.gd` | `titles.json`(生成) `office.json` |
 | 登用/同伴/武將特技 | `recruit.gd` `general.gd` | `sim_recruit.gd` | `generals.json`(生成) `general_skills.json` `quiz_generals.json` |

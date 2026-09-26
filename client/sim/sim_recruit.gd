@@ -493,6 +493,9 @@ func _cheb(a: Dictionary, b: Dictionary) -> int:
 # 同伴每 tick (之後 _think_player 負責追/打): 回血 → 跨圖跟主公 → 按指令揀目標 → 冇目標就跟隨
 func _think_companion(c: Dictionary) -> void:
 	var gn: Dictionary = c["gen"]
+	if bool(gn.get("office", false)):        # 官令護衛/救援 NPC (S06a)：走另一套簡化 tick
+		_think_office_npc(c)
+		return
 	var o := ent(int(gn["owner"]))
 	if o.is_empty() or int(c["hp"]) <= 0:
 		return
@@ -925,3 +928,75 @@ func _office_ap_cost(ch: Dictionary) -> int:
 	if c.is_empty() or not c.has("gen"):
 		return base
 	return MathX.js_round(base * float(_comp_eff(c).get("apCostMul", 1.0)))
+
+
+# ================= 官員護衛/流落官員 NPC (S06a spec 06 §3): 借用同伴 (gen kind) 嘅過圖/HP/倒下機制 =================
+# 生成官員 NPC：escort = 主公隔籬跟隨；rescue = field_1 打怪區隨機一角，等玩家救
+func _spawn_office_npc(pe: Dictionary, role: String) -> Dictionary:
+	var zone := "field_1"
+	for od2 in data.office["orders"]:
+		if String(od2["kind"]) == role:
+			zone = String(od2["zone"])
+	var pos: Vector2i
+	if role == "escort":
+		pos = _free_near(int(pe["x"]), int(pe["y"]))
+	else:
+		pos = _pick_free(52, 5, 96, 22)
+	var ename := "護衛官員" if role == "escort" else "流落官員"
+	var c := _new_ent(ename, "gen", pos)
+	var ch := RulesStats.create_character(data, ename.substr(0, 8), "yishi")
+	ch["level"] = 15
+	ch["bag"] = []
+	ch["gold"] = 0
+	ch["equip"]["spellbooks"] = [0, 0, 0]
+	ch["equip"]["jewels"] = [0, 0]
+	_ensure_equip(ch)
+	_full_heal(ch)
+	c["ch"] = ch
+	c["gen"] = {"gid": 0, "owner": int(pe["id"]) if role == "escort" else 0, "office": true,
+		"role": role, "rescued": false, "order": "follow", "skillCd": 0}
+	_sync_stats(c)
+	return c
+
+
+# 官員 NPC 跟隨: 過圖跟主公 (簡化版 _think_companion, 冇打怪/落指令); rescue 未救到之前企定唔郁
+func _think_office_npc(c: Dictionary) -> void:
+	var gn: Dictionary = c["gen"]
+	if bool(c.get("down", false)):
+		return
+	if String(gn["role"]) == "rescue" and not bool(gn.get("rescued", false)):
+		var pe := ent(int(state["player_id"]))
+		var near := not pe.is_empty() and int(pe.get("hp", 0)) > 0 and map_id_at(int(pe["x"]), int(pe["y"])) == map_id_at(int(c["x"]), int(c["y"])) and _cheb(c, pe) <= 3
+		if near:
+			gn["rescued"] = true
+			gn["owner"] = int(pe["id"])
+			_msg(int(pe["id"]), "救到流落官員！帶佢返官宅覆命啦。")
+		return
+	var o := ent(int(gn.get("owner", 0)))
+	if o.is_empty():
+		return
+	var omap := map_id_at(int(o["x"]), int(o["y"]))
+	if map_id_at(int(c["x"]), int(c["y"])) != omap:
+		if not _route_to_map(c, omap):
+			var p := _free_near(int(o["x"]), int(o["y"]))
+			_put_ent(c, p.x, p.y)
+		return
+	var d := _cheb(c, o)
+	if d <= 2:
+		c["tx"] = c["x"]
+		c["ty"] = c["y"]
+		c.erase("path")
+	elif maxi(absi(int(c["tx"]) - int(o["x"])), absi(int(c["ty"]) - int(o["y"]))) > 2 or (int(c["tx"]) == int(c["x"]) and int(c["ty"]) == int(c["y"])):
+		_set_dest(c, int(o["x"]), int(o["y"]), CHASE_CAP)
+
+
+# UI 用: 護衛/救援官員 NPC 現況一句講
+func _office_npc_status(od: Dictionary) -> String:
+	var npc := ent(int(od.get("npc", 0)))
+	if npc.is_empty() or bool(npc.get("down", false)):
+		return "（官員已經死咗，放棄官令再接過）"
+	var gn: Dictionary = npc.get("gen", {})
+	if String(gn.get("role", "")) == "rescue" and not bool(gn.get("rescued", false)):
+		return "（HP %d/%d，未搵到）" % [int(npc["hp"]), int(npc["max_hp"])]
+	return "（HP %d/%d，跟緊你）" % [int(npc["hp"]), int(npc["max_hp"])]
+

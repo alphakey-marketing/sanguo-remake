@@ -2,50 +2,64 @@
   "_note": "工作技能【原=技能種類/工具/城外工作區；自訂=解鎖等級/機率/耐久，攻略無數字】(Step 7.1)。材料 id 對應 data/items.json 既有分類 (草藥材/礦石材料/木材/蔬果材/魚材/食材)。tool=正式工具、starterTool=新手工具(平、耐久低)。",
   "toolDurability": { "starter": 50, "normal": 200 },
   "_note12": "Step 12 (spec 05 §2/§4)：技能等級 1~100【原】；經驗/機率/修理費【自訂】。初階 tier 按技能等級解鎖 (唔再睇角色等級)。進階 = 對應初階 50 級解鎖【原】，要喺城內設施 (facilities.json crafts) + 進階工具【原】(暫時工具店賣，Step 14 官宅後改)。repair: 武器 = 冶鐵、頭/身/靴 = 修繕、戒指/項鍊 = 木匠【原】",
+  "_note05b": "S05b (spec 05 §2)：3 等工具【原=種類；耐久/成功率加成自訂】。items.json 原有 26041~26073 已係特製/白金/御賜 3 等（每個技能各 1 件，template 沿用普通工具外觀）；skills/advanced 各技能 tiers 對應返呢啲 id。御賜 (u24=1 綁定) 暫時用官宅貢獻兌換過渡 (sim_office.gd cmd_office_redeem_tool)，真任務來源等 S06c。",
+  "tierBonus": { "special": { "dur": 800, "bonus": 0.05 }, "platinum": { "dur": 2000, "bonus": 0.10 }, "godgiven": { "dur": 5000, "bonus": 0.15 } },
+  "toolRedeemContrib": { "basic": 200, "advanced": 400 },
   "level": { "max": 100, "base": 4, "perLv": 1, "gainOk": 2, "gainFail": 1 },
   "basicRate": { "base": 0.85, "perLv": 0.005, "cap": 0.98, "big": 0.005 },
   "craftRate": { "base": 0.6, "perLv": 0.006, "perItemLv": 0.01, "min": 0.05, "max": 0.98, "failLoseMat": 0.5 },
   "repair": { "serviceRate": 0.3 },
   "advanced": {
-    "cooking":   { "name": "廚藝", "tool": 26005, "from": ["farming", "fishing", "hunting"], "unlockLv": 50 },
-    "alchemy":   { "name": "煉丹", "tool": 26012, "from": ["herbalism"], "unlockLv": 50 },
-    "carpentry": { "name": "木匠", "tool": 26007, "from": ["woodcutting"], "unlockLv": 50, "repairs": ["ring", "necklace"] },
-    "smithing":  { "name": "冶鐵", "tool": 26004, "from": ["mining"], "unlockLv": 50, "repairs": ["weapon"] },
-    "mending":   { "name": "修繕", "tool": 26010, "from": ["mining"], "unlockLv": 50, "repairs": ["head", "body", "boots"] }
+    "cooking":   { "name": "廚藝", "tool": 26005, "from": ["farming", "fishing", "hunting"], "unlockLv": 50,
+      "tiers": { "special": 26060, "platinum": 26065, "godgiven": 26070 } },
+    "alchemy":   { "name": "煉丹", "tool": 26012, "from": ["herbalism"], "unlockLv": 50,
+      "tiers": { "special": 26063, "platinum": 26068, "godgiven": 26073 } },
+    "carpentry": { "name": "木匠", "tool": 26007, "from": ["woodcutting"], "unlockLv": 50, "repairs": ["ring", "necklace"],
+      "tiers": { "special": 26061, "platinum": 26066, "godgiven": 26071 } },
+    "smithing":  { "name": "冶鐵", "tool": 26004, "from": ["mining"], "unlockLv": 50, "repairs": ["weapon"],
+      "tiers": { "special": 26059, "platinum": 26064, "godgiven": 26069 } },
+    "mending":   { "name": "修繕", "tool": 26010, "from": ["mining"], "unlockLv": 50, "repairs": ["head", "body", "boots"],
+      "tiers": { "special": 26062, "platinum": 26067, "godgiven": 26072 } }
   },
   "skills": {
     "farming": {
       "name": "農耕", "tool": 26001, "starterTool": 26031,
       "materials": [25064, 25065, 25066, 25067, 25068, 25069, 25070, 25071, 25072, 25073, 25074],
       "unlockLv": [1, 3, 6, 10, 14, 18, 22, 27, 32, 38, 45],
-      "doubleChance": 0.15
+      "doubleChance": 0.15,
+      "tiers": { "special": 26041, "platinum": 26047, "godgiven": 26053 }
     },
     "hunting": {
       "name": "狩獵", "tool": 26011, "starterTool": 26036,
       "materials": [25012, 25013, 25014, 25015, 25016, 25017, 25018, 25019, 25020, 25021],
-      "unlockLv": [1, 4, 8, 12, 17, 22, 27, 33, 39, 46]
+      "unlockLv": [1, 4, 8, 12, 17, 22, 27, 33, 39, 46],
+      "tiers": { "special": 26046, "platinum": 26052, "godgiven": 26058 }
     },
     "woodcutting": {
       "name": "伐木", "tool": 26002, "starterTool": 26032,
       "materials": [25053, 25054, 25055, 25056, 25057, 25058, 25059, 25060, 25061, 25062, 25063],
       "unlockLv": [1, 3, 6, 10, 14, 18, 22, 27, 32, 38, 45],
-      "doubleChance": 0.15
+      "doubleChance": 0.15,
+      "tiers": { "special": 26042, "platinum": 26048, "godgiven": 26054 }
     },
     "fishing": {
       "name": "釣魚", "tool": 26006, "starterTool": 26034,
       "materials": [25031, 25035, 25036, 25037, 25038, 25039, 25040],
-      "unlockLv": [1, 6, 12, 18, 26, 34, 45]
+      "unlockLv": [1, 6, 12, 18, 26, 34, 45],
+      "tiers": { "special": 26044, "platinum": 26050, "godgiven": 26056 }
     },
     "herbalism": {
       "name": "採藥", "tool": 26008, "starterTool": 26035,
       "materials": [25042, 25043, 25044, 25045, 25046, 25047, 25048, 25049, 25050, 25051, 25052],
-      "unlockLv": [1, 3, 6, 10, 14, 18, 22, 27, 32, 38, 45]
+      "unlockLv": [1, 3, 6, 10, 14, 18, 22, 27, 32, 38, 45],
+      "tiers": { "special": 26045, "platinum": 26051, "godgiven": 26057 }
     },
     "mining": {
       "name": "採礦", "tool": 26003, "starterTool": 26033,
       "materials": [25001, 25002, 25003, 25004, 25005, 25006, 25007, 25008, 25009, 25010, 25011],
       "unlockLv": [1, 3, 6, 10, 14, 18, 22, 27, 32, 38, 45],
-      "doubleChance": 0.15
+      "doubleChance": 0.15,
+      "tiers": { "special": 26043, "platinum": 26049, "godgiven": 26055 }
     }
   }
 }
