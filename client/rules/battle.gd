@@ -25,7 +25,7 @@ static func can_enter(battle: Dictionary, level: int) -> String:
 	if battle.is_empty():
 		return "而家冇戰役開放"
 	if not bool(battle.get("playable", false)):
-		return "%s仲未開放【原型只做張牛角戰役】" % String(battle.get("name", ""))
+		return "%s仲未開放" % String(battle.get("name", ""))
 	if level > int(battle["maxLevel"]):
 		return "武等超過 %d，入唔到%s" % [int(battle["maxLevel"]), String(battle["name"])]
 	return ""

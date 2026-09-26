@@ -101,6 +101,20 @@ func _draw_world(view: Control) -> void:
 	view.draw_rect(Rect2(Vector2.ZERO, view.size), Color(0.18, 0.15, 0.1, 0.6))
 	view.draw_string(font, Vector2(view.size.x - 60, 20), "豫州", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(0.8, 0.7, 0.5, 0.6))
 	view.draw_string(font, Vector2(view.size.x - 60, view.size.y - 10), "荊州", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(0.8, 0.7, 0.5, 0.6))
+	# 戰役窗口標示 (S04c): 而家開緊邊場戰役 (許昌北門義勇士兵入場) + 入場進度
+	var vb: Dictionary = main.sim.view_battles(main.my_id)
+	var bcol := Color(0.95, 0.75, 0.45)
+	var btxt := "戰役：而家冇窗口開緊（每場時辰窗口重開）"
+	if bool(vb["inBattle"]):
+		btxt = "戰役：喺 %s 第 %d/%d 層（許昌北門義勇士兵）" % [vb["battleName"], int(vb["floor"]), int(vb["totalFloors"])]
+		bcol = Color(1, 0.9, 0.4)
+	elif not String(vb["open"]).is_empty():
+		for bb in vb["list"]:
+			if bool(bb["open"]):
+				btxt = "戰役：%s 開緊（武≤%d）" % [bb["name"], int(bb["maxLevel"])]
+				break
+	view.draw_rect(Rect2(Vector2(10, 8), Vector2(230, 26)), Color(0.12, 0.1, 0.07, 0.85))
+	view.draw_string(font, Vector2(16, 24), btxt, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, bcol)
 	for e in w["edges"]:
 		var a: Dictionary = nodes[String(e[0])]
 		var b: Dictionary = nodes[String(e[1])]

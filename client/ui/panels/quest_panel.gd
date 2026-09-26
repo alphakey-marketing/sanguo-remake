@@ -5,11 +5,12 @@ extends GamePanel
 func _init(m: Node) -> void:
 	super(m)
 	title_lbl.text = "記事"
-	set_tabs(["進行中", "完成"])
+	set_tabs(["進行中", "完成", "戰役"])
 
 
 func sig() -> String:
-	return JSON.stringify([tab, main.sim.view_quests(), main.sim.view_commissions()])
+	return JSON.stringify([tab, main.sim.view_quests(), main.sim.view_commissions(),
+		main.sim.view_battles(main.my_id)])
 
 
 func _build_body() -> void:
@@ -35,5 +36,23 @@ func _build_body() -> void:
 			list.add_child(lbl("◆ 委託・%s" % c["name"], 16, UiTheme.GOLD))
 			list.add_child(wrap_lbl("　%s%s（仲有 %d 日，報酬 %s）" % [c["text"], "　可以覆命" if bool(c["ready"]) else "",
 				int(c["left"]), c["reward"]], 14, UiTheme.TEXT))
-	if n == 0:
+	if n == 0 and tab < 2:
 		list.add_child(lbl("未有任務 — 去城門口搵神秘老人" if tab == 0 else "未完成任何任務", 14, UiTheme.DIM))
+	if tab == 2:                           # 戰役日程 (S04c, spec 06 §7 / spec 04 §5)
+		_battle_section(list)
+
+
+func _battle_section(list: Node) -> void:
+	var vb: Dictionary = main.sim.view_battles(main.my_id)
+	list.add_child(lbl("今日戰役（每日窗口重開，武等上限內先入得）", 14, UiTheme.TEXT))
+	for b in vb["list"]:
+		var open := bool(b["open"])
+		list.add_child(lbl("%s%s　%s（武≤%d）　%s" % ["● " if open else "○ ", b["name"],
+			RulesClock.format_ke(int(b["startKe"])), int(b["maxLevel"]),
+			RulesClock.format_ke(int(b["endKe"]))], 15, UiTheme.GOLD if open else UiTheme.TEXT))
+	if bool(vb["inBattle"]):
+		list.add_child(lbl("── 而家喺戰役入面 ──", 15, UiTheme.GOLD))
+		list.add_child(wrap_lbl("%s 第 %d/%d 層，打完自動離場；內陣亡唔跌經驗/物品" % [vb["battleName"],
+			int(vb["floor"]), int(vb["totalFloors"])], 14, UiTheme.TEXT))
+	else:
+		list.add_child(wrap_lbl("去許昌城上方「義勇士兵」（開窗時出現）報名，打贏尾層大頭目即完成。", 14, UiTheme.DIM))

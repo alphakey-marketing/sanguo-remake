@@ -30,6 +30,29 @@ func battle_view(id: int) -> Dictionary:
 	return out
 
 
+# S04c: 記事/大地圖 讀戰役日程 (UI read-model，架構 A2)。全部 6 場 + 而家開邊場 + 玩家進度
+func view_battles(id: int) -> Dictionary:
+	var e := ent(id)
+	var ke := int(_clock()["ke"])
+	var open_id := RulesBattle.open_id(data.battles, ke)
+	var list: Array = []
+	for b in data.battles:
+		var w: Dictionary = b["window"]
+		list.append({"id": String(b["id"]), "name": String(b["name"]),
+			"maxLevel": int(b["maxLevel"]),
+			"startKe": int(w["startKe"]), "endKe": int(w["endKe"]),
+			"open": String(b["id"]) == open_id})
+	var out := {"ke": ke, "open": open_id, "list": list, "inBattle": false}
+	if e.has("battle"):
+		var bt: Dictionary = e["battle"]
+		var b2 := RulesBattle.find(data.battles, String(bt["id"]))
+		out["inBattle"] = true
+		out["battleName"] = String(b2.get("name", ""))
+		out["floor"] = int(bt["floor"]) + 1
+		out["totalFloors"] = RulesBattle.floor_count(b2)
+	return out
+
+
 func cmd_battle_enter(id: int) -> void:
 	var e := ent(id)
 	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:

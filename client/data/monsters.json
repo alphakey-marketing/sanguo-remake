@@ -85,7 +85,7 @@
    "rareDrops": [
     {
      "item": 32306,
-     "p": 0.00006
+     "p": 6e-05
     },
     {
      "item": 26038,
@@ -209,7 +209,7 @@
    "rareDrops": [
     {
      "item": 32302,
-     "p": 0.00006
+     "p": 6e-05
     },
     {
      "item": 29042,
@@ -1220,7 +1220,7 @@
    "rareDrops": [
     {
      "item": 32101,
-     "p": 0.00006
+     "p": 6e-05
     },
     {
      "item": 26038,
@@ -1228,7 +1228,7 @@
     },
     {
      "item": 32301,
-     "p": 0.00006
+     "p": 6e-05
     },
     {
      "item": 29045,
@@ -1276,7 +1276,7 @@
    "rareDrops": [
     {
      "item": 32302,
-     "p": 0.00006
+     "p": 6e-05
     },
     {
      "item": 29042,
@@ -1404,7 +1404,7 @@
    "rareDrops": [
     {
      "item": 32306,
-     "p": 0.00006
+     "p": 6e-05
     },
     {
      "item": 26038,
@@ -1567,7 +1567,7 @@
    "rareDrops": [
     {
      "item": 32304,
-     "p": 0.00006
+     "p": 6e-05
     },
     {
      "item": 26039,
@@ -1635,7 +1635,7 @@
     },
     {
      "item": 32303,
-     "p": 0.00006
+     "p": 6e-05
     },
     {
      "item": 26038,
@@ -2357,7 +2357,7 @@
     },
     {
      "item": 32302,
-     "p": 0.00006
+     "p": 6e-05
     },
     {
      "item": 61505,
@@ -2468,7 +2468,7 @@
     },
     {
      "item": 32232,
-     "p": 0.00005
+     "p": 5e-05
     }
    ]
   },
@@ -2886,7 +2886,7 @@
     },
     {
      "item": 32305,
-     "p": 0.00006
+     "p": 6e-05
     }
    ]
   },
@@ -2937,7 +2937,7 @@
     },
     {
      "item": 32207,
-     "p": 0.00006
+     "p": 6e-05
     },
     {
      "item": 61506,
@@ -3000,7 +3000,7 @@
     },
     {
      "item": 32306,
-     "p": 0.00006
+     "p": 6e-05
     },
     {
      "item": 61505,
@@ -3063,7 +3063,7 @@
     },
     {
      "item": 32102,
-     "p": 0.00006
+     "p": 6e-05
     },
     {
      "item": 61505,
@@ -3187,7 +3187,7 @@
     },
     {
      "item": 32106,
-     "p": 0.00006
+     "p": 6e-05
     },
     {
      "item": 29041,
@@ -3247,11 +3247,11 @@
     },
     {
      "item": 32211,
-     "p": 0.00006
+     "p": 6e-05
     },
     {
      "item": 32301,
-     "p": 0.00006
+     "p": 6e-05
     },
     {
      "item": 26040,
@@ -3315,7 +3315,7 @@
     },
     {
      "item": 32209,
-     "p": 0.00006
+     "p": 6e-05
     },
     {
      "item": 29047,
@@ -3328,6 +3328,1090 @@
     {
      "item": 31219,
      "p": 0.002
+    }
+   ]
+  },
+  {
+   "id": 1039,
+   "name": "百夫長",
+   "level": 24,
+   "hp": 4144,
+   "atk": 78,
+   "def": 23,
+   "spellDef": 33,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 2280,
+   "gold": [
+    72,
+    168
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "boss": true,
+   "drops": [
+    {
+     "item": 65040,
+     "p": 1.0
+    },
+    {
+     "item": 32042,
+     "p": 1.0
+    }
+   ],
+   "_battle": "chufeiyan",
+   "_floor": 0
+  },
+  {
+   "id": 1040,
+   "name": "千夫長",
+   "level": 27,
+   "hp": 5138,
+   "atk": 88,
+   "def": 26,
+   "spellDef": 36,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 2565,
+   "gold": [
+    81,
+    189
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "boss": true,
+   "drops": [
+    {
+     "item": 65031,
+     "p": 1.0
+    },
+    {
+     "item": 23084,
+     "p": 1.0
+    }
+   ],
+   "_battle": "chufeiyan",
+   "_floor": 1
+  },
+  {
+   "id": 1041,
+   "name": "萬夫長",
+   "level": 29,
+   "hp": 5866,
+   "atk": 94,
+   "def": 28,
+   "spellDef": 38,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 2755,
+   "gold": [
+    87,
+    203
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "boss": true,
+   "drops": [
+    {
+     "item": 28061,
+     "p": 1.0
+    },
+    {
+     "item": 23086,
+     "p": 1.0
+    }
+   ],
+   "_battle": "chufeiyan",
+   "_floor": 2
+  },
+  {
+   "id": 1042,
+   "name": "褚飛燕",
+   "level": 30,
+   "hp": 6250,
+   "atk": 98,
+   "def": 29,
+   "spellDef": 39,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 2850,
+   "gold": [
+    90,
+    210
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "boss": true,
+   "drops": [
+    {
+     "item": 30567,
+     "p": 1.0
+    },
+    {
+     "item": 30577,
+     "p": 1.0
+    }
+   ],
+   "_battle": "chufeiyan",
+   "_floor": 3,
+   "skills": [
+    {
+     "spell": "yun_m",
+     "cd": 360
+    }
+   ]
+  },
+  {
+   "id": 1043,
+   "name": "極惡之虎/神射手",
+   "level": 33,
+   "hp": 7478,
+   "atk": 107,
+   "def": 31,
+   "spellDef": 41,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 3135,
+   "gold": [
+    99,
+    231
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "boss": true,
+   "drops": [
+    {
+     "item": 32044,
+     "p": 1.0
+    },
+    {
+     "item": 32323,
+     "p": 1.0
+    },
+    {
+     "item": 65040,
+     "p": 1.0
+    },
+    {
+     "item": 23004,
+     "p": 1.0
+    },
+    {
+     "item": 28061,
+     "p": 1.0
+    },
+    {
+     "item": 65012,
+     "p": 1.0
+    }
+   ],
+   "_battle": "lidamu",
+   "_floor": 0
+  },
+  {
+   "id": 1044,
+   "name": "神射手",
+   "level": 35,
+   "hp": 8362,
+   "atk": 114,
+   "def": 33,
+   "spellDef": 43,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 3325,
+   "gold": [
+    105,
+    245
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "boss": true,
+   "drops": [
+    {
+     "item": 31501,
+     "p": 1.0
+    },
+    {
+     "item": 24006,
+     "p": 1.0
+    },
+    {
+     "item": 28061,
+     "p": 1.0
+    },
+    {
+     "item": 65031,
+     "p": 1.0
+    }
+   ],
+   "_battle": "lidamu",
+   "_floor": 1
+  },
+  {
+   "id": 1045,
+   "name": "神射手",
+   "level": 37,
+   "hp": 9298,
+   "atk": 120,
+   "def": 35,
+   "spellDef": 45,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 3515,
+   "gold": [
+    111,
+    259
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "boss": true,
+   "drops": [
+    {
+     "item": 65025,
+     "p": 1.0
+    },
+    {
+     "item": 22004,
+     "p": 1.0
+    },
+    {
+     "item": 28061,
+     "p": 1.0
+    },
+    {
+     "item": 65020,
+     "p": 1.0
+    }
+   ],
+   "_battle": "lidamu",
+   "_floor": 2
+  },
+  {
+   "id": 1046,
+   "name": "神射手",
+   "level": 39,
+   "hp": 10286,
+   "atk": 126,
+   "def": 37,
+   "spellDef": 47,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 3705,
+   "gold": [
+    117,
+    273
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "boss": true,
+   "drops": [
+    {
+     "item": 56651,
+     "p": 1.0
+    },
+    {
+     "item": 32043,
+     "p": 1.0
+    },
+    {
+     "item": 28061,
+     "p": 1.0
+    },
+    {
+     "item": 65008,
+     "p": 1.0
+    }
+   ],
+   "_battle": "lidamu",
+   "_floor": 3
+  },
+  {
+   "id": 1047,
+   "name": "李大目",
+   "level": 40,
+   "hp": 10800,
+   "atk": 130,
+   "def": 38,
+   "spellDef": 48,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 3800,
+   "gold": [
+    120,
+    280
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "boss": true,
+   "drops": [
+    {
+     "item": 30568,
+     "p": 1.0
+    },
+    {
+     "item": 30578,
+     "p": 1.0
+    }
+   ],
+   "_battle": "lidamu",
+   "_floor": 4,
+   "skills": [
+    {
+     "spell": "shui_m",
+     "cd": 360
+    }
+   ]
+  },
+  {
+   "id": 1048,
+   "name": "嗜血狂魔",
+   "level": 42,
+   "hp": 11866,
+   "atk": 136,
+   "def": 39,
+   "spellDef": 49,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 3990,
+   "gold": [
+    126,
+    294
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "boss": true,
+   "drops": [
+    {
+     "item": 32202,
+     "p": 1.0
+    },
+    {
+     "item": 65031,
+     "p": 1.0
+    },
+    {
+     "item": 32225,
+     "p": 1.0
+    },
+    {
+     "item": 65040,
+     "p": 1.0
+    }
+   ],
+   "_battle": "zhangbaiqi",
+   "_floor": 0
+  },
+  {
+   "id": 1049,
+   "name": "嗜血狂魔",
+   "level": 44,
+   "hp": 12984,
+   "atk": 142,
+   "def": 41,
+   "spellDef": 51,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 4180,
+   "gold": [
+    132,
+    308
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "boss": true,
+   "drops": [
+    {
+     "item": 32202,
+     "p": 1.0
+    },
+    {
+     "item": 65031,
+     "p": 1.0
+    },
+    {
+     "item": 32225,
+     "p": 1.0
+    },
+    {
+     "item": 65040,
+     "p": 1.0
+    }
+   ],
+   "_battle": "zhangbaiqi",
+   "_floor": 1
+  },
+  {
+   "id": 1050,
+   "name": "浮雲",
+   "level": 46,
+   "hp": 14154,
+   "atk": 149,
+   "def": 43,
+   "spellDef": 53,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 4370,
+   "gold": [
+    138,
+    322
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "boss": true,
+   "drops": [
+    {
+     "item": 65008,
+     "p": 1.0
+    },
+    {
+     "item": 65031,
+     "p": 1.0
+    }
+   ],
+   "_battle": "zhangbaiqi",
+   "_floor": 2
+  },
+  {
+   "id": 1051,
+   "name": "劉石",
+   "level": 48,
+   "hp": 15376,
+   "atk": 155,
+   "def": 45,
+   "spellDef": 55,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 4560,
+   "gold": [
+    144,
+    336
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "boss": true,
+   "drops": [
+    {
+     "item": 65030,
+     "p": 1.0
+    },
+    {
+     "item": 65020,
+     "p": 1.0
+    }
+   ],
+   "_battle": "zhangbaiqi",
+   "_floor": 3
+  },
+  {
+   "id": 1052,
+   "name": "五鹿/白鳳",
+   "level": 49,
+   "hp": 16006,
+   "atk": 158,
+   "def": 46,
+   "spellDef": 56,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 4655,
+   "gold": [
+    147,
+    343
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "boss": true,
+   "drops": [
+    {
+     "item": 32045,
+     "p": 1.0
+    },
+    {
+     "item": 65016,
+     "p": 1.0
+    },
+    {
+     "item": 32044,
+     "p": 1.0
+    },
+    {
+     "item": 65029,
+     "p": 1.0
+    }
+   ],
+   "_battle": "zhangbaiqi",
+   "_floor": 4
+  },
+  {
+   "id": 1053,
+   "name": "張白騎",
+   "level": 50,
+   "hp": 16650,
+   "atk": 162,
+   "def": 47,
+   "spellDef": 57,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 4750,
+   "gold": [
+    150,
+    350
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "boss": true,
+   "drops": [
+    {
+     "item": 30569,
+     "p": 1.0
+    },
+    {
+     "item": 30579,
+     "p": 1.0
+    }
+   ],
+   "_battle": "zhangbaiqi",
+   "_floor": 5,
+   "skills": [
+    {
+     "spell": "feng_m",
+     "cd": 360
+    }
+   ]
+  },
+  {
+   "id": 1054,
+   "name": "戰狂",
+   "level": 52,
+   "hp": 17976,
+   "atk": 168,
+   "def": 48,
+   "spellDef": 58,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 4940,
+   "gold": [
+    156,
+    364
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "boss": true,
+   "drops": [
+    {
+     "item": 22008,
+     "p": 1.0
+    },
+    {
+     "item": 23031,
+     "p": 1.0
+    }
+   ],
+   "_battle": "huanglong",
+   "_floor": 0
+  },
+  {
+   "id": 1055,
+   "name": "戰狂",
+   "level": 54,
+   "hp": 19354,
+   "atk": 174,
+   "def": 50,
+   "spellDef": 60,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 5130,
+   "gold": [
+    162,
+    378
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "boss": true,
+   "drops": [
+    {
+     "item": 22031,
+     "p": 1.0
+    },
+    {
+     "item": 23031,
+     "p": 1.0
+    },
+    {
+     "item": 23024,
+     "p": 1.0
+    }
+   ],
+   "_battle": "huanglong",
+   "_floor": 1
+  },
+  {
+   "id": 1056,
+   "name": "戰狂",
+   "level": 56,
+   "hp": 20784,
+   "atk": 181,
+   "def": 52,
+   "spellDef": 62,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 5320,
+   "gold": [
+    168,
+    392
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "boss": true,
+   "drops": [
+    {
+     "item": 22011,
+     "p": 1.0
+    },
+    {
+     "item": 23024,
+     "p": 1.0
+    },
+    {
+     "item": 32043,
+     "p": 1.0
+    }
+   ],
+   "_battle": "huanglong",
+   "_floor": 2
+  },
+  {
+   "id": 1057,
+   "name": "苦蝤/于氐根",
+   "level": 58,
+   "hp": 22266,
+   "atk": 187,
+   "def": 54,
+   "spellDef": 64,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 5510,
+   "gold": [
+    174,
+    406
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "boss": true,
+   "drops": [
+    {
+     "item": 65031,
+     "p": 1.0
+    },
+    {
+     "item": 32305,
+     "p": 1.0
+    },
+    {
+     "item": 25085,
+     "p": 1.0
+    },
+    {
+     "item": 30544,
+     "p": 1.0
+    }
+   ],
+   "_battle": "huanglong",
+   "_floor": 3
+  },
+  {
+   "id": 1058,
+   "name": "楊鳳/雷公/左校/白繞",
+   "level": 59,
+   "hp": 23026,
+   "atk": 190,
+   "def": 55,
+   "spellDef": 65,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 5605,
+   "gold": [
+    177,
+    413
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "boss": true,
+   "drops": [
+    {
+     "item": 25083,
+     "p": 1.0
+    },
+    {
+     "item": 32046,
+     "p": 1.0
+    },
+    {
+     "item": 25087,
+     "p": 1.0
+    },
+    {
+     "item": 32045,
+     "p": 1.0
+    },
+    {
+     "item": 25088,
+     "p": 1.0
+    },
+    {
+     "item": 32044,
+     "p": 1.0
+    },
+    {
+     "item": 65008,
+     "p": 1.0
+    },
+    {
+     "item": 32305,
+     "p": 1.0
+    }
+   ],
+   "_battle": "huanglong",
+   "_floor": 4
+  },
+  {
+   "id": 1059,
+   "name": "黃龍",
+   "level": 60,
+   "hp": 23800,
+   "atk": 194,
+   "def": 56,
+   "spellDef": 66,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 5700,
+   "gold": [
+    180,
+    420
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "boss": true,
+   "drops": [
+    {
+     "item": 30570,
+     "p": 1.0
+    },
+    {
+     "item": 30580,
+     "p": 1.0
+    }
+   ],
+   "_battle": "huanglong",
+   "_floor": 5,
+   "skills": [
+    {
+     "spell": "huo_m",
+     "cd": 360
+    }
+   ]
+  },
+  {
+   "id": 1060,
+   "name": "蹇碩/程曠/夏惲/孫璋/韓梩",
+   "level": 62,
+   "hp": 25386,
+   "atk": 200,
+   "def": 57,
+   "spellDef": 67,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 5890,
+   "gold": [
+    186,
+    434
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "boss": true,
+   "drops": [
+    {
+     "item": 24007,
+     "p": 1.0
+    },
+    {
+     "item": 64023,
+     "p": 1.0
+    },
+    {
+     "item": 10026,
+     "p": 1.0
+    },
+    {
+     "item": 30619,
+     "p": 1.0
+    },
+    {
+     "item": 13026,
+     "p": 1.0
+    },
+    {
+     "item": 15026,
+     "p": 1.0
+    }
+   ],
+   "_battle": "shichangshi",
+   "_floor": 0
+  },
+  {
+   "id": 1061,
+   "name": "曹節/侯覽/高望/張恭",
+   "level": 64,
+   "hp": 27024,
+   "atk": 206,
+   "def": 59,
+   "spellDef": 69,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 6080,
+   "gold": [
+    192,
+    448
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "boss": true,
+   "drops": [
+    {
+     "item": 22029,
+     "p": 1.0
+    },
+    {
+     "item": 64023,
+     "p": 1.0
+    },
+    {
+     "item": 22032,
+     "p": 1.0
+    },
+    {
+     "item": 14026,
+     "p": 1.0
+    },
+    {
+     "item": 30585,
+     "p": 1.0
+    }
+   ],
+   "_battle": "shichangshi",
+   "_floor": 1
+  },
+  {
+   "id": 1062,
+   "name": "封諝/段珪/栗嵩/宋典",
+   "level": 66,
+   "hp": 28714,
+   "atk": 213,
+   "def": 61,
+   "spellDef": 71,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 6270,
+   "gold": [
+    198,
+    462
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "boss": true,
+   "drops": [
+    {
+     "item": 23009,
+     "p": 1.0
+    },
+    {
+     "item": 64023,
+     "p": 1.0
+    },
+    {
+     "item": 24010,
+     "p": 1.0
+    },
+    {
+     "item": 11026,
+     "p": 1.0
+    },
+    {
+     "item": 30601,
+     "p": 1.0
+    }
+   ],
+   "_battle": "shichangshi",
+   "_floor": 2
+  },
+  {
+   "id": 1063,
+   "name": "張讓/趙忠/郭勝/畢嵐",
+   "level": 68,
+   "hp": 30456,
+   "atk": 219,
+   "def": 63,
+   "spellDef": 73,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 6460,
+   "gold": [
+    204,
+    476
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "boss": true,
+   "drops": [
+    {
+     "item": 22010,
+     "p": 1.0
+    },
+    {
+     "item": 64023,
+     "p": 1.0
+    },
+    {
+     "item": 23049,
+     "p": 1.0
+    },
+    {
+     "item": 12026,
+     "p": 1.0
+    },
+    {
+     "item": 23048,
+     "p": 1.0
+    }
+   ],
+   "_battle": "shichangshi",
+   "_floor": 3
+  },
+  {
+   "id": 1064,
+   "name": "張讓/趙忠/郭勝/封諝/段珪/曹節/侯覽/蹇碩/程曠/夏惲",
+   "level": 70,
+   "hp": 32250,
+   "atk": 226,
+   "def": 65,
+   "spellDef": 75,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 6650,
+   "gold": [
+    210,
+    490
+   ],
+   "alignment": -800,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "boss": true,
+   "drops": [
+    {
+     "item": 30571,
+     "p": 1.0
+    },
+    {
+     "item": 30581,
+     "p": 1.0
+    },
+    {
+     "item": 32213,
+     "p": 1.0
+    },
+    {
+     "item": 32046,
+     "p": 1.0
+    },
+    {
+     "item": 32228,
+     "p": 1.0
+    },
+    {
+     "item": 32227,
+     "p": 1.0
+    },
+    {
+     "item": 23015,
+     "p": 1.0
+    },
+    {
+     "item": 23052,
+     "p": 1.0
+    },
+    {
+     "item": 32216,
+     "p": 1.0
+    },
+    {
+     "item": 30562,
+     "p": 1.0
+    },
+    {
+     "item": 30563,
+     "p": 1.0
+    }
+   ],
+   "_battle": "shichangshi",
+   "_floor": 4,
+   "skills": [
+    {
+     "spell": "feng_l",
+     "cd": 420
+    },
+    {
+     "spell": "shui_l",
+     "cd": 420
     }
    ]
   }
