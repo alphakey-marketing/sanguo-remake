@@ -88,3 +88,30 @@ static func drink(thirst: int, cfg: Dictionary) -> int:
 # 搭話扣飲水度 (最低 0)
 static func sip(thirst: int, cfg: Dictionary) -> int:
 	return maxi(0, thirst - int(cfg["chat"]))
+
+
+# ================= S08d 名額競爭 (spec 08 §2 / 攻略 sy2_8_3) =================
+# 【原】各階頭銜有名額限制，玩家之間每月要競爭守位，輸咗頭銜拱手讓人 (跌返上一階)。
+# 單機化【自訂】: 每月初一 3 個 NPC 挑戰者同玩家鬥名望；玩家競爭力 = 名聲 (+ defenderBonus 調節)。
+static func comp_cfg(office: Dictionary) -> Dictionary:
+	return office.get("competition", {})
+
+
+# 玩家守位競爭力【自訂】= 名聲 + defenderBonus
+static func comp_score(fame: int, cfg: Dictionary) -> int:
+	return fame + int(cfg.get("defenderBonus", 0))
+
+
+# 單一 NPC 挑戰者分數：以該階名聲需求 base 為基準，roll (0~1) → base × [npcLo, npcHi]
+static func npc_score(base_fame: int, roll: float, cfg: Dictionary) -> int:
+	var lo := float(cfg.get("npcLo", 0.85))
+	var hi := float(cfg.get("npcHi", 1.05))
+	return int(round(float(base_fame) * (lo + roll * (hi - lo))))
+
+
+# 守位成功? 玩家分數 ≥ 全部挑戰者最高分
+static func defend_ok(player_score: int, npc_scores: Array) -> bool:
+	var best := 0
+	for s in npc_scores:
+		best = maxi(best, int(s))
+	return player_score >= best

@@ -26,6 +26,12 @@ func _init() -> void:
 	t_relief_flow(data)
 	t_relief_effects(data)
 	t_relief_save(data)
+	t_comp_data(data)
+	t_comp_rules(data)
+	t_comp_claim(data)
+	t_comp_defend(data)
+	t_comp_save(data)
+	t_comp_determinism(data)
 	t_determinism(data)
 	print("[TEST] militia (tribute/favor) scenarios: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
@@ -73,6 +79,13 @@ func _new(data: GameData, seed: int = 8) -> Array:
 
 func _last(msgs: Array) -> String:
 	return String(msgs[-1]) if not msgs.is_empty() else ""
+
+
+func _any(msgs: Array, sub: String) -> bool:
+	for m in msgs:
+		if String(m).contains(sub):
+			return true
+	return false
 
 
 func t_data(data: GameData) -> void:
@@ -570,3 +583,138 @@ func t_relief_save(data: GameData) -> void:
 	check(int((old.player_ch()["office"]["order"] as Dictionary)["done"]) == 4, "舊存檔: 冇 baseSupply 照做到 4")
 	# 決定性
 	check(_relief_seq(data) == _relief_seq(data), "決定性: 救災流程同種子同操作 → 同存檔")
+
+
+# ================= S08d 名額競爭 (spec 08 §2 / 攻略 sy2_8_3) =================
+
+func t_comp_data(data: GameData) -> void:
+	var cfg: Dictionary = data.office["competition"]
+	check(bool(cfg["enabled"]) and int(cfg["competitors"]) == 3, "名額競爭: enabled + 每階 3 個 NPC")
+	check(int(cfg["minRank"]) == 1 and int(cfg["defenderBonus"]) == 0, "名額競爭: minRank 1 / defenderBonus 0")
+
+
+func t_comp_rules(data: GameData) -> void:
+	var cfg: Dictionary = data.office["competition"]
+	var c := RulesTitle.comp_cfg(data.office)
+	check(RulesTitle.comp_cfg({}) == {} and c.size() == cfg.size(), "comp_cfg 讀 office.competition")
+	check(RulesTitle.comp_score(3000, cfg) == 3000 and RulesTitle.comp_score(3000, {"defenderBonus": 100}) == 3100, "comp_score = 名聲 + defenderBonus")
+	check(RulesTitle.npc_score(1000, 0.0, cfg) == 850 and RulesTitle.npc_score(1000, 1.0, cfg) == 1050, "npc_score [npcLo, npcHi]")
+	check(RulesTitle.npc_score(3000, 0.5, cfg) == 2850, "npc_score 中位數")
+	check(RulesTitle.defend_ok(1000, [900, 1000, 950]) and not RulesTitle.defend_ok(999, [900, 1000, 950]), "defend_ok: 打和都算贏")
+	check(RulesTitle.defend_ok(1000, []) == true, "defend_ok 冇挑戰者 = 贏")
+
+
+func t_comp_claim(data: GameData) -> void:
+	var r := _new(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	_put_fac(sim, pid, data, "donate_xc")
+	ch["fame"] = 4000
+	ch["gold"] = 5000
+	check(not bool(ch.get("titleCompete", false)), "討取前未入競爭系統")
+	sim.cmd_claim_title(pid, 6)
+	check(int(ch["titleRank"]) == 6 and bool(ch["titleCompete"]), "討取頭銜 → 入名額競爭系統")
+	var v := sim.title_contest_view(pid)
+	check(bool(v["competing"]) and int(v["competitors"]) == 3 and int(v["rank"]) == 6, "title_contest_view read-model")
+	check((v["last"] as Dictionary).is_empty(), "未考驗過 = last 空")
+
+
+func t_comp_defend(data: GameData) -> void:
+	# 必輸: 名望低過最弱挑戰者下限 (0.85 × 3000)
+	var a := _new(data)
+	var sim: Sim = a[0]
+	var ch: Dictionary = a[2]
+	var msgs: Array = a[3]
+	ch["titleRank"] = 6
+	ch["fame"] = 2500
+	ch["titleCompete"] = true
+	sim._daily_hook(30)
+	check(int(ch["titleRank"]) == 5, "守位失敗 → 跌返上一階")
+	check(_any(msgs, "守位失敗") and int((ch["titleContest"] as Dictionary)["rank"]) == 6, "失敗訊息 + 記錄原階")
+	check(bool((ch["titleContest"] as Dictionary)["won"]) == false, "titleContest.won = false")
+	# 必贏: 名望高過最強挑戰者上限 (1.05 × 3000)
+	var b := _new(data)
+	var sb: Sim = b[0]
+	var chb: Dictionary = b[2]
+	chb["titleRank"] = 6
+	chb["fame"] = 3200
+	chb["titleCompete"] = true
+	sb._daily_hook(60)
+	check(int(chb["titleRank"]) == 6 and bool((chb["titleContest"] as Dictionary)["won"]), "名望夠高 → 守位成功")
+	check(((chb["titleContest"] as Dictionary)["npc"] as Array).size() == 3, "3 個挑戰者分數留低")
+	# 月中唔考驗
+	var c := _new(data)
+	var sc: Sim = c[0]
+	var chc: Dictionary = c[2]
+	chc["titleRank"] = 6
+	chc["fame"] = 2500
+	chc["titleCompete"] = true
+	sc._daily_hook(31)
+	check(int(chc["titleRank"]) == 6 and not chc.has("titleContest"), "月中唔考驗")
+	# 白身 / 未入系統 唔考驗
+	var d := _new(data)
+	var sd: Sim = d[0]
+	var chd: Dictionary = d[2]
+	chd["titleRank"] = 6
+	chd["fame"] = 2500
+	sd._daily_hook(30)
+	check(int(chd["titleRank"]) == 6 and not chd.has("titleContest"), "未經討取嘅頭銜唔競爭 (舊存檔兼容)")
+	chd["titleCompete"] = true
+	chd["titleRank"] = 0
+	sd._daily_hook(60)
+	check(int(chd["titleRank"]) == 0, "白身唔考驗")
+
+
+func t_comp_save(data: GameData) -> void:
+	var r := _new(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	_put_fac(sim, pid, data, "donate_xc")
+	ch["fame"] = 2500
+	ch["titleRank"] = 6
+	ch["titleCompete"] = true
+	sim._daily_hook(30)
+	var s1 := sim.save_string()
+	var loaded := Sim.load_string(data, s1)
+	var lch := loaded.player_ch()
+	check(bool(lch["titleCompete"]) and int(lch["titleRank"]) == 5, "存檔: 競爭旗標 + 跌階保留")
+	check(int((lch["titleContest"] as Dictionary)["day"]) == 30, "存檔: 上次考驗記錄保留")
+	check(loaded.save_string() == s1, "存檔: save→load→save 一致")
+	# 舊存檔: 冇 titleCompete / titleContest
+	var d: Dictionary = JSON.parse_string(s1)
+	for e in d["state"]["ents"].values():
+		if e.has("ch"):
+			e["ch"].erase("titleCompete")
+			e["ch"].erase("titleContest")
+	var old := Sim.load_string(data, JSON.stringify(d))
+	var opid := int(old.state["player_id"])
+	var och := old.player_ch()
+	och["titleRank"] = 6
+	och["fame"] = 2500
+	old._daily_hook(90)
+	check(int(och["titleRank"]) == 6 and not old.title_competing(och), "舊存檔: 冇 flag 唔競爭")
+	# 舊存檔補討取就入系統
+	_put_fac(old, opid, data, "donate_xc")
+	och["fame"] = 4000
+	och["gold"] = 5000
+	old.cmd_claim_title(opid, 7)
+	check(old.title_competing(och) and int(och["titleRank"]) == 7, "舊存檔: 重新討取即入競爭系統")
+
+
+func t_comp_determinism(data: GameData) -> void:
+	var a := _new(data, 55)
+	var sa: Sim = a[0]
+	sa.player_ch()["titleRank"] = 6
+	sa.player_ch()["fame"] = 2500
+	sa.player_ch()["titleCompete"] = true
+	sa._daily_hook(30)
+	var b := _new(data, 55)
+	var sb: Sim = b[0]
+	sb.player_ch()["titleRank"] = 6
+	sb.player_ch()["fame"] = 2500
+	sb.player_ch()["titleCompete"] = true
+	sb._daily_hook(30)
+	check(JSON.stringify(sa.player_ch()["titleContest"]) == JSON.stringify(sb.player_ch()["titleContest"]), "決定性: 同 day/rank → 同挑戰者分數")
+	check(sa.player_ch()["titleRank"] == sb.player_ch()["titleRank"], "決定性: 同結果")

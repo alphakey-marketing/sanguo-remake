@@ -46,6 +46,7 @@ func cmd_claim_title(id: int, rank: int) -> void:
 	var t := RulesTitle.def_of(data.titles, rank)
 	ch["gold"] = int(ch["gold"]) - int(t["gold"])
 	ch["titleRank"] = rank
+	ch["titleCompete"] = true    # S08d: 入名額競爭系統 (每月初一守位考驗)
 	_emit({"k": "title", "id": id, "rank": rank, "name": String(t["name"])})
 	_msg(id, "朝廷受落，御賜頭銜「%s」(第 %d 階)！扣資金 %d；行動力上限 %d、每月俸祿 %d" % [t["name"], rank,
 		int(t["gold"]), int(t["ap"]), int(t["salary"])])
@@ -781,3 +782,73 @@ func _relief_reward(e: Dictionary, ch: Dictionary, od: Dictionary) -> void:
 	_emit({"k": "office_order", "id": id, "order": "relief", "done": true, "fame": fame, "contrib": 0})
 	_msg(id, "救災官令完成：%s「%s」災情已緩，名聲 +%d%s" % [
 		_city_name(String(od.get("city", ""))), _disaster_name(String(od.get("disaster", ""))), fame, tail])
+
+
+# ================= S08d 名額競爭 (spec 08 §2 / 攻略 sy2_8_3) =================
+# 【原】各階頭銜有名額限制，每月要競爭守位，輸咗跌返上一階。
+# 單機化【自訂】: 每月初一 3 個 NPC 挑戰者 (獨立 SimRng，唔佔主 rng) 同玩家鬥名望。
+func competition_cfg() -> Dictionary:
+	return RulesTitle.comp_cfg(data.office)
+
+
+# 玩家係咪入咗名額競爭系統 (由 cmd_claim_title 設定；舊存檔冇 = false，照唔競爭保兼容)
+func title_competing(ch: Dictionary) -> bool:
+	return bool(ch.get("titleCompete", false))
+
+
+# 每月初一守位考驗 (sim.gd _daily_hook 叫)
+func _title_contest_daily(day: int) -> void:
+	var cfg := competition_cfg()
+	if not bool(cfg.get("enabled", false)):
+		return
+	if not RulesTitle.is_month_start(day, int(data.world["clock"].get("monthDays", 30))):
+		return
+	for e in ents.values():
+		if not e.has("ch"):
+			continue
+		var ch: Dictionary = e["ch"]
+		if title_competing(ch):
+			_title_contest(int(e["id"]), ch, day, cfg)
+
+
+# 一次守位考驗: 3 NPC 挑戰者 (獨立 SimRng) vs 玩家名望；輸 → 跌一階 (spec 08 §2)
+func _title_contest(id: int, ch: Dictionary, day: int, cfg: Dictionary) -> void:
+	var rank := int(ch.get("titleRank", 0))
+	if rank < int(cfg.get("minRank", 1)):
+		return
+	var t := RulesTitle.def_of(data.titles, rank)
+	if t.is_empty():
+		return
+	var crng := SimRng.new(800001 + day * 3181 + rank * 101)
+	var npc_scores: Array = []
+	for _i in int(cfg.get("competitors", 3)):
+		npc_scores.append(RulesTitle.npc_score(int(t["fame"]), crng.next(), cfg))
+	var ps := RulesTitle.comp_score(int(ch.get("fame", 0)), cfg)
+	var won := RulesTitle.defend_ok(ps, npc_scores)
+	var best := 0
+	for s in npc_scores:
+		best = maxi(best, int(s))
+	ch["titleContest"] = {"day": day, "rank": rank, "score": ps, "npc": npc_scores, "won": won}
+	if won:
+		_emit({"k": "title_contest", "id": id, "rank": rank, "won": true, "score": ps, "npcBest": best})
+		_msg(id, "月初頭銜守位考驗：你以 %d 名望壓過 %d 位挑戰者（最強 %d），坐穩「%s」。" % [ps, npc_scores.size(), best, String(t["name"])])
+	else:
+		var nr := maxi(0, rank - 1)
+		ch["titleRank"] = nr
+		_emit({"k": "title_contest", "id": id, "rank": rank, "won": false, "score": ps, "npcBest": best, "dropTo": nr})
+		_msg(id, "月初守位失敗：你 %d 名望不敵挑戰者（最強 %d），頭銜由「%s」跌返「%s」。" % [ps, best, String(t["name"]), RulesTitle.name_of(data.titles, nr)])
+
+
+# UI read-model: 名額競爭狀態 + 上次考驗結果
+func title_contest_view(id: int) -> Dictionary:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return {}
+	var ch: Dictionary = e["ch"]
+	return {
+		"competing": title_competing(ch),
+		"rank": int(ch.get("titleRank", 0)),
+		"fame": int(ch.get("fame", 0)),
+		"competitors": int(competition_cfg().get("competitors", 3)),
+		"last": ch.get("titleContest", {}),
+	}
