@@ -764,6 +764,240 @@
    "safe": false,
    "kind": "field",
    "instance": true
+  },
+  {
+   "id": "chufeiyan_f1",
+   "name": "褚飛燕戰役 1F",
+   "ox": 450,
+   "oy": 0,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "chufeiyan_f2",
+   "name": "褚飛燕戰役 2F",
+   "ox": 486,
+   "oy": 0,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "chufeiyan_f3",
+   "name": "褚飛燕戰役 3F",
+   "ox": 450,
+   "oy": 36,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "chufeiyan_f4",
+   "name": "褚飛燕戰役 4F",
+   "ox": 486,
+   "oy": 36,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "lidamu_f1",
+   "name": "李大目戰役 1F",
+   "ox": 224,
+   "oy": 60,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "lidamu_f2",
+   "name": "李大目戰役 2F",
+   "ox": 260,
+   "oy": 60,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "lidamu_f3",
+   "name": "李大目戰役 3F",
+   "ox": 296,
+   "oy": 60,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "lidamu_f4",
+   "name": "李大目戰役 4F",
+   "ox": 450,
+   "oy": 72,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "lidamu_f5",
+   "name": "李大目戰役 5F",
+   "ox": 486,
+   "oy": 72,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "zhangbaiqi_f1",
+   "name": "張白騎戰役 1F",
+   "ox": 332,
+   "oy": 84,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "zhangbaiqi_f2",
+   "name": "張白騎戰役 2F",
+   "ox": 368,
+   "oy": 84,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "zhangbaiqi_f3",
+   "name": "張白騎戰役 3F",
+   "ox": 404,
+   "oy": 84,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "zhangbaiqi_f4",
+   "name": "張白騎戰役 4F",
+   "ox": 440,
+   "oy": 108,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "zhangbaiqi_f5",
+   "name": "張白騎戰役 5F",
+   "ox": 476,
+   "oy": 108,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "zhangbaiqi_f6",
+   "name": "張白騎戰役 6F",
+   "ox": 320,
+   "oy": 120,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "huanglong_f1",
+   "name": "黃龍戰役 1F",
+   "ox": 356,
+   "oy": 120,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "huanglong_f2",
+   "name": "黃龍戰役 2F",
+   "ox": 392,
+   "oy": 120,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "huanglong_f3",
+   "name": "黃龍戰役 3F",
+   "ox": 428,
+   "oy": 144,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "huanglong_f4",
+   "name": "黃龍戰役 4F",
+   "ox": 464,
+   "oy": 144,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "huanglong_f5",
+   "name": "黃龍戰役 5F",
+   "ox": 320,
+   "oy": 156,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "huanglong_f6",
+   "name": "黃龍戰役 6F",
+   "ox": 356,
+   "oy": 156,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "shichangshi_f1",
+   "name": "十常侍戰役 1F",
+   "ox": 392,
+   "oy": 156,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "shichangshi_f2",
+   "name": "十常侍戰役 2F",
+   "ox": 316,
+   "oy": 232,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "shichangshi_f3",
+   "name": "十常侍戰役 3F",
+   "ox": 352,
+   "oy": 232,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "shichangshi_f4",
+   "name": "十常侍戰役 4F",
+   "ox": 388,
+   "oy": 232,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "shichangshi_f5",
+   "name": "十常侍戰役 5F",
+   "ox": 424,
+   "oy": 232,
+   "safe": false,
+   "kind": "field",
+   "instance": true
   }
  ],
  "landmarks": [

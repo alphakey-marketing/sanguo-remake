@@ -765,6 +765,20 @@ func _run() -> void:
 		check(casting_seen, "吟唱線索: 術法怪吟唱中 + castSpell 透出")
 		if not m.sim.ent(int(csp_["id"])).is_empty():
 			m.sim.damage(m.sim.ent(int(csp_["id"])), 99999, m.sim.ent(int(m.my_id)))
+	# S04c 戰役：記事「戰役」tab + 大地圖標示底下嘅 read-model (view_battles)
+	m.sim.state["clock"]["ke"] = 0          # 子時 = 褚飛燕窗
+	var vb: Dictionary = m.sim.view_battles(int(m.my_id))
+	check((vb["list"] as Array).size() == 6, "戰役: view_battles 回 6 場日程")
+	check(String(vb["open"]) == "chufeiyan", "戰役: 子時開褚飛燕窗 (%s)" % str(vb["open"]))
+	hud.open_panel("quest")
+	var qpb: GamePanel = hud.panels["quest"]
+	qpb.set_tab(2)                            # 記事「戰役」頁
+	qpb.refresh(true)
+	await frames(2)
+	check(qpb.tab == 2, "戰役: 記事切到戰役 tab")
+	hud.close_panels()
+	m.sim.state["clock"]["ke"] = 90         # 窗與窗之間 → view_battles open 空
+	check(String(m.sim.view_battles(int(m.my_id))["open"]).is_empty(), "戰役: 冇窗口時 open 空")
 	print("[TEST] ui_smoke: %d, fail %d" % [total, fails])
 	print("PASS: ui smoke" if fails == 0 else "FAIL: ui smoke")
 	get_tree().quit(1 if fails > 0 else 0)
