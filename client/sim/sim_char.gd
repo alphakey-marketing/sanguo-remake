@@ -524,4 +524,7 @@ func _npc_react(actor_e: Dictionary, actor_id: int) -> void:
 		var res := NpcBrain.decide(ctx, rng.below(4))
 		if res["action"] == "ignore":
 			continue
+		# S09d Tier2 居民：偶發接 LLM（tier 政策抽唔中 / 未啟用 = 模板）
+		if _llm_talk(w, String(w["name"]), String(w.get("ch", {}).get("ideology", "")), 0, int(w["x"]), int(w["y"]), actor_id):
+			continue
 		_emit({"k": "npc_say", "id": w["id"], "name": w["name"], "text": res["line"], "action": res["action"], "x": w["x"], "y": w["y"]})

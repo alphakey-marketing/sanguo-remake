@@ -9,13 +9,35 @@ const AFFINITY_MAX := 100
 
 
 static func init_memory() -> Dictionary:
-	return {"affinity": {}, "events": [], "rumors": {}}
+	return {"affinity": {}, "events": [], "rumors": {}, "summary": "", "goal": "", "summaryDay": -1}
 
 
-# 舊存檔記憶表冇 rumors 欄 → 補返 (S09b)
+# 舊存檔記憶表冇 rumors 欄 → 補返 (S09b)；冇反思摘要欄 → 補返 (S09d)
 static func ensure(mem: Dictionary) -> void:
 	if not mem.has("rumors") or not (mem["rumors"] is Dictionary):
 		mem["rumors"] = {}
+	if not mem.has("summary"):
+		mem["summary"] = ""
+	if not mem.has("goal"):
+		mem["goal"] = ""
+	if not mem.has("summaryDay"):
+		mem["summaryDay"] = -1
+
+
+# 每日反思摘要 (S09d): 由規則層/LLM 寫入；純資料，唔影響數值
+static func set_summary(mem: Dictionary, summary: String, goal: String, day: int) -> void:
+	ensure(mem)
+	mem["summary"] = summary
+	mem["goal"] = goal
+	mem["summaryDay"] = day
+
+
+static func summary(mem: Dictionary) -> String:
+	return String(mem.get("summary", ""))
+
+
+static func goal(mem: Dictionary) -> String:
+	return String(mem.get("goal", ""))
 
 
 # 目擊/交流一件事: 記事件 + 更新對 actor_id 嘅好感 (clamp)

@@ -89,6 +89,7 @@ var comm: Dictionary = {}          # 居民委託 + 武將收集冊設定 (data/
 var experts: Dictionary = {}       # 專長 (data/experts.json, Step S01c, spec 01 §8)
 var master: Dictionary = {}        # 大宗師合成術 (data/master_recipes.json, S05c, spec 05 §5)
 var residents: Dictionary = {}     # 居民 NPC 設定/角色/日程/名字池 (data/residents.json, S09a, spec 09 §1)
+var llm: Dictionary = {}           # LLM 層設定 (data/llm.json, S09d, spec 09 §5)；key 唔喺度
 
 static var _cache: GameData
 
@@ -206,6 +207,7 @@ static func load_all() -> GameData:
 	g.experts = _read("res://data/experts.json")
 	g.master = _read("res://data/master_recipes.json")
 	g.residents = _read("res://data/residents.json")
+	g.llm = _read("res://data/llm.json")
 	for x in c["classes"]:
 		g.classes[String(x["id"])] = x
 	for x in m["monsters"]:

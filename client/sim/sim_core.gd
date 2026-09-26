@@ -20,6 +20,10 @@ var rng: SimRng
 var rng_fn: Callable
 var state: Dictionary = {}
 var inn_pos := Vector2i(10, 10)   # 復活點(客棧)
+# ---- LLM 層 (S09d, spec 09 §5) ----
+# pending 只喺 instance（唔入存檔；重載 = 未回覆嘅請求當冇，模板後備照玩）。key 永遠唔入 sim。
+var _llm_pending: Dictionary = {}
+var _llm_seq: int = 0
 
 
 func _init(game_data: GameData, seed_value: int = 1) -> void:
@@ -29,7 +33,9 @@ func _init(game_data: GameData, seed_value: int = 1) -> void:
 	state = {"tick": 0, "next_id": 1, "ents": {}, "respawns": [], "player_id": -1, "bots": [],
 		"clock": {"day": 0, "ke": 0, "lastShichen": -1, "is_night": false}, "market": {}, "disasters": [],
 		"cityAttrs": {}, "quest_npcs": {}, "cityGov": {}, "cityPop": {},
-		"rumors": [], "rumorSeq": 0}		# S09b 傳聞 (spec 09 §4)
+		"rumors": [], "rumorSeq": 0,		# S09b 傳聞 (spec 09 §4)
+		"llm": {"enabled": false, "model": "",
+			"used": {"day": -1, "calls": 0, "reflect": 0}, "cd": {}, "lastError": ""}}
 	inn_pos = Vector2i(int(data.inn["x"]), int(data.inn["y"]))
 	_init_markets()
 	_init_city_attrs()
@@ -1017,3 +1023,226 @@ func _half_heal(ch: Dictionary) -> void:
 	ch["hp"] = maxi(1, MathX.js_round(_eff_max_hp(ch) / 2.0))
 	ch["mp"] = maxi(0, MathX.js_round(_eff_max_mp(ch) / 2.0))
 	ch["sp"] = maxi(0, MathX.js_round(_eff_max_sp(ch) / 2.0))
+
+
+# ================= LLM 層 (S09d, spec 09 §5) =================
+# 架構: sim 只發 `llm_request` 事件（含規則層砌好嘅 request body，冇 key），UI/客戶端傳送去
+# OpenRouter 之後 call `cmd_llm_reply(req_id, text)` / `cmd_llm_summary(req_id, text)` 回填。
+# 邏輯層測試用 mock 文字餵呢兩個 cmd，完全唔碰網絡。冇 enabled / 冇回覆 → 模板後備。
+# key 只由 `LlmClient` 存本機（user://llm.cfg），sim 存檔只記 enabled/model（非機密）。
+
+func _llm_cfg() -> Dictionary:
+	return RulesLlm.cfg(data)
+
+
+func _ensure_llm() -> void:
+	if not state.has("llm") or not (state["llm"] is Dictionary):
+		state["llm"] = {"enabled": false, "model": "", "used": {"day": -1, "calls": 0, "reflect": 0}, "lastError": ""}
+	var l: Dictionary = state["llm"]
+	if not l.has("enabled"):
+		l["enabled"] = false
+	if not l.has("model"):
+		l["model"] = ""
+	if not l.has("lastError"):
+		l["lastError"] = ""
+	if not l.has("cd") or not (l["cd"] is Dictionary):
+		l["cd"] = {}
+	var u = l.get("used", {})
+	if not (u is Dictionary):
+		u = {}
+	if not (u as Dictionary).has("day"):
+		(u as Dictionary)["day"] = -1
+	if not (u as Dictionary).has("calls"):
+		(u as Dictionary)["calls"] = 0
+	if not (u as Dictionary).has("reflect"):
+		(u as Dictionary)["reflect"] = 0
+	l["used"] = u
+
+
+func llm_enabled() -> bool:
+	_ensure_llm()
+	return bool(state["llm"]["enabled"])
+
+
+func llm_model() -> String:
+	_ensure_llm()
+	var m := String(state["llm"].get("model", ""))
+	return m if m != "" else String(_llm_cfg().get("model", ""))
+
+
+# UI 設定: enabled / 模型名（key 唔經呢度）
+func cmd_llm_config(enabled: bool, model: String) -> void:
+	_ensure_llm()
+	state["llm"]["enabled"] = enabled
+	state["llm"]["model"] = model
+
+
+func _llm_set_error(err: String) -> void:
+	_ensure_llm()
+	state["llm"]["lastError"] = err
+
+
+# 砌一個 NPC talk 用嘅 ctx（mem 可空 = 未登用嘅 Tier1 武將）
+func _llm_ctx(npc_name: String, ideo: String, mem: Dictionary, actor_e: Dictionary, actor_id: int) -> Dictionary:
+	var actor_ch: Dictionary = actor_e.get("ch", {})
+	var karma_tier := RulesKarma.tier(int(actor_ch.get("karma", 0))) if not actor_ch.is_empty() else 3
+	var aff := NpcMemory.affinity(mem, actor_id) if not mem.is_empty() else 0
+	var rk := ""
+	var digest := ""
+	if not mem.is_empty():
+		var keys := NpcMemory.rumor_keys(mem)
+		if not keys.is_empty():
+			rk = String(NpcMemory.rumor_of(mem, String(keys[0])).get("kind", ""))
+		digest = RulesLlm.template_summary(_llm_cfg(), mem)
+	return {"actor_name": String(actor_e.get("name", "")), "npc_name": npc_name, "tier": 0,
+		"ideology": ideo, "affinity": aff, "karma_tier": karma_tier, "rumor_kind": rk, "mem_digest": digest}
+
+
+# 開一個 LLM 請求（kind = "talk"/"reflect"）；回傳 req id，0 = 唔開（未啟用/超預算）
+# extra: {npcId, npcName, gid, x, y, actorId, pick, tier}
+func _llm_offer(kind: String, ctx: Dictionary, extra: Dictionary) -> int:
+	_ensure_llm()
+	if not llm_enabled():
+		return 0
+	var c := _llm_cfg()
+	state["llm"]["used"] = RulesLlm.roll_day(state["llm"]["used"], int(_clock()["day"]))   # 跨日重設預算
+	var used: Dictionary = state["llm"]["used"]
+	if not RulesLlm.budget_ok(c, used, kind):
+		_llm_set_error("budget")
+		return 0
+	_llm_seq += 1
+	var req_id := _llm_seq
+	var key := ""                                   # key 由客戶端加，sim 唔碰
+	var req := RulesLlm.build_request(c, llm_model(), ctx, key) if kind != "reflect" else RulesLlm.build_reflect_request(c, llm_model(), ctx, key)
+	_llm_pending[req_id] = {"kind": kind, "ctx": ctx, "extra": extra}
+	if kind == "reflect":
+		used["reflect"] = int(used.get("reflect", 0)) + 1
+	else:
+		used["calls"] = int(used.get("calls", 0)) + 1
+	_llm_set_error("")
+	_emit({"k": "llm_request", "reqId": req_id, "kind": kind, "tier": int(extra.get("tier", 0)),
+		"url": String(req.get("url", "")), "headers": req.get("headers", {}), "body": req.get("body", {}),
+		"npcId": int(extra.get("npcId", 0)), "gid": int(extra.get("gid", 0)),
+		"x": int(extra.get("x", 0)), "y": int(extra.get("y", 0))})
+	return req_id
+
+
+# sim 側打開一個 NPC 對話 LLM 請求（sim_recruit / sim_char 用）。true = 已排隊（唔好再出模板句）
+func _llm_talk(npc_e: Dictionary, npc_name: String, ideo: String, gid: int, x: int, y: int, actor_id: int) -> bool:
+	if not llm_enabled():
+		return false
+	var actor_e := ent(actor_id)
+	if actor_e.is_empty():
+		return false
+	var mem: Dictionary = npc_e.get("mem", {}) if not npc_e.is_empty() else {}
+	var npc_id := int(npc_e.get("id", 0))
+	var cd_key := ("g:%d" % gid) if gid > 0 else ("e:%d" % npc_id)
+	var last := int((state["llm"].get("cd", {}) as Dictionary).get(cd_key, -99999))
+	if not RulesLlm.cooldown_ok(_llm_cfg(), last, tick):
+		return false
+	var tier := 1 if (gid > 0 and npc_e.is_empty()) else (1 if String(npc_e.get("kind", "")) == "gen" else 2)
+	var roll := rng.below(1000)
+	if not RulesLlm.tier_uses_llm(_llm_cfg(), tier, roll):
+		return false
+	var ctx := _llm_ctx(npc_name, ideo, mem, actor_e, actor_id)
+	ctx["tier"] = tier
+	ctx["npc_id"] = npc_id
+	var extra := {"npcId": npc_id, "npcName": npc_name, "gid": gid, "x": x, "y": y,
+		"actorId": actor_id, "pick": rng.below(4), "tier": tier}
+	var rid := _llm_offer("talk", ctx, extra)
+	if rid == 0:
+		return false
+	_llm_mark_cd(cd_key)
+	return true
+
+
+func _llm_mark_cd(cd_key: String) -> void:
+	var l: Dictionary = state["llm"]
+	if not l.has("cd") or not (l["cd"] is Dictionary):
+		l["cd"] = {}
+	l["cd"][cd_key] = tick
+
+
+# 回填 LLM 對話回應。parsed 唔到 → 用模板後備；任何數值改動只由 RulesLlm.effect_of 決定。
+func cmd_llm_reply(req_id: int, text: String) -> bool:
+	var p: Dictionary = _llm_pending.get(req_id, {})
+	if p.is_empty() or String(p.get("kind", "")) != "talk":
+		return false
+	_llm_pending.erase(req_id)
+	var c := _llm_cfg()
+	var extra: Dictionary = p.get("extra", {})
+	var ctx: Dictionary = p.get("ctx", {})
+	var parsed := RulesLlm.parse_response(c, text)
+	if parsed.is_empty():
+		parsed = NpcBrainLlm.decide(ctx, int(extra.get("pick", 0)))     # 解析唔到 → 模板後備
+	var action := String(parsed["action"])
+	var line := String(parsed["line"])
+	var eff := RulesLlm.effect_of(action)                               # 唯一數值來源
+	var npc_id := int(extra.get("npcId", 0))
+	var actor_id := int(extra.get("actorId", 0))
+	var npc_e := ent(npc_id)
+	if not npc_e.is_empty() and npc_e.has("mem") and int(eff["affinity"]) != 0:
+		NpcMemory.witness(npc_e["mem"], actor_id, "llm_" + action, tick, int(eff["affinity"]))
+	_emit({"k": "npc_say", "id": npc_id, "name": String(extra.get("npcName", "")), "text": line,
+		"action": action, "x": int(extra.get("x", 0)), "y": int(extra.get("y", 0)),
+		"general": int(extra.get("gid", 0)), "llm": true})
+	_emit({"k": "llm_action", "reqId": req_id, "action": action, "accept": bool(eff["accept"]),
+		"hint": bool(eff["hint"]), "rumor": bool(eff["rumor"]), "refuse": bool(eff["refuse"]),
+		"warn": bool(eff["warn"]), "ignore": bool(eff["ignore"])})
+	return true
+
+
+# 回填 LLM 反思摘要 → mem.summary / mem.goal
+func cmd_llm_summary(req_id: int, text: String) -> bool:
+	var p: Dictionary = _llm_pending.get(req_id, {})
+	if p.is_empty() or String(p.get("kind", "")) != "reflect":
+		return false
+	_llm_pending.erase(req_id)
+	var extra: Dictionary = p.get("extra", {})
+	var npc_e := ent(int(extra.get("npcId", 0)))
+	if npc_e.is_empty() or not npc_e.has("mem"):
+		return false
+	var s := RulesLlm.parse_summary(_llm_cfg(), text)
+	if s == "":
+		return false
+	NpcMemory.set_summary(npc_e["mem"], s, RulesLlm.goal_of(npc_e["mem"]), int(_clock()["day"]))
+	return true
+
+
+# read-model
+func llm_view() -> Dictionary:
+	_ensure_llm()
+	var c := _llm_cfg()
+	var used: Dictionary = state["llm"]["used"]
+	return {"enabled": llm_enabled(), "model": llm_model(),
+		"actions": RulesLlm.actions(c), "used": used,
+		"budgetPerDay": RulesLlm.per_day(c), "reflectPerDay": RulesLlm.reflect_per_day(c),
+		"pending": _llm_pending.size(), "lastError": String(state["llm"].get("lastError", ""))}
+
+
+# 每日反思批次 (子時): 先寫規則模板摘要（決定性、離線一定有），LLM 有回應再覆蓋。
+# 摘要/目標純屬 read-model 資料，唔改任何遊戲數值。
+func _llm_reflect_daily(day: int) -> void:
+	_ensure_llm()
+	var c := _llm_cfg()
+	var actor_e := ent(int(state["player_id"]))
+	var ids: Array = ents.keys()
+	ids.sort()
+	for id in ids:
+		var e := ent(int(id))
+		if e.is_empty() or not e.has("mem"):
+			continue
+		var mem: Dictionary = e["mem"]
+		if not RulesLlm.reflect_due(c, mem, day):
+			continue
+		NpcMemory.set_summary(mem, RulesLlm.template_summary(c, mem), RulesLlm.goal_of(mem), day)
+		if not llm_enabled() or actor_e.is_empty():
+			continue
+		var tier := 1 if String(e.get("kind", "")) == "gen" else 2
+		if not RulesLlm.tier_uses_llm(c, tier, rng.below(1000)):
+			continue
+		var ch: Dictionary = e.get("ch", {})
+		var ctx := _llm_ctx(String(e.get("name", "")), String(ch.get("ideology", "")), mem, actor_e, int(state["player_id"]))
+		ctx["tier"] = tier
+		ctx["npc_id"] = int(id)
+		_llm_offer("reflect", ctx, {"npcId": int(id), "day": day, "tier": tier})
