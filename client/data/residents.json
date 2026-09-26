@@ -10,7 +10,15 @@
     "personalityDims": ["outgoing", "friendly", "shrewd", "brave", "steady"],
     "personalityMax": 10,
     "ideologies": ["義理", "霸權", "權謀", "隱遁", "治國"],
-    "schedule": ["sleep", "sleep", "sleep", "work", "work", "work", "eat", "work", "work", "work", "home", "sleep"]
+    "schedule": ["sleep", "sleep", "sleep", "work", "work", "work", "eat", "work", "work", "work", "home", "sleep"],
+    "rumor": {
+      "cap": 16,
+      "memCap": 8,
+      "minWeight": 3,
+      "kindMap": {"murder": {"neg": "killer", "pos": "bounty"}},
+      "delayMin": 1,
+      "delayMax": 3
+    }
   },
   "roles": [
     {"id": "villager", "name": "村民", "weight": 5, "work": "field", "align": "good"},

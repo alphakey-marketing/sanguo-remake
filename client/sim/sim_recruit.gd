@@ -707,6 +707,22 @@ func _recruit_daily(day: int) -> void:
 			_companion_leave(c, "忠誠太低", true)
 
 
+# S09b (spec 09 §4): 主公謀殺善居民 → 義理念同伴忠誠 −15。
+# 只計「玩家先行出手」(initiated)，自衛反殺 / 殺紅名 / 其他理念 唔扣。
+func _kill_bot(t: Dictionary, by: Dictionary) -> void:
+	var is_player := int(by.get("id", 0)) == int(state["player_id"])
+	var red := bool(t.get("ch", {}).get("criminal", false))
+	var initiated := is_player and int(ent(int(state["player_id"])).get("atk_target", 0)) == int(t["id"])
+	super(t, by)
+	if is_player and not red and initiated:
+		var c := _companion_of(ent(int(state["player_id"])))
+		if not c.is_empty():
+			var lcfg: Dictionary = data.recruit_cfg["loyalty"]
+			var ideo := String(c["ch"].get("ideology", ""))
+			if (lcfg.get("badNpcKillIdeo", []) as Array).has(ideo):
+				_loyalty_change(c, int(lcfg.get("badNpcKill", -15)))
+
+
 # 同伴倒下 = 唔會死: 原地進入「倒下」狀態 (hp 0, flags down) 等道士「超渡」復活 (S02c)；
 # 超過 koTicks 未救 → 當佢退返客棧 (忠誠 -ko, 兜底免得冇道士時同伴永遠倒地)。
 func _kill_player(p: Dictionary) -> void:
