@@ -215,3 +215,42 @@ static func trade_mul(eff: Dictionary) -> Dictionary:
 		buy = float(eff.get("tradeBuyMul", 1.0))
 		sell = float(eff.get("tradeSellMul", 1.0))
 	return {"buy": buy, "sell": sell}
+
+
+# ================= 主動特技 (S09c-b, spec 09 §3.4) =================
+# 21 無限遁地 / 32 挑釁 / 38 急救 = 同伴主動技，由主公落 cmd_companion_skill 指令。
+# 種類由 eff["active"] 決定；冷卻 tick 由 eff["cd"]。22 職業特技 = proximity 被動 (見下面 class_skill_mul)。
+
+# 主動特技種類: "burrow"/"taunt"/"heal"；"" = 唔係主動
+static func active_kind(eff: Dictionary) -> String:
+	return String(eff.get("active", ""))
+
+
+# 主動特技冷卻 (tick)：缺省 0 = 無限
+static func active_cd(eff: Dictionary) -> int:
+	return int(eff.get("cd", 0))
+
+
+# 主動特技用唔用得 → "" = 得；否則 = 原因。cooldowns = {kind: 冷卻完 tick}
+static func active_block(eff: Dictionary, cooldowns: Dictionary, tick: int) -> String:
+	var kind := active_kind(eff)
+	if kind == "":
+		return "同伴冇呢招主動特技"
+	if tick < int(cooldowns.get(kind, 0)):
+		return "特技冷卻中"
+	return ""
+
+
+# 38 急救: 回復量 = 主公上限 HP × hpPct (最少 1)
+static func heal_amount(max_hp: int, eff: Dictionary) -> int:
+	return maxi(1, MathX.js_round(float(maxi(1, max_hp)) * float(eff.get("healPct", 0.0))))
+
+
+# 32 挑釁: 影響範圍 (格)
+static func taunt_range(eff: Dictionary) -> int:
+	return int(eff.get("tauntRange", 0))
+
+
+# 22 職業特技 (proximity): 主公職業特技冷卻 / 消耗乘數 {cd, cost} (冇 = 1.0 / 1.0)
+static func class_skill_mul(eff: Dictionary) -> Dictionary:
+	return {"cd": float(eff.get("classSkillCdMul", 1.0)), "cost": float(eff.get("classSkillCostMul", 1.0))}

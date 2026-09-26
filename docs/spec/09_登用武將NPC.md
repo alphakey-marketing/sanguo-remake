@@ -3,7 +3,7 @@
 > 對應攻略: sy1_1_2(理念)、sy2_6_1~6(登用全頁)、sy2_7_*(結婚)、sy2_8_5(制度)、sy3_5(歷史任務→將軍令)
 > 原始資料: `D:\Download\sanguo\extracted\text\general_npc.csv`(1261 武將: 名/武力/智力/9 技能)、`general_skills.csv`、`Npc_table.tsv`(hp/mp/atk)、`recruitinfo.txt`(官方新手說明)
 > 現有實作: `sim/npc_brain.gd`(規則版決策)、`rules/npc_memory.gd`、`bot_sys.gd`(居民)、Step 6 未做 LLM
-> **現狀 (2026-09-26, S09c-a)**: 居民化（S09a）+ 傳聞擴散／忠誠事件（S09b）+ 內政協助／內政·生產·經濟被動特技（S09c-a）完成 —— `general_skills.json` 39~43、45~51 `impl:true`（內政協助 `domesticAssist` / 商才 `tradeBuyMul·tradeSellMul` / 生產 `workExpAdd` / 進階 `craftRateAdd`）+ `cfg.assist`（政治 = round(智力×0.5)）；`rules/general.gd` `pol_of`/`assist_bonus`/`work_exp_mult`/`craft_rate_add`/`trade_mul`；`sim_core` 4 個空 hook（`_companion_pol_bonus`/`_work_exp_mult`/`_craft_rate_add`/`_companion_trade_mul`）由 `sim_recruit` 覆寫；官宅內政／營地內政／營地監督／工作經驗／進階成功率／買賣價全部接同伴政治＋特技。測試 `tests/run_residents.gd`、`tests/run_rumor.gd`、`tests/run_general.gd`（+F 群組）。尚欠：主動特技 21/22/32/38、鑑定 44、國戰類（S10）。對話仍規則版 (`NpcBrain`)，LLM 未接。
+> **現狀 (2026-09-26, S09c-b)**: 居民化（S09a）+ 傳聞擴散／忠誠事件（S09b）+ 被動特技（S09c-a）+ 主動特技（S09c-b）完成 —— `general_skills.json` `impl:true`：39~43、45~51 被動（內政協助 `domesticAssist` / 商才 `tradeBuyMul·tradeSellMul` / 生產 `workExpAdd` / 進階 `craftRateAdd`）+ `cfg.assist`（政治 = round(智力×0.5)）；21 無限遁地 / 32 挑釁 / 38 急救（`eff.active` + 冷卻 `eff.cd`）+ 22 職業特技（`classSkillCdMul`/`classSkillCostMul` proximity 被動）。`rules/general.gd` `pol_of`/`assist_bonus`/`work_exp_mult`/`craft_rate_add`/`trade_mul` + `active_kind`/`active_cd`/`active_block`/`heal_amount`/`taunt_range`/`class_skill_mul`。`sim_core` 空 hook（`_companion_pol_bonus`/`_work_exp_mult`/`_craft_rate_add`/`_companion_trade_mul`/`_companion_class_skill_mul`）由 `sim_recruit` 覆寫；官宅內政／營地內政／營地監督／工作經驗／進階成功率／買賣價／潛行·透視·超渡冷卻消耗全部接同伴特技；`sim_recruit.cmd_companion_skill(id,kind)`（burrow/taunt/heal）。測試 `tests/run_residents.gd`、`tests/run_rumor.gd`、`tests/run_general.gd`（+F/G 群組）。尚欠：鑑定 44（無系統）、國戰類 23~37/53~70（S10）。對話仍規則版 (`NpcBrain`)，LLM 未接。
 > 【原】= 攻略明文；【自訂】= 自己設計。
 
 ## 1. 居民 NPC（現有 bot → 居民化）
@@ -65,7 +65,8 @@
 ### 3.4 武將特技
 
 - general_skills.csv（1261 武將 × 9 技能）+ 攻略「70 項特技」：每刻恢復 HP / 發話唔扣飲水度 / 無限遁地 / 使用職業特技… → skill_id 對照表 `data/general_skills.json`；特技效果逐項規則化（大部分 = passive buff，容易做）。
-  - **實裝 (S09c-a)**：被動 39~43、45~51（見 §3.3 內政協助 + 下表）。`44 鑑定` 冇鑑定系統、主動 21 遁地/22 職業特技/32 挑釁/38 急救 及國戰類 23~31/33~37/53~70 未做（PLAN §4 / S10）。新特技全部經 `pin` 指派（唔入 `drawPool`，依 S07d 凍結慣例）。
+  - **實裝 (S09c-a)**：被動 39~43、45~51（見 §3.3 內政協助 + 下表）。
+  - **實裝 (S09c-b)**：主動 21 無限遁地（`eff {active:burrow,cd:0}`，主公+同伴即時返最近城池）、32 挑釁（`{active:taunt,tauntRange:6,cd:600}`，同伴附近怪仇恨轉向同伴）、38 急救（`{active:heal,healPct:0.3,cd:1200}`，同伴 auraRange 內即回主公 HP）；22 職業特技（`{classSkillCdMul:0.5,classSkillCostMul:0.5}`，同伴同圖 auraRange 內 → 主公職業特技冷卻/消耗 ×0.5，proximity 被動）。指令 = `sim_recruit.cmd_companion_skill(id, kind)`（kind = burrow/taunt/heal）；冷卻存同伴實體 `gen.activeCd`。`44 鑑定` 冇鑑定系統、國戰類 23~37/53~70 未做（PLAN §4 / S10）。新特技全部經 `pin` 指派（唔入 `drawPool`，依 S07d 凍結慣例）。
 
 ## 4. NPC 好感 / 忠誠（規則層，已實作 + 擴充）
 

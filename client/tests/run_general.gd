@@ -23,6 +23,7 @@ func _init() -> void:
 	t_skill_work(data)
 	t_skill_craft(data)
 	t_skill_trade(data)
+	t_skill_active(data)
 	t_comp_ult(data)
 	t_comp_spell(data)
 	t_team_exp_split()
@@ -196,7 +197,7 @@ func t_data(data: GameData) -> void:
 		if bool(s["impl"]):
 			n_impl += 1
 			check(not (s.get("eff", {}) as Dictionary).is_empty(), "特技 %s: impl 要有 eff" % s["name"])
-	check(ids.size() == 70 and n_impl == 33, "特技: id 唔重複 + 已實作 33 項 (而家 %d)" % n_impl)
+	check(ids.size() == 70 and n_impl == 37, "特技: id 唔重複 + 已實作 37 項 (而家 %d)" % n_impl)
 	var bad_ov := 0
 	for nm in data.gen_skill_override:
 		var s: Dictionary = data.gen_skill_by_id.get(int(data.gen_skill_override[nm]), {})
@@ -477,7 +478,7 @@ func t_skill_self(data: GameData) -> void:
 	check(sim._mp_cost(cch, 10) == 7, "軍師: 術法 MP 10 → 7")
 	_with_skill(c, 18)
 	check(is_equal_approx(sim._eff_attr(cch, "agi"), agi0 + 8), "疾風: 敏捷 +8")
-	_with_skill(c, 21)
+	_with_skill(c, 23)
 	check(sim._jewel_bonus(cch)["atkPct"] == 0.0 and sim._comp_eff(c).is_empty(), "未實作特技 = 冇效果")
 	# 回春/冥想/養氣: 戰鬥中都回
 	_with_skill(c, 1)
@@ -712,6 +713,128 @@ func t_skill_trade(data: GameData) -> void:
 	var sell_base := int(ch["gold"])
 	check(sell0 > sell_base, "商才 (43): 賣出價 +5%% (%d > %d)" % [sell0, sell_base])
 	check(is_equal_approx(float(RulesGeneral.trade_mul({}).get("buy", 1.0)), 1.0), "商才: 空 eff = 原價")
+
+
+# ---------------- G: S09c-b 主動特技 (21 遁地 / 22 職業特技 / 32 挑釁 / 38 急救) ----------------
+func _gskill(data: GameData, sid: int) -> Dictionary:
+	for s in data.gen_skills:
+		if int(s["id"]) == sid:
+			return s
+	return {}
+
+
+func t_skill_active(data: GameData) -> void:
+	# 資料 + pin
+	check(bool(_gskill(data, 21).get("impl", false)) and RulesGeneral.active_kind(_gskill(data, 21)["eff"]) == "burrow",
+		"資料: 21 無限遁地 impl + active=burrow")
+	check(bool(_gskill(data, 22).get("impl", false)) and _gskill(data, 22)["eff"].has("classSkillCdMul"), "資料: 22 職業特技 impl")
+	check(bool(_gskill(data, 32).get("impl", false)) and RulesGeneral.active_kind(_gskill(data, 32)["eff"]) == "taunt", "資料: 32 挑釁 impl")
+	check(bool(_gskill(data, 38).get("impl", false)) and RulesGeneral.active_kind(_gskill(data, 38)["eff"]) == "heal", "資料: 38 急救 impl")
+	check(int(data.gen_skill_pin.get("左慈", 0)) == 21 and int(data.gen_skill_pin.get("于吉", 0)) == 21, "pin: 左慈/于吉 → 21")
+	check(int(data.gen_skill_pin.get("張郃", 0)) == 32 and int(data.gen_skill_pin.get("華佗", 0)) == 38, "pin: 張郃 → 32 / 華佗 → 38")
+	# 純函數
+	check(RulesGeneral.active_cd(_gskill(data, 21)["eff"]) == 0, "21 無限遁地: 冇冷卻 (無限)")
+	check(RulesGeneral.active_block(_gskill(data, 21)["eff"], {}, 0) == "", "active_block: 冇冷卻 = 用得")
+	check(RulesGeneral.active_block(_gskill(data, 38)["eff"], {"heal": 999}, 10) != "", "active_block: 冷卻中 = 唔用得")
+	check(RulesGeneral.active_block({}, {}, 0) != "", "active_block: 唔係主動技")
+	check(RulesGeneral.heal_amount(1000, {"healPct": 0.3}) == 300 and RulesGeneral.heal_amount(0, {}) == 1, "急救回復量: 30% / 最少 1")
+	check(RulesGeneral.taunt_range(_gskill(data, 32)["eff"]) == 6, "挑釁範圍 = 6 格")
+	var cm := RulesGeneral.class_skill_mul(_gskill(data, 22)["eff"])
+	check(is_equal_approx(float(cm["cd"]), 0.5) and is_equal_approx(float(cm["cost"]), 0.5), "22: 冷卻/消耗 ×0.5")
+	var cm0 := RulesGeneral.class_skill_mul({})
+	check(is_equal_approx(float(cm0["cd"]), 1.0) and is_equal_approx(float(cm0["cost"]), 1.0), "22: 空 eff = ×1.0")
+
+	# ── 38 急救 ──
+	var r := _comp_setup(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	var c: Dictionary = r[6]
+	var cp0 := sim._free_near(int(sim.ent(pid)["x"]) + 1, int(sim.ent(pid)["y"]))
+	_put(sim, int(c["id"]), cp0.x, cp0.y)
+	_with_skill(c, 38)
+	var amt := RulesGeneral.heal_amount(sim._eff_max_hp(ch), _gskill(data, 38)["eff"])
+	ch["hp"] = 50
+	sim.cmd_companion_skill(pid, "heal")
+	check(int(ch["hp"]) == 50 + amt, "急救 (38): 即回主公 %d HP" % amt)
+	ch["hp"] = 50
+	sim.cmd_companion_skill(pid, "heal")
+	check(int(ch["hp"]) == 50, "急救: 冷卻中唔再回")
+	sim.state["tick"] = sim.tick + 1200
+	sim.cmd_companion_skill(pid, "heal")
+	check(int(ch["hp"]) == 50 + amt, "急救: 冷卻完再用得")
+	# 同伴唔喺附近 + 主公滿血 = 唔回
+	var cpfar := sim._free_near(int(sim.ent(pid)["x"]) + 30, int(sim.ent(pid)["y"]))
+	_put(sim, int(c["id"]), cpfar.x, cpfar.y)
+	sim.state["tick"] = sim.tick + 1200
+	ch["hp"] = 50
+	sim.cmd_companion_skill(pid, "heal")
+	check(int(ch["hp"]) == 50, "急救: 同伴唔喺附近唔回")
+	# 冇呢招主動技
+	_with_skill(c, 0)
+	sim.cmd_companion_skill(pid, "heal")
+	check(int(ch["hp"]) == 50, "急救: 同伴冇特技 = 冇效")
+
+	# ── 32 挑釁 ──
+	var r2 := _comp_setup(data)
+	var sim2: Sim = r2[0]
+	var pid2: int = r2[1]
+	var c2: Dictionary = r2[6]
+	_with_skill(c2, 32)
+	var m_near := _mob_at(sim2, int(c2["x"]) + 2, int(c2["y"]))
+	m_near["mob"]["state"] = "wander"
+	m_near["mob"]["target"] = 0
+	var m_far := _mob_at(sim2, int(c2["x"]) + 20, int(c2["y"]))
+	m_far["mob"]["state"] = "wander"
+	m_far["mob"]["target"] = 0
+	sim2.cmd_companion_skill(pid2, "taunt")
+	check(String(m_near["mob"]["state"]) == "chase" and int(m_near["mob"]["target"]) == int(c2["id"]),
+		"挑釁 (32): 附近怪仇恨轉同伴")
+	check(String(m_far["mob"]["state"]) == "wander", "挑釁: 範圍外唔受影響")
+
+	# ── 21 無限遁地 ──
+	var r3 := _comp_setup(data)
+	var sim3: Sim = r3[0]
+	var pid3: int = r3[1]
+	var c3: Dictionary = r3[6]
+	_with_skill(c3, 21)
+	var before := sim3.map_id_at(int(sim3.ent(pid3)["x"]), int(sim3.ent(pid3)["y"]))
+	sim3.cmd_companion_skill(pid3, "burrow")
+	var after := sim3.map_id_at(int(sim3.ent(pid3)["x"]), int(sim3.ent(pid3)["y"]))
+	check(before != after and String(data.map_by_id[after].get("kind", "")) == "city", "遁地 (21): 主公返到城池 (%s → %s)" % [before, after])
+	check(sim3.map_id_at(int(c3["x"]), int(c3["y"])) == after, "遁地: 同伴一齊返")
+	sim3.cmd_companion_skill(pid3, "burrow")
+	check(not sim3.ent(pid3).is_empty(), "遁地: 無限次 (冇冷卻)")
+
+	# ── 22 職業特技: 同伴喺附近 → 主公職業特技冷卻減半 (用透視，即時入冷卻) ──
+	var r4 := _comp_setup(data)
+	var sim4: Sim = r4[0]
+	var pid4: int = r4[1]
+	var ch4: Dictionary = r4[2]
+	var c4: Dictionary = r4[6]
+	var cp4 := sim4._free_near(int(sim4.ent(pid4)["x"]) + 1, int(sim4.ent(pid4)["y"]))
+	_put(sim4, int(c4["id"]), cp4.x, cp4.y)
+	ch4["classId"] = "meinu"
+	ch4["classSkill"] = "toushi"
+	ch4["level"] = 10
+	_mob_at(sim4, int(sim4.ent(pid4)["x"]) + 1, int(sim4.ent(pid4)["y"]) + 1)
+	_with_skill(c4, 22)
+	check(is_equal_approx(float(sim4._companion_class_skill_mul(sim4.ent(pid4))["cd"]), 0.5), "22 hook: 同伴附近 → cd ×0.5")
+	var t0 := sim4.tick
+	sim4.cmd_use_skill(pid4, "toushi")
+	check(int(ch4.get("toushiCd", 0)) == t0 + MathX.js_round(RulesToushi.TOUSHI_CD_TICKS * 0.5),
+		"22 職業特技: 透視冷卻減半 (%d)" % int(ch4.get("toushiCd", 0)))
+	ch4["toushiCd"] = 0
+	_with_skill(c4, 0)
+	check(is_equal_approx(float(sim4._companion_class_skill_mul(sim4.ent(pid4))["cd"]), 1.0), "22 hook: 冇特技 → cd ×1.0")
+	sim4.cmd_use_skill(pid4, "toushi")
+	check(int(ch4.get("toushiCd", 0)) == t0 + RulesToushi.TOUSHI_CD_TICKS, "22: 冇同伴特技 = 正常冷卻")
+
+	# ── 存檔: activeCd 保留 (新欄位喺同伴實體 dict 內) ──
+	var sv := sim.save_string()
+	var ld := Sim.load_string(data, sv)
+	check(int(ld.ent(int(c["id"]))["gen"].get("activeCd", {}).get("heal", 0)) > 0, "存檔: 主動特技冷卻保留")
+	check(ld.save_string() == sv, "存檔: activeCd roundtrip 穩定")
 
 
 func t_comp_ult(data: GameData) -> void:
