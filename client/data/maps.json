@@ -998,6 +998,114 @@
    "safe": false,
    "kind": "field",
    "instance": true
+  },
+  {
+   "id": "taohuadu_f1",
+   "name": "桃花渡 1F",
+   "ox": 460,
+   "oy": 232,
+   "safe": false,
+   "kind": "cave",
+   "instance": true
+  },
+  {
+   "id": "taohuadu_f2",
+   "name": "桃花渡 2F",
+   "ox": 484,
+   "oy": 268,
+   "safe": false,
+   "kind": "cave",
+   "instance": true
+  },
+  {
+   "id": "taohuadu_f3",
+   "name": "桃花渡 3F",
+   "ox": 484,
+   "oy": 304,
+   "safe": false,
+   "kind": "cave",
+   "instance": true
+  },
+  {
+   "id": "taohuadu_f4",
+   "name": "桃花渡 4F",
+   "ox": 432,
+   "oy": 330,
+   "safe": false,
+   "kind": "cave",
+   "instance": true
+  },
+  {
+   "id": "taohuadu_f5",
+   "name": "桃花渡 5F",
+   "ox": 468,
+   "oy": 340,
+   "safe": false,
+   "kind": "cave",
+   "instance": true
+  },
+  {
+   "id": "qicai_f1",
+   "name": "七彩奪寶陣 1F",
+   "ox": 464,
+   "oy": 376,
+   "safe": false,
+   "kind": "cave",
+   "instance": true
+  },
+  {
+   "id": "qicai_f2",
+   "name": "七彩奪寶陣 2F",
+   "ox": 96,
+   "oy": 412,
+   "safe": false,
+   "kind": "cave",
+   "instance": true
+  },
+  {
+   "id": "qicai_f3",
+   "name": "七彩奪寶陣 3F",
+   "ox": 464,
+   "oy": 412,
+   "safe": false,
+   "kind": "cave",
+   "instance": true
+  },
+  {
+   "id": "qicai_f4",
+   "name": "七彩奪寶陣 4F",
+   "ox": 380,
+   "oy": 442,
+   "safe": false,
+   "kind": "cave",
+   "instance": true
+  },
+  {
+   "id": "qicai_f5",
+   "name": "七彩奪寶陣 5F",
+   "ox": 416,
+   "oy": 442,
+   "safe": false,
+   "kind": "cave",
+   "instance": true
+  },
+  {
+   "id": "qicai_f6",
+   "name": "七彩奪寶陣 6F",
+   "ox": 452,
+   "oy": 448,
+   "safe": false,
+   "kind": "cave",
+   "instance": true
+  },
+  {
+   "id": "qicai_f7",
+   "name": "七彩奪寶陣 7F",
+   "ox": 488,
+   "oy": 448,
+   "safe": false,
+   "kind": "cave",
+   "instance": true
   }
  ],
  "landmarks": [

@@ -1,4 +1,4 @@
-extends "res://sim/sim_battle.gd"
+extends "res://sim/sim_scene.gd"
 # Sim 繼承鏈 第 6 層: 傷害 / 死亡 / 掉落 / 重生排期
 
 # ================= 戰鬥 =================
@@ -73,11 +73,12 @@ func _kill_mob(m: Dictionary, by: Dictionary, exp_mult: float = 1.0) -> void:
 		_remove_ent(int(m["id"]))
 		return
 	var battle_id := str(m.get("mob", {}).get("battle_id", ""))   # 戰役 boss (Step 19): 掉落照常，但唔重生 + 打完自動過層
+	var scene_id := str(m.get("mob", {}).get("scene_id", ""))     # S04d 特殊場景怪: 同戰役（唔重生 + 打完過層）
 	if by.has("ch"):
 		var w := BotSys.W_SEE_KILL if RulesKarma.tier(int(by["ch"]["karma"])) < 5 else -BotSys.W_SEE_KILL
 		_witness_nearby(m, int(by["id"]), "see_kill", w)
 	_remove_ent(int(m["id"]))
-	if battle_id == "":
+	if battle_id == "" and scene_id == "":
 		_schedule_respawn(m, d)
 	if not by.has("ch"):
 		return
@@ -87,8 +88,8 @@ func _kill_mob(m: Dictionary, by: Dictionary, exp_mult: float = 1.0) -> void:
 	items.append_array(RulesCombat.roll_drops(d.get("rareDrops", []), rng_fn))   # 稀有掉落 (Step 11, spec 11 §2)
 	ch["gold"] = int(ch["gold"]) + gold
 	# S04a (spec 04 §6)【原=跌落地】: 野外地圖物品以「跌落地」實體出現，行埋邊拾取。
-	# 戰役落場 (battle_id != "") 例外: 過層即傳走，唔返頭執 → 掉寶照直入袋 (保留戰役獎勵)
-	if battle_id != "":
+	# 戰役/特殊場景落場 (battle_id/scene_id != "") 例外: 過層即傳走，唔返頭執 → 掉寶照直入袋 (保留獎勵)
+	if battle_id != "" or scene_id != "":
 		for it in items:
 			RulesShop.add_item(ch["bag"], int(it), 1)
 	elif not items.is_empty():
@@ -130,6 +131,8 @@ func _kill_mob(m: Dictionary, by: Dictionary, exp_mult: float = 1.0) -> void:
 		"lvUp": int(ch["level"]) if ups > 0 else 0})
 	if battle_id != "":
 		_battle_on_boss_kill(by, battle_id, int(m["mob"].get("battle_floor", 0)))
+	if scene_id != "" and bool(m.get("mob", {}).get("scene_boss", false)):
+		_scene_on_boss_kill(by, scene_id, int(m["mob"].get("scene_layer", 0)))
 
 
 # 重生排期: 普通怪定時重生，boss 每日一次【自訂】(spec 04 §3)。zone 用 mob spawn 嗰層，免得同 def 多層混亂
@@ -149,8 +152,10 @@ func _schedule_respawn(m: Dictionary, d: Dictionary) -> void:
 func _kill_player(p: Dictionary) -> void:
 	var ch: Dictionary = p["ch"]
 	var bt: Dictionary = p.get("battle", {})
-	# 戰役內陣亡唔跌經驗/物品【原 sy3_8】(除非個別場 dropOnDeath=true, Step 19)
-	var skip_drop := not bt.is_empty() and not RulesBattle.drop_on_death(RulesBattle.find(data.battles, String(bt.get("id", ""))))
+	var sc: Dictionary = p.get("scene", {})
+	# 戰役內陣亡唔跌經驗/物品【原 sy3_8】(除非個別場 dropOnDeath=true, Step 19)；特殊場景 (S04d) 照樣唔跌
+	var skip_drop := (not bt.is_empty() and not RulesBattle.drop_on_death(RulesBattle.find(data.battles, String(bt.get("id", "")))) \
+		or not sc.is_empty())
 	# S03c 死亡道具 (spec 03 §4)【自訂】——死亡流程 6 步順序照 §4.3:
 	# 1 扣經驗 → 2 掉物品(幸運符擋) → 3 傳客棧回一半 → 4 目擊好感 → 5 耐久-10% → 6 天譴先判
 
@@ -197,14 +202,17 @@ func _kill_player(p: Dictionary) -> void:
 	var die_x := int(p["x"])
 	var die_y := int(p["y"])
 	_half_heal(ch)
-	if bt.is_empty():
+	if bt.is_empty() and sc.is_empty():
 		var inn := nearest_inn(map_id_at(int(p["x"]), int(p["y"])))    # 返最近客棧 (過圖次數最少) (Step 11.7)
 		p["x"] = int(inn["x"])
 		p["tx"] = int(inn["x"])
 		p["y"] = int(inn["y"])
 		p["ty"] = int(inn["y"])
 	else:
-		_battle_exit(p, "died")     # 戰役內死亡: 傳送返報名點 + 清晒呢場遺留 boss (Step 19)
+		if not bt.is_empty():
+			_battle_exit(p, "died")     # 戰役內死亡: 傳送返報名點 + 清晒呢場遺留 boss (Step 19)
+		if not sc.is_empty():
+			_scene_exit(p, "died")      # S04d: 特殊場景內死亡: 傳送返入口 + 清晒呢場遺留怪
 	# 4. 目擊死亡: 死亡嗰位附近有記憶表嘅 NPC 記低 (好感微升: 同情 +2【自訂】, spec 03 §4.3)
 	_witness_nearby({"x": die_x, "y": die_y}, int(p["id"]), "die", BotSys.W_SEE_DIE)
 

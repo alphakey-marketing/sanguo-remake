@@ -269,6 +269,8 @@ func _send(d: Dictionary) -> void:
 		"tea": sim.cmd_tea(my_id)
 		"battle_enter": sim.cmd_battle_enter(my_id)
 		"battle_leave": sim.cmd_battle_leave(my_id)
+		"scene_enter": sim.cmd_scene_enter(my_id, str(d.sid))
+		"scene_leave": sim.cmd_scene_leave(my_id)
 		"donate_gold": sim.cmd_donate_gold(my_id, int(d.amount))
 		"donate_items": sim.cmd_donate_items(my_id, d.items)
 		"use_item": sim.cmd_use_item(my_id, int(d.item))
@@ -577,6 +579,16 @@ func _on_event(e: Dictionary) -> void:
 		"disaster":
 			if str(e.city) == str(data.world["homeCity"]):
 				_set_banner("天災：%s (%s)！物資價格波動" % [e.name, e.size], Color(1, 0.55, 0.3), 15.0)
+		"scene_open":                       # S04d: 特殊場景開門公告 (game 日曆)
+			_set_banner("%s 開門（武等 ≥%d，每月%s）！入口喺荊州港口" % [str(e.name), int(e.minLevel), str(e.openDays)], Color(0.6, 0.95, 0.8), 12.0)
+			_log("特殊場景「%s」開門咗！" % str(e.name))
+		"scene_enter":
+			if int(e.dst) == my_id:
+				_log("入咗%s" % str(e.name))
+		"scene_win":
+			if int(e.dst) == my_id:
+				_set_banner("%s通晒！" % str(e.name), Color(0.9, 0.9, 0.5), 6.0)
+				_log("%s通晒！" % str(e.name))
 
 # S03c 死亡結算彈窗文案: 跌咗邊啲物品/扣幾多/道具消耗 (spec 03 §4)
 func _death_report(e: Dictionary) -> String:

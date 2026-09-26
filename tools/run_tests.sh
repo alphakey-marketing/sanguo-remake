@@ -37,6 +37,7 @@ run recruit --script tests/run_recruit.gd
 run general --script tests/run_general.gd
 run title --script tests/run_title.gd
 run battle --script tests/run_battle.gd
+run scene --script tests/run_scene.gd
 run pk --script tests/run_pk.gd
 run karma --script tests/run_karma.gd
 run market --script tools/market_sim.gd

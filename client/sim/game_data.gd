@@ -52,6 +52,7 @@ var mounts: Dictionary = {}       # 座騎設定 (data/mounts.json, Step 17a)
 var mount_weapons: Dictionary = {}  # 馬戰兵器 + 特技 (data/mount_weapons.json, Step 17b)
 var war_beasts: Dictionary = {}   # 戰騎屬性/升級 (data/war_beasts.json, Step 18)
 var battles: Array = []           # 戰役任務 (data/battles.json, Step 19)
+var scenes: Array = []            # 特殊場景 (data/scenes.json, S04d): 怪物/層/日曆窗口
 var quiz: Array = []              # 理念測驗題庫 (data/quiz.json, Step 7.5)
 var face_parts: Dictionary = {}   # 臉譜 8 部位款式數 (data/face.json, Step 7.5)
 var quests: Array = []            # 任務定義 (data/quests.json, Step 8)
@@ -132,6 +133,7 @@ static func load_all() -> GameData:
 	g.mount_weapons = _read("res://data/mount_weapons.json")
 	g.war_beasts = _read("res://data/war_beasts.json")
 	g.battles = (_read("res://data/battles.json") as Dictionary)["battles"]
+	g.scenes = (_read("res://data/scenes.json") as Dictionary)["scenes"]
 	for o in g.office["orders"]:
 		o["rankName"] = RulesTitle.name_of(g.titles, int(o["rank"]))
 	var qz: Dictionary = _read("res://data/quiz.json")
