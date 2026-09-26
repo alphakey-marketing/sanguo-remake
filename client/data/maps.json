@@ -1106,6 +1106,89 @@
    "safe": false,
    "kind": "cave",
    "instance": true
+  },
+  {
+   "id": "luoyang",
+   "name": "洛陽城",
+   "ox": 0,
+   "oy": 530,
+   "safe": true,
+   "kind": "city",
+   "city": "luoyang",
+   "areas": [
+    {
+     "name": "黃巾道場",
+     "x0": 6,
+     "y0": 12,
+     "x1": 18,
+     "y1": 20
+    },
+    {
+     "name": "南華竹林",
+     "x0": 6,
+     "y0": 30,
+     "x1": 16,
+     "y1": 33
+    }
+   ]
+  },
+  {
+   "id": "luoyang_well",
+   "name": "皇城井底",
+   "ox": 68,
+   "oy": 530,
+   "safe": false,
+   "kind": "house",
+   "parent": "luoyang",
+   "areas": []
+  },
+  {
+   "id": "chengfu",
+   "name": "程府民房",
+   "ox": 128,
+   "oy": 530,
+   "safe": true,
+   "kind": "house",
+   "parent": "luoyang",
+   "areas": []
+  },
+  {
+   "id": "xiapi",
+   "name": "下邳城",
+   "ox": 176,
+   "oy": 530,
+   "safe": true,
+   "kind": "city",
+   "city": "xiapi",
+   "areas": []
+  },
+  {
+   "id": "hefu",
+   "name": "何府",
+   "ox": 252,
+   "oy": 530,
+   "safe": true,
+   "kind": "house",
+   "parent": "xiapi",
+   "areas": []
+  },
+  {
+   "id": "lingling",
+   "name": "零陵城",
+   "ox": 296,
+   "oy": 530,
+   "safe": true,
+   "kind": "city",
+   "city": "lingling",
+   "areas": [
+    {
+     "name": "練兵場",
+     "x0": 6,
+     "y0": 6,
+     "x1": 16,
+     "y1": 13
+    }
+    ]
   }
  ],
  "landmarks": [
@@ -1324,6 +1407,24 @@
    "r": 3,
    "name": "隆中對",
    "text": "建安十二年，劉備三顧茅廬。亮為之畫策：跨有荊、益，保其巖阻，西和諸戎，南撫夷越，外結好孫權，內修政理——天下三分之勢，定於草廬之中。"
+  },
+  {
+   "id": "luoyang_seal",
+   "map": "luoyang",
+   "x": 24,
+   "y": 15,
+   "r": 3,
+   "name": "皇城井",
+   "text": "初平元年，董卓焚洛陽宮室，驅民西遷。孫堅入洛陽，於城南甄官井中得傳國玉璽，遂萌代漢自立之志。"
+  },
+  {
+   "id": "xiapi_lubu",
+   "map": "xiapi",
+   "x": 20,
+   "y": 18,
+   "r": 3,
+   "name": "下邳",
+   "text": "建安元年，呂布襲奪徐州，據下邳自守；建安三年，曹操決泗、沂水灌城，布眾潰，縊殺於白門樓。"
   }
  ],
  "world": {
@@ -1495,6 +1596,33 @@
     "y": 0.98,
     "map": "changsha",
     "city": true
+   },
+   {
+    "id": "luoyang",
+    "name": "洛陽",
+    "province": "司隸",
+    "x": 0.8,
+    "y": 0.02,
+    "map": "luoyang",
+    "city": true
+   },
+   {
+    "id": "xiapi",
+    "name": "下邳",
+    "province": "徐州",
+    "x": 0.98,
+    "y": 0.02,
+    "map": "xiapi",
+    "city": true
+   },
+   {
+    "id": "lingling",
+    "name": "零陵",
+    "province": "荊州",
+    "x": 0.65,
+    "y": 0.98,
+    "map": "lingling",
+    "city": true
    }
   ],
   "edges": [
@@ -1577,6 +1705,18 @@
    [
     "xiangyang",
     "changsha"
+   ],
+   [
+    "chenliu",
+    "luoyang"
+   ],
+   [
+    "xiaopei",
+    "xiapi"
+   ],
+   [
+    "changsha",
+    "lingling"
    ]
   ]
  },
@@ -2166,6 +2306,114 @@
    "x": 14,
    "y": 17,
    "to": "lz_caolu",
+   "auto": true
+  },
+  {
+   "id": "cln_luoyang",
+   "name": "西北口 → 洛陽城",
+   "map": "chenliu",
+   "x": 0,
+   "y": 12,
+   "to": "ly_south",
+   "auto": true
+  },
+  {
+   "id": "ly_south",
+   "name": "南門 → 陳留郊外",
+   "map": "luoyang",
+   "x": 23,
+   "y": 35,
+   "to": "cln_luoyang",
+   "auto": true
+  },
+  {
+   "id": "ly_well",
+   "name": "皇城井",
+   "map": "luoyang",
+   "x": 24,
+   "y": 15,
+   "to": "lyw_door",
+   "auto": true
+  },
+  {
+   "id": "lyw_door",
+   "name": "井口 → 洛陽城",
+   "map": "luoyang_well",
+   "x": 20,
+   "y": 0,
+   "to": "ly_well",
+   "auto": true
+  },
+  {
+   "id": "ly_chengfu",
+   "name": "程府",
+   "map": "luoyang",
+   "x": 34,
+   "y": 28,
+   "to": "cf_door",
+   "auto": true
+  },
+  {
+   "id": "cf_door",
+   "name": "府門 → 洛陽城",
+   "map": "chengfu",
+   "x": 14,
+   "y": 15,
+   "to": "ly_chengfu",
+   "auto": true
+  },
+  {
+   "id": "xps_xiapi",
+   "name": "南口 → 下邳城",
+   "map": "xiaopei",
+   "x": 21,
+   "y": 35,
+   "to": "xiapi_west",
+   "auto": true
+  },
+  {
+   "id": "xiapi_west",
+   "name": "西門 → 小沛城",
+   "map": "xiapi",
+   "x": 0,
+   "y": 18,
+   "to": "xps_xiapi",
+   "auto": true
+  },
+  {
+   "id": "xiapi_hefu",
+   "name": "何府",
+   "map": "xiapi",
+   "x": 44,
+   "y": 17,
+   "to": "hf_door",
+   "auto": true
+  },
+  {
+   "id": "hf_door",
+   "name": "府門 → 下邳城",
+   "map": "hefu",
+   "x": 11,
+   "y": 13,
+   "to": "xiapi_hefu",
+   "auto": true
+  },
+  {
+   "id": "css_lingling",
+   "name": "南門 → 零陵城",
+   "map": "changsha",
+   "x": 23,
+   "y": 35,
+   "to": "ll_north",
+   "auto": true
+  },
+  {
+   "id": "ll_north",
+   "name": "北門 → 長沙城",
+   "map": "lingling",
+   "x": 23,
+   "y": 0,
+   "to": "css_lingling",
    "auto": true
   }
  ]
