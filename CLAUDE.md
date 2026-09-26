@@ -15,9 +15,9 @@
 - 大 Step 開工先「核實」spec vs 代碼，更新 PLAN §1 同清單
 - 跨 spec 依賴：先做資料 + 掛鈎 + 測試，效果喺後面 Step 接，記入 PLAN §4
 - PLAN 標【待決】= 做到嗰步先問用家，唔好自己估
-- **下一步 = PLAN §3 第一個未剔 `[ ]`**（2026-09-25：S03a 可攻擊 NPC 完，下一步 S03b 天譴+城門）
+- **下一步 = PLAN §3 第一個未剔 `[ ]`**（2026-09-25：S03b 天譴+城門完，下一步 S03c 死亡道具）
 
-## 現況 (2026-09-25，六職全開；S03a 可攻擊 NPC 完；下一步 S03b 天譴+城門)
+## 現況 (2026-09-25，六職全開；S03b 天譴+城門完；下一步 S03c 死亡道具)
 - **全部喺 `client/` (Godot 4.7, GDScript)**：`rules/`(純函數)、`sim/`(單機世界模擬，狀態可存檔、種子 RNG)、`ui/`(`touch/` HUD 觸控 + `panels/` 正式面板)、`tests/`
 - 詳細現況 = PLAN §1；已做系統 → 檔案索引：
 
@@ -27,7 +27,7 @@
 | 戰鬥/術法/寶石/絕招/融合 | `combat.gd` `spell.gd` `jewel.gd` | `sim_combat.gd` `sim_skill.gd` `sim_ai.gd` | `monsters.json`(掉落由 `tools/import_drops.py` 生成) |
 | 職業特技（義士融合內建；仕女開鎖、道士超渡、**巫女潛行、辯士竊聽、美女透視**已開） | `class_skill.gd` + `stealth.gd` + `qieting.gd` + `ammo.gd` + `toushi.gd` | `sim_skill.gd`（`cmd_use_skill`/`cmd_skill_pick`/`cmd_stealth_cross`/`_try_qieting`/`_try_toushi`/`_spell_heal`）+ `sim_ai.gd`（弩箭消耗） | `class_skills.json` `rumors.json` `spells.json`（+恢復術一~七級） |
 | 裝備/耐久 | `equip.gd` | `sim_econ.gd` | `equip.json` |
-| 善惡/可攻擊 NPC | `karma.gd`（+`karma_after_kill_npc`/`counter_kill`） | `sim_combat.gd`（`_kill_bot`）+ `bot_sys.gd`（`_pk_flee`/`_crime_find_player`） | `world.json`（`bots.criminalPct/fleeChance/crimeAggro`） |
+| 善惡/可攻擊 NPC | `karma.gd`（+`karma_after_kill_npc`/`counter_kill`/`tianqian_*`/`city_banned`/`office_blocked`） | `sim_combat.gd`（`_kill_bot`/`_tianqian_reprisal`）+ `bot_sys.gd`（`_pk_flee`/`_crime_find_player`）+ `sim.gd` `_city_guard_check` + `sim_econ.gd` `cmd_rest`(拒住) + `sim_office.gd` `order_block`(罪犯拒官令) | `world.json`（`bots.criminalPct/fleeChance/crimeAggro/guardWarnTicks`） |
 | 生產/修理/天地商行/捐獻/市場 | `work.gd` `tiandi.gd` `market.gd` `shop.gd` | `sim_econ.gd` | `work.json` `recipes.json`(生成) `shops.json` `donation.json` |
 | 任務/歷史/委託/收集冊 | `quest.gd` `commission.gd` | `sim_quest.gd` `sim_comm.gd` | `quests.json` `quest_npcs.json` `commissions.json` |
 | 頭銜/官宅/官令 | `title.gd` | `sim_office.gd` | `titles.json`(生成) `office.json` |
