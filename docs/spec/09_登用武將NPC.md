@@ -3,7 +3,7 @@
 > 對應攻略: sy1_1_2(理念)、sy2_6_1~6(登用全頁)、sy2_7_*(結婚)、sy2_8_5(制度)、sy3_5(歷史任務→將軍令)
 > 原始資料: `D:\Download\sanguo\extracted\text\general_npc.csv`(1261 武將: 名/武力/智力/9 技能)、`general_skills.csv`、`Npc_table.tsv`(hp/mp/atk)、`recruitinfo.txt`(官方新手說明)
 > 現有實作: `sim/npc_brain.gd`(規則版決策)、`rules/npc_memory.gd`、`bot_sys.gd`(居民)、Step 6 未做 LLM
-> **現狀 (2026-09-26, S09b)**: 居民化（S09a）+ 傳聞擴散／忠誠事件（S09b）完成 —— `rules/rumor.gd`（目擊事件→傳聞類型、延遲、key）+ `NpcMemory.rumors` + `sim` 每日反思批次（同城即日、跨城延遲 1~3 game 日，A 城殺人魔名聲傳到 B 城）+ 玩家謀殺善 NPC → 義理念同伴忠誠 −15；`sim.rumor_view()`/`known_rumors()` read-model。對話仍規則版 (`NpcBrain`)，LLM 未接。測試 `tests/run_residents.gd`、`tests/run_rumor.gd`。
+> **現狀 (2026-09-26, S09c-a)**: 居民化（S09a）+ 傳聞擴散／忠誠事件（S09b）+ 內政協助／內政·生產·經濟被動特技（S09c-a）完成 —— `general_skills.json` 39~43、45~51 `impl:true`（內政協助 `domesticAssist` / 商才 `tradeBuyMul·tradeSellMul` / 生產 `workExpAdd` / 進階 `craftRateAdd`）+ `cfg.assist`（政治 = round(智力×0.5)）；`rules/general.gd` `pol_of`/`assist_bonus`/`work_exp_mult`/`craft_rate_add`/`trade_mul`；`sim_core` 4 個空 hook（`_companion_pol_bonus`/`_work_exp_mult`/`_craft_rate_add`/`_companion_trade_mul`）由 `sim_recruit` 覆寫；官宅內政／營地內政／營地監督／工作經驗／進階成功率／買賣價全部接同伴政治＋特技。測試 `tests/run_residents.gd`、`tests/run_rumor.gd`、`tests/run_general.gd`（+F 群組）。尚欠：主動特技 21/22/32/38、鑑定 44、國戰類（S10）。對話仍規則版 (`NpcBrain`)，LLM 未接。
 > 【原】= 攻略明文；【自訂】= 自己設計。
 
 ## 1. 居民 NPC（現有 bot → 居民化）
@@ -59,11 +59,13 @@
 - 武將用品：藥膳師 NPC（許昌市集【原】）買武將補品；玩家 `cmd_use_item` 對準武將就用
 - **贈與寶物**（武將寶物 2 格【原】）：速度之石×5種/兵量之石（帶兵 7000）/物攻之石×6/物防之石×3/術攻之石×6/術防之石×3/武材之石×5/軍略之石×5 —— 入咗寶物唔可以攞返，登用完跟武將走【原】！同類別高數值取代低數值（低嘅消失）【原】
 - 內政協助：武將屬性（政治）加入官宅工作/營地監督完成度
+  - **實裝 (S09c-a)**：政治【自訂】= round(智力×0.5)（generals 表冇政治）；加成 = 政治/200 + 內政特技 `domesticAssist`（39 屯田/40 築城/41 治水/42 開墾 各 +0.2），封頂 1.0；營地監督完成度 = `RulesCamp.supervise_points` 政治改用主公 + 同伴政治。同伴跟住主公即生效（唔限距離，同政才/辯才一致）。
 - 帶兵：登用武將喺國戰 = 第四部隊（兵力=武將頭銜帶兵，≤7000）【原】；國戰未完登用時間到 → 打完先走【原】
 
 ### 3.4 武將特技
 
 - general_skills.csv（1261 武將 × 9 技能）+ 攻略「70 項特技」：每刻恢復 HP / 發話唔扣飲水度 / 無限遁地 / 使用職業特技… → skill_id 對照表 `data/general_skills.json`；特技效果逐項規則化（大部分 = passive buff，容易做）。
+  - **實裝 (S09c-a)**：被動 39~43、45~51（見 §3.3 內政協助 + 下表）。`44 鑑定` 冇鑑定系統、主動 21 遁地/22 職業特技/32 挑釁/38 急救 及國戰類 23~31/33~37/53~70 未做（PLAN §4 / S10）。新特技全部經 `pin` 指派（唔入 `drawPool`，依 S07d 凍結慣例）。
 
 ## 4. NPC 好感 / 忠誠（規則層，已實作 + 擴充）
 

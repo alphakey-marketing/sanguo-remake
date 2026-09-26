@@ -19,6 +19,10 @@ func _init() -> void:
 	t_skill_owner(data)
 	t_skill_misc(data)
 	t_skill_mount(data)
+	t_skill_assist(data)
+	t_skill_work(data)
+	t_skill_craft(data)
+	t_skill_trade(data)
 	t_comp_ult(data)
 	t_comp_spell(data)
 	t_team_exp_split()
@@ -192,7 +196,7 @@ func t_data(data: GameData) -> void:
 		if bool(s["impl"]):
 			n_impl += 1
 			check(not (s.get("eff", {}) as Dictionary).is_empty(), "特技 %s: impl 要有 eff" % s["name"])
-	check(ids.size() == 70 and n_impl == 21, "特技: id 唔重複 + 已實作 21 項 (而家 %d)" % n_impl)
+	check(ids.size() == 70 and n_impl == 33, "特技: id 唔重複 + 已實作 33 項 (而家 %d)" % n_impl)
 	var bad_ov := 0
 	for nm in data.gen_skill_override:
 		var s: Dictionary = data.gen_skill_by_id.get(int(data.gen_skill_override[nm]), {})
@@ -602,6 +606,112 @@ func t_skill_mount(data: GameData) -> void:
 	check(is_equal_approx(sim._mount_intimacy_mult(sim.ent(pid)), 2.0), "馴馬: intimacy mult = 2.0")
 	_with_skill(c, 3)
 	check(is_equal_approx(sim._mount_intimacy_mult(sim.ent(pid)), 1.0), "無同伴特技 → mult = 1.0")
+
+
+# ---------------- F: S09c 內政協助 + 被動特技 (39~43 / 45~51) ----------------
+func t_skill_assist(data: GameData) -> void:
+	var r := _comp_setup(data)
+	var sim: Sim = r[0]
+	var ch: Dictionary = r[2]
+	var c: Dictionary = r[6]
+	var gid: int = r[5]
+	var g: Dictionary = data.general_by_id[gid]
+	var cfg: Dictionary = data.gen2_cfg["assist"]
+	var pol := RulesGeneral.pol_of(g, cfg)
+	check(pol == MathX.js_round(int(g["int"]) * 0.5) and pol > 0, "武將政治: 由智力換算 (智力 %d → 政治 %d)" % [int(g["int"]), pol])
+	_with_skill(c, 0)
+	check(is_equal_approx(sim._domestic_assist_bonus(ch), float(pol) / 200.0), "內政協助: 冇內政特技 = 政治/200")
+	check(sim._companion_pol_bonus(ch) == pol, "營地監督: 同伴政治加入 (hook)")
+	_with_skill(c, 39)
+	check(is_equal_approx(sim._domestic_assist_bonus(ch), float(pol) / 200.0 + 0.2), "內政協助: 屯田 (39) 額外 +0.2")
+	_with_skill(c, 40)
+	check(is_equal_approx(sim._domestic_assist_bonus(ch), float(pol) / 200.0 + 0.2), "內政協助: 築城 (40) 額外 +0.2")
+	_with_skill(c, 42)
+	check(is_equal_approx(sim._domestic_assist_bonus(ch), float(pol) / 200.0 + 0.2), "內政協助: 開墾 (42) 額外 +0.2")
+	# 主公政治 n 大 → 封頂 maxAssist (純函數)
+	check(is_equal_approx(RulesGeneral.assist_bonus(1000, {}, cfg), float(cfg["maxAssist"])), "內政協助: 封頂 maxAssist (1.0)")
+	check(sim._companion_pol_bonus(ch) > 0, "內政協助: 主公政治入營地監督")
+	# 冇同伴 = 零改變
+	sim.cmd_companion_dismiss(r[1])
+	check(is_equal_approx(sim._domestic_assist_bonus(ch), 0.0) and sim._companion_pol_bonus(ch) == 0, "解散同伴 → 內政協助歸零")
+
+
+func t_skill_work(data: GameData) -> void:
+	var r := _comp_setup(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	var c: Dictionary = r[6]
+	_with_skill(c, 0)
+	ch["workLv"] = {}
+	sim._work_gain(pid, ch, "mining", 4)
+	check(int((ch["workLv"]["mining"] as Dictionary)["exp"]) == 4, "工作經驗: 冇生產專精 = 原值 4")
+	_with_skill(c, 45)
+	ch["workLv"] = {}
+	sim._work_gain(pid, ch, "mining", 2)
+	check(int((ch["workLv"]["mining"] as Dictionary)["exp"]) == 3, "採礦專精 (45): 經驗 ×1.5 → 3")
+	ch["workLv"] = {}
+	sim._work_gain(pid, ch, "woodcutting", 2)
+	check(int((ch["workLv"]["woodcutting"] as Dictionary)["exp"]) == 2, "採礦專精: 唔影響伐木 (技能唔啱)")
+	# 46/47/48 分別對應伐木/狩獵/釣魚
+	_with_skill(c, 46)
+	check(is_equal_approx(sim._work_exp_mult(ch, "woodcutting"), 1.5) and is_equal_approx(sim._work_exp_mult(ch, "mining"), 1.0),
+		"伐木專精 (46): 只加 woodcutting")
+	_with_skill(c, 47)
+	check(is_equal_approx(sim._work_exp_mult(ch, "hunting"), 1.5), "狩獵專精 (47): hunting ×1.5")
+	_with_skill(c, 48)
+	check(is_equal_approx(sim._work_exp_mult(ch, "fishing"), 1.5), "釣魚專精 (48): fishing ×1.5")
+
+
+func t_skill_craft(data: GameData) -> void:
+	var r := _comp_setup(data)
+	var sim: Sim = r[0]
+	var ch: Dictionary = r[2]
+	var c: Dictionary = r[6]
+	_with_skill(c, 0)
+	check(is_equal_approx(sim._craft_rate_add(ch, "cooking"), 0.0), "生產專精: 冇特技 = 成功率 +0")
+	_with_skill(c, 49)
+	check(is_equal_approx(sim._craft_rate_add(ch, "cooking"), 0.1) and is_equal_approx(sim._craft_rate_add(ch, "alchemy"), 0.0),
+		"烹飪專精 (49): 只加 cooking +10%")
+	_with_skill(c, 50)
+	check(is_equal_approx(sim._craft_rate_add(ch, "alchemy"), 0.1), "製藥專精 (50): alchemy +10%")
+	_with_skill(c, 51)
+	check(is_equal_approx(sim._craft_rate_add(ch, "smithing"), 0.1), "鑄造專精 (51): smithing +10%")
+	check(is_equal_approx(RulesGeneral.craft_rate_add({}, "cooking"), 0.0), "生產專精: 空 eff = 0")
+
+
+func t_skill_trade(data: GameData) -> void:
+	var r := _comp_setup(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	var c: Dictionary = r[6]
+	var herb: Dictionary = {}
+	for s in data.shops:
+		if String(s["id"]) == "herbalist":
+			herb = s
+	_put(sim, pid, int(herb["x"]), int(herb["y"]) + 1)
+	_with_skill(c, 0)
+	ch["gold"] = 100000
+	sim.cmd_buy(pid, 30015, 1)
+	var cost0 := 100000 - int(ch["gold"])
+	ch["gold"] = 100000
+	_with_skill(c, 43)
+	sim.cmd_buy(pid, 30015, 1)
+	var cost1 := 100000 - int(ch["gold"])
+	check(cost1 < cost0, "商才 (43): 買入價 -5%% (%d → %d)" % [cost0, cost1])
+	# 賣出
+	RulesShop.add_item(ch["bag"], 30015, 1)
+	ch["gold"] = 0
+	sim.cmd_sell(pid, 30015, 1)
+	var sell0 := int(ch["gold"])
+	RulesShop.add_item(ch["bag"], 30015, 1)
+	ch["gold"] = 0
+	_with_skill(c, 0)
+	sim.cmd_sell(pid, 30015, 1)
+	var sell_base := int(ch["gold"])
+	check(sell0 > sell_base, "商才 (43): 賣出價 +5%% (%d > %d)" % [sell0, sell_base])
+	check(is_equal_approx(float(RulesGeneral.trade_mul({}).get("buy", 1.0)), 1.0), "商才: 空 eff = 原價")
 
 
 func t_comp_ult(data: GameData) -> void:

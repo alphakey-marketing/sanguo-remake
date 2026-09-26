@@ -939,6 +939,26 @@ func _domestic_assist_bonus(_ch: Dictionary) -> float:
 	return 0.0
 
 
+# 同伴政治 hook (S09c)：sim_recruit override。回傳同伴政治值 (加落營地監督完成度)；0 = 冇
+func _companion_pol_bonus(_ch: Dictionary) -> int:
+	return 0
+
+
+# 生產專精 hook (S09c)：sim_recruit override。工作技能經驗倍率 (1.0 = 冇)
+func _work_exp_mult(_ch: Dictionary, _skill: String) -> float:
+	return 1.0
+
+
+# 生產專精 hook (S09c)：sim_recruit override。進階技能成功率加成 (0.0 = 冇)
+func _craft_rate_add(_ch: Dictionary, _skill: String) -> float:
+	return 0.0
+
+
+# 商才 hook (S09c)：sim_recruit override。買賣價乘數 {buy, sell}
+func _companion_trade_mul(_ch: Dictionary) -> Dictionary:
+	return {}
+
+
 # 友好特技「聖體」: 每刻自動回復倍率 (sim_war_beast 覆寫；1.0 = 冇效果)
 func _friend_regen_mult(_e: Dictionary) -> float:
 	return 1.0
