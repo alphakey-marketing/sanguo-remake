@@ -27,7 +27,7 @@
 | 05 生產經濟 | 🟡 | ✅ | 6 初階 + 5 進階 + 2318 配方、修理、工具店、天地商行、捐獻、市場 | 產出 1~2 件、特製/白金/御賜工具、大宗師、4 類商店補齊、天災停進貨、城際貿易提示 |
 | 06 任務 | 🟡 | ✅ | 框架、新手 5 條、義士絕招 3 條、官令 7 條、歷史 11+1 條、委託、戰役、團體任務 17 條（16 條義勇軍限定 + 紫虛上人非義勇軍版，S06c）、其他職絕招 15 條（S06d）、**專長任務 8 條（天文/地理認證 1~4 級，S06e）** | 四~六招、結婚、左慈渾天儀任務、國戰專長（→S10） |
 | 07 座騎戰騎 | 🟡 | 🟡 | 17a 座騎全套 + UI；17b 繁衍/馬戰 **sim 有、`main.gd` 有派送、面板未有掣**；18 戰騎純規則；**S07b（leg 5）戰騎 sim 整合**（`sim/sim_war_beast.gd`：馬廄馴養買獸/最多 3 隻/出戰跟隨+自動攻擊+戰鬥特技/吸 exp/死亡忠誠−1/走佬/寄馬廄）；**S07c（leg 6）友好特技效果接系統**；**S07d（leg 7）NPC 拍賣場 + 武將特技「馴馬」+ 抽技固定池** | 繁衍/馬戰/改名 UI；戰騎 UI 面板；原版捕獲途徑；其餘友好技效果（聖靈/遁地/奇門/脫出/召喚/神行/回城/火焰/飛影/狂力/開光/忠誠/巨力/穩重/地行/神獸/嗅血/野性/獅魂/王者） |
-| 08 名聲義勇軍 | 🟡 | 🟡 | 名聲、頭銜 60 階、官宅（討取/官令/捐獻/月俸/行動丹）、**義舉證明（四類 20 項）+ 城池進貢/好感（S08a）**、**城池屬性 8 項 + 官宅內政 6 種（S08b）**、**救災（S08c）**、**名額競爭（S08d）**、**義勇軍成立 + 定居 + 帶兵量（S08e）**、**營地建設 10 設施 + 義勇軍工作 22 項 + 評定會議（S08f）** | 民心、法令 |
+| 08 名聲義勇軍 | 🟡 | ✅ | 名聲、頭銜 60 階、官宅（討取/官令/捐獻/月俸/行動丹）、**義舉證明（四類 20 項）+ 城池進貢/好感（S08a）**、**城池屬性 8 項 + 官宅內政 6 種（S08b）**、**救災（S08c）**、**名額競爭（S08d）**、**義勇軍成立 + 定居 + 帶兵量（S08e）**、**營地建設 10 設施 + 義勇軍工作 22 項 + 評定會議（S08f）**、**民心 + 6 條城池法令（S08g；邏輯層，城池佔領啟動留 S10c）** | 佔城啟動（→S10c）、法令下游（山洞商店/PK/善惡入城） |
 | 09 登用武將 | 🟡 | 🟡 | 居民 bot/記憶/brain、登用 v1+v2、同伴 6 指令、20 passive 特技 | `residents.json` 居民化、傳聞擴散、忠誠事件規則、其餘 50 特技、內政協助、LLM 層（原 Step 20） |
 | 10 國戰 | ❌ | ❌ | — | 全部（D-3【待決】） |
 | 11 資料對照 | 🟡 | — | items/monsters/generals/recipes/titles 導入器 | `material_ids.json`、箭矢定義、商城道具單機化定案、recruitinfo 說明頁、warbtl 對照 |
@@ -234,9 +234,9 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
   - 完成（spec 08 §7~§8 / 攻略 sy2_8_5、sy2_8_6、sy2_8_8）：`data/camp.json` 10 設施（初始級/基本材料/設施 store 上限表/規模→工作指派份數 50→100/規模→階級人數上限/4 級典農靈台、5 級司農）+ 22 項工作（內政 10、軍事 3、軍備 9）+ 評定指派 3 類（捐獻/監督/商情）+ 績效→功績對照表 14 段【原】。新 `rules/camp.gd`（`upgrade_cost` = 基本×目標級數、`supervise_points` = 0.5 + 政治×0.01 + 木匠 lv×0.02 + 身份加成、`work_cap`/`grade_limit`/`facility_cap`/`positions_at`）；新 `rules/militia_work.gd`（22 工作定義、有/無城池過濾、指派類別、`merit_delta`、`performance_gain`）。`sim/sim_office.gd` +`camp_view`/`cmd_camp_upgrade`/`cmd_camp_supervise`/`militia_work_view`/`cmd_militia_work`/`eval_view`/`cmd_eval_assign`/`cmd_eval_meeting`/`_eval_daily`/`_on_militia_quest_done`/`_militia_quest_reset`；`sim.gd` `_daily_hook` 加每月初一結算 + 重複任務清零。團體任務接軌：`data/quests.json` 16 條義勇軍 group 任務 +`repeat:monthly`（`group_zixu` daily）、`data/quest_npcs.json` `shenjing_lao`/`luopo_lao` +`dayWindow`（16~21 / 10~15 日）、`rules/quest.gd` `npc_visible`/`npc_shown` 加 `day` 參數 + `day_in_window`、完成 group 任務 → 義勇軍績效 +30。
   - 偏離【自訂】/【待決→推薦方針】：原作「杉竹 / 白石礦石」items.json 冇 → 用現有最接近資源（杉竹→箭竹 25054、白石礦石→石頭 25001）。營地指令唔要求實體座標，用「根據地城池」代表（`city_at(e) == m.city`），唔另加地圖設施。單機玩家固定頭目身份（`m.role="banner"`）；「有城池」= `m.hasCity` 旗（佔城系統 S10 前 false → 淨得監督/商情）。監督完成度目標 100【自訂】。軍備/捐獻轉換率、每工作績效值皆【自訂】（spec 只寫影響方向）。徵兵/軍馬為 store 加減，兵種/戰場留 S10。商情情報值 0~100 下游（睇商店/武將情報 85/80 門檻）留 S09/S10。
   - 驗收：新 `tests/run_camp.gd` 132 項（資料/純函數/升級監督/22 工作/專長/評定會議/月初結算/團體任務績效/每月每日重複/日窗口/存檔 roundtrip+舊存檔/決定性）；`sh tools/run_tests.sh` 全 PASS（尾行 `ALL OK`）。
-- [ ] **S08g 民心 + 法令**（要有城池 → 可能要等 S10 攻城；先做資料 + 規則 + 測試）
-- UI：官宅面板分頁（頭銜/官令/內政/救災/義舉）、義勇軍面板、營地面板、公佈欄
-- 驗收：`tests/run_title.gd` 擴充 + `tests/run_militia.gd`（新）
+- [x] **S08g 民心 + 法令**（要有城池先啟動 → 佔城系統 S10 未有）：先做資料 + 規則 + 測試。`world.json` +`cityMorale`（初始 100/cap/`taxDrop` 高稅 −4/`famePerMorale`/`monthlyGainCap`/`popLossRate`/`recruitFloor`）+`cityLaw`（行動力 100/每月 1 次/6 條法令）；新 `rules/civic.gd`（民心 clamp/tax_drop/morale_gain/prod_mult/pop_after/recruit_mult + 法令 default/change_block/ap_cost）；`sim_core` `state["cityGov"]`+`state["cityPop"]` + `city_gov_active`/`city_gov_init`/`city_morale`/`law_allows`/`city_pop`/`city_id_at`/`civic_fame_gain`；`sim_office` `_morale_daily`（每月初一評比：高稅 −4 + 人口流失 + 月度增益歸零）/`city_gov_view`/`cmd_city_tax`/`cmd_city_law`；連動：`RulesMarket` prod × 民心/100（`sim.gd _market_daily`）、動態人口入市場、徵兵 ×`recruit_mult`、救災/捐贈官令 +民心（每 10 名聲 +0.1，上限 +10/月）、`crafts` 法令 → 大宗師閘、`guard` 法令 → 城門衛兵閘、`cityDrop` 法令 → 新 `cmd_drop_item`；新 `tests/run_civic.gd` 87 項
+- UI：官宅面板分頁（頭銜/官令/內政/救災/義舉）、義勇軍面板、營地面板、公佈欄、城池民心/法令面板
+- 驗收：`tests/run_title.gd` 擴充 + `tests/run_militia.gd`（新）+ `tests/run_civic.gd`（新）
 
 ### S09 登用武將 / NPC / LLM（spec 09）
 - [ ] **S09a 居民化**：`data/residents.json`（性格/日程/role），bot → 居民；每城 12~20 人
@@ -289,7 +289,7 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
 | S02c-辯士 | 弩箭消耗來源：商店賣箭 / 木匠製箭（`RulesAmmo` 耗箭邏輯已通，只欠補箭途徑） | S05 |
 | S02c-美女 | 恢復術一~七級來源：任務/戰役掉寶（`spells.json huifu1~7` + items 30697+ 已定義可用，只欠掉落途徑） | S04 |
 | S03a | 叫衛兵 `guard_alert` 事件 + NPC 目擊記錄（`ch criminal/murder/witness`，`_kill_bot` 已發） → 城門衛兵拒入殺人魔 + 罪犯拒官令 + 天譴 | **S03b（已接）** |
-| S03b | 城門「拒入城」採用「城內服務拒絶 + 定期 guard_warn」而非硬閂城門（連續地圖 + 死亡返客棧先天衝突；見樣 ·3 完成註）——若日後 spec 08 法令 7「善惡法令容許殺人魔入城」要放寬，接 `world.json bots.guardWarnTicks` / `cmd_rest` / `_city_guard_check` 開關 | S08g |
+| S03b | 城門「拒入城」採用「城內服務拒絶 + 定期 guard_warn」而非硬閂城門（連續地圖 + 死亡返客棧先天衝突；見樣 ·3 完成註）——**S08g 已接 `guard` 城池法令**（`_city_guard_check` 冇僱護衛就唔警告；未佔城 = 照舊）。spec 08 法令 7「善惡 ≥1001 非本勢力入城」單機玩家 = 定居者豁免，留佔城/勢力系統 | S10c（`dangerEntry` 下游） |
 | S05b | 工具正式來源（團體任務） | **S06c（任務已實裝）+ S08f（義勇軍 monthly 可重接）** |
 | S06c | 義勇軍限定團體任務 | **S08f（已接：monthly 重複、日窗口、完成 → 績效）** |
 | S07c | 撿寶/幸運護身還魂/聖體 | 要 S04a/S03c/S01a 先（**已接**：撿寶自動執 `_drop_items` 產出、幸運/護身/還魂 friendly 代替死亡道具、聖體 `_safe_regen_tick` ×2） |
@@ -314,11 +314,12 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
 | S08f | 商情情報值（`camp.trade` 0~100）未有下游（原版：85 睇商店 / 80 睇武將情報）| S09/S10 |
 | S08f | 「杉竹 / 白石礦石」items.json 冇 → 用箭竹 25054 / 石頭 25001 代替（營地升級材料）| 後續道具批次（如要忠於原作名） |
 | S08b | 內政武將政治協助（同伴/部將加成）：`_domestic_assist_bonus` hook 已備（暫 0.0），`RulesExpert.domestic_mult` 已食專長 lv | S09c |
-| S08g | 民心/法令要有城池 | S10c |
+| S08g | 民心/法令邏輯做完；城池佔領（`state["cityGov"]` 啟動入口 `city_gov_init`）要接城池勢力/攻城 | S10c |
+| S08g | 法令下游未有系統嘅先存落 gov：`caveShops` 山洞商店（現冇山洞商店）、`cityPk` 城內 PK（原作未開放）、`dangerEntry` 善惡 ≥1001 非本勢力入城（單機玩家 = 定居者豁免） | S10（佔城/勢力）或後續場景批次 |
 | S01c | 渾天儀來源（商城道具單機化定案，`sim.gd WEATHER_ITEM 26029` 已資料有、冇商店賣） | S11 |
 | S09c | 國戰類特技/寶物 | S10 |
 | S05c | 白晝之珠正式來源（神秘洞窟打怪掉落，v1 後期新場景）；過渡用官宅貢獻兌換（`cmd_master_redeem_baizhu`） | 後續批次（同 通天關/黑山寨 等一齊考慮） |
-| S05c | 大宗師合成場景開唔開放由城主法令決定；而家常開 | S08 法令 |
+| S05c | 大宗師合成場景開唔開放由城主法令決定 → **已接** `crafts` 法令（`cmd_master_gem`/`cmd_master_treasure` 閘）；未佔城 = 照舊常開 | S08g 已接 |
 | S07b | 戰騎獲得途徑【待決→推薦方針】原版捕獲/任務/商店；而家用馬廄「戰騎馴養」買幼獸 + 每隻出戰；原版捕獲機制未做 | S07d **已加 NPC 拍賣場隨機上架** / 後續捕獲批次 |
 | S07b | 戰騎戰鬥特技 buff/debuff 部分 stat：**leg 6 已接** spellAtk/lifesteal/mpRegen（beastBuff 下游）+ 降敵 def/atk（beastDebuff 下游）；debuff 嘅 spellDef/hit/evade 對物理怪冇下游效果 | 後續（有需要先） |
 | S07c | 友好技導航/天眼只出 read-model flag（`beast_view.effects`），小地圖/顯示 NPC 嘅 UI 延後 | 後續專 UI Step |

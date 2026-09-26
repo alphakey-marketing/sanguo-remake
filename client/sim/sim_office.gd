@@ -763,7 +763,11 @@ func _relief_reward(e: Dictionary, ch: Dictionary, od: Dictionary) -> void:
 	var cfg := relief_cfg()
 	var fame := int(cfg.get("fame", 10))
 	ch["fame"] = int(ch.get("fame", 0)) + fame
+	# S08g：救災官令 → 所屬城池民心【自訂】（每 10 名聲 +0.1，上限 +10/月）
+	var mg := civic_fame_gain(ch, fame)
 	var tail := ""
+	if mg > 0.0:
+		tail += "，城池民心 +%.1f" % mg
 	var pe := int(cfg.get("polExp", 0))
 	if pe > 0:
 		var r := RulesTiandi.cha_gain(int(ch["attrs"]["pol"]), int(ch.get("polExp", 0)), pe,
@@ -1110,6 +1114,118 @@ func militia_has_city(ch: Dictionary) -> bool:
 	return bool(_militia_read(ch).get("hasCity", false))
 
 
+# ================= S08g 民心 + 城池法令 (spec 08 §9/§10 / 攻略 sy2_8_14, sy2_8_5 尾) =================
+# 【原】民心/法令要有城池（城主）先啟動。單機未有佔城系統（S10）→ state["cityGov"] 預設空 =
+# 未啟動（全部 helper 兼容）；城池佔領入口（city_gov_init 掛到佔城）留 S10c。
+func civic_cfg() -> Dictionary:
+	return _civic_cfg()
+
+
+func city_law_cfg() -> Dictionary:
+	return _law_cfg()
+
+
+# 玩家係唔係呢座城嘅城主（有城池 + 定居城市 = 嗰座城）
+func _is_city_lord(ch: Dictionary, city_id: String) -> bool:
+	if city_id == "":
+		return false
+	var m := _militia_read(ch)
+	return bool(m.get("hasCity", false)) and String(m.get("city", "")) == city_id
+
+
+# 每月初一民心評比：高稅 → 民心 −4【原】；民心低 → 人口流失【自訂份量】；本月官令增益歸零
+func _morale_daily(day: int) -> void:
+	var md := int(data.world["clock"].get("monthDays", 30))
+	if not RulesTitle.is_month_start(day, md):
+		return
+	var cfg := _civic_cfg()
+	for e in ents.values():
+		if not e.has("ch"):
+			continue
+		var ch: Dictionary = e["ch"]
+		var m := _militia_read(ch)
+		if not bool(m.get("hasCity", false)):
+			continue
+		var city := String(m.get("city", ""))
+		if city == "" or not city_gov_active(city):
+			continue
+		var g := city_gov(city)
+		var drop := RulesCivic.tax_drop(String(g.get("tax", "low")), cfg)
+		if drop != 0:
+			g["morale"] = clampf(float(g.get("morale", 100)) - float(drop), 0.0, float(RulesCivic.cap(cfg)))
+		var pop := city_pop(city)
+		var np := RulesCivic.pop_after(city_morale(city), pop, cfg)
+		if np != pop:
+			city_pop_set(city, np)
+			_emit({"k": "city_pop", "id": int(e["id"]), "city": city, "pop": np})
+		g["moraleGain"] = 0.0
+		_emit({"k": "city_morale", "id": int(e["id"]), "city": city, "morale": city_morale(city)})
+
+
+# read-model：城池民心 + 法令頁（UI 用；未佔城 = active false）
+func city_gov_view(city_id: String) -> Dictionary:
+	var g := city_gov(city_id)
+	var laws: Array = []
+	for l in RulesCivic.laws(_law_cfg()):
+		var lid := String(l["id"])
+		laws.append({"id": lid, "name": String(l.get("name", lid)), "desc": String(l.get("desc", "")),
+			"on": bool((g.get("laws", {}) as Dictionary).get(lid, l.get("default", true)))})
+	return {"city": city_id, "name": _settle_city_name(city_id), "active": not g.is_empty(),
+		"morale": city_morale(city_id), "pop": city_pop(city_id),
+		"tax": String(g.get("tax", _civic_cfg().get("defaultTax", "low"))),
+		"lastLawDay": int(g.get("lastLawDay", -1)), "apCost": RulesCivic.ap_cost(_law_cfg()), "laws": laws}
+
+
+# 設定城池稅率（城主要求；唔扣行動力，非每月 1 次限制）
+func cmd_city_tax(id: int, tax: String) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var ch: Dictionary = e["ch"]
+	var m := _militia_read(ch)
+	var city := String(m.get("city", ""))
+	if not _is_city_lord(ch, city):
+		return _msg(id, "要有城池先設定得稅率")
+	if not (_civic_cfg().get("taxDrop", {}) as Dictionary).has(tax):
+		return _msg(id, "冇呢個稅率")
+	var g := city_gov_init(city)
+	g["tax"] = tax
+	_emit({"k": "city_tax", "id": id, "city": city, "tax": tax})
+	_msg(id, "%s 稅率設為「%s」" % [_settle_city_name(city), tax])
+
+
+# 更改城池法令（城主每月 1 次、需行動力 100、立即生效【原】）
+func cmd_city_law(id: int, law_id: String, on: bool) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var ch: Dictionary = e["ch"]
+	var m := _militia_read(ch)
+	var city := String(m.get("city", ""))
+	if not _is_city_lord(ch, city):
+		return _msg(id, "要有城池先改得法令")
+	var lcfg := _law_cfg()
+	var ld := RulesCivic.law_def(lcfg, law_id)
+	if ld.is_empty():
+		return _msg(id, "冇呢條法令")
+	var g := city_gov(city)
+	if g.is_empty():
+		g = city_gov_init(city)
+	var day := int(_clock()["day"])
+	var why := RulesCivic.change_block(int(g.get("lastLawDay", -1)), day, lcfg)
+	if why != "":
+		return _msg(id, why)
+	var cost := RulesCivic.ap_cost(lcfg)
+	if ap_of(ch) < cost:
+		return _msg(id, "行動力不足（要 %d）" % cost)
+	ch["ap"] = ap_of(ch) - cost
+	g["laws"][law_id] = on
+	g["lastLawDay"] = day
+	_emit({"k": "city_law", "id": id, "city": city, "law": law_id, "on": on})
+	_msg(id, "%s 法令「%s」%s（行動力 -%d）" % [_settle_city_name(city), String(ld.get("name", law_id)),
+		"開放" if on else "關閉", cost])
+
+
 func _at_home(e: Dictionary, m: Dictionary) -> bool:
 	var city := String(m.get("city", ""))
 	return city != "" and city_at(e) == city
@@ -1348,7 +1464,8 @@ func _work_apply(e: Dictionary, ch: Dictionary, m: Dictionary, c: Dictionary, w:
 				RulesExpert.add_exp(ch, data.experts, exp_id, 3)
 			return "營地訓練度 +%d（而家 %d）" % [add_t, int(c["train"])]
 		"recruit":
-			var got := _store_add(c, m, "soldiers", 10000)
+			var mm := RulesCivic.recruit_mult(city_morale(String(m.get("city", ""))), _civic_cfg())
+			var got := _store_add(c, m, "soldiers", int(round(10000.0 * mm)))
 			return "招募士兵 +%d（而家 %d）" % [got, int(c["stores"]["soldiers"])]
 		"armament", "donate":
 			if w.has("costGold"):
