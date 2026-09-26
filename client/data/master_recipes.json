@@ -1,0 +1,23 @@
+{
+  "_note": "S05c 大宗師合成術（spec 05 §5，【原】=系統框架/條件；細節數值+產出地自訂，因原表 sy2_2_5 未逐格搬字）",
+  "_note2": "新初階/進階材料原文產出地喺豫荊以外城池（廬江/北平/壽春/北海/南皮/柴桑）；單機只做豫荊【自訂簡化】改為：用御賜工具做初階/進階工作時有機會額外得返呢件材料（唔加額外 SP/耐久/exp 消耗，掛喺原有 cmd_work/cmd_craft 一齊出）",
+  "condition": { "basicLv": 100, "advLv": 20 },
+  "gatherChance": 0.05,
+  "materials": {
+    "farming": 26075, "fishing": 26076, "hunting": 26077, "mining": 26078,
+    "woodcutting": 26079, "herbalism": 26080,
+    "cooking": 26081, "smithing": 26082, "mending": 26083, "carpentry": 26084, "alchemy": 26085
+  },
+  "baizhu": 26086,
+  "_note3": "白晝之珠原文= 神秘洞窟打怪掉落（v1 後期新場景，見 PLAN §4 延後掛鈎）；過渡來源同 S05b 御賜工具一樣用官宅貢獻兌換",
+  "baizhuRedeemContrib": 600,
+  "gems": {
+    "cooking":   { "item": 26087, "basicFrom": "farming",     "need": [[26075, 5], [26081, 3], [26086, 1]] },
+    "alchemy":   { "item": 26088, "basicFrom": "herbalism",   "need": [[26080, 5], [26085, 3], [26086, 1]] },
+    "smithing":  { "item": 26089, "basicFrom": "mining",      "need": [[26078, 5], [26082, 3], [26086, 1]] },
+    "mending":   { "item": 26090, "basicFrom": "mining",      "need": [[26078, 5], [26083, 3], [26086, 1]] },
+    "carpentry": { "item": 26091, "basicFrom": "woodcutting", "need": [[26079, 5], [26084, 3], [26086, 1]] }
+  },
+  "treasures": [26092, 26093, 26094, 26095, 26096],
+  "synth": { "minGems": 2, "maxGems": 5, "base": 0.15, "perLv": 0.01 }
+}

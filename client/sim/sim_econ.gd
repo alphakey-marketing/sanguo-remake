@@ -279,11 +279,19 @@ func cmd_storage_rest(id: int) -> void:
 	_msg(id, "喺工作區小屋休息完畢，花 %d 金" % cost)
 
 
-# 工具耐久上限 (新手工具 / 正式工具)
+# 工具耐久上限 (新手/普通/特製/白金/御賜, S05b spec 05 §2)
 func _tool_max_dur(skill: String, item: int) -> int:
+	var tier := String(data.tool_tier.get(item, ""))
+	if tier != "":
+		return RulesWork.tool_tier_dur(tier, data.work_meta["tierBonus"])
 	var sk := _skill_def(skill)
 	var td: Dictionary = data.work_meta.get("toolDurability", {})
 	return int(td.get("starter" if int(sk.get("starterTool", -1)) == item else "normal", 50))
+
+
+# 3 等工具成功率加成 (S05b)：普通/新手 = 0
+func _tool_bonus(item: int) -> float:
+	return RulesWork.tool_tier_bonus(String(data.tool_tier.get(item, "")), data.work_meta["tierBonus"])
 
 
 # 做完一次工作: 耐久剩 toolSellAt 自動賣【原】；冇工具 (爛咗/賣咗) + 勾咗買工具 → 自動買返同一件【原】
@@ -452,9 +460,11 @@ func cmd_equip_tool(id: int, skill: String, item: int) -> void:
 	var ch: Dictionary = e["ch"]
 	if not RulesShop.remove_item(ch["bag"], item, 1):
 		return _msg(id, "背包冇呢件工具")
-	var dur: int = int(data.work_meta.get("toolDurability", {}).get("starter" if int(sk.get("starterTool", -1)) == item else "normal", 50))
+	var dur := _tool_max_dur(skill, item)
 	ch["tools"][skill] = {"item": item, "dur": dur}
-	_msg(id, "裝備咗%s（耐久 %d）" % [data.names.get(item, str(item)), dur])
+	var bonus := _tool_bonus(item)
+	var tail := "，成功率 +%d%%" % int(round(bonus * 100)) if bonus > 0.0 else ""
+	_msg(id, "裝備咗%s（耐久 %d%s）" % [data.names.get(item, str(item)), dur, tail])
 
 
 # 初階/進階技能定義 ({} = 冇)
@@ -540,7 +550,7 @@ func cmd_work(id: int, skill: String) -> void:
 	ch["sp"] = int(ch["sp"]) - cost
 	var lv := work_lv(ch, skill)
 	var cfg: Dictionary = data.work_meta["basicRate"]
-	var ok := MathX.roll(rng_fn) < RulesWork.basic_success(lv, cfg)
+	var ok := MathX.roll(rng_fn) < clampf(RulesWork.basic_success(lv, cfg) + _tool_bonus(int(tool["item"])), 0.0, 1.0)
 	var item := 0
 	var n := 0
 	if ok:
@@ -552,6 +562,7 @@ func cmd_work(id: int, skill: String) -> void:
 		if n == 1 and sk.has("doubleChance") and MathX.roll(rng_fn) < float(sk["doubleChance"]):
 			n = 2       # 農耕/伐木/採礦：額外機率多收 1 件（spec 05 §2「1~2件」）
 		RulesShop.add_item(ch["bag"], item, n)
+		_master_gather_bonus(id, ch, skill, int(tool["item"]))
 	var tool_item := int(tool["item"])
 	tool["dur"] = RulesWork.durability_after_use(int(tool["dur"]))
 	var broke := int(tool["dur"]) <= 0
@@ -641,13 +652,15 @@ func cmd_craft(id: int, item: int) -> void:
 	if not RulesWork.has_materials(_bag_counts(ch["bag"]), r["need"]):
 		return _msg(id, "材料唔夠")
 	var cfg: Dictionary = data.work_meta["craftRate"]
-	var ok := MathX.roll(rng_fn) < RulesWork.craft_chance(work_lv(ch, skill), int(r["lv"]), cfg)
+	var tool_bonus := _tool_bonus(int(ch["tools"][skill]["item"]))
+	var ok := MathX.roll(rng_fn) < clampf(RulesWork.craft_chance(work_lv(ch, skill), int(r["lv"]), cfg) + tool_bonus, 0.0, 1.0)
 	var lose := ok or MathX.roll(rng_fn) < float(cfg["failLoseMat"])
 	if lose:
 		for m in r["need"]:
 			RulesShop.remove_item(ch["bag"], int(m[0]), int(m[1]))
 	if ok:
 		RulesShop.add_item(ch["bag"], item, 1)
+		_master_gather_bonus(id, ch, skill, int(ch["tools"][skill]["item"]))
 	var broke := _adv_use(ch, skill)
 	_emit({"k": "craft", "id": id, "skill": skill, "item": item, "ok": ok, "lost": lose, "toolBroke": broke})
 	var sn: String = data.work_adv[skill]["name"]
@@ -657,6 +670,110 @@ func cmd_craft(id: int, item: int) -> void:
 	else:
 		_msg(id, "%s失敗%s%s" % [sn, "，材料冇咗" if lose else "，材料保住", tail])
 	_work_gain(id, ch, skill, int(data.work_meta["level"]["gainOk" if ok else "gainFail"]))
+
+
+# ================= 大宗師合成術 (S05c, spec 05 §5) =================
+
+# 用御賜工具工作/製作時，額外機會夾埋一件大宗師材料（唔加額外 SP/耐久/exp 消耗）
+func _master_gather_bonus(id: int, ch: Dictionary, skill: String, tool_item: int) -> void:
+	if String(data.tool_tier.get(tool_item, "")) != "godgiven":
+		return
+	var mat := int(data.master["materials"].get(skill, 0))
+	if mat == 0:
+		return
+	if MathX.roll(rng_fn) < float(data.master["gatherChance"]):
+		RulesShop.add_item(ch["bag"], mat, 1)
+		_msg(id, "御賜工具顯靈：多得一件「%s」！" % data.names.get(mat, str(mat)))
+
+
+# 合成一粒大宗師寶石：條件 100/20 + 材料齊
+func cmd_master_gem(id: int, skill: String) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var gc: Dictionary = data.master["gems"].get(skill, {})
+	if gc.is_empty():
+		return _msg(id, "冇呢種大宗師寶石")
+	var ch: Dictionary = e["ch"]
+	var basic_lv := work_lv(ch, String(gc["basicFrom"]))
+	var adv_lv := work_lv(ch, skill)
+	if not RulesMaster.gem_ready(basic_lv, adv_lv, data.master["condition"]):
+		return _msg(id, "要 %s 100 級 + %s 20 級先合得（而家 %d / %d）" %
+			[data.work[String(gc["basicFrom"])]["name"], data.work_adv[skill]["name"], basic_lv, adv_lv])
+	var need: Array = gc["need"]
+	if not RulesMaster.has_need(_bag_counts(ch["bag"]), need):
+		return _msg(id, "材料唔夠")
+	for m in need:
+		RulesShop.remove_item(ch["bag"], int(m[0]), int(m[1]))
+	var gem := int(gc["item"])
+	RulesShop.add_item(ch["bag"], gem, 1)
+	_emit({"k": "master_gem", "id": id, "skill": skill, "item": gem})
+	_msg(id, "合成成功：得到「%s」" % data.names.get(gem, str(gem)))
+
+
+# 進階大宗師合成術：2~5 粒寶石（至少 1 粒對應技能）→ 隨機虛擬寶物；成功率跟進階技能等級
+func cmd_master_treasure(id: int, skill: String, gems: Array) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	if not data.work_adv.has(skill):
+		return _msg(id, "冇呢種技能")
+	var cfg: Dictionary = data.master["synth"]
+	if not RulesMaster.gem_count_ok(gems.size(), cfg):
+		return _msg(id, "要用 %d~%d 粒寶石" % [int(cfg["minGems"]), int(cfg["maxGems"])])
+	var my_gem := int(data.master["gems"].get(skill, {}).get("item", -1))
+	if not gems.has(my_gem):
+		return _msg(id, "至少要 1 粒「%s」對應嘅寶石" % data.work_adv[skill]["name"])
+	var ch: Dictionary = e["ch"]
+	var counts := {}
+	for g in gems:
+		counts[int(g)] = int(counts.get(int(g), 0)) + 1
+	if not RulesWork.has_materials(_bag_counts(ch["bag"]), counts.keys().map(func(k): return [k, counts[k]])):
+		return _msg(id, "寶石唔夠")
+	for g in counts:
+		RulesShop.remove_item(ch["bag"], int(g), int(counts[g]))
+	var ok := MathX.roll(rng_fn) < RulesMaster.synth_chance(work_lv(ch, skill), cfg)
+	if ok:
+		var treasure := RulesMaster.pick_treasure(data.master["treasures"], rng_fn)
+		RulesShop.add_item(ch["bag"], treasure, 1)
+		_emit({"k": "master_treasure", "id": id, "skill": skill, "ok": true, "item": treasure})
+		_msg(id, "大宗師合成成功：煉出「%s」！" % data.names.get(treasure, str(treasure)))
+	else:
+		_emit({"k": "master_treasure", "id": id, "skill": skill, "ok": false})
+		_msg(id, "大宗師合成失敗，寶石冇咗")
+
+
+# 兌換白晝之珠（過渡來源，等神秘洞窟場景接正式掉落，見 PLAN §4）
+func cmd_master_redeem_baizhu(id: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var ch: Dictionary = e["ch"]
+	var cost := int(data.master["baizhuRedeemContrib"])
+	if int(ch.get("contrib", 0)) < cost:
+		return _msg(id, "官宅貢獻不足 (要 %d，而家 %d)" % [cost, int(ch.get("contrib", 0))])
+	ch["contrib"] = int(ch["contrib"]) - cost
+	var item := int(data.master["baizhu"])
+	RulesShop.add_item(ch["bag"], item, 1)
+	_emit({"k": "master_redeem_baizhu", "id": id, "item": item, "contrib": cost})
+	_msg(id, "兌換咗「%s」，扣官宅貢獻 %d" % [data.names.get(item, str(item)), cost])
+
+
+# read-model：大宗師頁面用（工房 UI）
+func view_master(id: int) -> Dictionary:
+	var e := ent(id)
+	var out := {"gems": [], "treasures": data.master["treasures"], "baizhuCost": int(data.master["baizhuRedeemContrib"])}
+	if e.is_empty() or not e.has("ch"):
+		return out
+	var ch: Dictionary = e["ch"]
+	for skill in data.master["gems"]:
+		var gc: Dictionary = data.master["gems"][skill]
+		var basic_lv := work_lv(ch, String(gc["basicFrom"]))
+		var adv_lv := work_lv(ch, skill)
+		out["gems"].append({"skill": skill, "name": data.work_adv[skill]["name"], "item": int(gc["item"]),
+			"ready": RulesMaster.gem_ready(basic_lv, adv_lv, data.master["condition"]),
+			"basicLv": basic_lv, "advLv": adv_lv, "need": gc["need"]})
+	return out
 
 
 # 呢件裝備歸邊個技能修【原】(武器 = 冶鐵、頭/身/靴 = 修繕、戒指/項鍊 = 木匠)；"" = 唔修得

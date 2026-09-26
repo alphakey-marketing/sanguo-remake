@@ -10,6 +10,8 @@ const LIST_MAX := 60           # 最多列幾多個 (高等配方由尾計)
 var skills: Array = []         # 呢間設施做得嘅進階技能
 var has_repair := false        # 有「修理」頁 (自己修)
 var service := false           # 打鐵鋪修理服務
+var has_master := false        # 有「大宗師」頁 (S05c)
+var master_skill := ""         # 大宗師頁面而家撳緊邊個技能
 var sel := 0
 
 
@@ -22,13 +24,18 @@ func open_craft(fac_name: String, crafts: Array) -> void:
 	service = false
 	skills = crafts
 	has_repair = false
+	has_master = false
 	var names: Array = []
 	for sk in crafts:
 		names.append(str(main.data.work_adv[sk]["name"]))
 		if not (main.data.work_adv[sk].get("repairs", []) as Array).is_empty():
 			has_repair = true
+		if main.data.master.get("gems", {}).has(sk):
+			has_master = true
 	if has_repair:
 		names.append("修理")
+	if has_master:
+		names.append("大宗師")
 	title_lbl.text = fac_name
 	_reset(names)
 
@@ -56,8 +63,8 @@ func set_tab(i: int) -> void:
 
 func sig() -> String:
 	var ch: Dictionary = main.ch
-	return JSON.stringify([tab, sel, ch.get("bag", []), ch.get("workLv", {}), ch.get("tools", {}), ch.get("sp", 0), ch.get("gold", 0),
-		ch.get("equip", {}).get("dur", {})])
+	return JSON.stringify([tab, sel, master_skill, ch.get("bag", []), ch.get("workLv", {}), ch.get("tools", {}), ch.get("sp", 0), ch.get("gold", 0),
+		ch.get("equip", {}).get("dur", {}), ch.get("contrib", 0)])
 
 
 func _me() -> Dictionary:
@@ -91,7 +98,10 @@ func _build_body() -> void:
 	if ch.is_empty() or main.sim == null:
 		return
 	var lr := _cols()
-	if service or tab >= skills.size():
+	var master_idx := skills.size() + (1 if has_repair else 0)
+	if not service and has_master and tab == master_idx:
+		_build_master(lr[0], lr[1], ch)
+	elif service or tab >= skills.size():
 		_build_repair(lr[0], lr[1], ch)
 	else:
 		_build_craft(lr[0], lr[1], ch, String(skills[tab]))
@@ -110,12 +120,22 @@ func _skill_head(p: Control, ch: Dictionary, skill: String) -> void:
 	var tool: Dictionary = ch.get("tools", {}).get(skill, {})
 	var tid := int(ad["tool"])
 	if tool.is_empty():
-		if _bag_n(tid) > 0:
-			p.add_child(btn("裝備%s" % item_name(tid), func() -> void: main._send({"t": "equip_tool", "skill": skill, "item": tid})))
+		var tiers: Dictionary = ad.get("tiers", {})
+		var candidates := [int(tiers.get("godgiven", -1)), int(tiers.get("platinum", -1)), int(tiers.get("special", -1)), tid]
+		var picked := -1
+		for c in candidates:
+			if c > 0 and _bag_n(c) > 0:
+				picked = c
+				break
+		if picked > 0:
+			var pid: int = picked
+			p.add_child(btn("裝備%s" % item_name(pid), func() -> void: main._send({"t": "equip_tool", "skill": skill, "item": pid})))
 		else:
 			p.add_child(lbl("未裝%s（工具店有得買）" % item_name(tid), 13, UiTheme.BAD))
 	else:
-		p.add_child(lbl("%s 耐久 %d" % [item_name(int(tool["item"])), int(tool["dur"])], 13, UiTheme.DIM))
+		var cur_tier := String(main.data.tool_tier.get(int(tool["item"]), ""))
+		var tier_tail := "（%s）" % cur_tier if cur_tier != "" else ""
+		p.add_child(lbl("%s 耐久 %d%s" % [item_name(int(tool["item"])), int(tool["dur"]), tier_tail], 13, UiTheme.DIM))
 
 
 func _build_craft(left: Control, right: Control, ch: Dictionary, skill: String) -> void:
@@ -177,6 +197,77 @@ func _build_craft(left: Control, right: Control, ch: Dictionary, skill: String) 
 	var b2 := btn("製作", func() -> void: main._send({"t": "craft", "item": id2}))
 	b2.disabled = err != ""
 	right.add_child(b2)
+
+
+# 大宗師合成術 (S05c, spec 05 §5)：左 = 呢間設施做得嘅寶石 + 條件；右 = 選定技能嘅合成寶石/進階合成
+func _build_master(left: Control, right: Control, ch: Dictionary) -> void:
+	var sim = main.sim
+	var m: Dictionary = main.data.master
+	var counts: Dictionary = sim._bag_counts(ch.get("bag", []))
+	left.add_child(lbl("官宅貢獻 %d（換白晝之珠要 %d）" % [int(ch.get("contrib", 0)), int(m["baizhuRedeemContrib"])], 13, UiTheme.DIM))
+	var bcost := int(m["baizhuRedeemContrib"])
+	var bbtn := btn("兌換白晝之珠 x1", func() -> void: main._send({"t": "master_redeem_baizhu"}))
+	bbtn.disabled = int(ch.get("contrib", 0)) < bcost
+	left.add_child(bbtn)
+	left.add_child(lbl("——合成寶石——", 14, UiTheme.GOLD))
+	var my_skills: Array = []
+	for sk in skills:
+		if m["gems"].has(sk):
+			my_skills.append(sk)
+	for sk in my_skills:
+		var gc: Dictionary = m["gems"][sk]
+		var basic_lv: int = sim.work_lv(ch, String(gc["basicFrom"]))
+		var adv_lv: int = sim.work_lv(ch, sk)
+		var ready := RulesMaster.gem_ready(basic_lv, adv_lv, m["condition"])
+		var b := btn("%s（%s%d / %s%d）" % [item_name(int(gc["item"])), main.data.work[String(gc["basicFrom"])]["name"], basic_lv,
+			main.data.work_adv[sk]["name"], adv_lv], func() -> void:
+			master_skill = sk
+			refresh(true))
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		b.toggle_mode = true
+		b.set_pressed_no_signal(master_skill == sk)
+		b.add_theme_color_override("font_color", UiTheme.GOOD if ready else UiTheme.DIM)
+		left.add_child(b)
+	if master_skill == "" or not my_skills.has(master_skill):
+		right.add_child(wrap_lbl("揀一種大宗師寶石。條件：對應初階 100 級 + 進階 20 級。", 14, UiTheme.DIM))
+		return
+	var sk2: String = master_skill
+	var gc2: Dictionary = m["gems"][sk2]
+	var basic_lv2: int = sim.work_lv(ch, String(gc2["basicFrom"]))
+	var adv_lv2: int = sim.work_lv(ch, sk2)
+	right.add_child(lbl(item_name(int(gc2["item"])), 18, UiTheme.GOLD))
+	right.add_child(lbl("要 %s Lv%d + %s Lv%d" % [main.data.work[String(gc2["basicFrom"])]["name"], int(m["condition"]["basicLv"]),
+		main.data.work_adv[sk2]["name"], int(m["condition"]["advLv"])], 14,
+		UiTheme.TEXT if RulesMaster.gem_ready(basic_lv2, adv_lv2, m["condition"]) else UiTheme.BAD))
+	right.add_child(lbl("材料:", 14))
+	for mt in gc2["need"]:
+		var have := int(counts.get(int(mt[0]), 0))
+		right.add_child(lbl("  %s  %d/%d" % [item_name(int(mt[0])), have, int(mt[1])], 14, UiTheme.GOOD if have >= int(mt[1]) else UiTheme.BAD))
+	var err := ""
+	if not RulesMaster.gem_ready(basic_lv2, adv_lv2, m["condition"]):
+		err = "條件未達標"
+	elif not RulesMaster.has_need(counts, gc2["need"]):
+		err = "材料唔夠"
+	if err != "":
+		right.add_child(lbl(err, 13, UiTheme.BAD))
+	var b2 := btn("合成", func() -> void: main._send({"t": "master_gem", "skill": sk2}))
+	b2.disabled = err != ""
+	right.add_child(b2)
+	right.add_child(lbl("——進階大宗師合成術（隨機虛擬寶物）——", 14, UiTheme.GOLD))
+	right.add_child(wrap_lbl("2~5 粒寶石（至少 1 粒對應「%s」），成功率跟%s等級" % [main.data.work_adv[sk2]["name"], main.data.work_adv[sk2]["name"]], 13, UiTheme.DIM))
+	var have_gem := int(counts.get(int(gc2["item"]), 0))
+	right.add_child(lbl("%s 持有 %d 粒" % [item_name(int(gc2["item"])), have_gem], 13))
+	var synth_cfg: Dictionary = m["synth"]
+	var n := clampi(have_gem, 0, int(synth_cfg["maxGems"]))
+	var chance := RulesMaster.synth_chance(adv_lv2, synth_cfg)
+	right.add_child(lbl("成功率 %d%%" % roundi(chance * 100), 13, UiTheme.DIM))
+	var b3 := btn("用 %d 粒進行合成" % n, func() -> void:
+		var arr: Array = []
+		for i in n:
+			arr.append(int(gc2["item"]))
+		main._send({"t": "master_treasure", "skill": sk2, "gems": arr}))
+	b3.disabled = n < int(synth_cfg["minGems"])
+	right.add_child(b3)
 
 
 # 要修嘅裝備: 身上 + 背包有耐久記錄嘅 (唔滿)；自己修 = 只列呢間設施技能修得嘅

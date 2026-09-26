@@ -11,6 +11,7 @@ func _init() -> void:
 	t_data(data)
 	t_work_levels(data)
 	t_double_yield(data)
+	t_tool_tiers(data)
 	t_unlock(data)
 	t_craft(data)
 	t_craft_food(data)
@@ -174,6 +175,27 @@ func t_double_yield(data: GameData) -> void:
 				twos += 1
 	check(oks > 0, "採礦 300 次有成功樣本")
 	check(float(twos) / float(oks) > 0.05, "採礦大量成功入面 2 件比例夠高 (~15%%+0.5%%，got %.3f)" % (float(twos) / float(oks)))
+
+
+# S05b (spec 05 §2): 特製/白金工具耐久 + 成功率加成
+func t_tool_tiers(data: GameData) -> void:
+	check(String(data.tool_tier.get(26041, "")) == "special" and String(data.tool_tier.get(26047, "")) == "platinum"
+		and String(data.tool_tier.get(26053, "")) == "godgiven", "農耕特製/白金/御賜工具 tier 對照")
+	check(String(data.tool_tier.get(26001, "")) == "", "普通鋤頭冇 tier")
+	var tb: Dictionary = data.work_meta["tierBonus"]
+	check(int(tb["special"]["dur"]) == 800 and int(tb["platinum"]["dur"]) == 2000, "特製耐久800/白金耐久2000")
+	var r := _new(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	_put(sim, pid, 30, 30)
+	_equip_tool(sim, pid, ch, "mining", 26043)      # 特製十字鎬
+	check(int(ch["tools"]["mining"]["dur"]) == 800, "裝特製十字鎬: 耐久 800")
+	var lv := sim.work_lv(ch, "mining")
+	var base_p := RulesWork.basic_success(lv, data.work_meta["basicRate"])
+	var bonus := RulesWork.tool_tier_bonus("special", tb)
+	check(absf(bonus - 0.05) < 1e-9, "特製工具加成 +5%%")
+	check(base_p + bonus <= 1.0, "加成後成功率夾上限")
 
 
 func t_unlock(data: GameData) -> void:

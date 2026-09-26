@@ -14,10 +14,15 @@ func _init() -> void:
 	t_claim(data)
 	t_salary(data)
 	t_ap_pill(data)
+	t_tool_redeem(data)
 	t_order_supply(data)
 	t_order_letter(data)
 	t_order_census(data)
 	t_order_abandon(data)
+	t_order_buy(data)
+	t_order_recruit(data)
+	t_order_escort(data)
+	t_order_rescue(data)
 	t_thirst(data)
 	t_recruit_title(data)
 	t_save_roundtrip(data)
@@ -77,7 +82,7 @@ func t_data(data: GameData) -> void:
 	check(String(tt[59]["name"]) == "大將軍" and int(tt[59]["fame"]) == 60000 and int(tt[59]["ap"]) == 220, "60 階大將軍【原】")
 	check(int(tt[40]["salary"]) == 4100 and int(tt[40]["salaryGuide"]) == 4900, "41 階俸祿筆誤修正 4900 → 4100")
 	check(int(tt[4]["salary"]) == 0 and int(tt[5]["salary"]) == 600, "5 階冇俸祿、6 階 600【原】")
-	check(data.office["orders"].size() == 3, "官令 3 條")
+	check(data.office["orders"].size() == 7, "官令 7 條 (S06a 加訂製軍備/官員護衛/朝廷求才/流落官員)")
 	check(String(data.office["orders"][1]["rankName"]) == "南中郎將", "遞送軍函 = 南中郎將 (6 階) 解鎖")
 	var offs := 0
 	for k in data.facilities:
@@ -176,6 +181,42 @@ func t_ap_pill(data: GameData) -> void:
 	ch["contrib"] = 35
 	sim.cmd_office_pill(pid)
 	check(RulesShop.count_item(ch["bag"], pill) == 1 and int(ch["contrib"]) == 5, "30 貢獻換 1 粒行動丹")
+
+
+# S05b (spec 05 §2/§5): 御賜工具兌換 = 暫代過渡 (真任務等 S06c)，扣官宅貢獻換 1 件入背包
+func t_tool_redeem(data: GameData) -> void:
+	var r := _new(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	var msgs: Array = r[3]
+	var gg := sim.godgiven_tools()
+	check(gg.size() == 11, "御賜工具清單 11 件 (6 初階 + 5 進階)")
+	var farming_row := {}
+	var smithing_row := {}
+	for t in gg:
+		if String(t["skill"]) == "farming":
+			farming_row = t
+		elif String(t["skill"]) == "smithing":
+			smithing_row = t
+	check(int(farming_row["cost"]) == 200, "初階御賜工具貢獻 200")
+	check(int(smithing_row["cost"]) == 400, "進階御賜工具貢獻 400")
+	var item := int(farming_row["item"])
+	sim.cmd_office_redeem_tool(pid, item)
+	check(RulesShop.count_item(ch["bag"], item) == 0 and _last(msgs).contains("要去官宅"), "唔喺官宅兌換唔到")
+	_put_fac(sim, pid, data, "donate_xc")
+	ch["contrib"] = 100
+	sim.cmd_office_redeem_tool(pid, item)
+	check(RulesShop.count_item(ch["bag"], item) == 0 and _last(msgs).contains("官宅貢獻不足"), "貢獻唔夠兌換唔到")
+	ch["contrib"] = 250
+	sim.cmd_office_redeem_tool(pid, item)
+	check(RulesShop.count_item(ch["bag"], item) == 1 and int(ch["contrib"]) == 50, "貢獻夠: 兌換成功扣 200")
+	sim.cmd_office_redeem_tool(pid, 26001)
+	check(RulesShop.count_item(ch["bag"], 26001) == 0 and _last(msgs).contains("唔係御賜工具"), "普通鋤頭兌換唔到")
+	# 裝上御賜鋤頭: 耐久/成功率加成
+	sim.cmd_equip_tool(pid, "farming", item)
+	check(int(ch["tools"]["farming"]["dur"]) == int(data.work_meta["tierBonus"]["godgiven"]["dur"]), "御賜鋤頭耐久 = tierBonus 設定")
+	check(String(data.tool_tier.get(item, "")) == "godgiven", "御賜鋤頭 tool_tier = godgiven")
 
 
 func t_order_supply(data: GameData) -> void:
@@ -300,6 +341,139 @@ func t_order_abandon(data: GameData) -> void:
 	check(int(ch["ap"]) == 90, "放棄唔退行動力 (100 - 10)")
 	sim.cmd_office_order(pid, "arms")
 	check(_last(msgs).begins_with("今日已經"), "放棄咗今日都唔接得")
+
+
+# S06a: 訂製軍備 (kind "buy") — 武器店買指定武器 (10001 柳葉刀) 捐畀官宅
+func t_order_buy(data: GameData) -> void:
+	var r := _new(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	var msgs: Array = r[3]
+	var item := int(sim.order_def("custom_arms")["item"])
+	_put_fac(sim, pid, data, "donate_xc")
+	ch["titleRank"] = 9
+	sim.cmd_office_order(pid, "custom_arms")
+	check(_last(msgs).begins_with("要五官中郎將"), "9 階接唔到訂製軍備")
+	ch["titleRank"] = 10
+	sim.cmd_office_order(pid, "custom_arms")
+	check(String(ch["office"]["order"]["id"]) == "custom_arms", "10 階接咗訂製軍備")
+	sim.cmd_office_turnin(pid)
+	check(_last(msgs).begins_with("仲未買到"), "未買武器覆唔到命")
+	RulesShop.add_item(ch["bag"], item, 1)
+	var fame0 := int(ch.get("fame", 0))
+	sim.cmd_office_turnin(pid)
+	check((ch["office"]["order"] as Dictionary).is_empty() and int(ch["fame"]) == fame0 + 40, "訂製軍備完成: 名聲 +40")
+	check(RulesShop.count_item(ch["bag"], item) == 0, "武器已經捐咗")
+
+
+# S06a: 朝廷求才 (kind "recruit") — 要跟緊 1 位「文官」型同伴先覆得命 (武將唔算數)
+func t_order_recruit(data: GameData) -> void:
+	var r := _new(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	var msgs: Array = r[3]
+	_put_fac(sim, pid, data, "donate_xc")
+	ch["titleRank"] = 19
+	sim.cmd_office_order(pid, "recruit")
+	check(_last(msgs).begins_with("要領軍將軍"), "19 階接唔到朝廷求才")
+	ch["titleRank"] = 20
+	sim.cmd_office_order(pid, "recruit")
+	check(String(ch["office"]["order"]["id"]) == "recruit", "20 階接咗朝廷求才")
+	sim.cmd_office_turnin(pid)
+	check(_last(msgs).begins_with("要登用緊"), "未登用文官覆唔到命")
+	var pe := sim.ent(pid)
+	if not ch.has("recruit"):
+		ch["recruit"] = {}
+	var wu: Dictionary = data.general_by_id[2]
+	var cwu := sim._spawn_companion(pe, wu)
+	ch["recruit"]["comp"] = int(cwu["id"])
+	sim.cmd_office_turnin(pid)
+	check(_last(msgs).begins_with("要登用緊"), "跟緊嘅係武將唔算數")
+	var wen: Dictionary = data.general_by_id[1]
+	var cwen := sim._spawn_companion(pe, wen)
+	ch["recruit"]["comp"] = int(cwen["id"])
+	var fame0 := int(ch.get("fame", 0))
+	sim.cmd_office_turnin(pid)
+	check((ch["office"]["order"] as Dictionary).is_empty() and int(ch["fame"]) == fame0 + 60, "朝廷求才完成 (文官同伴): 名聲 +60")
+
+
+# S06a: 官員護衛 (kind "escort") — 護送去 field_1 打怪區保唔死；死咗 (down) → 自動失敗
+func t_order_escort(data: GameData) -> void:
+	var r := _new(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	var msgs: Array = r[3]
+	_put_fac(sim, pid, data, "donate_xc")
+	ch["titleRank"] = 24
+	sim.cmd_office_order(pid, "escort")
+	check(_last(msgs).begins_with("要奮武將軍"), "24 階接唔到官員護衛")
+	ch["titleRank"] = 25
+	sim.cmd_office_order(pid, "escort")
+	var npc_id := int(ch["office"]["order"]["npc"])
+	check(npc_id != 0, "接咗官員護衛，生成護衛 NPC")
+	var npc := sim.ent(npc_id)
+	check(npc.has("gen") and String(npc["gen"]["role"]) == "escort", "護衛 NPC role = escort")
+	sim.cmd_office_turnin(pid)
+	check(_last(msgs).begins_with("仲未護送到"), "未護送到打怪區覆唔到命")
+	sim._put_ent(npc, 60, 10)     # field_1 (潁川郊外) 範圍內
+	var fame0 := int(ch.get("fame", 0))
+	var gold0 := int(ch.get("gold", 0))
+	sim.cmd_office_turnin(pid)
+	check((ch["office"]["order"] as Dictionary).is_empty(), "官員護衛完成")
+	check(int(ch["fame"]) == fame0 + 50, "官員護衛獎勵: 名聲 +50")
+	var pay := RulesTitle.salary(data.titles, int(ch["titleRank"]))
+	check(int(ch["gold"]) == gold0 + pay, "官員護衛獎勵: 俸祿 x1 金 (%d)" % pay)
+	check(sim.ent(npc_id).is_empty(), "覆命後護衛 NPC 消失")
+	# 失敗流程: 護衛 NPC 死咗 (down) → 官令自動失敗，唔退行動力
+	sim._daily_hook(1)
+	sim.state["clock"]["day"] = 1
+	sim.cmd_office_order(pid, "escort")
+	var npc2_id := int(ch["office"]["order"]["npc"])
+	var npc2 := sim.ent(npc2_id)
+	npc2["ch"]["hp"] = 1
+	sim._kill_player(npc2)
+	sim._office_tick()
+	check((ch["office"]["order"] as Dictionary).is_empty() and _last(msgs).begins_with("官令「官員護衛」失敗"), "護衛 NPC 死咗 → 官令自動失敗")
+	check(sim.ent(npc2_id).is_empty(), "失敗後護衛 NPC 被清走")
+
+
+# S06a: 流落官員 (kind "rescue") — 打怪區搵到先跟你，帶返官宅覆命；死咗 (down) → 自動失敗
+func t_order_rescue(data: GameData) -> void:
+	var r := _new(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	var msgs: Array = r[3]
+	_put_fac(sim, pid, data, "donate_xc")
+	ch["titleRank"] = 25
+	sim.cmd_office_order(pid, "rescue")
+	var npc_id := int(ch["office"]["order"]["npc"])
+	var npc := sim.ent(npc_id)
+	check(String(npc["gen"]["role"]) == "rescue" and not bool(npc["gen"]["rescued"]), "流落官員生成，未搵到")
+	sim.cmd_office_turnin(pid)
+	check(_last(msgs).begins_with("帶流落官員返"), "未搵到官員覆唔到命")
+	var e := sim.ent(pid)
+	sim._put_ent(e, int(npc["x"]), int(npc["y"]))
+	sim._think_office_npc(npc)
+	check(bool(npc["gen"]["rescued"]), "玩家埋身 → 救到，開始跟隨")
+	_put_fac(sim, pid, data, "donate_xc")
+	var fame0 := int(ch.get("fame", 0))
+	sim.cmd_office_turnin(pid)
+	check((ch["office"]["order"] as Dictionary).is_empty() and int(ch["fame"]) == fame0 + 50, "流落官員救回完成: 名聲 +50")
+	check(sim.ent(npc_id).is_empty(), "覆命後 NPC 消失")
+	# 失敗流程: NPC 死咗 (down) → 官令自動失敗
+	sim._daily_hook(1)
+	sim.state["clock"]["day"] = 1
+	sim.cmd_office_order(pid, "rescue")
+	var npc2_id := int(ch["office"]["order"]["npc"])
+	var npc2 := sim.ent(npc2_id)
+	npc2["ch"]["hp"] = 1
+	sim._kill_player(npc2)
+	sim._office_tick()
+	check((ch["office"]["order"] as Dictionary).is_empty() and _last(msgs).begins_with("官令「流落官員」失敗"), "流落官員死咗 → 官令自動失敗")
 
 
 func t_thirst(data: GameData) -> void:

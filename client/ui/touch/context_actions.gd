@@ -238,11 +238,18 @@ static func work_dialog(main: Node) -> Dictionary:
 		var lv: int = main.sim.work_lv(ch, sk)
 		var skill := String(sk)
 		if tools.has(sk):
-			lines.append("%s Lv%d  工具耐久 %d" % [w["name"], lv, int(tools[sk]["dur"])])
+			var cur_item := int(tools[sk]["item"])
+			var cur_tier := String(main.data.tool_tier.get(cur_item, ""))
+			var tier_tail := "（%s）" % cur_tier if cur_tier != "" else ""
+			lines.append("%s Lv%d  工具耐久 %d%s" % [w["name"], lv, int(tools[sk]["dur"]), tier_tail])
 			opts.append({"label": "%s" % w["name"], "cb": func() -> void: main._send({"t": "work", "skill": skill})})
 			continue
-		for tid in [int(w["tool"]), int(w["starterTool"])]:
-			if RulesShop.count_item(ch.get("bag", []), tid) > 0:
+		# 揀背包入面最好嗰件工具裝 (御賜 > 白金 > 特製 > 普通 > 新手)
+		var tiers: Dictionary = w.get("tiers", {})
+		var candidates := [int(tiers.get("godgiven", -1)), int(tiers.get("platinum", -1)), int(tiers.get("special", -1)),
+			int(w["tool"]), int(w["starterTool"])]
+		for tid in candidates:
+			if tid > 0 and RulesShop.count_item(ch.get("bag", []), tid) > 0:
 				var t: int = tid
 				opts.append({"label": "裝%s" % main.item_names.get(tid, "工具"), "cb": func() -> void: main._send({"t": "equip_tool", "skill": skill, "item": t})})
 				break
@@ -353,8 +360,25 @@ static func office_dialog(main: Node, def: Dictionary) -> Dictionary:
 	opts.append({"label": "捐獻…", "cb": func() -> void: main.hud.open_dialog(func() -> Dictionary: return donate_dialog(main, def))})
 	opts.append({"label": "換行動丹 (%d 貢獻)" % int(off["pillCost"]), "cb": func() -> void: main._send({"t": "office_pill"}),
 		"disabled": int(ch.get("contrib", 0)) < int(off["pillCost"])})
+	opts.append({"label": "換御賜工具…", "cb": func() -> void: main.hud.open_dialog(func() -> Dictionary: return tool_redeem_dialog(main, def))})
 	opts.append(_leave(main))
 	return {"title": str(def.get("name", "官宅")), "text": "\n".join(lines), "options": opts}
+
+
+# 御賜工具兌換 (S05b spec 05 §5)：暫代過渡，扣官宅貢獻換 1 件；真任務來源等 S06c 團體任務
+static func tool_redeem_dialog(main: Node, def: Dictionary) -> Dictionary:
+	var ch: Dictionary = main.ch
+	var contrib := int(ch.get("contrib", 0))
+	var lines: Array = ["官宅貢獻 %d。御賜工具（耐久 %d、成功率 +%d%%）暫用貢獻兌換，任務正式來源後續開放。" %
+		[contrib, int(main.data.work_meta["tierBonus"]["godgiven"]["dur"]), int(round(float(main.data.work_meta["tierBonus"]["godgiven"]["bonus"]) * 100))]]
+	var opts: Array = []
+	for t in main.sim.godgiven_tools():
+		var tid := int(t.item)
+		var cost := int(t.cost)
+		opts.append({"label": "%s (%d 貢獻)" % [main.item_names.get(tid, str(tid)), cost],
+			"cb": func() -> void: main._send({"t": "office_redeem_tool", "item": tid}), "disabled": contrib < cost})
+	opts.append({"label": "返回", "cb": func() -> void: main.hud.open_dialog(func() -> Dictionary: return office_dialog(main, def))})
+	return {"title": "御賜工具", "text": "\n".join(lines), "options": opts}
 
 
 # 官令清單 (每日 1 次、扣行動力 10)：未解鎖/今日接過 = 灰

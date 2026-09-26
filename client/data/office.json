@@ -14,6 +14,18 @@
    "desc": "將軍函送去%s，交畀嗰度官宅就算覆命。"},
   {"id": "census", "name": "戶口普查", "rank": 15, "kind": "census", "n": 5,
    "fame": 30, "polExp": 10, "contrib": 15,
-   "desc": "喺%s同 %d 個唔同嘅人傾偈 (任務 NPC / 城內人才)，再返嚟覆命。"}
+   "desc": "喺%s同 %d 個唔同嘅人傾偈 (任務 NPC / 城內人才)，再返嚟覆命。"},
+  {"id": "custom_arms", "name": "訂製軍備", "rank": 10, "kind": "buy", "item": 10002,
+   "fame": 40, "contrib": 20,
+   "desc": "去武器店買一把%s捐畀官宅。"},
+  {"id": "recruit", "name": "朝廷求才", "rank": 20, "kind": "recruit",
+   "fame": 60, "contrib": 30,
+   "desc": "登用返 1 位文官，帶佢返嚟見官。"},
+  {"id": "escort", "name": "官員護衛", "rank": 25, "kind": "escort", "zone": "field_1",
+   "fame": 50, "contrib": 25, "salaryMult": 1,
+   "desc": "護送官員出城去%s，保住佢唔死，再返官宅覆命。"},
+  {"id": "rescue", "name": "流落官員", "rank": 25, "kind": "rescue", "zone": "field_1",
+   "fame": 50, "contrib": 25,
+   "desc": "去%s打怪區搵返流落嘅官員，帶佢生還返官宅覆命。"}
  ]
 }

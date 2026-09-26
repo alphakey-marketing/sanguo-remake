@@ -149,13 +149,20 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
   - 天災停進貨：`world.json` 加 `shopShutdown:{min:1,max:3}`；`rules/disaster.gd roll_day()` 大/中規模天災額外算 `shutdownEnd`/`shutdownCats`；`sim_econ.gd cmd_buy` 擋購買 + 訊息提示
   - 城際價差 UI：`sim.gd view_market_prices()` 新 read-model + `map_panel.gd` 新「市價」頁（文字列表，代表物資 × 各城現價）
   - 偏離：「城際貿易搬運跨城賣」（§6 表）未做，留後續批次（見 spec 05 §9）；雜貨店定義用 items.json cat 250（消耗/特殊）頂替【自訂】
-- [ ] **S05b 特製/白金/御賜工具**：3 等工具耐久/成功率；來源 = 任務獎勵（團體任務 S06c 前先用官宅兌換過渡）
-- [ ] **S05c 大宗師合成術**：條件 100/20、新初階/進階材料（產出地【待決：豫荊外城池點處理 — 建議改指定豫荊地點【自訂】】）、白晝之珠、5 合成寶石、進階大宗師（`data/master_recipes.json`）
-  - UI：工房「大宗師」頁
+- [x] **S05b 特製/白金/御賜工具**：3 等工具耐久/成功率；來源 = 任務獎勵（團體任務 S06c 前先用官宅兌換過渡）
+  - 偏移：items.json 原有 26041~26073（33 件，每技能 3 等）已係特製/白金/御賜工具，直接用原 id，冇加新自訂 item；`work.json` 各技能 `tiers` 對照 + 頂層 `tierBonus`（特製耐久800/+5%、白金2000/+10%、御賜5000/+15%【自訂數值，spec 只寫特製/白金】）。御賜工具（u24=1 綁定）用 `sim_office.gd cmd_office_redeem_tool` 官宅貢獻兌換（初階 200 / 進階 400 貢獻，**過渡**，等 S06c 團體任務「初階御賜工具的取得」開返正式來源，見 §4 表）。UI：官宅面板「換御賜工具…」+ 野外工作/工房裝工具自動揀背包最好嗰件。
+- [x] **S05c 大宗師合成術**：條件 100/20、新初階/進階材料、白晝之珠、5 合成寶石、進階大宗師（`data/master_recipes.json`）
+  - 完成：新增 22 件 item（`tools/add_master_items.py` 一次性寫入 `items.json`，追加式唔打亂原有順序）：6 新初階材料（黃金稻穗/飛天龍魚/荒野虎肉/璀璨晶礦/鐵樹精華/九命人參）+ 5 新進階材料（茗香泉水/煉獄礦石/雪羽晶塊/天山樹鬚/不老丹藥）+ 白晝之珠 + 5 合成寶石（扈江/玄牝/炎冥/仲卿/山淵之石）+ 5 虛擬寶物（龍威寶鼎等）；新 `rules/master.gd`（`gem_ready`/`has_need`/`gem_count_ok`/`synth_chance`/`pick_treasure` 純函數）+ `data/master_recipes.json`（條件/材料表/寶石配方/虛寶池/合成成功率公式）；`sim_econ.gd` 加 `_master_gather_bonus`（掛喺 `cmd_work`/`cmd_craft` 尾、用御賜工具時額外機會夾埋材料，唔加額外 SP/耐久/exp）+ `cmd_master_gem`/`cmd_master_treasure`/`cmd_master_redeem_baizhu`/`view_master`；`main.gd` 接 3 個新指令；`craft_panel.gd` 廚房/藥房/工房加「大宗師」頁（兌換白晝之珠/合成寶石/進階合成虛寶）
+  - 偏離：**新材料產出地**（原文豫荊外六城：廬江/北平/壽春/北海/南皮/柴桑）單機只做豫荊【自訂簡化，用家確認方針】→ 改為冇獨立地點，用御賜工具做返嗰種初階/進階工作時 5% 機會額外夾埋材料；**白晝之珠**（原文神秘洞窟打怪掉落）→ 過渡用官宅貢獻兌換（同 S05b 御賜工具模式一致），神秘洞窟場景延後見 §4；**寶石配方**（材料組合對照表原文喺攻略未逐格搬字）→ 自訂每種寶石 = 對應初階材料×5 + 進階材料×3 + 白晝之珠×1；**進階大宗師合成術**輸出簡化為 5 件收藏向「虛擬寶物」（唔做完整隨機武防詞條生成），成功率公式【自訂】= 0.15 + 0.01×進階技能等級
+  - 延後掛鈎：白晝之珠正式來源（神秘洞窟場景）→ 見 §4；場景開唔開放由城主法令決定 → S08 法令做完先接（而家常開）
+  - 驗收：`tests/run_master.gd`（新，67 項）+ `sh tools/run_tests.sh` 全 PASS（ALL OK）
 - 驗收：`tests/run_craft.gd`/`run_tiandi.gd` 擴充 + `tests/run_master.gd`（新）
 
 ### S06 任務（spec 06）
-- [ ] **S06a 官令補齊**：訂製軍備、官員護衛（護送 NPC）、朝廷求才（登用 1 文官）、流落官員（野外救人）
+- [x] **S06a 官令補齊**：訂製軍備、官員護衛（護送 NPC）、朝廷求才（登用 1 文官）、流落官員（野外救人）
+  - 完成：`data/office.json` 官令 3→7 條（新 `custom_arms`/`recruit`/`escort`/`rescue`）；`sim_office.gd` 加 4 個 kind 分支（`buy`/`recruit`/`escort`/`rescue`）+ `_office_tick()`（護衛/救援 NPC 死咗即自動失敗，唔退行動力）；`sim_recruit.gd` 加 `_spawn_office_npc`/`_think_office_npc`（借用同伴 `gen` kind 嘅過圖/HP/「倒下」機制，HP 到 0 觸發現有 `_kill_player` 嘅 `down` 分支，唔會真死）+ `_think_companion` 頂部分流。UI 零改動：官宅面板/官令清單本身數據驅動（`context_actions.gd order_dialog`/`office_dialog` 逐條 loop `data.office["orders"]`），`order_text()` 加 4 個 kind 顯示（護衛/救援仲加埋 NPC HP/狀態一句）。測試：`tests/run_title.gd` 加 4 個 `t_order_*` 函數（32→130 項）。
+  - 偏離：**訂製軍備**冇驗證武器係咪真係喺武器店買（同 `letter`/`arms` 一致嘅簡化：淨係查背包有冇指定 item，交收即扣）；指定武器揀 10002（鬼頭刀，武器店有賣，非新手起始裝備，避免同起始柳葉刀 10001 撞）。**官員護衛/流落官員**嘅「打怪區」= `field_1`（潁川郊外，`DEFAULT_ZONE`）；NPC = `gen` kind 單位（唔係真同伴，`ch.recruit.comp` 唔會指到佢），escort 生成即跟主公、rescue 企定喺 `field_1` (52,5)~(96,22) 隨機一格等玩家埋身 3 格內先開始跟隨；NPC 冇打怪能力（純被動，可以被怪打），死咗 = 進入現有「倒下」狀態（唔會真消失喺存檔中途，`_office_tick` 見到 `down` 即刻拆走官令 + `_remove_ent`）。**官員護衛俸祿 ×1**＝ `RulesTitle.salary(titles, titleRank)` 一次性加金（唔係「額外月俸」，即時發放）。**朝廷求才**唔消耗/踢走登用緊嘅文官同伴，淨係檢查「而家有冇文官型 (`type=="wen"`) 同伴跟緊」。
+  - 驗收：`tests/run_title.gd`（130 項）+ `sh tools/run_tests.sh` 全 PASS
 - [ ] **S06b 歷史任務其餘 5 條**：孫堅匿璽/張公公謀害何進/黃蓋/曹阿瞞/討伐張角；需要洛陽/零陵等地圖【待決：新開地圖定移去豫荊】
 - [ ] **S06c 團體任務 16 項**：要「所屬義勇軍」→ 依賴 S08；呢步先做任務資料 + 非義勇軍版可接嘅（紫虛上人等），其餘掛鈎 S08
 - [ ] **S06d 其他職絕招任務鏈**：各職一~三招（15 條）+ 四~六招（排後，涉及多城）；義士二/三招要晉陽/河內/桂陽【待決：地點】
@@ -235,6 +242,8 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
 | S08g | 民心/法令要有城池 | S10c |
 | S01c | 渾天儀來源（商城道具單機化定案，`sim.gd WEATHER_ITEM 26029` 已資料有、冇商店賣） | S11 |
 | S09c | 國戰類特技/寶物 | S10 |
+| S05c | 白晝之珠正式來源（神秘洞窟打怪掉落，v1 後期新場景）；過渡用官宅貢獻兌換（`cmd_master_redeem_baizhu`） | 後續批次（同 通天關/黑山寨 等一齊考慮） |
+| S05c | 大宗師合成場景開唔開放由城主法令決定；而家常開 | S08 法令 |
 | 2026-09-25 討論 | 多存檔 + 共享世界隊友（方向 2.5，見下）| S02c 做完後開新 Step |
 
 ---

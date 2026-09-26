@@ -40,6 +40,15 @@ static func durability_after_use(dur: int) -> int:
 	return maxi(0, dur - 1)
 
 
+# 3 等工具 (S05b, spec 05 §2)【原=種類；耐久/成功率加成自訂】: tier = "special"/"platinum"/"godgiven"，"" = 普通/新手
+static func tool_tier_dur(tier: String, tier_cfg: Dictionary) -> int:
+	return int(tier_cfg.get(tier, {}).get("dur", 200))
+
+
+static func tool_tier_bonus(tier: String, tier_cfg: Dictionary) -> float:
+	return float(tier_cfg.get(tier, {}).get("bonus", 0.0))
+
+
 # ================= 技能等級 / 進階生產 / 修理 (Step 12, spec 05 §2/§4) =================
 # cfg 全部嚟自 data/work.json: level / basicRate / craftRate / repair
 
