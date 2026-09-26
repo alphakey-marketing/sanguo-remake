@@ -5700,6 +5700,116 @@
     }
    ],
    "_scene": "qicai"
+  },
+  {
+   "id": 1087,
+   "name": "木乃伊",
+   "level": 22,
+   "hp": 900,
+   "atk": 30,
+   "def": 10,
+   "atkInterval": 15,
+   "moveSpeed": 1,
+   "exp": 40,
+   "gold": [0, 20],
+   "alignment": -50,
+   "aggroRange": 6,
+   "leash": 10,
+   "element": "none",
+   "drops": [
+    {"item": 56494, "p": 0.9}
+   ]
+  },
+  {
+   "id": 1088,
+   "name": "殭屍",
+   "level": 23,
+   "hp": 950,
+   "atk": 32,
+   "def": 11,
+   "atkInterval": 15,
+   "moveSpeed": 1,
+   "exp": 42,
+   "gold": [0, 20],
+   "alignment": -50,
+   "aggroRange": 6,
+   "leash": 10,
+   "element": "none",
+   "drops": [
+    {"item": 56494, "p": 0.9}
+   ]
+  },
+  {
+   "id": 1089,
+   "name": "程普",
+   "level": 20,
+   "hp": 1600,
+   "atk": 48,
+   "def": 16,
+   "spellDef": 30,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 0,
+   "gold": [0, 0],
+   "alignment": 0,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "drops": []
+  },
+  {
+   "id": 1090,
+   "name": "何進",
+   "level": 22,
+   "hp": 1800,
+   "atk": 50,
+   "def": 18,
+   "spellDef": 32,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 0,
+   "gold": [0, 0],
+   "alignment": -100,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "drops": []
+  },
+  {
+   "id": 1091,
+   "name": "黃蓋",
+   "level": 25,
+   "hp": 2000,
+   "atk": 54,
+   "def": 20,
+   "spellDef": 34,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 0,
+   "gold": [0, 0],
+   "alignment": 0,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "drops": []
+  },
+  {
+   "id": 1092,
+   "name": "張角",
+   "level": 30,
+   "hp": 2600,
+   "atk": 60,
+   "def": 22,
+   "spellDef": 40,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 0,
+   "gold": [0, 0],
+   "alignment": -700,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "drops": []
   }
  ],
  "spawns": [
@@ -6826,6 +6936,20 @@
     20,
     20
    ]
+  },
+  {
+   "zone": "luoyang_well",
+   "monster": 1087,
+   "count": 4,
+   "respawnTicks": 200,
+   "area": [2, 2, 37, 21]
+  },
+  {
+   "zone": "luoyang_well",
+   "monster": 1088,
+   "count": 4,
+   "respawnTicks": 220,
+   "area": [2, 2, 37, 21]
   }
  ]
 }
