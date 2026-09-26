@@ -1675,6 +1675,218 @@
     {"type": "talk", "npc": "craft_boss", "dialog": ["工匠工頭：「多謝！呢堆木材你拎去用。」"], "hint": "覆命", "done": true}
    ],
    "reward": {"gold": 300, "items": [[25053, 20]]}
+  },
+  {
+   "id": "ult_shinu_huxiao",
+   "name": "虎嘯龍吟（絕招一）",
+   "type": "ultimate",
+   "giver": "shinu_master",
+   "pre": {"classId": "shinu", "minLevel": 20},
+   "preHint": "仕女 20 級以上，去許昌城西街搵黃師姐（限環類武器）",
+   "stages": [
+    {"type": "ask", "npc": "shinu_master", "dialog": ["黃師姐：「洛陽城南有極惡盜賊擾民。先答我：除害最緊要係咩？」"], "options": ["亂咁衝，殺咗先算", "問清楚情報，知己知彼", "等官府自己搞"], "answer": 1, "getItem": {"id": 58009, "n": 1}, "hint": "答啱黃師姐嘅問題（得殲盜密函）"},
+    {"type": "collect", "item": {"id": 58012, "n": 20}, "hint": "去郊外打極惡盜賊，收集極惡令 %v/%n", "done": true}
+   ],
+   "reward": {"exp": 1500, "gold": 300, "items": [[11042, 1]], "ultimate": "huxiao"}
+  },
+  {
+   "id": "ult_shinu_jinhu",
+   "name": "金環裂地（絕招二）",
+   "type": "ultimate",
+   "giver": "shinu_master",
+   "pre": {"classId": "shinu", "minLevel": 33, "questDone": ["ult_shinu_huxiao"]},
+   "preHint": "已學虎嘯龍吟 + 33 級以上，再搵黃師姐",
+   "stages": [
+    {"type": "talk", "npc": "shinu_master", "dialog": ["黃師姐：「濮陽有屍怪作亂，拎住除屍令去洞窟八層，敲透光石柱引骷髏王出嚟。」"], "getItem": {"id": 58020, "n": 1}, "hint": "除屍令到手，去汝南洞窟八層"},
+    {"type": "fight", "npc": "sjs_zhu", "monster": 1100, "dialog": ["透光石柱發出一閃銀光，密室應聲而開——骷髏王殺出！"], "getItem": {"id": 58021, "n": 1}, "hint": "打敗骷髏王，得亮橙水晶"},
+    {"type": "talk", "npc": "shinu_master", "dialog": ["黃師姐：「水晶到手，金環奧武訣歸你！」"], "getItem": {"id": 58024, "n": 1}, "hint": "返去搵黃師姐覆命", "done": true}
+   ],
+   "reward": {"exp": 3500, "gold": 800, "ultimate": "jinhu"}
+  },
+  {
+   "id": "ult_shinu_jinghua",
+   "name": "鏡花水月（絕招三）",
+   "type": "ultimate",
+   "giver": "shinu_master",
+   "pre": {"classId": "shinu", "minLevel": 43, "questDone": ["ult_shinu_jinhu"]},
+   "preHint": "已學金環裂地 + 43 級以上，再搵黃師姐",
+   "stages": [
+    {"type": "talk", "npc": "shinu_master", "dialog": ["黃師姐：「呂布要為赤兔馬打造馬甲，急求千年礦石。幫佢收集，佢自會教你絕招。」"], "getItem": {"id": 58039, "n": 1}, "hint": "呂布求礦書到手"},
+    {"type": "collect", "item": {"id": 25120, "n": 50}, "hint": "千年石礦 %v/%n"},
+    {"type": "collect", "item": {"id": 25121, "n": 40}, "hint": "千年鐵礦 %v/%n"},
+    {"type": "collect", "item": {"id": 25122, "n": 30}, "hint": "千年銅礦 %v/%n"},
+    {"type": "collect", "item": {"id": 25123, "n": 20}, "hint": "千年銀礦 %v/%n"},
+    {"type": "collect", "item": {"id": 25124, "n": 10}, "hint": "千年金礦 %v/%n", "done": true}
+   ],
+   "reward": {"exp": 8000, "gold": 2000, "ultimate": "jinghua"}
+  },
+  {
+   "id": "ult_daoshi_xuwu",
+   "name": "虛無飄渺（絕招一）",
+   "type": "ultimate",
+   "giver": "daoshi_master",
+   "pre": {"classId": "daoshi", "minLevel": 20},
+   "preHint": "道士 20 級以上，去許昌城南角搵玄真道人（限符咒類武器）",
+   "stages": [
+    {"type": "talk", "npc": "daoshi_master", "dialog": ["玄真道人：「譙城文成採礦缺人手，幫佢湊 150 個鐵礦石，我引薦你去見道雲道長。」"], "getItem": {"id": 58003, "n": 1}, "hint": "協助採礦書到手，去收集鐵礦石"},
+    {"type": "collect", "item": {"id": 25002, "n": 150}, "hint": "鐵礦石 %v/%n", "done": true}
+   ],
+   "reward": {"exp": 1500, "gold": 300, "items": [[14038, 1]], "ultimate": "xuwu"}
+  },
+  {
+   "id": "ult_daoshi_ruhuan",
+   "name": "如幻似真（絕招二）",
+   "type": "ultimate",
+   "giver": "daoshi_master",
+   "pre": {"classId": "daoshi", "minLevel": 30, "questDone": ["ult_daoshi_xuwu"]},
+   "preHint": "已學虛無飄渺 + 30 級以上，再搵玄真道人",
+   "stages": [
+    {"type": "talk", "npc": "daoshi_master", "dialog": ["玄真道人：「文成託你送信去晉陽畀兄長文義，佢要 30 個咆哮結晶先肯傳虛極情報書。」"], "getItem": {"id": 58013, "n": 1}, "hint": "文成親筆信到手，去收集咆哮結晶"},
+    {"type": "collect", "item": {"id": 25009, "n": 30}, "hint": "咆哮結晶 %v/%n", "done": true}
+   ],
+   "reward": {"exp": 3500, "gold": 800, "ultimate": "ruhuan"}
+  },
+  {
+   "id": "ult_daoshi_shenyou",
+   "name": "神遊太虛（絕招三）",
+   "type": "ultimate",
+   "giver": "daoshi_master",
+   "pre": {"classId": "daoshi", "minLevel": 45, "questDone": ["ult_daoshi_ruhuan"]},
+   "preHint": "已學如幻似真 + 45 級以上，再搵玄真道人",
+   "stages": [
+    {"type": "talk", "npc": "daoshi_master", "dialog": ["玄真道人：「桂陽城外東方有怪人張得施邪法，去擊敗佢，攞術文全書返嚟。」"], "getItem": {"id": 58040, "n": 1}, "hint": "怪人情報書到手"},
+    {"type": "fight", "npc": "zhangde", "monster": 1101, "dialog": ["怪人張得：「邊個敢壞我法事！」"], "getItem": {"id": 58041, "n": 1}, "hint": "打敗張得，得術文全書"},
+    {"type": "talk", "npc": "daoshi_master", "dialog": ["玄真道人：「好，月藍先生收你為徒，神遊殘卷歸你！」"], "getItem": {"id": 58042, "n": 1}, "hint": "返去搵玄真道人覆命", "done": true}
+   ],
+   "reward": {"exp": 8000, "gold": 2000, "items": [[28003, 20]], "ultimate": "shenyou"}
+  },
+  {
+   "id": "ult_wunu_candeng",
+   "name": "殘燈映紅（絕招一）",
+   "type": "ultimate",
+   "giver": "wunu_master",
+   "pre": {"classId": "wunu", "minLevel": 20},
+   "preHint": "巫女 20 級以上，去許昌城廣場搵巫姬婆（限卷軸類武器）",
+   "stages": [
+    {"type": "talk", "npc": "wunu_master", "dialog": ["巫姬婆：「汝南洞窟十層有妖人紫臣，先睇妖人情報，再照佢吩咐收集材料。」"], "getItem": {"id": 58001, "n": 1}, "hint": "妖人情報到手"},
+    {"type": "collect", "item": {"id": 25100, "n": 20}, "hint": "細毛兔皮 %v/%n"},
+    {"type": "collect", "item": {"id": 25102, "n": 10}, "hint": "昆蟲藥粉 %v/%n"},
+    {"type": "collect", "item": {"id": 25098, "n": 10}, "hint": "芳香軟石 %v/%n", "done": true}
+   ],
+   "reward": {"exp": 1500, "gold": 300, "items": [[13038, 1]], "ultimate": "candeng"}
+  },
+  {
+   "id": "ult_wunu_danchan",
+   "name": "膽顫心驚（絕招二）",
+   "type": "ultimate",
+   "giver": "wunu_master",
+   "pre": {"classId": "wunu", "minLevel": 30, "questDone": ["ult_wunu_candeng"]},
+   "preHint": "已學殘燈映紅 + 30 級以上，再搵巫姬婆",
+   "stages": [
+    {"type": "talk", "npc": "wunu_master", "dialog": ["巫姬婆：「紫臣捎信嚟，話晉陽洞窟有惡狼團，去收服頭目狼懿。」"], "getItem": {"id": 58034, "n": 1}, "hint": "紫臣親筆信到手"},
+    {"type": "fight", "npc": "wolfyi_head", "monster": 1102, "dialog": ["惡狼團頭目：「想搶我狼爪信物？先問過我對爪！」"], "getItem": {"id": 58037, "n": 1}, "hint": "打敗狼懿，得狼爪信物"},
+    {"type": "talk", "npc": "wunu_master", "dialog": ["巫姬婆：「狼爪到手，紫軒收你為徒！」"], "getItem": {"id": 58036, "n": 1}, "hint": "返去搵巫姬婆覆命", "done": true}
+   ],
+   "reward": {"exp": 3500, "gold": 800, "ultimate": "danchan"}
+  },
+  {
+   "id": "ult_wunu_guiku",
+   "name": "鬼哭神號（絕招三）",
+   "type": "ultimate",
+   "giver": "wunu_master",
+   "pre": {"classId": "wunu", "minLevel": 42, "questDone": ["ult_wunu_danchan"]},
+   "preHint": "已學膽顫心驚 + 42 級以上，再搵巫姬婆",
+   "stages": [
+    {"type": "talk", "npc": "wunu_master", "dialog": ["巫姬婆：「長沙城外西邊有瘋婆子紅菁唸邪咒，去制止佢，攞咒法全書返嚟。」"], "getItem": {"id": 58040, "n": 1}, "hint": "怪人情報書到手"},
+    {"type": "fight", "npc": "hongjing", "monster": 1103, "dialog": ["怪人紅菁：「嘿嘿，聽我咒語嘅人冇一個醒得返！」"], "getItem": {"id": 58044, "n": 1}, "hint": "打敗紅菁，得咒法全書"},
+    {"type": "talk", "npc": "wunu_master", "dialog": ["巫姬婆：「好，月藍先生嘅鬼神卷歸你！」"], "getItem": {"id": 58042, "n": 1}, "hint": "返去搵巫姬婆覆命", "done": true}
+   ],
+   "reward": {"exp": 8000, "gold": 2000, "items": [[28003, 20]], "ultimate": "guiku"}
+  },
+  {
+   "id": "ult_bianshi_tiandao",
+   "name": "天道循環（絕招一）",
+   "type": "ultimate",
+   "giver": "bianshi_master",
+   "pre": {"classId": "bianshi", "minLevel": 20},
+   "preHint": "辯士 20 級以上，去許昌城十字街搵蔡師傅（限弩類武器）",
+   "stages": [
+    {"type": "talk", "npc": "bianshi_master", "dialog": ["蔡師傅：「陳留黃大製弓師欠皮料，幫佢收集狐狸皮、貂皮同高級狼皮，佢送你天道神弩。」"], "hint": "接受獵皮委託"},
+    {"type": "collect", "item": {"id": 25109, "n": 30}, "hint": "狐貍皮 %v/%n"},
+    {"type": "collect", "item": {"id": 25108, "n": 20}, "hint": "貂皮 %v/%n"},
+    {"type": "collect", "item": {"id": 25107, "n": 10}, "hint": "高級狼皮 %v/%n", "done": true}
+   ],
+   "reward": {"exp": 1500, "gold": 300, "items": [[12038, 1]], "ultimate": "tiandao"}
+  },
+  {
+   "id": "ult_bianshi_tuohuo",
+   "name": "吐火羅語（絕招二）",
+   "type": "ultimate",
+   "giver": "bianshi_master",
+   "pre": {"classId": "bianshi", "minLevel": 31, "questDone": ["ult_bianshi_tiandao"]},
+   "preHint": "已學天道循環 + 31 級以上，再搵蔡師傅",
+   "stages": [
+    {"type": "talk", "npc": "bianshi_master", "dialog": ["蔡師傅：「零陵製箭商趕唔切 500 支穿心箭，幫佢手；洛陽講師有雙風殲滅令。」"], "getItem": {"id": 58029, "n": 1}, "hint": "箭商委託書到手"},
+    {"type": "fight", "npc": "shuangfeng", "monster": 1104, "dialog": ["雙風黑殺手：「想攞圓薄扇？先過我招！」"], "getItem": {"id": 58032, "n": 1}, "hint": "打敗雙風黑殺手，得園薄扇"},
+    {"type": "talk", "npc": "bianshi_master", "dialog": ["蔡師傅：「圓薄扇入手，武弩術語歸你！」"], "getItem": {"id": 58033, "n": 1}, "hint": "返去搵蔡師傅覆命", "done": true}
+   ],
+   "reward": {"exp": 3500, "gold": 800, "ultimate": "tuohuo"}
+  },
+  {
+   "id": "ult_bianshi_sanfen",
+   "name": "三分天下（絕招三）",
+   "type": "ultimate",
+   "giver": "bianshi_master",
+   "pre": {"classId": "bianshi", "minLevel": 45, "questDone": ["ult_bianshi_tuohuo"]},
+   "preHint": "已學吐火羅語 + 45 級以上，再搵蔡師傅",
+   "stages": [
+    {"type": "talk", "npc": "bianshi_master", "dialog": ["蔡師傅：「洛陽講師要考你政學同武體。先去桂陽三個秘密入口收集 10 個滅獸印記。」"], "getItem": {"id": 58046, "n": 1}, "hint": "政學考驗書到手"},
+    {"type": "collect", "item": {"id": 58055, "n": 10}, "hint": "滅獸印記 %v/%n"},
+    {"type": "talk", "npc": "bianshi_master", "dialog": ["蔡師傅：「考驗合格，三分天下傳你！」"], "getItem": {"id": 58050, "n": 1}, "hint": "返去搵蔡師傅覆命", "done": true}
+   ],
+   "reward": {"exp": 8000, "gold": 2000, "ultimate": "sanfen"}
+  },
+  {
+   "id": "ult_meinu_xiaobo",
+   "name": "笑撥弦步（絕招一）",
+   "type": "ultimate",
+   "giver": "meinu_master",
+   "pre": {"classId": "meinu", "minLevel": 20},
+   "preHint": "美女 20 級以上，去許昌城南街搵夢韶華（限琴類武器）",
+   "stages": [
+    {"type": "talk", "npc": "meinu_master", "dialog": ["夢韶華：「襄陽陳靈相公身染奇病，要百年狐膽同百年狼肺。你肯幫佢嗎？」"], "getItem": {"id": 58006, "n": 1}, "hint": "獵狼狐情報到手"},
+    {"type": "collect", "item": {"id": 58008, "n": 1}, "hint": "百年狐膽 %v/%n"},
+    {"type": "collect", "item": {"id": 58007, "n": 1}, "hint": "百年狼肺 %v/%n", "done": true}
+   ],
+   "reward": {"exp": 1500, "gold": 300, "items": [[15038, 1]], "ultimate": "xiaobo"}
+  },
+  {
+   "id": "ult_meinu_songzhu",
+   "name": "松竹聽雨（絕招二）",
+   "type": "ultimate",
+   "giver": "meinu_master",
+   "pre": {"classId": "meinu", "minLevel": 30, "questDone": ["ult_meinu_xiaobo"]},
+   "preHint": "已學笑撥弦步 + 30 級以上，再搵夢韶華",
+   "stages": [
+    {"type": "talk", "npc": "meinu_master", "dialog": ["夢韶華：「婈兒細佬被狼懿捉咗！去晉陽洞窟八層打敗狼懿頭目，攞狂兒救助函。」"], "getItem": {"id": 58026, "n": 1}, "hint": "婈兒信函到手"},
+    {"type": "fight", "npc": "langyi_head", "monster": 1102, "dialog": ["狼懿頭目：「細路喺我手上，打我呀！」"], "getItem": {"id": 58028, "n": 1}, "hint": "打敗狼懿頭目，得狂兒救助函"},
+    {"type": "talk", "npc": "meinu_master", "dialog": ["夢韶華：「狂兒救返嚟，五個玄冰丹（冥思散代）送你，松竹聽雨傳你！」"], "getItem": {"id": 28003, "n": 5}, "hint": "返去搵夢韶華覆命", "done": true}
+   ],
+   "reward": {"exp": 3500, "gold": 800, "ultimate": "songzhu"}
+  },
+  {
+   "id": "ult_meinu_feihua",
+   "name": "飛花點翠（絕招三）",
+   "type": "ultimate",
+   "giver": "meinu_master",
+   "pre": {"classId": "meinu", "minLevel": 44, "questDone": ["ult_meinu_songzhu"]},
+   "preHint": "已學松竹聽雨 + 44 級以上，再搵夢韶華",
+   "stages": [
+    {"type": "talk", "npc": "meinu_master", "dialog": ["夢韶華：「美女武學宗師月婈仙子肯見你喇，先收魅隱考驗書，去桂陽秘密入口收集 10 個滅獸印記。」"], "getItem": {"id": 58051, "n": 1}, "hint": "魅隱考驗書到手"},
+    {"type": "collect", "item": {"id": 58055, "n": 10}, "hint": "滅獸印記 %v/%n"},
+    {"type": "talk", "npc": "meinu_master", "dialog": ["夢韶華：「考驗合格，飛花點翠傳你！」"], "getItem": {"id": 58054, "n": 1}, "hint": "返去搵夢韶華覆命", "done": true}
+   ],
+   "reward": {"exp": 8000, "gold": 2000, "ultimate": "feihua"}
   }
  ]
 }

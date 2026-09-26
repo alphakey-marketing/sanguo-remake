@@ -19,6 +19,7 @@ run rules --script tests/run_rules.gd
 run quest --script tests/run_quest.gd
 run hist --script tests/run_hist.gd
 run group --script tests/run_group.gd
+run ult --script tests/run_ult.gd
 run b3 --script tests/run_b3.gd
 run mount --script tests/run_mount.gd
 run war_beast --script tests/run_war_beast.gd
