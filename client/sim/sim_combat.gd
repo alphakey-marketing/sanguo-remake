@@ -54,6 +54,8 @@ func damage(t: Dictionary, dmg: int, by: Dictionary) -> void:
 		_kill_mob(t, by)
 	elif t.get("kind", "") == "bot":
 		_kill_bot(t, by)              # S03a: 居民死亡 (唔走返回客棧條玩家死亡流程)
+	elif t.get("kind", "") == "beast":
+		_kill_beast(t, by)            # S07b: 戰騎倒下 → 忠誠 −1 / 走佬 / 送返馬廄
 	elif t.has("ch"):
 		_kill_player(t)
 
@@ -125,6 +127,7 @@ func _kill_mob(m: Dictionary, by: Dictionary, exp_mult: float = 1.0) -> void:
 		if int(member["id"]) == int(by["id"]):
 			ups = mups
 	_comm_on_kill(by, int(m["mob"]["def"]))      # 居民委託打怪計數 (Step 16)
+	_beast_on_mob_kill(by, base_exp)              # S07b: 出戰戰騎吸 exp
 	if ups > 0:
 		_sync_quest_npcs()          # 升級可能改變任務 NPC 可見性 (神秘老人/流浪狗)
 	_emit({"k": "kill", "src": by["id"], "dst": m["id"], "exp": int(d["exp"]), "gold": gold, "items": items,

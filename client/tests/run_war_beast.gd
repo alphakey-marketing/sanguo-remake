@@ -18,6 +18,13 @@ func _init() -> void:
 	t_battle_skills(cfg)
 	t_friend_skills(cfg)
 	t_loyalty_trade(cfg)
+	t_stats(data)
+	t_sim_adopt(data)
+	t_sim_combat(data)
+	t_sim_skill(data)
+	t_sim_death(data)
+	t_sim_roundtrip(data)
+	t_sim_determinism(data)
 	print("[TEST] war_beast: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -182,3 +189,259 @@ func t_loyalty_trade(cfg: Dictionary) -> void:
 	check(RulesWarBeast.sell_why(cfg, wb2, 10) == "", "玩家 10 級 + 忠誠夠 = 可以交易")
 	wb2["level"] = 10
 	check(RulesWarBeast.sell_price(cfg, wb2) == int(cfg["sellBase"]) + 10 * int(cfg["sellPerLevel"]), "賣價跟等級")
+# ================= 實戰數值 (S07b) =================
+func t_stats(data: GameData) -> void:
+	var cfg: Dictionary = data.war_beasts
+	var niu := RulesWarBeast.new_beast(cfg, "niujiao", 1)
+	var sn := RulesWarBeast.stats_for(cfg, niu)
+	var bao := RulesWarBeast.new_beast(cfg, "canying", 2)
+	var sb := RulesWarBeast.stats_for(cfg, bao)
+	check(int(sn["hpMax"]) > int(sb["hpMax"]), "獸體高 (巨角牛 9) HP 多過 殘影豹 3")
+	check(float(sn["atk"]) > float(sb["atk"]), "獸力高攻擊高")
+	check(int(sb["spMax"]) > int(sn["spMax"]), "獸靈高 SP 多")
+	check(int(sn["interval"]) >= 6, "攻速間隔有下限")
+	var lv := RulesWarBeast.new_beast(cfg, "niujiao", 3)
+	lv["level"] = 50
+	var s50 := RulesWarBeast.stats_for(cfg, lv)
+	check(int(s50["hpMax"]) > int(sn["hpMax"]), "等級高 HP 高")
+	var p := RulesWarBeast.new_beast(cfg, "bawang", 4)
+	var base_atk := float(RulesWarBeast.stats_for(cfg, p)["atk"])
+	p["battleSkills"] = {"bawang_juli": 5}
+	var boosted := float(RulesWarBeast.stats_for(cfg, p)["atk"])
+	check(boosted > base_atk, "passive 巨力加成攻擊")
+	check(RulesWarBeast.exp_share(cfg, 100) == int(round(100.0 * float(cfg["beastExpShare"]))), "exp 分享按比例")
+	var wb := RulesWarBeast.new_beast(cfg, "jifeng", 5)
+	check(RulesWarBeast.pick_skill(cfg, wb, 0, {}, 999, 1.0).is_empty(), "冇學招 = 普通攻擊")
+	wb["battleSkills"] = {"jifeng_langzhao": 1}
+	check(not RulesWarBeast.pick_skill(cfg, wb, 0, {}, 999, 1.0).is_empty(), "學咗狼爪 → 揀嚟用")
+	check(RulesWarBeast.pick_skill(cfg, wb, 0, {}, 0, 1.0).is_empty(), "SP 唔夠唔出招")
+	check(RulesWarBeast.pick_skill(cfg, wb, 100, {"jifeng_langzhao": 200}, 999, 1.0).is_empty(), "冷卻中唔出招")
+	var fox := RulesWarBeast.new_beast(cfg, "jifeng", 6)
+	fox["battleSkills"] = {"jifeng_langzhao": 1, "jifeng_liaoshang": 1}
+	var pick := RulesWarBeast.pick_skill(cfg, fox, 0, {}, 999, 0.3)
+	check(not pick.is_empty() and String(pick["skill"]["kind"]) == "heal", "血少優先揀療傷")
+
+
+# ================= sim (S07b) =================
+func _new(data: GameData, seed: int) -> Array:
+	var sim := Sim.new(data, seed)
+	var id := sim.spawn_player("t")
+	var ch: Dictionary = sim.player_ch()
+	ch["level"] = 30
+	ch["gold"] = 500000
+	var msgs: Array = []
+	sim.event_emitted.connect(func(ev: Dictionary) -> void:
+		if ev["k"] == "msg" and int(ev.get("dst", -1)) == id:
+			msgs.append(str(ev["text"])))
+	return [sim, id, ch, msgs]
+
+
+func _put(sim: Sim, id: int, x: int, y: int) -> void:
+	var e := sim.ent(id)
+	e["x"] = x
+	e["y"] = y
+	e["tx"] = x
+	e["ty"] = y
+	e.erase("path")
+
+
+func _at_fac(sim: Sim, id: int, key: String) -> void:
+	var f: Dictionary = sim.data.facilities[key]
+	var p := sim._free_near(int(f["x"]), int(f["y"]))
+	_put(sim, id, p.x, p.y)
+
+
+func _last(msgs: Array) -> String:
+	return str(msgs[-1]) if not msgs.is_empty() else ""
+
+
+func t_sim_adopt(data: GameData) -> void:
+	var r := _new(data, 21)
+	var sim: Sim = r[0]
+	var id: int = r[1]
+	var ch: Dictionary = r[2]
+	var msgs: Array = r[3]
+	sim.cmd_beast_adopt(id, "jifeng")
+	check(sim._beasts(ch).is_empty() and _last(msgs).contains("馬廄"), "唔喺馬廄馴唔到戰騎")
+	_at_fac(sim, id, "stable_xc")
+	sim.cmd_beast_adopt(id, "jifeng")
+	var list: Array = sim._beasts(ch)
+	check(list.size() == 1 and String(list[0]["where"]) == "with", "馴養 → 出戰跟身")
+	check(int(ch["gold"]) == 500000 - 15000, "扣 15000 金")
+	check(not sim.beast_ent(id).is_empty(), "出戰戰騎有實體")
+	sim.cmd_beast_adopt(id, "niujiao")
+	check(list.size() == 2 and String(list[1]["where"]) == "stable", "第 2 隻有出戰 → 寄馬廄")
+	sim.cmd_beast_adopt(id, "bawang")
+	check(list.size() == 3, "養到 3 隻")
+	sim.cmd_beast_adopt(id, "canying")
+	check(list.size() == 3 and _last(msgs).contains("3"), "最多 3 隻【原】")
+	sim.cmd_beast_adopt(id, "shenglin")
+	check(list.size() == 3, "未開放品種馴唔到")
+	var uid := int(list[0]["uid"])
+	sim.cmd_beast_rename(id, uid, "  小風  ")
+	check(String(list[0]["nick"]) == "小風", "改名 trim")
+	check(String(sim.beast_ent(id)["name"]) == "小風", "改名更新實體名")
+	list[0]["attrPts"] = 2
+	var pow0 := int(list[0]["attrs"]["pow"])
+	sim.cmd_beast_point(id, uid, "pow")
+	check(int(list[0]["attrs"]["pow"]) == pow0 + 1 and int(list[0]["attrPts"]) == 1, "屬性點分配")
+	var uid2 := int(list[1]["uid"])
+	sim.cmd_beast_deploy(id, uid2, true)
+	check(String(list[0]["where"]) == "stable" and String(list[1]["where"]) == "with", "出戰切換")
+	check(int(sim.beast_ent(id)["uid"]) == uid2, "換咗實體")
+	sim.cmd_beast_deploy(id, uid2, false)
+	check(String(list[1]["where"]) == "stable" and sim.beast_ent(id).is_empty(), "收回馬廄 → 冇實體")
+	list[0]["battlePts"] = 3
+	sim.cmd_beast_train(id, uid, "jifeng_fengren")
+	check(RulesWarBeast.battle_skill_level(list[0], "jifeng_fengren") == 0, "*招要前置先學到")
+	sim.cmd_beast_train(id, uid, "jifeng_langzhao")
+	check(RulesWarBeast.battle_skill_level(list[0], "jifeng_langzhao") == 1, "練到狼爪 1 級")
+	list[0]["friendPts"] = 5
+	sim.cmd_beast_friend_train(id, uid, "jifeng", "jifeng_tuochu")
+	check(RulesWarBeast.friend_learned(list[0], "jifeng_tuochu"), "學到友好特技脫出")
+	var gold0 := int(ch["gold"])
+	sim.cmd_beast_sell(id, uid)
+	check(sim._beasts(ch).size() == 2 and int(ch["gold"]) > gold0, "賣戰騎換金")
+
+
+func t_sim_combat(data: GameData) -> void:
+	var r := _new(data, 22)
+	var sim: Sim = r[0]
+	var id: int = r[1]
+	var ch: Dictionary = r[2]
+	sim.init_mobs()
+	_at_fac(sim, id, "stable_xc")
+	sim.cmd_beast_adopt(id, "bawang")
+	var wb: Dictionary = sim._beasts(ch)[0]
+	var be_id := int(sim.beast_ent(id)["id"])
+	var hits: Array = []
+	sim.event_emitted.connect(func(ev: Dictionary) -> void:
+		if ev["k"] == "hit" and int(ev.get("src", -1)) == be_id and int(ev["dmg"]) > 0:
+			hits.append(ev))
+	_put(sim, id, 30, 30)
+	sim._spawn_mob(1001)
+	var mob_id := 0
+	for e in sim.ents.values():
+		if e["kind"] == "mob":
+			mob_id = int(e["id"])
+			break
+	_put(sim, mob_id, 31, 30)
+	sim.ent(mob_id)["mob"]["home_x"] = 31
+	sim.ent(mob_id)["mob"]["home_y"] = 30
+	_put(sim, be_id, 29, 30)
+	var exp0 := int(wb["exp"])
+	for i in 400:
+		sim.step()
+		if not sim.ents.has(mob_id):
+			break
+	check(not hits.is_empty(), "戰騎自動攻擊打中怪")
+	check(not sim.ents.has(mob_id), "戰騎幫手殺到怪")
+	check(int(wb["exp"]) > exp0 or int(wb["level"]) > 1, "戰騎殺怪吸 exp")
+
+
+func t_sim_skill(data: GameData) -> void:
+	var r := _new(data, 23)
+	var sim: Sim = r[0]
+	var id: int = r[1]
+	var ch: Dictionary = r[2]
+	sim.init_mobs()
+	_at_fac(sim, id, "stable_xc")
+	sim.cmd_beast_adopt(id, "jifeng")
+	var wb: Dictionary = sim._beasts(ch)[0]
+	wb["battleSkills"] = {"jifeng_langzhao": 1}
+	wb["sp"] = 999
+	var used: Array = []
+	sim.event_emitted.connect(func(ev: Dictionary) -> void:
+		if ev["k"] == "beast_skill":
+			used.append(str(ev["skill"])))
+	_put(sim, id, 30, 30)
+	sim._spawn_mob(1001)
+	var mob_id := 0
+	for e in sim.ents.values():
+		if e["kind"] == "mob":
+			mob_id = int(e["id"])
+			break
+	_put(sim, mob_id, 31, 30)
+	sim.ent(mob_id)["mob"]["home_x"] = 31
+	sim.ent(mob_id)["mob"]["home_y"] = 30
+	_put(sim, int(sim.beast_ent(id)["id"]), 29, 30)
+	for i in 120:
+		sim.step()
+		if not used.is_empty():
+			break
+	check(used.has("jifeng_langzhao"), "戰騎出戰鬥特技 (狼爪)")
+
+
+func t_sim_death(data: GameData) -> void:
+	var r := _new(data, 24)
+	var sim: Sim = r[0]
+	var id: int = r[1]
+	var ch: Dictionary = r[2]
+	_at_fac(sim, id, "stable_xc")
+	sim.cmd_beast_adopt(id, "niujiao")
+	var wb: Dictionary = sim._beasts(ch)[0]
+	wb["loyalty"] = 50
+	var before := int(wb["loyalty"])
+	var be := sim.beast_ent(id)
+	sim.damage(be, 999999, sim.ent(id))
+	check(sim._beasts(ch).size() == 1, "倒下唔走佬 → 仲喺清單")
+	check(int(wb["loyalty"]) == before - 1, "戰鬥死亡忠誠 −1【原】")
+	check(String(wb["where"]) == "stable", "倒下送返馬廄")
+	check(sim.beast_ent(id).is_empty(), "倒下 → 移除實體")
+	var r2 := _new(data, 25)
+	var sim2: Sim = r2[0]
+	var id2: int = r2[1]
+	var ch2: Dictionary = r2[2]
+	_at_fac(sim2, id2, "stable_xc")
+	sim2.cmd_beast_adopt(id2, "niujiao")
+	var wb2: Dictionary = sim2._beasts(ch2)[0]
+	wb2["loyalty"] = 1
+	sim2.damage(sim2.beast_ent(id2), 999999, sim2.ent(id2))
+	check(sim2._beasts(ch2).is_empty(), "忠誠 0 → 走佬消失")
+
+
+func t_sim_roundtrip(data: GameData) -> void:
+	var r := _new(data, 26)
+	var sim: Sim = r[0]
+	var id: int = r[1]
+	var ch: Dictionary = r[2]
+	_at_fac(sim, id, "stable_xc")
+	sim.cmd_beast_adopt(id, "jifeng")
+	sim.cmd_beast_adopt(id, "bawang")
+	sim._beasts(ch)[0]["battleSkills"] = {"jifeng_langzhao": 3}
+	var s1 := sim.save_string()
+	var sim2 := Sim.load_string(data, s1)
+	check(sim2 != null and sim2.save_string() == s1, "戰騎存檔 roundtrip 字串一致")
+	var ch2: Dictionary = sim2.player_ch()
+	var id2 := int(sim2.state["player_id"])
+	check(sim2._beasts(ch2).size() == 2, "載入 2 隻戰騎")
+	check(not sim2.beast_ent(id2).is_empty(), "載入後出戰實體重建")
+	check(RulesWarBeast.battle_skill_level(sim2._beasts(ch2)[0], "jifeng_langzhao") == 3, "載入後招式等級保留")
+	check(not (sim2.beast_view(id2)["list"] as Array).is_empty(), "beast_view 讀到清單")
+
+
+func t_sim_determinism(data: GameData) -> void:
+	check(_script(data) == _script(data), "同種子同操作 → 存檔一致")
+
+
+func _script(data: GameData) -> String:
+	var r := _new(data, 138)
+	var sim: Sim = r[0]
+	var id: int = r[1]
+	sim.init_mobs()
+	_at_fac(sim, id, "stable_xc")
+	sim.cmd_beast_adopt(id, "bawang")
+	_put(sim, id, 30, 30)
+	sim._spawn_mob(1001)
+	var mob_id := 0
+	for e in sim.ents.values():
+		if e["kind"] == "mob":
+			mob_id = int(e["id"])
+			break
+	_put(sim, mob_id, 31, 30)
+	sim.ent(mob_id)["mob"]["home_x"] = 31
+	sim.ent(mob_id)["mob"]["home_y"] = 30
+	_put(sim, int(sim.beast_ent(id)["id"]), 29, 30)
+	for i in 200:
+		sim.step()
+	return sim.save_string()

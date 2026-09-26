@@ -588,6 +588,15 @@ func _mount_weapon_wdef(_ch: Dictionary) -> Dictionary:
 	return {"power": 0.0, "hit": 0.0}
 
 
+# 戰騎 hook (S07b)：sim_war_beast 覆寫；畀 sim_combat (喺繼承鏈上游) 用得
+func _kill_beast(_t: Dictionary, _by: Dictionary) -> void:
+	pass
+
+
+func _beast_on_mob_kill(_by: Dictionary, _base_exp: int) -> void:
+	pass
+
+
 func order_count(ch: Dictionary, item: int) -> int:
 	return RulesShop.count_item(ch["bag"], item)
 

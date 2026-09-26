@@ -1,5 +1,5 @@
 class_name Sim
-extends "res://sim/sim_mount.gd"
+extends "res://sim/sim_war_beast.gd"
 # 單機世界模擬: 格子地圖 + 單位 + 即時戰鬥 + 怪物 AI + 設施。
 # - state 全部係純資料 (Dictionary/Array/int/String)，可直接存檔；RNG 由種子驅動 → 可重現
 # - UI 只透過 cmd_* 發意圖、透過 event_emitted 收事件、透過 view_ents()/player_ch() 讀狀態
@@ -165,6 +165,8 @@ func step() -> void:
 	_recruit_tick()             # 擂台勝負 (Step 13.5)
 	_office_tick()              # 官令護衛/救援 NPC 死咗 → 自動失敗 (S06a)
 	_mount_tick()               # 放牧返嚟 (Step 17a)
+	_beast_tick()               # 戰騎出戰實體同步/回復 (S07b)
+	_beast_orphans()            # 戰騎無主實體清理 (S07b)
 	_safe_regen_tick()          # 城內安全區自動回復 (S01a, spec 01 §4)
 	_city_guard_check()         # S03b: 殺人魔喺城內/安全區 → 城門衛兵警告 (拒入城)
 	_expire_drops()             # S04a: 過期地面掉落物消失
@@ -174,6 +176,8 @@ func step() -> void:
 			continue
 		if e["kind"] == "mob":
 			_think_mob(e)
+		elif e["kind"] == "beast":
+			_think_beast(e)         # 戰騎: 跟主人/自動攻擊/戰鬥特技 (S07b)
 		elif e.has("ch"):
 			if e["kind"] == "gen":
 				_think_companion(e)     # 登用同伴: 揀目標/跟隨 (Step 13.5)
