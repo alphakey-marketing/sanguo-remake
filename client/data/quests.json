@@ -1438,6 +1438,243 @@
      ]
     ]
    }
+  },
+  {
+   "id": "group_merchant",
+   "name": "商會長經濟交流",
+   "type": "group",
+   "giver": "merchant_guild",
+   "pre": {"militia": true},
+   "preHint": "要所屬義勇軍先接得；去許昌城中心搵商會長",
+   "stages": [
+    {"type": "talk", "npc": "merchant_guild", "getItem": {"id": 56503, "n": 1}, "dialog": ["商會長：「我想同宛城做單大生意，你幫我帶呢塊商會令牌去宛城搵商人，辦妥返嚟重重有賞！」"], "hint": "帶商會令牌去宛城搵商人"},
+    {"type": "talk", "npc": "wancheng_merchant", "takeItems": [[56503, 1]], "dialog": ["宛城商人：「許昌商會嘅令牌？我即刻備貨！」"], "hint": "交商會令牌畀宛城商人"},
+    {"type": "talk", "npc": "merchant_guild", "dialog": ["商會長：「貨銀兩訖，多謝你奔波！呢啲係你嘅報酬。」"], "hint": "返許昌商會長覆命", "done": true}
+   ],
+   "reward": {"gold": 500, "fame": 15}
+  },
+  {
+   "id": "group_exterminate",
+   "name": "居民除害（猛獸王）",
+   "type": "group",
+   "giver": "wu_lao",
+   "pre": {"militia": true},
+   "preHint": "要所屬義勇軍先接得；去宛城搵武老",
+   "stages": [
+    {"type": "talk", "npc": "wu_lao", "dialog": ["武老：「九命怪狐、殺人凶熊、深山巨蟒王……群獸之首猛獸王出沒汝南道，義勇軍幫手除害啦！」"], "hint": "去汝南道搵猛獸王"},
+    {"type": "fight", "npc": "beast_king", "monster": 1093, "dialog": ["猛獸王怒吼一聲，撲向你！"], "hint": "同猛獸王 PK（行近猛獸王對話開打）"},
+    {"type": "talk", "npc": "wu_lao", "dialog": ["武老：「猛獸王已除，鄉親終於可以安心！多謝義勇軍！」"], "hint": "返宛城同武老覆命", "done": true}
+   ],
+   "reward": {"gold": 800, "fame": 20}
+  },
+  {
+   "id": "group_weizi",
+   "name": "衛茲資助軍備",
+   "type": "group",
+   "giver": "weizi",
+   "pre": {"militia": true},
+   "preHint": "要所屬義勇軍先接得；去陳留搵衛茲",
+   "stages": [
+    {"type": "talk", "npc": "weizi", "dialog": ["衛茲：「我願資助義勇軍軍備，不過……我喜好白玉飾品，搵返嚟送我，軍備即刻奉上！」"], "hint": "搵一件白玉飾品畀衛茲"},
+    {"type": "collect", "item": {"id": 56504, "n": 1}, "hint": "交白玉飾品畀衛茲 (%v/%n)"},
+    {"type": "talk", "npc": "weizi", "dialog": ["衛茲：「好玉！軍備你拎去，義勇軍守城衛民，衛某義不容辭！」"], "hint": "向衛茲覆命", "done": true}
+   ],
+   "reward": {"gold": 600, "fame": 25}
+  },
+  {
+   "id": "group_miner",
+   "name": "幫助礦工工頭",
+   "type": "group",
+   "giver": "miner_boss",
+   "pre": {"militia": true},
+   "preHint": "要所屬義勇軍先接得；去宛城搵礦工工頭",
+   "stages": [
+    {"type": "talk", "npc": "miner_boss", "dialog": ["礦工工頭：「礦坑太暗，又缺工具。送兩支蠟燭同一把鐵鎚嚟，我用礦石回報你！」"], "hint": "收集蠟燭×2 + 鐵鎚×1"},
+    {"type": "collect", "item": {"id": 26015, "n": 2}, "hint": "蠟燭 %v/%n"},
+    {"type": "collect", "item": {"id": 26004, "n": 1}, "hint": "鐵鎚 %v/%n"},
+    {"type": "talk", "npc": "miner_boss", "dialog": ["礦工工頭：「多謝！呢啲礦石你帶走。」"], "hint": "向礦工工頭覆命", "done": true}
+   ],
+   "reward": {"gold": 300, "items": [[25002, 10]]}
+  },
+  {
+   "id": "group_zixu",
+   "name": "紫虛上人修行",
+   "type": "group",
+   "giver": "zixu",
+   "preHint": "紫虛上人每日修行，供材料可得藏寶圖；去許昌城搵佢",
+   "stages": [
+    {"type": "talk", "npc": "zixu", "dialog": ["紫虛上人：「貧道每日例行修行，正缺紫色香草。你供我五株，我送你一張藏寶圖。」"], "hint": "收集紫色香草×5"},
+    {"type": "collect", "item": {"id": 25097, "n": 5}, "hint": "紫色香草 %v/%n"},
+    {"type": "talk", "npc": "zixu", "dialog": ["紫虛上人：「善哉。呢張藏寶圖你收好，他日必有大用。」"], "hint": "向紫虛上人覆命", "done": true}
+   ],
+   "reward": {"gold": 100, "items": [[61319, 1]]}
+  },
+  {
+   "id": "group_court_harm",
+   "name": "朝廷除害",
+   "type": "group",
+   "giver": "court_harm",
+   "pre": {"militia": true},
+   "preHint": "要所屬義勇軍先接得；去許昌城搵朝廷除害官",
+   "stages": [
+    {"type": "talk", "npc": "court_harm", "dialog": ["朝廷除害官：「食人惡虎喺荊州地界傷人，朝廷懸賞除害，義勇軍接唔接？」"], "hint": "去荊州地界搵食人惡虎"},
+    {"type": "fight", "npc": "man_eating_tiger", "monster": 1094, "dialog": ["食人惡虎咆哮，直撲過嚟！"], "hint": "同食人惡虎 PK"},
+    {"type": "talk", "npc": "court_harm", "dialog": ["朝廷除害官：「惡虎已除，朝廷賞金即刻發放！」"], "hint": "返許昌覆命", "done": true}
+   ],
+   "reward": {"gold": 1000}
+  },
+  {
+   "id": "group_court_rat",
+   "name": "朝廷滅鼠",
+   "type": "group",
+   "giver": "court_rat",
+   "pre": {"militia": true},
+   "preHint": "要所屬義勇軍先接得；去許昌城搵朝廷滅鼠官",
+   "stages": [
+    {"type": "talk", "npc": "court_rat", "dialog": ["朝廷滅鼠官：「鼠害頻傳、農作物欠收！義勇軍去潁川郊外打田鼠，攞 30 塊田鼠碎骨返嚟為證！」"], "hint": "打田鼠收集田鼠碎骨"},
+    {"type": "collect", "item": {"id": 61501, "n": 30}, "hint": "田鼠碎骨 %v/%n"},
+    {"type": "talk", "npc": "court_rat", "dialog": ["朝廷滅鼠官：「好！鼠患平定，賞金奉上！」"], "hint": "返許昌覆命", "done": true}
+   ],
+   "reward": {"gold": 400}
+  },
+  {
+   "id": "group_court_thief",
+   "name": "朝廷滅賊",
+   "type": "group",
+   "giver": "court_thief",
+   "pre": {"militia": true},
+   "preHint": "要所屬義勇軍先接得；去許昌城搵朝廷滅賊官",
+   "stages": [
+    {"type": "talk", "npc": "court_thief", "dialog": ["朝廷滅賊官：「何進引董卓入京，賊寇四起！義勇軍去陳留郊外剿滅賊寇，朝廷重重有賞！」"], "hint": "去陳留郊外搵賊寇"},
+    {"type": "fight", "npc": "thief", "monster": 1095, "dialog": ["賊寇頭目獰笑：「就憑你？」"], "hint": "同賊寇 PK"},
+    {"type": "talk", "npc": "court_thief", "dialog": ["朝廷滅賊官：「賊患已平，賞金奉上！」"], "hint": "返許昌覆命", "done": true}
+   ],
+   "reward": {"gold": 1000}
+  },
+  {
+   "id": "group_lin",
+   "name": "林員外喜宴",
+   "type": "group",
+   "giver": "lin",
+   "pre": {"militia": true},
+   "preHint": "要所屬義勇軍先接得；去許昌城搵林員外",
+   "stages": [
+    {"type": "talk", "npc": "lin", "dialog": ["林員外：「犬子大婚，欠缺料理高手！義勇軍肯推薦廚藝高手，先答我：大型喜宴最緊要乜？」"], "hint": "答林員外嘅問題"},
+    {"type": "ask", "npc": "lin", "dialog": ["林員外：「大型喜宴最緊要係乜？」"], "options": ["材料新鮮", "份量夠多兼快", "擺盤華麗"], "answer": 1, "hint": "答啱林員外嘅問題", "done": true}
+   ],
+   "reward": {"gold": 800, "fame": 20}
+  },
+  {
+   "id": "group_thief_camp",
+   "name": "勇闖賊寨",
+   "type": "group",
+   "giver": "yongbo",
+   "pre": {"militia": true},
+   "preHint": "要所屬義勇軍先接得；去汝南道搵勇伯",
+   "stages": [
+    {"type": "talk", "npc": "yongbo", "dialog": ["勇伯：「山洞畀山大王霸咗，禍害鄉民！壯士肯去說服佢收山嗎？」"], "hint": "去于毒山寨搵山大王"},
+    {"type": "fight", "npc": "bandit_king", "monster": 1096, "dialog": ["山大王：「收山？先打低我！」"], "hint": "同山大王 PK"},
+    {"type": "talk", "npc": "yongbo", "dialog": ["勇伯：「山大王肯收山，鄉民有救喇！多謝壯士！」"], "hint": "返汝南道覆命", "done": true}
+   ],
+   "reward": {"gold": 700, "fame": 20}
+  },
+  {
+   "id": "group_ghost",
+   "name": "鬼域迷陣",
+   "type": "group",
+   "giver": "shenjing_lao",
+   "pre": {"militia": true},
+   "preHint": "要所屬義勇軍先接得；許昌寺廟附近搵神經老人（每月 16~21 日先現身）",
+   "stages": [
+    {"type": "talk", "npc": "shenjing_lao", "dialog": ["神經老人：「鬼域喺汝南洞窟三層……巨魎守住豐富礦藏，有膽就去！」"], "hint": "去汝南洞窟三層搵鬼域巨魎"},
+    {"type": "fight", "npc": "ghost_guard", "monster": 1098, "dialog": ["鬼域巨魎陰氣逼人，瞪住你！"], "hint": "同鬼域巨魎 PK"},
+    {"type": "talk", "npc": "shenjing_lao", "dialog": ["神經老人：「礦藏歸你，老朽只要巨魎不得為害。」"], "hint": "返許昌覆命", "done": true}
+   ],
+   "reward": {"gold": 900, "items": [[25002, 20]]}
+  },
+  {
+   "id": "group_yanshan",
+   "name": "岩山瘴林歷險",
+   "type": "group",
+   "giver": "yanshan",
+   "pre": {"militia": true},
+   "preHint": "要所屬義勇軍先接得；去荊州地界搵岩山樵夫",
+   "stages": [
+    {"type": "talk", "npc": "yanshan", "dialog": ["岩山樵夫：「岩山瘴林多木料，義勇軍缺資源？我二十根木頭換你情報。」"], "hint": "收集木頭×20"},
+    {"type": "collect", "item": {"id": 25053, "n": 20}, "hint": "木頭 %v/%n"},
+    {"type": "talk", "npc": "yanshan", "dialog": ["岩山樵夫：「多謝！呢啲金礦石回報你。」"], "hint": "覆命", "done": true}
+   ],
+   "reward": {"gold": 500, "items": [[25005, 5]]}
+  },
+  {
+   "id": "group_recruit_soldier",
+   "name": "義勇士兵增兵",
+   "type": "group",
+   "giver": "recruit_officer",
+   "pre": {"militia": true},
+   "preHint": "要所屬義勇軍先接得；去許昌城搵徵兵官",
+   "stages": [
+    {"type": "talk", "npc": "recruit_officer", "dialog": ["徵兵官：「戰事頻繁，兵源短缺！憑義勇軍名號，幫我號召熱血勇士入伍！」"], "hint": "號召勇士入伍"},
+    {"type": "talk", "npc": "recruit_officer", "dialog": ["徵兵官：「好！有你號召，招募到一批熱血勇士！」"], "hint": "覆命", "done": true}
+   ],
+   "reward": {"gold": 300, "fame": 10}
+  },
+  {
+   "id": "group_maze",
+   "name": "亂數迷宮找寶藏",
+   "type": "group",
+   "giver": "luopo_lao",
+   "pre": {"militia": true},
+   "preHint": "要所屬義勇軍先接得；許昌客棧內搵落魄老人（每月 10~15 日先現身）",
+   "stages": [
+    {"type": "talk", "npc": "luopo_lao", "dialog": ["落魄老人：「荊州有前朝寶藏，藏喺汝南洞窟三層，有守衛鎮守……你去試下。」"], "hint": "去汝南洞窟三層搵寶藏守衛"},
+    {"type": "fight", "npc": "treasure_guard", "monster": 1099, "dialog": ["前朝寶藏守衛：「寶藏豈是爾等可染指？」"], "hint": "同寶藏守衛 PK"},
+    {"type": "talk", "npc": "luopo_lao", "dialog": ["落魄老人：「尋得寶藏，總算冇埋沒前朝……」"], "hint": "返許昌覆命", "done": true}
+   ],
+   "reward": {"gold": 900, "items": [[61319, 1]]}
+  },
+  {
+   "id": "group_evil_head",
+   "name": "斬殺惡頭",
+   "type": "group",
+   "giver": "liu_lao",
+   "pre": {"militia": true},
+   "preHint": "要所屬義勇軍先接得；去許昌城搵劉老",
+   "stages": [
+    {"type": "talk", "npc": "liu_lao", "dialog": ["劉老：「有惡頭濫用邪術害人！洛陽抱馬窄知道佢嘅巢穴，先去問佢。」"], "hint": "去洛陽搵抱馬窄"},
+    {"type": "talk", "npc": "baoma_zhai", "dialog": ["抱馬窄：「惡頭喺洛陽城外藏身……你行近搵佢，小心邪術！」"], "hint": "去洛陽城外搵惡頭"},
+    {"type": "fight", "npc": "evil_head", "monster": 1097, "dialog": ["惡頭獰笑：「敢壞我好事？受死！」"], "hint": "同惡頭 PK"},
+    {"type": "talk", "npc": "liu_lao", "dialog": ["劉老：「惡頭伏法，大快人心！多謝義勇軍！」"], "hint": "返許昌覆命", "done": true}
+   ],
+   "reward": {"gold": 1000, "fame": 30}
+  },
+  {
+   "id": "group_imperial_tool",
+   "name": "初階御賜工具",
+   "type": "group",
+   "giver": "court_official_tool",
+   "pre": {"militia": true},
+   "preHint": "要所屬義勇軍先接得；去許昌練兵場搵朝廷官吏",
+   "stages": [
+    {"type": "talk", "npc": "court_official_tool", "dialog": ["朝廷官吏：「義勇軍朝廷有賞——繳交十件雕刻木，換一件御賜鋤頭！」"], "hint": "收集雕刻木×10"},
+    {"type": "collect", "item": {"id": 25105, "n": 10}, "hint": "雕刻木 %v/%n"},
+    {"type": "talk", "npc": "court_official_tool", "dialog": ["朝廷官吏：「好，御賜鋤頭歸你！」"], "hint": "覆命", "done": true}
+   ],
+   "reward": {"items": [[26053, 1]]}
+  },
+  {
+   "id": "group_craftsman",
+   "name": "協助工匠工頭",
+   "type": "group",
+   "giver": "craft_boss",
+   "pre": {"militia": true},
+   "preHint": "要所屬義勇軍先接得；去陳留搵工匠工頭",
+   "stages": [
+    {"type": "talk", "npc": "craft_boss", "dialog": ["工匠工頭：「急住升級營地，欠雕刻器具！送十件雕刻木嚟，我用木材回報！」"], "hint": "收集雕刻木×10"},
+    {"type": "collect", "item": {"id": 25105, "n": 10}, "hint": "雕刻木 %v/%n"},
+    {"type": "talk", "npc": "craft_boss", "dialog": ["工匠工頭：「多謝！呢堆木材你拎去用。」"], "hint": "覆命", "done": true}
+   ],
+   "reward": {"gold": 300, "items": [[25053, 20]]}
   }
  ]
 }

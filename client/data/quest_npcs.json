@@ -636,6 +636,31 @@
    "questOnly": true,
    "desc": "零陵城練兵場門口街道嘅曹阿瞞【原】。",
    "map": "lingling"
-  }
+  },
+  {"id": "merchant_guild", "name": "商會長", "x": 36, "y": 26, "map": "xuchang", "idle": ["商會長：「經濟交流，利國利民。」"], "desc": "許昌城商會長【原 sy3_4】：義勇軍每月可接經濟交流任務。"},
+  {"id": "wu_lao", "name": "武老", "x": 36, "y": 28, "map": "wancheng", "idle": ["武老：「猛獸為禍，苦不堪言。」"], "desc": "宛城居民【原 sy3_4】：義勇軍每月可接除害任務。"},
+  {"id": "weizi", "name": "衛茲", "x": 48, "y": 28, "map": "chenliu", "idle": ["衛茲：「除害救民，義勇軍好樣的。」"], "desc": "陳留富商之子【原 sy3_4】：樂於資助義勇軍軍備。"},
+  {"id": "miner_boss", "name": "礦工工頭", "x": 35, "y": 28, "map": "wancheng", "idle": ["礦工工頭：「礦坑黑漆漆，缺照明。」"], "desc": "宛城礦工工頭【原 sy3_4】：提供照明天工具可換礦石。"},
+  {"id": "zixu", "name": "紫虛上人", "x": 36, "y": 27, "map": "xuchang", "idle": ["紫虛上人：「修行貴在日行一善。」"], "desc": "許昌城紫虛上人【原 sy3_4】：每日修行，供材料可得藏寶圖（非義勇軍版可接）。"},
+  {"id": "court_harm", "name": "朝廷除害官", "x": 35, "y": 26, "map": "xuchang", "idle": ["朝廷除害官：「猛獸傷人，朝廷懸賞。」"], "desc": "許昌朝廷除害官【原 sy3_4】：義勇軍每月可接除害任務。"},
+  {"id": "court_rat", "name": "朝廷滅鼠官", "x": 37, "y": 26, "map": "xuchang", "idle": ["朝廷滅鼠官：「鼠害頻傳，農作欠收。」"], "desc": "許昌朝廷滅鼠官【原 sy3_4】：義勇軍每月可接滅鼠任務。"},
+  {"id": "court_thief", "name": "朝廷滅賊官", "x": 36, "y": 25, "map": "xuchang", "idle": ["朝廷滅賊官：「賊寇四起，人心惶惶。」"], "desc": "許昌朝廷滅賊官【原 sy3_4】：義勇軍每月可接滅賊任務。"},
+  {"id": "lin", "name": "林員外", "x": 35, "y": 27, "map": "xuchang", "idle": ["林員外：「犬子大婚，排場要大。」"], "desc": "許昌林員外【原 sy3_4】：家有喜事，徵料理高手辦大型喜宴。"},
+  {"id": "yongbo", "name": "勇伯", "x": 48, "y": 20, "map": "runan_road", "idle": ["勇伯：「山洞畀山賊霸咗，唉。」"], "desc": "汝南道山洞附近老人家【原 sy3_4】：請人說服山大王收山。"},
+  {"id": "shenjing_lao", "name": "神經老人", "x": 37, "y": 27, "map": "xuchang", "idle": ["神經老人：「鬼域……礦藏……嘿嘿。」"], "desc": "許昌城寺廟附近神經老人【原 sy3_4】：每月 16~21 日現身，知鬼域迷陣位置（day-window 延後 S08f）。"},
+  {"id": "yanshan", "name": "岩山樵夫", "x": 48, "y": 25, "map": "jingzhou", "idle": ["岩山樵夫：「岩山瘴林，木料多。」"], "desc": "荊州岩山樵夫【原 sy3_4】：義勇軍每月可接資源任務。"},
+  {"id": "recruit_officer", "name": "徵兵官", "x": 36, "y": 28, "map": "xuchang", "idle": ["徵兵官：「兵源短缺，號召勇士！」"], "desc": "許昌徵兵官【原 sy3_4】：義勇軍每月可接增兵任務。"},
+  {"id": "luopo_lao", "name": "落魄老人", "x": 35, "y": 25, "map": "xuchang", "idle": ["落魄老人：「前朝寶藏……唉。」"], "desc": "許昌客棧內落魄老人【原 sy3_4】：每月 10~15 日現身，講前朝寶藏故事（day-window 延後 S08f）。"},
+  {"id": "liu_lao", "name": "劉老", "x": 37, "y": 25, "map": "xuchang", "idle": ["劉老：「惡頭害人，天理不容！」"], "desc": "許昌劉老【原 sy3_4】：請人除去濫用邪術嘅惡頭。"},
+  {"id": "court_official_tool", "name": "朝廷官吏", "x": 34, "y": 26, "map": "xuchang", "idle": ["朝廷官吏：「御賜工具，只賞有功之人。」"], "desc": "許昌練兵場朝廷官吏【原 sy3_4】：義勇軍繳物品換御賜工具。"},
+  {"id": "craft_boss", "name": "工匠工頭", "x": 48, "y": 29, "map": "chenliu", "idle": ["工匠工頭：「急住升級營地，欠木材！」"], "desc": "陳留工匠工頭【原 sy3_4】：義勇軍每月可接木材任務。"},
+  {"id": "baoma_zhai", "name": "抱馬窄", "x": 24, "y": 18, "map": "luoyang", "idle": ["抱馬窄：「惡頭個巢穴喺城外……唔好話係我講。」"], "desc": "洛陽抱馬窄【原 sy3_4】：唯一知惡頭藏身處之人。"},
+  {"id": "beast_king", "name": "猛獸王", "x": 48, "y": 21, "map": "runan_road", "questOnly": true, "desc": "汝南道猛獸王【原 sy3_4】：居民除害任務目標。"},
+  {"id": "man_eating_tiger", "name": "食人惡虎", "x": 48, "y": 26, "map": "jingzhou", "questOnly": true, "desc": "荊州地界食人惡虎【原 sy3_4】：朝廷除害任務目標。"},
+  {"id": "thief", "name": "賊寇", "x": 48, "y": 30, "map": "chenliu", "questOnly": true, "desc": "陳留郊外賊寇頭目【原 sy3_4】：朝廷滅賊任務目標。"},
+  {"id": "bandit_king", "name": "山大王", "x": 36, "y": 25, "map": "yudu", "questOnly": true, "desc": "于毒山寨山大王【原 sy3_4】：勇闖賊寨任務目標。"},
+  {"id": "evil_head", "name": "惡頭", "x": 24, "y": 19, "map": "luoyang", "questOnly": true, "desc": "洛陽城外惡頭【原 sy3_4】：斬殺惡頭任務目標。"},
+  {"id": "ghost_guard", "name": "鬼域巨魎", "x": 22, "y": 13, "map": "runan_f3", "questOnly": true, "desc": "汝南洞窟三層鬼域巨魎【原 sy3_4】：鬼域迷陣任務目標。"},
+  {"id": "treasure_guard", "name": "前朝寶藏守衛", "x": 22, "y": 14, "map": "runan_f3", "questOnly": true, "desc": "汝南洞窟三層寶藏守衛【原 sy3_4】：亂數迷宮任務目標。"}
  ]
 }

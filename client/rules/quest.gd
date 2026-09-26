@@ -177,6 +177,9 @@ static func pre_ok(data: GameData, q: Dictionary, ch: Dictionary) -> bool:
 	for qid in pre.get("questDone", []):
 		if not bool(ch.get("questDone", {}).get(String(qid), false)):
 			return false
+	if pre.has("militia"):       # 團體任務 (spec 06 §6): 要「所屬義勇軍」先接得 (S06c)
+		if not bool(ch.get("militia", {}).get("founded", false)):
+			return false
 	return true
 
 
