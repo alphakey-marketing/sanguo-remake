@@ -852,3 +852,192 @@ func title_contest_view(id: int) -> Dictionary:
 		"competitors": int(competition_cfg().get("competitors", 3)),
 		"last": ch.get("titleContest", {}),
 	}
+
+
+# ================= S08e 義勇軍成立 + 定居 + 帶兵量 (spec 08 §4~§5 / 攻略 sy2_8_2、sy2_9_19) =================
+# ch["militia"] = {founded, name, password, city, grade, supporters:[{id,name}], foundedDay}
+# ch["homeCity"] = 定居城池 id ("" = 未定居)；rules/quest.gd pre.militia 睇 ch.militia.founded (S06c 掛鈎)。
+func militia_cfg() -> Dictionary:
+	return RulesMilitia.cfg(data.office)
+
+
+# 讀寫 helper: 補齊預設欄 (寫入用；view 用 _militia_read 唔改 state)
+func _militia_of(ch: Dictionary) -> Dictionary:
+	if not ch.has("militia") or not (ch["militia"] is Dictionary):
+		ch["militia"] = {}
+	var m: Dictionary = ch["militia"]
+	if not m.has("founded"):
+		m["founded"] = false
+	if not m.has("name"):
+		m["name"] = ""
+	if not m.has("password"):
+		m["password"] = ""
+	if not m.has("city"):
+		m["city"] = ""
+	if not m.has("grade"):
+		m["grade"] = 1
+	if not m.has("foundedDay"):
+		m["foundedDay"] = -1
+	if not m.has("supporters"):
+		m["supporters"] = []
+	return m
+
+
+# view 用: 淨讀，冇 key 亦唔寫
+func _militia_read(ch: Dictionary) -> Dictionary:
+	var m = ch.get("militia", {})
+	return m if m is Dictionary else {}
+
+
+# 單位格 → 城池 id ("" = 唔喺城池)
+func city_at(e: Dictionary) -> String:
+	return String(data.map_at(int(e["x"]), int(e["y"])).get("city", ""))
+
+
+# 定居城市清單 (maps.json kind:city；去重；newbie flag) —— 唔另開地圖，用現有城池
+func _settle_cities() -> Array:
+	var cfg := militia_cfg()
+	var seen := {}
+	var out: Array = []
+	for md in data.maps:
+		var cid := String(md.get("city", ""))
+		if cid == "" or seen.has(cid):
+			continue
+		seen[cid] = true
+		out.append({"id": cid, "name": String(md["name"]), "map": String(md["id"]), "newbie": RulesMilitia.is_newbie(cfg, cid)})
+	return out
+
+
+func _settle_city_name(city_id: String) -> String:
+	for c in _settle_cities():
+		if String(c["id"]) == city_id:
+			return String(c["name"])
+	return city_id
+
+
+func home_city(ch: Dictionary) -> String:
+	return String(ch.get("homeCity", ""))
+
+
+# 定居 read-model
+func settle_view(id: int) -> Dictionary:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return {}
+	var ch: Dictionary = e["ch"]
+	return {"at": city_at(e), "home": home_city(ch), "cities": _settle_cities()}
+
+
+# 定居: 要企喺目標城池入面 (sim 只用座標判斷，唔需要新設施)
+func cmd_settle(id: int, city: String) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var ch: Dictionary = e["ch"]
+	var here := city_at(e)
+	if here == "":
+		return _msg(id, "要喺城池入面先定居得")
+	if String(city) != here:
+		return _msg(id, "你唔喺「%s」入面" % _settle_city_name(city))
+	var why := RulesMilitia.settle_block(militia_cfg(), here, home_city(ch))
+	if why != "":
+		return _msg(id, why)
+	ch["homeCity"] = here
+	_emit({"k": "settle", "id": id, "city": here, "newbie": RulesMilitia.is_newbie(militia_cfg(), here)})
+	_msg(id, "你定居喺「%s」。%s" % [_settle_city_name(here),
+		"（新手城，唔可以喺度成立義勇軍）" if RulesMilitia.is_newbie(militia_cfg(), here) else "（可以喺度成立義勇軍）"])
+
+
+# 遊說居民擁護 (近距離 + Lv/好感門檻；成功記快照，居民走咗都算)
+func cmd_militia_invite(id: int, npc_id: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var ch: Dictionary = e["ch"]
+	var npc := ent(npc_id)
+	if npc.is_empty() or not npc.has("ch"):
+		return _msg(id, "搵唔到嗰個人")
+	if not (state["bots"] as Array).has(int(npc_id)):
+		return _msg(id, "佢唔係居民，唔可以擁護你")
+	if int(npc["hp"]) <= 0:
+		return _msg(id, "佢唔喺度")
+	if maxi(absi(int(npc["x"]) - int(e["x"])), absi(int(npc["y"]) - int(e["y"]))) > NEAR:
+		return _msg(id, "要行近%s先遊說得" % str(npc["name"]))
+	var m := _militia_of(ch)
+	var already := false
+	for s in m["supporters"]:
+		if int((s as Dictionary).get("id", 0)) == int(npc_id):
+			already = true
+	var lv := int(npc["ch"].get("level", 1))
+	var favor := NpcMemory.affinity(npc["mem"], id) if npc.has("mem") else 0
+	var why := RulesMilitia.invite_block(militia_cfg(), lv, favor, already, bool(m["founded"]))
+	if why != "":
+		return _msg(id, why)
+	m["supporters"].append({"id": int(npc_id), "name": str(npc["name"])})
+	var need := int(militia_cfg().get("supporterNeed", 10))
+	_emit({"k": "militia_invite", "id": id, "npc": int(npc_id), "name": str(npc["name"]), "count": (m["supporters"] as Array).size()})
+	_msg(id, "%s 願意擁護你！擁護者 %d/%d" % [str(npc["name"]), (m["supporters"] as Array).size(), need])
+
+
+# 成立義勇軍【原 sy2_8_2】: 【團】→【起義】輸入名號 + 暗號
+func cmd_militia_found(id: int, name: String, password: String) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var ch: Dictionary = e["ch"]
+	var cfg := militia_cfg()
+	var nb := RulesMilitia.name_block(cfg, name)
+	if nb != "":
+		return _msg(id, nb)
+	var m := _militia_of(ch)
+	var sup := (m["supporters"] as Array).size()
+	var home := home_city(ch)
+	var why := RulesMilitia.found_block(data.titles, cfg, ch, sup, home)
+	if why != "":
+		return _msg(id, why)
+	ch["gold"] = int(ch["gold"]) - int(cfg["fund"])
+	m["founded"] = true
+	m["name"] = name.strip_edges()
+	m["password"] = password
+	m["city"] = home
+	m["grade"] = 1
+	m["foundedDay"] = int(_clock()["day"])
+	_emit({"k": "militia_found", "id": id, "name": String(m["name"]), "city": home, "supporters": sup, "fund": int(cfg["fund"])})
+	_msg(id, "義勇軍「%s」成立！根據地 %s，擁護者 %d 人自動入會，你係頭目（階級 %s）。扣經費 %d 兩。" % [
+		String(m["name"]), _settle_city_name(home), sup, RulesMilitia.grade_name(cfg, 1), int(cfg["fund"])])
+
+
+# 義勇軍 read-model: 狀態 + 帶兵量 + 4 成立條件
+func militia_view(id: int) -> Dictionary:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return {}
+	var ch: Dictionary = e["ch"]
+	var cfg := militia_cfg()
+	var m := _militia_read(ch)
+	var sup := (m.get("supporters", []) as Array).size()
+	var home := home_city(ch)
+	var rank := int(ch.get("titleRank", 0))
+	var conds: Array = [
+		{"key": "title", "ok": rank >= int(cfg.get("minTitleRank", 6)), "text": "頭銜「南中郎將」以上"},
+		{"key": "fame", "ok": int(ch.get("fame", 0)) >= int(cfg.get("minFame", 3000)), "text": "名聲 ≥ %d" % int(cfg.get("minFame", 3000))},
+		{"key": "supporters", "ok": sup >= int(cfg.get("supporterNeed", 10)), "text": "擁護者 %d/%d" % [sup, int(cfg.get("supporterNeed", 10))]},
+		{"key": "fund", "ok": int(ch.get("gold", 0)) >= int(cfg.get("fund", 200000)), "text": "經費 %d 兩" % int(cfg.get("fund", 200000))},
+		{"key": "settle", "ok": home != "" and not RulesMilitia.is_newbie(cfg, home), "text": "定居非新手城"},
+	]
+	return {
+		"founded": bool(m.get("founded", false)),
+		"name": String(m.get("name", "")),
+		"city": String(m.get("city", "")),
+		"cityName": _settle_city_name(String(m.get("city", ""))),
+		"grade": int(m.get("grade", 1)),
+		"gradeName": RulesMilitia.grade_name(cfg, int(m.get("grade", 1))),
+		"supporters": m.get("supporters", []),
+		"supporterCount": sup,
+		"supporterNeed": int(cfg.get("supporterNeed", 10)),
+		"rank": rank,
+		"soldiers": RulesMilitia.max_soldiers(data.titles, cfg, rank, int(m.get("grade", 1)), int(ch.get("level", 1)), bool(m.get("founded", false))),
+		"homeCity": home,
+		"homeName": _settle_city_name(home),
+		"conditions": conds,
+	}

@@ -98,5 +98,30 @@
   "npcLo": 0.85,
   "npcHi": 1.05,
   "defenderBonus": 0
+ },
+ "_noteMilitia": "義勇軍成立 / 帶兵量 (S08e, spec 08 §4~§5 / 攻略 sy2_8_2、sy2_9_19)【原】全條件: 頭銜南中郎將 (名聲 3000)、25 人擁護 (每人 Lv5 + 名聲 100)、經費 20 萬、定居非新手城 (許昌/襄陽/新野【原 許昌襄陽洛陽 → 換新野】)、【團】→【起義】輸入名號 + 暗號。單機化【自訂】: 擁護者人數與門檻 = supporterNeed 10 + 居民好感 ≥supporterFavor 50 (居民無名聲，改用好感；spec §4 註「隨想簡化: 10 個都得」)；名號唯一無從驗證 → 只驗非空 + nameMaxLen。max_soldiers = baseSoldiers 7000 (要 Lv≥minLv + 入會) + 階級帶兵 grades 8000~1000 + 頭銜 soldiers 欄；capRank 51 階起固定 capSoldiers 28000。",
+ "militia": {
+  "minTitleRank": 6,
+  "minFame": 3000,
+  "supporterNeed": 10,
+  "supporterLv": 5,
+  "supporterFavor": 50,
+  "fund": 200000,
+  "minLv": 5,
+  "nameMaxLen": 12,
+  "newbieCities": ["xuchang", "xiangyang", "xinye"],
+  "baseSoldiers": 7000,
+  "capRank": 51,
+  "capSoldiers": 28000,
+  "grades": [
+   {"grade": 1, "name": "一品", "soldiers": 8000},
+   {"grade": 2, "name": "二品", "soldiers": 7000},
+   {"grade": 3, "name": "三品", "soldiers": 6000},
+   {"grade": 4, "name": "四品", "soldiers": 5000},
+   {"grade": 5, "name": "五品", "soldiers": 4000},
+   {"grade": 6, "name": "六品", "soldiers": 3000},
+   {"grade": 7, "name": "七品", "soldiers": 2000},
+   {"grade": 8, "name": "八品", "soldiers": 1000}
+  ]
  }
 }

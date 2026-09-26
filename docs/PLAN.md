@@ -27,7 +27,7 @@
 | 05 生產經濟 | 🟡 | ✅ | 6 初階 + 5 進階 + 2318 配方、修理、工具店、天地商行、捐獻、市場 | 產出 1~2 件、特製/白金/御賜工具、大宗師、4 類商店補齊、天災停進貨、城際貿易提示 |
 | 06 任務 | 🟡 | ✅ | 框架、新手 5 條、義士絕招 3 條、官令 7 條、歷史 11+1 條、委託、戰役、團體任務 17 條（16 條義勇軍限定 + 紫虛上人非義勇軍版，S06c）、其他職絕招 15 條（S06d）、**專長任務 8 條（天文/地理認證 1~4 級，S06e）** | 四~六招、結婚、左慈渾天儀任務、國戰專長（→S10） |
 | 07 座騎戰騎 | 🟡 | 🟡 | 17a 座騎全套 + UI；17b 繁衍/馬戰 **sim 有、`main.gd` 有派送、面板未有掣**；18 戰騎純規則；**S07b（leg 5）戰騎 sim 整合**（`sim/sim_war_beast.gd`：馬廄馴養買獸/最多 3 隻/出戰跟隨+自動攻擊+戰鬥特技/吸 exp/死亡忠誠−1/走佬/寄馬廄）；**S07c（leg 6）友好特技效果接系統**；**S07d（leg 7）NPC 拍賣場 + 武將特技「馴馬」+ 抽技固定池** | 繁衍/馬戰/改名 UI；戰騎 UI 面板；原版捕獲途徑；其餘友好技效果（聖靈/遁地/奇門/脫出/召喚/神行/回城/火焰/飛影/狂力/開光/忠誠/巨力/穩重/地行/神獸/嗅血/野性/獅魂/王者） |
-| 08 名聲義勇軍 | 🟡 | 🟡 | 名聲、頭銜 60 階、官宅（討取/官令/捐獻/月俸/行動丹）、**義舉證明（四類 20 項）+ 城池進貢/好感（S08a）**、**城池屬性 8 項 + 官宅內政 6 種（S08b）**、**救災（S08c：公佈欄/救災官令/7 種救災物品/救災區 N 次工作/覆命，天災強度遞減）**、**名額競爭（S08d：每月初一 3 NPC 挑戰者鬥名望，輸跌一階）** | 義勇軍、帶兵量、營地、團體工作、民心、法令 |
+| 08 名聲義勇軍 | 🟡 | 🟡 | 名聲、頭銜 60 階、官宅（討取/官令/捐獻/月俸/行動丹）、**義舉證明（四類 20 項）+ 城池進貢/好感（S08a）**、**城池屬性 8 項 + 官宅內政 6 種（S08b）**、**救災（S08c）**、**名額競爭（S08d）**、**義勇軍成立 + 定居 + 帶兵量（S08e：頭銜/擁護 10 人/20 萬/定居非新手城，set militia 旗）** | 營地、團體工作、民心、法令 |
 | 09 登用武將 | 🟡 | 🟡 | 居民 bot/記憶/brain、登用 v1+v2、同伴 6 指令、20 passive 特技 | `residents.json` 居民化、傳聞擴散、忠誠事件規則、其餘 50 特技、內政協助、LLM 層（原 Step 20） |
 | 10 國戰 | ❌ | ❌ | — | 全部（D-3【待決】） |
 | 11 資料對照 | 🟡 | — | items/monsters/generals/recipes/titles 導入器 | `material_ids.json`、箭矢定義、商城道具單機化定案、recruitinfo 說明頁、warbtl 對照 |
@@ -225,7 +225,11 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
   - 完成（spec 08 §2 / 攻略 sy2_8_3）：`data/office.json` +`competition`（`enabled`/`minRank:1`/`competitors:3`/`npcLo:0.85`/`npcHi:1.05`/`defenderBonus:0`）；`rules/title.gd` +`comp_cfg`/`comp_score`（= 名聲 + defenderBonus）/`npc_score`（該階名聲需求 × [npcLo,npcHi] 隨機）/`defend_ok`（≥ 全部挑戰者最高分）純函數；`sim/sim_office.gd` +`competition_cfg`/`title_competing`/`_title_contest_daily`/`_title_contest`/`title_contest_view`。每月初一（`sim.gd _daily_hook` 喺 `_salary_daily` 之後叫）對有 `ch.titleCompete` 嘅頭銜做守位考驗：3 NPC 挑戰者分數用**獨立 SimRng**（`800001 + day*3181 + rank*101`，唔佔主 rng 流），玩家 ≥ 全部 → 守位成功，否則 `titleRank -= 1`（跌返上一階）+ 發 `title_contest` 事件/訊息。`cmd_claim_title` 成功後設 `ch.titleCompete = true` 入競爭系統。
   - **偏離／【待決→推薦方針】**：原版「玩家之間每月競爭」→ 單機化 = 3 個 NPC 挑戰者模擬，競爭方式由「武將 PK（弱化版）」**再簡化為「比名望」**（spec 講「武將 PK」，但單機冇其他玩家；用名聲分數比併最簡單可測、唔郁戰鬥系統）。只對經官宅朝廷討取得嚟嘅頭銜生效（`titleCompete` 旗標）；舊存檔／直接設 `titleRank` 唔競爭（保兼容）。守位失敗跌一階而唔清空（spec【自訂】「跌返上一階」）；名聲唔下降（spec §1）。
   - 驗收：`tests/run_militia.gd` 131→158（資料/規則邊界/討取入系統/必贏必輸守位/月中唔考驗/舊存檔兼容/存檔 roundtrip/決定性）；`sh tools/run_tests.sh` ALL OK。
-- [ ] **S08e 義勇軍成立**：條件 4 項（擁護 NPC 數【自訂】、20 萬、定居非新手城 → 要「定居」功能）；品階/帶兵量公式（`titles.json soldiers`）
+- [x] **S08e 義勇軍成立**：條件 4 項（擁護 NPC 數【自訂】、20 萬、定居非新手城 → 要「定居」功能）；品階/帶兵量公式（`titles.json soldiers`）
+  - 完成（spec 08 §4~§5 / 攻略 sy2_8_2、sy2_9_19）：`tools/gen_titles.py` 由 `docs/guide/sy2_9_19.txt` 解析 60 階「增加兵量」寫入 `titles.json` 每行 `soldiers`（1~20 階 +200/階、21~40 +250/階、41~50 +400/階、51~60 固定 28000；`--check` 加公式核對）＋重跑生成器。`data/office.json` +`militia`（`minTitleRank:6`/`minFame:3000`/`supporterNeed:10`/`supporterLv:5`/`supporterFavor:50`/`fund:200000`/`minLv:5`/`capRank:51`/`capSoldiers:28000`/`newbieCities:[xuchang,xiangyang,xinye]`/`grades` 一品 8000~八品 1000）。新 `rules/militia.gd`（`cfg`/`grade_soldiers`/`grade_name`/`title_soldiers`/`max_soldiers`/`is_newbie`/`settle_block`/`invite_block`/`name_block`/`found_block` 純函數）。`sim/sim_office.gd` +`militia_cfg`/`_militia_of`/`city_at`/`_settle_cities`/`settle_view`/`cmd_settle`/`home_city`/`cmd_militia_invite`/`cmd_militia_found`/`militia_view`。`ch.homeCity` = 定居城池（新增，pre 條件之一）；`ch.militia = {founded,name,password,city,grade,supporters,foundedDay}`（成立後 `founded:true`，自動清 S06c `rules/quest.gd` `pre.militia` 前置）。定居用現有 `maps.json kind:city` 城池（10 個，唔新開地圖），要企喺目標城池入面先定居得。測試 `tests/run_militia.gd` 158→232（資料/帶兵量例題/成立 4 條件/定居流程/遊說擁護者/成立流程/`pre.militia` 掛鈎/存檔 roundtrip/舊存檔/決定性）。
+  - 【自訂】擁護者門檻 = 10 人 + 居民好感 ≥50（居民冇名聲機制，改用好感；spec §4 註明「隨想簡化: 10 個都得」）；擁護者以快照存 `ch.militia.supporters`（居民走咗/死咗都算）。名號唯一單機冇從驗證 → 只驗非空 + 長度 ≤12。定居唔另收費。新手城 = 許昌/襄陽/新野（spec【原 許昌襄陽洛陽 → 換新野】）。
+  - 偏離：原版「25 人擁護 + 每人名聲 100」→ 單機化 10 人 + 好感 50【自訂】。原版成立喺【團】→【起義】面板（UI 延後）→ sim 層 = `cmd_militia_found`。定居唔新開地圖／唔加設施，直接用現有城池座標（spec 12 慣例：其他數據寫座標，GameData 載入轉全域）。
+  - 驗收：`tests/run_militia.gd` 158→232；`sh tools/run_tests.sh` ALL OK（尾行 `ALL OK`，uitest 無 flake）。
 - [ ] **S08f 營地 + 義勇軍工作 22 項 + 評定會議**：`data/camp.json`、監督建設、功績表；團體任務接軌（清 S06c 延後）
 - [ ] **S08g 民心 + 法令**（要有城池 → 可能要等 S10 攻城；先做資料 + 規則 + 測試）
 - UI：官宅面板分頁（頭銜/官令/內政/救災/義舉）、義勇軍面板、營地面板、公佈欄
@@ -291,6 +295,10 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
 | S08a | 義舉證明 20 項物品來源途徑未接（61501~61510 任務物品 / 61037~61046 收藏品，現時都冇怪物掉落/商店）；邏輯層（繳交/頭銜門檻）已通，考驗用 `RulesShop.add_item` 落包 | 後續掉落/商店批次（同 S06 任務雜物一齊考慮） |
 | S08a | 城池好感下游效果未接（`ch.cityFavor` 已存 + `city_favor_view` read-model）；影響居民/NPC 打招呼、登用好感、任務解鎖等 | S08b/S09 |
 | S08a | 襄陽冇捐獻處（只有許昌官宅/新野縣衙），暫時進貢唔到；要加襄陽捐獻處 | 後續設施批次（S08e 定居/設施一齊考慮） |
+| S08e | 義勇軍面板 UI（定居/遊說/成立/成員/階級/帶兵量）：`settle_view`/`militia_view`/`cmd_settle`/`cmd_militia_invite`/`cmd_militia_found` read-model + 意圖已備但無面板/掣 | 後續專 UI Step |
+| S08e | 義勇軍階級管理/權限設定/評定指派/俸祿設定/名號暗號實際用途（除咗存低）未接 | S08f（評定會議）+ 後續 |
+| S08e | 頭目/擁護者帶兵量只係 read-model（`militia_view.soldiers`），未有兵種/戰場系統 | S10（帶兵量 + 兵種 + 戰棋） |
+| S08e | 定居城池限 `maps.json kind:city` 現有 10 城；各城未必有官宅/設施（如宛城/長沙），要城池設施批次先補 | 後續設施批次 |
 | S08b | 城池「防禦」屬性下游（城牆/守城/攻城）未有系統，只出 read-model；要 S10 城池攻防接 | S10 |
 | S08b | 城池「治安」「防災」屬性提升途徑（官宅內政唔包）：迷信 → S08f（義勇軍工作 治安/防災）；**S08c 救災實裝 = 直接減弱生效中天災 effect（非提升防災 attr）** | S08f |
 | S08c | 襄陽冇官宅（同 S08a 捐獻處問題）→ 襄陽救災官令暫時冇得領；救災區（longzhong）已備 | 後續設施批次（S08e 定居/設施一齊考慮） |
