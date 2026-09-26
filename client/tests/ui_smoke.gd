@@ -227,7 +227,11 @@ func _run() -> void:
 	# 4. 行近武器店 → 互動掣 = 商店 → 揀貨 → 確認買入
 	var sp0 := shop_pos()
 	put(sp0.x, sp0.y + 1)
-	check(await until(func() -> bool: return String(hud.ctx.get("kind", "")) == "shop"), "近武器店互動掣應該係商店 (%s)" % hud.ctx)
+	# ctx 每 0.2s 先更新一次；put() 瞬移後要等 ctx 真正指住武器店（唔係前一步殘留嘅其他商店）
+	check(await until(func() -> bool:
+		var _st: Array = hud.ctx.get("ref", {}).get("stock", []) as Array
+		return String(hud.ctx.get("kind", "")) == "shop" and (!_st.is_empty() and int(_st[0]) == 10001)),
+		"近武器店互動掣應該係武器店 (%s)" % hud.ctx)
 	await click(center("context"))
 	var sp: GamePanel = hud.panels.get("shop")
 	check(sp != null and sp.visible, "撳互動掣應該開商店")

@@ -33,6 +33,7 @@ run recruit --script tests/run_recruit.gd
 run general --script tests/run_general.gd
 run title --script tests/run_title.gd
 run battle --script tests/run_battle.gd
+run pk --script tests/run_pk.gd
 run market --script tools/market_sim.gd
 run hud --script tests/run_hud.gd
 run autotest -- --autotest
