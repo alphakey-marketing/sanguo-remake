@@ -667,6 +667,11 @@
   {"id": "shuangfeng", "name": "雙風黑殺手", "x": 30, "y": 13, "map": "runan_f5", "questOnly": true, "desc": "雙風黑殺手【原 sy3_6_2 辯士吐火羅語】：打敗佢得園薄扇（自訂改編: 汝南洞窟五層）。"},
   {"id": "zhangde", "name": "怪人張得", "x": 48, "y": 25, "map": "jingzhou", "questOnly": true, "desc": "怪人張得【原 sy3_6_3 道士神遊太虛】：打敗佢得術文全書（自訂改編: 荊州地界）。"},
   {"id": "hongjing", "name": "怪人紅菁", "x": 10, "y": 18, "map": "changsha", "questOnly": true, "desc": "怪人紅菁【原 sy3_6_3 巫女鬼哭神號】：打敗佢得咒法全書（自訂改編: 長沙城）。"},
-  {"id": "langyi_head", "name": "狼懿頭目", "x": 20, "y": 13, "map": "runan_f8", "questOnly": true, "desc": "狼懿頭目【原 sy3_6_2 美女松竹聽雨】：打敗佢得狂兒救助函（自訂改編: 汝南洞窟八層）。"}
+  {"id": "langyi_head", "name": "狼懿頭目", "x": 20, "y": 13, "map": "runan_f8", "questOnly": true, "desc": "狼懿頭目【原 sy3_6_2 美女松竹聽雨】：打敗佢得狂兒救助函（自訂改編: 汝南洞窟八層）。"},
+  {"id": "gande", "name": "甘德", "x": 30, "y": 20, "map": "changsha", "idle": ["甘德：「觀天察地，學問無涯。」"], "desc": "長沙城甘德【原 sy3_9_2】：天文/地理一級認證。"},
+  {"id": "nanhua_immortal", "name": "南華老仙", "x": 16, "y": 31, "map": "luoyang", "idle": ["南華老仙：「彩虹鑽石，天地精華所凝。」"], "desc": "洛陽南華竹林水池邊南華老仙【原 sy3_9_2】：天文/地理二級認證（原作廬江，搬豫荊）。"},
+  {"id": "qiaoxuan", "name": "喬玄", "x": 28, "y": 13, "map": "runan_f3", "questOnly": true, "desc": "汝南洞窟深處喬玄仙人【原 sy3_9_2】：天文一級任務目標（原作江夏山洞，搬豫荊）。"},
+  {"id": "geo_guardian", "name": "地理圖守護者", "x": 28, "y": 14, "map": "runan_f3", "questOnly": true, "desc": "汝南洞窟深處地理圖守護者【原 sy3_9_2】：地理一級任務目標（原作江夏山洞，搬豫荊）。"},
+  {"id": "zuoci", "name": "左慈", "x": 45, "y": 28, "map": "xiangyang", "idle": ["左慈：「天地水風，皆有其道。」"], "desc": "襄陽左慈仙人【原 sy3_9_2】：天文三/四級認證（原作襄平，搬豫荊）。"}
  ]
 }
