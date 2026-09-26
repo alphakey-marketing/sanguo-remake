@@ -673,6 +673,66 @@ func _run() -> void:
 	check(int(ch["hp"]) > 0, "死亡: 復活返客棧 (HP>0)")
 	check(int(m.sim.ent(pid_d)["x"]) == m.sim.inn_pos.x and int(m.sim.ent(pid_d)["y"]) == m.sim.inn_pos.y, "死亡: 傳返客棧")
 	check(RulesShop.count_item(ch["bag"], 65030) == 0, "死亡: 還魂丹消耗")
+	# S04a 地面掉落物: 殺怪跌落地 → view_ents 透出 → 互動掣=拾取 → 撳落袋 + 實體消失
+	# 搵一格附近冇設施/NPC/武將嘅自由格 (確保互動掣唔會被搶)
+	var pme_: Dictionary = m._me()
+	var px0: int = int(pme_.get("x", 0))
+	var py0: int = int(pme_.get("y", 0))
+	var spot := Vector2i(px0, py0)
+	var spot_ok := false
+	for r in range(1, 40):
+		for dy in range(-r, r + 1):
+			for dx in range(-r, r + 1):
+				var c2 := Vector2i(px0 + dx, py0 + dy)
+				if not m.sim.is_free(c2.x, c2.y):
+					continue
+				var mm_: Dictionary = {"x": c2.x, "y": c2.y}
+				var blocked := false
+				for f2 in m.facilities:
+					if ContextActions._near(mm_, int(f2.x), int(f2.y)): blocked = true; break
+				if blocked: continue
+				for q2 in m.quest_npcs:
+					if ContextActions._near(mm_, int(q2.x), int(q2.y)): blocked = true; break
+				if blocked: continue
+				for g2 in m.generals:
+					if ContextActions._near(mm_, int(g2.x), int(g2.y)): blocked = true; break
+				if not blocked:
+					spot = c2
+					spot_ok = true
+					break
+			if spot_ok:
+				break
+		if spot_ok:
+			break
+	m.sim.data.monsters[999998] = {"id": 999998, "name": "測怪", "level": 5, "hp": 50, "exp": 10,
+		"gold": [0, 0], "drops": [{"item": 29042, "p": 1.0}], "rareDrops": [], "alignment": 0}
+	var mm2 = m.sim._spawn_mob(999998, "field_1")
+	mm2["x"] = spot.x
+	mm2["y"] = spot.y
+	mm2["tx"] = spot.x
+	mm2["ty"] = spot.y
+	m.sim.damage(mm2, 99999, m.sim.ent(int(m.my_id)))
+	m.sim.data.monsters.erase(999998)
+	m._refresh()
+	await frames(2)
+	var ditem := 0
+	for e in m.ents:
+		if bool(e.get("dropped", false)):
+			ditem = int(e["id"])
+	check(ditem != 0, "掉落: view_ents 透出 dropped 實體")
+	# 行到跌落地點 → 互動掣 = 拾取
+	m.sim.ent(int(m.my_id))["x"] = spot.x
+	m.sim.ent(int(m.my_id))["y"] = spot.y
+	m.sim.ent(int(m.my_id))["tx"] = spot.x
+	m.sim.ent(int(m.my_id))["ty"] = spot.y
+	m._refresh()
+	var ctx_ok := await until(func() -> bool: return String(hud.ctx.get("kind", "")) == "pickup", 2.0)
+	check(ctx_ok, "掉落: 企正互動掣 = 拾取 (%s)" % str(hud.ctx.get("kind", "")))
+	var had_x := RulesShop.count_item(m.ch["bag"], 29042)
+	m._send({"t": "pick", "drop": ditem})
+	await frames(2)
+	check(RulesShop.count_item(m.ch["bag"], 29042) == had_x + 1, "掉落: 撳拾取落袋")
+	check(ditem > 0 and m.sim.ent(ditem).is_empty(), "掉落: 拾取後實體消失")
 	print("[TEST] ui_smoke: %d, fail %d" % [total, fails])
 	print("PASS: ui smoke" if fails == 0 else "FAIL: ui smoke")
 	get_tree().quit(1 if fails > 0 else 0)

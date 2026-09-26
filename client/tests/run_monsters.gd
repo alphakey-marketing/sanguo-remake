@@ -21,6 +21,12 @@ func _init() -> void:
 	t_boss_daily(data)
 	t_runan_travel(data)
 	t_cave_shop(data)
+	t_kill_drops_to_ground(data)
+	t_dropped_ttl(data)
+	t_dropped_pick(data)
+	t_dropped_pick_bagfull(data)
+	t_dropped_save_roundtrip(data)
+	t_bag_weight_rules(data)
 	print("[TEST] monsters scenarios: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -496,3 +502,146 @@ func t_gate_newbie(data: GameData) -> void:
 		for i in 20:
 			var m: Variant = sim._spawn_mob(11070, "field_1")
 			check(m != null and maxi(absi(int(m["x"]) - gx), absi(int(m["y"]) - gy)) > 30, "北門: 重生 Lv30 喺遠處 (潁水南岸)")
+
+
+# ===== S04a 地面掉落物 (spec 04 §6) =====
+
+# 殺怪: 金錢直入袋；物品以「跌落地」實體出現(唔直入袋)，跌喺怪死位
+func t_kill_drops_to_ground(data: GameData) -> void:
+	var sim := Sim.new(data, 51)
+	var pid := sim.spawn_player("t")
+	_put(sim, pid, 30, 30)
+	var fake := 999999
+	data.monsters[fake] = {"id": fake, "name": "測怪", "level": 5, "hp": 50, "exp": 10,
+		"gold": [1, 1], "drops": [{"item": 29042, "p": 1.0}], "rareDrops": [], "alignment": 0}
+	var m: Variant = sim._spawn_mob(fake, "field_1")
+	_put(sim, int(m["id"]), 31, 30)
+	var ch: Dictionary = sim.player_ch()
+	ch["gold"] = 0
+	sim.damage(sim.ent(int(m["id"])), 99999, sim.ent(pid))
+	data.monsters.erase(fake)
+	check(sim.ent(int(m["id"])).is_empty(), "掉落: 怪死咗")
+	check(int(ch["gold"]) == 1, "掉落: 金錢照直入袋 (+%d)" % int(ch["gold"]))
+	check(RulesShop.count_item(ch["bag"], 29042) == 0, "掉落: 物品唔直入袋")
+	var dropped := 0
+	for e in sim.ents.values():
+		if e["kind"] == "dropped":
+			dropped = int(e["id"])
+	check(dropped != 0, "掉落: 地上有 dropped 實體")
+	if dropped != 0:
+		var d: Dictionary = sim.ent(dropped)
+		check(int(d["x"]) == 31 and int(d["y"]) == 30, "掉落: 跌喺怪死位 (%d,%d)" % [int(d["x"]), int(d["y"])])
+		var items: Array = d["drop"]["items"]
+		check(items.size() == 1 and int(items[0]["id"]) == 29042 and int(items[0]["n"]) == 1,
+			"掉落: 件數啱 %s" % str(items))
+		check(int(d["drop"]["until"]) == sim.tick + 300, "掉落: until = tick + 300 (%d)" % int(d["drop"]["until"]))
+
+
+# 跌落物過 300 tick 後消失
+func t_dropped_ttl(data: GameData) -> void:
+	var sim := Sim.new(data, 52)
+	var pid := sim.spawn_player("t")
+	_put(sim, pid, 30, 30)
+	sim._drop_items(32, 32, [{"id": 29042, "n": 1}])
+	var d_id := 0
+	for e in sim.ents.values():
+		if e["kind"] == "dropped":
+			d_id = int(e["id"])
+	check(d_id != 0, "TTL: 建立掉落物")
+	var start := sim.tick
+	for _i in 299:
+		sim.step()
+	check(not sim.ent(d_id).is_empty(), "TTL: 299 tick 仲喺")
+	sim.step()                                          # 到 300
+	check(sim.ent(d_id).is_empty(), "TTL: 300 tick 後消失")
+
+
+# 行埋邊撳拾取: 落袋 + 實體消失
+func t_dropped_pick(data: GameData) -> void:
+	var sim := Sim.new(data, 53)
+	var pid := sim.spawn_player("t")
+	_put(sim, pid, 30, 30)
+	var ch: Dictionary = sim.player_ch()
+	ch["bag"] = []                                       # 清袋定值
+	sim._drop_items(31, 31, [{"id": 29042, "n": 2}])
+	var d_id := 0
+	for e in sim.ents.values():
+		if e["kind"] == "dropped":
+			d_id = int(e["id"])
+	check(d_id != 0, "拾取: 有掉落物")
+	var got: Array = [{}]
+	sim.event_emitted.connect(func(ev: Dictionary) -> void:
+		if String(ev.get("k", "")) == "picked" and int(ev.get("dst", 0)) == pid:
+			got[0] = ev)
+	sim.cmd_pick(pid, d_id)
+	check(RulesShop.count_item(ch["bag"], 29042) == 2, "拾取: 落袋 ×2")
+	check(sim.ent(d_id).is_empty(), "拾取: 實體消失")
+	check(bool((got[0] as Dictionary).get("full", false)) == false, "拾取: 未滿 flag false")
+	# 遠咗執唔到
+	sim._drop_items(40, 40, [{"id": 10001, "n": 1}])
+	var d2 := 0
+	for e in sim.ents.values():
+		if e["kind"] == "dropped":
+			d2 = int(e["id"])
+	sim.cmd_pick(pid, d2)
+	check(not sim.ent(d2).is_empty(), "拾取: 太遠唔執 (留落地)")
+
+
+# 背包滿 (重量超 capBagWeight) 逐件試: 裝得落執, 裝唔落留落地 + full flag
+func t_dropped_pick_bagfull(data: GameData) -> void:
+	var sim := Sim.new(data, 54)
+	var pid := sim.spawn_player("t")
+	_put(sim, pid, 30, 30)
+	var ch: Dictionary = sim.player_ch()
+	ch["bag"] = []
+	sim.data.world["dropped"]["capBagWeight"] = 2        # 甜蘿蔔(w1)裝到, 柳葉刀(w8)裝唔到
+	sim._drop_items(31, 31, [{"id": 29042, "n": 1}, {"id": 10001, "n": 1}])
+	var d_id := 0
+	for e in sim.ents.values():
+		if e["kind"] == "dropped":
+			d_id = int(e["id"])
+	check(d_id != 0, "背包滿: 有掉落物")
+	var got: Array = [{}]
+	sim.event_emitted.connect(func(ev: Dictionary) -> void:
+		if String(ev.get("k", "")) == "picked" and int(ev.get("dst", 0)) == pid:
+			got[0] = ev)
+	sim.cmd_pick(pid, d_id)
+	check(RulesShop.count_item(ch["bag"], 29042) == 1, "背包滿: 輕嘢裝到 (甜蘿蔔)")
+	check(RulesShop.count_item(ch["bag"], 10001) == 0, "背包滿: 重嘢裝唔到")
+	check(bool((got[0] as Dictionary).get("full", false)) == true, "背包滿: full flag true")
+	check(not sim.ent(d_id).is_empty(), "背包滿: 實體留落地")
+	if not sim.ent(d_id).is_empty():
+		var items: Array = sim.ent(d_id)["drop"]["items"]
+		check(items.size() == 1 and int(items[0]["id"]) == 10001, "背包滿: 留低重嘢 %s" % str(items))
+
+
+# 跌落物存檔 roundtrip (打落 + 未執照樣存到讀返)
+func t_dropped_save_roundtrip(data: GameData) -> void:
+	var sim := Sim.new(data, 55)
+	var pid := sim.spawn_player("t")
+	_put(sim, pid, 30, 30)
+	sim._drop_items(31, 31, [{"id": 29042, "n": 3}])
+	var d_id := 0
+	for e in sim.ents.values():
+		if e["kind"] == "dropped":
+			d_id = int(e["id"])
+	var s := sim.save_string()
+	var loaded := Sim.load_string(data, s)
+	check(loaded != null and loaded.save_string() == s, "存檔: 跌落物存讀一致")
+	check(not loaded.ent(d_id).is_empty(), "存檔: 讀檔後仍在")
+	if not loaded.ent(d_id).is_empty():
+		var ld: Dictionary = loaded.ent(d_id)
+		var items: Array = ld["drop"]["items"]
+		check(int(ld["x"]) == 31 and int(ld["y"]) == 31 and items.size() == 1 and int(items[0]["n"]) == 3,
+			"存檔: 位置 + 件數保真")
+
+
+# RulesShop 重量 helpers: bag_weight / bag_fits (負重式背包滿)
+func t_bag_weight_rules(data: GameData) -> void:
+	var wfn := func(i: int) -> int: return int(data.weights.get(i, 0))
+	var bag: Array = [{"id": 29042, "n": 3}, {"id": 10001, "n": 1}]     # 甜蘿蔔 w1×3 + 柳葉刀 w8×1 = 11
+	var w0 := RulesShop.bag_weight(bag, wfn)
+	check(w0 == 11, "重量規則: bag_weight 加埋件數×重量 (=%d)" % w0)
+	check(RulesShop.bag_fits(bag, 29042, 1, wfn, 12), "重量規則: 12 度裝到 1 件甜蘿蔔 (11+1)")
+	check(RulesShop.bag_fits(bag, 10001, 1, wfn, 19), "重量規則: 19 度裝到 1 件刀 (11+8)")
+	check(not RulesShop.bag_fits(bag, 10001, 1, wfn, 12), "重量規則: 12 度裝唔到刀 (12<19)")
