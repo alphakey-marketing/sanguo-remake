@@ -1,0 +1,51 @@
+{
+  "_note": "S09d LLM 層 (spec 09 §5)。玩家自填 key（唔喺呢個檔，亦唔入存檔/log）；呢個檔只放非機密設定。",
+  "_noteKey": "key 由 LlmClient 存去 user://llm.cfg（本機），sim 只存 enabled/model（非機密）。",
+  "endpoint": "https://openrouter.ai/api/v1/chat/completions",
+  "model": "deepseek/deepseek-chat",
+  "models": [
+    "deepseek/deepseek-chat",
+    "deepseek/deepseek-chat-v3.1",
+    "openai/gpt-4o-mini",
+    "qwen/qwen-2.5-7b-instruct"
+  ],
+  "temperature": 0.7,
+  "maxTokens": 120,
+  "timeoutSec": 15,
+  "actions": ["greet", "warn", "ignore", "acceptQuest", "hint", "rumor", "refuse"],
+  "tiers": {
+    "1": {"mode": "llm", "chance": 1.0},
+    "2": {"mode": "mixed", "chance": 0.15},
+    "3": {"mode": "template", "chance": 0.0}
+  },
+  "cooldownTicks": 1200,
+  "budget": {"perDay": 40, "reflectPerDay": 8},
+  "reflect": {"intervalDays": 1, "maxChars": 80},
+  "ideologyStyle": {
+    "義理": "重情重義，講信用同幫人",
+    "霸權": "威嚴剛烈，講實力同爭雄",
+    "權謀": "圓滑機巧，講利害同盤算",
+    "隱遁": "寡言淡泊，講避世同清靜",
+    "治國": "務實關民，講民生同秩序"
+  },
+  "prompt": {
+    "system": "你係三國武將/居民，用粵語短句回應。只可以揀一個動作，唔可以改任何數值（好感/善惡/血量/金錢）。動作白名單：greet(打招呼)/warn(警告)/ignore(唔理)/acceptQuest(答應請求)/hint(提示)/rumor(講傳聞)/refuse(拒絕)。輸出一定要係 JSON：{\"action\":\"...\",\"line\":\"...\"}，line 最多 40 個中文字。",
+    "reflectSystem": "你係 NPC 記憶摘要器。只輸出純文字摘要（最多 40 字），唔可以改任何數值、唔可以輸出 JSON。"
+  },
+  "responseFormat": {
+    "type": "json_schema",
+    "json_schema": {
+      "name": "npc_action",
+      "strict": true,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "action": {"type": "string", "enum": ["greet", "warn", "ignore", "acceptQuest", "hint", "rumor", "refuse"]},
+          "line": {"type": "string", "maxLength": 80}
+        },
+        "required": ["action", "line"],
+        "additionalProperties": false
+      }
+    }
+  }
+}

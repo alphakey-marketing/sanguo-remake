@@ -48,8 +48,10 @@ func cmd_general_talk(id: int, gid: int) -> void:
 	var text := String(pool[rng.below(pool.size())]) if not pool.is_empty() else "……"
 	if not _sip_thirst(e):          # 口渴 (Step 14): 只講模板客套話
 		text = THIRSTY_LINE
-	_emit({"k": "npc_say", "id": 0, "name": String(g["name"]), "text": text, "action": "greet",
-		"x": int(g["x"]), "y": int(g["y"]), "general": gid})
+	# S09d: Tier1 武將先接 LLM（request 事件交俾客戶端送；冇 key/超預算 = 模板後備）
+	if not _llm_talk({}, String(g["name"]), String(g["ideo"]), gid, int(g["x"]), int(g["y"]), id):
+		_emit({"k": "npc_say", "id": 0, "name": String(g["name"]), "text": text, "action": "greet",
+			"x": int(g["x"]), "y": int(g["y"]), "general": gid})
 	_msg(id, "%s（戰等 %d・%s%s・理念 %s）" % [g["name"], int(g["lv"]), RulesRecruit.type_name(String(g["type"])),
 		String(g["sub"]), g["ideo"]])
 
