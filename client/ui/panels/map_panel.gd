@@ -11,15 +11,18 @@ var _sel_map := ""               # 天下頁: 撳咗嘅已開放節點對應地�
 func _init(m: Node) -> void:
 	super(m)
 	title_lbl.text = "地圖"
-	set_tabs(["區域", "天下"])
+	set_tabs(["區域", "天下", "市價"])
 
 
 func sig() -> String:
 	var me = main._me()
-	return JSON.stringify([tab, _info, _sel_map, main.cur_map.get("id", ""), int(me.x) if me != null else 0, int(me.y) if me != null else 0])
+	return JSON.stringify([tab, _info, _sel_map, main.cur_map.get("id", ""), int(me.x) if me != null else 0, int(me.y) if me != null else 0, main.sim.view_market_prices()])
 
 
 func _build_body() -> void:
+	if tab == 2:
+		_build_prices()
+		return
 	var view := Control.new()
 	view.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	view.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -35,6 +38,27 @@ func _build_body() -> void:
 		if _sel_map != "":
 			row.add_child(btn("自動前往", func() -> void: goto_sel(), 120))
 		body.add_child(row)
+
+
+# ---- 市價 (spec 05 §6【自訂】): 各城代表物資現時市價，睇城際價差 ----
+func _build_prices() -> void:
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body.add_child(scroll)
+	var col := VBoxContainer.new()
+	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(col)
+	col.add_child(wrap_lbl("各城代表物資市價（因供需/天災浮動 0.5~2.0 倍）：", 13, UiTheme.DIM))
+	for row in main.sim.view_market_prices():
+		var box := VBoxContainer.new()
+		box.add_child(wrap_lbl(String(row["name"]), 15, UiTheme.GOLD))
+		var line := ""
+		for it in (row["items"] as Array):
+			line += "%s %d金　" % [String(it["name"]), int(it["price"])]
+		box.add_child(wrap_lbl(line, 13, Color.WHITE))
+		col.add_child(box)
+		col.add_child(HSeparator.new())
 
 
 # ---- 區域 ----
