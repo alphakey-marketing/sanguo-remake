@@ -34,8 +34,10 @@ func _beast_of_owner(owner: Dictionary) -> Dictionary:
 	return active_beast(owner.get("ch", {})) if owner.has("ch") else {}
 
 
-func _wrap_wb(cfg: Dictionary, breed: String, uid: int) -> Dictionary:
+func _wrap_wb(cfg: Dictionary, breed: String, uid: int, lvl: int = 1) -> Dictionary:
 	var wb := RulesWarBeast.new_beast(cfg, breed, uid)
+	if lvl > 1:                                    # S07d 拍賣場 NPC 戰騎標等級
+		RulesWarBeast.gain_exp(cfg, wb, RulesWarBeast.exp_total(cfg, lvl))
 	var st := RulesWarBeast.stats_for(cfg, wb)
 	wb["where"] = "with"
 	wb["stable"] = ""
@@ -635,6 +637,157 @@ func _beast_owner_of(by: Dictionary) -> Dictionary:
 	if by.get("kind", "") == "beast":
 		return ent(int(by.get("owner", 0)))
 	return {}
+
+
+# ================= S07d NPC 拍賣場 (spec 07 §9) =================
+# 單機化「拍賣/交易戰騎」= NPC 拍賣場，隨機上架座騎/戰騎。state["auction"] = {day, seq, lots}
+# 獨立 SimRng (由 game 日驅動)【自訂】→ 唔佔主 rng 流，唔會影響戰鬥/掉落決定性
+# lot = {id, kind("mount"/"beast"), breed, price, sex, tamed, level}
+func _aucfg() -> Dictionary:
+	return _wbcfg().get("auction", {})
+
+
+func _auction() -> Dictionary:
+	if not state.has("auction"):
+		state["auction"] = {"day": -1, "seq": 0, "lots": []}
+	return state["auction"]
+
+
+# 每日子時換貨 (sim.gd _daily_hook 叫)
+func _auction_daily(day: int) -> void:
+	if int(_auction().get("day", -1)) != day:
+		_auction_roll(day)
+
+
+# 讀/買之前確保當日已有貨 (舊存檔 / 未過子時)
+func _auction_ensure() -> void:
+	var day := int(_clock()["day"])
+	if int(_auction().get("day", -1)) != day:
+		_auction_roll(day)
+
+
+func _auction_roll(day: int) -> void:
+	var cfg := _aucfg()
+	var a := _auction()
+	var arng := SimRng.new(900001 + day * 7919)
+	var lots: Array = []
+	for _i in int(cfg.get("slots", 6)):
+		lots.append(_auction_lot(a, arng))
+	a["day"] = day
+	a["lots"] = lots
+	_emit({"k": "auction", "act": "refresh", "day": day, "n": lots.size()})
+
+
+func _auction_lot(a: Dictionary, arng: SimRng) -> Dictionary:
+	var cfg := _aucfg()
+	var lo := float(cfg.get("priceMin", 0.8))
+	var hi := float(cfg.get("priceMax", 1.5))
+	var pf := lo + arng.next() * (hi - lo)
+	a["seq"] = int(a.get("seq", 0)) + 1
+	var is_beast := arng.next() < float(cfg.get("beastWeight", 0.5))
+	if is_beast:
+		var breeds := RulesWarBeast.breeds_enabled(_wbcfg())
+		var b: Dictionary = breeds[arng.below(breeds.size())]
+		var lv := 1
+		if arng.next() < float(cfg.get("beastLevelPct", 0.4)):
+			lv = 1 + arng.below(maxi(1, int(cfg.get("beastLevelMax", 15))))
+		var base := int(b.get("price", 0))
+		if base <= 0:
+			base = int(_wbcfg().get("sellBase", 500)) * 20
+		var price := MathX.js_round(float(base) * (1.0 + 0.08 * float(lv - 1)) * pf)
+		return {"id": int(a["seq"]), "kind": "beast", "breed": String(b["id"]), "name": String(b["name"]),
+			"price": price, "sex": "", "tamed": false, "level": lv}
+	var mcfg: Dictionary = data.mounts
+	var mbreeds: Array = mcfg["breeds"]
+	var mb: Dictionary = mbreeds[arng.below(mbreeds.size())]
+	var tamed := arng.next() < float(cfg.get("tamedPct", 0.5))
+	var mbase := int((mcfg["tamed"] as Dictionary)["price"]) if tamed else int(mcfg["foalPrice"])
+	var mprice := MathX.js_round(float(mbase) * pf)
+	var sex := "m" if arng.next() < float(cfg.get("malePct", 0.3)) else "f"
+	var mname := String(mb.get("adult", mb["name"])) if tamed else String(mb["name"])
+	return {"id": int(a["seq"]), "kind": "mount", "breed": String(mb["id"]), "name": mname,
+		"price": mprice, "sex": sex, "tamed": tamed, "level": 0}
+
+
+func _auction_find(a: Dictionary, lot_id: int) -> Dictionary:
+	for l in a["lots"]:
+		if int(l["id"]) == lot_id:
+			return l
+	return {}
+
+
+# 買一件拍賣品 (要喺馬廄)
+func cmd_auction_buy(id: int, lot_id: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var key := stable_near(e)
+	if key == "":
+		return _msg(id, "要去馬廄先買到拍賣品")
+	_auction_ensure()
+	var a := _auction()
+	var lot := _auction_find(a, lot_id)
+	if lot.is_empty():
+		return _msg(id, "呢件拍賣品已經冇咗")
+	var ch: Dictionary = e["ch"]
+	var price := int(lot["price"])
+	if int(ch["gold"]) < price:
+		return _msg(id, "買%s要 %d 金" % [lot["name"], price])
+	if String(lot["kind"]) == "beast":
+		var cfg := _wbcfg()
+		var blist := _beasts(ch)
+		if blist.size() >= int(cfg["maxOwned"]):
+			return _msg(id, "最多養 %d 隻戰騎" % int(cfg["maxOwned"]))
+		ch["gold"] = int(ch["gold"]) - price
+		var uid := int(ch.get("beastSeq", 0)) + 1
+		ch["beastSeq"] = uid
+		var wb := _wrap_wb(cfg, String(lot["breed"]), uid, int(lot.get("level", 1)))
+		wb["home"] = key
+		if not active_beast(ch).is_empty():
+			wb["where"] = "stable"
+			wb["stable"] = key
+		else:
+			_spawn_beast_ent(e, wb)
+		blist.append(wb)
+		_emit({"k": "auction", "act": "buy", "dst": id, "kind": "beast", "uid": uid, "price": price})
+		_msg(id, "拍賣買咗%s %d 級（%d 金）" % [RulesWarBeast.display_name(cfg, wb), int(wb["level"]), price])
+	else:
+		var mcfg: Dictionary = data.mounts
+		var ms := _mounts(ch)
+		if ms.size() >= int(mcfg["maxOwned"]):
+			return _msg(id, "最多養 %d 匹馬" % int(mcfg["maxOwned"]))
+		ch["gold"] = int(ch["gold"]) - price
+		var muid := int(ch.get("mountSeq", 0)) + 1
+		ch["mountSeq"] = muid
+		var m := RulesMount.new_mount(mcfg, String(lot["breed"]), muid, bool(lot["tamed"]))
+		m["sex"] = String(lot["sex"]) if String(lot["sex"]) != "" else "f"
+		if not mount_near_me(ch).is_empty():
+			m["where"] = "stable"
+			m["stable"] = key
+		ms.append(m)
+		_emit({"k": "auction", "act": "buy", "dst": id, "kind": "mount", "uid": muid, "price": price})
+		_msg(id, "拍賣買咗%s（%d 金）" % [RulesMount.display_name(mcfg, m), price])
+	a["lots"].erase(lot)
+
+
+# UI 讀取: 當日拍賣品 + 玩家容量/金錢
+func auction_view(id: int) -> Dictionary:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return {}
+	_auction_ensure()
+	var a := _auction()
+	var ch: Dictionary = e["ch"]
+	var lots: Array = []
+	for l in a["lots"]:
+		lots.append({"id": int(l["id"]), "kind": String(l["kind"]), "breed": String(l["breed"]),
+			"name": String(l["name"]), "price": int(l["price"]), "sex": String(l.get("sex", "")),
+			"tamed": bool(l.get("tamed", false)), "level": int(l.get("level", 0)),
+			"afford": int(ch["gold"]) >= int(l["price"])})
+	return {"day": int(a["day"]), "lots": lots, "gold": int(ch["gold"]), "stable": stable_near(e),
+		"atStable": stable_near(e) != "",
+		"mountCount": _mounts(ch).size(), "mountMax": int((data.mounts as Dictionary)["maxOwned"]),
+		"beastCount": _beasts(ch).size(), "beastMax": int(_wbcfg()["maxOwned"])}
 
 
 # ================= UI 讀取 =================

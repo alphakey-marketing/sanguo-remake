@@ -27,7 +27,13 @@
       "1": "fire", "2": "water", "4": "earth", "5": "wind", "9": "wind", "11": "water", "12": "none", "15": "earth"
     },
     "auraRange": 4,
-    "regenTicks": 10
+    "regenTicks": 10,
+    "_noteDraw": "S07d: 抽特技用嘅固定池 (drawPool)。唔跟 impl flag 浮動 → 開新特技唔會打亂其他武將。pin = 個別武將指定特技 (優先順序 override > pin > 抽)。",
+    "drawPool": {
+      "wu": [1, 3, 4, 5, 7, 9, 10, 12, 13, 16, 18, 19],
+      "wen": [1, 2, 6, 8, 11, 12, 14, 15, 16, 17, 20]
+    },
+    "pin": {"馬超": 52, "馬岱": 52, "公孫瓚": 52, "馬騰": 52}
   },
   "skills": [
     {"id": 1, "name": "回春", "types": ["wu", "wen"], "impl": true, "desc": "每刻恢復 HP (戰鬥中都回) 3%", "eff": {"regenPct": 0.03}},
@@ -81,7 +87,7 @@
     {"id": 49, "name": "烹飪專精", "types": ["wen"], "impl": false, "desc": "(生產) 烹飪成功率提升"},
     {"id": 50, "name": "製藥專精", "types": ["wen"], "impl": false, "desc": "(生產) 製藥成功率提升"},
     {"id": 51, "name": "鑄造專精", "types": ["wu"], "impl": false, "desc": "(生產) 鑄造成功率提升"},
-    {"id": 52, "name": "馴馬", "types": ["wu"], "impl": false, "desc": "(座騎) 座騎親密度提升"},
+    {"id": 52, "name": "馴馬", "types": ["wu"], "impl": true, "desc": "(座騎) 座騎親密度提升 (每日子時親密度成長 ×2)", "eff": {"mountIntimacyMul": 2.0}},
     {"id": 53, "name": "騎兵統率", "types": ["wu"], "impl": false, "desc": "(國戰) 騎兵能力提升"},
     {"id": 54, "name": "步兵統率", "types": ["wu"], "impl": false, "desc": "(國戰) 步兵能力提升"},
     {"id": 55, "name": "弓兵統率", "types": ["wu"], "impl": false, "desc": "(國戰) 弓兵能力提升"},

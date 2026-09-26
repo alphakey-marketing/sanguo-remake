@@ -206,6 +206,15 @@ func t_daily(cfg: Dictionary) -> void:
 	dl["life"] = 5
 	dl["status"]["bleed"] = true
 	check(RulesMount.daily(cfg, dl, false).has("dead"), "生命力歸 0 = 死亡【原】")
+	# S07d 馴馬: 親密度成長倍率 (只放大正成長)
+	var mul := RulesMount.new_mount(cfg, "dawan", 11)
+	mul["mood"] = 85
+	RulesMount.daily(cfg, mul, false, 2.0)
+	check(int(mul["intimacy"]) == 24, "馴馬倍率: 親密度 +2 → +4")
+	var neg := RulesMount.new_mount(cfg, "dawan", 12)
+	neg["mood"] = 20
+	RulesMount.daily(cfg, neg, false, 2.0)
+	check(int(neg["intimacy"]) == 19, "馴馬倍率唔放大負成長")
 
 
 func t_ride_pure(cfg: Dictionary) -> void:

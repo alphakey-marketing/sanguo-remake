@@ -165,5 +165,18 @@
   "_noteLoyalty": "忠誠 / 交易 (Step 18c, spec 07 §8.5)【原=戰鬥死亡 −1；交易 −5；忠誠 <5 唔可以交易；玩家 <10 級唔可以交易；過低走佬】。PK 單機冇對手，唔實作 (同馬戰 PK 一樣偏離)。交易 = 單機簡化做「賣畀 NPC」，賣價【自訂，spec 冇寫金額】。",
   "loyalty": {"start": 100, "deathLoss": 1, "tradeLoss": 5, "desertAt": 0, "tradeMinLoyalty": 5, "tradeMinPlayerLevel": 10},
   "sellBase": 500,
-  "sellPerLevel": 50
+  "sellPerLevel": 50,
+  "_noteAuction": "S07d NPC 拍賣場 (spec 07 §9 單機化：拍賣/交易戰騎 → NPC 拍賣場，隨機上架座騎/戰騎)。每 slots 個位，每 refreshDays game 日 自動換貨；唔佔主 RNG 流 (獨立 SimRng 由 game 日驅動)。價 = 底價 × [priceMin, priceMax]；戰騎可標 levelMax 以下嘅等級。玩家疲勞放牧都會執到 → 【自訂簡化】併入放牧 loot，唔另做。",
+  "auction": {
+    "slots": 6,
+    "refreshDays": 1,
+    "mountWeight": 0.5,
+    "beastWeight": 0.5,
+    "priceMin": 0.8,
+    "priceMax": 1.5,
+    "beastLevelMax": 15,
+    "beastLevelPct": 0.4,
+    "tamedPct": 0.5,
+    "malePct": 0.3
+  }
 }

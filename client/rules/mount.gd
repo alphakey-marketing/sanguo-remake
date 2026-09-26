@@ -220,8 +220,9 @@ static func apply_act(cfg: Dictionary, m: Dictionary, act: String, effects: Arra
 
 # 每日子時結算【原=情緒必降；情緒好加親密度；襁褓期要帶喺身邊；馬廄過子時疲勞/頭暈恢復；飽食 <50 疲勞唔降】
 # plague = 寄喺有瘟疫嘅城【自訂=原版馬瘟全死，單機改做扣生命力】
+# intimacy_mul = 親密度成長倍率 (S07d 武將特技「馴馬」)；只放大正成長，唔放大跌幅。預設 1.0 = 舊行為
 # 返事件 Array: "grown" 啱啱成年 / "old" 入衰老期 / "dead" 死亡
-static func daily(cfg: Dictionary, m: Dictionary, plague: bool) -> Array:
+static func daily(cfg: Dictionary, m: Dictionary, plague: bool, intimacy_mul: float = 1.0) -> Array:
 	var d: Dictionary = cfg["daily"]
 	var ev: Array = []
 	var where := String(m["where"])
@@ -233,6 +234,8 @@ static func daily(cfg: Dictionary, m: Dictionary, plague: bool) -> Array:
 			if int(m["mood"]) >= int(row[0]):
 				dv = int(row[1])
 				break
+		if dv > 0 and intimacy_mul > 1.0:
+			dv = MathX.js_round(float(dv) * intimacy_mul)
 		m["intimacy"] = clampi(int(m["intimacy"]) + dv, 0, 100)
 	# 情緒必降；肚餓/好攰再跌
 	var mood := int(d["mood"])

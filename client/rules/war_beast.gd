@@ -43,6 +43,14 @@ static func exp_to_next(cfg: Dictionary, level: int) -> int:
 	return MathX.js_round(float(cfg["expBase"]) * pow(level, float(cfg["expPow"])))
 
 
+# 由 1 級升到 level 級嘅累積經驗 (S07d 拍賣場 NPC 戰騎標等級用)
+static func exp_total(cfg: Dictionary, level: int) -> int:
+	var sum := 0
+	for l in range(1, maxi(1, level)):
+		sum += exp_to_next(cfg, l)
+	return sum
+
+
 # 呢級每升一級發嘅 3 種點數 (§8.2)【原=1~25/26~50/51~75/76~100 四段】
 static func points_for_level(cfg: Dictionary, level: int) -> Dictionary:
 	for row in cfg["levelPoints"]:
