@@ -4,7 +4,7 @@ extends RefCounted
 
 const NEWBIE_LEVEL := 5
 const WORLD_W := 512              # 全域格仔 (所有地圖拼埋一張，spec 12 §2)
-const WORLD_H := 512
+const WORLD_H := 640               # S06b (2026-09-26)：512 格幾乎排滿，起司隸/徐州邊境新城要加高
 
 var classes: Dictionary = {}     # id(String) -> def
 var monsters: Dictionary = {}    # id(int) -> def

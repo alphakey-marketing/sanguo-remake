@@ -519,6 +519,8 @@ def chenliu():
     c.rect(56, 17, 59, 18, "H")
     c.rect(22, 36, 25, 37, "H")
     c.scatter(4, 10, 92, 52, ",", 0.07, rng)
+    # 西北口 → 洛陽 (司隸，S06b 借用邊境)
+    c.line(0, 12, 18, 12, "=", 1, only=".,T")
     n = c.seal_unreachable((48, 54), "T")
     print("chenliu sealed", n)
     c.put(47, 55, "T")
@@ -527,6 +529,8 @@ def chenliu():
     c.put(0, 30, "=")                             # 西口 (傳送點 0,30)
     c.put(95, 31, "T")
     c.put(95, 30, "=")                            # 東口 (傳送點 95,30)
+    c.put(0, 13, "T")
+    c.put(0, 12, "=")                             # 西北口 → 洛陽 (傳送點 0,12)
     c.save("chenliu")
 
 
@@ -561,7 +565,7 @@ def yudu():
 # ---------------- 小沛城 48×36 (城門口一帶；陳留東) ----------------
 def xiaopei():
     rng = random.Random(196)          # 建安元年 轅門射戟
-    c = _city_base(48, 36, [("W", 17)])
+    c = _city_base(48, 36, [("W", 17), ("S", 20)])   # S → 下邳城 (S06b 借用邊境)
     for b in ((8, 6, 16, 11), (20, 6, 28, 11), (32, 6, 42, 11), (8, 22, 16, 29), (22, 24, 28, 29), (32, 22, 42, 29)):
         c.rect(*b, "H")
     c.rect(34, 14, 40, 18, "_")                   # 轅門校場
@@ -786,7 +790,7 @@ def xy_prison():
 # ---------------- 長沙城 48×36 (城門口一帶；賭場) ----------------
 def changsha():
     rng = random.Random(187)          # 孫堅長沙太守
-    c = _city_base(48, 36, [("N", 22)])
+    c = _city_base(48, 36, [("N", 22), ("S", 22)])   # S → 零陵城 (S06b 借用邊境)
     for b in ((6, 8, 16, 14),                    # 賭場
               (30, 8, 42, 14), (6, 20, 16, 29), (20, 22, 28, 29), (32, 20, 42, 29)):
         c.rect(*b, "H")
@@ -851,6 +855,105 @@ B25 = {"chenliu": chenliu, "yudu": yudu, "xiaopei": xiaopei, "runan_city": runan
        "hanshui": hanshui, "xiangyang": xiangyang, "xy_prison": xy_prison, "changsha": changsha}
 
 
+# ================= S06b (2026-09-26 用家確認：開始起司隸/徐州/荊州邊境新城，同 chenliu/xiaopei/changsha 一樣
+# 「借用邊境城池」做法，唔起完整新州) =================
+# 洛陽城 (司隸；孫堅匿璽 + 討伐張角) + 皇城井底 (寶物室) + 程府民房
+# 下邳城 (徐州；張公公謀害何進) + 何府
+# 零陵城 (荊州；找尋曹阿瞞)
+
+# ---------------- 洛陽城 48×36 (司隸；私塾/黃巾道場、竹林、皇城井) ----------------
+def luoyang():
+    rng = random.Random(190)          # 初平元年 董卓遷都、洛陽動亂
+    c = _city_base(48, 36, [("S", 22)])           # 南門 → 陳留郊外
+    # 私塾 + 黃巾道場 (私塾左上方)
+    c.rect(6, 6, 13, 9, "H")                      # 私塾
+    c.ring(6, 12, 18, 20, "#")
+    c.rect(7, 13, 17, 19, "_")
+    c.rect(9, 14, 15, 17, "H")                    # 黃巾道場 (張角)
+    c.rect(11, 20, 13, 20, "_")                   # 道場門口 (南牆開缺)
+    # 皇城井 (中央廣場一口井 → 皇城井底)
+    c.rect(22, 14, 26, 16, "_")
+    c.put(24, 15, "b")                            # 井口 (傳送點 24,15)
+    for b in ((28, 6, 36, 10), (38, 6, 44, 10), (30, 22, 38, 27), (6, 24, 14, 30), (18, 26, 26, 31)):
+        c.rect(*b, "H")                           # 客棧 / 民房
+    c.put(34, 28, "+")                            # 程府門 (傳送點 34,28)
+    # 城外西南竹林 (南華老仙)
+    c.rect(6, 30, 16, 33, ".")
+    c.scatter(6, 30, 16, 33, "T", 0.35, rng)
+    n = c.seal_unreachable((22, 22), "H")
+    print("luoyang sealed", n)
+    c.save("luoyang")
+
+
+# ---------------- 皇城井底 40×24 (室內；木乃伊/僵屍，玉璽錦囊) ----------------
+def luoyang_well():
+    rng = random.Random(1900)
+    c = Canvas(40, 24, "_")
+    c.ring(0, 0, 39, 23, "#")
+    c.scatter(3, 3, 36, 20, "^", 0.06, rng, only="_")
+    n = c.seal_unreachable((2, 2), "^")
+    print("luoyang_well sealed", n)
+    c.put(20, 0, "+")                             # 井口 (傳送點 20,0)
+    c.save("luoyang_well")
+
+
+# ---------------- 程府民房 28×16 (室內；程普) ----------------
+def chengfu():
+    c = Canvas(28, 16, "_")
+    c.ring(0, 0, 27, 15, "#")
+    c.rect(4, 3, 11, 5, "H")
+    c.rect(16, 3, 23, 5, "H")
+    c.rect(12, 8, 15, 9, "H")
+    c.put(14, 15, "+")                            # 府門 (傳送點 14,15)
+    c.save("chengfu")
+
+
+# ---------------- 下邳城 56×40 (徐州；何府) ----------------
+def xiapi():
+    rng = random.Random(196)          # 建安元年 呂布據下邳
+    c = _city_base(56, 40, [("W", 18)])           # 西門 → 小沛城
+    # 何府 (東北)
+    c.ring(36, 6, 51, 17, "#")
+    c.rect(37, 7, 50, 16, "_")
+    c.rect(39, 8, 48, 12, "H")
+    c.put(44, 17, "+")                            # 何府門 (傳送點 44,17)
+    for b in ((6, 6, 14, 11), (18, 6, 26, 11), (6, 20, 14, 27), (18, 22, 26, 27),
+              (30, 22, 38, 27), (42, 22, 50, 27), (6, 31, 14, 37), (18, 31, 26, 37)):
+        c.rect(*b, "H")
+    n = c.seal_unreachable((20, 18), "H")
+    print("xiapi sealed", n)
+    c.save("xiapi")
+
+
+# ---------------- 何府 24×14 (室內；何進) ----------------
+def hefu():
+    c = Canvas(24, 14, "_")
+    c.ring(0, 0, 23, 13, "#")
+    c.rect(3, 2, 9, 4, "H")
+    c.rect(14, 2, 20, 4, "H")
+    c.rect(9, 7, 14, 8, "H")
+    c.put(11, 13, "+")                            # 何府門 (傳送點 11,13)
+    c.save("hefu")
+
+
+# ---------------- 零陵城 48×32 (荊州；練兵場、客棧門口) ----------------
+def lingling():
+    rng = random.Random(187)          # 建安年間 曹嵩尋子
+    c = _city_base(48, 32, [("N", 22)])           # 北門 → 長沙城
+    c.rect(6, 6, 16, 13, "_")                     # 練兵場
+    c.scatter(6, 6, 16, 6, "T", 0.4, rng)
+    c.rect(30, 8, 40, 14, "H")                    # 客棧
+    for b in ((6, 18, 16, 25), (20, 20, 28, 26), (32, 18, 42, 25)):
+        c.rect(*b, "H")
+    n = c.seal_unreachable((22, 16), "H")
+    print("lingling sealed", n)
+    c.save("lingling")
+
+
+S06B = {"luoyang": luoyang, "luoyang_well": luoyang_well, "chengfu": chengfu,
+        "xiapi": xiapi, "hefu": hefu, "lingling": lingling}
+
+
 # ---------------- 戰役 (spec 06 §7): 張牛角戰役 4 層 24×16 小場地 (單機教學版，即場傳送唔行門) ----------------
 def battle_floor(n):
     w, h = 24, 16
@@ -867,8 +970,12 @@ BATTLE_ZNJ = {"zhangniujiao_f%d" % i: (lambda i=i: battle_floor(i)) for i in ran
 
 if __name__ == "__main__":
     if "--force" not in sys.argv:
-        sys.exit("會覆蓋 data/maps/*.txt，確定就加 --force (--b2 = 只起 B2 五張；--b25 = 只起 B2.5 十三張；--b3 = 只起隆中/草廬；--battle = 只起張牛角戰役 4 層)")
+        sys.exit("會覆蓋 data/maps/*.txt，確定就加 --force (--b2 = 只起 B2 五張；--b25 = 只起 B2.5 十三張；--b3 = 只起隆中/草廬；--battle = 只起張牛角戰役 4 層；--s06b = 只起洛陽/下邳/零陵 六張)")
     os.makedirs(OUT, exist_ok=True)
+    if "--s06b" in sys.argv:
+        for fn in S06B.values():
+            fn()
+        sys.exit(0)
     if "--battle" in sys.argv:
         for fn in BATTLE_ZNJ.values():
             fn()

@@ -29,8 +29,8 @@ T~.##:HHHHHHHHHHH:::HHHHHHHHH:::HHHHHHHHHHH##.~T
 T~.##:HHHHHHHHHHH:::HHHHHHHHH:::HHHHHHHHHHH##.~T
 T~.##:HHHHHHHHHHH:::HHHHHHHHH:::HHHHHHHHHHH##.~T
 T~.##::::::::::::::::::::::::::::::::::::::##.~T
-T~.##########################################.~T
-T~.##########################################.~T
-T~............................................~T
-T~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~T
-TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
+T~.###################++++###################.~T
+T~.###################++++###################.~T
+T~....................====....................~T
+T~~~~~~~~~~~~~~~~~~~~~bbbb~~~~~~~~~~~~~~~~~~~~~T
+TTTTTTTTTTTTTTTTTTTTTTT=TTTTTTTTTTTTTTTTTTTTTTTT
