@@ -35,6 +35,15 @@ func damage(t: Dictionary, dmg: int, by: Dictionary) -> void:
 			t["mob"]["state"] = "flee"
 			t["mob"]["target"] = int(by["id"])
 			_emit({"k": "flee", "src": int(t["id"]), "dst": int(by["id"]), "name": str(t["name"])})
+	# S03a: 居民被襲擊 -> 反擊 / 逃跑叫衛兵 (spec 03 §2~3)。紅名(殺人魔)亦會主動襲擊玩家 (見 bot_sys.think)
+	if t["kind"] == "bot" and by.has("ch") and dmg > 0:
+		t["aggressor"] = int(by["id"])              # 記低攻擊者 (反擊/叫衛兵都用)
+		if int(t.get("reacted", 0)) == 0:           # 一場打交首次受擊先揀一次反應
+			t["reacted"] = 1
+			t["atk_target"] = int(by["id"])          # 預設反擊
+			if MathX.roll(rng_fn) < float(data.world["bots"]["fleeChance"]):
+				t["fleePk"] = true                   # 幾會逃跑: 走去叫衛兵
+				t["atk_target"] = 0
 	if t.has("ch"):
 		t["ch"]["hp"] = t["hp"]
 		if dmg > 0:
@@ -43,6 +52,8 @@ func damage(t: Dictionary, dmg: int, by: Dictionary) -> void:
 		return
 	if t["kind"] == "mob":
 		_kill_mob(t, by)
+	elif t.get("kind", "") == "bot":
+		_kill_bot(t, by)              # S03a: 居民死亡 (唔走返回客棧條玩家死亡流程)
 	elif t.has("ch"):
 		_kill_player(t)
 
@@ -162,6 +173,35 @@ func _kill_player(p: Dictionary) -> void:
 	p["atk_target"] = 0
 	_sync_stats(p)
 	_emit({"k": "die", "dst": p["id"], "lost": lost})
+
+
+# S03a: 殺死居民/紅名(殺人魔) NPC (spec 03 §2, §4)。
+# 善惡: 殺善一次過 -1000 / 紅殺紅 +300 / 反擊成功 +100；目擊；居民唔重生、冇掉落。
+func _kill_bot(t: Dictionary, by: Dictionary) -> void:
+	if by.is_empty() or not by.has("ch"):
+		_remove_ent(int(t["id"]))
+		return
+	var is_player := int(by["id"]) == int(state["player_id"])
+	var red := bool(t.get("ch", {}).get("criminal", false))
+	# 反擊判定: 玩家而家追擊緊呢隻 bot = 玩家先行出手 (謀殺 / 紅殺)；
+	# 玩家冇追緊 = 呢隻 bot 主動襲擊玩家而玩家自衛反殺 -> 反擊成功 +100
+	var initiated := is_player and int(ent(int(state["player_id"])).get("atk_target", 0)) == int(t["id"])
+	var counter := is_player and not initiated
+	if is_player:
+		var pch: Dictionary = by["ch"]
+		pch["karma"] = RulesKarma.karma_after_kill_npc(int(pch["karma"]), {"good": not red, "red": red})
+		if counter:
+			pch["karma"] = RulesKarma.counter_kill(int(pch["karma"]))
+		# 目擊: 附近有記憶表嘅 NPC 記錄玩家做咗嘢 (好感/傳聞, Spec 09)
+		_witness_nearby(t, int(by["id"]), "murder", BotSys.W_KILL_NPC if not red else BotSys.W_KILL_RED)
+		_msg(int(by["id"]), "你殺咗%s！%s" % [str(t["name"]), ("（除害）" if red else "（罪案）")])
+	state["bots"].erase(int(t["id"]))
+	_remove_ent(int(t["id"]))
+	var ev := {"k": "kill_npc", "dst": int(by["id"]), "name": str(t["name"]), "red": red, "counter": counter}
+	if is_player:
+		ev["karma"] = int(by["ch"]["karma"])
+		ev["kind"] = "murder" if not red else "bounty"
+	_emit(ev)
 
 
 # 逃跑怪消失: 排重生 + 清 atk_target (冇掉落/善惡/經驗)

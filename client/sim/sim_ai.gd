@@ -160,19 +160,28 @@ func _think_player(p: Dictionary) -> void:
 	var hit := base_hit + float(jb.get("hitPct", 0.0))
 	if rng.next() >= hit:
 		_emit({"k": "hit", "src": p["id"], "dst": t["id"], "dmg": 0})     # miss
-		t["mob"]["state"] = "chase"
-		t["mob"]["target"] = p["id"]
+		if not tm.is_empty():                    # 怪先有仇恨/逃跑 state；NPC 冇 (S03a)
+			t["mob"]["state"] = "chase"
+			t["mob"]["target"] = p["id"]
 		return
 	# 弩命中 -> 扣 1 箭（有箭先出到呢步，前面已查）
 	if not mounted_combat and int(data.cats.get(int(ch["equip"].get("weapon", 0)), 0)) == RulesAmmo.NU_WEAPON_CAT:
 		RulesAmmo.consume_arrow(data, ch, 1)
-	var mdef: Dictionary = data.mob_def(int(t["mob"]["def"]))
+	# 目標防禦 / 元素: 怪睇 mob_def；NPC(居民/玩家/同伴) 用玩家防禦 + 冇元素 (spec 03 §4)
+	var t_def := 0.0
+	var t_elem := "none"
+	if not tm.is_empty():
+		var mdef := data.mob_def(int(t["mob"]["def"]))
+		t_def = float(mdef["def"])
+		t_elem = str(mdef.get("element", "none"))
+	else:
+		t_def = float(RulesCombat.player_def(int(t.get("level", 1))))
 	# 聚力/強力/神力 buff: 物攻 ×1.15/1.3/1.5 (spec 02 §7) + 輔助石物攻 % (effect 7)
 	var atk_mult := RulesSpell.atk_mult(ch.get("status", {}), tick)
 	atk_mult = atk_mult * (1.0 + float(jb.get("atkPct", 0.0)))
 	var eff_str := _eff_attr(ch, "str", ab) + float(jb.get("strFlat", 0))
-	var elem_mult := _phys_elem_mult(ch, str(mdef.get("element", "none")))
-	var dmg0 := RulesCombat.calc_damage(eff_str, w["power"], mdef["def"], rng_fn, atk_mult, 1.0)
+	var elem_mult := _phys_elem_mult(ch, t_elem)
+	var dmg0 := RulesCombat.calc_damage(eff_str, w["power"], t_def, rng_fn, atk_mult, 1.0)
 	var dmg := MathX.js_round(dmg0 * elem_mult)
 	_emit({"k": "hit", "src": p["id"], "dst": t["id"], "dmg": dmg})
 	if not mounted_combat:

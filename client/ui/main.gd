@@ -11,6 +11,7 @@ const FONT_SZ := 12
 const TARGET_RANGE := 16          # 換目標: 附近幾多格 (Manhattan) 內嘅怪
 const FIELD_RETRY_TICKS := 60     # 自動掛機冇怪: 每幾多 tick 再行去野區
 const DEBUG_FOOD := 29054         # debug「試食」: 燻魚 (回 HP)
+const LONG_PRESS_MS := 650        # S03a: 長按 NPC 先出「攻擊」menu (二次確認)
 
 var sim: Sim
 var data: GameData
@@ -27,6 +28,8 @@ var t0 := 0.0
 var start_pos := Vector2i(-1, -1)
 var moved := false
 var target_id := -1
+var _touch_at := 0                # S03a: 長按偵測 (down 嘅時間戳)
+var _touch_pos := Vector2.ZERO
 var hud: MobileHud                # 手機操控層 (ui/touch/mobile_hud.gd)
 var auto := false                 # 自動掛機
 var sshot_file := ""             # --sshot: 開場幾秒後截圖存 user:// 退出
@@ -408,6 +411,15 @@ func _on_event(e: Dictionary) -> void:
 				var names := []
 				for i in e.items: names.append(item_names.get(int(i), str(i)))
 				_log("殺怪 +%d 經驗 +%d 金 %s%s" % [e.exp, e.gold, ",".join(names), "  升級! Lv%d" % e.lvUp if int(e.lvUp) > 0 else ""])
+		"kill_npc":                # S03a: 殺居民/紅名 NPC -> 善惡變化
+			if int(e.dst) == my_id:
+				var km := str(e.get("kind", ""))
+				var diff_str := "善惡咗"
+				kills += 1
+				_log("殺%s%s！%s（善惡而家 %d）" % ["咗紅名·殺人魔" if bool(e.get("red", false)) else "居民", str(e.name), "（反擊+100）" if bool(e.get("counter", false)) else "（謀殺-1000）", int(e.get("karma", 0))])
+		"guard_alert":            # S03a: 被襲居民走去叫衛兵
+			if int(e.dst) == my_id:
+				_log("%s走去叫衛兵！" % str(e.name))
 		"msg":
 			if int(e.dst) == my_id: _log(str(e.text))
 		"travel":
@@ -875,6 +887,47 @@ func _ent_at(g: Vector2):
 		if int(e.x) == int(g.x) and int(e.y) == int(g.y): return e
 	return null
 
+
+# S03a: 長按位置附近格嘅居民 (bot) → 出「攻擊」menu (二次確認)。
+# 短按照正常 tap (行路/打怪)；長按唔係撳中居民就照做 normal tap。
+func _handle_long_press(pos: Vector2) -> void:
+	var g := (pos + cam) / TILE
+	var gx := int(floor(g.x))
+	var gy := int(floor(g.y))
+	var hit: Dictionary = {}
+	for e in ents:
+		if not bool(e.get("bot", false)):
+			continue
+		if absi(int(e.x) - gx) <= 1 and absi(int(e.y) - gy) <= 1:
+			hit = e
+			break
+	if hit.is_empty():
+		_hud_tap(pos)                 # 唔係居民: 當普通 tap
+		return
+	_open_npc_attack(hit)
+
+
+# S03a: 長按居民 → 攻擊 menu + 二次確認。安全區照禁 (sim 出手前都擋, 呢度 UI 都灰)。
+func _open_npc_attack(ev: Dictionary) -> void:
+	var me = _me()
+	var safe: bool = me != null and sim.is_safe(int(me.x), int(me.y))
+	var red := bool(ev.get("criminal", false))
+	var tid := int(ev.id)
+	var name := str(ev.get("name", "居民")) + ("　［紅名·殺人魔］" if red else "")
+	var effect := ("除害善惡 +300" if red else "做衰嘢，善惡一次過 -1000")
+	var warn := "城內（安全區）唔可以攻擊居民。" if safe else "攻擊佢？殺害居民會被視為罪案（%s）。" % effect
+	hud.open_dialog(func() -> Dictionary: return {
+		"title": name, "text": warn, "options": [
+			{"label": "攻擊…", "disabled": safe, "cb": func() -> void:
+				hud.open_dialog(func() -> Dictionary: return {
+					"title": "確定攻擊？", "text": "殺害居民會損善惡，附近居民都會記得你。\n%s" % name, "options": [
+						{"label": "確定攻擊", "cb": func() -> void:
+							target_id = tid
+							_send({"t": "attack", "target": tid})
+							hud.close_panels()},
+						{"label": "取消", "cb": func() -> void: hud.close_panels()}]})},
+			{"label": "離開", "cb": func() -> void: hud.close_panels()}]})
+
 # 測試功能: 「更多」面板 + 桌面鍵盤共用（成品前換走；倉庫已搬去背包面板）
 func _on_debug_pressed(action: String) -> void:
 	match action:
@@ -925,7 +978,14 @@ func _unhandled_input(ev: InputEvent) -> void:
 	# （唔用 Input.is_emulating_mouse_from_touch(): 4.7 桌面都回 true）
 	if ev is InputEventScreenTouch:
 		if ev.pressed:
-			_hud_tap(ev.position)
+			_touch_at = Time.get_ticks_msec()      # S03a: 記低 down 時刻做長按偵測
+			_touch_pos = ev.position
+		else:
+			var held := Time.get_ticks_msec() - _touch_at
+			if held >= LONG_PRESS_MS:              # 長按: 對 NPC 出「攻擊」menu
+				_handle_long_press(ev.position)
+			else:                                  # 短按: 正常 tap
+				_hud_tap(ev.position)
 		return
 	if ev is InputEventMouse and ev.device == InputEvent.DEVICE_ID_EMULATION:
 		return
@@ -1020,7 +1080,9 @@ func _draw() -> void:
 			nm += "（吟唱中）"
 		if isgen:
 			nm = "【同伴】" + nm
-		_txt(p + Vector2(-8, -18), nm, Color(1, 0.7, 0.6) if ismob else Color(0.6, 1, 0.65) if isgen else Color.WHITE, 11)
+		# S03a: 紅名(殺人魔)居民 = 紅字表示（居民警告話你知佢係殺人魔）
+		var nc := Color(1, 0.32, 0.32) if bool(e.get("criminal", false)) else Color(1, 0.7, 0.6) if ismob else Color(0.6, 1, 0.65) if isgen else Color.WHITE
+		_txt(p + Vector2(-8, -18), nm, nc, 11)
 	for qn in quest_npcs:
 		if not mr.has_point(Vector2i(int(qn.x), int(qn.y))):
 			continue

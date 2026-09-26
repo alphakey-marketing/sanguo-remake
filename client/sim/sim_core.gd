@@ -486,6 +486,8 @@ func add_bots(n: int) -> void:
 		var nm: String = BotSys.NAMES[i % BotSys.NAMES.size()] + (str(i) if i >= BotSys.NAMES.size() else "")
 		var e := _spawn_actor(nm, "bot")
 		BotSys.init_identity(e, rng)
+		if rng.next() < float(data.world["bots"]["criminalPct"]):   # S03a: 部分居民係紅名(殺人魔)「殺人魔 NPC」
+			e["ch"]["criminal"] = true
 		state["bots"].append(int(e["id"]))
 
 

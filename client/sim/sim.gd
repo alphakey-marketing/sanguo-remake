@@ -225,6 +225,7 @@ func view_ents() -> Array:
 				st_vis.append(str(k))
 		out.append({"id": e["id"], "name": e["name"], "x": e["x"], "y": e["y"], "face": e["face"],
 			"bot": e["kind"] == "bot", "gen": e["kind"] == "gen", "hp": e["hp"], "maxHp": e["max_hp"], "level": e["level"], "mob": e["kind"] == "mob",
+			"criminal": bool(e.get("ch", {}).get("criminal", false)),
 			"statuses": st_vis, "casting": e.has("casting"),
 			"aggro": int(e["mob"]["target"]) if e["kind"] == "mob" and e["mob"]["state"] == "chase" else 0})   # 怪追緊邊個
 	return out
