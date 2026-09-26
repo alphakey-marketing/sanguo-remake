@@ -53,7 +53,8 @@ CFG = {
     "companion": {"strMulWu": 1.2, "strMulWen": 0.7, "intAddWen": 0.5, "regenTicks": 10, "regenPct": 0.01,
                   "follow": 2, "farFollow": 4, "huntRange": 8, "leashOwner": 12, "expShare": 0.5},
     "loyalty": {"init": 60, "sameIdeo": 10, "leave": 30, "ko": -5, "gift": 2, "badKill": -3,
-                "badKillIdeo": ["義理", "治國"]},
+                "badKillIdeo": ["義理", "治國"],
+                "badNpcKill": -15, "badNpcKillIdeo": ["義理"]},   # S09b: 主公謀殺善 NPC → 義理忠誠 -15 (spec 09 §4)
 }
 
 # Tier1 (spec 09 §2): 許昌 = 曹營；新野 = 劉備軍。x/y = 地圖內座標；window = 出現刻 (96 刻/日, 8 刻一時辰)

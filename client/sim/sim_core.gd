@@ -28,7 +28,8 @@ func _init(game_data: GameData, seed_value: int = 1) -> void:
 	rng_fn = Callable(rng, "next")
 	state = {"tick": 0, "next_id": 1, "ents": {}, "respawns": [], "player_id": -1, "bots": [],
 		"clock": {"day": 0, "ke": 0, "lastShichen": -1, "is_night": false}, "market": {}, "disasters": [],
-		"cityAttrs": {}, "quest_npcs": {}, "cityGov": {}, "cityPop": {}}		# npc_id -> {"visible": bool} (Step 8)
+		"cityAttrs": {}, "quest_npcs": {}, "cityGov": {}, "cityPop": {},
+		"rumors": [], "rumorSeq": 0}		# S09b 傳聞 (spec 09 §4)
 	inn_pos = Vector2i(int(data.inn["x"]), int(data.inn["y"]))
 	_init_markets()
 	_init_city_attrs()
@@ -725,13 +726,162 @@ func _spawn_mob(def_id: int, zone_id: String = DEFAULT_ZONE) -> Variant:
 	return e
 
 
-# 目擊/傳聞入口 (Step 5.2): actor_id 做咗一件事，附近有記憶表嘅 NPC (bot) 記低 + 調好感
+# 目擊/傳聞入口 (Step 5.2 + S09b): actor_id 做咗一件事，附近有記憶表嘅 NPC (bot) 記低 + 調好感；
+# 顯著事件 (spec 09 §4) 再種一條傳聞，之後每日擴散。
 func _witness_nearby(actor_e: Dictionary, actor_id: int, kind: String, weight: int) -> void:
+	var rk := RulesRumor.rumor_kind_of(kind, weight, data.residents)
+	var origin := ""
+	var wits: Array = []
 	for w in ents.values():
 		if int(w["id"]) == actor_id or not w.has("mem"):
 			continue
 		if RulesCombat.in_range(actor_e["x"], actor_e["y"], w["x"], w["y"], WITNESS_RANGE):
 			NpcMemory.witness(w["mem"], actor_id, kind, tick, weight)
+			wits.append(w)
+			if rk != "" and origin == "":
+				origin = city_id_at(int(actor_e["x"]), int(actor_e["y"]))
+				if origin == "":
+					origin = String(w.get("ch", {}).get("homeCity", ""))
+	if wits.is_empty() or rk == "" or origin == "":
+		return
+	_seed_rumor(actor_id, rk, weight, origin, int(_clock()["day"]))
+	var rumor := _rumor_by_key(RulesRumor.rumor_key(actor_id, rk))
+	var memcap := RulesRumor.mem_cap(data.residents)
+	for w in wits:                                  # 目擊者即刻入記憶表 (居民再由 _inject_rumor 按城覆蓋)
+		NpcMemory.add_rumor(w["mem"], String(rumor["key"]), rumor, memcap)
+
+
+func _rumor_by_key(key: String) -> Dictionary:
+	_ensure_rumors()
+	for r in state["rumors"]:
+		if String(r.get("key", "")) == key:
+			return r
+	return {}
+
+
+# ================= 傳聞擴散 (S09b, spec 09 §4) =================
+# state["rumors"] = [{"key", "actor", "kind", "weight", "origin", "day", "cities": {city: day}, "deliver": {city: day}}]
+# 目擊 → 種傳聞 (起源城即日) → 每日反思: 同城 + 跨城 (延遲 1~3 日) 注入居民記憶表。
+func _ensure_rumors() -> void:
+	if not (state.get("rumors") is Array):
+		state["rumors"] = []
+	if not state.has("rumorSeq"):
+		state["rumorSeq"] = 0
+
+
+# 全部 kind:city 城池 id (maps.json；排序決定性)
+func _all_city_ids() -> Array:
+	var out: Array = []
+	for md in data.maps:
+		if String(md.get("kind", "")) != "city":
+			continue
+		var cid := String(md.get("city", ""))
+		if cid != "" and not out.has(cid):
+			out.append(cid)
+	out.sort()
+	return out
+
+
+func _city_name(city_id: String) -> String:
+	return String((data.cities.get(city_id, {}) as Dictionary).get("name", city_id))
+
+
+# 種/更新一條傳聞；起源城即日揭示，其餘城用獨立 SimRng 抽 1~3 日延遲
+func _seed_rumor(actor: int, rkind: String, weight: int, origin: String, day: int) -> void:
+	_ensure_rumors()
+	var key := RulesRumor.rumor_key(actor, rkind)
+	var list: Array = state["rumors"]
+	for r in list:
+		if String(r.get("key", "")) == key:
+			r["weight"] = weight
+			r["day"] = mini(int(r.get("day", day)), day)
+			_inject_rumor(r, origin)
+			return
+	var cap := RulesRumor.cap(data.residents)
+	if list.size() >= cap:
+		var oi := 0
+		var od := 1 << 60
+		for i in list.size():
+			if int(list[i].get("day", 0)) < od:
+				od = int(list[i].get("day", 0))
+				oi = i
+		list.remove_at(oi)
+	var seq := int(state.get("rumorSeq", 0))
+	state["rumorSeq"] = seq + 1
+	var rr := SimRng.new(910000 + seq * 7919)     # 獨立 SimRng，唔佔主 rng 流 (同 S08d 慣例)
+	var rumor := RulesRumor.make_rumor(actor, rkind, weight, origin, day)
+	var lo := RulesRumor.delay_min(data.residents)
+	var hi := RulesRumor.delay_max(data.residents)
+	for cid in _all_city_ids():
+		if cid == origin:
+			continue
+		rumor["deliver"][cid] = day + RulesRumor.delay(lo, hi, rr.below(hi - lo + 1))
+	list.append(rumor)
+	_inject_rumor(rumor, origin)
+
+
+# 將傳聞記入某城所有居民嘅記憶表 (同一 key 覆蓋)
+func _inject_rumor(rumor: Dictionary, city: String) -> void:
+	var memcap := RulesRumor.mem_cap(data.residents)
+	for id in state["bots"]:
+		var e := ent(int(id))
+		if e.is_empty() or not e.has("mem"):
+			continue
+		if String((e.get("ch", {}) as Dictionary).get("homeCity", "")) != city:
+			continue
+		NpcMemory.add_rumor(e["mem"], String(rumor["key"]), rumor, memcap)
+
+
+# 每日子時反思批次: 已揭示城持續注入；到期未傳嘅城揭示 + 注入 + emit
+func _rumor_daily(day: int) -> void:
+	_ensure_rumors()
+	var list: Array = state["rumors"]
+	var spread: Array = []
+	for r in list:
+		for cid in (r["cities"] as Dictionary).keys():
+			_inject_rumor(r, String(cid))
+		var deliver: Dictionary = r["deliver"]
+		var due: Array = []
+		for cid in deliver:
+			if day >= int(deliver[cid]):
+				due.append(cid)
+		for cid in due:
+			r["cities"][String(cid)] = day
+			deliver.erase(cid)
+			_inject_rumor(r, String(cid))
+			spread.append({"r": r, "city": String(cid)})
+	for s in spread:
+		var r: Dictionary = s["r"]
+		var city := String(s["city"])
+		_emit({"k": "rumor_spread", "key": String(r["key"]), "actor": int(r["actor"]),
+			"kind": String(r["kind"]), "city": city, "day": day})
+		if String(r["kind"]) == "killer" and int(r["actor"]) == int(state["player_id"]):
+			_msg(int(state["player_id"]), "你嘅惡名傳到%s" % _city_name(city))
+
+
+# read-model: 某城已知傳聞 (city = "" → 全部)
+func rumor_view(city: String = "") -> Array:
+	_ensure_rumors()
+	var out: Array = []
+	for r in state["rumors"]:
+		if city != "" and not (r["cities"] as Dictionary).has(city):
+			continue
+		out.append({"key": String(r["key"]), "actor": int(r["actor"]), "kind": String(r["kind"]),
+			"weight": int(r["weight"]), "origin": String(r["origin"]), "day": int(r["day"]),
+			"cities": (r["cities"] as Dictionary).keys()})
+	return out
+
+
+# read-model: 某 NPC 記憶表入面嘅傳聞
+func known_rumors(id: int) -> Array:
+	var e := ent(id)
+	if e.is_empty() or not e.has("mem"):
+		return []
+	var rs: Dictionary = (e["mem"] as Dictionary).get("rumors", {})
+	var out: Array = []
+	for k in rs:
+		out.append(rs[k])
+	return out
 
 
 # 同 NPC 傾偈 hook (官令戶口普查, Step 14)：sim_office 覆寫。key = "q:<npc>" / "g:<gid>"

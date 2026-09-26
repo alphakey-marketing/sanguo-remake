@@ -3,14 +3,14 @@
 > 對應攻略: sy1_1_2(理念)、sy2_6_1~6(登用全頁)、sy2_7_*(結婚)、sy2_8_5(制度)、sy3_5(歷史任務→將軍令)
 > 原始資料: `D:\Download\sanguo\extracted\text\general_npc.csv`(1261 武將: 名/武力/智力/9 技能)、`general_skills.csv`、`Npc_table.tsv`(hp/mp/atk)、`recruitinfo.txt`(官方新手說明)
 > 現有實作: `sim/npc_brain.gd`(規則版決策)、`rules/npc_memory.gd`、`bot_sys.gd`(居民)、Step 6 未做 LLM
-> **現狀 (2026-09-26, S09a)**: 居民化完成 —— `data/residents.json`（性格 5 維/理念/日程 12 時辰/role/名字池/每城 homeZone）+ `rules/resident.gd`（純函數）+ `sim.add_residents()`（每張 kind:city 地圖 12~20 人，大城多）+ `BotSys.init_resident`（bot → 居民身份）+ `sim.resident_view()` read-model；對話 still 規則版 (`NpcBrain`)，LLM 未接。測試 `tests/run_residents.gd`。
+> **現狀 (2026-09-26, S09b)**: 居民化（S09a）+ 傳聞擴散／忠誠事件（S09b）完成 —— `rules/rumor.gd`（目擊事件→傳聞類型、延遲、key）+ `NpcMemory.rumors` + `sim` 每日反思批次（同城即日、跨城延遲 1~3 game 日，A 城殺人魔名聲傳到 B 城）+ 玩家謀殺善 NPC → 義理念同伴忠誠 −15；`sim.rumor_view()`/`known_rumors()` read-model。對話仍規則版 (`NpcBrain`)，LLM 未接。測試 `tests/run_residents.gd`、`tests/run_rumor.gd`。
 > 【原】= 攻略明文；【自訂】= 自己設計。
 
 ## 1. 居民 NPC（現有 bot → 居民化）
 
 `data/residents.json`（由 bot 升級）：名字/性格/理念/日程（各時辰去邊）/喜好/商店（商販係居民）/好感表/記憶表冚唪唥已有。
 
-> **實裝 (S09a)**：`residents.json` = `cfg`（`minPerCity:12`/`maxPerCity:20`/`popPerResident:30`/`borderPop:350`/`personalityDims` 5 維/`personalityMax:10`/`ideologies` 5 個/`schedule` 12 時辰）+ `roles` 5 種（villager/merchant/guard/stableman/official，`weight`+`work`+`align`）+ `cities`（10 城 → `homeZone`）+ `names`（姓氏/名字池）。`rules/resident.gd` 純函數；`sim.add_residents()` 每城生 12~20 人（`round(pop/30)` 夾 12~20）；`ch` 存 `resident/role/personality/align/homeCity/homeZone`；`resident_view()` read-model。日程暫時只出 read-model，未驅動行動（S09b）。
+> **實裝 (S09a)**：`residents.json` = `cfg`（`minPerCity:12`/`maxPerCity:20`/`popPerResident:30`/`borderPop:350`/`personalityDims` 5 維/`personalityMax:10`/`ideologies` 5 個/`schedule` 12 時辰）+ `roles` 5 種（villager/merchant/guard/stableman/official，`weight`+`work`+`align`）+ `cities`（10 城 → `homeZone`）+ `names`（姓氏/名字池）。`rules/resident.gd` 純函數；`sim.add_residents()` 每城生 12~20 人（`round(pop/30)` 夾 12~20）；`ch` 存 `resident/role/personality/align/homeCity/homeZone`；`resident_view()` read-model。日程暫時只出 read-model，未驅動行動（留 S09c/S09d）。
 
 | 欄位 | 說明 |
 |---|---|
@@ -69,7 +69,8 @@
 
 - 好感：−100~+100（`NpcMemory`）；觸發：打招呼 +1、目擊殺怪（善 +3/惡 −5 按殺者善惡反轉，已實作）、任務幫過 +20、送禮 +（禮物價值/100）、打交 −20、結婚 +50
 - **忠誠（武將同伴專用）**：0~100；影響：行為（你殺善 NPC → 義理念武將忠誠 −15）、待遇（畀寶物/補品 +）、理念一致度（初始 ±）；忠誠 <30 → 會離開；=0 → 即刻走（公告）
-- 傳聞擴散（未做，PLAN Step 6）：目擊事件 → NPC 記憶 → 每日「反思」批次（LLM 摘要）→ 鄰居之間交換傳聞；換句話：A 城殺人魔名聲會傳到 B 城（延遲 1~3 game 日）
+- 傳聞擴散（**S09b 實裝**）：目擊事件 → NPC 記憶（`NpcMemory.witness` + `add_rumor`）→ 每日「反思」批次（`_rumor_daily`：城級傳聞池，同城即日、跨城延遲 1~3 game 日）→ 鄰居之間交換傳聞；A 城殺人魔名聲會傳到 B 城（延遲 1~3 game 日）。**單機化**：用城級池做等價可觀察效果（唔逐個 NPC 兩兩交換）；LLM 摘要留 S09d。
+- 忠誠事件（**S09b 實裝**）：玩家先行出手謀殺善 NPC → 義理念同伴忠誠 −15（`generals.json` cfg.loyalty `badNpcKill`/`badNpcKillIdeo`）；自衛反殺/殺紅名/其他理念唔扣；忠誠 0~100、<30 子時走、=0 即刻走 沿用現有。
 - NPC 態度層次：好感(微觀) → 善惡(鉅觀) → 名聲(社交) → 理念(結構)：任務可得/買價/衛兵/登用條件各睇對應層
 
 ## 5. LLM 整合（Step 6 設計基準，唔變）

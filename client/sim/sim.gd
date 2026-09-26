@@ -94,6 +94,7 @@ func _daily_hook(day: int) -> void:
 	_morale_daily(day)           # S08g 每月初一民心評比（稅率 → 民心 −4 / 人口流失）
 	_militia_quest_reset(day)    # S08f 團體任務每月/每日重複 (清 S06c 延後)
 	_recruit_daily(day)          # 同伴到期/忠誠低離開 (Step 13.5)
+	_rumor_daily(day)            # S09b 傳聞擴散: 每日反思/鄰居交換 + 跨城延遲 (spec 09 §4)
 	_comm_daily(day)             # 居民委託過期 (Step 16)
 	_mount_daily(day)            # 座騎子時結算 (Step 17a)
 	_auction_daily(day)          # S07d NPC 拍賣場換貨 (spec 07 §9)
@@ -368,6 +369,7 @@ static func load_string(game_data: GameData, s: String) -> Sim:
 		if e.has("ch"):
 			sim._ensure_equip(e["ch"])      # 舊存檔裝備欄兼容 (Step 11.6)
 	sim._ensure_city_attrs()                # 舊存檔城池屬性兼容 (S08b)
+	sim._ensure_rumors()                    # 舊存檔傳聞欄兼容 (S09b)
 	sim._fix_positions()
 	return sim
 
