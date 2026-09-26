@@ -177,6 +177,7 @@ func _kill_player(p: Dictionary) -> void:
 
 # S03a: 殺死居民/紅名(殺人魔) NPC (spec 03 §2, §4)。
 # 善惡: 殺善一次過 -1000 / 紅殺紅 +300 / 反擊成功 +100；目擊；居民唔重生、冇掉落。
+# S03b: 殺善居民(非自衛/非紅名) → 即時天譴 (雷劈 50% HP + 傳送客棧 + 公告)。
 func _kill_bot(t: Dictionary, by: Dictionary) -> void:
 	if by.is_empty() or not by.has("ch"):
 		_remove_ent(int(t["id"]))
@@ -194,6 +195,10 @@ func _kill_bot(t: Dictionary, by: Dictionary) -> void:
 			pch["karma"] = RulesKarma.counter_kill(int(pch["karma"]))
 		# 目擊: 附近有記憶表嘅 NPC 記錄玩家做咗嘢 (好感/傳聞, Spec 09)
 		_witness_nearby(t, int(by["id"]), "murder", BotSys.W_KILL_NPC if not red else BotSys.W_KILL_RED)
+		# S03b 天譴: 殺善居民 (非紅名) 且玩家先行出手 (非自衛) → 雷劈 50% HP + 傳送客棧 + 公告
+		var tianqian := not red and initiated
+		if tianqian:
+			_tianqian_reprisal(by, str(t["name"]))
 		_msg(int(by["id"]), "你殺咗%s！%s" % [str(t["name"]), ("（除害）" if red else "（罪案）")])
 	state["bots"].erase(int(t["id"]))
 	_remove_ent(int(t["id"]))
@@ -201,7 +206,31 @@ func _kill_bot(t: Dictionary, by: Dictionary) -> void:
 	if is_player:
 		ev["karma"] = int(by["ch"]["karma"])
 		ev["kind"] = "murder" if not red else "bounty"
+		ev["tianqian"] = not red and initiated
 	_emit(ev)
+
+
+# S03b 天譴 (spec 03 §3)【自訂】: 殺善居民(非自衛)後即時雷劈——現有 HP×50% + 傳送返客棧 + 世界公告
+# 「XXX 因作惡多端遭到天譴」；冇得用還魂丹 (ch.tianqian 旗留俾 S03c 還魂丹檢查, 有測試)。
+func _tianqian_reprisal(p: Dictionary, victim: String) -> void:
+	var ch: Dictionary = p["ch"]
+	var hp_before := int(ch["hp"])
+	ch["hp"] = RulesKarma.tianqian_hp(hp_before)
+	ch["status"] = {}          # 雷劈清狀態
+	ch["tianqian"] = true       # S03c 還魂丹對天譴無效 (RulesKarma.tianqian_blocks_revive)
+	var inn: Dictionary = nearest_inn(map_id_at(int(p["x"]), int(p["y"])))
+	p["x"] = int(inn["x"])
+	p["tx"] = int(inn["x"])
+	p["y"] = int(inn["y"])
+	p["ty"] = int(inn["y"])
+	p.erase("path")
+	p.erase("goto")
+	p["atk_target"] = 0
+	_sync_stats(p)
+	var pid := int(p["id"])
+	_msg(pid, "你天譴上身：雷劈扣 %d HP，被傳返客棧！" % (hp_before - int(ch["hp"])))
+	_emit({"k": "tianqian", "dst": pid, "name": str(p["name"]), "victim": victim,
+		"hp": int(ch["hp"]), "announce": RulesKarma.tianqian_announce(str(p["name"]))})
 
 
 # 逃跑怪消失: 排重生 + 清 atk_target (冇掉落/善惡/經驗)

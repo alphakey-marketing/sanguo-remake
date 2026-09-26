@@ -9,6 +9,8 @@ func cmd_rest(id: int) -> void:
 	if inn.is_empty():
 		return _msg(id, "要喺客棧附近先可以休息")
 	var ch: Dictionary = e["ch"]
+	if RulesKarma.city_banned(int(ch["karma"])):     # S03b: 殺人魔城門衛兵拒入城 → 唔俾留宿 (spec 03 §5)
+		return _msg(id, RulesKarma.guard_warn_text(int(ch["karma"])) + "（衛兵唔俾你留宿！）")
 	var cost := 0 if int(ch["level"]) < GameData.NEWBIE_LEVEL else int(inn["restCost"])   # 5 級前店小二免費補 HP (S01a, spec 01 §5)
 	if int(ch["gold"]) < cost:
 		return _msg(id, "住宿要 %d 金" % cost)

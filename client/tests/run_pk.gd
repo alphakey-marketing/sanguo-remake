@@ -17,6 +17,12 @@ func _init() -> void:
 	t_npc_self_defense(data)
 	t_npc_flee_guards(data)
 	t_npc_view(data)
+	t_tianqian_rules(data)
+	t_tianqian_reprisal(data)
+	t_selfdef_no_tianqian(data)
+	t_safe_guard_warn(data)
+	t_murderer_rest_refused(data)
+	t_criminal_no_office(data)
 	print("[TEST] pk: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -242,3 +248,177 @@ func t_npc_view(data: GameData) -> void:
 			found_red = bool(e.get("criminal", false))
 	check(found_good, "view_ents: 普通居民 criminal=false (白名)")
 	check(found_red, "view_ents: 紅名居民 criminal=true (紅名顯示)")
+
+
+# ===== S03b 純函數: 天譴 + 城門二階 + 官令阻 (spec 03 §3, §5) =====
+func t_tianqian_rules(data: GameData) -> void:
+	# 天譴雷劈: 現有 HP×50% (最多留 1)
+	check(RulesKarma.tianqian_hp(100) == 50, "天譴: HP100 -> 50")
+	check(RulesKarma.tianqian_hp(99) == 49, "天譴: HP99 -> 49")
+	check(RulesKarma.tianqian_hp(101) == 50, "天譴: HP101 -> 50 (floor)")
+	check(RulesKarma.tianqian_hp(1) == 1, "天譴: HP1 -> 最少 1")
+	check(RulesKarma.tianqian_hp(0) == 1, "天譴: HP0 -> 最少 1")
+	check(RulesKarma.tianqian_announce("張三") == "張三因作惡多端遭到天譴", "天譴: 公告文案")
+	check(RulesKarma.tianqian_blocks_revive(), "天譴: 還魂丹無效 (S03c invariant)")
+	# 城門拒入: 殺人魔 (≤ -16001, tier6) 先拒
+	check(RulesKarma.city_banned(-30000), "城門: -30000 殺人魔拒入")
+	check(RulesKarma.city_banned(-16001), "城門: -16001 殺人魔拒入 (邊界)")
+	check(not RulesKarma.city_banned(-16000), "城門: -16000 惡人唔拒 (邊界)")
+	check(not RulesKarma.city_banned(0), "城門: 中立唔拒")
+	# 官令: 罪犯及以下 (≤ -1001, tier>=4) 唔接
+	check(RulesKarma.office_blocked(-1001), "官令: -1001 罪犯拒")
+	check(RulesKarma.office_blocked(-30000), "官令: -30000 殺人魔拒")
+	check(not RulesKarma.office_blocked(-1000), "官令: -1000 中立接 (邊界)")
+	check(not RulesKarma.office_blocked(30000), "官令: 大英雄接")
+	check(str(RulesKarma.guard_warn_text(-30000)) != "", "城門: 衛兵警告文案非空")
+
+
+# ===== S03b sim: 殺善居民(非自衛) -> 天譴 =====
+func t_tianqian_reprisal(data: GameData) -> void:
+	var r := _mk(data, 71)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var b: Dictionary = r[2]
+	var ch: Dictionary = sim.player_ch()
+	var bid := int(b["id"])
+	ch["karma"] = 0
+	# 玩家喺野外 (60,60) 打爆居民, 設定玩家 HP 高過 1 先 (好驗 half)
+	var hp_before := int(ch["hp"])
+	sim.ent(bid)["hp"] = 1
+	sim.ent(bid)["ch"]["hp"] = 1
+	var got: Array = [false, "", false]
+	sim.event_emitted.connect(func(ev: Dictionary) -> void:
+		if String(ev.get("k", "")) == "tianqian" and int(ev.get("dst", 0)) == pid:
+			got[0] = true
+			got[1] = str(ev.get("announce", ""))
+		if String(ev.get("k", "")) == "kill_npc" and int(ev.get("dst", 0)) == pid:
+			got[2] = bool(ev.get("tianqian", false)))
+	sim.cmd_attack(pid, bid)
+	for _i in 60:
+		sim.step()
+		if bool(got[0]):
+			break
+	check(bool(got[0]), "天譴: 殺善居民發出 tianqian 事件")
+	check(bool(got[2]), "天譴: kill_npc 事件帶 tianqian=true")
+	check(int(ch["karma"]) == -1000, "天譴: 善惡照 -1000")
+	check(int(ch["hp"]) == RulesKarma.tianqian_hp(hp_before), "天譴: 玩家 HP 劈半")
+	check(bool(ch.get("tianqian", false)), "天譴: ch.tianqian 旗 (S03c 還魂丹無效用)")
+	check(str(got[1]) == RulesKarma.tianqian_announce("t"), "天譴: 公告文案送出")
+	var inn: Dictionary = data.inn
+	check(int(sim.ent(pid)["x"]) == int(inn["x"]) and int(sim.ent(pid)["y"]) == int(inn["y"]), "天譴: 傳送回客棧")
+	check(not sim.ents.has(bid), "天譴: 居民已移除")
+
+
+# ===== S03b sim: 自衛反殺善居民 -> 唔啪天譴 =====
+func t_selfdef_no_tianqian(data: GameData) -> void:
+	# 玩家被居民先攻而反殺 -> counter=true -> 唔應該有天譴
+	var sim := Sim.new(data, 72)
+	var pid := sim.spawn_player("t", "yishi")
+	var me: Dictionary = sim.ent(pid)
+	_put(sim, pid, 60, 60)
+	sim._sync_stats(me)
+	var ch: Dictionary = sim.player_ch()
+	ch["karma"] = 0
+	var b := sim._spawn_actor("路人", "bot")
+	BotSys.init_identity(b, sim.rng)
+	var q := sim._free_near(60, 60)
+	_put(sim, int(b["id"]), q.x, q.y)
+	sim._sync_stats(b)
+	sim.state["bots"].append(int(b["id"]))
+	var bid := int(b["id"])
+	var got := [false]
+	sim.event_emitted.connect(func(ev: Dictionary) -> void:
+		if String(ev.get("k", "")) == "tianqian" and int(ev.get("dst", 0)) == pid:
+			got[0] = true)
+	# 玩家冇追擊 (atk_target=0) -> 直接打 (假定覺察到被襲, 自衛反殺)
+	sim.ent(bid)["hp"] = 1
+	sim.ent(bid)["ch"]["hp"] = 1
+	sim.damage(sim.ent(bid), 99999, sim.ent(pid))
+	check(not got[0], "天譴: 自衛反殺唔啪天譴")
+	check(not bool(ch.get("tianqian", false)), "天譴: 自衛反殺冇 tianqian 旗")
+	check(int(ch["karma"]) == -900, "天譴: 自衛反殺善居民 = 殺善 -1000 + 反擊 +100 = -900")
+	check(not sim.ents.has(bid), "天譴: 自衛反殺居民移除")
+
+
+# ===== S03b sim: 殺人魔喺安全區 -> 城門衛兵警告 =====
+func t_safe_guard_warn(data: GameData) -> void:
+	var sim := Sim.new(data, 73)
+	var pid := sim.spawn_player("t", "yishi")
+	var me: Dictionary = sim.ent(pid)
+	var ch: Dictionary = me["ch"]
+	ch["karma"] = -30000          # 殺人魔
+	var inn: Dictionary = data.inn
+	_put(sim, pid, int(inn["x"]), int(inn["y"]))
+	sim._sync_stats(me)
+	var got := [false]
+	sim.event_emitted.connect(func(ev: Dictionary) -> void:
+		if String(ev.get("k", "")) == "guard_warn" and int(ev.get("dst", 0)) == pid:
+			got[0] = true)
+	sim.step()
+	sim.step()
+	sim.step()
+	check(got[0], "城門: 殺人魔喺安全區發出 guard_warn")
+
+
+# ===== S03b sim: 殺人魔客棧休息被衛兵拒 =====
+func t_murderer_rest_refused(data: GameData) -> void:
+	var sim := Sim.new(data, 74)
+	var pid := sim.spawn_player("t", "yishi")
+	var me: Dictionary = sim.ent(pid)
+	var ch: Dictionary = me["ch"]
+	ch["karma"] = -30000
+	var inn: Dictionary = data.inn
+	_put(sim, pid, int(inn["x"]) + 1, int(inn["y"]))
+	sim._sync_stats(me)
+	var hp := int(ch["hp"])
+	var gold := int(ch["gold"])
+	var refused := [false]
+	sim.event_emitted.connect(func(ev: Dictionary) -> void:
+		if String(ev.get("k", "")) == "msg" and int(ev.get("dst", 0)) == pid and str(ev.get("text", "")).contains("衛兵"):
+			refused[0] = true)
+	sim.cmd_rest(pid)
+	check(refused[0], "城門: 殺人魔客棧休息被衛兵拒")
+	check(int(ch["hp"]) == hp and int(ch["gold"]) == gold, "城門: 拒絶後冇回復冇扣金")
+
+
+# ===== S03b sim: 罪犯以下唔接官令 =====
+func t_criminal_no_office(data: GameData) -> void:
+	var orders: Array = data.office["orders"]
+	if orders.is_empty():
+		check(true, "官令表非空 (測試可跑)")
+		return
+	var oid := String(orders[0]["id"])
+	var sim := Sim.new(data, 75)
+	var pid := sim.spawn_player("t", "yishi")
+	var me: Dictionary = sim.ent(pid)
+	var ch: Dictionary = me["ch"]
+	ch["karma"] = -5000           # 罪犯
+	# 企喺官宅隔籬 (donate_xc, xuchang 許昌)
+	var xcf: Dictionary = data.facilities.get("donate_xc", {})
+	if xcf.is_empty():
+		check(true, "官宅設施存在 (測試可跑)")
+		return
+	_put(sim, pid, int(xcf["x"]), int(xcf["y"]))
+	sim._sync_stats(me)
+	check(sim.office_near(me) != "", "官令: 玩家企喺官宅隔籬")
+	var refused := [false]
+	sim.event_emitted.connect(func(ev: Dictionary) -> void:
+		if String(ev.get("k", "")) == "msg" and int(ev.get("dst", 0)) == pid and str(ev.get("text", "")).contains("罪犯") and str(ev.get("text", "")).contains("官令"):
+			refused[0] = true)
+	sim.cmd_office_order(pid, oid)
+	check(refused[0], "官令: 罪犯接官令被拒 (msg 罪犯...官令)")
+	# 對照: 中立玩家接得到 (唔應該被官令阻) — 升夠頭銜 rank 過官令 title gate
+	var sim2 := Sim.new(data, 76)
+	var pid2 := sim2.spawn_player("t2", "yishi")
+	var me2: Dictionary = sim2.ent(pid2)
+	var ch2: Dictionary = me2["ch"]
+	ch2["karma"] = 0
+	ch2["titleRank"] = 10
+	_put(sim2, pid2, int(xcf["x"]), int(xcf["y"]))
+	sim2._sync_stats(me2)
+	var accepted := [false]
+	sim2.event_emitted.connect(func(ev: Dictionary) -> void:
+		if String(ev.get("k", "")) == "office_order" and int(ev.get("id", 0)) == pid2:
+			accepted[0] = true)
+	sim2.cmd_office_order(pid2, oid)
+	check(accepted[0], "官令: 中立玩家接得官令 (對照)")
