@@ -107,7 +107,8 @@ func cmd_buy(id: int, item: int, n: int = 1) -> void:
 	if shut != "":
 		return _msg(id, shut)
 	var ch: Dictionary = e["ch"]
-	var cost := RulesShop.buy_price(data.prices.get(item, 0.0) * market_factor(item), ch["attrs"]["cha"], int(ch["karma"]), expert_lv(ch, "jiaoyi")) * n
+	var tm := _companion_trade_mul(ch)                                                    # 商才 (S09c)
+	var cost := maxi(1, MathX.js_round(RulesShop.buy_price(data.prices.get(item, 0.0) * market_factor(item), ch["attrs"]["cha"], int(ch["karma"]), expert_lv(ch, "jiaoyi")) * n * float(tm.get("buy", 1.0))))
 	if int(ch["gold"]) < cost:
 		return _msg(id, "金錢不足，要 %d" % cost)
 	ch["gold"] = int(ch["gold"]) - cost
@@ -136,7 +137,7 @@ func cmd_sell(id: int, item: int, n: int = 1) -> void:
 		return _msg(id, "快捷列裝備中，唔可以賣")
 	if not RulesShop.remove_item(ch["bag"], item, n):
 		return _msg(id, "背包冇咁多")
-	var gain := RulesShop.sell_price(data.prices.get(item, 0.0) * market_factor(item), expert_lv(ch, "jiaoyi")) * n
+	var gain := maxi(0, MathX.js_round(RulesShop.sell_price(data.prices.get(item, 0.0) * market_factor(item), expert_lv(ch, "jiaoyi")) * n * float(_companion_trade_mul(ch).get("sell", 1.0))))   # 商才 (S09c)
 	ch["gold"] = int(ch["gold"]) + gain
 	_cleanup_dur(ch)
 	_cleanup_fused(ch)                    # 賣晒融合武器 → 清嵌石記錄
@@ -236,7 +237,7 @@ func cmd_storage_sell(id: int, item: int, n: int = 1) -> void:
 		return _msg(id, "裝備中，唔可以賣 (先卸下)")
 	if not RulesShop.remove_item(ch["bag"], item, n):
 		return _msg(id, "背包冇咁多")
-	var gain := RulesShop.sell_price(data.prices.get(item, 0.0) * market_factor(item), expert_lv(ch, "jiaoyi")) * n
+	var gain := maxi(0, MathX.js_round(RulesShop.sell_price(data.prices.get(item, 0.0) * market_factor(item), expert_lv(ch, "jiaoyi")) * n * float(_companion_trade_mul(ch).get("sell", 1.0))))   # 商才 (S09c)
 	ch["gold"] = int(ch["gold"]) + gain
 	_cleanup_dur(ch)
 	_msg(id, "天地商行代賣 %d 件，得 %d 金" % [n, gain])
@@ -536,6 +537,7 @@ func adv_unlocked(ch: Dictionary, skill: String) -> bool:
 
 # 加技能經驗 + 升級訊息；初階升到解鎖級 → 進階技能開 1 級
 func _work_gain(id: int, ch: Dictionary, skill: String, amount: int) -> void:
+	amount = maxi(1, MathX.js_round(float(amount) * _work_exp_mult(ch, skill)))   # 生產專精 (S09c)
 	if not ch.has("workLv"):
 		ch["workLv"] = {}
 	var w: Dictionary = ch["workLv"].get(skill, {"lv": maxi(1, work_lv(ch, skill)), "exp": 0})
@@ -689,7 +691,7 @@ func cmd_craft(id: int, item: int) -> void:
 		return _msg(id, "材料唔夠")
 	var cfg: Dictionary = data.work_meta["craftRate"]
 	var tool_bonus := _tool_bonus(int(ch["tools"][skill]["item"]))
-	var ok := MathX.roll(rng_fn) < clampf(RulesWork.craft_chance(work_lv(ch, skill), int(r["lv"]), cfg) + tool_bonus, 0.0, 1.0)
+	var ok := MathX.roll(rng_fn) < clampf(RulesWork.craft_chance(work_lv(ch, skill), int(r["lv"]), cfg) + tool_bonus + _craft_rate_add(ch, skill), 0.0, 1.0)   # 生產專精 49~51 (S09c)
 	var lose := ok or MathX.roll(rng_fn) < float(cfg["failLoseMat"])
 	if lose:
 		for m in r["need"]:

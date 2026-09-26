@@ -799,6 +799,54 @@ func _comp_eff(c: Dictionary) -> Dictionary:
 	return _skill_eff_of(c["ch"]) if c.has("ch") else {}
 
 
+# ===== S09c 內政協助 / 被動特技 (spec 09 §3.3/§3.4) =====
+# 主人 ch → 同伴實體 (生存先計)；同伴跟住主公時生效 (唔限距離，同政才/辯才一致)
+func _comp_of_ch(ch: Dictionary) -> Dictionary:
+	var c := ent(int(ch.get("recruit", {}).get("comp", 0))) if ch.has("recruit") else {}
+	if not c.is_empty() and c.has("gen") and int(c["hp"]) > 0:
+		return c
+	return {}
+
+
+func _comp_eff_of_ch(ch: Dictionary) -> Dictionary:
+	var c := _comp_of_ch(ch)
+	return _comp_eff(c) if not c.is_empty() else {}
+
+
+# 同伴政治 (由武將智力換算)
+func _comp_pol_of_ch(ch: Dictionary) -> int:
+	var c := _comp_of_ch(ch)
+	if c.is_empty():
+		return 0
+	var g: Dictionary = data.general_by_id.get(int(c["gen"]["gid"]), {})
+	return RulesGeneral.pol_of(g, data.gen2_cfg.get("assist", {}))
+
+
+# 內政協助: 同伴政治 + 內政類特技 → 官宅內政 / 營地內政完成度加成 (override S08b hook)
+func _domestic_assist_bonus(ch: Dictionary) -> float:
+	return RulesGeneral.assist_bonus(_comp_pol_of_ch(ch), _comp_eff_of_ch(ch), data.gen2_cfg.get("assist", {}))
+
+
+# 營地監督完成度: 同伴政治加入主公政治 (override S08f hook)
+func _companion_pol_bonus(ch: Dictionary) -> int:
+	return _comp_pol_of_ch(ch)
+
+
+# 生產專精 45~48: 對應工作技能經驗倍率
+func _work_exp_mult(ch: Dictionary, skill: String) -> float:
+	return RulesGeneral.work_exp_mult(_comp_eff_of_ch(ch), skill)
+
+
+# 生產專精 49~51: 對應進階技能成功率加成
+func _craft_rate_add(ch: Dictionary, skill: String) -> float:
+	return RulesGeneral.craft_rate_add(_comp_eff_of_ch(ch), skill)
+
+
+# 商才 43: 買賣價乘數
+func _companion_trade_mul(ch: Dictionary) -> Dictionary:
+	return RulesGeneral.trade_mul(_comp_eff_of_ch(ch))
+
+
 # 同伴術法 = 武將最高等級攻擊戰術 (火計/水計/落石…) → {name, elem}
 func _comp_spell(c: Dictionary) -> Dictionary:
 	var g: Dictionary = data.general_by_id.get(int(c["gen"]["gid"]), {})

@@ -1428,7 +1428,7 @@ func _work_apply(e: Dictionary, ch: Dictionary, m: Dictionary, c: Dictionary, w:
 			var attrs := city_attrs(city)
 			var key := String(w["attr"])
 			var cur := RulesCity.attr_of(attrs, key, _city_attr_cfg())
-			var g := RulesCity.attr_gain(int(data.office.get("domestic", {}).get("baseGain", 2)), _work_mult(w, lv))
+			var g := RulesCity.attr_gain(int(data.office.get("domestic", {}).get("baseGain", 2)), _work_mult(w, lv) + _domestic_assist_bonus(ch))   # S09c 同伴內政協助
 			g = mini(g, 100 - cur)
 			attrs[key] = cur + g
 			city_attrs_set(city, attrs)
@@ -1437,7 +1437,8 @@ func _work_apply(e: Dictionary, ch: Dictionary, m: Dictionary, c: Dictionary, w:
 			return "%s +%d（而家 %d）" % [RulesCity.name_of(_city_attr_cfg(), key), g, cur + g]
 		"supervise":
 			var build: Dictionary = c["build"]
-			var pts := RulesCamp.supervise_points(cfg, int((ch.get("attrs", {}) as Dictionary).get("pol", 0)), work_lv(ch, "carpentry"), String(m.get("role", "banner")))
+			var pol := int((ch.get("attrs", {}) as Dictionary).get("pol", 0)) + _companion_pol_bonus(ch)   # S09c 同伴政治加入完成度
+			var pts := RulesCamp.supervise_points(cfg, pol, work_lv(ch, "carpentry"), String(m.get("role", "banner")))
 			build["progress"] = minf(float(build.get("need", 100)), float(build.get("progress", 0.0)) + pts)
 			c["build"] = build
 			var fac_id := String(build["fac"])

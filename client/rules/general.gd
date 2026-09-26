@@ -175,3 +175,43 @@ static func skill_pick(order: String, mp: int, sp: int, mp_need: int, sp_need: i
 	if order == "spell" and mp >= mp_need:
 		return "spell"
 	return ""
+
+
+# ================= 內政協助 / 被動特技 (S09c, spec 09 §3.3/§3.4) =================
+# 攻略只舉「每刻恢復 HP / 發話唔扣飲水度 / 無限遁地 / 使用職業特技」4 例；70 項清單同效果皆【自訂】。
+# 內政/生產/經濟類 = 同伴跟住主公時對主公系統嘅 passive 加成 (唔限距離，同政才/辯才一致)。
+
+# 武將政治【自訂】: generals 表冇政治值 → 由智力換算 (政治 = round(智力 × polPerInt))
+static func pol_of(g: Dictionary, cfg: Dictionary) -> int:
+	return MathX.js_round(float(g.get("int", 0)) * float(cfg.get("polPerInt", 0.5)))
+
+
+# 內政協助加成: 同伴政治 / polDivisor + 內政類特技 domesticAssist，封頂 maxAssist
+# 呢個值會加落 RulesExpert.domestic_mult 一齊餵 RulesCity.attr_gain
+static func assist_bonus(pol: int, eff: Dictionary, cfg: Dictionary) -> float:
+	var v := float(pol) / float(cfg.get("polDivisor", 200.0)) + float(eff.get("domesticAssist", 0.0))
+	return clampf(v, 0.0, float(cfg.get("maxAssist", 1.0)))
+
+
+# 生產專精 45~48: 對應工作技能嘅經驗倍率 (1.0 = 冇加成)
+static func work_exp_mult(eff: Dictionary, skill: String) -> float:
+	if eff.is_empty() or String(eff.get("workSkill", "")) != skill:
+		return 1.0
+	return 1.0 + float(eff.get("workExpAdd", 0.0))
+
+
+# 生產專精 49~51: 對應進階技能嘅成功率加成 (0.0 = 冇)
+static func craft_rate_add(eff: Dictionary, skill: String) -> float:
+	if eff.is_empty() or String(eff.get("craftSkill", "")) != skill:
+		return 0.0
+	return float(eff.get("craftRateAdd", 0.0))
+
+
+# 商才 43: 買入 / 賣出價乘數 {buy, sell} (冇 = 1.0 / 1.0)
+static func trade_mul(eff: Dictionary) -> Dictionary:
+	var buy := 1.0
+	var sell := 1.0
+	if not eff.is_empty():
+		buy = float(eff.get("tradeBuyMul", 1.0))
+		sell = float(eff.get("tradeSellMul", 1.0))
+	return {"buy": buy, "sell": sell}
