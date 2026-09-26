@@ -475,3 +475,105 @@ func cmd_city_tribute(id: int, items: Array) -> void:
 	_emit({"k": "city_tribute", "id": id, "city": city, "units": units, "favor": gain, "fame": fame})
 	var tail := "，名聲 +%d" % fame if fame > 0 else ""
 	_msg(id, "進貢 %d 單位物資入%s：好感 +%d%s" % [units, _city_name(city), gain, tail])
+
+
+# ================= 官宅內政 6 種 (S08b, spec 08 §3 / 攻略 sy2_8_8) =================
+# 開墾(墾荒種地)/商業(商業開發)/畜牧(照顧牲畜)/礦產(探索礦能)/防禦(增強防禦)/鑄造(技術開發)
+# 執行 = 喺官宅做一次：提昇所在城池對應屬性 0~100 + 該專長 exp（清 S01c 內政延後）。
+# 需有身份（頭銜 ≥ minTitleRank）【原】；扣行動力 = 官令同價（武將協助 S09c 會減）。
+# 武將政治協助：_domestic_assist_bonus(ch)（S09c override，而家 0.0）。
+
+func domestic_cfg() -> Dictionary:
+	return data.office.get("domestic", {})
+
+
+func domestic_def(job_id: String) -> Dictionary:
+	for j in domestic_cfg().get("jobs", []):
+		if String(j["id"]) == job_id:
+			return j
+	return {}
+
+
+func domestic_jobs() -> Array:
+	return domestic_cfg().get("jobs", [])
+
+
+# 做唔做得："" = 得，否則理由（UI 灰掣 + cmd 檢查）
+func domestic_block(ch: Dictionary, city_id: String, job_id: String) -> String:
+	var cfg := domestic_cfg()
+	var j := domestic_def(job_id)
+	if j.is_empty():
+		return "冇呢種內政"
+	if city_id == "":
+		return "要喺官宅先做得內政"
+	var need := int(cfg.get("minTitleRank", 1))
+	if int(ch.get("titleRank", 0)) < need:
+		return "要官身（頭銜 ≥ %d 階）先做得內政" % need
+	var cost := _office_ap_cost(ch)
+	if ap_of(ch) < cost:
+		return "行動力不足 (要 %d)" % cost
+	var key := String(j["attr"])
+	if RulesCity.attr_of(city_attrs(city_id), key, _city_attr_cfg()) >= 100:
+		return "城池「%s」已經封頂 (100)" % RulesCity.name_of(_city_attr_cfg(), key)
+	return ""
+
+
+# 內政 read-model（UI 用）：城池屬性 + 6 種工作 can/why/gain
+func domestic_view(id: int) -> Dictionary:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return {}
+	var ch: Dictionary = e["ch"]
+	var here := office_near(e)
+	var city := _facility_city_id(here) if here != "" else ""
+	var cfg := domestic_cfg()
+	var attrs := city_attrs(city) if city != "" else {}
+	var rows: Array = []
+	for k in RulesCity.KEYS:
+		rows.append({"key": k, "name": RulesCity.name_of(_city_attr_cfg(), k), "val": RulesCity.attr_of(attrs, k, _city_attr_cfg())})
+	var jobs: Array = []
+	for j in domestic_jobs():
+		var why := domestic_block(ch, city, String(j["id"]))
+		var lv := expert_lv(ch, String(j["expert"]))
+		var assist := _domestic_assist_bonus(ch)
+		jobs.append({"id": String(j["id"]), "name": String(j["name"]), "attr": String(j["attr"]),
+			"attrName": RulesCity.name_of(_city_attr_cfg(), String(j["attr"])), "expert": String(j["expert"]),
+			"expertLv": lv, "gain": RulesCity.attr_gain(int(cfg.get("baseGain", 2)), RulesExpert.domestic_mult(lv) + assist),
+			"can": why == "", "why": why})
+	return {"city": city, "cityName": _city_name(city), "office": here, "apCost": _office_ap_cost(ch),
+		"minTitleRank": int(cfg.get("minTitleRank", 1)), "attrs": rows, "jobs": jobs}
+
+
+func cmd_domestic(id: int, job_id: String) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var here := office_near(e)
+	if here == "":
+		return _msg(id, "要去官宅先做得內政")
+	var city := _facility_city_id(here)
+	if city == "":
+		return _msg(id, "呢度唔屬任何城池，做唔到內政")
+	var ch: Dictionary = e["ch"]
+	var why := domestic_block(ch, city, job_id)
+	if why != "":
+		return _msg(id, why)
+	var cfg := domestic_cfg()
+	var j := domestic_def(job_id)
+	var key := String(j["attr"])
+	var attrs := city_attrs(city)
+	var cur := RulesCity.attr_of(attrs, key, _city_attr_cfg())
+	var before_lv := expert_lv(ch, String(j["expert"]))
+	var gain := RulesCity.attr_gain(int(cfg.get("baseGain", 2)), RulesExpert.domestic_mult(before_lv) + _domestic_assist_bonus(ch))
+	gain = mini(gain, 100 - cur)
+	attrs[key] = cur + gain
+	city_attrs_set(city, attrs)
+	ch["ap"] = ap_of(ch) - _office_ap_cost(ch)
+	RulesExpert.add_exp(ch, data.experts, String(j["expert"]), int(cfg.get("expertExp", 3)))
+	var after_lv := expert_lv(ch, String(j["expert"]))
+	var tail := ""
+	if after_lv > before_lv:
+		tail = "，「%s」專長升到 %d 級！" % [String(data.experts["skills"].get(String(j["expert"]), {}).get("name", j["expert"])), after_lv]
+	_emit({"k": "domestic", "id": id, "job": job_id, "city": city, "attr": key, "gain": gain, "val": int(attrs[key]),
+		"expert": String(j["expert"]), "expertExp": int(cfg.get("expertExp", 3))})
+	_msg(id, "內政「%s」完成：%s 屬性 +%d（而家 %d）%s" % [j["name"], RulesCity.name_of(_city_attr_cfg(), key), gain, int(attrs[key]), tail])

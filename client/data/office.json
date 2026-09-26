@@ -28,6 +28,20 @@
    "fame": 50, "contrib": 25,
    "desc": "去%s打怪區搵返流落嘅官員，帶佢生還返官宅覆命。"}
  ],
+ "_noteDomestic": "官宅內政 6 種 (S08b, spec 08 §3 / 攻略 sy2_8_8)【原=開墾/商業/畜牧/礦產/防禦/鑄造 對應官令；自訂=行動力/增量/專長 exp】: 喺官宅做一次，提昇所在城池對應屬性 0~100 + 該專長 exp。需有身份（頭銜 ≥ minTitleRank）【原】。baseGain = 基礎屬性增量，實際 = baseGain × RulesExpert.domestic_mult(專長 lv) + 武將協助 (S09c 掛鈎，暫 0)；expertExp = 每次專長 exp。",
+ "domestic": {
+  "minTitleRank": 1,
+  "baseGain": 2,
+  "expertExp": 3,
+  "jobs": [
+   {"id": "kaiken", "name": "墾荒種地", "attr": "kaiken", "expert": "kaiken", "desc": "官令：墾荒種地，提昇城池「開墾」屬性，學習「開墾」專長。"},
+   {"id": "shangye", "name": "商業開發", "attr": "shangye", "expert": "zhaolai", "desc": "官令：商業開發，提昇城池「商業」屬性，學習「招徠」專長。"},
+   {"id": "xumu", "name": "照顧牲畜", "attr": "xumu", "expert": "siyu", "desc": "官令：照顧牲畜，提昇城池「畜牧」屬性，學習「飼育」專長。"},
+   {"id": "kuangchan", "name": "探索礦能", "attr": "kuangchan", "expert": "tankuang", "desc": "官令：探索礦能，提昇城池「礦產」屬性，學習「探礦」專長。"},
+   {"id": "fangyu", "name": "增強防禦", "attr": "fangyu", "expert": "xiuzhu", "desc": "官令：增強防禦，提昇城池「防禦」屬性，學習「修築」專長。"},
+   {"id": "duanzao", "name": "技術開發", "attr": "duanzao", "expert": "gongyi", "desc": "官令：技術開發，提昇城池「鑄造」屬性，學習「工藝」專長。"}
+  ]
+ },
  "_noteMerit": "義舉證明 (S08a, spec 08 §1)【原 sy2_8_3】: 四類 20 項物品，只有許昌 (朝廷直轄) 嘅朝廷官員受理 → imperialOffice。為民除害類冇頭銜限制；其餘三類要對應頭銜【原】。每項固定名聲值【自訂】。",
  "merit": {
   "imperialOffice": "donate_xc",

@@ -21,16 +21,20 @@ static func step(good: Dictionary, m: Dictionary, supply: float, demand: float, 
 	m["pf"] = pf
 
 
-static func daily(city: Dictionary, markets: Dictionary, cfg: Dictionary, supply_mod: Dictionary = {}, demand_mod: Dictionary = {}) -> void:
-	# markets: cat(String) -> {stock, pf}；city: {pop, defense}；mod: cat -> 倍率
+static func daily(city: Dictionary, markets: Dictionary, cfg: Dictionary, supply_mod: Dictionary = {}, demand_mod: Dictionary = {}, attr_cfg: Dictionary = {}) -> void:
+	# markets: cat(String) -> {stock, pf}；city: {pop, defense, attrs?}；mod: cat -> 倍率
+	# attr_cfg (S08b) = world.cityAttrs：城池屬性「開墾/商業/畜牧/礦產」影響供應 prod
 	var pop_scale := float(city["pop"]) / 100.0
 	var cats: Dictionary = cfg["cats"]
+	var attrs: Dictionary = city.get("attrs", {})
 	for key in cats:
 		var g: Dictionary = cats[key]
 		var m: Dictionary = markets.get(key, {})
 		if m.is_empty():
 			m = {"stock": float(g["vol"]), "pf": 1.0}
 		var sup := float(g["prod"]) * pop_scale * float(supply_mod.get(key, 1.0))
+		if not attr_cfg.is_empty():
+			sup *= RulesCity.prod_mult(attrs, key, attr_cfg)
 		var dem := float(g["demand"]) * pop_scale * float(demand_mod.get(key, 1.0))
 		var el := elasticity(g, m, sup, dem, cfg)          # 價格反饋
 		step(g, m, el.x, el.y, cfg)
@@ -57,7 +61,8 @@ static func supply_mods(season: int, seasons: Dictionary, disasters: Array, city
 		for k in d["supply"]:
 			var f := float(d["supply"][k])
 			if f < 1.0:
-				f = 1.0 - (1.0 - f) * (1.0 - float(city.get("defense", 50.0)) / 100.0)    # 防災度減輕
+				# 防災度減輕 (S08b): 城池 attrs.fangzai；冇 attrs → 舊 defense 欄
+				f = 1.0 - (1.0 - f) * (1.0 - RulesCity.disaster_mitigation(city.get("attrs", {}), {}, float(city.get("defense", 50.0))))
 			var cur := float(out.get(k, 1.0))
 			out[k] = cur * f
 	return out
