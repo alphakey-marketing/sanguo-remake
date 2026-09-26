@@ -662,6 +662,132 @@ func cmd_companion_dismiss(id: int) -> void:
 		_companion_leave(c, "你叫佢返去", false)
 
 
+# ===== S09c-b 主動特技 (spec 09 §3.4): 21 無限遁地 / 32 挑釁 / 38 急救 =====
+# 主公向同伴落指令 cmd_companion_skill(id, kind)；同伴要有對應主動技 + 冷卻完。
+# 22 職業特技 = proximity 被動 (見 _companion_class_skill_mul)，唔經呢個指令。
+func cmd_companion_skill(id: int, kind: String) -> void:
+	var o := ent(id)
+	var c := _companion_of(o)
+	if c.is_empty() or int(c["hp"]) <= 0 or o.is_empty() or int(o["hp"]) <= 0:
+		return
+	var eff := _comp_eff(c)
+	var why := RulesGeneral.active_block(eff, c["gen"].get("activeCd", {}), tick)
+	if why != "" or RulesGeneral.active_kind(eff) != kind:
+		return _msg(id, why if why != "" else "同伴冇呢招主動特技")
+	match kind:
+		"burrow":
+			_comp_burrow(id, o, c, eff)
+		"taunt":
+			_comp_taunt(id, c, eff)
+		"heal":
+			_comp_heal(id, o, c, eff)
+		_:
+			return _msg(id, "同伴冇呢招主動特技")
+	var cd := RulesGeneral.active_cd(eff)
+	if cd > 0:
+		var acd: Dictionary = c["gen"].get("activeCd", {})
+		acd[kind] = tick + cd
+		c["gen"]["activeCd"] = acd
+
+
+# 21 無限遁地: 主公 + 同伴即時傳送去最近城池中心 (唔使車費、無限次)。
+# 目標城池 = map 圖 BFS 最近嘅 kind:city 地圖；落腳點 = 地圖內最接近中心嘅行得格。
+func _comp_burrow(id: int, o: Dictionary, c: Dictionary, _eff: Dictionary) -> void:
+	var cur := map_id_at(int(o["x"]), int(o["y"]))
+	var md := _nearest_city_map(cur)
+	if md.is_empty():
+		return _msg(id, "附近冇城池可以遁地返去")
+	var p := _city_anchor(md)
+	_put_ent(o, p.x, p.y)
+	o["atk_target"] = 0
+	o.erase("goto")
+	if o.has("casting"):
+		o.erase("casting")
+		_emit({"k": "cast_interrupted", "dst": int(o["id"]), "reason": "travel"})
+	if int(c["hp"]) > 0:
+		var cp := _free_near(p.x, p.y)
+		_put_ent(c, cp.x, cp.y)
+		c["atk_target"] = 0
+	_emit({"k": "travel", "dst": int(o["id"]), "to": String(md["name"]), "x": o["x"], "y": o["y"],
+		"map": map_id_at(int(o["x"]), int(o["y"])), "station": false, "burrow": true})
+	_msg(id, "%s遁地！主公一齊返到%s" % [c["name"], String(md["name"])])
+
+
+# 最近城池地圖 (map 圖 BFS 最短 hop)；去唔到 = {}
+func _nearest_city_map(from_map: String) -> Dictionary:
+	var best: Dictionary = {}
+	var best_hops := 1 << 30
+	for md in data.maps:
+		if String(md.get("kind", "")) != "city":
+			continue
+		var h := map_hops(from_map, String(md["id"]))
+		if h < 0:
+			continue
+		if h < best_hops:
+			best_hops = h
+			best = md
+	return best
+
+
+# 城池落腳點: 地圖範圍內最接近中心嘅行得格 (掃 map rect)
+func _city_anchor(md: Dictionary) -> Vector2i:
+	var ox := int(md["ox"])
+	var oy := int(md["oy"])
+	var cx := ox + int(md["w"]) / 2
+	var cy := oy + int(md["h"]) / 2
+	var best := Vector2i(ox, oy)
+	var best_d := 1 << 30
+	for y in range(oy, oy + int(md["h"])):
+		for x in range(ox, ox + int(md["w"])):
+			if not is_free(x, y):
+				continue
+			var d := absi(x - cx) + absi(y - cy)
+			if d < best_d:
+				best_d = d
+				best = Vector2i(x, y)
+	return best
+
+
+# 32 挑釁: 同伴附近 tauntRange 格內嘅可打怪 → 仇恨轉去同伴 (chase target = 同伴)
+func _comp_taunt(id: int, c: Dictionary, eff: Dictionary) -> void:
+	var r := RulesGeneral.taunt_range(eff)
+	var n := 0
+	var cid := int(c["id"])
+	var cmap := map_id_at(int(c["x"]), int(c["y"]))
+	for m in ents.values():
+		if not _hittable(m) or _cheb(m, c) > r or map_id_at(int(m["x"]), int(m["y"])) != cmap:
+			continue
+		m["mob"]["state"] = "chase"
+		m["mob"]["target"] = cid
+		n += 1
+	_emit({"k": "comp_taunt", "dst": id, "src": cid, "count": n, "range": r})
+	_msg(id, "%s大吼一聲，%d 隻怪畀佢引埋去！" % [c["name"], n])
+
+
+# 38 急救: 同伴喺主公附近 → 即回主公 HP (上限 healPct)，入冷卻
+func _comp_heal(id: int, o: Dictionary, c: Dictionary, eff: Dictionary) -> void:
+	if not _aura_near(c, o):
+		return _msg(id, "要行近同伴先急救到")
+	var och: Dictionary = o["ch"]
+	if int(och["hp"]) >= _eff_max_hp(och):
+		return _msg(id, "主公滿血，唔使急救")
+	var amt := RulesGeneral.heal_amount(_eff_max_hp(och), eff)
+	och["hp"] = mini(_eff_max_hp(och), int(och["hp"]) + amt)
+	_sync_stats(o)
+	_emit({"k": "comp_heal", "dst": id, "src": int(c["id"]), "hp": amt})
+	_msg(id, "%s施展急救，主公回復 %d HP" % [c["name"], amt])
+
+
+# 22 職業特技 (override S09c-b hook): 同伴生存 + 同圖 + auraRange 內 → 主公職業特技冷卻/消耗乘數
+func _companion_class_skill_mul(e: Dictionary) -> Dictionary:
+	var c := ent(int(e.get("ch", {}).get("recruit", {}).get("comp", 0)))
+	if c.is_empty() or not c.has("gen") or int(c["hp"]) <= 0:
+		return {"cd": 1.0, "cost": 1.0}
+	if not _aura_near(c, e):
+		return {"cd": 1.0, "cost": 1.0}
+	return RulesGeneral.class_skill_mul(_comp_eff(c))
+
+
 # 忠誠變動 → 0 即刻走 (spec 09 §4)；<leave 喺子時結算
 func _loyalty_change(c: Dictionary, delta: int) -> void:
 	delta = RulesGeneral.loyalty_delta(delta, _comp_eff(c))     # 忠義: 跌減半 (Step 15)

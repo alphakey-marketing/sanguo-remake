@@ -959,6 +959,11 @@ func _companion_trade_mul(_ch: Dictionary) -> Dictionary:
 	return {}
 
 
+# 職業特技 hook (S09c-b, 22)：sim_recruit override。同伴喺附近 → 主公職業特技冷卻/消耗乘數 {cd, cost}
+func _companion_class_skill_mul(_e: Dictionary) -> Dictionary:
+	return {"cd": 1.0, "cost": 1.0}
+
+
 # 友好特技「聖體」: 每刻自動回復倍率 (sim_war_beast 覆寫；1.0 = 冇效果)
 func _friend_regen_mult(_e: Dictionary) -> float:
 	return 1.0

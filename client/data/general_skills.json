@@ -1,5 +1,6 @@
 {
-  "_note": "登用 v2 (Step 15, spec 09 §3.1/3.3/3.4)。【原】將軍令/御賜金牌無視條件、用完即消；武將寶物 2 格、同類高取代低 (低嘅消失)、登用完跟武將走；藥膳師 (許昌市集) 賣武將補品；戰鬥指令 6 種 (絕招/術法 MP/SP 唔夠轉普通攻擊)；特技共 70 項 (攻略只舉例: 每刻恢復 HP / 發話唔扣飲水度 / 無限遁地 / 使用職業特技)。【自訂】特技清單 + 效果數值 (攻略冇原文清單)、特技分配 (名將指定，其餘按 id 固定抽)、寶物數值換算、補品效果/價、同伴絕招/術法數值、戰術 → 元素對照。S09c: 內政/生產/經濟被動特技 (39~43、45~51) 已實作；impl=false = 未做 (國戰類 23~38 中除內政、主動特技 21/22/32/38、鑑定 44 留後)，唔會抽中；新開特技經 pin 指派免得打亂 drawPool。",
+  "_note": "登用 v2 (Step 15, spec 09 §3.1/3.3/3.4)。【原】將軍令/御賜金牌無視條件、用完即消；武將寶物 2 格、同類高取代低 (低嘅消失)、登用完跟武將走；藥膳師 (許昌市集) 賣武將補品；戰鬥指令 6 種 (絕招/術法 MP/SP 唔夠轉普通攻擊)；特技共 70 項 (攻略只舉例: 每刻恢復 HP / 發話唔扣飲水度 / 無限遁地 / 使用職業特技)。【自訂】特技清單 + 效果數值 (攻略冇原文清單)、特技分配 (名將指定，其餘按 id 固定抽)、寶物數值換算、補品效果/價、同伴絕招/術法數值、戰術 → 元素對照。S09c: 內政/生產/經濟被動 (39~43、45~51) + 主動 (21 無限遁地/22 職業特技/32 挑釁/38 急救) 已實作；impl=false = 未做 (國戰類 23~37/53~70、鑑定 44 留後)，唔會抽中；新開特技經 pin 指派免得打亂 drawPool。",
+  "_noteActive": "主動特技 (S09c-b)【自訂】: eff.active = burrow(21 遁地，主公+同伴返最近城池，無限次)/taunt(32 挑釁，附近怪仇恨轉向同伴)/heal(38 急救，即回主公 HP)；eff.cd = 冷卻 tick。22 職業特技 = 同伴喺附近(auraRange)時主公職業特技冷卻/消耗乘數 (classSkillCdMul/classSkillCostMul)，屬 proximity 被動。",
   "cfg": {
     "orderSuffix": "將軍令",
     "_noteAlias": "將軍令字號 → 武將名 (B3 孔明將軍令 = 諸葛亮)【自訂】",
@@ -39,7 +40,8 @@
     },
     "pin": {"馬超": 52, "馬岱": 52, "公孫瓚": 52, "馬騰": 52,
       "諸葛亮": 39, "荀攸": 40, "張昭": 42, "魯肅": 41, "田豐": 42, "劉曄": 43,
-      "于禁": 45, "曹洪": 46, "韓當": 47, "虞翻": 48, "顧雍": 49, "張紘": 50, "樂進": 51}
+      "于禁": 45, "曹洪": 46, "韓當": 47, "虞翻": 48, "顧雍": 49, "張紘": 50, "樂進": 51,
+      "左慈": 21, "于吉": 21, "張郃": 32, "魏延": 32, "顏良": 32, "華佗": 38}
   },
   "skills": [
     {"id": 1, "name": "回春", "types": ["wu", "wen"], "impl": true, "desc": "每刻恢復 HP (戰鬥中都回) 3%", "eff": {"regenPct": 0.03}},
@@ -62,8 +64,8 @@
     {"id": 18, "name": "疾風", "types": ["wu"], "impl": true, "desc": "出手更快 (敏捷 +8)", "eff": {"flat": {"agi": 8}}},
     {"id": 19, "name": "堅忍", "types": ["wu"], "impl": true, "desc": "倒下唔扣忠誠", "eff": {"noKoLoss": true}},
     {"id": 20, "name": "政才", "types": ["wen"], "impl": true, "desc": "主公接官令行動力消耗減半", "eff": {"apCostMul": 0.5}},
-    {"id": 21, "name": "無限遁地", "types": ["wu", "wen"], "impl": false, "desc": "(主動) 無限次遁地返城【原例】"},
-    {"id": 22, "name": "職業特技", "types": ["wu", "wen"], "impl": false, "desc": "(主動) 使用職業特技【原例】"},
+    {"id": 21, "name": "無限遁地", "types": ["wu", "wen"], "impl": true, "desc": "(主動) 無限次遁地返城【原例】主公+同伴即時返最近城池", "eff": {"active": "burrow", "cd": 0}},
+    {"id": 22, "name": "職業特技", "types": ["wu", "wen"], "impl": true, "desc": "同伴跟住時，主公職業特技冷卻/消耗減半", "eff": {"classSkillCdMul": 0.5, "classSkillCostMul": 0.5}},
     {"id": 23, "name": "火攻", "types": ["wen"], "impl": false, "desc": "(國戰) 火計威力提升"},
     {"id": 24, "name": "水攻", "types": ["wen"], "impl": false, "desc": "(國戰) 水計威力提升"},
     {"id": 25, "name": "伏兵", "types": ["wu"], "impl": false, "desc": "(國戰) 伏兵突襲"},
@@ -73,13 +75,13 @@
     {"id": 29, "name": "騎射", "types": ["wu"], "impl": false, "desc": "(國戰) 騎兵可遠攻"},
     {"id": 30, "name": "突擊", "types": ["wu"], "impl": false, "desc": "(國戰) 衝陣傷害提升"},
     {"id": 31, "name": "衝鋒", "types": ["wu"], "impl": false, "desc": "(國戰) 移動力 +1"},
-    {"id": 32, "name": "挑釁", "types": ["wu"], "impl": false, "desc": "(主動) 吸引附近怪仇恨"},
+    {"id": 32, "name": "挑釁", "types": ["wu"], "impl": true, "desc": "(主動) 吸引附近怪仇恨 (轉去同伴)", "eff": {"active": "taunt", "tauntRange": 6, "cd": 600}},
     {"id": 33, "name": "威壓", "types": ["wu"], "impl": false, "desc": "(國戰) 敵軍士氣下降"},
     {"id": 34, "name": "鼓舞士氣", "types": ["wu", "wen"], "impl": false, "desc": "(國戰) 我軍士氣上升"},
     {"id": 35, "name": "看破", "types": ["wen"], "impl": false, "desc": "(國戰) 識破敵方計略"},
     {"id": 36, "name": "反計", "types": ["wen"], "impl": false, "desc": "(國戰) 計略反彈"},
     {"id": 37, "name": "識破", "types": ["wen"], "impl": false, "desc": "(國戰) 伏兵無效"},
-    {"id": 38, "name": "急救", "types": ["wen"], "impl": false, "desc": "(主動) 即時回復主公 HP"},
+    {"id": 38, "name": "急救", "types": ["wen"], "impl": true, "desc": "(主動) 即時回復主公 HP (上限 30%)", "eff": {"active": "heal", "healPct": 0.3, "cd": 1200}},
     {"id": 39, "name": "屯田", "types": ["wen"], "impl": true, "desc": "內政協助：官宅內政/營地內政完成度 +", "eff": {"domesticAssist": 0.2}},
     {"id": 40, "name": "築城", "types": ["wen"], "impl": true, "desc": "內政協助：官宅內政/營地內政完成度 +", "eff": {"domesticAssist": 0.2}},
     {"id": 41, "name": "治水", "types": ["wen"], "impl": true, "desc": "內政協助：官宅內政/營地內政完成度 +", "eff": {"domesticAssist": 0.2}},

@@ -330,7 +330,7 @@ func cmd_stealth_cross(id: int) -> void:
 			if not ch.has("status"):
 				ch["status"] = {}
 			RulesSpell.add_status(ch["status"], "stealth", RulesStealth.STEALTH_TICKS, tick)
-			ch["stealthCd"] = tick + RulesStealth.STEALTH_CD_TICKS
+			ch["stealthCd"] = tick + MathX.js_round(RulesStealth.STEALTH_CD_TICKS * float(_companion_class_skill_mul(e)["cd"]))    # 22 職業特技
 			_sync_stats(e)
 			_emit({"k": "stealth_done", "dst": id, "until": tick + RulesStealth.STEALTH_TICKS})
 			_msg(id, "潛行！10 分鐘內主動怪唔會仇恨你（CD 1 日）")
@@ -417,7 +417,7 @@ func _try_toushi(id: int) -> void:
 			info["mp"] = int(bch.get("mp", 0))
 			info["maxMp"] = RulesStats.max_mp(int(bch.get("level", 0)), bch.get("attrs", {}))
 	info["weakness"] = RulesToushi.weakness_of(String(info["elem"]))
-	ch["toushiCd"] = tick + RulesToushi.TOUSHI_CD_TICKS
+	ch["toushiCd"] = tick + MathX.js_round(RulesToushi.TOUSHI_CD_TICKS * float(_companion_class_skill_mul(e)["cd"]))    # 22 職業特技
 	if not ch.has("status"):
 		ch["status"] = {}
 	RulesSpell.add_status(ch["status"], "insight", RulesToushi.INSIGHT_TICKS, tick)
@@ -440,8 +440,9 @@ func _try_chaodu(id: int) -> void:
 		return _msg(id, "附近冇倒下嘅同伴（同伴倒下先可以超渡）")
 	var max_hp := maxi(1, int(e.get("max_hp", 1)))
 	var max_mp := maxi(1, RulesStats.max_mp(int(ch["level"]), ch["attrs"]))
-	var hp_cost := int(ceil(max_hp * 0.2))
-	var mp_cost := int(ceil(max_mp * 0.3))
+	var cmul := float(_companion_class_skill_mul(e)["cost"])    # 22 職業特技
+	var hp_cost := int(ceil(max_hp * 0.2 * cmul))
+	var mp_cost := int(ceil(max_mp * 0.3 * cmul))
 	if int(ch["hp"]) <= hp_cost:
 		return _msg(id, "自己體力唔夠做超渡（要留 %d HP）" % hp_cost)
 	if int(ch["mp"]) < mp_cost:
