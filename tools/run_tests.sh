@@ -28,6 +28,7 @@ run spell --script tests/run_spell.gd
 run stealth --script tests/run_stealth.gd
 run jewel_ult --script tests/run_jewel_ult.gd
 run sim --script tests/run_sim.gd
+run residents --script tests/run_residents.gd
 run char --script tests/run_char.gd
 run class --script tests/run_class.gd
 run world --script tests/run_world.gd

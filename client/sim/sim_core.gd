@@ -581,8 +581,8 @@ func _cleanup_fused(ch: Dictionary) -> void:
 			f.erase(k)
 
 
-func _spawn_actor(ename: String, kind: String, class_id: String = "yishi") -> Dictionary:
-	var sp: Array = _home_map().get("spawn", [int(data.inn["x"]) - 2, int(data.inn["y"]) - 2, int(data.inn["x"]) + 2, int(data.inn["y"]) + 2])
+func _spawn_actor(ename: String, kind: String, class_id: String = "yishi", spawn_range: Array = []) -> Dictionary:
+	var sp: Array = spawn_range if not spawn_range.is_empty() else _home_map().get("spawn", [int(data.inn["x"]) - 2, int(data.inn["y"]) - 2, int(data.inn["x"]) + 2, int(data.inn["y"]) + 2])
 	var e := _new_ent(ename, kind, _pick_free(int(sp[0]), int(sp[1]), int(sp[2]), int(sp[3])))
 	e["ch"] = RulesStats.create_character(data, ename.substr(0, 8), class_id)
 	e["ch"]["tools"] = {}                     # skill -> {item, dur} (Step 7.1)
@@ -629,6 +629,48 @@ func add_bots(n: int) -> void:
 		if rng.next() < float(data.world["bots"]["criminalPct"]) * crime_mul:   # S03a: 部分居民係紅名(殺人魔)「殺人魔 NPC」
 			e["ch"]["criminal"] = true
 		state["bots"].append(int(e["id"]))
+
+
+# S09a 居民化 (spec 09 §1): 每張 city 地圖生 12~20 名居民 (大城多)，代入 residents.json 性格/理念/role/日程/homeZone。
+func add_residents() -> void:
+	for md in data.maps:
+		if String(md.get("kind", "")) != "city":
+			continue
+		var city_id := String(md.get("city", ""))
+		if city_id == "":
+			continue
+		var cdef: Dictionary = data.cities.get(city_id, {})
+		var n := RulesResident.city_count(cdef, data.residents)
+		var zone_id := RulesResident.home_zone(data.residents, city_id)
+		var z := zone_by_id(String(md["id"]))
+		var r := [int(z.get("x0", 0)), int(z.get("y0", 0)), int(z.get("x1", 0)), int(z.get("y1", 0))]
+		var used := {}
+		for i in n:
+			var nm := RulesResident.make_name(data.residents, rng.below(maxi(1, RulesResident.surname_pool(data.residents).size())), rng.below(maxi(1, RulesResident.given_pool(data.residents).size())))
+			if used.has(nm):
+				nm += str(i)
+			used[nm] = true
+			var e := _spawn_actor(nm, "bot", "yishi", r)
+			BotSys.init_resident(e, rng, data.residents, city_id, zone_id)
+			var crime_mul := RulesCity.crime_mult(city_attrs(city_id), _city_attr_cfg())
+			if rng.next() < float(data.world["bots"]["criminalPct"]) * crime_mul:
+				e["ch"]["criminal"] = true
+			state["bots"].append(int(e["id"]))
+
+
+# S09a: 居民休息客棧位置。居民 → 自己城嘅客棧 (冇 = Vector2i(-1,-1) 唔撤退)；legacy bot → 預設客棧。
+func resident_inn_pos(e: Dictionary) -> Vector2i:
+	var ch: Dictionary = e.get("ch", {})
+	if not bool(ch.get("resident", false)):
+		return inn_pos
+	var city := String(ch.get("homeCity", ""))
+	if city == "":
+		return inn_pos
+	for x in data.inns:
+		var m: Dictionary = data.map_by_id.get(String(x.get("map", "")), {})
+		if String(m.get("city", "")) == city:
+			return Vector2i(int(x["x"]), int(x["y"]))
+	return Vector2i(-1, -1)
 
 
 func init_mobs() -> void:

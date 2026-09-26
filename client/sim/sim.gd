@@ -305,6 +305,8 @@ func view_ents() -> Array:
 		var o: Dictionary = {"id": e["id"], "name": e["name"], "x": e["x"], "y": e["y"], "face": e["face"],
 			"bot": e["kind"] == "bot", "gen": e["kind"] == "gen", "hp": e["hp"], "maxHp": e["max_hp"], "level": e["level"], "mob": e["kind"] == "mob",
 			"criminal": bool(e.get("ch", {}).get("criminal", false)),
+			"resident": bool(e.get("ch", {}).get("resident", false)),
+			"role": String(e.get("ch", {}).get("role", "")),
 			"statuses": st_vis, "casting": e.has("casting"), "castX": csx, "castY": csy, "castSpell": csp,
 			"aggro": int(e["mob"]["target"]) if e["kind"] == "mob" and e["mob"]["state"] == "chase" else 0}   # 怪追緊邊個
 		if e["kind"] == "dropped":
@@ -316,6 +318,21 @@ func view_ents() -> Array:
 
 func save_string() -> String:
 	return JSON.stringify(_canonical({"state": state, "rng": rng.s}))
+
+
+# S09a 居民 read-model: role/性格/理念/homeCity/homeZone/當前時辰活動。非居民 = {}
+func resident_view(id: int) -> Dictionary:
+	var e := ent(id)
+	var ch: Dictionary = e.get("ch", {})
+	if not bool(ch.get("resident", false)):
+		return {}
+	var shi := RulesClock.shichen_of_ke(int(_clock()["ke"]))
+	var role := String(ch.get("role", ""))
+	return {"role": role, "roleName": RulesResident.role_name(data.residents, role),
+		"personality": ch.get("personality", {}), "ideology": String(ch.get("ideology", "")),
+		"align": String(ch.get("align", "good")), "homeCity": String(ch.get("homeCity", "")),
+		"homeZone": String(ch.get("homeZone", "")), "shichen": shi,
+		"activity": RulesResident.activity_at(data.residents, shi)}
 
 
 # 規範化: 整數 float → int、其他 float → 6 位小數。保證 save→load→save 字串一致
