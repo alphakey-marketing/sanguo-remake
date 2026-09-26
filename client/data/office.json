@@ -79,5 +79,15 @@
   "favorCap": 100,
   "unitsPerFavor": 100,
   "unitsPerFame": 100
+ },
+ "_noteRelief": "救災 (S08c, spec 08 §6 / 攻略 sy2_8_12)【原 sy2_8_12 全流程】: 公佈欄睇天災 → 官宅功曹領救災官令 (扣行動力 10) → 買對應救災物品 → 去救災區做 N 次 (每次扣 SP + 用 1 份物品；小 10/中 20/大 30【自訂】) → 返官宅覆命 (名聲 +10【原】/ 政治 exp / 救災專長 exp【自訂】)。做嘅次數令該城天災強度遞減 (supply factor 向 1.0 靠)。救災官令同其他官令一樣每日 1 條 (共用 ch.office.order)。",
+ "relief": {
+  "minTitleRank": 0,
+  "spCost": 10,
+  "fame": 10,
+  "polExp": 20,
+  "expert": "jiuzai",
+  "expertExp": 12,
+  "workPerSize": {"大": 30, "中": 20, "細": 10}
  }
 }

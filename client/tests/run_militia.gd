@@ -20,6 +20,12 @@ func _init() -> void:
 	t_cap(data)
 	t_save_roundtrip(data)
 	t_city_save(data)
+	t_relief_data(data)
+	t_relief_rules(data)
+	t_bulletin(data)
+	t_relief_flow(data)
+	t_relief_effects(data)
+	t_relief_save(data)
 	t_determinism(data)
 	print("[TEST] militia (tribute/favor) scenarios: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
@@ -343,3 +349,224 @@ func t_city_save(data: GameData) -> void:
 	_put_fac(old, pid, data, "donate_xc")
 	old.cmd_domestic(pid, "kaiken")
 	check(int(old.city_attrs("xuchang")["kaiken"]) == 52, "舊存檔: 補完 cityAttrs 照做內政")
+
+
+# ================= S08c 救災 (spec 08 §6 / 攻略 sy2_8_12) =================
+
+# 喺 state["disasters"] 塞一條天災 (測試用；idx 0=大 1=中 2=細)
+func _set_disaster(sim: Sim, disaster_id: String, city: String, size: String, idx: int) -> Dictionary:
+	for d in sim.data.world["disasters"]:
+		if String(d["id"]) == disaster_id:
+			var sz: Dictionary = d["sizes"][idx]
+			var dis := {"id": disaster_id, "name": String(d["name"]), "city": city, "size": size,
+				"startDay": 0, "endDay": 999,
+				"supply": (sz["supply"] as Dictionary).duplicate(),
+				"baseSupply": (sz["supply"] as Dictionary).duplicate()}
+			sim.state["disasters"].append(dis)
+			return dis
+	return {}
+
+
+func t_relief_data(data: GameData) -> void:
+	var defs: Array = data.world["disasters"]
+	check(defs.size() == 7, "天災 7 種")
+	var want := {"locust": 26022, "plague": 26023, "drought": 26024, "typhoon": 26025, "flood": 26026, "blizzard": 26027, "quake": 26028}
+	var items: Array = []
+	for d in defs:
+		var iid := int(d.get("reliefItem", 0))
+		items.append(iid)
+		check(int(want[String(d["id"])]) == iid, "天災 %s → 救災物品 %d" % [d["id"], iid])
+	check(RulesDisaster.relief_items(defs).size() == 7 and items.size() == 7, "7 種救災物品不同")
+	var cfg: Dictionary = data.office["relief"]
+	check(int(cfg["minTitleRank"]) == 0 and int(cfg["fame"]) == 10 and String(cfg["expert"]) == "jiuzai", "救災設定: 無頭銜限制/名聲+10/救災專長")
+	check(int((cfg["workPerSize"] as Dictionary)["細"]) == 10 and int((cfg["workPerSize"] as Dictionary)["中"]) == 20 and int((cfg["workPerSize"] as Dictionary)["大"]) == 30, "救災次數 小10/中20/大30")
+	# 設施: 3 城公佈欄 + 3 個救災區
+	for k in ["bulletin_xc", "bulletin_xy", "bulletin_xyc"]:
+		check(bool((data.facilities[k] as Dictionary).get("bulletin", false)), "%s 有 bulletin flag" % k)
+	for k in ["relief_xc", "relief_xy", "relief_xyc"]:
+		var f: Dictionary = data.facilities[k]
+		check(bool(f.get("relief", false)) and String(f.get("cityId", "")) != "", "%s 有 relief flag + cityId" % k)
+	check(String(data.facilities["relief_xc"]["map"]) == "field_1" and String(data.facilities["relief_xy"]["map"]) == "bowang" and String(data.facilities["relief_xyc"]["map"]) == "longzhong", "救災區喺各城腹地")
+	# 工具店賣齊 7 種
+	for sid in ["tool", "tool_xy", "tool_xyc"]:
+		var stock: Array = []
+		for s in data.shops:
+			if String(s["id"]) == sid:
+				stock = s["stock"]
+		var n := 0
+		for iid in [26022, 26023, 26024, 26025, 26026, 26027, 26028]:
+			if stock.has(iid) or stock.has(float(iid)):
+				n += 1
+		check(n == 7, "工具店 %s 賣齊 7 種救災物品" % sid)
+
+
+func t_relief_rules(data: GameData) -> void:
+	var defs: Array = data.world["disasters"]
+	var cfg: Dictionary = data.office["relief"]
+	check(RulesDisaster.relief_item_of(defs, "locust") == 26022 and RulesDisaster.relief_item_of(defs, "quake") == 26028, "relief_item_of")
+	check(RulesDisaster.relief_item_of(defs, "nope") == 0, "未知天災 = 0")
+	check(RulesDisaster.relief_need("細", cfg) == 10 and RulesDisaster.relief_need("中", cfg) == 20 and RulesDisaster.relief_need("大", cfg) == 30, "relief_need")
+	var d := {"supply": {"43": 0.5, "44": 1.0}, "baseSupply": {"43": 0.5, "44": 1.0}}
+	RulesDisaster.relief_weaken(d, 5, 10)
+	check(absf(float(d["supply"]["43"]) - 0.75) < 1e-9 and absf(float(d["supply"]["44"]) - 1.0) < 1e-9, "減弱 50%: 0.5 → 0.75 (1.0 不變)")
+	RulesDisaster.relief_weaken(d, 10, 10)
+	check(absf(float(d["supply"]["43"]) - 1.0) < 1e-9, "做完: factor → 1.0 (冇天災影響)")
+	RulesDisaster.relief_weaken(d, 99, 10)
+	check(absf(float(d["supply"]["43"]) - 1.0) < 1e-9, "超出需求 clamp 1.0")
+	check(absf(float((d["baseSupply"] as Dictionary)["43"]) - 0.5) < 1e-9, "baseSupply 保留原值")
+
+
+func t_bulletin(data: GameData) -> void:
+	var r := _new(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var v0 := sim.bulletin_view(pid)
+	check(not bool(v0["at"]) and (v0["cities"] as Array).size() == 3, "唔喺公佈欄: at=false，3 城")
+	_put_fac(sim, pid, data, "bulletin_xc")
+	var v1 := sim.bulletin_view(pid)
+	check(bool(v1["at"]), "企喺許昌公佈欄: at=true")
+	_set_disaster(sim, "locust", "xuchang", "細", 2)
+	var v2 := sim.bulletin_view(pid)
+	var rows: Array = []
+	for c in v2["cities"]:
+		if String(c["id"]) == "xuchang":
+			rows = c["disasters"]
+	check(rows.size() == 1 and String(rows[0]["name"]) == "蝗災" and String(rows[0]["size"]) == "細" and int(rows[0]["item"]) == 26022, "公佈欄顯示許昌蝗災 + 農藥")
+
+
+func t_relief_flow(data: GameData) -> void:
+	var r := _new(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	var msgs: Array = r[3]
+	_put_fac(sim, pid, data, "donate_xc")
+	ch["sp"] = 200
+	ch["ap"] = 100
+	var fame0 := int(ch.get("fame", 0))
+	var pol0 := int(ch.get("polExp", 0))
+	# 冇天災
+	sim.cmd_office_relief(pid)
+	check(_last(msgs).contains("冇天災"), "冇天災領唔到救災官令")
+	_set_disaster(sim, "locust", "xuchang", "細", 2)
+	sim.cmd_office_relief(pid)
+	var od: Dictionary = sim.player_ch()["office"]["order"]
+	check(String(od.get("id", "")) == "relief" and int(od["need"]) == 10 and int(od["done"]) == 0, "領到救災官令: 細規模需 10 次")
+	check(int(ch["ap"]) == 90 and _last(msgs).contains("農藥"), "領令扣行動力 10 + 提示買農藥")
+	sim.cmd_office_relief(pid)
+	check(_last(msgs).contains("仲有官令"), "已有官令唔可以再接")
+	# 救災區: 冇物品
+	_put_fac(sim, pid, data, "relief_xc")
+	sim.cmd_relief_work(pid)
+	check(_last(msgs).contains("冇「農藥」"), "冇救災物品做唔到")
+	# 錯區
+	_put_fac(sim, pid, data, "relief_xy")
+	RulesShop.add_item(ch["bag"], 26022, 10)
+	sim.cmd_relief_work(pid)
+	check(_last(msgs).contains("唔係許昌"), "唔喺所屬救災區做唔到")
+	# 正確區做 1 次
+	_put_fac(sim, pid, data, "relief_xc")
+	sim.cmd_relief_work(pid)
+	var dis := sim._active_disaster("xuchang")
+	check(int(od["done"]) == 1 and RulesShop.count_item(ch["bag"], 26022) == 9, "做 1 次: 進度 1 + 用 1 農藥")
+	check(int(ch["sp"]) == 190, "救災扣 SP 10")
+	check(absf(float(dis["supply"]["43"]) - 0.865) < 1e-9, "1/10 進度令蝗災 supply 0.85 → 0.865 (減弱)")
+	check(_last(msgs).contains("1/10"), "進度訊息 1/10")
+	# 做埋 9 次
+	for i in 9:
+		sim.cmd_relief_work(pid)
+	check(int(od["done"]) == 10 and absf(float(dis["supply"]["43"]) - 1.0) < 1e-9, "做完 10 次: 蝗災 supply → 1.0")
+	sim.cmd_relief_work(pid)
+	check(_last(msgs).contains("做完"), "做完唔可以再做")
+	# 覆命: 去錯官宅
+	_put_fac(sim, pid, data, "donate_xy")
+	sim.cmd_office_turnin(pid)
+	check(_last(msgs).contains("返許昌官宅"), "要返接令嗰間官宅覆命")
+	# 正確覆命
+	_put_fac(sim, pid, data, "donate_xc")
+	var pol_before := int(ch["attrs"]["pol"])
+	sim.cmd_office_turnin(pid)
+	check((sim.player_ch()["office"]["order"] as Dictionary).is_empty(), "覆命清咗官令")
+	check(int(ch["fame"]) == fame0 + 10, "覆命名聲 +10")
+	var pol_gain := (int(ch["attrs"]["pol"]) - pol_before) * int(data.office["polExpPerPoint"]) + (int(ch.get("polExp", 0)) - pol0)
+	check(pol_gain == 20, "覆命政治 exp +20 (實得 %d)" % pol_gain)
+	check(int(ch["expert"]["jiuzai"]) == 12, "覆命救災專長 exp 12 (而家=%d)" % int(ch["expert"]["jiuzai"]))
+	check(_last(msgs).contains("名聲 +10") and _last(msgs).contains("蝗災"), "覆命訊息")
+	sim.cmd_relief_work(pid)
+	check(_last(msgs).contains("手上冇救災官令"), "冇官令做唔到救災")
+
+
+func t_relief_effects(data: GameData) -> void:
+	var r := _new(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	# 大規模颶風 → 停 cat 40 進貨，但救災物品豁免
+	var dis := _set_disaster(sim, "typhoon", "xuchang", "大", 0)
+	dis["shutdownEnd"] = 999
+	dis["shutdownCats"] = ["43", "44", "40"]
+	var shop := {"name": "工具店", "map": "xuchang", "stock": []}
+	check(sim._shop_shutdown_reason(shop, 26001).contains("停止進貨"), "普通 cat 40 貨被停進貨")
+	check(sim._shop_shutdown_reason(shop, 26022) == "", "救災物品豁免停進貨")
+	# 真買得到
+	for s in data.shops:
+		if String(s["id"]) == "tool":
+			_put(sim, pid, int(s["x"]), int(s["y"]))
+	ch["gold"] = 9999
+	sim.cmd_buy(pid, 26022)
+	check(RulesShop.count_item(ch["bag"], 26022) >= 1, "天災期間照買到農藥")
+
+
+func _relief_seq(data: GameData) -> String:
+	var r := _new(data, 77)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	_put_fac(sim, pid, data, "donate_xc")
+	ch["sp"] = 500
+	ch["ap"] = 100
+	_set_disaster(sim, "drought", "xuchang", "中", 1)
+	sim.cmd_office_relief(pid)
+	_put_fac(sim, pid, data, "relief_xc")
+	RulesShop.add_item(ch["bag"], 26024, 20)
+	for i in 7:
+		sim.cmd_relief_work(pid)
+	_put_fac(sim, pid, data, "donate_xc")
+	sim.cmd_office_turnin(pid)
+	for i in 300:
+		sim.step()
+	return sim.save_string()
+
+
+func t_relief_save(data: GameData) -> void:
+	var r := _new(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	_put_fac(sim, pid, data, "donate_xc")
+	ch["sp"] = 500
+	ch["ap"] = 100
+	_set_disaster(sim, "drought", "xuchang", "中", 1)
+	sim.cmd_office_relief(pid)
+	_put_fac(sim, pid, data, "relief_xc")
+	RulesShop.add_item(ch["bag"], 26024, 20)
+	for i in 3:
+		sim.cmd_relief_work(pid)
+	var s1 := sim.save_string()
+	var loaded := Sim.load_string(data, s1)
+	var lod: Dictionary = loaded.player_ch()["office"]["order"]
+	check(String(lod["id"]) == "relief" and int(lod["done"]) == 3 and int(lod["need"]) == 20, "存檔: 救災官令進度保留")
+	check(loaded.save_string() == s1, "存檔: save→load→save 一致")
+	var ldis := loaded._active_disaster("xuchang")
+	check(absf(float(ldis["supply"]["43"]) - (0.6 + 0.4 * 3.0 / 20.0)) < 1e-9, "存檔: 天災減弱狀態保留")
+	# 舊存檔: 冇 baseSupply → 照做到 (以現 supply 做 base)
+	var d: Dictionary = JSON.parse_string(s1)
+	for e in d["state"]["disasters"]:
+		e.erase("baseSupply")
+	var old := Sim.load_string(data, JSON.stringify(d))
+	var opid := int(old.state["player_id"])
+	_put_fac(old, opid, data, "relief_xc")
+	old.cmd_relief_work(opid)
+	check(int((old.player_ch()["office"]["order"] as Dictionary)["done"]) == 4, "舊存檔: 冇 baseSupply 照做到 4")
+	# 決定性
+	check(_relief_seq(data) == _relief_seq(data), "決定性: 救災流程同種子同操作 → 同存檔")

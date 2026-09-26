@@ -39,5 +39,19 @@
   "stable_xc": { "name": "許昌馬廄", "map": "xuchang", "x": 61, "y": 20, "color": [0.6, 0.42, 0.25], "stable": true, "city": "xuchang",
     "desc": "馬廄 (Step 17a, spec 07)【原】: 買馬 / 寄養領馬 / 馬用品 (飼料、玩具、寵物藥、馴馬專用哨)。寄喺馬廄過子時 = 疲勞清零、頭暈好返" },
   "stable_xy": { "name": "新野馬廄", "map": "xinye", "x": 54, "y": 20, "color": [0.6, 0.42, 0.25], "stable": true, "city": "xinye",
-    "desc": "馬廄 (Step 17a, spec 07)【原】: 買馬 / 寄養領馬 / 馬用品 (飼料、玩具、寵物藥、馴馬專用哨)。寄喺馬廄過子時 = 疲勞清零、頭暈好返" }
+    "desc": "馬廄 (Step 17a, spec 07)【原】: 買馬 / 寄養領馬 / 馬用品 (飼料、玩具、寵物藥、馴馬專用哨)。寄喺馬廄過子時 = 疲勞清零、頭暈好返" },
+
+  "bulletin_xc": { "name": "許昌公佈欄", "map": "xuchang", "x": 37, "y": 49, "color": [0.7, 0.62, 0.4], "bulletin": true,
+    "desc": "公佈欄【原 sy2_8_12】: 城門口查看各城池正發生嘅天災同種類" },
+  "bulletin_xy": { "name": "新野公佈欄", "map": "xinye", "x": 33, "y": 45, "color": [0.7, 0.62, 0.4], "bulletin": true,
+    "desc": "公佈欄【原 sy2_8_12】: 城門口查看各城池正發生嘅天災同種類" },
+  "bulletin_xyc": { "name": "襄陽公佈欄", "map": "xiangyang", "x": 39, "y": 57, "color": [0.7, 0.62, 0.4], "bulletin": true,
+    "desc": "公佈欄【原 sy2_8_12】: 城門口查看各城池正發生嘅天災同種類" },
+
+  "relief_xc": { "name": "許昌救災區", "map": "field_1", "x": 104, "y": 10, "color": [0.9, 0.45, 0.3], "relief": true, "cityId": "xuchang",
+    "desc": "救災區【原 sy2_8_12】: 領咗救災官令 + 帶對應救災物品，喺呢度執行救災工作（每次扣 SP + 用 1 份物品）" },
+  "relief_xy": { "name": "新野救災區", "map": "bowang", "x": 62, "y": 10, "color": [0.9, 0.45, 0.3], "relief": true, "cityId": "xinye",
+    "desc": "救災區【原 sy2_8_12】: 領咗救災官令 + 帶對應救災物品，喺呢度執行救災工作（每次扣 SP + 用 1 份物品）" },
+  "relief_xyc": { "name": "襄陽救災區", "map": "longzhong", "x": 38, "y": 10, "color": [0.9, 0.45, 0.3], "relief": true, "cityId": "xiangyang",
+    "desc": "救災區【原 sy2_8_12】: 領咗救災官令 + 帶對應救災物品，喺呢度執行救災工作（每次扣 SP + 用 1 份物品）" }
 }
