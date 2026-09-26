@@ -607,7 +607,7 @@ func _mount_daily(_day: int) -> void:
 			if m.has("preg") and RulesMount.breed_daily(cfg, m) == "ready":
 				_msg(id, "%s胎氣夠喇，去馬廄接生啦" % _mname(m))
 		for m in ms.duplicate():
-			var ev := RulesMount.daily(cfg, m, _stable_plague(m))
+			var ev := RulesMount.daily(cfg, m, _stable_plague(m), _mount_intimacy_mult(e))
 			var nm := _mname(m)
 			if ev.has("dead"):
 				if String(m["where"]) != "stable":
@@ -622,6 +622,14 @@ func _mount_daily(_day: int) -> void:
 				_msg(id, "%s入咗衰老期，大約仲有 %d 日壽命" % [nm, int(cfg["oldDays"])])
 			if is_riding(e["ch"]) and String(m["where"]) == "with" and RulesMount.ride_why(cfg, m) != "":
 				_set_riding(e, false)
+
+
+# S07d 武將特技「馴馬」(52): 身邊同伴學咗 → 座騎親密度成長 ×2。冇同伴 / 冇特技 = 1.0
+func _mount_intimacy_mult(e: Dictionary) -> float:
+	var c := _companion_of(e)
+	if c.is_empty():
+		return 1.0
+	return float(_comp_eff(c).get("mountIntimacyMul", 1.0))
 
 
 # 寄喺有瘟疫嘅城嘅馬廄 (馬瘟)【自訂】

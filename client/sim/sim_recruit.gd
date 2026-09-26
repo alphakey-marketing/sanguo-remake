@@ -85,7 +85,7 @@ func _gen_view(g: Dictionary, ch: Dictionary = {}) -> Dictionary:
 	var pn := _pass_need(ch, g) if not ch.is_empty() else ""
 	return {"id": int(g["id"]), "name": g["name"], "lv": int(g["lv"]), "type": g["type"], "sub": g["sub"],
 		"ideo": g["ideo"], "t1": int(g["tier"]) == 1, "pass": pn if pn != "x" else "",
-		"skill": String(_gskill_def(RulesGeneral.skill_for(g, data.gen_skills, data.gen_skill_override)).get("name", ""))}
+		"skill": String(_gskill_def(RulesGeneral.skill_for(g, data.gen_skills, data.gen_skill_override, data.gen_draw_pool, data.gen_skill_pin)).get("name", ""))}
 
 
 # ================= 將軍令 / 御賜金牌 (Step 15, spec 09 §3.1) =================
@@ -415,7 +415,7 @@ func _spawn_companion(pe: Dictionary, g: Dictionary) -> Dictionary:
 	ch["gold"] = 0
 	ch["equip"]["spellbooks"] = [0, 0, 0]
 	ch["equip"]["jewels"] = [0, 0]
-	ch["genSkill"] = RulesGeneral.skill_for(g, data.gen_skills, data.gen_skill_override)   # 特技 (Step 15)
+	ch["genSkill"] = RulesGeneral.skill_for(g, data.gen_skills, data.gen_skill_override, data.gen_draw_pool, data.gen_skill_pin)   # 特技 (Step 15; S07d 固定池)
 	ch["genTreasures"] = []                                                              # 寶物 2 格
 	_ensure_equip(ch)
 	_full_heal(ch)

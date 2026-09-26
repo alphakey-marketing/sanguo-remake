@@ -18,6 +18,7 @@ func _init() -> void:
 	t_skill_self(data)
 	t_skill_owner(data)
 	t_skill_misc(data)
+	t_skill_mount(data)
 	t_comp_ult(data)
 	t_comp_spell(data)
 	t_team_exp_split()
@@ -191,7 +192,7 @@ func t_data(data: GameData) -> void:
 		if bool(s["impl"]):
 			n_impl += 1
 			check(not (s.get("eff", {}) as Dictionary).is_empty(), "特技 %s: impl 要有 eff" % s["name"])
-	check(ids.size() == 70 and n_impl == 20, "特技: id 唔重複 + 已實作 20 項 (而家 %d)" % n_impl)
+	check(ids.size() == 70 and n_impl == 21, "特技: id 唔重複 + 已實作 21 項 (而家 %d)" % n_impl)
 	var bad_ov := 0
 	for nm in data.gen_skill_override:
 		var s: Dictionary = data.gen_skill_by_id.get(int(data.gen_skill_override[nm]), {})
@@ -202,6 +203,21 @@ func t_data(data: GameData) -> void:
 		if s.is_empty() or g.is_empty() or not bool(s["impl"]) or not (s["types"] as Array).has(String(g["type"])):
 			bad_ov += 1
 	check(bad_ov == 0 and data.gen_skill_override.size() == data.generals_t1.size(), "特技 override: Tier1 全部指定 + 已實作 + 類型啱")
+	# S07d: 抽技固定池 / pin 都係已實作 + 類型啱
+	var dp_bad := 0
+	for t in data.gen_draw_pool:
+		for sid in (data.gen_draw_pool[t] as Array):
+			var sd: Dictionary = data.gen_skill_by_id.get(int(sid), {})
+			if sd.is_empty() or not bool(sd["impl"]) or not (sd["types"] as Array).has(String(t)):
+				dp_bad += 1
+	check(dp_bad == 0 and (data.gen_draw_pool["wu"] as Array).size() == 12 and (data.gen_draw_pool["wen"] as Array).size() == 11,
+		"抽技固定池: 每項已實作 + 類型啱 (wu 12 / wen 11)")
+	var pin_bad := 0
+	for nm in data.gen_skill_pin:
+		var ps: Dictionary = data.gen_skill_by_id.get(int(data.gen_skill_pin[nm]), {})
+		if ps.is_empty() or not bool(ps["impl"]):
+			pin_bad += 1
+	check(pin_bad == 0 and data.gen_skill_pin.get("馬超", 0) == 52, "特技 pin: 馬超 = 馴馬 (52)")
 	check(data.general_order_item.size() >= 100 and data.general_order_item.has("呂布"), "將軍令: ≥100 款，有呂布將軍令")
 	check(String(data.names.get(int(data.gen2_cfg["goldMedal"]), "")) == "御賜金牌", "御賜金牌 item id 啱")
 	var tcount := {}
@@ -254,6 +270,21 @@ func t_rules(data: GameData) -> void:
 	for i in 200:
 		spread[RulesGeneral.skill_for({"id": i + 1000, "name": "x", "type": "wen"}, data.gen_skills, data.gen_skill_override)] = true
 	check(spread.size() >= 8, "特技分配: 文官分散 (%d 種)" % spread.size())
+	# S07d: 固定池 (drawPool) 唔跟 impl flag 浮動 → 新開特技唔會打亂其他武將；馴馬只經 pin 指派
+	var pool: Dictionary = data.gen_draw_pool
+	var wu_pool: Array = []
+	for sid in (pool["wu"] as Array):
+		wu_pool.append(int(sid))
+	var p1 := RulesGeneral.skill_for(g_wu, data.gen_skills, data.gen_skill_override, pool, {})
+	check(wu_pool.has(p1) and p1 != 52, "固定抽技池: 抽到 wu 池內 + 唔會抽中馴馬")
+	var fake: Array = data.gen_skills.duplicate(true)
+	fake.append({"id": 99, "name": "x", "types": ["wu"], "impl": true, "eff": {"regenPct": 1.0}})
+	check(RulesGeneral.skill_for(g_wu, fake, {}, pool, {}) == RulesGeneral.skill_for(g_wu, data.gen_skills, {}, pool, {}),
+		"固定抽技池: 加新實作特技唔會打亂其他武將")
+	check(RulesGeneral.skill_for({"id": 141, "name": "馬超", "type": "wu"}, data.gen_skills, data.gen_skill_override, pool, data.gen_skill_pin) == 52,
+		"pin: 馬超抽到馴馬 (52)")
+	check(int((RulesGeneral.skill_eff(data.gen_skill_by_id[52]) as Dictionary).get("mountIntimacyMul", 0)) == 2,
+		"馴馬 eff: 座騎親密度成長 ×2")
 	check(RulesGeneral.loyalty_delta(-5, {"loyaltyLossMul": 0.5}) == -2 and RulesGeneral.loyalty_delta(-1, {"loyaltyLossMul": 0.5}) == -1
 		and RulesGeneral.loyalty_delta(2, {"loyaltyLossMul": 0.5}) == 2 and RulesGeneral.loyalty_delta(-5, {}) == -5, "忠義: 跌減半 (最少 1)")
 	check(is_equal_approx(RulesGeneral.exp_share(0.5, {"expShareAdd": 0.25}), 0.75), "教導: 經驗分成 +25%")
@@ -547,6 +578,32 @@ func t_skill_misc(data: GameData) -> void:
 
 
 # ---------------- E: 絕招 / 術法指令 ----------------
+# S07d 武將特技 52「馴馬」: 座騎每日親密度成長 ×2
+func t_skill_mount(data: GameData) -> void:
+	var r := _comp_setup(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	var c: Dictionary = r[6]
+	var mcfg: Dictionary = data.mounts
+	var m := RulesMount.new_mount(mcfg, "wusun", 1, false)
+	m["mood"] = 90
+	m["intimacy"] = 50
+	m["where"] = "with"
+	ch["mounts"] = [m]
+	_with_skill(c, 3)
+	sim._mount_daily(1)
+	check(int((ch["mounts"] as Array)[0]["intimacy"]) == 52, "冇馴馬: 日結親密度 +2")
+	(ch["mounts"] as Array)[0]["intimacy"] = 50
+	(ch["mounts"] as Array)[0]["mood"] = 90
+	_with_skill(c, 52)
+	sim._mount_daily(2)
+	check(int((ch["mounts"] as Array)[0]["intimacy"]) == 54, "馴馬: 親密度成長 ×2 (+4)")
+	check(is_equal_approx(sim._mount_intimacy_mult(sim.ent(pid)), 2.0), "馴馬: intimacy mult = 2.0")
+	_with_skill(c, 3)
+	check(is_equal_approx(sim._mount_intimacy_mult(sim.ent(pid)), 1.0), "無同伴特技 → mult = 1.0")
+
+
 func t_comp_ult(data: GameData) -> void:
 	var r := _comp_setup(data)
 	var sim: Sim = r[0]

@@ -35,6 +35,7 @@ func _init() -> void:
 	t_sim_friend_passives(data)
 	t_sim_skill_buff_debuff(data)
 	t_sim_friend_view(data)
+	t_auction(data)
 	print("[TEST] war_beast: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -650,3 +651,73 @@ func t_sim_friend_view(data: GameData) -> void:
 	var v := sim.beast_view(id)
 	check(bool((v["effects"] as Dictionary).get("bag_capacity", false)), "beast_view 透出友好效果")
 	check(bool(((v["list"] as Array)[0]["effects"] as Dictionary).get("bag_capacity", false)), "每個戰騎有 effects 欄")
+
+
+func t_auction(data: GameData) -> void:
+	# 生成 + 決定性 + 唔影響主 rng 流
+	var a := _new(data, 41)
+	var sim: Sim = a[0]
+	var id: int = a[1]
+	var ch: Dictionary = a[2]
+	var msgs: Array = a[3]
+	var rng_before := sim.rng.s
+	sim._auction_daily(3)
+	check(sim.rng.s == rng_before, "拍賣場用獨立 rng：唔影響主 rng 流")
+	var b := _new(data, 41)
+	var sim2: Sim = b[0]
+	sim2._auction_daily(3)
+	check(JSON.stringify(sim._auction()["lots"]) == JSON.stringify(sim2._auction()["lots"]), "同種子同 game 日 → 拍賣貨一樣")
+	var v := sim.auction_view(id)
+	check((v["lots"] as Array).size() == int(sim._aucfg()["slots"]), "拍賣場 slot 數")
+	var kinds := {}
+	for l in v["lots"]:
+		kinds[String(l["kind"])] = true
+		check(int(l["price"]) > 0 and String(l["breed"]) != "", "每件貨價格 > 0 + 有品種")
+	check(not kinds.is_empty(), "拍賣場有貨")
+	var sim3 := Sim.new(data, 41)
+	sim3.spawn_player("t")
+	sim3._auction_daily(4)
+	check(JSON.stringify(sim._auction()["lots"]) != JSON.stringify(sim3._auction()["lots"]), "第 2 日換貨")
+	# 唔喺馬廄買唔到
+	var lot := {"id": 501, "kind": "beast", "breed": "canying", "name": "殘影豹", "price": 5000, "sex": "", "tamed": false, "level": 5}
+	sim._auction()["day"] = int(sim._clock()["day"])
+	sim._auction()["lots"] = [lot.duplicate()]
+	sim.cmd_auction_buy(id, 501)
+	check(_last(msgs).contains("馬廄") and sim._beasts(ch).is_empty(), "唔喺馬廄買唔到拍賣品")
+	# 買戰騎 (標等級)
+	_at_fac(sim, id, "stable_xc")
+	ch["gold"] = 500000
+	sim._auction()["lots"] = [lot.duplicate()]
+	sim.cmd_auction_buy(id, 501)
+	var blist: Array = sim._beasts(ch)
+	check(blist.size() == 1 and int(blist[0]["level"]) == 5, "買到 5 級戰騎")
+	check(int(ch["gold"]) == 495000, "扣 5000 金")
+	check((sim._auction()["lots"] as Array).is_empty(), "賣出後落架")
+	check(not sim.beast_ent(id).is_empty(), "第 1 隻即出戰")
+	# 已有出戰 → 新戰騎寄馬廄
+	sim._auction()["lots"] = [{"id": 502, "kind": "beast", "breed": "jifeng", "name": "疾風狼", "price": 3000, "sex": "", "tamed": false, "level": 1}]
+	sim.cmd_auction_buy(id, 502)
+	check(sim._beasts(ch).size() == 2 and String(sim._beasts(ch)[1]["where"]) == "stable", "已有出戰 → 新戰騎寄馬廄")
+	# 買座騎
+	sim._auction()["lots"] = [{"id": 503, "kind": "mount", "breed": "dawan", "name": "火焰紅馬", "price": 6000, "sex": "m", "tamed": true, "level": 0}]
+	sim.cmd_auction_buy(id, 503)
+	var mlist: Array = sim._mounts(ch)
+	check(mlist.size() == 1 and String(mlist[0]["sex"]) == "m" and int(mlist[0]["intimacy"]) == 60, "買到成年公馬 (親密 60)")
+	# 唔夠錢 / 滿額
+	ch["gold"] = 1
+	sim._auction()["lots"] = [lot.duplicate()]
+	sim.cmd_auction_buy(id, 501)
+	check(_last(msgs).contains("金"), "唔夠錢買唔到")
+	ch["gold"] = 500000
+	sim._beasts(ch).clear()
+	for i in int(sim._wbcfg()["maxOwned"]):
+		sim._beasts(ch).append(sim._wrap_wb(sim._wbcfg(), "canying", i + 100))
+	sim._auction()["lots"] = [lot.duplicate()]
+	sim.cmd_auction_buy(id, 501)
+	check(sim._beasts(ch).size() == int(sim._wbcfg()["maxOwned"]), "戰騎滿 3 隻買唔到")
+	# 存檔 roundtrip + 舊存檔兼容
+	var s := sim.save_string()
+	var sim4 := Sim.load_string(data, s)
+	check(int(sim4._auction()["day"]) == int(sim._auction()["day"]), "存檔保留拍賣場")
+	sim4.state.erase("auction")
+	check((sim4.auction_view(int(sim4.state["player_id"]))["lots"] as Array).size() > 0, "舊存檔冇 auction → 即時生成")

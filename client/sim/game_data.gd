@@ -81,6 +81,8 @@ var gen2_cfg: Dictionary = {}     # 登用 v2 (data/general_skills.json cfg, Ste
 var gen_skills: Array = []        # 70 項特技
 var gen_skill_by_id: Dictionary = {}   # 特技 id -> def
 var gen_skill_override: Dictionary = {}  # 武將名 -> 特技 id (名將指定)
+var gen_draw_pool: Dictionary = {}     # S07d 抽特技固定池 (type -> [skill id])
+var gen_skill_pin: Dictionary = {}     # S07d 個別武將指定 (名 -> 特技 id)
 var general_order_item: Dictionary = {}  # 武將名 -> 將軍令 item id
 var comm: Dictionary = {}          # 居民委託 + 武將收集冊設定 (data/commissions.json, Step 16)
 var experts: Dictionary = {}       # 專長 (data/experts.json, Step S01c, spec 01 §8)
@@ -186,6 +188,8 @@ static func load_all() -> GameData:
 		s["id"] = int(s["id"])
 		g.gen_skill_by_id[int(s["id"])] = s
 	g.gen_skill_override = gs.get("override", {})
+	g.gen_draw_pool = gs["cfg"].get("drawPool", {})
+	g.gen_skill_pin = gs["cfg"].get("pin", {})
 	var qg: Dictionary = _read("res://data/quiz_generals.json")
 	g.quiz_generals = qg["questions"]
 	var ul: Dictionary = _read("res://data/ultimates.json")

@@ -77,15 +77,25 @@ static func treasure_bonus(slots: Array, cfg: Dictionary) -> Dictionary:
 
 
 # ================= 特技 (70 項，先做 passive) =================
-# 分配: 名將 override (按名)；其餘 = 合類型 + impl 嘅特技按 id 固定抽 (同 id 永遠一樣)
-static func skill_for(g: Dictionary, skills: Array, override: Dictionary) -> int:
+# 分配: 名將 override (按名) → 指定 pin (按名) → 抽 (合類型嘅池按 id 固定抽，同 id 永遠一樣)
+# S07d「處理抽特技打亂問題」: 抽技池由 data 嘅 draw_pool 明確釘死 (唔再跟 impl flag 浮動)，
+# 所以日後開多幾項特技都唔會改動其他武將原本抽到嘅特技；新開嘅特技經 pin / override 指派。
+# draw_pool 空 = 舊行為 (由 impl flag 建池) 兼容舊 caller
+static func skill_for(g: Dictionary, skills: Array, override: Dictionary, draw_pool: Dictionary = {}, pin: Dictionary = {}) -> int:
 	var nm := String(g["name"])
 	if override.has(nm):
 		return int(override[nm])
+	if pin.has(nm):
+		return int(pin[nm])
 	var pool: Array = []
-	for s in skills:
-		if bool(s.get("impl", false)) and (s["types"] as Array).has(String(g["type"])):
-			pool.append(int(s["id"]))
+	var t := String(g["type"])
+	if draw_pool.has(t):
+		for sid in (draw_pool[t] as Array):
+			pool.append(int(sid))
+	else:
+		for s in skills:
+			if bool(s.get("impl", false)) and (s["types"] as Array).has(t):
+				pool.append(int(s["id"]))
 	if pool.is_empty():
 		return 0
 	var h := (int(g["id"]) * 2654435761) & 0x7FFFFFFF
