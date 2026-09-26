@@ -23,7 +23,7 @@
 | 01 角色成長 | 🟡 | 🟡 | 建角、六屬性、HP/MP/SP、升級點數 + 自動分配、理念測驗、稱號/生日（福日 exp）/臉譜、修練場所、行動力、飲水度、專長、二轉/三轉框架（`rules/stats.gd` `expert.gd` `class.gd`、`sim_char`、`char_panel.gd`） | 三轉考試任務接掛（S04d）；地理迷宮地圖效果（S01c 偏離） |
 | 02 戰鬥 | 🟡 | 🟡 | 近戰、術法、相剋、狀態、寶石、義士三招 + 融合、防具/武器 3 槽/耐久、組隊經驗分配（按傷害 70%/平分 30%）、狀態 icon 列、術法快捷列 3 本切換 UI、**仕女（特技開鎖 + 三招絕招）**、**道士（特技超渡 + 三招絕招 + 同伴倒下機制）**、**巫女（特技潛行 + 行車 QTE + 三招絕招 + 潛行避仇恨）**、**辯士（特技竊聽 + 三招絕招 + 弩箭消耗）**、**美女（特技透視 + 洞悉 + 三招絕招 + 恢復術）** | 六職完整；多絕招 HUD 已通；恢復術來源（戰役掉寶）= S04 |
 | 03 善惡死亡 | ✅ | ✅ | 七階、死亡掉物品/跌經驗/價格加成、**攻擊居民/紅名 NPC + 反擊/逃跑叫衛兵（S03a）+ 天譴 + 殺人魔拒入城 + 罪犯拒官令（S03b）+ 幸運符/護身符/還魂丹 + 死亡結算彈窗（S03c）** | — |
-| 04 怪物地圖 | 🟡 | ✅ | 46 怪 + 掉落導入、重生、逃跑/群攻、boss 每日、夜怪、汝南洞 10 層、張牛角戰役、**地面掉落物（`dropped` 實體：300 tick 消失 + 撳地拾取 + 背包滿 + 存檔 roundtrip，S04a）**、**術法怪/boss 技能（遠程吟唱+走位可躲+吟唱線索+`skills`表輪流，S04b）** | 特殊場景 7 個（`scenes.json`）、其餘 5 場戰役實體 |
+| 04 怪物地圖 | 🟡 | ✅ | 46 怪 + 掉落導入、重生、逃跑/群攻、boss 每日、夜怪、汝南洞 10 層、張牛角戰役、**地面掉落物（`dropped` 實體：300 tick 消失 + 撳地拾取 + 背包滿 + 存檔 roundtrip，S04a）**、**術法怪/boss 技能（遠程吟唱+走位可躲+吟唱線索+`skills`表輪流，S04b）**、**其餘 5 場戰役實體（褚飛燕→李大目→張白騎→黃龍→十常侍 26 層 monster+多層 map+掉寶齊，記事戰役頁+大地圖標示，S04c）** | 特殊場景 7 個（`scenes.json`） |
 | 05 生產經濟 | 🟡 | ✅ | 6 初階 + 5 進階 + 2318 配方、修理、工具店、天地商行、捐獻、市場 | 產出 1~2 件、特製/白金/御賜工具、大宗師、4 類商店補齊、天災停進貨、城際貿易提示 |
 | 06 任務 | 🟡 | ✅ | 框架、新手 5 條、義士絕招 3 條、官令 3 條、歷史 6+1 條、委託、戰役 | 其餘 4 條官令、團體任務 16 項、其餘 5 條歷史、其他職絕招任務、專長任務、結婚 |
 | 07 座騎戰騎 | 🟡 | 🟡 | 17a 座騎全套 + UI；17b 繁衍/馬戰 **sim 有、`main.gd` 有派送、面板未有掣**；18 戰騎純規則 | 繁衍/馬戰/改名 UI；戰騎 sim 整合（獲得/裝備/出戰/友好技效果）+ 面板；NPC 拍賣場；特技「馴馬」 |
@@ -128,8 +128,12 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
     - boss 技能只配 19001（今批得張牛角 boss）；其餘 5 場戰役 boss 留 S04c 實裝時加 `skills`（重用 `d.get("skills")` 路徑）。
     - 術法怪能力用現有術書（huo_s/seal/hex），唔另設新手軍書；boss 技能 reuse 術書 spell id（`item` 欄 mob 唔讀）。
   - 驗收：`tests/run_monsters.gd` 加 6 組（遠程境地法/座落點躲避/唔埋身近戰/boss 技能輪流+skill_cd/吟唱線索透出/存檔 roundtrip）+ `ui_smoke` 吟唱線索煙霧 → 全 PASS（monsters 1464）
-- [ ] **S04c 其餘 5 場戰役實裝**：褚飛燕 → 李大目 → 張白騎 → 黃龍 → 十常侍（每場 monster + 多層 map + 掉寶齊）；戰役狀態入記事/大地圖
+- [x] **S04c 其餘 5 場戰役實裝**：褚飛燕 → 李大目 → 張白騎 → 黃龍 → 十常侍（每場 monster + 多層 map + 掉寶齊）；戰役狀態入記事/大地圖
   - UI：記事「戰役」頁（今日窗口/進度）、大地圖標示
+  - 完成：`tools/gen_battles.py`（新導入器，--check 核對、idempotent）將 `data/battles.json` 5 場補齊 playable：每層配 `monster`（boss id 1039~1064，26 隻，數值【自訂】按 lv template 遞增）+ `map`（26 張 16×16 戰役地圖 `maps/<bid>_f<n>.txt`，自動打包揾 free 位、地圖間 ≥20 格分隔唔相撞）；`rules/battle.gd can_enter` 移除「原型只做張牛角戰役」；`sim_battle.gd` 加 `view_battles()` read-model；UI 記事加「戰役」tab（今日窗口/武等/進度）+ 大地圖加戰役窗口標示
+  - 設計決策【自訂】：**每層一格 boss**（sim 單一格 boss/層盡頭目），攻略一層多頭目 = 併入嗰層 boss 名（「X/…」），掉寶照攻略全併入嗰層 monster drops（保持原掉寶表）；**尾層大頭目加 `skills`**（延續 S04b），interim 層頭目用近戰（唔加技能）；**boss 數值** = `hp=6.5·lv²+400 / atk=3.2·lv+2 / exp=95·lv`【自訂】隨 lv 遞增（練功打寶戰役頭目，較強）；**戰役地圖 16×16**（跟張牛角）由 generator 起稿
+  - 測試：`run_battle.gd` 297 項（t_data 全部 6 場 playable+monster/map/drops 完整性 + t_five_battles 逐場入層打死完場掉寶齊 + t_enter 改做褚飛燕）；`run_monsters.gd` 手寫怪計數 38→64 + `CUSTOM_BATTLE` 白名單（1039~1064）；`ui_smoke` 加戰役 tab/view_battles 煙霧 → 全 PASS（battle 297 / monsters 1464 / maps 2807 / ui_smoke 124）
+  - 踩坑：GDScript 嘅 `var x :=` 唔識推斷 function 回傳 Dictionary 型（quest_panel/map_panel/ui_smoke）→ 改顯式 `var x: Dictionary =` 先編譯到（否則主面板 load 唔到 → uitest watchdog 超時）
 - [ ] **S04d 特殊場景框架 + 首批**：`data/scenes.json`（schema 照 §4）、game 日曆開門、公告；首批【待決揀邊個】（建議：桃花渡 → 七彩奪寶陣（接 S01d 三轉））
 - 驗收：`tests/run_monsters.gd`/`run_battle.gd` 擴充 + `tests/run_scene.gd`（新）
 
