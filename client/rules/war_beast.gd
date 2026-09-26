@@ -231,3 +231,85 @@ static func sell_why(cfg: Dictionary, wb: Dictionary, player_level: int) -> Stri
 
 static func sell_price(cfg: Dictionary, wb: Dictionary) -> int:
 	return int(cfg["sellBase"]) + int(wb["level"]) * int(cfg["sellPerLevel"])
+
+
+# ================= 實戰數值 / 出手 (S07b, spec 07 §8.1~8.2) =================
+# 由四維 + 等級算實戰數值；passive 戰鬥特技按 stat 名加成【自訂】
+static func stats_for(cfg: Dictionary, wb: Dictionary) -> Dictionary:
+	var s: Dictionary = cfg["stats"]
+	var a: Dictionary = wb["attrs"]
+	var lv := int(wb["level"])
+	var out := {
+		"hpMax": MathX.js_round(float(s["hpBase"]) + float(s["hpBody"]) * float(a["body"]) + float(s["hpLevel"]) * float(lv - 1)),
+		"mpMax": MathX.js_round(float(s["mpBase"]) + float(s["mpSpirit"]) * float(a["spirit"]) + float(s["mpLevel"]) * float(lv - 1)),
+		"atk": float(s["atkBase"]) + float(s["atkPow"]) * float(a["pow"]) + float(s["atkLevel"]) * float(lv - 1),
+		"def": float(s["defBase"]) + float(s["defBody"]) * float(a["body"]) + float(s["defLevel"]) * float(lv - 1),
+		"spellAtk": float(s["spellAtkPow"]) * float(a["spirit"]),
+		"spellDef": float(s["spellDefSpirit"]) * float(a["spirit"]),
+		"hit": float(s["hit"]),
+		"evadePct": float(s["evadeBase"]) / 100.0 + float(s["evadeAgi"]) * float(a["agi"]) / 100.0,
+		"spMax": MathX.js_round(float(s["spBase"]) + float(s["spSpirit"]) * float(a["spirit"]) + float(s["spLevel"]) * float(lv - 1)),
+		"interval": RulesCombat.attack_interval(float(a["agi"])),
+		"agi": float(a["agi"]),
+	}
+	# passive 戰鬥特技 (kind=passive): stat 名 → 加成
+	for sid in (wb.get("battleSkills", {}) as Dictionary).keys():
+		var lv2 := battle_skill_level(wb, String(sid))
+		if lv2 <= 0:
+			continue
+		var sd := battle_skill_def(cfg, String(wb["breed"]), String(sid))
+		if String(sd.get("kind", "")) != "passive":
+			continue
+		var pct := skill_value(sd, lv2)
+		match String(sd.get("stat", "")):
+			"hpMax":
+				out["hpMax"] = MathX.js_round(float(out["hpMax"]) * (1.0 + pct))
+			"mpMax":
+				out["mpMax"] = MathX.js_round(float(out["mpMax"]) * (1.0 + pct))
+			"atk":
+				out["atk"] = float(out["atk"]) * (1.0 + pct)
+			"evade":
+				out["evadePct"] = float(out["evadePct"]) + pct
+	return out
+
+
+# 主人殺怪 → 戰騎得幾多 exp【自訂】
+static func exp_share(cfg: Dictionary, base_exp: int) -> int:
+	return MathX.js_round(float(base_exp) * float(cfg["beastExpShare"]))
+
+
+# 主動招式種類 (passive 唔使主動出)
+static func is_active_skill(sd: Dictionary) -> bool:
+	return String(sd.get("kind", "")) in ["atk", "combo", "aoe", "mpNuke", "heal", "buff", "debuff"]
+
+
+# 揀一招主動戰鬥特技: 血少優先補血，否則揀學過、冷卻完、SP 夠嘅傷害招 (數值高者)。返 {} = 普通攻擊
+static func pick_skill(cfg: Dictionary, wb: Dictionary, tick: int, cd: Dictionary, sp: int, hp_frac: float) -> Dictionary:
+	var ready: Array = []
+	for sd in battle_skills_of(cfg, String(wb["breed"])):
+		var sid := String(sd["id"])
+		var lv := battle_skill_level(wb, sid)
+		if lv <= 0 or not is_active_skill(sd):
+			continue
+		if tick < int(cd.get(sid, 0)):
+			continue
+		if sp < int(sd.get("sp", 0)):
+			continue
+		ready.append({"skill": sd, "level": lv})
+	if ready.is_empty():
+		return {}
+	if hp_frac < 0.5:
+		for r in ready:
+			if String(r["skill"]["kind"]) == "heal":
+				return r
+	var best: Dictionary = {}
+	var best_v := -1.0
+	for r in ready:
+		var k := String(r["skill"]["kind"])
+		if k in ["buff", "debuff"]:
+			continue                                   # 冇目標壓力時唔主動上 buff/debuff
+		var v := skill_value(r["skill"], int(r["level"]))
+		if v > best_v:
+			best = r
+			best_v = v
+	return best
