@@ -40,18 +40,52 @@ func _think_mob(m: Dictionary) -> void:
 			m["tx"] = s["home_x"]
 			m["ty"] = s["home_y"]
 			return
+		# ---- 術法怪 / boss 技能揀選 (S04b, spec 04 §3) ----
+		# boss 用 `skills` 表輪流放；其他術法怪用單一 `spell`（有冷卻 next_spell）
+		var skills: Array = (d.get("skills", []) as Array)
+		var picked := ""
+		var picked_i := -1
+		var sdef: Dictionary = {}
+		if skills.size() > 0:
+			var scd: Dictionary = s.get("skill_cd", {})
+			var n := int(s.get("skill_i", 0))
+			for k in range(skills.size()):
+				var i := (n + k) % skills.size()
+				var sk: Dictionary = skills[i]
+				if tick >= int(scd.get(str(i), 0)):
+					picked = str(sk["spell"])
+					picked_i = i
+					s["skill_i"] = i
+					break
+			if picked != "":
+				sdef = data.spell_by_id.get(picked, {})
+		else:
+			picked = str(d.get("spell", ""))
+			if picked != "":
+				sdef = data.spell_by_id.get(picked, {})
+				if sdef.is_empty() or tick < int(s.get("next_spell", 0)):
+					picked = ""
+		# 喺術法距離內就可吟唱（唔使埋到身），吟唱 = 鎖定落點 = 開始時目標企位（走位可躲）
+		var in_spell := (not sdef.is_empty()) and RulesCombat.in_range(m["x"], m["y"], tgt["x"], tgt["y"], float(sdef["range"]))
+		if picked != "" and not sdef.is_empty() and in_spell:
+			m["tx"] = m["x"]
+			m["ty"] = m["y"]
+			var cs: Dictionary = {"spell": picked, "target": int(tgt["id"]),
+				"done_at": tick + int(sdef["castTicks"]), "x": int(tgt["x"]), "y": int(tgt["y"])}
+			if picked_i >= 0:
+				cs["sk"] = picked_i
+			m["casting"] = cs
+			_emit({"k": "cast_start", "src": m["id"], "dst": int(tgt["id"]),
+				"book": int(sdef.get("item", 0)), "ticks": int(sdef["castTicks"])})
+			return
+		if bool(d.get("ranged", false)):
+			# 術法怪: 唔埋身近戰；喺術距內就停低等冷卻，未到術距先追
+			m["tx"] = m["x"] if in_spell else tgt["x"]
+			m["ty"] = m["y"] if in_spell else tgt["y"]
+			return
 		if RulesCombat.in_range(m["x"], m["y"], tgt["x"], tgt["y"]):
 			m["tx"] = m["x"]
 			m["ty"] = m["y"]
-			# 術法怪: 喺術法距離內就吟唱 (有冷卻)
-			var spell_id := str(d.get("spell", ""))
-			if spell_id != "" and tick >= int(s.get("next_spell", 0)):
-				var sdef: Dictionary = data.spell_by_id.get(spell_id, {})
-				if not sdef.is_empty() and RulesCombat.in_range(m["x"], m["y"], tgt["x"], tgt["y"], float(sdef["range"])):
-					m["casting"] = {"spell": spell_id, "target": int(tgt["id"]), "done_at": tick + int(sdef["castTicks"])}
-					_emit({"k": "cast_start", "src": m["id"], "dst": int(tgt["id"]),
-						"book": int(sdef.get("item", 0)), "ticks": int(sdef["castTicks"])})
-					return
 			if tick >= int(s["next_atk"]):
 				s["next_atk"] = tick + int(d["atkInterval"])
 				var pch: Dictionary = tgt["ch"]

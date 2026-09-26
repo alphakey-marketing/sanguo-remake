@@ -733,6 +733,38 @@ func _run() -> void:
 	await frames(2)
 	check(RulesShop.count_item(m.ch["bag"], 29042) == had_x + 1, "掉落: 撳拾取落袋")
 	check(ditem > 0 and m.sim.ent(ditem).is_empty(), "掉落: 拾取後實體消失")
+	# S04b 術法怪吟唱線索: 術距內 → 吟唱 → view_ents 透出 castX/castY/castSpell (UI 畫紅圈)
+	var pcast_: Dictionary = m._me()
+	var c2x: int = int(pcast_.get("x", 0))
+	var c2y: int = int(pcast_.get("y", 0))
+	var c2_ok := false
+	for r in range(1, 4):
+		for dy in range(-r, r + 1):
+			for dx in range(-r, r + 1):
+				var cc := Vector2i(c2x + dx, c2y + dy)
+				if m.sim.is_free(cc.x, cc.y):
+					c2x = cc.x; c2y = cc.y; c2_ok = true
+					break
+			if c2_ok: break
+		if c2_ok: break
+	check(c2_ok, "吟唱線索: 揾到術法怪站位 (術距內)")
+	if c2_ok:
+		var csp_: Variant = m.sim._spawn_mob(1007, "field_1")   # 火之術(小) range5
+		csp_["x"] = c2x; csp_["y"] = c2y; csp_["tx"] = c2x; csp_["ty"] = c2y
+		var mmob: Dictionary = csp_["mob"]
+		mmob["home_x"] = c2x; mmob["home_y"] = c2y
+		mmob["state"] = "chase"; mmob["target"] = int(m.my_id)
+		var casting_seen := false
+		for _i in 14:
+			m.sim.step()
+			for e in m.sim.view_ents():
+				if int(e["id"]) == int(csp_["id"]) and bool(e.get("casting", false)) \
+						and String(e.get("castSpell", "")) == "huo_s":
+					casting_seen = true
+			if casting_seen: break
+		check(casting_seen, "吟唱線索: 術法怪吟唱中 + castSpell 透出")
+		if not m.sim.ent(int(csp_["id"])).is_empty():
+			m.sim.damage(m.sim.ent(int(csp_["id"])), 99999, m.sim.ent(int(m.my_id)))
 	print("[TEST] ui_smoke: %d, fail %d" % [total, fails])
 	print("PASS: ui smoke" if fails == 0 else "FAIL: ui smoke")
 	get_tree().quit(1 if fails > 0 else 0)
