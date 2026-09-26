@@ -27,6 +27,12 @@ func _init() -> void:
 	t_dropped_pick_bagfull(data)
 	t_dropped_save_roundtrip(data)
 	t_bag_weight_rules(data)
+	t_mob_cast_ranged(data)
+	t_mob_cast_dodge(data)
+	t_mob_ranged_no_melee(data)
+	t_boss_skills(data)
+	t_cast_telegraph_expose(data)
+	t_cast_save_roundtrip(data)
 	print("[TEST] monsters scenarios: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -645,3 +651,163 @@ func t_bag_weight_rules(data: GameData) -> void:
 	check(RulesShop.bag_fits(bag, 29042, 1, wfn, 12), "重量規則: 12 度裝到 1 件甜蘿蔔 (11+1)")
 	check(RulesShop.bag_fits(bag, 10001, 1, wfn, 19), "重量規則: 19 度裝到 1 件刀 (11+8)")
 	check(not RulesShop.bag_fits(bag, 10001, 1, wfn, 12), "重量規則: 12 度裝唔到刀 (12<19)")
+
+
+# S04b 術法怪: 遠程術攻擊 —— 唔使埋身，喺術距內就吟唱；aoe 打到玩家
+func t_mob_cast_ranged(data: GameData) -> void:
+	var sim := Sim.new(data, 61)
+	var pid := sim.spawn_player("t")
+	_put(sim, pid, 30, 30)
+	var m: Variant = sim._spawn_mob(1007, "field_1")    # 火之術(小) range5 aoe3 castTicks10
+	_put(sim, int(m["id"]), 34, 30)                     # 距 player = 4 (≤5, 唔使埋身)
+	m["mob"]["home_x"] = 34
+	m["mob"]["home_y"] = 30
+	var hits: Array = [0]                                # GDScript 閉包要用容器先會同步
+	sim.event_emitted.connect(func(ev: Dictionary) -> void:
+		if String(ev.get("k", "")) == "spell_hit" and int(ev.get("src", 0)) == int(m["id"]) and int(ev.get("dst", 0)) == pid:
+			hits[0] += 1)
+	var hp0 := int(sim.ent(pid)["hp"])
+	sim.damage(sim.ent(int(m["id"])), 1, sim.ent(pid))   # 拉仇恨 → chase
+	for _i in 30:
+		sim.step()
+		if sim.ent(int(m["id"])).is_empty():
+			break
+	check(hits[0] > 0, "術法怪遠程: aoe 術打到玩家 (hits=%d)" % hits[0])
+	check(int(sim.ent(pid)["hp"]) < hp0, "術法怪遠程: 玩家扣血 (%d→%d)" % [hp0, int(sim.ent(pid)["hp"])])
+
+
+# S04b 走位可躲: 吟唱鎖定落點, 行開就躲到 / 企喺落點就中 (用吟唱落點確定性測試)
+func t_mob_cast_dodge(data: GameData) -> void:
+	# (a) 企喺落點 → 中
+	var sa := Sim.new(data, 621)
+	var pid_a := sa.spawn_player("t")
+	_put(sa, pid_a, 30, 30)
+	var ma: Variant = sa._spawn_mob(1007, "field_1")
+	_put(sa, int(ma["id"]), 34, 30)
+	ma["mob"]["home_x"] = 34; ma["mob"]["home_y"] = 30
+	ma["mob"]["state"] = "chase"; ma["mob"]["target"] = pid_a
+	var hit_a: Array = [0]
+	sa.event_emitted.connect(func(ev: Dictionary) -> void:
+		if String(ev.get("k", "")) == "spell_hit" and int(ev.get("src", 0)) == int(ma["id"]) and int(ev.get("dst", 0)) == pid_a:
+			hit_a[0] += 1)
+	sa.ent(int(ma["id"]))["casting"] = {"spell": "huo_s", "target": pid_a, "done_at": sa.tick + 2, "x": 30, "y": 30}
+	for _i in 4:
+		sa.step()
+	check(hit_a[0] > 0, "彈道落點: 企喺落點 -> 中 (hits=%d)" % hit_a[0])
+	# (b) 行開落點 → 走位可躲
+	var sb := Sim.new(data, 622)
+	var pid_b := sb.spawn_player("t")
+	_put(sb, pid_b, 30, 30)
+	var mb: Variant = sb._spawn_mob(1007, "field_1")
+	_put(sb, int(mb["id"]), 34, 30)
+	_put(sb, pid_b, 35, 35)                              # 行開到 aoe3 之外 (離落點 (30,30) 5 格)
+	mb["mob"]["home_x"] = 34; mb["mob"]["home_y"] = 30
+	mb["mob"]["state"] = "chase"; mb["mob"]["target"] = pid_b
+	var hit_b: Array = [0]
+	sb.event_emitted.connect(func(ev: Dictionary) -> void:
+		if String(ev.get("k", "")) == "spell_hit" and int(ev.get("src", 0)) == int(mb["id"]) and int(ev.get("dst", 0)) == pid_b:
+			hit_b[0] += 1)
+	sb.ent(int(mb["id"]))["casting"] = {"spell": "huo_s", "target": pid_b, "done_at": sb.tick + 2, "x": 30, "y": 30}
+	for _i in 4:
+		sb.step()
+	check(hit_b[0] == 0, "彈道落點: 行開咗 -> 躲到 (hits=%d)" % hit_b[0])
+
+
+# S04b 術法怪遠程: 唔會埋身近戰 (spell CD 中都企定等冷卻)
+func t_mob_ranged_no_melee(data: GameData) -> void:
+	var sim := Sim.new(data, 63)
+	var pid := sim.spawn_player("t")
+	_put(sim, pid, 30, 30)
+	var m: Variant = sim._spawn_mob(1009, "field_1")    # 中邪術 range4 castTicks15 spellCd 600
+	_put(sim, int(m["id"]), 31, 30)                     # 距 1 (埋到身)
+	m["mob"]["home_x"] = 31
+	m["mob"]["home_y"] = 30
+	var melee: Array = [0]
+	sim.event_emitted.connect(func(ev: Dictionary) -> void:
+		if String(ev.get("k", "")) == "hit" and int(ev.get("src", 0)) == int(m["id"]):
+			melee[0] += 1)
+	sim.damage(sim.ent(int(m["id"])), 1, sim.ent(pid))
+	for _i in 45:
+		sim.step()
+		if sim.ent(int(m["id"])).is_empty():
+			break
+	check(melee[0] == 0, "術法怪遠程: 近身都唔會近戰 (melee_hits=%d)" % melee[0])
+
+
+# S04b boss 技能表: 有 skills + 會輪流放 + skill_cd 記低
+func t_boss_skills(data: GameData) -> void:
+	var boss: Dictionary = data.monsters[19001]
+	check(boss.has("skills") and (boss["skills"] as Array).size() == 2, "boss技能表: 有 2 個技能")
+	var sim := Sim.new(data, 64)
+	var pid := sim.spawn_player("t")
+	_put(sim, pid, 30, 30)
+	var m: Variant = sim._spawn_mob(19001, "field_1")
+	_put(sim, int(m["id"]), 33, 30)                     # 距 3 (huo_s range5 內)
+	m["mob"]["home_x"] = 33
+	m["mob"]["home_y"] = 30
+	var cast_count: Array = [0]
+	sim.event_emitted.connect(func(ev: Dictionary) -> void:
+		if String(ev.get("k", "")) == "cast_start" and int(ev.get("src", 0)) == int(m["id"]):
+			cast_count[0] += 1)
+	sim.damage(sim.ent(int(m["id"])), 1, sim.ent(pid))
+	for _i in 60:
+		sim.step()
+		if sim.ent(int(m["id"])).is_empty():
+			break
+	check(cast_count[0] >= 1, "boss技能: 會用技能表放術 (cast=%d)" % cast_count[0])
+	if not sim.ent(int(m["id"])).is_empty():
+		check(sim.ent(int(m["id"]))["mob"].has("skill_cd"), "boss技能: skill_cd 已記")
+
+
+# S04b 吟唱線索透出: view_ents 吟唱中怪帶 castX/castY/castSpell (UI 畫紅圈)
+func t_cast_telegraph_expose(data: GameData) -> void:
+	var sim := Sim.new(data, 65)
+	var pid := sim.spawn_player("t")
+	_put(sim, pid, 30, 30)
+	var m: Variant = sim._spawn_mob(1007, "field_1")
+	_put(sim, int(m["id"]), 34, 30)
+	m["mob"]["home_x"] = 34
+	m["mob"]["home_y"] = 30
+	sim.damage(sim.ent(int(m["id"])), 1, sim.ent(pid))
+	var ok := false
+	for _i in 6:
+		sim.step()
+		var mm = sim.ent(int(m["id"]))
+		if mm.is_empty():
+			break
+		if not mm.has("casting"):
+			continue
+		for v in sim.view_ents():
+			if int(v["id"]) == int(m["id"]) and bool(v.get("casting", false)) \
+					and int(v["castX"]) == 30 and int(v["castY"]) == 30 and String(v.get("castSpell", "")) == "huo_s":
+				ok = true
+		break
+	check(ok, "吟唱線索: view_ents 透出 castX/castY/castSpell")
+
+
+# S04b 存檔 roundtrip: 吟唱中 mob 存讀保持 casting
+func t_cast_save_roundtrip(data: GameData) -> void:
+	var sim := Sim.new(data, 66)
+	var pid := sim.spawn_player("t")
+	_put(sim, pid, 30, 30)
+	var m: Variant = sim._spawn_mob(1007, "field_1")
+	_put(sim, int(m["id"]), 34, 30)
+	m["mob"]["home_x"] = 34
+	m["mob"]["home_y"] = 30
+	sim.damage(sim.ent(int(m["id"])), 1, sim.ent(pid))
+	var casting := false
+	for _i in 6:
+		sim.step()
+		var mm = sim.ent(int(m["id"]))
+		if mm.is_empty():
+			break
+		if mm.has("casting"):
+			casting = true
+			break
+	check(casting, "存檔: 吟唱已開始")
+	if casting:
+		var s := sim.save_string()
+		var loaded := Sim.load_string(data, s)
+		check(loaded != null and loaded.save_string() == s, "存檔: 吟唱中存讀一致")
+		check(not loaded.ent(int(m["id"])).is_empty() and loaded.ent(int(m["id"])).has("casting"),
+			"存檔: 讀檔後仲吟唱緊")

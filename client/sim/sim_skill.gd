@@ -626,7 +626,7 @@ func _spell_buff(p: Dictionary, def: Dictionary) -> void:
 	_msg(int(p["id"]), "施咗「%s」（%d tick）" % [str(def["name"]), ticks])
 
 
-# 術法怪吟唱生效: 傷害 (aoe = 打晒附近 ch) / 狀態 (打目標)
+# 術法怪吟唱生效 (S04b): aoe 打「吟唱開始時目標企位」(走位可躲)；單體打 chase 目標走甩術距就 miss
 func _resolve_mob_cast(m: Dictionary, s: Dictionary, d: Dictionary, tgt: Dictionary) -> void:
 	var cs: Dictionary = m["casting"]
 	if tick < int(cs["done_at"]):
@@ -636,32 +636,49 @@ func _resolve_mob_cast(m: Dictionary, s: Dictionary, d: Dictionary, tgt: Diction
 	m.erase("casting")
 	var sdef: Dictionary = data.spell_by_id.get(str(cs["spell"]), {})
 	if sdef.is_empty():
+		_mobcast_cd(s, d, cs)
 		return
+	var aoe := int(sdef.get("aoe", 0))
+	if aoe > 0:
+		# 彈道落點 = 吟唱開始時鎖定嘅格；範圍內嘅 ch 都食到 (行開躲到)
+		var cx := int(cs.get("x", int(m["x"])))
+		var cy := int(cs.get("y", int(m["y"])))
+		var targets: Array = []
+		for o in ents.values():
+			if o.has("ch") and int(o["hp"]) > 0 and RulesCombat.in_range(cx, cy, o["x"], o["y"], aoe):
+				targets.append(o)
+		for o in targets:
+			var pch: Dictionary = o["ch"]
+			# 防具: 術防 flat + 術迴避 + 術法受擊減少 (Step 11.6)；冇術迴避就唔擲骰 (保持舊重播一致)
+			var ab := _armor_bonus(pch)
+			var caps: Dictionary = data.equip_cfg["caps"]
+			var pd := (RulesStats.player_spell_def(int(pch["level"]), int(_eff_attr(pch, "spi"))) + int(ab["sdef"])) \
+				* RulesSpell.spell_def_mult(pch.get("status", {}), tick)
+			if int(ab["sevade"]) > 0 and rng.next() < RulesEquip.evade_chance(int(ab["sevade"]), 0.0, int(caps["evadePct"])):
+				_emit({"k": "spell_hit", "src": m["id"], "dst": o["id"], "dmg": 0, "elem": str(sdef["elem"])})    # 術迴避
+				continue
+			var dmg := RulesEquip.reduce_dmg(RulesSpell.calc_spell_damage(float(sdef["power"]), float(d["level"]), pd,
+				str(sdef["elem"]), "none", 0.0, rng_fn), int(ab["sdmgRed"]), int(caps["dmgRedPct"]))
+			_emit({"k": "spell_hit", "src": m["id"], "dst": o["id"], "dmg": dmg, "elem": str(sdef["elem"])})
+			damage(o, dmg, m)
+		_mobcast_cd(s, d, cs)
+		return
+	# ---- 單體 (aoe==0): 目標死咗 / 行甩咗術距 -> miss (唔打) ----
 	if tgt.is_empty() or int(tgt["hp"]) <= 0 \
 			or not RulesCombat.in_range(m["x"], m["y"], tgt["x"], tgt["y"], float(sdef["range"])):
-		s["next_spell"] = tick + int(d.get("spellCd", 600))
+		_mobcast_cd(s, d, cs)
 		return
 	match str(sdef["kind"]):
 		"attack":
-			var aoe := int(sdef.get("aoe", 0))
-			var targets: Array = []
-			if aoe > 0:
-				for o in ents.values():
-					if o.has("ch") and int(o["hp"]) > 0 \
-							and RulesCombat.in_range(tgt["x"], tgt["y"], o["x"], o["y"], aoe):
-						targets.append(o)
+			var o: Dictionary = tgt
+			var pch: Dictionary = o["ch"]
+			var ab := _armor_bonus(pch)
+			var caps: Dictionary = data.equip_cfg["caps"]
+			var pd := (RulesStats.player_spell_def(int(pch["level"]), int(_eff_attr(pch, "spi"))) + int(ab["sdef"])) \
+				* RulesSpell.spell_def_mult(pch.get("status", {}), tick)
+			if int(ab["sevade"]) > 0 and rng.next() < RulesEquip.evade_chance(int(ab["sevade"]), 0.0, int(caps["evadePct"])):
+				_emit({"k": "spell_hit", "src": m["id"], "dst": o["id"], "dmg": 0, "elem": str(sdef["elem"])})
 			else:
-				targets.append(tgt)
-			for o in targets:
-				var pch: Dictionary = o["ch"]
-				# 防具: 術防 flat + 術迴避 + 術法受擊減少 (Step 11.6)；冇術迴避就唔擲骰 (保持舊重播一致)
-				var ab := _armor_bonus(pch)
-				var caps: Dictionary = data.equip_cfg["caps"]
-				var pd := (RulesStats.player_spell_def(int(pch["level"]), int(_eff_attr(pch, "spi"))) + int(ab["sdef"])) \
-					* RulesSpell.spell_def_mult(pch.get("status", {}), tick)
-				if int(ab["sevade"]) > 0 and rng.next() < RulesEquip.evade_chance(int(ab["sevade"]), 0.0, int(caps["evadePct"])):
-					_emit({"k": "spell_hit", "src": m["id"], "dst": o["id"], "dmg": 0, "elem": str(sdef["elem"])})    # 術迴避
-					continue
 				var dmg := RulesEquip.reduce_dmg(RulesSpell.calc_spell_damage(float(sdef["power"]), float(d["level"]), pd,
 					str(sdef["elem"]), "none", 0.0, rng_fn), int(ab["sdmgRed"]), int(caps["dmgRedPct"]))
 				_emit({"k": "spell_hit", "src": m["id"], "dst": o["id"], "dmg": dmg, "elem": str(sdef["elem"])})
@@ -674,10 +691,21 @@ func _resolve_mob_cast(m: Dictionary, s: Dictionary, d: Dictionary, tgt: Diction
 				var res := int(_armor_bonus(pch2)["resist"].get(sid, 0))
 				if res > 0 and rng.next() < minf(res, int(data.equip_cfg["caps"]["resistPct"])) / 100.0:
 					_emit({"k": "status", "dst": tgt["id"], "id": sid, "until": 0, "applied": false, "resisted": true})
-					s["next_spell"] = tick + int(d.get("spellCd", 600))
+					_mobcast_cd(s, d, cs)
 					return
 				if not pch2.has("status"):
 					pch2["status"] = {}
 				RulesSpell.add_status(pch2["status"], sid, RulesSpell.status_ticks(sid), tick)
 				_emit({"k": "status", "dst": tgt["id"], "id": sid, "until": tick + RulesSpell.status_ticks(sid), "applied": true})
-	s["next_spell"] = tick + int(d.get("spellCd", 600))
+	_mobcast_cd(s, d, cs)
+
+
+# 術法怪 / boss 技能冷卻: boss 用 skill_cd[sk]，其他用 next_spell
+func _mobcast_cd(s: Dictionary, d: Dictionary, cs: Dictionary) -> void:
+	if cs.has("sk"):
+		if not s.has("skill_cd"):
+			s["skill_cd"] = {}
+		var sk: Dictionary = (d.get("skills", []) as Array)[int(cs["sk"])]
+		s["skill_cd"][str(int(cs["sk"]))] = tick + int(sk.get("cd", int(d.get("spellCd", 600))))
+	else:
+		s["next_spell"] = tick + int(d.get("spellCd", 600))

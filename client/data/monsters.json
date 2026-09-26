@@ -347,6 +347,7 @@
    "element": "fire",
    "spell": "huo_s",
    "spellCd": 360,
+   "ranged": true,
    "drops": [
     {
      "item": 30507,
@@ -379,6 +380,7 @@
    "element": "none",
    "spell": "seal",
    "spellCd": 480,
+   "ranged": true,
    "drops": [
     {
      "item": 30526,
@@ -411,6 +413,7 @@
    "element": "none",
    "spell": "hex",
    "spellCd": 600,
+   "ranged": true,
    "drops": [
     {
      "item": 30525,
@@ -1725,7 +1728,17 @@
      "p": 0.02
     }
    ],
-   "boss": true
+   "boss": true,
+   "skills": [
+    {
+     "spell": "huo_s",
+     "cd": 300
+    },
+    {
+     "spell": "huo_m",
+     "cd": 540
+    }
+   ]
   },
   {
    "id": 11072,

@@ -245,10 +245,19 @@ func view_ents() -> Array:
 		for k in st_all:
 			if int(st_all[k]) > tick:
 				st_vis.append(str(k))
+		# S04b 吟唱線索: 透出術法怪/boss 吟唱中嘅彈道落點 + 術（UI 畫紅圈）
+		var csx := 0
+		var csy := 0
+		var csp := ""
+		if e.has("casting"):
+			var cs: Dictionary = e["casting"]
+			csp = str(cs.get("spell", ""))
+			csx = int(cs.get("x", int(e["x"])))
+			csy = int(cs.get("y", int(e["y"])))
 		var o: Dictionary = {"id": e["id"], "name": e["name"], "x": e["x"], "y": e["y"], "face": e["face"],
 			"bot": e["kind"] == "bot", "gen": e["kind"] == "gen", "hp": e["hp"], "maxHp": e["max_hp"], "level": e["level"], "mob": e["kind"] == "mob",
 			"criminal": bool(e.get("ch", {}).get("criminal", false)),
-			"statuses": st_vis, "casting": e.has("casting"),
+			"statuses": st_vis, "casting": e.has("casting"), "castX": csx, "castY": csy, "castSpell": csp,
 			"aggro": int(e["mob"]["target"]) if e["kind"] == "mob" and e["mob"]["state"] == "chase" else 0}   # 怪追緊邊個
 		if e["kind"] == "dropped":
 			o["dropped"] = true
