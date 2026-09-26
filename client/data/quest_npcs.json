@@ -661,6 +661,12 @@
   {"id": "bandit_king", "name": "山大王", "x": 36, "y": 25, "map": "yudu", "questOnly": true, "desc": "于毒山寨山大王【原 sy3_4】：勇闖賊寨任務目標。"},
   {"id": "evil_head", "name": "惡頭", "x": 24, "y": 19, "map": "luoyang", "questOnly": true, "desc": "洛陽城外惡頭【原 sy3_4】：斬殺惡頭任務目標。"},
   {"id": "ghost_guard", "name": "鬼域巨魎", "x": 22, "y": 13, "map": "runan_f3", "questOnly": true, "desc": "汝南洞窟三層鬼域巨魎【原 sy3_4】：鬼域迷陣任務目標。"},
-  {"id": "treasure_guard", "name": "前朝寶藏守衛", "x": 22, "y": 14, "map": "runan_f3", "questOnly": true, "desc": "汝南洞窟三層寶藏守衛【原 sy3_4】：亂數迷宮任務目標。"}
+  {"id": "treasure_guard", "name": "前朝寶藏守衛", "x": 22, "y": 14, "map": "runan_f3", "questOnly": true, "desc": "汝南洞窟三層寶藏守衛【原 sy3_4】：亂數迷宮任務目標。"},
+  {"id": "sjs_zhu", "name": "透光石柱", "x": 11, "y": 13, "map": "runan_f8", "questOnly": true, "desc": "洞窟八層透光石柱【原 sy3_6_2 仕女金環裂地】：敲石柱引出密室骷髏王（自訂改編: 汝南洞窟八層）。"},
+  {"id": "wolfyi_head", "name": "惡狼團頭目", "x": 34, "y": 13, "map": "runan_f8", "questOnly": true, "desc": "惡狼團頭目狼懿【原 sy3_6_2 巫女膽顫心驚】：打敗佢得狼爪信物（自訂改編: 汝南洞窟八層）。"},
+  {"id": "shuangfeng", "name": "雙風黑殺手", "x": 30, "y": 13, "map": "runan_f5", "questOnly": true, "desc": "雙風黑殺手【原 sy3_6_2 辯士吐火羅語】：打敗佢得園薄扇（自訂改編: 汝南洞窟五層）。"},
+  {"id": "zhangde", "name": "怪人張得", "x": 48, "y": 25, "map": "jingzhou", "questOnly": true, "desc": "怪人張得【原 sy3_6_3 道士神遊太虛】：打敗佢得術文全書（自訂改編: 荊州地界）。"},
+  {"id": "hongjing", "name": "怪人紅菁", "x": 10, "y": 18, "map": "changsha", "questOnly": true, "desc": "怪人紅菁【原 sy3_6_3 巫女鬼哭神號】：打敗佢得咒法全書（自訂改編: 長沙城）。"},
+  {"id": "langyi_head", "name": "狼懿頭目", "x": 20, "y": 13, "map": "runan_f8", "questOnly": true, "desc": "狼懿頭目【原 sy3_6_2 美女松竹聽雨】：打敗佢得狂兒救助函（自訂改編: 汝南洞窟八層）。"}
  ]
 }
