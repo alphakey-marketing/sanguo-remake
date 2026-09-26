@@ -37,6 +37,20 @@ static func count_item(bag: Array, id: int) -> int:
 	return t
 
 
+# 背包總重量 (S04a, spec 04 §6): 逐件 item id 叫 weight_fn(id)->int，乘件數加埋。
+static func bag_weight(bag: Array, weight_fn: Callable) -> int:
+	var t := 0
+	for s in bag:
+		t += int(s["n"]) * int(weight_fn.call(int(s["id"])))
+	return t
+
+
+# 背包加唔加得落 (拾取時背包滿檢查, S04a): 而家總重 + 新件重量 ≤ cap。
+# weight_fn(id)->int 由 caller 傳 (要 items.json weight，rules 唔直接讀 data)。
+static func bag_fits(bag: Array, item_id: int, n: int, weight_fn: Callable, cap: int) -> bool:
+	return bag_weight(bag, weight_fn) + int(weight_fn.call(item_id)) * n <= cap
+
+
 static func remove_item(bag: Array, id: int, n: int) -> bool:
 	for i in bag.size():
 		var s: Dictionary = bag[i]

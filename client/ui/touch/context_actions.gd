@@ -39,6 +39,14 @@ static func find(main: Node) -> Dictionary:
 				var lab := "驛站" if bool(fd.get("station", false)) else "馬廄" if bool(fd.get("stable", false)) else str(fd["name"]).substr(0, 3)
 				best = {"kind": "fac", "label": lab, "ref": f}
 			"travel": best = {"kind": "travel", "label": "傳送", "ref": f}
+	# S04a 地面掉落物: 企埋邊就「拾取」優先 (企正上面 dd=0 最贏)
+	for d_ in main.ents:
+		if not bool(d_.get("dropped", false)):
+			continue
+		var dd4 := _dist(me, int(d_.x), int(d_.y))
+		if dd4 < bd:
+			bd = dd4
+			best = {"kind": "pickup", "label": "拾取", "ref": d_}
 	if not best.is_empty():
 		return best
 	if not main.sim.is_safe(int(me.x), int(me.y)) and has_work_tool(main):
@@ -120,6 +128,8 @@ static func run(main: Node, act: Dictionary) -> void:
 			hud.open_dialog(func() -> Dictionary: return general_dialog(main, gid))
 		"survey":
 			hud.open_panel("recruit")
+		"pickup":
+			main._send({"t": "pick", "drop": int(act.ref.id)})
 
 
 static func _leave(main: Node) -> Dictionary:

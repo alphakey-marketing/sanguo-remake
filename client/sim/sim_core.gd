@@ -499,6 +499,28 @@ func init_mobs() -> void:
 			_spawn_mob(int(sp["monster"]), String(sp.get("zone", DEFAULT_ZONE)))
 
 
+# S04a 地面掉落物 (spec 04 §6)【原=跌落地】: 物品堆跌落地，存在 capTicks tick 後消失；
+# 戰騎「撿寶」友好技 (S07c) 自動執呢啲 (PLAN §4)。
+func _drop_items(x: int, y: int, items: Array) -> Dictionary:
+	if items.is_empty():
+		return {}
+	var e := _new_ent("掉落物", "dropped", Vector2i(x, y))
+	e["face"] = 0
+	e["hp"] = 1
+	e["max_hp"] = 1
+	e["drop"] = {"items": items, "until": tick + int(data.world.get("dropped", {}).get("capTicks", 300))}
+	return e
+
+
+# 每 tick: 過期地面掉落物消失
+func _expire_drops() -> void:
+	var gone: Array = []
+	for e in ents.values():
+		if e["kind"] == "dropped" and tick >= int(e["drop"]["until"]):
+			gone.append(int(e["id"]))
+	_remove_ents(gone)
+
+
 func _spawn_mob(def_id: int, zone_id: String = DEFAULT_ZONE) -> Variant:
 	var d: Dictionary = data.mob_def(def_id)
 	if d.get("night", false) and not _clock().is_night:

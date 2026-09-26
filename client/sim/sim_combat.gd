@@ -86,8 +86,19 @@ func _kill_mob(m: Dictionary, by: Dictionary, exp_mult: float = 1.0) -> void:
 	var items := RulesCombat.roll_drops(d["drops"], rng_fn)
 	items.append_array(RulesCombat.roll_drops(d.get("rareDrops", []), rng_fn))   # 稀有掉落 (Step 11, spec 11 §2)
 	ch["gold"] = int(ch["gold"]) + gold
-	for it in items:
-		RulesShop.add_item(ch["bag"], int(it), 1)
+	# S04a (spec 04 §6)【原=跌落地】: 野外地圖物品以「跌落地」實體出現，行埋邊拾取。
+	# 戰役落場 (battle_id != "") 例外: 過層即傳走，唔返頭執 → 掉寶照直入袋 (保留戰役獎勵)
+	if battle_id != "":
+		for it in items:
+			RulesShop.add_item(ch["bag"], int(it), 1)
+	elif not items.is_empty():
+		var counts := {}
+		for it in items:
+			counts[int(it)] = int(counts.get(int(it), 0)) + 1
+		var di: Array = []
+		for k in counts:
+			di.append({"id": int(k), "n": int(counts[k])})
+		_drop_items(int(m["x"]), int(m["y"]), di)
 	ch["karma"] = RulesCombat.karma_after_kill(int(ch["karma"]), d["alignment"])
 	var base_exp := MathX.js_round(float(d["exp"]) * exp_mult)
 	var dmg_log: Dictionary = m.get("dmg", {})
@@ -177,6 +188,9 @@ func _kill_player(p: Dictionary) -> void:
 			dropped = RulesCombat.roll_death_drop_items(int(ch["karma"]), loose, rng_fn)
 			for it in dropped:
 				RulesShop.remove_item(ch["bag"], int(it["id"]), int(it["n"]))
+			# S04a (spec 04 §6)【原=跌落地】: 死亡掉出嚟嘅物品留喺死位，唔係消失
+			if not dropped.is_empty():
+				_drop_items(int(p["x"]), int(p["y"]), dropped)
 			_cleanup_dur(ch)
 
 	# 3. 傳送返客棧: HP/MP/SP 回復一半【自訂】(原版復活後唔滿，要訓覺/食)
@@ -271,3 +285,44 @@ func _tianqian_reprisal(p: Dictionary, victim: String) -> void:
 func _erase_flee(m: Dictionary, d: Dictionary) -> void:
 	_schedule_respawn(m, d)
 	_remove_ent(int(m["id"]))
+
+
+# S04a 拾取地面掉落物 (spec 04 §6): 行埋邊 (NEAR 格) 撳拾取 → 收進背包。
+# 背包滿 (總重超 capBagWeight) → 提示 + 留落地；逐件試，裝唔落嗰啲留低。
+func cmd_pick(id: int, drop_id: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return
+	var d := ent(drop_id)
+	if d.is_empty() or d["kind"] != "dropped":
+		return _msg(id, "呢度冇嘢執")
+	if not _near(e, int(d["x"]), int(d["y"])):
+		return _msg(id, "太遠喎，行埋啲先")
+	var ch: Dictionary = e["ch"]
+	var cfg: Dictionary = data.world.get("dropped", {})
+	var cap := int(cfg.get("capBagWeight", 1000))
+	var wfn := func(i: int) -> int: return int(data.weights.get(i, 0))
+	var picked: Array = []
+	var leftover: Array = []
+	var full := false
+	for it in d["drop"]["items"] as Array:
+		var iid := int(it["id"])
+		var n := int(it["n"])
+		if RulesShop.bag_fits(ch["bag"], iid, n, wfn, cap):
+			RulesShop.add_item(ch["bag"], iid, n)
+			picked.append({"id": iid, "n": n})
+		else:
+			full = true
+			leftover.append({"id": iid, "n": n})
+	var dxy := [int(d["x"]), int(d["y"])]
+	if leftover.is_empty():
+		_remove_ent(drop_id)
+	else:
+		d["drop"]["items"] = leftover
+		d["drop"]["until"] = tick + int(cfg.get("capTicks", 300))
+	if full:
+		_msg(id, "背包滿，裝唔落，留返喺地下")
+	for it in picked:
+		_msg(id, "執到 %s ×%d" % [data.names.get(int(it["id"]), str(it["id"])), int(it["n"])])
+	_emit({"k": "picked", "dst": id, "drop": drop_id, "items": picked, "full": full,
+		"x": int(dxy[0]), "y": int(dxy[1])})

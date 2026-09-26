@@ -158,6 +158,7 @@ func step() -> void:
 	_mount_tick()               # 放牧返嚟 (Step 17a)
 	_safe_regen_tick()          # 城內安全區自動回復 (S01a, spec 01 §4)
 	_city_guard_check()         # S03b: 殺人魔喺城內/安全區 → 城門衛兵警告 (拒入城)
+	_expire_drops()             # S04a: 過期地面掉落物消失
 	for id in ents.keys():
 		var e: Dictionary = ents.get(id, {})
 		if e.is_empty():
@@ -244,11 +245,15 @@ func view_ents() -> Array:
 		for k in st_all:
 			if int(st_all[k]) > tick:
 				st_vis.append(str(k))
-		out.append({"id": e["id"], "name": e["name"], "x": e["x"], "y": e["y"], "face": e["face"],
+		var o: Dictionary = {"id": e["id"], "name": e["name"], "x": e["x"], "y": e["y"], "face": e["face"],
 			"bot": e["kind"] == "bot", "gen": e["kind"] == "gen", "hp": e["hp"], "maxHp": e["max_hp"], "level": e["level"], "mob": e["kind"] == "mob",
 			"criminal": bool(e.get("ch", {}).get("criminal", false)),
 			"statuses": st_vis, "casting": e.has("casting"),
-			"aggro": int(e["mob"]["target"]) if e["kind"] == "mob" and e["mob"]["state"] == "chase" else 0})   # 怪追緊邊個
+			"aggro": int(e["mob"]["target"]) if e["kind"] == "mob" and e["mob"]["state"] == "chase" else 0}   # 怪追緊邊個
+		if e["kind"] == "dropped":
+			o["dropped"] = true
+			o["dropItems"] = e["drop"]["items"]
+		out.append(o)
 	return out
 
 
@@ -295,6 +300,8 @@ static func load_string(game_data: GameData, s: String) -> Sim:
 # 舊存檔 (地圖改版前, spec 12) 單位可能企喺牆/樹/虛空: 人搬返客棧、怪喺自己 spawn 範圍重揀位
 func _fix_positions() -> void:
 	for e in ents.values():
+		if e["kind"] == "dropped":
+			continue                        # 地面掉落物唔搬位 (跌出位本身行得)
 		if is_free(int(e["x"]), int(e["y"])):
 			continue
 		var p := inn_pos

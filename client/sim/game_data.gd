@@ -14,6 +14,7 @@ var weapons: Dictionary = {}     # item id -> {power, hit}  武器強度(effect 
 var heals: Dictionary = {}       # item id -> {hp, mp}  回復生命力(effect 14) / 回復靈力(effect 16)，供 cmd_use_item
 var prices: Dictionary = {}      # item id -> price
 var item_ids: Dictionary = {}    # item id -> true
+var weights: Dictionary = {}     # item id -> weight (負重, 背包滿 S04a / 城際貿易 S05)
 var names: Dictionary = {}       # item id -> 名
 var cats: Dictionary = {}        # item id -> cat (物品分類, 市場用)
 var info: Dictionary = {}        # item id -> {cat_label, req_lv, effects:[{label, value}]}  UI 物品詳情用
@@ -201,6 +202,7 @@ static func load_all() -> GameData:
 		g.item_ids[id] = true
 		g.names[id] = str(it.get("name", id))
 		g.prices[id] = float(it.get("price", 0))
+		g.weights[id] = int(it.get("weight", 0))
 		g.cats[id] = int(it.get("cat", 0))
 		var gname := RulesGeneral.order_general_name(g.names[id], String(g.gen2_cfg["orderSuffix"]), g.gen2_cfg.get("orderAlias", {}))
 		if gname != "" and not g.general_order_item.has(gname):

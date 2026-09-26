@@ -65,6 +65,13 @@ var _dirty := false                # 發咗意圖/收咗事件: 下幀要 _refre
 func _ready() -> void:
 	autotest = "--autotest" in OS.get_cmdline_user_args()
 	uitest = "--uitest" in OS.get_cmdline_user_args() or "--uishot" in OS.get_cmdline_user_args()
+	# 內建 watchdog: --uitest/--autotest 無論 test script 有冇 load 到 / 有冇 crash / 有冇死迴圈，
+	# 超過呢個時間都會強制 quit，唔會令 Godot 無限跑 → bash 永久等 → relay leg 掛死。
+	# 要喺 load test script 之前裝好，先至唔會因 smoke parse error 而失效。
+	if autotest or uitest:
+		get_tree().create_timer(150.0).timeout.connect(func() -> void:
+			print("FAIL: watchdog timeout (150s)")
+			get_tree().quit(1))
 	for i in Sim.FACE_COUNT:
 		var p := "%sface_%d.jpg" % [FACE_DIR, i]
 		faces.append(load(p) if ResourceLoader.exists(p) else null)   # 冇圖就畫色塊
@@ -123,9 +130,13 @@ func _ready() -> void:
 		if a == "--sshot":
 			sshot_file = "user://sshot_ui.png"
 	if "--uitest" in OS.get_cmdline_user_args():
-		add_child(load("res://tests/ui_smoke.gd").new())
+		var sm := load("res://tests/ui_smoke.gd")
+		if sm != null:   # guard: smoke parse error 都唔會 crash main._ready (斷續 -> watchdog 接住 quit)
+			add_child(sm.new())
 	elif "--uishot" in OS.get_cmdline_user_args():
-		add_child(load("res://tests/ui_shot.gd").new())
+		var sh := load("res://tests/ui_shot.gd")
+		if sh != null:
+			add_child(sh.new())
 
 func _refresh() -> void:
 	_dirty = false
@@ -237,6 +248,7 @@ func _send(d: Dictionary) -> void:
 		"goto_map": sim.cmd_goto_map(my_id, str(d.map))
 		"work": sim.cmd_work(my_id, str(d.skill))
 		"equip_tool": sim.cmd_equip_tool(my_id, str(d.skill), int(d.item))
+		"pick": sim.cmd_pick(my_id, int(d.drop))
 		"storage_sub": sim.cmd_storage_sub(my_id, bool(d.on))
 		"storage_deposit": sim.cmd_storage_deposit(my_id, int(d.item), int(d.get("n", 1)))
 		"storage_withdraw": sim.cmd_storage_withdraw(my_id, int(d.item), int(d.get("n", 1)))
@@ -430,6 +442,15 @@ func _on_event(e: Dictionary) -> void:
 				_log(str(e.get("text", "城門衛兵攔住你：唔准入城！")))
 		"msg":
 			if int(e.dst) == my_id: _log(str(e.text))
+		"picked":                 # S04a 拾取地面掉落物
+			if int(e.dst) == my_id:
+				var pn := []
+				for it in e.get("items", []):
+					pn.append("%s×%d" % [item_names.get(int(it["id"]), str(it["id"])), int(it["n"])])
+				if not pn.is_empty():
+					_log("拾取 %s" % ", ".join(pn))
+				if bool(e.get("full", false)):
+					_log("背包滿，有啲裝唔落留落地")
 		"travel":
 			if int(e.dst) == my_id:
 				target_id = -1
@@ -683,6 +704,15 @@ func _hud_tap(pos: Vector2) -> void:
 			_send({"t": "move", "x": int(it.ref.x), "y": int(it.ref.y)})
 			marker = {"pos": Vector2(int(it.ref.x), int(it.ref.y)), "t": 1.0}
 		return
+	# S04a 地面掉落物: 撳落地物件 → 行埋邊執 (近就即拾取)
+	var dd = _drop_at_tap(pos, g)
+	if dd != null:
+		if me != null and ContextActions._near(me, int(dd.x), int(dd.y)):
+			_send({"t": "pick", "drop": int(dd.id)})
+		else:
+			_send({"t": "move", "x": int(dd.x), "y": int(dd.y)})
+			marker = {"pos": Vector2(int(dd.x), int(dd.y)), "t": 1.0}
+		return
 	if not sim.is_free(int(g.x), int(g.y)):           # 撳中屋/樹/河: 行去最近行得嘅格
 		var f := _free_near(Vector2i(g), 2)
 		if f.x < 0:
@@ -807,6 +837,24 @@ func _mob_near_tap(pos: Vector2):
 	for e in ents:
 		if not e.get("mob", false):
 			continue
+		var center: Vector2 = Vector2(e.x, e.y) * TILE + Vector2(TILE, TILE) * 0.5
+		var d: float = world_pos.distance_to(center)
+		if d < best_d:
+			best_d = d
+			best = e
+	return best
+
+# S04a: 撳嗰格係咪地面掉落物 (隔籬格都算中，同 _mob_near_tap 一樣容差)
+func _drop_at_tap(pos: Vector2, g: Vector2):
+	var world_pos: Vector2 = pos + cam
+	var best = null
+	var best_d := TAP_TOLERANCE
+	for e in ents:
+		if not e.get("dropped", false):
+			continue
+		# 玩家撳正嗰格 = 直接命中；隔籬格用距離容差 (手指粗)
+		if int(e.x) == int(g.x) and int(e.y) == int(g.y):
+			return e
 		var center: Vector2 = Vector2(e.x, e.y) * TILE + Vector2(TILE, TILE) * 0.5
 		var d: float = world_pos.distance_to(center)
 		if d < best_d:
@@ -1087,6 +1135,15 @@ func _draw() -> void:
 		var p := Vector2(e.x, e.y) * TILE - cam
 		var isme: bool = int(e.id) == my_id
 		var ismob: bool = e.get("mob", false)
+		if e.get("dropped", false):                     # S04a 地面掉落物: 小袋圖示 + 件數
+			draw_rect(Rect2(p + Vector2(4, 12), Vector2(16, 10)), Color(0.85, 0.7, 0.35))
+			draw_rect(Rect2(p + Vector2(7, 6), Vector2(10, 7)), Color(0.6, 0.5, 0.22))
+			draw_rect(Rect2(p + Vector2(4, 12), Vector2(16, 10)), Color(0.2, 0.15, 0.05), false, 1.0)
+			var n := 0
+			for it in e.get("dropItems", []):
+				n += int(it.get("n", 1))
+			_txt(p + Vector2(-2, 4), "×%d" % n, Color(1, 0.95, 0.6), 11)
+			continue
 		if ismob:
 			draw_rect(Rect2(p, Vector2(TILE, TILE)), Color(0.8, 0.25, 0.2))    # 怪物色塊
 		else:
