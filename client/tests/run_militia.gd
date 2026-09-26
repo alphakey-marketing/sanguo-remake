@@ -32,6 +32,13 @@ func _init() -> void:
 	t_comp_defend(data)
 	t_comp_save(data)
 	t_comp_determinism(data)
+	t_mil_data(data)
+	t_mil_rules(data)
+	t_settle(data)
+	t_mil_invite(data)
+	t_mil_found(data)
+	t_mil_save(data)
+	t_mil_determinism(data)
 	t_determinism(data)
 	print("[TEST] militia (tribute/favor) scenarios: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
@@ -55,6 +62,12 @@ func _put(sim: Sim, id: int, x: int, y: int) -> void:
 func _put_fac(sim: Sim, id: int, data: GameData, key: String) -> void:
 	var f: Dictionary = data.facilities[key]
 	_put(sim, id, int(f["x"]), int(f["y"]) + 1)
+
+
+# 擺喺某張地圖內 (城/野都可用；map_idx 已覆蓋地圖全部格)
+func _put_map(sim: Sim, id: int, data: GameData, map_id: String) -> void:
+	var z: Dictionary = data.zone_by_id[map_id]
+	_put(sim, id, int(z["x0"]) + 1, int(z["y0"]) + 1)
 
 
 # data.shops 座標已經係 GameData 全域轉換後嘅值
@@ -718,3 +731,239 @@ func t_comp_determinism(data: GameData) -> void:
 	sb._daily_hook(30)
 	check(JSON.stringify(sa.player_ch()["titleContest"]) == JSON.stringify(sb.player_ch()["titleContest"]), "決定性: 同 day/rank → 同挑戰者分數")
 	check(sa.player_ch()["titleRank"] == sb.player_ch()["titleRank"], "決定性: 同結果")
+
+
+# ================= S08e 義勇軍成立 + 定居 + 帶兵量 (spec 08 §4~§5 / 攻略 sy2_8_2、sy2_9_19) =================
+
+func t_mil_data(data: GameData) -> void:
+	var cfg: Dictionary = data.office["militia"]
+	check(int(cfg["minTitleRank"]) == 6 and int(cfg["minFame"]) == 3000, "義勇軍: 頭銜南中郎將 + 名聲 3000")
+	check(int(cfg["supporterNeed"]) == 10 and int(cfg["supporterLv"]) == 5 and int(cfg["supporterFavor"]) == 50, "義勇軍: 擁護 10 人 (Lv5/好感50)【自訂】")
+	check(int(cfg["fund"]) == 200000 and int(cfg["baseSoldiers"]) == 7000, "義勇軍: 經費 20 萬 + 基本帶兵 7000")
+	check(int(cfg["capRank"]) == 51 and int(cfg["capSoldiers"]) == 28000, "義勇軍: 51 階起固定 28000")
+	check((cfg["newbieCities"] as Array).size() == 3 and (cfg["newbieCities"] as Array).has("xuchang") and (cfg["newbieCities"] as Array).has("xinye"), "新手城 = 許昌/襄陽/新野")
+	var grades: Array = cfg["grades"]
+	check(grades.size() == 8 and int((grades[0] as Dictionary)["soldiers"]) == 8000 and int((grades[7] as Dictionary)["soldiers"]) == 1000, "階級帶兵 一品 8000 ~ 八品 1000")
+	# 頭銜帶兵 (titles.json soldiers 欄，嚟自攻略 sy2_9_19)
+	check(int(data.titles[0]["soldiers"]) == 200 and int(data.titles[5]["soldiers"]) == 1200, "頭銜帶兵: 1 階 200 / 6 階 1200")
+	check(int(data.titles[49]["soldiers"]) == 13000 and int(data.titles[59]["soldiers"]) == 28000, "頭銜帶兵: 50 階 13000 / 60 階 28000")
+
+
+func t_mil_rules(data: GameData) -> void:
+	var cfg: Dictionary = data.office["militia"]
+	var titles: Array = data.titles
+	check(RulesMilitia.cfg(data.office).size() == cfg.size() and RulesMilitia.cfg({}) == {}, "cfg 讀 office.militia")
+	check(RulesMilitia.grade_soldiers(cfg, 1) == 8000 and RulesMilitia.grade_soldiers(cfg, 8) == 1000, "grade_soldiers 1/8")
+	check(RulesMilitia.grade_soldiers(cfg, 0) == 0 and RulesMilitia.grade_soldiers(cfg, 9) == 0, "grade_soldiers 出界 = 0")
+	check(RulesMilitia.grade_name(cfg, 1) == "一品" and RulesMilitia.grade_name(cfg, 8) == "八品", "grade_name")
+	check(RulesMilitia.title_soldiers(titles, 6) == 1200 and RulesMilitia.title_soldiers(titles, 50) == 13000, "title_soldiers")
+	check(RulesMilitia.title_soldiers(titles, 0) == 0 and RulesMilitia.title_soldiers(titles, 61) == 0, "title_soldiers 白身/出界 = 0")
+	# spec §5 例: 征東將軍(50) + 一品 = 28000
+	check(RulesMilitia.max_soldiers(titles, cfg, 50, 1, 20, true) == 28000, "帶兵量例題: 50 階 + 一品 = 28000")
+	check(RulesMilitia.max_soldiers(titles, cfg, 50, 8, 20, true) == 21000, "50 階 + 八品 = 7000+1000+13000")
+	check(RulesMilitia.max_soldiers(titles, cfg, 60, 1, 20, true) == 28000, "51 階起固定 28000 (grade 唔再疊)")
+	check(RulesMilitia.max_soldiers(titles, cfg, 50, 1, 20, false) == 0, "未入義勇軍 = 0 帶兵量")
+	check(RulesMilitia.max_soldiers(titles, cfg, 6, 1, 4, true) == 0, "唔夠 5 級 = 0")
+	check(RulesMilitia.max_soldiers(titles, cfg, 6, 1, 5, true) == 16200, "6 階 + 一品 + 基本 = 7000+8000+1200")
+	check(RulesMilitia.is_newbie(cfg, "xuchang") and not RulesMilitia.is_newbie(cfg, "wancheng"), "is_newbie")
+	check(RulesMilitia.settle_block(cfg, "", "") != "" and RulesMilitia.settle_block(cfg, "wancheng", "wancheng") != "", "settle_block: 非城/已定居")
+	check(RulesMilitia.settle_block(cfg, "wancheng", "xuchang") == "", "settle_block: 換城 OK")
+	check(RulesMilitia.invite_block(cfg, 5, 50, false, false) == "", "invite_block: 合資格")
+	check(RulesMilitia.invite_block(cfg, 4, 50, false, false) != "", "invite_block: 等級不足")
+	check(RulesMilitia.invite_block(cfg, 5, 49, false, false) != "", "invite_block: 好感不足")
+	check(RulesMilitia.invite_block(cfg, 5, 50, true, false) != "" and RulesMilitia.invite_block(cfg, 5, 50, false, true) != "", "invite_block: 已擁護/已成立")
+	check(RulesMilitia.name_block(cfg, "  ") != "" and RulesMilitia.name_block(cfg, "好長嘅名號超晒字數限制喇真係好長") != "", "name_block: 空/太長")
+	check(RulesMilitia.name_block(cfg, " 義軍 ") == "", "name_block: 合資格")
+	# found_block 逐條
+	var ok := {"titleRank": 6, "fame": 3000, "gold": 200000}
+	check(RulesMilitia.found_block(titles, cfg, ok, 10, "wancheng") == "", "found_block: 全條件齊")
+	check(RulesMilitia.found_block(titles, cfg, {"titleRank": 5, "fame": 3000, "gold": 200000}, 10, "wancheng") != "", "found_block: 頭銜不足")
+	check(RulesMilitia.found_block(titles, cfg, {"titleRank": 6, "fame": 2999, "gold": 200000}, 10, "wancheng") != "", "found_block: 名聲不足")
+	check(RulesMilitia.found_block(titles, cfg, {"titleRank": 6, "fame": 3000, "gold": 200000}, 9, "wancheng") != "", "found_block: 擁護不足")
+	check(RulesMilitia.found_block(titles, cfg, {"titleRank": 6, "fame": 3000, "gold": 199999}, 10, "wancheng") != "", "found_block: 經費不足")
+	check(RulesMilitia.found_block(titles, cfg, ok, 10, "") != "", "found_block: 未定居")
+	check(RulesMilitia.found_block(titles, cfg, ok, 10, "xuchang") != "", "found_block: 新手城")
+	check(RulesMilitia.found_block(titles, cfg, {"titleRank": 6, "fame": 3000, "gold": 200000, "militia": {"founded": true}}, 10, "wancheng") != "", "found_block: 已成立")
+
+
+func t_settle(data: GameData) -> void:
+	var r := _new(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	var msgs: Array = r[3]
+	check(sim.city_at(sim.ent(pid)) == "xuchang", "玩家開局喺許昌")
+	var v0 := sim.settle_view(pid)
+	check(String(v0["at"]) == "xuchang" and String(v0["home"]) == "" and (v0["cities"] as Array).size() == 10, "settle_view: 10 個城池 + 未定居")
+	# 新手城照定居得 (只係唔可以喺度成立)
+	sim.cmd_settle(pid, "xuchang")
+	check(String(ch["homeCity"]) == "xuchang" and _last(msgs).contains("新手城"), "定居許昌 OK + 提示新手城")
+	sim.cmd_settle(pid, "xuchang")
+	check(_last(msgs).contains("已經定居"), "重複定居")
+	sim.cmd_settle(pid, "wancheng")
+	check(_last(msgs).contains("唔喺"), "唔喺目標城池定居唔到")
+	_put_map(sim, pid, data, "wancheng")
+	var v1 := sim.settle_view(pid)
+	check(String(v1["at"]) == "wancheng", "settle_view at = 宛城")
+	sim.cmd_settle(pid, "wancheng")
+	check(String(ch["homeCity"]) == "wancheng" and _last(msgs).contains("可以"), "定居宛城 OK (非新手城)")
+	var v2 := sim.settle_view(pid)
+	check(String(v2["home"]) == "wancheng", "settle_view home = 宛城")
+
+
+func _support(sim: Sim, pid: int, n: int) -> void:
+	for i in n:
+		var bid := int((sim.state["bots"] as Array)[i])
+		var be := sim.ent(bid)
+		be["ch"]["level"] = 5
+		be["mem"]["affinity"][str(pid)] = 50
+		var pe := sim.ent(pid)
+		_put(sim, bid, int(pe["x"]), int(pe["y"]))
+		sim.cmd_militia_invite(pid, bid)
+
+
+func t_mil_invite(data: GameData) -> void:
+	var r := _new(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var msgs: Array = r[3]
+	sim.add_bots(12)
+	var bid := int((sim.state["bots"] as Array)[0])
+	var be := sim.ent(bid)
+	var pe := sim.ent(pid)
+	_put(sim, bid, int(pe["x"]) + 10, int(pe["y"]))
+	be["ch"]["level"] = 5
+	be["mem"]["affinity"][str(pid)] = 50
+	sim.cmd_militia_invite(pid, bid)
+	check(_last(msgs).contains("行近"), "太遠遊說唔到")
+	_put(sim, bid, int(pe["x"]), int(pe["y"]))
+	be["ch"]["level"] = 4
+	sim.cmd_militia_invite(pid, bid)
+	check(_last(msgs).contains("等級不足"), "居民等級不足")
+	be["ch"]["level"] = 5
+	be["mem"]["affinity"][str(pid)] = 49
+	sim.cmd_militia_invite(pid, bid)
+	check(_last(msgs).contains("好感不足"), "居民好感不足")
+	be["mem"]["affinity"][str(pid)] = 50
+	sim.cmd_militia_invite(pid, bid)
+	check(int(sim.militia_view(pid)["supporterCount"]) == 1 and _last(msgs).contains("願意擁護"), "遊說成功: 擁護 1/10")
+	sim.cmd_militia_invite(pid, bid)
+	check(_last(msgs).contains("已經擁護"), "重複遊說")
+	sim.cmd_militia_invite(pid, pid)
+	check(_last(msgs).contains("唔係居民"), "玩家唔算居民")
+	sim.cmd_militia_invite(pid, 99999)
+	check(_last(msgs).contains("搵唔到"), "搵唔到嗰個人")
+	sim.militia_view(pid)    # read-model 唔應該整壞 state
+	check(int(sim.militia_view(pid)["soldiers"]) == 0, "未成立: 帶兵量 0")
+
+
+func t_mil_found(data: GameData) -> void:
+	var r := _new(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	var msgs: Array = r[3]
+	sim.add_bots(12)
+	ch["titleRank"] = 6
+	ch["fame"] = 3000
+	ch["gold"] = 200000
+	ch["homeCity"] = "wancheng"
+	ch["level"] = 20
+	sim.cmd_militia_found(pid, "", "pw")
+	check(_last(msgs).contains("名號"), "名號空唔成立")
+	sim.cmd_militia_found(pid, "義軍", "pw")
+	check(_last(msgs).contains("擁護者不足") and not bool(sim.militia_view(pid)["founded"]), "擁護者不足唔成立")
+	_support(sim, pid, 10)
+	var v := sim.militia_view(pid)
+	check(int(v["supporterCount"]) == 10, "10 個擁護者")
+	var all_ok := true
+	for cnd in v["conditions"]:
+		if not bool(cnd["ok"]):
+			all_ok = false
+	check(all_ok, "成立前 4 條件全綠")
+	sim.cmd_militia_found(pid, " 忠義軍 ", "secret")
+	check(bool(ch["militia"]["founded"]) and String(ch["militia"]["name"]) == "忠義軍", "成立成功 + 名號 trim")
+	check(int(ch["gold"]) == 0 and String(ch["militia"]["city"]) == "wancheng" and int(ch["militia"]["grade"]) == 1, "扣 20 萬 + 根據地宛城 + 階級一品")
+	check((ch["militia"]["supporters"] as Array).size() == 10, "擁護者自動入會")
+	check(_last(msgs).contains("忠義軍") and _last(msgs).contains("宛城"), "成立訊息")
+	var v2 := sim.militia_view(pid)
+	check(bool(v2["founded"]) and int(v2["soldiers"]) == 16200, "成立後帶兵量 = 7000+8000+1200")
+	check(String(v2["gradeName"]) == "一品" and String(v2["cityName"]) == "宛城", "read-model 階級/地名")
+	sim.cmd_militia_found(pid, "第二隊", "pw2")
+	check(_last(msgs).contains("已經成立"), "唔可以成立第二次")
+	# S06c 掛鈎: pre.militia 團體任務而家接得
+	var mq: Dictionary = {}
+	for q in data.quests:
+		if bool((q.get("pre", {}) as Dictionary).get("militia", false)):
+			mq = q
+			break
+	check(not mq.is_empty() and RulesQuest.pre_ok(data, mq, ch), "成立後 pre.militia 團體任務接得")
+
+
+func t_mil_save(data: GameData) -> void:
+	var r := _new(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	sim.add_bots(12)
+	ch["titleRank"] = 6
+	ch["fame"] = 3000
+	ch["gold"] = 200000
+	ch["homeCity"] = "wancheng"
+	ch["level"] = 20
+	_support(sim, pid, 10)
+	sim.cmd_militia_found(pid, "忠義軍", "secret")
+	var s1 := sim.save_string()
+	var loaded := Sim.load_string(data, s1)
+	var lch := loaded.player_ch()
+	check(bool((lch.get("militia", {}) as Dictionary).get("founded", false)) and String((lch["militia"] as Dictionary)["name"]) == "忠義軍", "存檔: 義勇軍保留")
+	check(String(lch.get("homeCity", "")) == "wancheng" and (lch["militia"]["supporters"] as Array).size() == 10, "存檔: 定居 + 擁護者保留")
+	check(loaded.save_string() == s1, "存檔: save→load→save 一致")
+	check(int(loaded.militia_view(int(loaded.state["player_id"]))["soldiers"]) == 16200, "存檔: 帶兵量重算一致")
+	# 舊存檔: 冇 militia / homeCity
+	var d: Dictionary = JSON.parse_string(s1)
+	for e in d["state"]["ents"].values():
+		if e.has("ch"):
+			e["ch"].erase("militia")
+			e["ch"].erase("homeCity")
+	var old := Sim.load_string(data, JSON.stringify(d))
+	var opid := int(old.state["player_id"])
+	var och := old.player_ch()
+	check(String(old.home_city(och)) == "" and not bool(old.militia_view(opid)["founded"]), "舊存檔: 未定居/未成立")
+	var omq: Dictionary = {}
+	for q in data.quests:
+		if bool((q.get("pre", {}) as Dictionary).get("militia", false)):
+			omq = q
+			break
+	check(not RulesQuest.pre_ok(data, omq, och), "舊存檔: 冇 militia 接唔到團體任務")
+	# 舊存檔補定居照成立得
+	_put_map(old, opid, data, "wancheng")
+	old.cmd_settle(opid, "wancheng")
+	check(String(och["homeCity"]) == "wancheng", "舊存檔: 補定居")
+
+
+func t_mil_determinism(data: GameData) -> void:
+	var a := _new(data, 99)
+	var sa: Sim = a[0]
+	var pa: int = a[1]
+	var cha: Dictionary = a[2]
+	sa.add_bots(12)
+	cha["titleRank"] = 6
+	cha["fame"] = 3000
+	cha["gold"] = 200000
+	cha["homeCity"] = "wancheng"
+	_support(sa, pa, 10)
+	sa.cmd_militia_found(pa, "義軍", "pw")
+	var b := _new(data, 99)
+	var sb: Sim = b[0]
+	var pb: int = b[1]
+	var chb: Dictionary = b[2]
+	sb.add_bots(12)
+	chb["titleRank"] = 6
+	chb["fame"] = 3000
+	chb["gold"] = 200000
+	chb["homeCity"] = "wancheng"
+	_support(sb, pb, 10)
+	sb.cmd_militia_found(pb, "義軍", "pw")
+	check(JSON.stringify(cha["militia"]) == JSON.stringify(chb["militia"]), "決定性: 義勇軍狀態一致")
+	check(sa.save_string() == sb.save_string(), "決定性: 同種子同操作 → 同存檔")

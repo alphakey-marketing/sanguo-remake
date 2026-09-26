@@ -17,6 +17,7 @@ import sys
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 SRC = os.path.join(ROOT, "docs", "guide", "sy2_8_4.txt")
+SOLDIERS_SRC = os.path.join(ROOT, "docs", "guide", "sy2_9_19.txt")
 OUT = os.path.join(ROOT, "client", "data", "titles.json")
 
 FIXES = {41: {"salary": 4100}}      # 攻略筆誤修正 (見頂註)
@@ -46,6 +47,32 @@ def parse():
     return rows
 
 
+# 帶兵量 (spec 08 §5 / 攻略 sy2_9_19): 大表「階級/御賜頭銜/名聲需求/行動力上限/增加兵量」
+# 每行 5 個 token: rank, name, fame, "100+N", soldiers。全部照攻略抄，唔用公式猜。
+def parse_soldiers():
+    lines = [l.strip() for l in open(SOLDIERS_SRC, encoding="utf-8").read().splitlines()]
+    i = lines.index("增加兵量") + 1
+    out = {}
+    while i + 4 < len(lines):
+        if not re.fullmatch(r"\d+", lines[i] or "x"):
+            i += 1
+            continue
+        out[int(lines[i])] = int(lines[i + 4])
+        i += 5
+    return out
+
+
+def _soldiers_formula(rank):
+    # 【原】1~20 每階 +200 / 21~40 +250 / 41~50 +400 / 51~60 固定 28000
+    if rank <= 20:
+        return 200 * rank
+    if rank <= 40:
+        return 4000 + 250 * (rank - 20)
+    if rank <= 50:
+        return 9000 + 400 * (rank - 40)
+    return 28000
+
+
 def verify(rows):
     errs = []
     if [r["rank"] for r in rows] != list(range(1, 61)):
@@ -63,14 +90,26 @@ def verify(rows):
             errs.append("%d 階名 %s != %s" % (rank, rows[rank - 1]["name"], name))
     if "成立義勇軍" not in rows[5]["unlock"] or "戶口普查" not in rows[14]["unlock"]:
         errs.append("任務解鎖欄對錯行")
+    for r in rows:
+        rank = r["rank"]
+        if "soldiers" not in r:
+            errs.append("%d 階冇 soldiers" % rank)
+            continue
+        if r["soldiers"] != _soldiers_formula(rank):
+            errs.append("%d 階增加兵量 %d != 公式 %d" % (rank, r["soldiers"], _soldiers_formula(rank)))
+    if rows[5]["soldiers"] != 1200 or rows[49]["soldiers"] != 13000 or rows[59]["soldiers"] != 28000:
+        errs.append("帶兵量抽查錯 (6 階 1200 / 50 階 13000 / 60 階 28000)")
     return errs
 
 
 def main():
     rows = parse()
-    o = {"_note": "頭銜 60 階 (Step 14, spec 08 §2)。由 tools/gen_titles.py 從攻略 sy2_8_4 生成【原】，唔好手改。"
+    soldiers = parse_soldiers()
+    for r in rows:
+        r["soldiers"] = soldiers.get(r["rank"], 0)
+    o = {"_note": "頭銜 60 階 (Step 14, spec 08 §2)。由 tools/gen_titles.py 從攻略 sy2_8_4 + sy2_9_19 生成【原】，唔好手改。"
                   "fame/gold = 討取要名聲/資金 (資金一次過扣)；ap = 行動力上限；salary = 每月初一俸祿；unlock = 攻略「可執行的任務」欄；"
-                  "salaryGuide = 攻略原值 (筆誤已修)",
+                  "soldiers = 頭銜增加帶兵量 (1~20 階 +200/階、21~40 +250/階、41~50 +400/階、51~60 固定 28000)；salaryGuide = 攻略原值 (筆誤已修)",
          "titles": rows}
     txt = "{\n" + ",\n".join([' "_note": ' + json.dumps(o["_note"], ensure_ascii=False),
                                ' "titles": [\n' + ",\n".join("  " + json.dumps(r, ensure_ascii=False) for r in rows) + "\n ]"]) + "\n}\n"
