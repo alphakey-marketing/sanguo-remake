@@ -25,10 +25,10 @@
 | 03 善惡死亡 | ✅ | ✅ | 七階、死亡掉物品/跌經驗/價格加成、**攻擊居民/紅名 NPC + 反擊/逃跑叫衛兵（S03a）+ 天譴 + 殺人魔拒入城 + 罪犯拒官令（S03b）+ 幸運符/護身符/還魂丹 + 死亡結算彈窗（S03c）** | — |
 | 04 怪物地圖 | ✅ | ✅ | 46 怪 + 掉落導入、重生、逃跑/群攻、boss 每日、夜怪、汝南洞 10 層、張牛角戰役、**地面掉落物（`dropped` 實體：300 tick 消失 + 撳地拾取 + 背包滿 + 存檔 roundtrip，S04a）**、**術法怪/boss 技能（遠程吟唱+走位可躲+吟唱線索+`skills`表輪流，S04b）**、**其餘 5 場戰役實體（褚飛燕→李大目→張白騎→黃龍→十常侍 26 層 monster+多層 map+掉寶齊，記事戰役頁+大地圖標示，S04c）** 、**特殊場景首批**（桃花渡 5 層 + 七彩奪寶陣 7 層，game 日曆開門 + 記事場景頁 + 入口對話 + 大地圖標示，S04d） | 通天關/黑山寨/安定戰場/雪山/異族禁地（留返後續批次） |
 | 05 生產經濟 | 🟡 | ✅ | 6 初階 + 5 進階 + 2318 配方、修理、工具店、天地商行、捐獻、市場 | 產出 1~2 件、特製/白金/御賜工具、大宗師、4 類商店補齊、天災停進貨、城際貿易提示 |
-| 06 任務 | 🟡 | ✅ | 框架、新手 5 條、義士絕招 3 條、官令 7 條、歷史 11+1 條、委託、戰役、團體任務 17 條（16 條義勇軍限定 + 紫虛上人非義勇軍版，S06c）、其他職絕招 15 條（S06d）、**專長任務 8 條（天文/地理認證 1~4 級，S06e）** | 四~六招、結婚、左慈渾天儀任務、國戰專長（→S10） |
+| 06 任務 | 🟡 | ✅ | 框架、新手 5 條、義士絕招 3 條、官令 7 條、歷史 11+1 條、委託、戰役、團體任務 17 條（16 條義勇軍限定 + 紫虛上人非義勇軍版，S06c）、其他職絕招 15 條（S06d）、**專長任務 8 條（天文/地理認證 1~4 級，S06e）**、**結婚（御賜函任務 2 條 + 喜餅/開餅盒/分餅 + 禮堂/婚禮/婚戒 + 配偶頁/離婚，S09e）** | 四~六招、左慈渾天儀任務、國戰專長（→S10） |
 | 07 座騎戰騎 | 🟡 | 🟡 | 17a 座騎全套 + UI；17b 繁衍/馬戰 **sim 有、`main.gd` 有派送、面板未有掣**；18 戰騎純規則；**S07b（leg 5）戰騎 sim 整合**（`sim/sim_war_beast.gd`：馬廄馴養買獸/最多 3 隻/出戰跟隨+自動攻擊+戰鬥特技/吸 exp/死亡忠誠−1/走佬/寄馬廄）；**S07c（leg 6）友好特技效果接系統**；**S07d（leg 7）NPC 拍賣場 + 武將特技「馴馬」+ 抽技固定池** | 繁衍/馬戰/改名 UI；戰騎 UI 面板；原版捕獲途徑；其餘友好技效果（聖靈/遁地/奇門/脫出/召喚/神行/回城/火焰/飛影/狂力/開光/忠誠/巨力/穩重/地行/神獸/嗅血/野性/獅魂/王者） |
 | 08 名聲義勇軍 | 🟡 | ✅ | 名聲、頭銜 60 階、官宅（討取/官令/捐獻/月俸/行動丹）、**義舉證明（四類 20 項）+ 城池進貢/好感（S08a）**、**城池屬性 8 項 + 官宅內政 6 種（S08b）**、**救災（S08c）**、**名額競爭（S08d）**、**義勇軍成立 + 定居 + 帶兵量（S08e）**、**營地建設 10 設施 + 義勇軍工作 22 項 + 評定會議（S08f）**、**民心 + 6 條城池法令（S08g；邏輯層，城池佔領啟動留 S10c）** | 佔城啟動（→S10c）、法令下游（山洞商店/PK/善惡入城） |
-| 09 登用武將 | 🟡 | 🟡 | 居民 bot/記憶/brain、**居民化 `residents.json`（性格/日程/role，每城 12~20，S09a）**、**傳聞擴散 `rules/rumor.gd` + 每日反思/跨城延遲 1~3 日 + 殺善 NPC→義理忠誠 −15（S09b）**、登用 v1+v2、同伴 6 指令、20 passive 特技、**內政協助 + 內政/生產/經濟被動特技 39~43/45~51（S09c-a）**、**主動特技 21 遁地/22 職業特技/32 挑釁/38 急救（S09c-b）**、**LLM 層 `rules/llm.gd` + `npc_brain_llm.gd` + `llm_client.gd`（白名單/OpenRouter 請求/每日反思摘要/Tier 分配/預算/模板後備，S09d）** | 鑑定 44（無系統）、國戰類 23~37/53~70（→S10）、LLM UI（設定頁/對話顯示→專 UI Step） |
+| 09 登用武將 | 🟡 | 🟡 | 居民 bot/記憶/brain、**居民化 `residents.json`（性格/日程/role，每城 12~20，S09a）**、**傳聞擴散 `rules/rumor.gd` + 每日反思/跨城延遲 1~3 日 + 殺善 NPC→義理忠誠 −15（S09b）**、登用 v1+v2、同伴 6 指令、20 passive 特技、**內政協助 + 內政/生產/經濟被動特技 39~43/45~51（S09c-a）**、**主動特技 21 遁地/22 職業特技/32 挑釁/38 急救（S09c-b）**、**LLM 層 `rules/llm.gd` + `npc_brain_llm.gd` + `llm_client.gd`（白名單/OpenRouter 請求/每日反思摘要/Tier 分配/預算/模板後備，S09d）**、**結婚 `rules/marry.gd` + `sim_marry.gd`（御賜函男/女 + 喜餅 4 價位/開餅盒/分餅回 HP/MP/SP + 禮堂/主婚人/婚禮 + 婚戒無限召喚 50 SP + 配偶頁/叮嚀/離婚 50 萬兩，S09e）** | 鑑定 44（無系統）、國戰類 23~37/53~70（→S10）、LLM UI（設定頁/對話顯示→專 UI Step） |
 | 10 國戰 | ❌ | ❌ | — | 全部（D-3【待決】） |
 | 11 資料對照 | 🟡 | — | items/monsters/generals/recipes/titles 導入器 | `material_ids.json`、箭矢定義、商城道具單機化定案、recruitinfo 說明頁、warbtl 對照 |
 | 12 地圖世界 | ✅(B1~B3) | ✅ | 多地圖/A*/過圖/大地圖/驛站/戰役實例 | 各 Step 需要嘅新地圖（隨 S04/S06/S08 加）；B4 其餘州郡【待決】 |
@@ -257,8 +257,10 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
   - 驗收（spec）：mock 全動作 ✓；無 key 照玩 ✓；LLM 唔改數值（惡意數值欄全被 `parse_response` 丟棄，好感只按 `RulesLlm.effect_of` +1，善惡/錢/血不變）✓；唔碰網絡（mock transport）✓。
   - 偏離／【待決→推薦方針】：sim **唔經網絡**，只發 `llm_request` 事件（規則層砌好 `url`/`headers`(冇 Authorization)/`body`），客戶端送完 call `cmd_llm_reply`/`cmd_llm_summary` 回填；pending 唔入存檔（重載 = 請求當冇，模板後備照玩）。key 只由 `LlmClient` 存本機、sim 只存 `enabled`/`model`（非機密）。Tier1 武將 + Tier2 居民偶發（政策 15%）先接；Tier3 純模板。`acceptQuest` 只出 `llm_action` 標記（未有玩家→NPC 請求系統，下游留後續）；反思摘要/目標只寫 `mem.summary`/`mem.goal`（read-model，未驅動行為）。真 HTTPRequest 接線 + 設定頁/對話顯示 = UI 欠債。
   - 驗收：`tests/run_llm.gd` 113 項（資料/解析丟數值/效果/Tier/預算/冷卻/brain/摘要/請求形狀/client mock/sim 設定/Tier1 對話/回填唔准改數值/每日反思/預算/存檔/舊存檔/決定性）；`sh tools/run_tests.sh` **ALL OK**。
-- [ ] **S09e 結婚**（spec 06 §9 / 09 §6）：御賜函、喜餅、分餅、禮堂、婚戒召喚、配偶頁、離婚
-- 驗收：`tests/run_recruit.gd`/`run_general.gd` 擴充 + `tests/run_llm.gd`（新，mock）
+- [x] **S09e 結婚**（spec 06 §9 / 09 §6）：御賜函、喜餅、分餅、禮堂、婚戒召喚、配偶頁、離婚
+  - **完成（leg 20）**：新 `data/marry.json`（好感鎖 90/召喚 50 SP/離婚 50 萬兩/婚戒 23030/男 51627 女 51628 御賜函/4 價位喜餅對照 `buy→open→contents`/結婚村 4 NPC id）；新 `rules/marry.gd`（`cfg`/`affinity_lock`/`summon_sp`/`divorce_gold`/`ring_item`/`letter_for`/`gender_of`/`has_letter`/`has_ring`/`cakes`/`cake_by_tier`/`cake_by_buy`/`open_result`/`contents`/`propose_block`/`book_block`/`hold_block`/`divorce_block`/`summon_block` 純函數）；新 `sim/sim_marry.gd`（`cmd_marry_propose`/`buy_cake`/`open_cake`/`share_cake`/`book`/`hold`/`summon`/`message`/`divorce` + `marry_view` read-model + `_spread_festive`/`_spawn_spouse`/`_spouse_ent` + 覆寫 `cmd_companion_dismiss` 擋免職配偶；繼承鏈 `sim_office` 改 extends `sim_marry`）；`data/quests.json` +2 條 `type:marry`（`marry_letter_m`/`marry_letter_f`，giver = 朝廷官員，`pre.gender` 男/女 + minLevel 10）；`data/quest_npcs.json` +4 NPC（禮餅商/開餅盒師傅/朝廷官員/斷情絕愛郎，許昌結婚村）；`rules/quest.gd` `pre_ok` +`pre.gender`；`sim_core` state +`marry`、`game_data` +`marry`；`sim_recruit._recruit_daily` 配偶唔期滿/低忠誠唔走；`sim.gd load_string` +`_ensure_marry`；`game_data` 物品效果 +type 19 → 回復 SP（喜餅點心）；新 `tests/run_marry.gd` 127 項。
+  - 偏離／【待決→推薦方針】：喜餅價位用 `items.json` 原有 1000/2000/3000/5000（攻略寫 1000/3000/5000/10000，改為數據驅動）；「同伴好感」用登用同伴忠誠值（0~100，武將冇獨立好感表）；結婚村 NPC 落許昌城（20,33~21,34 全域 152,33~153,34，貼現有城池做法，唔新開地圖）；分餅 = 用開餅 → 4 種點心（各回 HP/MP/SP，use_item 已通）入袋 + 全城居民好感 +10 + 婚慶氛圍 1 日；婚禮需先預約（主婚人 = 朝廷官員 NPC）；婚戒無限召喚扣 50 SP（實體唔見可由武將表重生）；離婚斷情絕愛郎扣 50 萬兩 + 回收婚戒 + 配偶實體離場。`cmd_acceptQuest`/喜帖/彩球喜糖/強迫離婚（刪角）唔做（無下游/單機無刪角）；婚禮面板 + 配偶頁 UI 留欠債。
+  - 驗收：`tests/run_marry.gd` 127 項（資料/道具/純函數/求婚/喜餅/分餅/婚禮/召喚/叮嚀離婚/配偶唔期滿/讀取/存檔 roundtrip/舊存檔/決定性），接入 `run_tests.sh`；`sh tools/run_tests.sh` **ALL OK**（尾行 `ALL OK`，marry 127 / hud 4195 / uitest 126 / autotest + 4 導入器 --check 全過；首即過，未見 uitest flake）。
 
 ### S10 國戰（spec 10）— 開工前 D-3 必須定案【待決】
 - [ ] S10a 帶兵量 + 兵種資料 + 戰棋純規則（交兵/對剋/士氣）
@@ -358,6 +360,11 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
 | S09d | `acceptQuest` 只出 `llm_action` 事件標記（未有玩家→NPC 請求/委託派發系統）；`hint`/`rumor`/`refuse` 亦只係對話標記 | 後續（要請求/委託系統先）或 S10 |
 | S09d | 反思 `mem.summary`/`mem.goal` 只寫入 + read-model（`llm_view`/`NpcMemory.summary`），未驅動 NPC 行為/選項 | 後續批次（NPC 行為擴充） |
 | S09d | LLM pending 請求唔入存檔（重載 = 請求當冇，模板後備照玩）；`state.llm.cd` 冷卻表已存檔 | 已定（単機重載安全） |
+| S09e | 婚禮面板/配偶頁 UI：`marry_view` read-model + `cmd_marry_propose`/`buy_cake`/`open_cake`/`share_cake`/`book`/`hold`/`summon`/`message`/`divorce` 意圖已備但無面板/掣；結婚村 4 NPC 亦冇圖示 | 後續專 UI Step |
+| S09e | 喜餅價位沿用 `items.json` 原有 1000/2000/3000/5000（攻略寫 1000/3000/5000/10000）——數據驅動 | 已定（如要忠於原作價位再改 items.json） |
+| S09e | 結婚對象「好感 ≥90」用登用同伴忠誠值（武將冇獨立好感表）；原作「送禮」門檻未另設（同伴補品/寶物指令已有） | 已定（如要武將好感表再議） |
+| S09e | 喜帖/婚禮拋彩球灑喜糖（拾特殊寶物）/刪角強迫離婚 未做（單機冇其他玩家/刪角） | 後續（如要彩球活動再議） |
+| S09e | `game_data` 物品效果 +type 19 → 回復 SP（喜餅點心 29106~29115 等 食物藥水/藥丸散會變可用）| 已接（cmd_use_item 自動支援） |
 | 2026-09-25 討論 | 多存檔 + 共享世界隊友（方向 2.5，見下）| S02c 做完後開新 Step |
 
 ---

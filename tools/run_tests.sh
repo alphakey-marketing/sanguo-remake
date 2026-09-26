@@ -31,6 +31,7 @@ run sim --script tests/run_sim.gd
 run residents --script tests/run_residents.gd
 run rumor --script tests/run_rumor.gd
 run llm --script tests/run_llm.gd
+run marry --script tests/run_marry.gd
 run char --script tests/run_char.gd
 run class --script tests/run_class.gd
 run world --script tests/run_world.gd

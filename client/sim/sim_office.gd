@@ -1,4 +1,4 @@
-extends "res://sim/sim_recruit.gd"
+extends "res://sim/sim_marry.gd"
 # Sim 繼承鏈: 名聲 / 頭銜 / 官宅 / 官令 (Step 14, spec 08 §1~3, spec 06 §3)
 # 官宅 = facilities.json 有 office:true 嘅設施 (兼捐獻處)。規則喺 rules/title.gd
 # ch.titleRank / ch.office {orderDay, order:{id, from, to?, met:[]}} / ch.contrib / ch.polExp

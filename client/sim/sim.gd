@@ -372,6 +372,7 @@ static func load_string(game_data: GameData, s: String) -> Sim:
 	sim._ensure_city_attrs()                # 舊存檔城池屬性兼容 (S08b)
 	sim._ensure_rumors()                    # 舊存檔傳聞欄兼容 (S09b)
 	sim._ensure_llm()                       # 舊存檔 LLM 狀態欄兼容 (S09d)
+	sim._ensure_marry()                     # 舊存檔結婚狀態欄兼容 (S09e)
 	sim._fix_positions()
 	return sim
 
