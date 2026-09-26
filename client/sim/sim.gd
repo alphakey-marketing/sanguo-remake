@@ -73,7 +73,7 @@ func _daily_hook(day: int) -> void:
 	var season := RulesClock.season_of_day(day, int(data.world["clock"]["seasonDays"]))
 	var changed: Array = []
 	for c in data.world["cities"]:
-		var d := RulesDisaster.roll_day(rng_fn, day, season, String(c.id), data.world["disasters"])
+		var d := RulesDisaster.roll_day(rng_fn, day, season, String(c.id), data.world["disasters"], data.world.get("shopShutdown", {}))
 		if not d.is_empty():
 			disas.append(d)
 			changed.append(d)
@@ -234,6 +234,23 @@ func view_weather() -> Array:
 				d = x
 				break
 		out.append({"city": String(c.id), "name": String(c.get("name", c.id)), "season": season, "disaster": (String(d.get("name", "")) if not d.is_empty() else "")})
+	return out
+
+
+# 城際價差 (spec 05 §6【自訂】): 幾件代表物資喺各城依家市價，俾地圖面板「市價」頁顯示
+const MARKET_REP_ITEMS := [25064, 25053, 25001, 29021, 29043]   # 蕃薯/木頭/石頭/宮保雞丁/回血草
+
+func view_market_prices() -> Array:
+	var out: Array = []
+	for c in data.world["cities"]:
+		var row := {"city": String(c.id), "name": String(c.get("name", c.id)), "items": []}
+		for iid in MARKET_REP_ITEMS:
+			var cat := str(int(data.cats.get(iid, 0)))
+			var g := market_city(String(c.id), cat)
+			var pf := float(g.get("pf", 1.0)) if not g.is_empty() else 1.0
+			var price := int(round(float(data.prices.get(iid, 0.0)) * pf))
+			(row["items"] as Array).append({"id": iid, "name": String(data.names.get(iid, str(iid))), "price": price})
+		out.append(row)
 	return out
 
 

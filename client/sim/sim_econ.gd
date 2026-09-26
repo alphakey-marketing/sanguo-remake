@@ -60,6 +60,24 @@ func _shop_for(e: Dictionary) -> Dictionary:
 	return {}
 
 
+# 天災大/中停進貨 (spec 05 §6【自訂】): 商店所屬城市有生效中天災、且天災 supply cat 蓋到呢件貨嘅 cat → 缺貨
+func _shop_shutdown_reason(shop: Dictionary, item: int) -> String:
+	var city_id := String(shop.get("map", ""))
+	if city_id == "":
+		return ""
+	var cat := int(data.cats.get(item, -1))
+	var day := int(_clock()["day"])
+	for d in state["disasters"]:
+		if str(d.get("city", "")) != city_id:
+			continue
+		if day >= int(d.get("shutdownEnd", -1)):
+			continue
+		var cats: Array = d.get("shutdownCats", [])
+		if cats.has(str(cat)) or cats.has(cat):
+			return "%s：%s 停止進貨中，暫時缺貨" % [String(d.get("name", "天災")), shop.get("name", "商店")]
+	return ""
+
+
 func cmd_buy(id: int, item: int, n: int = 1) -> void:
 	var e := ent(id)
 	n = mini(99, n)
@@ -71,6 +89,9 @@ func cmd_buy(id: int, item: int, n: int = 1) -> void:
 	var stock: Array = shop["stock"]
 	if not stock.has(item) and not stock.has(float(item)):
 		return _msg(id, "呢間店唔賣呢件")
+	var shut := _shop_shutdown_reason(shop, item)
+	if shut != "":
+		return _msg(id, shut)
 	var ch: Dictionary = e["ch"]
 	var cost := RulesShop.buy_price(data.prices.get(item, 0.0) * market_factor(item), ch["attrs"]["cha"], int(ch["karma"]), expert_lv(ch, "jiaoyi")) * n
 	if int(ch["gold"]) < cost:
@@ -528,6 +549,8 @@ func cmd_work(id: int, skill: String) -> void:
 		var tier := RulesWork.roll_tier(RulesWork.unlocked_tiers(lv, sk["unlockLv"]), rng_fn)
 		item = int(materials[tier])
 		n = 2 if MathX.roll(rng_fn) < float(cfg["big"]) else 1       # 大成功雙倍
+		if n == 1 and sk.has("doubleChance") and MathX.roll(rng_fn) < float(sk["doubleChance"]):
+			n = 2       # 農耕/伐木/採礦：額外機率多收 1 件（spec 05 §2「1~2件」）
 		RulesShop.add_item(ch["bag"], item, n)
 	var tool_item := int(tool["item"])
 	tool["dur"] = RulesWork.durability_after_use(int(tool["dur"]))

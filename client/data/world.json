@@ -231,6 +231,7 @@
   "supplyElast": 0.3,
   "demandElast": 0.35
  },
+ "shopShutdown": { "min": 1, "max": 3 },
  "disasters": [
   {
    "id": "locust",

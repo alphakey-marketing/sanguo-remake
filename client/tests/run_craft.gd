@@ -10,6 +10,7 @@ func _init() -> void:
 	var data := GameData.load_all()
 	t_data(data)
 	t_work_levels(data)
+	t_double_yield(data)
 	t_unlock(data)
 	t_craft(data)
 	t_craft_food(data)
@@ -17,6 +18,8 @@ func _init() -> void:
 	t_repair_self(data)
 	t_repair_service(data)
 	t_tool_shop(data)
+	t_shops_4cats(data)
+	t_disaster_shutdown(data)
 	t_save_roundtrip(data)
 	t_determinism(data)
 	print("[TEST] craft scenarios: %d, fail %d" % [total, fails])
@@ -142,6 +145,35 @@ func t_work_levels(data: GameData) -> void:
 		if RulesShop.count_item(ch["bag"], int(m)) > 0:
 			hi = true
 	check(hi, "採礦 45 級: 出到高 tier 礦")
+
+
+# S05a: 農耕/伐木/採礦有 doubleChance【自訂】→ 一般成功都有機率出 2 件；狩獵冇加 doubleChance → 只有大成功罕有雙倍
+func t_double_yield(data: GameData) -> void:
+	check(float(data.work["mining"]["doubleChance"]) > 0.0, "採礦有 doubleChance 設定")
+	check(not data.work["hunting"].has("doubleChance"), "狩獵冇 doubleChance（表寫「1件」）")
+	var r := _new(data, 22)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	_put(sim, pid, 30, 30)
+	_equip_tool(sim, pid, ch, "mining", 26003)
+	var twos := 0
+	var oks := 0
+	var last_n := [0]
+	sim.event_emitted.connect(func(ev: Dictionary) -> void:
+		if String(ev.get("k", "")) == "work":
+			last_n[0] = int(ev.get("n", 0)))
+	for i in 300:
+		ch["sp"] = 999999
+		if not ch["tools"].has("mining"):
+			_equip_tool(sim, pid, ch, "mining", 26003)
+		sim.cmd_work(pid, "mining")
+		if int(last_n[0]) > 0:
+			oks += 1
+			if int(last_n[0]) == 2:
+				twos += 1
+	check(oks > 0, "採礦 300 次有成功樣本")
+	check(float(twos) / float(oks) > 0.05, "採礦大量成功入面 2 件比例夠高 (~15%%+0.5%%，got %.3f)" % (float(twos) / float(oks)))
 
 
 func t_unlock(data: GameData) -> void:
@@ -366,6 +398,63 @@ func t_tool_shop(data: GameData) -> void:
 	ch["gold"] = 5000
 	sim.cmd_buy(pid, 26005, 1)
 	check(RulesShop.count_item(ch["bag"], 26005) == 1 and int(ch["gold"]) < 5000 and int(ch["gold"]) > 1000, "買到鍋子 (~3000)")
+
+
+# S05a: 5 城 (許昌/新野/汝南/宛城/襄陽) 各有齊 4 類商店 (工具/藥房/食物/雜貨)
+func t_shops_4cats(data: GameData) -> void:
+	var by_map := {}
+	for s in data.shops:
+		var m := String(s["map"])
+		if not by_map.has(m):
+			by_map[m] = {"tool": false, "herb": false, "food": false, "grocery": false}
+		var name := String(s["name"])
+		if name.contains("工具"):
+			by_map[m]["tool"] = true
+		elif name.contains("藥"):
+			by_map[m]["herb"] = true
+		elif name.contains("食"):
+			by_map[m]["food"] = true
+		elif name.contains("雜貨"):
+			by_map[m]["grocery"] = true
+	for city in ["xuchang", "xinye", "runan_city", "wancheng", "xiangyang"]:
+		var f: Dictionary = by_map.get(city, {})
+		check(bool(f.get("tool", false)), "%s 有工具店" % city)
+		check(bool(f.get("herb", false)), "%s 有藥房" % city)
+		check(bool(f.get("food", false)), "%s 有食坊" % city)
+		check(bool(f.get("grocery", false)), "%s 有雜貨店" % city)
+
+
+# S05a: 天災大/中規模停該城該 cat 商店進貨；細規模唔停
+func t_disaster_shutdown(data: GameData) -> void:
+	var cfg: Dictionary = data.world.get("shopShutdown", {})
+	check(not cfg.is_empty(), "world.json 有 shopShutdown 設定")
+	var defs: Array = data.world["disasters"]
+	var big_forced := func(_i: int) -> float: return 0.0     # 永遠擲到最細值 -> 天災必發生 + size idx0 (大)
+	var d := RulesDisaster.roll_day(big_forced, 1, 1, "xuchang", defs, cfg)
+	check(not d.is_empty() and String(d["size"]) == "大", "強制 rng: 擲到大規模天災")
+	check(d.has("shutdownEnd") and int(d["shutdownEnd"]) > 1, "大規模天災有 shutdownEnd")
+	check((d["shutdownCats"] as Array).size() > 0, "大規模天災有 shutdownCats")
+	# sim 層: 商店買嘢喺停進貨窗口內會被擋
+	var r := _new(data, 33)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	var msgs: Array = r[3]
+	var shop := {}
+	for s in data.shops:
+		if String(s["id"]) == "herbalist":
+			shop = s
+	_put(sim, pid, int(shop["x"]), int(shop["y"]) + 1)
+	ch["gold"] = 5000
+	var cat := int(data.cats.get(28037, 0))
+	sim.state["disasters"].append({"id": "plague", "name": "瘟疫", "city": "xuchang", "size": "大",
+		"startDay": 0, "endDay": 999, "shutdownEnd": 999, "shutdownCats": [str(cat)], "supply": {}})
+	sim.cmd_buy(pid, 28037, 1)
+	check(RulesShop.count_item(ch["bag"], 28037) == 0, "停進貨窗口內買唔到（未扣貨）")
+	check(_last(msgs).contains("停止進貨") or _last(msgs).contains("缺貨"), "有缺貨訊息 (%s)" % _last(msgs))
+	sim.state["disasters"].clear()
+	sim.cmd_buy(pid, 28037, 1)
+	check(RulesShop.count_item(ch["bag"], 28037) == 1, "冇天災時買得返")
 
 
 func t_save_roundtrip(data: GameData) -> void:
