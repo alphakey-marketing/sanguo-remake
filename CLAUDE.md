@@ -15,9 +15,9 @@
 - 大 Step 開工先「核實」spec vs 代碼，更新 PLAN §1 同清單
 - 跨 spec 依賴：先做資料 + 掛鈎 + 測試，效果喺後面 Step 接，記入 PLAN §4
 - PLAN 標【待決】= 做到嗰步先問用家，唔好自己估
-- **下一步 = PLAN §3 第一個未剔 `[ ]`**（2026-09-25：S04b 術法怪/boss 技能完，下一步 S04c 其餘 5 場戰役實裝）
+- **下一步 = PLAN §3 第一個未剔 `[ ]`**（2026-09-25：S04c 其餘 5 場戰役實裝完，下一步 S04d 特殊場景框架 + 首批）
 
-## 現況 (2026-09-25，六職全開；S03c 死亡道具完；S04a 地面掉落物完；S04b 術法怪/boss 技能完；下一步 S04c 其餘 5 場戰役)
+## 現況 (2026-09-25，六職全開；S03c 死亡道具完；S04a 地面掉落物完；S04b 術法怪/boss 技能完；S04c 其餘 5 場戰役實裝完；下一步 S04d 特殊場景)
 - **全部喺 `client/` (Godot 4.7, GDScript)**：`rules/`(純函數)、`sim/`(單機世界模擬，狀態可存檔、種子 RNG)、`ui/`(`touch/` HUD 觸控 + `panels/` 正式面板)、`tests/`
 - 詳細現況 = PLAN §1；已做系統 → 檔案索引：
 
@@ -34,11 +34,11 @@
 | 登用/同伴/武將特技 | `recruit.gd` `general.gd` | `sim_recruit.gd` | `generals.json`(生成) `general_skills.json` `quiz_generals.json` |
 | 座騎/繁衍/馬戰 | `mount.gd` `mount_battle.gd` | `sim_mount.gd` | `mounts.json` `mount_weapons.json` |
 | 戰騎（**純規則，sim/UI 未接**） | `war_beast.gd` | — | `war_beasts.json` |
-| 戰役（張牛角 playable，其餘 5 場資料殼） | `battle.gd` | `sim_battle.gd`(夾喺 sim_econ/sim_combat 之間) | `battles.json` |
+| 戰役（**6 場全部 playable**：張牛角 + 褚飛燕/李大目/張白騎/黃龍/十常侍 26 層，monster+多層 map+掉寶齊；記事「戰役」頁 + 大地圖標示） | `battle.gd` | `sim_battle.gd`(夾喺 sim_econ/sim_combat 之間；`view_battles()` read-model) | `battles.json` + `tools/gen_battles.py` |
 | 地圖/驛站/天災/時鐘 | `path.gd` `station.gd` `disaster.gd` `clock.gd` | `sim_core.gd` `sim_station.gd` | `maps.json` + `maps/*.txt` `world.json` `facilities.json` |
 | 居民/記憶/brain | `npc_memory.gd` | `bot_sys.gd` `npc_brain.gd` | — |
 
-- 已知 UI 欠債：座騎面板未有繁衍/馬戰/改名掣（`main.gd` 已有派送）；戰騎冇面板；建角面板仍係 debug 版；戰役只有報名對話
+- 已知 UI 欠債：座騎面板未有繁衍/馬戰/改名掣（`main.gd` 已有派送）；戰騎冇面板；建角面板仍係 debug 版
 - 地圖：B1~B3 做完（spec 12）；改地圖直接改 `data/maps/*.txt`（`tools/map_draft.py` 只係起稿，再跑會覆蓋）；新 txt 要喺 export include_filter（`data/maps/*.txt`）；其他數據寫 `map` + 地圖內座標，GameData 載入轉全域
 - 生成檔唔好手改：`monsters.json` 掉落、`recipes.json`、`generals.json`、`titles.json`（改導入器再跑）
 - `legacy/server/`：舊 Node+ws server，只作參考（`tools/export_vectors.ts` 由佢導出向量）
