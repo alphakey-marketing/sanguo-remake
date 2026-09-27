@@ -276,6 +276,8 @@ func _build_detail(p: Control, ch: Dictionary) -> void:
 		p.add_child(btn("裝備%s工具" % str(w.get("name", sk)), func() -> void: main._send({"t": "equip_tool", "skill": sk, "item": id})))
 	if bool(ch.get("storageSub", false)) and not main.quest_items.has(id):
 		p.add_child(btn("存入天地商行 x1", func() -> void: main._send({"t": "storage_deposit", "item": id, "n": 1})))
+	if not main.quest_items.has(id):
+		p.add_child(btn("丟低 x1（S08g 城內丟物）", func() -> void: main._send({"t": "drop_item", "item": id, "n": 1})))
 
 
 # 天地商行頁: 訂閱開關 + 倉庫格 + 攞返 / 代賣
