@@ -98,6 +98,10 @@ func _build_comp(list: VBoxContainer, c: Dictionary) -> void:
 		int(c.get("maxSp", 0)), String(c.get("spell", ""))], 14))
 	if String(c.get("skill", "")) != "":
 		list.add_child(wrap_lbl("特技「%s」：%s" % [c["skill"], c.get("skillDesc", "")], 14, UiTheme.GOLD))
+	var mul: Dictionary = c.get("classSkillMul", {})
+	if float(mul.get("cd", 1.0)) != 1.0 or float(mul.get("cost", 1.0)) != 1.0:
+		list.add_child(lbl("職業特技（同伴隨行加成）：冷卻 ×%.1f　消耗 ×%.1f" % [float(mul.get("cd", 1.0)), float(mul.get("cost", 1.0))], 13, UiTheme.DIM))
+	_build_active_skill(list, c)
 	list.add_child(lbl("戰鬥指令", 14, UiTheme.DIM))
 	var g := GridContainer.new()
 	g.columns = 2
@@ -120,6 +124,27 @@ func _build_comp(list: VBoxContainer, c: Dictionary) -> void:
 				func() -> void: main._send({"t": "companion_gift", "item": item})))
 	list.add_child(hsep())
 	list.add_child(btn("解散（叫佢返去）", func() -> void: main._send({"t": "companion_dismiss"})))
+
+
+# 同伴主動特技: 遁地(burrow)/挑釁(taunt)/急救(heal)；冷卻中顯示剩餘秒數
+const ACTIVE_SKILL_NAMES := {"burrow": "遁地", "taunt": "挑釁", "heal": "急救"}
+const ACTIVE_SKILL_DESC := {"burrow": "同伴帶主公傳送去最近城池", "taunt": "同伴引附近敵怪仇恨", "heal": "同伴急救主公一部分 HP"}
+
+
+func _build_active_skill(list: VBoxContainer, c: Dictionary) -> void:
+	var kind := String(c.get("activeKind", ""))
+	if kind == "" or not ACTIVE_SKILL_NAMES.has(kind):
+		return
+	var cd_left := int(c.get("activeCdLeft", 0))
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	list.add_child(row)
+	var label := "%s%s" % [String(ACTIVE_SKILL_NAMES[kind]), ("（冷卻 %ds）" % [cd_left / 10] if cd_left > 0 else "")]
+	var b := btn(label, func() -> void: main._send({"t": "companion_skill", "kind": kind}))
+	b.disabled = cd_left > 0
+	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(b)
+	list.add_child(wrap_lbl(String(ACTIVE_SKILL_DESC[kind]), 13, UiTheme.DIM))
 
 
 # 武將寶物 2 格【原】: 放咗攞唔返；同類高取代低 (低嘅消失)

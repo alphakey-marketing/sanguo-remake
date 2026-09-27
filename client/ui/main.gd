@@ -317,6 +317,7 @@ func _send(d: Dictionary) -> void:
 		"companion_gift": sim.cmd_companion_gift(my_id, int(d.item))
 		"companion_treasure": sim.cmd_companion_treasure(my_id, int(d.item))
 		"companion_dismiss": sim.cmd_companion_dismiss(my_id)
+		"companion_skill": sim.cmd_companion_skill(my_id, str(d.kind))
 		"mount_buy": sim.cmd_mount_buy(my_id, str(d.breed), bool(d.get("tamed", false)))
 		"mount_stable": sim.cmd_mount_stable(my_id, int(d.uid))
 		"mount_take": sim.cmd_mount_take(my_id, int(d.uid))

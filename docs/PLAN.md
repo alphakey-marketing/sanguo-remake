@@ -267,8 +267,8 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
 > 風格依據：**三國群英傳M + 三國演義 Online** 原作 UI（`ui/panels/ui_theme.gd` 墨啡底金邊 + 現有 `mount_panel.gd` 等已定風格，跟版）。
 > 規則：**一個 UI 系統 = 一個 session**，每份跟 `GamePanel` 慣例（讀 `sim.*_view()` read-model、`main._send()` 發意圖、`sig()` 判斷 refresh），做完要 `--uitest` 過 + 剔呢度個格 + 更新 CLAUDE.md「已知 UI 欠債」刪走已做嗰行。
 - [x] **U01 戰騎面板**：`beast_view` read-model 已備 → 新 `war_beast_panel.gd`（馴養買獸/出戰跟隨/訓練/友好效果顯示/賣出，仿 `mount_panel.gd` 頁面結構）完（頁 0 出戰狀態+加點+戰鬥/友好特技練+賣出，頁 1 馬廄列表+出戰收回+馴養買新+NPC拍賣場戰騎部分；`main.gd` +7 個 `beast_*`/`auction_buy` 意圖派送、`mobile_hud.gd`/`more_panel.gd` 入口；`sh tools/run_tests.sh` ALL OK，hud 4195/ui_smoke 129 過）
-- [ ] **U02 座騎補完**：`mount_panel.gd` 加改名輸入框、繁衍頁（借種馬/胎教 5 揀 1/積點分配/待領小馬）、馬戰頁（買兵器/學特技/HUD 特技掣）
-- [ ] **U03 同伴主動特技掣**：同伴面板/HUD 加遁地/挑釁/急救掣（`cmd_companion_skill(id,kind)`）+ 22 職業特技冷卻顯示
+- [x] **U02 座騎補完**：`mount_panel.gd` 加改名輸入框、繁衍頁（借種馬/胎教 5 揀 1/積點分配/待領小馬）、馬戰頁（買兵器/學特技/HUD 特技掣）（commit 6a24af4）
+- [x] **U03 同伴主動特技掣**：`recruit_panel.gd` 加遁地/挑釁/急救掣（`companion_skill` 意圖 → `cmd_companion_skill(id,kind)`），按冷卻剩餘 disable + 顯示秒數；22 職業特技冷卻/消耗加成用文字顯示（`classSkillMul`）。`sim_recruit.gd companion_view()` 加 `activeKind/activeCdLeft/activeCdTotal/classSkillMul` 欄；`main.gd` 加 `companion_skill` 派送。`sh tools/run_tests.sh` ALL OK。
 - [ ] **U04 NPC 拍賣場**：`auction_view`/`cmd_auction_buy` 掣寄喺 `war_beast_panel.gd`/`mount_panel.gd` 馬廄頁（每日上架列表 + 買）
 - [ ] **U05 官宅面板：頭銜/官令/義舉/進貢**：新 `office_panel.gd`（分頁），接 `merit_list`/`cmd_merit_turnin`/`city_favor_view`/`cmd_city_tribute` + 名額競爭 `title_contest_view` 顯示
 - [ ] **U06 官宅面板：內政 + 城池屬性**：`office_panel.gd` 加內政頁（`domestic_view`/`cmd_domestic`）+ 城池 8 項屬性顯示

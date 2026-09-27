@@ -444,6 +444,10 @@ func companion_view() -> Dictionary:
 	for t in ch.get("genTreasures", []):
 		trs.append({"item": int(t["item"]), "name": data.names.get(int(t["item"]), ""), "value": int(t["value"]),
 			"type": String(data.gen2_cfg["treasure"][String(t["type"])]["name"])})
+	var eff := _comp_eff(c)
+	var akind := RulesGeneral.active_kind(eff)
+	var acd: Dictionary = gn.get("activeCd", {})
+	var acd_total := RulesGeneral.active_cd(eff)
 	return {"id": int(c["id"]), "gid": int(gn["gid"]), "name": c["name"], "lv": int(c["level"]), "hp": int(c["hp"]),
 		"maxHp": int(c["max_hp"]), "exp": int(ch["exp"]), "needExp": RulesStats.exp_to_next(int(c["level"])),
 		"loyalty": int(gn["loyalty"]), "order": String(gn["order"]),
@@ -451,7 +455,9 @@ func companion_view() -> Dictionary:
 		"mp": int(ch["mp"]), "maxMp": _eff_max_mp(ch), "sp": int(ch["sp"]), "maxSp": _eff_max_sp(ch),
 		"skill": String(sk.get("name", "")), "skillDesc": String(sk.get("desc", "")),
 		"spell": String(_comp_spell(c)["name"]), "treasures": trs,
-		"stats": RulesGeneral.treasure_bonus(ch.get("genTreasures", []), data.gen2_cfg)["stats"]}
+		"stats": RulesGeneral.treasure_bonus(ch.get("genTreasures", []), data.gen2_cfg)["stats"],
+		"activeKind": akind, "activeCdLeft": (maxi(0, int(acd.get(akind, 0)) - tick) if akind != "" else 0),
+		"activeCdTotal": acd_total, "classSkillMul": RulesGeneral.class_skill_mul(eff)}
 
 
 # 登用面板視圖 (UI): 城內? / 調查封鎖原因 / 上次候選 / 考驗中 / 同伴
