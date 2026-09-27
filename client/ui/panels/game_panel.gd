@@ -167,6 +167,11 @@ func scroll() -> ScrollContainer:
 	s.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	s.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	s.scroll_deadzone = 8
+	# VScrollBar 預設闊度得 10~16px，手指好難撳中；theme stylebox 改唔到 widget
+	# 本身闊度，要直接摞返個 v scrollbar node 加大佢 custom_minimum_size。
+	var vbar := s.get_v_scroll_bar()
+	if vbar:
+		vbar.custom_minimum_size.x = 36.0
 	return s
 
 

@@ -1,7 +1,7 @@
 {
   "_note": "裝備系統 (Step 11.6, spec 02 §9)。slotCode = items.json b54_59[2] 部位碼【原】(1頭 2身 3靴 4戒 5項鍊 8武器，1993 件防具核實同 cat 19~31 一一對應)。req_a/req_b 核實係生產要求 ([2]=craft_kind/craft_lv)，唔係裝備條件；裝備條件只睇 req_lv。其餘數值全部【自訂】",
   "slotCode": { "1": "head", "2": "body", "3": "boots", "4": "ring", "5": "necklace" },
-  "slotNames": { "head": "頭部", "body": "身體", "boots": "靴", "ring": "戒指", "necklace": "項鍊" },
+  "slotNames": { "head": "頭盔", "body": "身體", "boots": "靴", "ring": "戒指", "necklace": "項鍊" },
   "durability": { "base": 50, "perLv": 5, "hitsPerWear": 10, "deathLossPct": 0.1 },
   "caps": { "evadePct": 60, "dmgRedPct": 50, "resistPct": 100 }
 }

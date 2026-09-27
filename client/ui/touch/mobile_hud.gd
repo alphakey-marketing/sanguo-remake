@@ -78,6 +78,9 @@ func _relayout() -> void:
 	var s := get_viewport_rect().size
 	var sr := safe_rect()
 	layout = HudLayout.build(s, sr)
+	var pslots := HudLayout.potion_slots(s, sr)
+	for k in pslots:
+		layout[k] = pslots[k]
 	if joy != null:
 		joy.zone = HudLayout.joy_zone(s, sr)
 
@@ -104,6 +107,9 @@ func _panel(name_: String) -> GamePanel:
 			"marriage": p = MarriagePanel.new(main)
 			"drop": p = DropPanel.new(main)
 			"create": p = CreatePanel.new(main)
+			"title": p = TitlePanel.new(main)
+			"auto_setup": p = AutoPanel.new(main)
+			"potion_setup": p = PotionSetupPanel.new(main)
 			"unlock": p = UnlockPanel.new(main)
 			"stealth": p = StealthPanel.new(main)
 			"rumor": p = RumorPanel.new(main)
@@ -201,6 +207,8 @@ func visible_ids() -> Array:
 	for i in slots.size():
 		ids.append("skill%d" % i)
 	ids.append_array(["target", "auto"])
+	for i in HudLayout.POTION_SLOTS:
+		ids.append("potion%d" % i)
 	ids.append_array(HudLayout.MENU)
 	ids.append("minimap")
 	ids.append("portrait")
@@ -285,8 +293,13 @@ func _fire(id: String) -> void:
 		"attack": attack_pressed.emit()
 		"target": target_cycle.emit()
 		"auto":
-			auto = not auto
-			auto_toggled.emit(auto)
+			if auto:
+				auto = false
+				auto_toggled.emit(false)
+			else:
+				open_panel("auto_setup")     # 開自動之前，先揀邊種怪打 / 跨唔跨場景
+		"potion0", "potion1", "potion2":
+			main.use_potion(int(id.substr(6)))
 		"context":
 			if not ctx.is_empty():
 				context_pressed.emit(ctx)
@@ -384,11 +397,29 @@ func _draw() -> void:
 	_draw_info()
 	_draw_menu()
 	_draw_combat()
+	_draw_potions()
 	if _t < 12.0:                       # 開場提示，12 秒後淡出
 		_txt(Vector2(sr.position.x + 10, sr.end.y - 8), "拖左下移動 · 點怪攻擊 · 點地行路 · 按住普攻連打", Color(1, 1, 1, 0.6), 11)
 
 func _is_down(id: String) -> bool:
 	return pressed.values().has(id)
+
+# 快捷補品欄 (U-fix): 搖桿上面 3 粒細圓，撳一下即用
+func _draw_potions() -> void:
+	if not layout.has("potion0"):
+		return
+	for i in HudLayout.POTION_SLOTS:
+		var id := "potion%d" % i
+		if not layout.has(id):
+			continue
+		var c: Vector2 = layout[id]["c"]
+		var r := HudLayout.POTION_R
+		var item_id := int(main.potion_slots[i]) if i < main.potion_slots.size() else 0
+		var filled := item_id > 0
+		_circle_btn(id, Color(0.12, 0.28, 0.14, 0.8) if filled else Color(0.12, 0.12, 0.12, 0.55),
+			Color(0.55, 0.95, 0.55) if filled else Color(1, 1, 1, 0.4))
+		var label := main.item_name_for_potion(item_id).substr(0, 3) if filled else "空"
+		_txt_center(c.y + 4, label, Color.WHITE if filled else Color(0.7, 0.7, 0.7), 11, r * 2, c.x - r)
 
 # 左上角色框
 func _draw_status() -> void:

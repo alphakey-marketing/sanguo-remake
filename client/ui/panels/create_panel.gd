@@ -1,7 +1,8 @@
 class_name CreatePanel
 extends GamePanel
-# 建角面板（S01b，正式化取代 mobile_hud 舊 debug 建角覆蓋層）
-# 姓名 → 稱號 → 生日 → 職業 → 臉譜 → 理念測驗 → 確認，逐頁行；撳「出發！」先完成。
+# 建角面板（S01b，正式化取代 mobile_hud 舊 debug 建角覆蓋層；U-fix: 7 tab 精簡做 2 頁）
+# 第 1 頁「基本資料」= 姓名+稱號+生日+職業+臉譜合埋一版；第 2 頁答理念測驗（12題必答）
+# 答完自動變確認畫面，撳「出發！」先完成。
 # sim 權威：改動經 main._send 行 sim.cmd_set_*；理念測驗答案喺呢度暫存，答滿 12 題先一次過交。
 # 未撳「出發！」唔可以關（✕ / 撳遮罩都冇效），逼玩家行完全部步。
 
@@ -18,7 +19,7 @@ var title_edit: LineEdit
 func _init(m: Node) -> void:
 	super(m)
 	title_lbl.text = "建角"
-	set_tabs(["姓名", "稱號", "生日", "職業", "臉譜", "理念", "確認"])
+	set_tabs(["基本資料", "理念 + 確認"])
 
 
 func open() -> void:
@@ -48,52 +49,75 @@ func _build_body() -> void:
 	var ch: Dictionary = main.ch
 	if ch.is_empty():
 		return
-	match tab:
-		0: _build_name(ch)
-		1: _build_title(ch)
-		2: _build_birth(ch)
-		3: _build_class(ch)
-		4: _build_face(ch)
-		5: _build_quiz(ch)
-		_: _build_confirm(ch)
+	if tab == 0:
+		_build_basic(ch)
+		return
+	# 第二頁: 理念未答完先答問卷，答完就直接顯示確認資料 + 出發
+	if str(ch.get("ideology", "")) == "":
+		_build_quiz(ch)
+	else:
+		_build_confirm(ch)
+
+
+# 第一頁: 姓名/稱號/生日/職業/臉譜合埋一版，撳完即刻見到效果，減少嚟回切 tab
+func _build_basic(ch: Dictionary) -> void:
+	var sc := scroll()
+	body.add_child(sc)
+	var list := VBoxContainer.new()
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	list.add_theme_constant_override("separation", 10)
+	sc.add_child(list)
+	_build_name(ch, list)
+	list.add_child(hsep())
+	_build_title(ch, list)
+	list.add_child(hsep())
+	_build_birth(ch, list)
+	list.add_child(hsep())
+	_build_class(ch, list)
+	list.add_child(hsep())
+	_build_face(ch, list)
+	list.add_child(hsep())
+	list.add_child(btn("下一步：理念測驗 →", func() -> void:
+		tab = 1
+		refresh(true), 200))
 
 
 # ---- 姓名（最多 8 字，決定後不可改） ----
-func _build_name(ch: Dictionary) -> void:
+func _build_name(ch: Dictionary, parent: Control) -> void:
 	var locked := bool(ch.get("nameLocked", false))
-	body.add_child(lbl("姓名（最多 8 字，決定後不可改）", 15, UiTheme.GOLD))
-	body.add_child(lbl("而家：「%s」%s" % [str(ch.get("name", "")), "（已鎖定）" if locked else ""], 14))
+	parent.add_child(lbl("姓名（最多 8 字，決定後不可改）", 15, UiTheme.GOLD))
+	parent.add_child(lbl("而家：「%s」%s" % [str(ch.get("name", "")), "（已鎖定）" if locked else ""], 14))
 	if locked:
 		return
 	name_edit = LineEdit.new()
 	name_edit.max_length = 8
 	name_edit.placeholder_text = "姓名 1~8 字"
 	name_edit.text = str(ch.get("name", ""))
-	body.add_child(name_edit)
-	body.add_child(btn("確定", func() -> void: main._send({"t": "set_name", "name": name_edit.text}), 120))
+	parent.add_child(name_edit)
+	parent.add_child(btn("確定", func() -> void: main._send({"t": "set_name", "name": name_edit.text}), 120))
 
 
 # ---- 稱號（隨時可改） ----
-func _build_title(ch: Dictionary) -> void:
-	body.add_child(lbl("稱號（隨時可以改）", 15, UiTheme.GOLD))
-	body.add_child(lbl("而家：「%s」" % (str(ch.get("title", "")) if str(ch.get("title", "")) != "" else "未設"), 14))
+func _build_title(ch: Dictionary, parent: Control) -> void:
+	parent.add_child(lbl("稱號（隨時可以改）", 15, UiTheme.GOLD))
+	parent.add_child(lbl("而家：「%s」" % (str(ch.get("title", "")) if str(ch.get("title", "")) != "" else "未設"), 14))
 	title_edit = LineEdit.new()
 	title_edit.max_length = 8
 	title_edit.placeholder_text = "稱號 1~8 字"
 	title_edit.text = str(ch.get("title", ""))
-	body.add_child(title_edit)
-	body.add_child(btn("確定", func() -> void: main._send({"t": "set_title", "title": title_edit.text}), 120))
+	parent.add_child(title_edit)
+	parent.add_child(btn("確定", func() -> void: main._send({"t": "set_title", "title": title_edit.text}), 120))
 
 
 # ---- 生日（影響福日 exp +10%，隨時可改） ----
-func _build_birth(ch: Dictionary) -> void:
+func _build_birth(ch: Dictionary, parent: Control) -> void:
 	var m := int(ch.get("birthMonth", 1))
 	var d := int(ch.get("birthDay", 1))
-	body.add_child(lbl("生日（福日嗰日練功 exp +10%，隨時可改）", 15, UiTheme.GOLD))
-	body.add_child(lbl("而家：%d 月 %d 日" % [m, d], 16))
+	parent.add_child(lbl("生日（福日嗰日練功 exp +10%，隨時可改）", 15, UiTheme.GOLD))
+	parent.add_child(lbl("而家：%d 月 %d 日" % [m, d], 16))
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 6)
-	body.add_child(row)
+	parent.add_child(row)
 	row.add_child(lbl("月", 14))
 	row.add_child(btn("－", func() -> void: _shift_birth(-1, 0), 48))
 	row.add_child(btn("＋", func() -> void: _shift_birth(1, 0), 48))
@@ -114,8 +138,8 @@ func _shift_birth(dm: int, dd: int) -> void:
 
 
 # ---- 職業（六職，未開放灰；只限未出發 Lv1 揀） ----
-func _build_class(ch: Dictionary) -> void:
-	body.add_child(lbl("職業（未出發前可以改）", 15, UiTheme.GOLD))
+func _build_class(ch: Dictionary, parent: Control) -> void:
+	parent.add_child(lbl("職業（未出發前可以改）", 15, UiTheme.GOLD))
 	var cur := str(ch.get("classId", ""))
 	var can_change := int(ch.get("level", 1)) == 1
 	for cid in main.data.classes:
@@ -125,24 +149,19 @@ func _build_class(ch: Dictionary) -> void:
 		var t := "%s%s%s" % [str(cls.get("name", cid)), "　（現用）" if is_cur else "", "　未開放" if not enabled else ""]
 		var b := btn(t, func() -> void: main._send({"t": "select_class", "class_id": String(cid)}))
 		b.disabled = not enabled or is_cur or not can_change
-		body.add_child(b)
+		parent.add_child(b)
 
 
 # ---- 臉譜（8 部位，款式循環） ----
-func _build_face(ch: Dictionary) -> void:
-	body.add_child(lbl("臉譜（撳格循環款式）", 15, UiTheme.GOLD))
-	var sc := scroll()
-	body.add_child(sc)
-	var g := VBoxContainer.new()
-	g.add_theme_constant_override("separation", 4)
-	sc.add_child(g)
+func _build_face(ch: Dictionary, parent: Control) -> void:
+	parent.add_child(lbl("臉譜（撳格循環款式）", 15, UiTheme.GOLD))
 	var face: Dictionary = ch.get("face", {})
 	for part in main.data.face_parts:
 		var cnt := int(main.data.face_parts[part])
 		var cur := int(face.get(part, 1))
 		var b := btn("%s　款式 %d/%d" % [str(FACE_NAMES.get(part, part)), cur, cnt],
 			func() -> void: main._send({"t": "set_face", "part": String(part), "value": cur % cnt + 1}))
-		g.add_child(b)
+		parent.add_child(b)
 
 
 # ---- 理念測驗（12 題，答滿一次過交，決定咗唔可以改） ----

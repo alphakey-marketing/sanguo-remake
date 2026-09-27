@@ -7,10 +7,11 @@ const TYPE_LABEL := {
 	"group": "義勇軍", "expert": "專長", "marry": "結婚",
 }
 const TYPE_ORDER := ["newbie", "general", "ultimate", "history", "expert", "group", "marry"]
+var _guide_open := {}          # quest id -> bool，指引頁撳落展開/摺埋詳情
 
 func _init(m: Node) -> void:
 	super(m)
-	title_lbl.text = "記事"
+	title_lbl.text = "任務"
 	set_tabs(["進行中", "完成", "戰役", "場景", "指引"])
 
 
@@ -28,6 +29,8 @@ func _build_body() -> void:
 	sc.add_child(list)
 	var n := 0
 	for q in main.sim.view_quests():
+		if tab > 1:           # 戰役/場景/指引唔應該顯示呢個進行中/完成 quest list
+			break
 		var act := bool(q.get("active", false))
 		var done := bool(q.get("done", false))
 		if (tab == 0 and not act) or (tab == 1 and not done):
@@ -116,7 +119,17 @@ func _guide_row(list: Node, q: Dictionary, st: Dictionary) -> void:
 	elif bool(st.get("active", false)):
 		mark = "●"
 		color = UiTheme.GOLD
-	list.add_child(lbl("%s %s" % [mark, str(q["name"])], 15, color))
+	var qid := String(q["id"])
+	var open := bool(_guide_open.get(qid, false))
+	var head := btn("%s %s %s %s" % [mark, str(q["name"]), "" , "▾" if open else "▸"], func() -> void:
+		_guide_open[qid] = not open
+		refresh(true))
+	head.add_theme_color_override("font_color", color)
+	head.add_theme_color_override("font_hover_color", color)
+	head.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	list.add_child(head)
+	if not open:
+		return
 	var giver := String(q.get("giver", ""))
 	if giver != "":
 		var npc: Dictionary = main.data.quest_npcs.get(giver, {})
@@ -132,6 +145,9 @@ func _guide_row(list: Node, q: Dictionary, st: Dictionary) -> void:
 		list.add_child(wrap_lbl("　　%s" % hint, 13, UiTheme.DIM))
 	if bool(st.get("active", false)) and String(st.get("hint", "")) != "":
 		list.add_child(wrap_lbl("　　現況：%s" % str(st["hint"]), 13, UiTheme.TEXT))
+	var reward := _reward_summary(q.get("reward", {}))
+	if reward != "":
+		list.add_child(lbl("　獎勵：%s" % reward, 13, UiTheme.DIM))
 
 
 func _map_name(map_id: String) -> String:
@@ -141,6 +157,22 @@ func _map_name(map_id: String) -> String:
 		if String(md.get("id", "")) == map_id:
 			return String(md.get("name", map_id))
 	return map_id
+
+
+func _reward_summary(r: Dictionary) -> String:
+	var parts: Array = []
+	if int(r.get("exp", 0)) > 0:
+		parts.append("經驗 %d" % int(r["exp"]))
+	if int(r.get("gold", 0)) > 0:
+		parts.append("金 %d" % int(r["gold"]))
+	for it in r.get("items", []):
+		var arr: Array = it
+		parts.append("%s x%d" % [item_name(int(arr[0])), int(arr[1])])
+	if r.has("ultimate"):
+		parts.append("絕招")
+	if r.has("expert"):
+		parts.append("專長認證")
+	return "、".join(parts)
 
 
 func _pre_summary(pre: Dictionary) -> String:
