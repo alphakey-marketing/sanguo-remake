@@ -58,6 +58,8 @@ var _ask_seen := ""                # 任務答題對話框已自動彈過 (唔�
 var cur_map := {}                  # 玩家而家身處嘅地圖 def (spec 12)
 var _place_key := ""               # 地圖+區名: 變咗就彈區名橫幅
 var ent_by_id := {}                # id -> ents 入面嗰個視圖 (_refresh 砌)
+var llm_client: LlmClient          # key 只存本機 user://llm.cfg，唔入 sim 存檔 (S09d)
+var llm_log := []                  # 最近 LLM 對話句 (面板顯示用，U11)
 var ask_now := {}                  # 進行中答題 (_refresh 計，每 tick 一次)
 var _unlock_chest := 0             # 開鎖小遊戲目標寶箱实體 id (unlock_panel 用, S02c)
 var _dirty := false                # 發咗意圖/收咗事件: 下幀要 _refresh (唔使等下個 tick)
@@ -114,6 +116,8 @@ func _ready() -> void:
 		sim.add_residents()
 		my_id = sim.spawn_player("玩家")
 	sim.event_emitted.connect(_on_event)
+	llm_client = LlmClient.new()
+	llm_client.load_cfg()
 	_refresh()
 	hud = MobileHud.new()
 	add_child(hud)
@@ -359,6 +363,37 @@ func _send(d: Dictionary) -> void:
 		"beast_friend_train": sim.cmd_beast_friend_train(my_id, int(d.uid), str(d.breed), str(d.skill))
 		"beast_sell": sim.cmd_beast_sell(my_id, int(d.uid))
 		"auction_buy": sim.cmd_auction_buy(my_id, int(d.lot))
+		"llm_config": sim.cmd_llm_config(bool(d.enabled), str(d.model))
+
+# sim 發 llm_request（url/headers/body 已砌好，冇 key）；呢度加返 key、真正發 HTTP，
+# 回應餵返 cmd_llm_reply/cmd_llm_summary。冇 key/傳送失敗 = 即刻用空字串回覆 → sim 模板後備。
+func _on_llm_request(e: Dictionary) -> void:
+	var req_id := int(e.reqId)
+	var kind := String(e.kind)
+	if llm_client == null or not llm_client.has_key():
+		if kind == "talk":
+			sim.cmd_llm_reply(req_id, "")
+		return
+	var headers: Dictionary = (e.get("headers", {}) as Dictionary).duplicate()
+	headers["Authorization"] = "Bearer " + String(llm_client.cfg.get("key", ""))
+	var hs: Array = []
+	for k in headers: hs.append("%s: %s" % [k, headers[k]])
+	var http := HTTPRequest.new()
+	add_child(http)
+	http.timeout = 15.0
+	http.request_completed.connect(func(_r: int, code: int, _h: PackedStringArray, body: PackedByteArray) -> void:
+		http.queue_free()
+		var text := body.get_string_from_utf8() if code >= 200 and code < 300 else ""
+		if kind == "talk":
+			sim.cmd_llm_reply(req_id, text)
+		else:
+			sim.cmd_llm_summary(req_id, text), CONNECT_ONE_SHOT)
+	var err := http.request(String(e.get("url", "")), PackedStringArray(hs), HTTPClient.METHOD_POST, JSON.stringify(e.get("body", {})))
+	if err != OK:
+		http.queue_free()
+		if kind == "talk":
+			sim.cmd_llm_reply(req_id, "")
+
 
 func _log(s: String) -> void:
 	log_lines.append(s)
@@ -385,6 +420,11 @@ func _on_event(e: Dictionary) -> void:
 			_log("%s: %s" % [e.name, e.text])
 		"npc_say":
 			_log("%s: %s" % [e.name, e.text])
+			if bool(e.get("llm", false)):
+				llm_log.append("%s: %s" % [e.name, e.text])
+				if llm_log.size() > 20: llm_log.pop_front()
+		"llm_request":
+			_on_llm_request(e)
 		"hit":
 			var d = _ent(int(e.dst))
 			if d != null:
