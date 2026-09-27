@@ -98,8 +98,8 @@
   {
    "id": "guard_captain",
    "name": "禁衛大隊長",
-   "x": 18,
-   "y": 25,
+   "x": 13,
+   "y": 23,
    "minLevel": 20,
    "window": {
     "startKe": 32,
