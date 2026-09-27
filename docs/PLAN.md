@@ -274,7 +274,7 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
 - [x] **U06 官宅面板：內政 + 城池屬性**：`office_panel.gd` 加第 5 頁「內政」（城池 8 項屬性顯示 + 6 種內政工作，扣行動力/專長經驗/封頂 100），全接現有 `domestic_view`/`cmd_domestic`；`main.gd` 加 `domestic` 意圖派送；hud/civic/uitest leg PASS
 - [x] **U07 救災**：`office_panel.gd` 加第 6 頁「救災」（公佈欄各城天災+對應物品、領救災官令/救災工作/交令放棄），全接現有 `bulletin_view`/`relief_view`/`cmd_office_relief`/`cmd_relief_work`；公佈欄/救災區設施本身用通用 fac 圖示（`facilities.json` bulletin/relief 旗）已顯示，唔使額外畫；hud/title/uitest leg PASS
 - [x] **U08 義勇軍面板**：新 `militia_panel.gd`（頁 0 定居揀城池、頁 1 義勇軍成立條件/擁護者/已成立顯示名號根據地階級帶兵量成員），全接現有 `settle_view`/`militia_view`/`cmd_settle`/`cmd_militia_found`；遊說擁護者掛喺長按居民 menu（`main._open_npc_attack` 加「遊說（義勇軍）」選項 → `cmd_militia_invite`，紅名殺人魔冇呢個選項）；`main.gd` 加 `settle`/`militia_invite`/`militia_found` 意圖派送；`mobile_hud.gd` 註冊 `militia` 面板 + `militia_panel()`；「更多」面板加入口；hud/militia/uitest leg PASS
-- [ ] **U09 營地面板**：新 `camp_panel.gd`（設施升級/監督/22 工作/評定會議/倉庫/商情/訓練，`camp_view`/`militia_work_view`/`eval_view` 系）
+- [x] **U09 營地面板**：新 `camp_panel.gd`（頁 0 設施升級/監督建設、頁 1 22 項工作分系顯示、頁 2 評定會議指派 + 召開、頁 3 倉庫/商情/訓練度），全接現有 `camp_view`/`militia_work_view`/`eval_view`/`cmd_camp_upgrade`/`cmd_camp_supervise`/`cmd_militia_work`/`cmd_eval_assign`/`cmd_eval_meeting`；`main.gd` 加 `camp_upgrade`/`camp_supervise`/`militia_work`/`eval_assign`/`eval_meeting` 意圖派送；`mobile_hud.gd` 註冊 `camp` 面板 + `camp_panel()`；「更多」面板加入口；hud/camp/uitest leg PASS
 - [ ] **U10 民心/法令面板**：`office_panel.gd` 加城池民心/稅率/法令頁（`city_gov_view`/`cmd_city_tax`/`cmd_city_law`）+ 丟物品掣（`cmd_drop_item`）
 - [ ] **U11 LLM 設定 + 對話**：設定頁（key/模型，寫 `LlmClient`）+ NPC 對話顯示 LLM 回覆 + 真 `HTTPRequest` 接線（`llm_client.gd http_transport` 已備）
 - [ ] **U12 結婚面板**：新 `marry_panel.gd`（求婚/喜餅/分餅/婚禮預約主婚/配偶頁/叮嚀/離婚，`marry_view` 系）+ 結婚村 4 NPC 圖示
