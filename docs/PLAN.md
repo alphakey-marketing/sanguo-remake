@@ -273,7 +273,7 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
 - [x] **U05 官宅面板：頭銜/官令/義舉/進貢**：新 `office_panel.gd`（4 頁：頭銜討取+俸祿、官令接/交/放棄、義舉證明繳交+進貢物資、名額競爭顯示），全接現有 sim read-model/cmd（`merit_list`/`cmd_merit_turnin`/`city_favor_view`/`cmd_city_tribute`/`title_contest_view`/`order_text`/`order_block`）；`main.gd` 加 `merit_turnin`/`city_tribute` 意圖派送，`mobile_hud.gd`/`more_panel.gd` 入口；hud/title leg PASS（uitest 掉落 2 個 fail 為現有 flaky test，stash 前後都會偶發，同呢個改動無關）
 - [x] **U06 官宅面板：內政 + 城池屬性**：`office_panel.gd` 加第 5 頁「內政」（城池 8 項屬性顯示 + 6 種內政工作，扣行動力/專長經驗/封頂 100），全接現有 `domestic_view`/`cmd_domestic`；`main.gd` 加 `domestic` 意圖派送；hud/civic/uitest leg PASS
 - [x] **U07 救災**：`office_panel.gd` 加第 6 頁「救災」（公佈欄各城天災+對應物品、領救災官令/救災工作/交令放棄），全接現有 `bulletin_view`/`relief_view`/`cmd_office_relief`/`cmd_relief_work`；公佈欄/救災區設施本身用通用 fac 圖示（`facilities.json` bulletin/relief 旗）已顯示，唔使額外畫；hud/title/uitest leg PASS
-- [ ] **U08 義勇軍面板**：新 `militia_panel.gd`（定居/遊說/成立/成員/階級/帶兵量，`settle_view`/`militia_view`/`cmd_settle`/`cmd_militia_invite`/`cmd_militia_found`）
+- [x] **U08 義勇軍面板**：新 `militia_panel.gd`（頁 0 定居揀城池、頁 1 義勇軍成立條件/擁護者/已成立顯示名號根據地階級帶兵量成員），全接現有 `settle_view`/`militia_view`/`cmd_settle`/`cmd_militia_found`；遊說擁護者掛喺長按居民 menu（`main._open_npc_attack` 加「遊說（義勇軍）」選項 → `cmd_militia_invite`，紅名殺人魔冇呢個選項）；`main.gd` 加 `settle`/`militia_invite`/`militia_found` 意圖派送；`mobile_hud.gd` 註冊 `militia` 面板 + `militia_panel()`；「更多」面板加入口；hud/militia/uitest leg PASS
 - [ ] **U09 營地面板**：新 `camp_panel.gd`（設施升級/監督/22 工作/評定會議/倉庫/商情/訓練，`camp_view`/`militia_work_view`/`eval_view` 系）
 - [ ] **U10 民心/法令面板**：`office_panel.gd` 加城池民心/稅率/法令頁（`city_gov_view`/`cmd_city_tax`/`cmd_city_law`）+ 丟物品掣（`cmd_drop_item`）
 - [ ] **U11 LLM 設定 + 對話**：設定頁（key/模型，寫 `LlmClient`）+ NPC 對話顯示 LLM 回覆 + 真 `HTTPRequest` 接線（`llm_client.gd http_transport` 已備）
