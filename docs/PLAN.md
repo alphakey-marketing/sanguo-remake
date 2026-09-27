@@ -262,6 +262,27 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
   - 偏離／【待決→推薦方針】：喜餅價位用 `items.json` 原有 1000/2000/3000/5000（攻略寫 1000/3000/5000/10000，改為數據驅動）；「同伴好感」用登用同伴忠誠值（0~100，武將冇獨立好感表）；結婚村 NPC 落許昌城（20,33~21,34 全域 152,33~153,34，貼現有城池做法，唔新開地圖）；分餅 = 用開餅 → 4 種點心（各回 HP/MP/SP，use_item 已通）入袋 + 全城居民好感 +10 + 婚慶氛圍 1 日；婚禮需先預約（主婚人 = 朝廷官員 NPC）；婚戒無限召喚扣 50 SP（實體唔見可由武將表重生）；離婚斷情絕愛郎扣 50 萬兩 + 回收婚戒 + 配偶實體離場。`cmd_acceptQuest`/喜帖/彩球喜糖/強迫離婚（刪角）唔做（無下游/單機無刪角）；婚禮面板 + 配偶頁 UI 留欠債。
   - 驗收：`tests/run_marry.gd` 127 項（資料/道具/純函數/求婚/喜餅/分餅/婚禮/召喚/叮嚀離婚/配偶唔期滿/讀取/存檔 roundtrip/舊存檔/決定性），接入 `run_tests.sh`；`sh tools/run_tests.sh` **ALL OK**（尾行 `ALL OK`，marry 127 / hud 4195 / uitest 126 / autotest + 4 導入器 --check 全過；首即過，未見 uitest flake）。
 
+### UI 補完 Step（U01~U15，2026-09-26 定；PLAN §3 邏輯全剔後嘅收尾工作，S10 國戰前插隊做）
+> 排序依據：**玩家實際使用頻率**（戰鬥/同伴類 → 經濟 → 官方行政類 → 一次性設定/劇情類 → 低頻顯示類）。
+> 風格依據：**三國群英傳M + 三國演義 Online** 原作 UI（`ui/panels/ui_theme.gd` 墨啡底金邊 + 現有 `mount_panel.gd` 等已定風格，跟版）。
+> 規則：**一個 UI 系統 = 一個 session**，每份跟 `GamePanel` 慣例（讀 `sim.*_view()` read-model、`main._send()` 發意圖、`sig()` 判斷 refresh），做完要 `--uitest` 過 + 剔呢度個格 + 更新 CLAUDE.md「已知 UI 欠債」刪走已做嗰行。
+- [ ] **U01 戰騎面板**：`beast_view` read-model 已備 → 新 `war_beast_panel.gd`（馴養買獸/出戰跟隨/訓練/友好效果顯示/賣出，仿 `mount_panel.gd` 頁面結構）
+- [ ] **U02 座騎補完**：`mount_panel.gd` 加改名輸入框、繁衍頁（借種馬/胎教 5 揀 1/積點分配/待領小馬）、馬戰頁（買兵器/學特技/HUD 特技掣）
+- [ ] **U03 同伴主動特技掣**：同伴面板/HUD 加遁地/挑釁/急救掣（`cmd_companion_skill(id,kind)`）+ 22 職業特技冷卻顯示
+- [ ] **U04 NPC 拍賣場**：`auction_view`/`cmd_auction_buy` 掣寄喺 `war_beast_panel.gd`/`mount_panel.gd` 馬廄頁（每日上架列表 + 買）
+- [ ] **U05 官宅面板：頭銜/官令/義舉/進貢**：新 `office_panel.gd`（分頁），接 `merit_list`/`cmd_merit_turnin`/`city_favor_view`/`cmd_city_tribute` + 名額競爭 `title_contest_view` 顯示
+- [ ] **U06 官宅面板：內政 + 城池屬性**：`office_panel.gd` 加內政頁（`domestic_view`/`cmd_domestic`）+ 城池 8 項屬性顯示
+- [ ] **U07 救災**：公佈欄 + 救災區設施圖示、`office_panel.gd` 加救災頁（`bulletin_view`/`relief_view`/`cmd_office_relief`/`cmd_relief_work`）
+- [ ] **U08 義勇軍面板**：新 `militia_panel.gd`（定居/遊說/成立/成員/階級/帶兵量，`settle_view`/`militia_view`/`cmd_settle`/`cmd_militia_invite`/`cmd_militia_found`）
+- [ ] **U09 營地面板**：新 `camp_panel.gd`（設施升級/監督/22 工作/評定會議/倉庫/商情/訓練，`camp_view`/`militia_work_view`/`eval_view` 系）
+- [ ] **U10 民心/法令面板**：`office_panel.gd` 加城池民心/稅率/法令頁（`city_gov_view`/`cmd_city_tax`/`cmd_city_law`）+ 丟物品掣（`cmd_drop_item`）
+- [ ] **U11 LLM 設定 + 對話**：設定頁（key/模型，寫 `LlmClient`）+ NPC 對話顯示 LLM 回覆 + 真 `HTTPRequest` 接線（`llm_client.gd http_transport` 已備）
+- [ ] **U12 結婚面板**：新 `marry_panel.gd`（求婚/喜餅/分餅/婚禮預約主婚/配偶頁/叮嚀/離婚，`marry_view` 系）+ 結婚村 4 NPC 圖示
+- [ ] **U13 導航/天眼 + 其餘友好技**：小地圖顯示（`beast_view.effects` 導航/天眼 flag）
+- [ ] **U14 建角面板正式化**：`create_panel.gd` 由 debug 版換做正式（三國群英傳M 風格揀職業/性別/初值分配）
+- [ ] **U15 記事分類頁**：`quest_panel.gd` 分類（新手/官令/歷史/團體/絕招/戰役/場景/專長）+ 傳聞 UI（`rumor_view`/`known_rumors`，`rumor_panel.gd` 已有底可能只需擴充）
+- 每 session 完成後喺呢度剔格 + 喺對應 CLAUDE.md「已知 UI 欠債」行刪走已做部分；`sh tools/run_tests.sh` 要保持 ALL OK（`--uitest` 煙霧測試）
+
 ### S10 國戰（spec 10）— 開工前 D-3 必須定案【待決】
 - [ ] S10a 帶兵量 + 兵種資料 + 戰棋純規則（交兵/對剋/士氣）
 - [ ] S10b 討伐程遠志原型（戰場 scene + 部隊 UI）
