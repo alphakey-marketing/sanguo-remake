@@ -101,6 +101,7 @@ func _panel(name_: String) -> GamePanel:
 			"camp": p = CampPanel.new(main)
 			"civic": p = CivicPanel.new(main)
 			"llm": p = LlmPanel.new(main)
+			"marriage": p = MarriagePanel.new(main)
 			"create": p = CreatePanel.new(main)
 			"unlock": p = UnlockPanel.new(main)
 			"stealth": p = StealthPanel.new(main)
@@ -148,6 +149,10 @@ func civic_panel() -> CivicPanel:
 func llm_panel() -> LlmPanel:
 	close_panels()
 	return _panel("llm") as LlmPanel
+
+func marriage_panel() -> MarriagePanel:
+	close_panels()
+	return _panel("marriage") as MarriagePanel
 
 func open_panel(name_: String) -> void:
 	close_panels()
