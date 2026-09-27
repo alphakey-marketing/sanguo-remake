@@ -8,7 +8,7 @@ extends GamePanel
 func _init(m: Node) -> void:
 	super(m)
 	title_lbl.text = "官宅"
-	tab_names = ["頭銜", "官令", "義舉/進貢", "名額競爭", "內政"]
+	tab_names = ["頭銜", "官令", "義舉/進貢", "名額競爭", "內政", "救災"]
 
 
 func open_tab(i: int) -> void:
@@ -21,7 +21,8 @@ func sig() -> String:
 	var ch: Dictionary = main.ch
 	return JSON.stringify([tab, ch.get("titleRank", 0), ch.get("fame", 0), ch.get("gold", 0),
 		ch.get("office", {}), main.sim.merit_list(ch), main.sim.city_favor_view(ch),
-		main.sim.title_contest_view(main.my_id), main.sim.domestic_view(main.my_id)])
+		main.sim.title_contest_view(main.my_id), main.sim.domestic_view(main.my_id),
+		main.sim.bulletin_view(main.my_id), main.sim.relief_view(main.my_id)])
 
 
 func _build_body() -> void:
@@ -36,7 +37,8 @@ func _build_body() -> void:
 		1: _build_order(list)
 		2: _build_merit(list)
 		3: _build_contest(list)
-		_: _build_domestic(list)
+		4: _build_domestic(list)
+		_: _build_relief(list)
 
 
 # ---- 頁 0: 頭銜 ----
@@ -175,6 +177,40 @@ func _build_domestic(list: VBoxContainer) -> void:
 		b.disabled = not can
 		row.add_child(b)
 		list.add_child(row)
+
+
+# ---- 頁 5: 救災 ----
+func _build_relief(list: VBoxContainer) -> void:
+	var bv: Dictionary = main.sim.bulletin_view(main.my_id)
+	list.add_child(lbl("公佈欄　各城天災", 15, UiTheme.GOLD))
+	var any_d := false
+	for c in (bv.get("cities", []) as Array):
+		for d in (c.get("disasters", []) as Array):
+			any_d = true
+			list.add_child(wrap_lbl("%s：「%s」（規模 %s，救災物品：%s）" %
+				[String(c["name"]), String(d["name"]), String(d["size"]), String(d["itemName"])], 14))
+	if not any_d:
+		list.add_child(wrap_lbl("暫時各城冇天災。", 14, UiTheme.DIM))
+	list.add_child(hsep())
+	var rv: Dictionary = main.sim.relief_view(main.my_id)
+	if rv.is_empty():
+		return
+	if bool(rv.get("hasOrder", false)):
+		var need := int(rv.get("need", 0))
+		var done := int(rv.get("done", 0))
+		list.add_child(lbl("救災官令：%s（%d/%d）　物品「%s」持有 %d" %
+			[String(rv.get("cityName", "")), done, need, String(rv.get("itemName", "")), int(rv.get("owned", 0))], 15, UiTheme.GOLD))
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 6)
+		row.add_child(_fill(btn("救災（去救災區）", func() -> void: main._send({"t": "relief_work"}))))
+		row.add_child(_fill(btn("交令" if done >= need else "放棄", func() -> void: main._send({"t": "office_turnin" if done >= need else "office_abandon"}))))
+		list.add_child(row)
+	else:
+		var why := String(rv.get("block", ""))
+		list.add_child(wrap_lbl("%s：%s" % [String(rv.get("cityName", "")), "呢個城而家冇天災" if not bool(rv.get("cityHasDisaster", false)) else "去官宅接救災官令"], 14))
+		var b := btn("領救災官令" if why == "" else why, func() -> void: main._send({"t": "office_relief"}), 120)
+		b.disabled = why != ""
+		list.add_child(b)
 
 
 func _fill(b: Button) -> Button:
