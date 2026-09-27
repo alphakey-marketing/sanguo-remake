@@ -270,6 +270,9 @@ func _send(d: Dictionary) -> void:
 		"office_relief": sim.cmd_office_relief(my_id)
 		"relief_work": sim.cmd_relief_work(my_id)
 		"city_tribute": sim.cmd_city_tribute(my_id, d.items as Array)
+		"settle": sim.cmd_settle(my_id, str(d.city))
+		"militia_invite": sim.cmd_militia_invite(my_id, int(d.npc))
+		"militia_found": sim.cmd_militia_found(my_id, str(d.name), str(d.password))
 		"office_pill": sim.cmd_office_pill(my_id)
 		"office_redeem_tool": sim.cmd_office_redeem_tool(my_id, int(d.item))
 		"master_gem": sim.cmd_master_gem(my_id, str(d.skill))
@@ -1030,17 +1033,21 @@ func _open_npc_attack(ev: Dictionary) -> void:
 	var name := str(ev.get("name", "居民")) + ("　［紅名·殺人魔］" if red else "")
 	var effect := ("除害善惡 +300" if red else "做衰嘢，善惡一次過 -1000")
 	var warn := "城內（安全區）唔可以攻擊居民。" if safe else "攻擊佢？殺害居民會被視為罪案（%s）。" % effect
-	hud.open_dialog(func() -> Dictionary: return {
-		"title": name, "text": warn, "options": [
-			{"label": "攻擊…", "disabled": safe, "cb": func() -> void:
-				hud.open_dialog(func() -> Dictionary: return {
-					"title": "確定攻擊？", "text": "殺害居民會損善惡，附近居民都會記得你。\n%s" % name, "options": [
-						{"label": "確定攻擊", "cb": func() -> void:
-							target_id = tid
-							_send({"t": "attack", "target": tid})
-							hud.close_panels()},
-						{"label": "取消", "cb": func() -> void: hud.close_panels()}]})},
-			{"label": "離開", "cb": func() -> void: hud.close_panels()}]})
+	var opts: Array = [
+		{"label": "攻擊…", "disabled": safe, "cb": func() -> void:
+			hud.open_dialog(func() -> Dictionary: return {
+				"title": "確定攻擊？", "text": "殺害居民會損善惡，附近居民都會記得你。\n%s" % name, "options": [
+					{"label": "確定攻擊", "cb": func() -> void:
+						target_id = tid
+						_send({"t": "attack", "target": tid})
+						hud.close_panels()},
+					{"label": "取消", "cb": func() -> void: hud.close_panels()}]})}]
+	if not red:
+		opts.append({"label": "遊說（義勇軍）", "cb": func() -> void:
+			_send({"t": "militia_invite", "npc": tid})
+			hud.close_panels()})
+	opts.append({"label": "離開", "cb": func() -> void: hud.close_panels()})
+	hud.open_dialog(func() -> Dictionary: return {"title": name, "text": warn, "options": opts})
 
 # 測試功能: 「更多」面板 + 桌面鍵盤共用（成品前換走；倉庫已搬去背包面板）
 func _on_debug_pressed(action: String) -> void:
