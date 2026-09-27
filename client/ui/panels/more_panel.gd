@@ -25,6 +25,7 @@ func _build_body() -> void:
 	body.add_child(btn("登用人才 / 同伴", func() -> void: main.hud.open_panel("recruit")))
 	body.add_child(btn("座騎", func() -> void: main.hud.mount_panel().open_tab(0)))
 	body.add_child(btn("戰騎", func() -> void: main.hud.war_beast_panel().open_tab(0)))
+	body.add_child(btn("官宅", func() -> void: main.hud.office_panel().open_tab(0)))
 	body.add_child(btn("情報冊（竊聽）", func() -> void: main.hud.open_panel("rumor")))
 	body.add_child(hsep())
 	body.add_child(lbl("設定", 16, UiTheme.GOLD))
