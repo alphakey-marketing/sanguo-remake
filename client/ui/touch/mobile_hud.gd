@@ -319,6 +319,21 @@ func _calc_skill_slots() -> Array:
 		var sd: Dictionary = d.class_skills.get(sk, {})
 		out.append({"kind": "skill", "skill": sk, "label": str(sd.get("name", "技")).substr(0, 2), "sub": "特技",
 			"ready": bool(RulesClassSkill.can_use(d, ch, sk).get("ok", false)), "cd": 0.0, "casting": false})
+	if bool(ch.get("riding", false)):            # U02: 馬戰特技掣（騎緊 + 已學）
+		var wtype := ""
+		var wid := str(ch.get("mountWeapon", ""))
+		if wid != "":
+			wtype = RulesMountBattle.weapon_type_of(d.mount_weapons, wid)
+		var cd_map: Dictionary = ch.get("mountSkillCd", {})
+		for skidk in ch.get("mountSkills", []):
+			var skid := str(skidk)
+			var s: Dictionary = RulesMountBattle.skill_def(d.mount_weapons, skid)
+			if s.is_empty():
+				continue
+			var left := int(cd_map.get(skid, 0)) - tick
+			var ready := left <= 0 and String(s["weapon"]) == wtype and int(ch["sp"]) >= int(s.get("sp", 0))
+			out.append({"kind": "mount", "skill": skid, "label": str(s.get("name", "馬")).substr(0, 2), "sub": "馬戰",
+				"ready": ready, "cd": clampf(float(left) / maxf(1.0, float(s.get("cd", 1))), 0.0, 1.0), "casting": false})
 	return out.slice(0, HudLayout.skill_cap(int(ch["level"])))
 
 # ================= 繪畫 =================
