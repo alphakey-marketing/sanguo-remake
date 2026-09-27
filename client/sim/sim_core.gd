@@ -941,6 +941,16 @@ func _friend_effect_active(_e: Dictionary, _effect: String) -> bool:
 	return false
 
 
+# 忠誠「痛楚屏障」減傷比例 hook (U13)：sim_war_beast 覆寫
+func _friend_pain_shield_pct(_e: Dictionary) -> float:
+	return 0.0
+
+
+# 神獸/王者「加成」練功經驗倍率 hook (U13)：sim_war_beast 覆寫
+func _friend_exp_mult(_e: Dictionary) -> float:
+	return 1.0
+
+
 # 內政武將協助 hook (S08b 掛鈎；S09c 同伴政治/專長協助 override)。回傳完成度加成 (0.0 = 冇)
 func _domestic_assist_bonus(_ch: Dictionary) -> float:
 	return 0.0

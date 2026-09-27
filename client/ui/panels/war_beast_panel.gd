@@ -126,6 +126,10 @@ func _build_active(list: VBoxContainer, v: Dictionary) -> void:
 			var b2 := btn("學", func() -> void: main._send({"t": "beast_friend_train", "uid": uid, "breed": String(wb["breed"]), "skill": sid2}), 64)
 			row2.add_child(b2)
 		list.add_child(row2)
+	# 遁地/地行 (U13): 有其中一款友好效果就可以即時傳送去最近城池
+	if bool((wb["effects"] as Dictionary).get("tunnel_scroll", false)):
+		list.add_child(hsep())
+		list.add_child(btn("遁地返城", func() -> void: main._send({"t": "beast_teleport"})))
 	# 賣出
 	list.add_child(hsep())
 	var sb := btn("賣出（%d 金）" % int(wb["sellPrice"]) if String(wb["sellWhy"]) == "" else String(wb["sellWhy"]),

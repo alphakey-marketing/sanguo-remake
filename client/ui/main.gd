@@ -362,6 +362,7 @@ func _send(d: Dictionary) -> void:
 		"beast_train": sim.cmd_beast_train(my_id, int(d.uid), str(d.skill))
 		"beast_friend_train": sim.cmd_beast_friend_train(my_id, int(d.uid), str(d.breed), str(d.skill))
 		"beast_sell": sim.cmd_beast_sell(my_id, int(d.uid))
+		"beast_teleport": sim.cmd_beast_teleport(my_id)
 		"auction_buy": sim.cmd_auction_buy(my_id, int(d.lot))
 		"llm_config": sim.cmd_llm_config(bool(d.enabled), str(d.model))
 		"marry_propose": sim.cmd_marry_propose(my_id)
