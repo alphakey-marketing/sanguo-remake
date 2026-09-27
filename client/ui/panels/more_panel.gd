@@ -22,29 +22,39 @@ func sig() -> String:
 
 
 func _build_body() -> void:
-	body.add_child(btn("登用人才 / 同伴", func() -> void: main.hud.open_panel("recruit")))
-	body.add_child(btn("座騎", func() -> void: main.hud.mount_panel().open_tab(0)))
-	body.add_child(btn("戰騎", func() -> void: main.hud.war_beast_panel().open_tab(0)))
-	body.add_child(btn("官宅", func() -> void: main.hud.office_panel().open_tab(0)))
-	body.add_child(btn("義勇軍", func() -> void: main.hud.militia_panel().open_tab(0)))
-	body.add_child(btn("營地", func() -> void: main.hud.camp_panel().open_tab(0)))
-	body.add_child(btn("民心/法令", func() -> void: main.hud.civic_panel().open()))
-	body.add_child(btn("情報冊（竊聽）", func() -> void: main.hud.open_panel("rumor")))
-	body.add_child(btn("LLM 設定 / 對話", func() -> void: main.hud.llm_panel().open_tab(0)))
-	body.add_child(btn("結婚", func() -> void: main.hud.marriage_panel().open_tab(0)))
-	body.add_child(btn("掉寶表", func() -> void: main.hud.drop_panel().open()))
-	body.add_child(hsep())
-	body.add_child(lbl("設定", 16, UiTheme.GOLD))
+	var sc := scroll()
+	body.add_child(sc)
+	var list := VBoxContainer.new()
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	list.add_theme_constant_override("separation", 6)
+	sc.add_child(list)
+	list.add_child(btn("登用人才 / 同伴", func() -> void: main.hud.open_panel("recruit")))
+	list.add_child(btn("座騎", func() -> void: main.hud.mount_panel().open_tab(0)))
+	list.add_child(btn("戰騎", func() -> void: main.hud.war_beast_panel().open_tab(0)))
+	list.add_child(btn("官宅", func() -> void: main.hud.office_panel().open_tab(0)))
+	list.add_child(btn("義勇軍", func() -> void: main.hud.militia_panel().open_tab(0)))
+	list.add_child(btn("營地", func() -> void: main.hud.camp_panel().open_tab(0)))
+	list.add_child(btn("民心/法令", func() -> void: main.hud.civic_panel().open()))
+	list.add_child(btn("情報冊（竊聽）", func() -> void: main.hud.open_panel("rumor")))
+	list.add_child(btn("LLM 設定 / 對話", func() -> void: main.hud.llm_panel().open_tab(0)))
+	list.add_child(btn("結婚", func() -> void: main.hud.marriage_panel().open_tab(0)))
+	list.add_child(btn("掉寶表", func() -> void: main.hud.drop_panel().open()))
+	list.add_child(hsep())
+	list.add_child(lbl("角色 / 存檔", 16, UiTheme.GOLD))
+	list.add_child(btn("切換角色 / 選擇存檔位", func() -> void: main.hud.open_panel("title")))
+	list.add_child(btn("設定快捷補品欄", func() -> void: main.hud.open_panel("potion_setup")))
+	list.add_child(hsep())
+	list.add_child(lbl("設定", 16, UiTheme.GOLD))
 	var hud = main.hud
-	body.add_child(btn("撳掣震動：%s" % ("開" if hud.vibrate_on else "關"), func() -> void:
+	list.add_child(btn("撳掣震動：%s" % ("開" if hud.vibrate_on else "關"), func() -> void:
 		hud.vibrate_on = not hud.vibrate_on
 		refresh(true)))
-	body.add_child(hsep())
-	body.add_child(lbl("測試功能（成品前會換走）", 16, UiTheme.GOLD))
+	list.add_child(hsep())
+	list.add_child(lbl("測試功能（成品前會換走）", 16, UiTheme.GOLD))
 	var g := GridContainer.new()
 	g.columns = 3
 	g.add_theme_constant_override("h_separation", 6)
-	body.add_child(g)
+	list.add_child(g)
 	for a in DEBUG_ACTIONS:
 		var act := String(a["action"])
 		var b := btn(String(a["label"]), func() -> void: main._on_debug_pressed(act), 120)

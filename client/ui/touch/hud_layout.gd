@@ -15,12 +15,15 @@ const SKILL_DIST2 := 150.0     # 額外 2 格 (S01a: 5 級後) 用大半徑，�
 const SKILL_ANGLES := [180.0, 210.0, 240.0, 270.0, 218.0, 248.0]   # 左 → 上 扇形（Godot y 向下）；前 4 個 = 5 級前；S01a: 5 級後開埋後 2 個 (用 SKILL_DIST2)
 const SMALL_R := 22.0          # 切換目標 / 自動
 const MENU := ["menu_bag", "menu_char", "menu_quest", "menu_more"]
-const MENU_LABELS := {"menu_bag": "背包", "menu_char": "角色", "menu_quest": "記事", "menu_more": "更多"}
+const MENU_LABELS := {"menu_bag": "背包", "menu_char": "角色", "menu_quest": "任務", "menu_more": "更多"}
 const MENU_SZ := 48.0
 const MENU_GAP := 4.0
 const MINI_SZ := Vector2(112, 50)   # 小地圖 (spec 12 §6)
 const COMP_SZ := Vector2(120, 54)   # 同伴框 (Step 13.5；S02b 加多一行 exp 條)
 const STATUS_ROW_H := 18.0     # 角色框底部狀態 icon 列高度 (S02a)
+const POTION_R := 26.0         # 快捷補品欄 (U-fix): 窄窄一條，喺搖桿區上面，3 格 HP/MP 補品
+const POTION_SLOTS := 3
+const POTION_GAP := 6.0
 
 
 # 系統介面鍵數 (S01a, spec 01 §5): 5 級前 4 鍵，5 級後 6 鍵
@@ -64,12 +67,26 @@ static func build(size: Vector2, safe: Rect2 = Rect2()) -> Dictionary:
 	return out
 
 
+# 快捷補品欄 (U-fix): 搖桿區正上面一排細圓，靠左；3 格，撳一下即用
+static func potion_slots(size: Vector2, safe: Rect2 = Rect2()) -> Dictionary:
+	if safe.size == Vector2.ZERO:
+		safe = Rect2(Vector2.ZERO, size)
+	var jz := joy_zone(size, safe)
+	var out := {}
+	var y := jz.position.y - POTION_R - 8.0
+	for i in POTION_SLOTS:
+		var x := jz.position.x + POTION_R + i * (POTION_R * 2 + POTION_GAP)
+		out["potion%d" % i] = {"kind": "circle", "c": Vector2(x, y), "r": POTION_R}
+	return out
+
+
 # 搖桿區: 左下，右邊界唔越過互動掣；有面板開住時 HUD 唔會路由（見 mobile_hud）
+# 頂部預留咗快捷補品欄嘅高度 (U-fix)，唔會同搖桿重疊
 static func joy_zone(size: Vector2, safe: Rect2 = Rect2()) -> Rect2:
 	if safe.size == Vector2.ZERO:
 		safe = Rect2(Vector2.ZERO, size)
 	var ctx: Rect2 = build(size, safe)["context"]["rect"]
-	var top := safe.position.y + 156.0 + STATUS_ROW_H   # 角色框 + 日誌下面
+	var top := safe.position.y + 156.0 + STATUS_ROW_H + POTION_R * 2 + 16.0   # 角色框 + 日誌 + 補品欄下面
 	var right := minf(safe.position.x + size.x * 0.5, ctx.position.x - 8.0)
 	return Rect2(safe.position.x, top, right - safe.position.x, safe.end.y - top)
 

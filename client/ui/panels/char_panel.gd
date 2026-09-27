@@ -214,19 +214,15 @@ func _build_equip(ch: Dictionary) -> void:
 		int(ab.get("sevade", 0))], 15, UiTheme.GOLD))
 	right.add_child(hsep())
 	if sel_slot == "":
-		right.add_child(wrap_lbl("撳左邊格睇詳情；換裝去背包揀件防具撳「裝備」。", 13, UiTheme.DIM))
-		right.add_child(btn("開背包", func() -> void:
-			close()
-			main.hud.bag_panel().open_filter("")))
+		right.add_child(wrap_lbl("撳左邊格睇詳情，同揀背包裡合用嘅裝備。", 13, UiTheme.DIM))
 		return
 	var id := _slot_item(eq, sel_slot)
 	if id == 0:
 		right.add_child(lbl("（空格）", 15, UiTheme.DIM))
 		if sel_slot.begins_with("w"):
 			_weapon_switch_btn(right, eq, int(sel_slot.substr(1)))
-		right.add_child(btn("開背包揀", func() -> void:
-			close()
-			main.hud.bag_panel().open_filter("")))
+		if RulesEquip.SLOTS.has(sel_slot):
+			_armor_pick_list(right, ch, sel_slot)
 		return
 	right.add_child(lbl(item_name(id), 17, UiTheme.GOLD))
 	for s in item_desc(id):
@@ -234,6 +230,9 @@ func _build_equip(ch: Dictionary) -> void:
 	if main.data.armors.has(id):
 		right.add_child(lbl(armor_dur_text(ch, id), 13))
 		right.add_child(btn("卸下", func() -> void: main._send({"t": "unequip", "part": sel_slot})))
+		right.add_child(hsep())
+		right.add_child(lbl("背包裡其他 %s：" % slot_name(sel_slot), 13, UiTheme.DIM))
+		_armor_pick_list(right, ch, sel_slot, id)
 	elif sel_slot.begins_with("w"):
 		var ws := int(sel_slot.substr(1))
 		right.add_child(lbl(armor_dur_text(ch, id), 13))
@@ -242,6 +241,28 @@ func _build_equip(ch: Dictionary) -> void:
 	elif sel_slot.begins_with("j"):
 		var js := int(sel_slot.substr(1))
 		right.add_child(btn("卸下", func() -> void: main._send({"t": "equip_jewel", "item": 0, "slot": js})))
+
+
+# 喺右邊直接列背包裡同 slot 嘅防具，撳一下就裝備，唔使再跳去背包 (U-fix)
+func _armor_pick_list(parent: Control, ch: Dictionary, slot: String, exclude_id := 0) -> void:
+	var bag: Array = ch.get("bag", [])
+	var found := false
+	for b in bag:
+		var id := int(b["id"])
+		if id == exclude_id:
+			continue
+		var ad: Dictionary = main.data.armors.get(id, {})
+		if ad.is_empty() or String(ad.get("slot", "")) != slot:
+			continue
+		found = true
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 6)
+		parent.add_child(row)
+		var it_id := id
+		row.add_child(btn("裝備：%s x%d" % [item_name(it_id), int(b["n"])],
+			func() -> void: main._send({"t": "equip", "item": it_id}), 0))
+	if not found:
+		parent.add_child(wrap_lbl("背包冇合用嘅%s，去防具店睇下。" % slot_name(slot), 12, UiTheme.DIM))
 
 
 # 專長頁 (S01c, spec 01 §8): 12 項專長，等級 1~4 = 藍/綠/紅/紫，顯示上限；天文 lv≥1 + 帶渾天儀顯示各城天氣

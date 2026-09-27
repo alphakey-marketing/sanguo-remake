@@ -32,6 +32,9 @@ var _touch_at := 0                # S03a: 長按偵測 (down 嘅時間戳)
 var _touch_pos := Vector2.ZERO
 var hud: MobileHud                # 手機操控層 (ui/touch/mobile_hud.gd)
 var auto := false                 # 自動掛機
+var auto_whitelist := {}          # U-fix: 自動掛機淨打嘅怪名 (name -> true)；空 = 打晒
+var auto_roam := false            # U-fix: 自動掛機冇怪時可唔可以自動跨場景去搵怪 (預設關，留喺同一場景)
+var potion_slots: Array = [0, 0, 0]   # U-fix: 快捷補品欄 3 格，存 item id（0 = 空），純 UI 偏好唔入 sim 存檔
 var sshot_file := ""             # --sshot: 開場幾秒後截圖存 user:// 退出
 var ch := {}                      # 玩家角色狀態 (sim 內同一個 Dictionary)
 var item_names := {}              # id -> 名 (items.json)
@@ -63,6 +66,7 @@ var llm_log := []                  # 最近 LLM 對話句 (面板顯示用，U11
 var ask_now := {}                  # 進行中答題 (_refresh 計，每 tick 一次)
 var _unlock_chest := 0             # 開鎖小遊戲目標寶箱实體 id (unlock_panel 用, S02c)
 var _dirty := false                # 發咗意圖/收咗事件: 下幀要 _refresh (唔使等下個 tick)
+var cur_slot := 0                  # U-fix: 0 = 用返 AUTOSLOT（原有行為）；1~SLOT_COUNT = 揀咗嗰個角色位
 
 func _ready() -> void:
 	autotest = "--autotest" in OS.get_cmdline_user_args()
@@ -215,7 +219,7 @@ func _process(delta: float) -> void:
 	t0 += delta
 	if not autotest and not uitest and sim.tick > 0 and sim.tick % _ticks_per_day() == 0 and sim.tick != last_save_tick:
 		last_save_tick = sim.tick
-		SaveSys.autosave(sim)
+		_save_current()
 	for f in floats: f.age += delta
 	floats = floats.filter(func(f): return f.age < 1.0)
 	var me = _me()
@@ -542,7 +546,7 @@ func _on_event(e: Dictionary) -> void:
 				_log(dr.split("\n")[0])
 				target_id = -1
 				if not uitest:
-					SaveSys.autosave(sim)       # 死完即存
+					_save_current()             # 死完即存
 				ch["status"] = {}              # 死亡清狀態 (sim 權威，UI 同步)
 				if hud != null and not autotest and not uitest:
 					hud.open_dialog(func() -> Dictionary: return {
@@ -1025,7 +1029,7 @@ func _auto_tick() -> void:
 		target_id = int(near.id)
 		_send({"t": "attack", "target": target_id})
 		return
-	if int(sim.tick) % FIELD_RETRY_TICKS == 0:
+	if auto_roam and int(sim.tick) % FIELD_RETRY_TICKS == 0:
 		_go_field()
 
 # 揀怪: 只揀同自己同一 zone (洞窟各層座標同野外相鄰，唔可以隔層鎖)；
@@ -1040,6 +1044,8 @@ func _pick_mob(me: Dictionary, safe_only: bool):
 			continue
 		if str(sim.zone_view(int(e.x), int(e.y)).get("id", "")) != my_zone:
 			continue
+		if safe_only and not auto_whitelist.is_empty() and not auto_whitelist.has(str(e.name)):
+			continue                            # 自動掛機白名單: 冇揀嘅怪唔自動打
 		var attacking := int(e.get("aggro", 0)) == int(me.id)
 		if safe_only and not attacking and int(e.level) > int(ch.level) + 1:
 			continue                            # 唔主動打高自己兩級以上嘅怪
@@ -1395,6 +1401,66 @@ func _calc_active_ask() -> Dictionary:
 	return {}
 
 
+# 快捷補品欄 (U-fix): 撳格即用嗰件補品，冇貨就出返 log 提示
+func use_potion(slot: int) -> void:
+	if slot < 0 or slot >= potion_slots.size():
+		return
+	var id := int(potion_slots[slot])
+	if id == 0:
+		_log("呢格快捷欄未裝補品，去背包長按補品揀「裝入快捷欄」。")
+		return
+	var have := false
+	for b in ch.get("bag", []):
+		if int(b["id"]) == id and int(b["n"]) > 0:
+			have = true
+			break
+	if not have:
+		_log("背包冇%s喇" % item_name_for_potion(id))
+		return
+	_send({"t": "use_item", "item": id})
+
+
+func item_name_for_potion(id: int) -> String:
+	return str(item_names.get(id, "補品"))
+
+
 # 建角面板完成（mobile_hud)_on_create_done 用
 func _on_create_done() -> void:
 	_log("建角完成，出發！")
+
+
+# 存返而家用緊嗰個角色位（cur_slot==0 = AUTOSLOT，向下兼容；否則存去嗰個 slot）
+func _save_current() -> void:
+	if cur_slot == 0:
+		SaveSys.autosave(sim)
+	else:
+		SaveSys.save_slot(sim, cur_slot)
+
+
+# ---- 切換/開新角色位 (U-fix: 「更多」面板嘅「切換角色」入口) ----
+# n=0 keep 用返 AUTOSLOT；n>=1 = 用 SaveSys slot_path(n)。is_new=true 就唔 load，直接開新角。
+func switch_to_slot(n: int, is_new: bool) -> void:
+	_save_current()      # 現有進度先存返落佢自己嗰個 slot
+	cur_slot = n
+	sim = Sim.new(data, 1 if autotest or uitest else randi())
+	var fresh := true
+	if not is_new and n >= 1 and SaveSys.slot_exists(n):
+		var loaded := SaveSys.read_slot(data, n)
+		if loaded != null:
+			sim = loaded
+			fresh = false
+			my_id = int(sim.state["player_id"])
+	if fresh:
+		sim.init_mobs()
+		sim.add_residents()
+		my_id = sim.spawn_player("玩家")
+	sim.event_emitted.connect(_on_event)
+	target_id = -1
+	exp_start = -1
+	_place_key = ""
+	_refresh()
+	hud.close_panels()
+	if fresh:
+		hud.open_panel("create")
+	if n >= 1:
+		SaveSys.save_slot(sim, n)
