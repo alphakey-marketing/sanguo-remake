@@ -364,6 +364,15 @@ func _send(d: Dictionary) -> void:
 		"beast_sell": sim.cmd_beast_sell(my_id, int(d.uid))
 		"auction_buy": sim.cmd_auction_buy(my_id, int(d.lot))
 		"llm_config": sim.cmd_llm_config(bool(d.enabled), str(d.model))
+		"marry_propose": sim.cmd_marry_propose(my_id)
+		"marry_buy_cake": sim.cmd_marry_buy_cake(my_id, int(d.tier))
+		"marry_open_cake": sim.cmd_marry_open_cake(my_id, int(d.item))
+		"marry_share_cake": sim.cmd_marry_share_cake(my_id, int(d.item))
+		"marry_book": sim.cmd_marry_book(my_id)
+		"marry_hold": sim.cmd_marry_hold(my_id)
+		"marry_summon": sim.cmd_marry_summon(my_id)
+		"marry_message": sim.cmd_marry_message(my_id, str(d.text))
+		"marry_divorce": sim.cmd_marry_divorce(my_id)
 
 # sim 發 llm_request（url/headers/body 已砌好，冇 key）；呢度加返 key、真正發 HTTP，
 # 回應餵返 cmd_llm_reply/cmd_llm_summary。冇 key/傳送失敗 = 即刻用空字串回覆 → sim 模板後備。
