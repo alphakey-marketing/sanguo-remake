@@ -8,6 +8,8 @@ func damage(t: Dictionary, dmg: int, by: Dictionary) -> void:
 	if t.has("casting") and MathX.roll(rng_fn) < float(cc["castInterruptPct"]):
 		t.erase("casting")
 		_emit({"k": "cast_interrupted", "dst": t["id"], "reason": "hit"})
+	if t["kind"] == "player" and dmg > 0 and _friend_effect_active(t, "pain_shield"):   # S07c/U13 戰騎「忠誠」痛楚屏障
+		dmg = maxi(1, MathX.js_round(float(dmg) * (1.0 - _friend_pain_shield_pct(t))))
 	t["hp"] = maxi(0, int(t["hp"]) - dmg)
 	if t["kind"] == "mob" and by.has("id") and dmg > 0:
 		# 隊伍經驗池 (S02b): 記低邊個對隻怪出過幾多傷害，死嗰陣按比例分經驗
@@ -120,6 +122,7 @@ func _kill_mob(m: Dictionary, by: Dictionary, exp_mult: float = 1.0) -> void:
 			e = MathX.js_round(float(e) * RulesStats.birthday_exp_mult(int(_clock()["day"]),
 				int(clk.get("yearDays", 360)), int(clk.get("monthDays", 30)),
 				int(mch.get("birthMonth", 1)), int(mch.get("birthDay", 1))))
+			e = MathX.js_round(float(e) * _friend_exp_mult(member))   # U13 戰騎「神獸/王者」加成友好技
 		var mups := RulesStats.gain_exp(data, mch, e)
 		if mups > 0 and member.get("kind", "") in ["bot", "gen"]:   # 機械人/同伴冇人幫手派點: 直接按建議比例自動派
 			RulesStats.auto_assign_points(mch, data.classes[mch["classId"]])
@@ -211,7 +214,12 @@ func _kill_player(p: Dictionary) -> void:
 	# 3. 傳送返客棧: HP/MP/SP 回復一半【自訂】(原版復活後唔滿，要訓覺/食)
 	var die_x := int(p["x"])
 	var die_y := int(p["y"])
-	_half_heal(ch)
+	if _friend_effect_active(p, "holy_elixir"):    # U13 戰騎「聖靈」友好技: 回滿代替回半
+		ch["hp"] = _eff_max_hp(ch)
+		ch["mp"] = _eff_max_mp(ch)
+		ch["sp"] = _eff_max_sp(ch)
+	else:
+		_half_heal(ch)
 	if bt.is_empty() and sc.is_empty():
 		var inn := nearest_inn(map_id_at(int(p["x"]), int(p["y"])))    # 返最近客棧 (過圖次數最少) (Step 11.7)
 		p["x"] = int(inn["x"])

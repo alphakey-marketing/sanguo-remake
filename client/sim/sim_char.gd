@@ -264,7 +264,7 @@ func _move(id: int, x: int, y: int, cap: int = 0) -> void:
 	if e.is_empty() or not is_free(x, y):
 		return
 	var ch: Dictionary = e.get("ch", {})
-	if not ch.is_empty() and RulesSpell.blocks_move(ch.get("status", {}), tick):  # 中邪定身【原】
+	if not ch.is_empty() and RulesSpell.blocks_move(ch.get("status", {}), tick) and not _friend_effect_active(e, "stun_resist"):  # 中邪定身【原】(戰騎「穩重」友好技免疫, U13)
 		if e["kind"] == "player":
 			_msg(id, "中邪緊，郁唔到")
 		return

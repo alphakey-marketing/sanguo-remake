@@ -264,6 +264,20 @@ static func regen_mult(cfg: Dictionary, wb: Dictionary) -> float:
 	return float((cfg.get("friendEffects", {}) as Dictionary).get("regenMult", 2.0))
 
 
+# 忠誠(bawang tier4)「痛楚屏障」: 受傷減免比例 (0 = 冇效果)；數值喺 cfg.friendEffects.painShieldPct
+static func pain_shield_pct(cfg: Dictionary, wb: Dictionary) -> float:
+	if not has_effect(cfg, wb, "pain_shield"):
+		return 0.0
+	return float((cfg.get("friendEffects", {}) as Dictionary).get("painShieldPct", 0.3))
+
+
+# 神獸/王者「加成」: 練功經驗倍率 (1.0 = 冇效果)；數值喺 cfg.friendEffects.doubleExpMult
+static func exp_mult(cfg: Dictionary, wb: Dictionary) -> float:
+	if not has_effect(cfg, wb, "double_exp_buff"):
+		return 1.0
+	return float((cfg.get("friendEffects", {}) as Dictionary).get("doubleExpMult", 2.0))
+
+
 # ================= 忠誠 / 交易 (Step 18c, spec 07 §8.5) =================
 # 戰鬥死亡: 忠誠 −1；跌到 desertAt 或以下 = 走佬(離隊消失)【原】。回 true = 走咗
 

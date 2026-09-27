@@ -490,11 +490,17 @@ func _draw_info() -> void:
 		var dst := Rect2(inner.position, src.size * K)
 		draw_texture_rect_region(MapArt.minimap(main.data, md), dst, src, Color(1, 1, 1, 0.9))
 		var org := inner.position - src.position * K
+		var fx: Dictionary = main.sim.beast_effects_view(main.my_id)   # U13 戰騎導航/天眼/嗅血 友好技
+		var tianyan: bool = bool(fx.get("show_npc", false))
+		var xiuxue: bool = bool(fx.get("show_low_hp", false))
 		for e in main.ents:
 			var p := org + (Vector2(float(e.x) - float(md.ox), float(e.y) - float(md.oy)) + Vector2(0.5, 0.5)) * K
 			if not dst.has_point(p) or int(e.id) == main.my_id:
 				continue
-			draw_rect(Rect2(p - Vector2(1, 1), Vector2(2, 2)), Color(0.95, 0.25, 0.2) if e.get("mob", false) else Color(0.9, 0.9, 0.9))
+			var is_low := xiuxue and bool(e.get("mob", false)) and float(e.maxHp) > 0 and float(e.hp) / float(e.maxHp) < 0.3
+			draw_rect(Rect2(p - Vector2(1, 1), Vector2(2, 2)), Color(1.0, 0.85, 0.1) if is_low else (Color(0.95, 0.25, 0.2) if e.get("mob", false) else Color(0.9, 0.9, 0.9)))
+			if tianyan and not e.get("mob", false) and (bool(e.get("bot", false)) or bool(e.get("gen", false))):
+				_txt(p + Vector2(3, 3), str(e.name), Color(0.6, 0.95, 1.0), 9)
 		for qn in main.quest_npcs:
 			var q := org + (Vector2(float(qn.x) - float(md.ox), float(qn.y) - float(md.oy)) + Vector2(0.5, 0.5)) * K
 			if dst.has_point(q):
@@ -512,6 +518,10 @@ func _draw_info() -> void:
 		draw_circle(org + (Vector2(mx, my) + Vector2(0.5, 0.5)) * K, 2.5, Color(1, 0.9, 0.2))
 		var zv: Dictionary = main.sim.zone_view(int(me.x), int(me.y))
 		var nm := str(zv.get("area", "")) if str(zv.get("area", "")) != "" else str(zv.get("name", ""))
+		if bool(fx.get("map_city", false)):     # U13 戰騎「導航」友好技: 加返最近城池名 + 方向指示
+			var nc: Dictionary = main.sim.nearest_city_view(int(me.x), int(me.y))
+			if not nc.is_empty():
+				nm += "  →%s" % str(nc.get("name", ""))
 		draw_rect(Rect2(r.position, Vector2(r.size.x, 14)), Color(0, 0, 0, 0.55))
 		_txt_right(Vector2(r.end.x - 4, r.position.y + 11), nm, Color(0.95, 0.88, 0.7), 11)
 	draw_rect(Rect2(Vector2(r.position.x, r.end.y - 13), Vector2(r.size.x, 13)), Color(0, 0, 0, 0.55))

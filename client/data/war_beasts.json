@@ -111,7 +111,7 @@
   "friendCosts": [3, 6, 12, 24],
   "friendCrossMult": 3,
   "_noteFriendEffects": "友好特技效果接系統 (S07c, spec 07 §8.4)【自訂數值】: autoLootRange = 殘影豹『撿寶』自動執地上寶物嘅半徑 (格)；bagCapacityPct = 霸王熊『背負』背包負重上限加成 (0.5 = +50%)；regenMult = 九尾狐『聖體』每刻自動回復倍率 (2.0 = ×2)。學習門檻之外嘅效果對應見 friendSkills[].effect。",
-  "friendEffects": {"autoLootRange": 3, "bagCapacityPct": 0.5, "regenMult": 2.0},
+  "friendEffects": {"autoLootRange": 3, "bagCapacityPct": 0.5, "regenMult": 2.0, "painShieldPct": 0.3, "doubleExpMult": 2.0},
   "friendSkills": {
     "niujiao": [
       {"id": "niujiao_daohang", "name": "導航", "tier": 1, "effect": "map_city"},

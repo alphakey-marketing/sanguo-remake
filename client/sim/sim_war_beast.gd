@@ -73,6 +73,69 @@ func _friend_regen_mult(e: Dictionary) -> float:
 	return RulesWarBeast.regen_mult(_wbcfg(), active_beast(e["ch"]))
 
 
+func _friend_pain_shield_pct(e: Dictionary) -> float:
+	if e.is_empty() or not e.has("ch"):
+		return 0.0
+	return RulesWarBeast.pain_shield_pct(_wbcfg(), active_beast(e["ch"]))
+
+
+func _friend_exp_mult(e: Dictionary) -> float:
+	if e.is_empty() or not e.has("ch"):
+		return 1.0
+	return RulesWarBeast.exp_mult(_wbcfg(), active_beast(e["ch"]))
+
+
+# 出戰戰騎「導航/天眼」flag，畀 UI 小地圖用 (U13)
+func beast_effects_view(id: int) -> Dictionary:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return {}
+	return RulesWarBeast.active_effects(_wbcfg(), active_beast(e["ch"]))
+
+
+# 「導航」友好技畀小地圖標最近城池名 (U13)
+func nearest_city_view(x: int, y: int) -> Dictionary:
+	var md := _nearest_city_map(map_id_at(x, y))
+	if md.is_empty():
+		return {}
+	return {"id": String(md["id"]), "name": String(md["name"])}
+
+
+const BEAST_TELEPORT_CD := 200          # U13【自訂】遁地/地行 冷卻 (無限次但唔可以連續刷)
+
+
+# U13 遁地(niujiao_dundi)/地行(changya_dixing) 友好技: 主公 + 出戰戰騎即時傳送去最近城池中心，仿同伴「無限遁地」
+func cmd_beast_teleport(id: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var ch: Dictionary = e["ch"]
+	if not _friend_effect_active(e, "tunnel_scroll"):
+		return _msg(id, "戰騎未學遁地/地行")
+	if tick < int(ch.get("beastTeleportCd", 0)):
+		return _msg(id, "遁地冷卻緊 (%d tick 後)" % (int(ch["beastTeleportCd"]) - tick))
+	var cur := map_id_at(int(e["x"]), int(e["y"]))
+	var md := _nearest_city_map(cur)
+	if md.is_empty():
+		return _msg(id, "附近冇城池可以遁地返去")
+	var p := _city_anchor(md)
+	_put_ent(e, p.x, p.y)
+	e["atk_target"] = 0
+	e.erase("goto")
+	if e.has("casting"):
+		e.erase("casting")
+		_emit({"k": "cast_interrupted", "dst": int(e["id"]), "reason": "travel"})
+	var be := beast_ent(id)
+	if not be.is_empty():
+		var bp := _free_near(p.x, p.y)
+		_put_ent(be, bp.x, bp.y)
+		be["atk_target"] = 0
+	ch["beastTeleportCd"] = tick + BEAST_TELEPORT_CD
+	_emit({"k": "travel", "dst": int(e["id"]), "to": String(md["name"]), "x": e["x"], "y": e["y"],
+		"map": map_id_at(int(e["x"]), int(e["y"])), "station": false, "burrow": true})
+	_msg(id, "戰騎遁地！返到%s" % String(md["name"]))
+
+
 # 霸王熊「背負」: 背包負重上限加成 (底 = world.dropped.capBagWeight)
 func _bag_cap(ch: Dictionary) -> int:
 	var base := int(data.world.get("dropped", {}).get("capBagWeight", 1000))
