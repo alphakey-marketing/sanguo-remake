@@ -98,6 +98,7 @@ func _panel(name_: String) -> GamePanel:
 			"war_beast": p = WarBeastPanel.new(main)
 			"office": p = OfficePanel.new(main)
 			"militia": p = MilitiaPanel.new(main)
+			"camp": p = CampPanel.new(main)
 			"create": p = CreatePanel.new(main)
 			"unlock": p = UnlockPanel.new(main)
 			"stealth": p = StealthPanel.new(main)
@@ -133,6 +134,10 @@ func office_panel() -> OfficePanel:
 func militia_panel() -> MilitiaPanel:
 	close_panels()
 	return _panel("militia") as MilitiaPanel
+
+func camp_panel() -> CampPanel:
+	close_panels()
+	return _panel("camp") as CampPanel
 
 func open_panel(name_: String) -> void:
 	close_panels()
