@@ -334,6 +334,13 @@ func _send(d: Dictionary) -> void:
 		"mount_weapon_buy": sim.cmd_mount_weapon_buy(my_id, str(d.wtype), str(d.wid))
 		"mount_skill_learn": sim.cmd_mount_skill_learn(my_id, str(d.skill))
 		"mount_skill_use": sim.cmd_mount_skill_use(my_id, str(d.skill), int(d.get("target", 0)))
+		"beast_adopt": sim.cmd_beast_adopt(my_id, str(d.breed))
+		"beast_deploy": sim.cmd_beast_deploy(my_id, int(d.uid), bool(d.on))
+		"beast_point": sim.cmd_beast_point(my_id, int(d.uid), str(d.attr))
+		"beast_train": sim.cmd_beast_train(my_id, int(d.uid), str(d.skill))
+		"beast_friend_train": sim.cmd_beast_friend_train(my_id, int(d.uid), str(d.breed), str(d.skill))
+		"beast_sell": sim.cmd_beast_sell(my_id, int(d.uid))
+		"auction_buy": sim.cmd_auction_buy(my_id, int(d.lot))
 
 func _log(s: String) -> void:
 	log_lines.append(s)

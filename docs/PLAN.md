@@ -266,7 +266,7 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
 > 排序依據：**玩家實際使用頻率**（戰鬥/同伴類 → 經濟 → 官方行政類 → 一次性設定/劇情類 → 低頻顯示類）。
 > 風格依據：**三國群英傳M + 三國演義 Online** 原作 UI（`ui/panels/ui_theme.gd` 墨啡底金邊 + 現有 `mount_panel.gd` 等已定風格，跟版）。
 > 規則：**一個 UI 系統 = 一個 session**，每份跟 `GamePanel` 慣例（讀 `sim.*_view()` read-model、`main._send()` 發意圖、`sig()` 判斷 refresh），做完要 `--uitest` 過 + 剔呢度個格 + 更新 CLAUDE.md「已知 UI 欠債」刪走已做嗰行。
-- [ ] **U01 戰騎面板**：`beast_view` read-model 已備 → 新 `war_beast_panel.gd`（馴養買獸/出戰跟隨/訓練/友好效果顯示/賣出，仿 `mount_panel.gd` 頁面結構）
+- [x] **U01 戰騎面板**：`beast_view` read-model 已備 → 新 `war_beast_panel.gd`（馴養買獸/出戰跟隨/訓練/友好效果顯示/賣出，仿 `mount_panel.gd` 頁面結構）完（頁 0 出戰狀態+加點+戰鬥/友好特技練+賣出，頁 1 馬廄列表+出戰收回+馴養買新+NPC拍賣場戰騎部分；`main.gd` +7 個 `beast_*`/`auction_buy` 意圖派送、`mobile_hud.gd`/`more_panel.gd` 入口；`sh tools/run_tests.sh` ALL OK，hud 4195/ui_smoke 129 過）
 - [ ] **U02 座騎補完**：`mount_panel.gd` 加改名輸入框、繁衍頁（借種馬/胎教 5 揀 1/積點分配/待領小馬）、馬戰頁（買兵器/學特技/HUD 特技掣）
 - [ ] **U03 同伴主動特技掣**：同伴面板/HUD 加遁地/挑釁/急救掣（`cmd_companion_skill(id,kind)`）+ 22 職業特技冷卻顯示
 - [ ] **U04 NPC 拍賣場**：`auction_view`/`cmd_auction_buy` 掣寄喺 `war_beast_panel.gd`/`mount_panel.gd` 馬廄頁（每日上架列表 + 買）
