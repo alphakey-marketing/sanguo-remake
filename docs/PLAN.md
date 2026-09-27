@@ -282,7 +282,9 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
   - 偏離（留返後續，冇合適掛鈎位）：脫出(`maze_escape`)/召喚(`summon_friend`)/神行(`haste_scroll`)/回城(`return_scroll`，同遁地合併咗)/火焰(`light`)/飛影/狂力/開光(agi/str/int_spi +3)/野性(`atk_speed_buff`)/奇門(`stealth_noncombat`)——單機冇連續移動速度系統、冇 fog-of-war/黑夜視野系統、冇屬性後天加成掛鈎位，做落去會等於新開一個子系統，記入 §4 留返有相關系統先接
   - 驗收：`run_war_beast.gd` 207 項全過（冇改動、純加新 hook）、`run_hud.gd` 4195/`run_sim.gd` 161/`run_char.gd` 80 全過；`--uitest` 129 項得返 2 個現有 flaky（掉落拾取，同呢個改動無關，之前 session 已記錄）
 - [ ] **U14 建角面板正式化**：`create_panel.gd` 由 debug 版換做正式（三國群英傳M 風格揀職業/性別/初值分配）
-- [ ] **U15 記事分類頁**：`quest_panel.gd` 分類（新手/官令/歷史/團體/絕招/戰役/場景/專長）+ 傳聞 UI（`rumor_view`/`known_rumors`，`rumor_panel.gd` 已有底可能只需擴充）
+- [x] **U15 記事「指引」頁**：`quest_panel.gd` 加第 5 個 tab「指引」（`_guide_section`）：靜態讀 `data/quests.json`（跳過 `hidden`）+ `data/quest_npcs.json` + `data/maps.json`，按 `TYPE_ORDER`（新手/職業特技/絕招/歷史/專長/義勇軍/結婚）列晒全部任務，每條顯示「接任務：NPC名（城池）」+ 條件（`_pre_summary`：等級/職業/義勇軍/性別/職業之一/屬性門檻）+ `preHint`；狀態（☆未接／●進行中／✓完成）由 `sim.view_quests()` 對返 id 標記；純查詢，唔碰 sim/存檔。傳聞 UI 留後（獨立 §4 項目，唔屬呢個 tab 範圍）
+  - **規則（記入呢度，日後補任務要跟）**：以後喺 `data/quests.json` 新增任務，要確保 `giver` 喺 `quest_npcs.json` 有對應 NPC（`map` 欄要填）、非通用條件寫清楚 `preHint`；`type` 如果係新分類要加入 `quest_panel.gd` 嘅 `TYPE_LABEL`/`TYPE_ORDER`，等「指引」頁自動列到，唔使另開 UI
+  - 驗收：`run_hud.gd` 4195/0 fail PASS；`--uitest` 待跑（同 U13 一樣預期得返舊有 2 個 flaky）
 - 每 session 完成後喺呢度剔格 + 喺對應 CLAUDE.md「已知 UI 欠債」行刪走已做部分；`sh tools/run_tests.sh` 要保持 ALL OK（`--uitest` 煙霧測試）
 
 ### S10 國戰（spec 10）— 開工前 D-3 必須定案【待決】

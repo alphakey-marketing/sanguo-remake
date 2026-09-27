@@ -1,11 +1,17 @@
 class_name QuestPanel
 extends GamePanel
-# 記事面板: 進行中任務（全文提示，可以拖捲）/ 已完成。
+# 記事面板: 進行中任務（全文提示，可以拖捲）/ 已完成 / 戰役 / 場景 / 指引。
+
+const TYPE_LABEL := {
+	"newbie": "新手", "general": "職業/特技", "ultimate": "絕招", "history": "歷史",
+	"group": "義勇軍", "expert": "專長", "marry": "結婚",
+}
+const TYPE_ORDER := ["newbie", "general", "ultimate", "history", "expert", "group", "marry"]
 
 func _init(m: Node) -> void:
 	super(m)
 	title_lbl.text = "記事"
-	set_tabs(["進行中", "完成", "戰役", "場景"])
+	set_tabs(["進行中", "完成", "戰役", "場景", "指引"])
 
 
 func sig() -> String:
@@ -42,6 +48,8 @@ func _build_body() -> void:
 		_battle_section(list)
 	if tab == 3:                           # 特殊場景日程 (S04d, spec 04 §4)
 		_scene_section(list)
+	if tab == 4:                           # 任務指引 (U17): 全部任務點揀/邊度接，靜態查詢，唔碰 sim
+		_guide_section(list)
 
 
 func _battle_section(list: Node) -> void:
@@ -74,3 +82,81 @@ func _scene_section(list: Node) -> void:
 			vs["sceneName"], int(vs["layer"]), int(vs["totalLayers"])], 14, UiTheme.TEXT))
 	else:
 		list.add_child(wrap_lbl("去荊州港口搵場景入口（開門日先入得）。", 14, UiTheme.DIM))
+
+
+# 任務指引 (U17): 靜態讀 data/quests.json + quest_npcs.json，列晒全部任務點揀/邊度接，
+# 唔發 sim 意圖；狀態（進行中/完成）由 sim.view_quests() 對返個 id 標記。
+func _guide_section(list: Node) -> void:
+	var status := {}
+	for q in main.sim.view_quests():
+		status[String(q["id"])] = q
+	var by_type := {}
+	for q in main.data.quests:
+		if bool(q.get("hidden", false)):
+			continue
+		var t := String(q.get("type", "?"))
+		if not by_type.has(t):
+			by_type[t] = []
+		(by_type[t] as Array).append(q)
+	list.add_child(lbl("任務指引 — 全部任務點揀、邊度接", 14, UiTheme.TEXT))
+	for t in TYPE_ORDER:
+		if not by_type.has(t):
+			continue
+		list.add_child(lbl(str(TYPE_LABEL.get(t, t)), 16, UiTheme.GOLD))
+		for q in by_type[t]:
+			_guide_row(list, q, status.get(String(q["id"]), {}))
+
+
+func _guide_row(list: Node, q: Dictionary, st: Dictionary) -> void:
+	var mark := "☆"
+	var color := UiTheme.TEXT
+	if bool(st.get("done", false)):
+		mark = "✓"
+		color = UiTheme.GOOD
+	elif bool(st.get("active", false)):
+		mark = "●"
+		color = UiTheme.GOLD
+	list.add_child(lbl("%s %s" % [mark, str(q["name"])], 15, color))
+	var giver := String(q.get("giver", ""))
+	if giver != "":
+		var npc: Dictionary = main.data.quest_npcs.get(giver, {})
+		var where := _map_name(String(npc.get("map", "")))
+		var npc_name := String(npc.get("name", giver))
+		list.add_child(lbl("　接任務：%s（%s）" % [npc_name, where] if where != "" else "　接任務：%s" % npc_name,
+			13, UiTheme.DIM))
+	var pre_txt := _pre_summary(q.get("pre", {}))
+	if pre_txt != "":
+		list.add_child(lbl("　條件：%s" % pre_txt, 13, UiTheme.DIM))
+	var hint := String(q.get("preHint", ""))
+	if hint != "" and not bool(st.get("active", false)) and not bool(st.get("done", false)):
+		list.add_child(wrap_lbl("　　%s" % hint, 13, UiTheme.DIM))
+	if bool(st.get("active", false)) and String(st.get("hint", "")) != "":
+		list.add_child(wrap_lbl("　　現況：%s" % str(st["hint"]), 13, UiTheme.TEXT))
+
+
+func _map_name(map_id: String) -> String:
+	if map_id == "":
+		return ""
+	for md in main.data.maps:
+		if String(md.get("id", "")) == map_id:
+			return String(md.get("name", map_id))
+	return map_id
+
+
+func _pre_summary(pre: Dictionary) -> String:
+	var parts: Array = []
+	if pre.has("minLevel"):
+		parts.append("等級≥%d" % int(pre["minLevel"]))
+	if pre.has("maxLevel"):
+		parts.append("等級≤%d" % int(pre["maxLevel"]))
+	if pre.has("classId"):
+		parts.append("職業：%s" % str(pre["classId"]))
+	if pre.has("militia"):
+		parts.append("要加入義勇軍")
+	if pre.has("gender"):
+		parts.append("性別：%s" % str(pre["gender"]))
+	if pre.has("classAny"):
+		parts.append("職業之一：%s" % ", ".join(pre["classAny"]))
+	for k in pre.get("attr", {}):
+		parts.append("%s≥%d" % [str(k), int(pre["attr"][k])])
+	return "、".join(parts)
