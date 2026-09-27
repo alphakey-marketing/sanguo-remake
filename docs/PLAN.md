@@ -271,7 +271,7 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
 - [x] **U03 同伴主動特技掣**：`recruit_panel.gd` 加遁地/挑釁/急救掣（`companion_skill` 意圖 → `cmd_companion_skill(id,kind)`），按冷卻剩餘 disable + 顯示秒數；22 職業特技冷卻/消耗加成用文字顯示（`classSkillMul`）。`sim_recruit.gd companion_view()` 加 `activeKind/activeCdLeft/activeCdTotal/classSkillMul` 欄；`main.gd` 加 `companion_skill` 派送。`sh tools/run_tests.sh` ALL OK。
 - [x] **U04 NPC 拍賣場**：`mount_panel.gd` 馬廄頁加 `_build_auction`（座騎部分，仿 `war_beast_panel.gd` 已有嘅戰騎部分，`kind=="mount"` 過濾）；sim 早已支援兩種 kind，唔使改 `sim_war_beast.gd`；`sig()` 加 `_aview()` 令每日換貨即時反映；`sh` hud/uitest/war_beast 三個 leg PASS
 - [x] **U05 官宅面板：頭銜/官令/義舉/進貢**：新 `office_panel.gd`（4 頁：頭銜討取+俸祿、官令接/交/放棄、義舉證明繳交+進貢物資、名額競爭顯示），全接現有 sim read-model/cmd（`merit_list`/`cmd_merit_turnin`/`city_favor_view`/`cmd_city_tribute`/`title_contest_view`/`order_text`/`order_block`）；`main.gd` 加 `merit_turnin`/`city_tribute` 意圖派送，`mobile_hud.gd`/`more_panel.gd` 入口；hud/title leg PASS（uitest 掉落 2 個 fail 為現有 flaky test，stash 前後都會偶發，同呢個改動無關）
-- [ ] **U06 官宅面板：內政 + 城池屬性**：`office_panel.gd` 加內政頁（`domestic_view`/`cmd_domestic`）+ 城池 8 項屬性顯示
+- [x] **U06 官宅面板：內政 + 城池屬性**：`office_panel.gd` 加第 5 頁「內政」（城池 8 項屬性顯示 + 6 種內政工作，扣行動力/專長經驗/封頂 100），全接現有 `domestic_view`/`cmd_domestic`；`main.gd` 加 `domestic` 意圖派送；hud/civic/uitest leg PASS
 - [ ] **U07 救災**：公佈欄 + 救災區設施圖示、`office_panel.gd` 加救災頁（`bulletin_view`/`relief_view`/`cmd_office_relief`/`cmd_relief_work`）
 - [ ] **U08 義勇軍面板**：新 `militia_panel.gd`（定居/遊說/成立/成員/階級/帶兵量，`settle_view`/`militia_view`/`cmd_settle`/`cmd_militia_invite`/`cmd_militia_found`）
 - [ ] **U09 營地面板**：新 `camp_panel.gd`（設施升級/監督/22 工作/評定會議/倉庫/商情/訓練，`camp_view`/`militia_work_view`/`eval_view` 系）
