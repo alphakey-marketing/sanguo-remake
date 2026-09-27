@@ -267,6 +267,8 @@ func _send(d: Dictionary) -> void:
 		"office_abandon": sim.cmd_office_abandon(my_id)
 		"merit_turnin": sim.cmd_merit_turnin(my_id, int(d.item))
 		"domestic": sim.cmd_domestic(my_id, str(d.job))
+		"office_relief": sim.cmd_office_relief(my_id)
+		"relief_work": sim.cmd_relief_work(my_id)
 		"city_tribute": sim.cmd_city_tribute(my_id, d.items as Array)
 		"office_pill": sim.cmd_office_pill(my_id)
 		"office_redeem_tool": sim.cmd_office_redeem_tool(my_id, int(d.item))
