@@ -9,6 +9,8 @@ const ACT_SHORT := {"feed": "餵食", "play": "玩耍", "scold": "責備", "gift
 
 var pick_act := ""          # 揀緊道具嘅動作
 var confirm_drop := false   # 丟棄要撳兩下
+var name_edit: LineEdit     # U02: 改名輸入框
+var pick_sire := ""         # U02: 揀緊種馬品種
 
 
 func _init(m: Node) -> void:
@@ -21,6 +23,7 @@ func open_tab(i: int) -> void:
 	tab = i
 	pick_act = ""
 	confirm_drop = false
+	pick_sire = ""
 	set_tabs(tab_names)
 	open()
 
@@ -28,6 +31,7 @@ func open_tab(i: int) -> void:
 func set_tab(i: int) -> void:
 	pick_act = ""
 	confirm_drop = false
+	pick_sire = ""
 	super(i)
 
 
@@ -39,7 +43,7 @@ func _view() -> Dictionary:
 
 
 func sig() -> String:
-	return JSON.stringify([tab, pick_act, confirm_drop, _view(), main.ch.get("bag", [])])
+	return JSON.stringify([tab, pick_act, confirm_drop, pick_sire, _view(), main.ch.get("bag", [])])
 
 
 func _mcfg() -> Dictionary:
@@ -102,6 +106,17 @@ func _build_mine(list: VBoxContainer, v: Dictionary) -> void:
 	if String(m["where"]) == "graze":
 		lines.append("放牧中，大約仲有 %d 刻返嚟" % int(m["grazeLeft"]))
 	list.add_child(wrap_lbl("\n".join(lines), 15))
+	# 改名
+	var nrow := HBoxContainer.new()
+	nrow.add_theme_constant_override("separation", 6)
+	list.add_child(nrow)
+	name_edit = LineEdit.new()
+	name_edit.max_length = 8
+	name_edit.placeholder_text = "改名（最多 8 字）"
+	name_edit.text = String(m.get("nick", ""))
+	name_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	nrow.add_child(name_edit)
+	nrow.add_child(btn("改名", func() -> void: main._send({"t": "mount_rename", "uid": uid, "nick": name_edit.text}), 80))
 	# 騎乘 / 放牧
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 6)
@@ -144,6 +159,18 @@ func _build_mine(list: VBoxContainer, v: Dictionary) -> void:
 		g.add_child(b)
 	if pick_act != "":
 		_build_pick(list, uid, pick_act)
+	# 繁衍 (Step 17b)
+	_build_breed(list, v, m, uid)
+	# 進階馬積點 (bpts): 揀屬性上限 +1
+	if int(m.get("bpts", 0)) > 0:
+		list.add_child(hsep())
+		list.add_child(lbl("進階積點 %d：揀屬性上限 +1" % int(m["bpts"]), 15, UiTheme.GOLD))
+		var bg := _grid(5)
+		list.add_child(bg)
+		var an2: Dictionary = cfg["attrNames"]
+		for at2 in cfg["attrs"]:
+			var aa2: String = at2
+			bg.add_child(_fill(btn(String(an2[aa2]).substr(0, 2), func() -> void: main._send({"t": "mount_spend_bpt", "uid": uid, "attr": aa2}))))
 	# 優秀值點數
 	if int(m["points"]) > 0:
 		list.add_child(hsep())
@@ -186,6 +213,58 @@ func _build_pick(list: VBoxContainer, uid: int, act: String) -> void:
 		list.add_child(wrap_lbl("背包冇啱用嘅道具，去馬廄買（飼料 / 玩具 / 寵物藥）。", 14, UiTheme.DIM))
 
 
+# 繁衍 (Step 17b, spec 07 §6): 未配種 → 揀種馬品種配種；配咗種 → 胎教小遊戲 + 懶人開關 + 接生
+func _build_breed(list: VBoxContainer, v: Dictionary, m: Dictionary, uid: int) -> void:
+	var cfg := _mcfg()
+	list.add_child(hsep())
+	var preg: Dictionary = m.get("preg", {})
+	if preg.is_empty():
+		list.add_child(lbl("繁衍：借種馬配種（%d 金）" % int(cfg["studPrice"]), 15, UiTheme.GOLD))
+		var why := String(m["breedWhy"])
+		if why == "" and String(v["stable"]) == "":
+			why = "要去馬廄先配得種"
+		if why != "":
+			list.add_child(wrap_lbl(why, 13, UiTheme.DIM))
+			return
+		var g := _grid(3)
+		list.add_child(g)
+		for b in v["breeds"]:
+			var bid := String(b["id"])
+			var bb := _fill(btn(b["name"], func() -> void:
+				pick_sire = "" if pick_sire == bid else bid
+				refresh(true)))
+			if pick_sire == bid:
+				bb.add_theme_color_override("font_color", UiTheme.GOLD)
+			g.add_child(bb)
+		if pick_sire != "":
+			var cb := btn("確定配種「%s」" % pick_sire, func() -> void:
+				main._send({"t": "mount_breed_start", "uid": uid, "sire": pick_sire})
+				pick_sire = "")
+			cb.disabled = int(v["gold"]) < int(cfg["studPrice"])
+			list.add_child(cb)
+		return
+	# 配咗種: 胎教
+	var bcfg: Dictionary = cfg["breed"]
+	list.add_child(lbl("胎教：動情值 %d/%d　胎氣 %d/%d%s" % [int(preg["motive"]), int(bcfg["motiveCap"]),
+		int(preg["taiqi"]), int(preg["taiqiNeed"]), "　（懶人胎教中）" if bool(preg["lazy"]) else ""], 15, UiTheme.GOLD))
+	if bool(preg["ready"]):
+		list.add_child(btn("胎氣夠喇！接生", func() -> void: main._send({"t": "mount_breed_claim", "uid": uid})))
+		return
+	var play_why := String(preg["playWhy"])
+	if play_why != "":
+		list.add_child(wrap_lbl(play_why, 13, UiTheme.DIM))
+	else:
+		var bets: Array = bcfg["bets"]
+		var g2 := _grid(3)
+		list.add_child(g2)
+		for i in bets.size():
+			var ci := i
+			g2.add_child(_fill(btn(String(bets[i]), func() -> void: main._send({"t": "mount_breed_bet", "uid": uid, "choice": ci}))))
+	var lazy := bool(preg["lazy"])
+	list.add_child(btn("懶人胎教：%s（開咗自動 %d 日後生，積點封頂 %d）" % ["開" if not lazy else "關", int(bcfg["lazyDays"]), int(bcfg["lazyBpts"])],
+		func() -> void: main._send({"t": "mount_breed_lazy", "uid": uid, "on": not lazy})))
+
+
 # 道具效果簡述 (效果碼 → 中文)
 func _eff_text(it: int) -> String:
 	var cfg := _mcfg()
@@ -213,6 +292,12 @@ func _build_stable(list: VBoxContainer, v: Dictionary) -> void:
 	var ms: Array = v["list"]
 	list.add_child(wrap_lbl("%s　金 %d　座騎 %d/%d" % ["喺" + at_name if at != "" else "唔喺馬廄（寄養 / 領馬 / 買馬要去馬廄）",
 		int(v["gold"]), ms.size(), int(cfg["maxOwned"])], 15, UiTheme.TEXT if at != "" else UiTheme.DIM))
+	var pf: Dictionary = v.get("pendingFoal", {})
+	if not pf.is_empty():
+		var fb := btn("提領小馬（%s，%s）" % [RulesMount.breed_def(cfg, String(pf["breed"]))["name"], "母" if String(pf["sex"]) == "f" else "公"],
+			func() -> void: main._send({"t": "mount_take_foal"}))
+		fb.disabled = at == "" or ms.size() >= int(cfg["maxOwned"])
+		list.add_child(fb)
 	for m in ms:
 		var uid := int(m["uid"])
 		var row := HBoxContainer.new()
@@ -251,7 +336,47 @@ func _build_stable(list: VBoxContainer, v: Dictionary) -> void:
 	list.add_child(tbtn)
 	list.add_child(btn("馬用品（飼料 / 玩具 / 寵物藥 / 馴馬專用哨）", func() -> void:
 		main.hud.shop_panel().open_shop({"stock": cfg["stableStock"], "shopName": at_name})))
+	_build_battle(list, v, gold)
 	list.add_child(hsep())
 	list.add_child(lbl("簡易養馬指南", 15, UiTheme.GOLD))
 	for t in cfg["tips"]:
 		list.add_child(wrap_lbl("・" + String(t), 13, UiTheme.DIM))
+
+
+# 馬戰 (Step 17b, spec 07 §7): 兵器買 3 級 + 特技拜師學（最多 3 招）
+func _build_battle(list: VBoxContainer, v: Dictionary, gold: int) -> void:
+	var mw: Dictionary = main.data.mount_weapons
+	var level := int(main.ch["level"])
+	var cur_wid := String(v["mountWeapon"])
+	list.add_child(hsep())
+	list.add_child(lbl("馬戰兵器（現裝：%s）" % (RulesMountBattle.weapon_def(mw, String(v["mountWeaponType"]), cur_wid).get("name", "無") if cur_wid != "" else "無"), 15, UiTheme.GOLD))
+	for wtype in v["mountWeapons"]:
+		var trow := HBoxContainer.new()
+		trow.add_theme_constant_override("separation", 6)
+		list.add_child(trow)
+		trow.add_child(lbl(String(mw["types"].get(wtype, wtype)), 14, UiTheme.DIM))
+		var g := _grid(3)
+		list.add_child(g)
+		for w in v["mountWeapons"][wtype]:
+			var wid := String(w["id"])
+			var owned := wid == cur_wid
+			var b := _fill(btn("%s%s（Lv%d，%d 金）" % ["✓" if owned else "", w["name"], int(w["lv"]), int(w["price"])],
+				func() -> void: main._send({"t": "mount_weapon_buy", "wtype": wtype, "wid": wid})))
+			b.disabled = owned or level < int(w["lv"]) or gold < int(w["price"])
+			if owned:
+				b.add_theme_color_override("font_color", UiTheme.GOLD)
+			g.add_child(b)
+	var learned: Array = v["mountSkills"]
+	list.add_child(hsep())
+	list.add_child(lbl("馬戰特技（拜師 %d 金，最多學 %d 招，要有對應兵器）" % [int(mw["teachPrice"]), int(mw["maxSkills"])], 15, UiTheme.GOLD))
+	var sg := _grid(3)
+	list.add_child(sg)
+	for s in v["mountSkillDefs"]:
+		var sid := String(s["id"])
+		var known := learned.has(sid)
+		var b2 := _fill(btn("%s%s（%s）" % ["✓" if known else "", s["name"], String(mw["types"].get(String(s["weapon"]), ""))],
+			func() -> void: main._send({"t": "mount_skill_learn", "skill": sid})))
+		b2.disabled = known or learned.size() >= int(mw["maxSkills"]) or gold < int(mw["teachPrice"])
+		if known:
+			b2.add_theme_color_override("font_color", UiTheme.GOLD)
+		sg.add_child(b2)

@@ -323,6 +323,7 @@ func _send(d: Dictionary) -> void:
 		"mount_act": sim.cmd_mount_act(my_id, int(d.uid), str(d.act), int(d.get("item", 0)))
 		"mount_abandon": sim.cmd_mount_abandon(my_id, int(d.uid))
 		"mount_point": sim.cmd_mount_point(my_id, int(d.uid), str(d.attr))
+		"mount_rename": sim.cmd_mount_rename(my_id, int(d.uid), str(d.nick))
 		"mount_ride": sim.cmd_mount_ride(my_id, bool(d.on))
 		"mount_graze": sim.cmd_mount_graze(my_id)
 		"mount_breed_start": sim.cmd_mount_breed_start(my_id, int(d.uid), str(d.sire))
@@ -816,6 +817,11 @@ func _on_skill(sl: Dictionary) -> void:
 		return
 	if String(sl["kind"]) == "skill":           # S02c 職業特技掣: 而家得開鎖（sim 會檢查附近有冇鎖寶箱）
 		_send({"t": "use_skill", "skill": String(sl["skill"])})
+		return
+	if String(sl["kind"]) == "mount":           # U02 馬戰特技掣
+		var t = target_ent()
+		var tgt := int(t.id) if t != null and bool(t.get("mob", false)) else 0
+		_send({"t": "mount_skill_use", "skill": String(sl["skill"]), "target": tgt})
 		return
 	if String(sl["ult"]) == "":
 		_log("未學絕招 (絕招任務: 練兵場門口禁衛大隊長)")
