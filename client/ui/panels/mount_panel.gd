@@ -43,7 +43,11 @@ func _view() -> Dictionary:
 
 
 func sig() -> String:
-	return JSON.stringify([tab, pick_act, confirm_drop, pick_sire, _view(), main.ch.get("bag", [])])
+	return JSON.stringify([tab, pick_act, confirm_drop, pick_sire, _view(), main.ch.get("bag", []), _aview()])
+
+
+func _aview() -> Dictionary:
+	return main.sim.auction_view(main.my_id)
 
 
 func _mcfg() -> Dictionary:
@@ -337,6 +341,7 @@ func _build_stable(list: VBoxContainer, v: Dictionary) -> void:
 	list.add_child(btn("馬用品（飼料 / 玩具 / 寵物藥 / 馴馬專用哨）", func() -> void:
 		main.hud.shop_panel().open_shop({"stock": cfg["stableStock"], "shopName": at_name})))
 	_build_battle(list, v, gold)
+	_build_auction(list, full, gold)
 	list.add_child(hsep())
 	list.add_child(lbl("簡易養馬指南", 15, UiTheme.GOLD))
 	for t in cfg["tips"]:
@@ -380,3 +385,29 @@ func _build_battle(list: VBoxContainer, v: Dictionary, gold: int) -> void:
 		if known:
 			b2.add_theme_color_override("font_color", UiTheme.GOLD)
 		sg.add_child(b2)
+
+
+# NPC 拍賣場（座騎部分，U04）
+func _build_auction(list: VBoxContainer, full: bool, gold: int) -> void:
+	var a := _aview()
+	if a.is_empty():
+		return
+	list.add_child(hsep())
+	list.add_child(lbl("NPC 拍賣場（每日換貨）", 15, UiTheme.GOLD))
+	var any := false
+	for lot in (a["lots"] as Array):
+		if String(lot["kind"]) != "mount":
+			continue
+		any = true
+		var lid := int(lot["id"])
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 6)
+		var sex_name := "公" if String(lot["sex"]) == "m" else "母"
+		var tag := "已馴" if bool(lot["tamed"]) else "幼馬"
+		row.add_child(wrap_lbl("%s（%s・%s，%d 金）" % [lot["name"], sex_name, tag, int(lot["price"])], 14))
+		var bb := btn("買", func() -> void: main._send({"t": "auction_buy", "lot": lid}), 64)
+		bb.disabled = full or not bool(lot["afford"])
+		row.add_child(bb)
+		list.add_child(row)
+	if not any:
+		list.add_child(wrap_lbl("今日冇座騎上架，聽日再嚟。", 14, UiTheme.DIM))
