@@ -8,7 +8,7 @@ extends GamePanel
 func _init(m: Node) -> void:
 	super(m)
 	title_lbl.text = "官宅"
-	tab_names = ["頭銜", "官令", "義舉/進貢", "名額競爭"]
+	tab_names = ["頭銜", "官令", "義舉/進貢", "名額競爭", "內政"]
 
 
 func open_tab(i: int) -> void:
@@ -21,7 +21,7 @@ func sig() -> String:
 	var ch: Dictionary = main.ch
 	return JSON.stringify([tab, ch.get("titleRank", 0), ch.get("fame", 0), ch.get("gold", 0),
 		ch.get("office", {}), main.sim.merit_list(ch), main.sim.city_favor_view(ch),
-		main.sim.title_contest_view(main.my_id)])
+		main.sim.title_contest_view(main.my_id), main.sim.domestic_view(main.my_id)])
 
 
 func _build_body() -> void:
@@ -35,7 +35,8 @@ func _build_body() -> void:
 		0: _build_title(list)
 		1: _build_order(list)
 		2: _build_merit(list)
-		_: _build_contest(list)
+		3: _build_contest(list)
+		_: _build_domestic(list)
 
 
 # ---- 頁 0: 頭銜 ----
@@ -151,6 +152,29 @@ func _build_contest(list: VBoxContainer) -> void:
 		else:
 			list.add_child(wrap_lbl("上次守位失敗（分數 %d，NPC 最高 %d），跌落第 %d 階。" %
 				[int(last.get("score", 0)), int(last.get("npcBest", 0)), int(last.get("dropTo", 0))], 14, UiTheme.BAD))
+
+
+# ---- 頁 4: 內政 + 城池屬性 ----
+func _build_domestic(list: VBoxContainer) -> void:
+	var v: Dictionary = main.sim.domestic_view(main.my_id)
+	if v.is_empty() or String(v.get("office", "")) == "":
+		list.add_child(wrap_lbl("要去官宅先做得內政。", 14, UiTheme.DIM))
+		return
+	list.add_child(lbl("%s　城池屬性" % String(v.get("cityName", "")), 15, UiTheme.GOLD))
+	for r in (v.get("attrs", []) as Array):
+		list.add_child(wrap_lbl("%s：%d" % [String(r["name"]), int(r["val"])], 14))
+	list.add_child(hsep())
+	list.add_child(lbl("內政工作（每次扣行動力 %d）" % int(v.get("apCost", 0)), 15, UiTheme.GOLD))
+	for j in (v.get("jobs", []) as Array):
+		var can := bool(j.get("can", false))
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 6)
+		row.add_child(wrap_lbl("%s：%s +%d（%s 專長 %d 級）" % [String(j["name"]), String(j["attrName"]),
+			int(j["gain"]), String(j["expert"]), int(j["expertLv"])], 14))
+		var b := btn("進行" if can else String(j["why"]), func() -> void: main._send({"t": "domestic", "job": String(j["id"])}), 96)
+		b.disabled = not can
+		row.add_child(b)
+		list.add_child(row)
 
 
 func _fill(b: Button) -> Button:
