@@ -212,6 +212,8 @@ func step() -> void:
 		var mv := 2 if (e["kind"] == "mob" and (e.get("mob", {}) as Dictionary).get("state", "") == "flee" and tick % 2 == 0) else 1
 		if e.has("ch"):
 			mv = _ride_steps(e)       # 騎馬: 移速 ×1.5~2 (Step 17a, spec 07 §7)
+		if e["kind"] == "bot" and bool(e.get("fleePk", false)) and tick % 3 == 2:
+			mv = 0                    # 打人模式/S03a: 逃走緊嘅居民行慢啲 (3 tick 行 2 格)，等玩家追得返 (spec 03 §3)
 		var moved := false
 		var moved_n := 0
 		for _k in mv:
