@@ -304,8 +304,7 @@ func t_tianqian_reprisal(data: GameData) -> void:
 	check(int(ch["hp"]) == RulesKarma.tianqian_hp(hp_before), "天譴: 玩家 HP 劈半")
 	check(bool(ch.get("tianqian", false)), "天譴: ch.tianqian 旗 (S03c 還魂丹無效用)")
 	check(str(got[1]) == RulesKarma.tianqian_announce("t"), "天譴: 公告文案送出")
-	var inn: Dictionary = data.inn
-	check(int(sim.ent(pid)["x"]) == int(inn["x"]) and int(sim.ent(pid)["y"]) == int(inn["y"]), "天譴: 傳送回客棧")
+	check(int(sim.ent(pid)["x"]) == 60 and int(sim.ent(pid)["y"]) == 60, "天譴: 原地捱雷劈，唔傳送")
 	check(not sim.ents.has(bid), "天譴: 居民已移除")
 
 

@@ -666,6 +666,60 @@ func add_residents() -> void:
 			state["bots"].append(int(e["id"]))
 
 
+# 捕快 NPC【自訂】: 每張 city 地圖生 guards.json cfg.perCity 隻，50~75 級，企喺客棧側 (唔係城門口)。
+func add_guards() -> void:
+	var g := RulesGuard.cfg(data.guards)
+	if g.is_empty():
+		return
+	var per_city := int(g.get("perCity", 2))
+	for md in data.maps:
+		if String(md.get("kind", "")) != "city":
+			continue
+		var city_id := String(md.get("city", ""))
+		if city_id == "":
+			continue
+		var inn_here := Vector2i(-1, -1)
+		for x in data.inns:
+			var m: Dictionary = data.map_by_id.get(String(x.get("map", "")), {})
+			if String(m.get("city", "")) == city_id:
+				inn_here = Vector2i(int(x["x"]), int(x["y"]))
+				break
+		if inn_here.x < 0:
+			continue
+		var stand := RulesGuard.stand_pos(inn_here.x, inn_here.y, g)
+		for i in per_city:
+			var e := _spawn_actor("捕快" + str(i + 1), "bot", "yishi", [stand.x - 1, stand.y - 1, stand.x + 1, stand.y + 1])
+			_bump_level(e, RulesGuard.level_of(g, i, per_city))
+			BotSys.init_guard(e, city_id, stand)
+			state["bots"].append(int(e["id"]))
+
+
+# 提升已生成單位嘅等級 (捕快用): 照 class 成長公式重推屬性/HP/MP/SP，滿血滿藍
+func _bump_level(e: Dictionary, lv: int) -> void:
+	var ch: Dictionary = e["ch"]
+	var cls: Dictionary = data.classes.get(String(ch["classId"]), {})
+	if cls.is_empty():
+		return
+	var attrs := RulesStats.attrs_at(cls, lv)
+	ch["level"] = lv
+	ch["attrs"] = attrs
+	ch["hp"] = RulesStats.max_hp(lv, attrs)
+	ch["mp"] = RulesStats.max_mp(lv, attrs)
+	ch["sp"] = RulesStats.max_sp(lv, attrs)
+	_sync_stats(e)
+
+
+# S09a 居民日程: 居民 homeCity → 對應城內地圖 id (kind:city 且 city==homeCity；如 runan → runan_city)。
+# 居民喺 in-town 活動 (eat/home/sleep) 時要留喺呢張城內地圖行街，唔出野外。
+func resident_city_map_id(city_id: String) -> String:
+	if city_id == "":
+		return ""
+	for md in data.maps:
+		if String(md.get("kind", "")) == "city" and String(md.get("city", "")) == city_id:
+			return String(md.get("id", ""))
+	return ""
+
+
 # S09a: 居民休息客棧位置。居民 → 自己城嘅客棧 (冇 = Vector2i(-1,-1) 唔撤退)；legacy bot → 預設客棧。
 func resident_inn_pos(e: Dictionary) -> Vector2i:
 	var ch: Dictionary = e.get("ch", {})

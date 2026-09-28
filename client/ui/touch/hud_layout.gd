@@ -14,8 +14,8 @@ const SKILL_DIST := 104.0      # 技能圓心距普攻圓心 (前 4 格)
 const SKILL_DIST2 := 150.0     # 額外 2 格 (S01a: 5 級後) 用大半徑，避免同前 4 格重疊
 const SKILL_ANGLES := [180.0, 210.0, 240.0, 270.0, 218.0, 248.0]   # 左 → 上 扇形（Godot y 向下）；前 4 個 = 5 級前；S01a: 5 級後開埋後 2 個 (用 SKILL_DIST2)
 const SMALL_R := 22.0          # 切換目標 / 自動
-const MENU := ["menu_bag", "menu_char", "menu_quest", "menu_more"]
-const MENU_LABELS := {"menu_bag": "背包", "menu_char": "角色", "menu_quest": "任務", "menu_more": "更多"}
+const MENU := ["menu_bag", "menu_char", "menu_quest", "menu_pk", "menu_more"]
+const MENU_LABELS := {"menu_bag": "背包", "menu_char": "角色", "menu_quest": "任務", "menu_pk": "打人", "menu_more": "更多"}
 const MENU_SZ := 48.0
 const MENU_GAP := 4.0
 const MINI_SZ := Vector2(112, 50)   # 小地圖 (spec 12 §6)

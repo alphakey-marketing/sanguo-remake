@@ -95,6 +95,13 @@ static func activity_at(residents: Dictionary, shichen: int) -> String:
 	return String(s[((shichen % s.size()) + s.size()) % s.size()])
 
 
+# 居民日程驅動 (spec 09 §1): 某啲活動 (cfg.inTownActivities，如 eat/home/sleep) → 留城內行街/休息，唔出野外；
+# 其餘 (work) → 去 homeZone 野外練功。非 in-town 活動一律回 false (照舊野外)。
+static func is_city_activity(residents: Dictionary, activity: String) -> bool:
+	var in_town = cfg(residents).get("inTownActivities", [])
+	return in_town is Array and (in_town as Array).has(activity)
+
+
 static func home_zone(residents: Dictionary, city_id: String) -> String:
 	var cs = residents.get("cities", {})
 	if not (cs is Dictionary):

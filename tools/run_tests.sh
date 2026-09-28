@@ -15,6 +15,14 @@ run() {   # run <label> <args...>: 印出 [TEST]/[FAIL]/PASS 行，Godot exit co
   echo "$out" | grep -E "^\[(TEST|FAIL)\]|^PASS|^FAIL"
   [ $code = 0 ] || { echo "!! $label exit $code"; rc=1; }
 }
+boot=$(timeout $GTOUT "$G" --headless --path client --quit-after 100 -- --newgame 2>&1)   # 開機檢查: main/HUD 任何 script 編譯錯誤 (例如 := 推唔到型) 即失敗
+if echo "$boot" | grep -E "SCRIPT ERROR|Parse Error|Compile Error|Failed to load script" >/dev/null; then
+  echo "[FAIL] boot: script 編譯/運行錯誤"
+  echo "$boot" | grep -E -A1 "SCRIPT ERROR|Failed to load script" | head -20
+  rc=1
+else
+  echo "[TEST] boot: 冇 script 錯誤"
+fi
 run rules --script tests/run_rules.gd
 run quest --script tests/run_quest.gd
 run hist --script tests/run_hist.gd
@@ -51,6 +59,8 @@ run battle --script tests/run_battle.gd
 run scene --script tests/run_scene.gd
 run pk --script tests/run_pk.gd
 run karma --script tests/run_karma.gd
+run guard --script tests/run_guard.gd
+run down --script tests/run_down.gd
 run market --script tools/market_sim.gd
 run hud --script tests/run_hud.gd
 run autotest -- --autotest

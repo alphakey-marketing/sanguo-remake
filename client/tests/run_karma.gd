@@ -90,7 +90,7 @@ func t_rules(data: GameData) -> void:
 	check(cap.size() == 6, "掉物: 惡人最多 6 件 (全中但斬 cap)")
 
 
-# ===== sim 死亡流程 (spec 03 §4.3): 扣經驗 → 掉物 → 回一半 → 目擊 → 耐久 =====
+# ===== sim 死亡流程 (spec 03 §4.3): 扣經驗 → 掉物 → 倒地【自訂新增】→ 目擊 → 耐久 =====
 func t_death_flow(data: GameData) -> void:
 	var r := _mk(data, 81)
 	var sim: Sim = r[0]
@@ -110,22 +110,38 @@ func t_death_flow(data: GameData) -> void:
 		if String(ev.get("k", "")) == "die" and int(ev.get("dst", 0)) == pid:
 			last_die[0] = ev)
 	var p: Dictionary = sim.ent(pid)
+	var dx := int(p["x"])
+	var dy := int(p["y"])
 	var dur_before := int(ch["equip"]["dur"][str(ch["equip"]["weapons"][0])])
 	sim.damage(p, 99999, {})                             # 死亡 (無戰鬥, 正常掉物/經驗)
-	# 1. 扣經驗 (10%)
+	# 1. 扣經驗 (10%) —— 即時
 	check(int(ch["exp"]) == maxi(0, exp_before - RulesCombat.death_exp_loss(0, exp_to_next)), "死: 扣 10%% 經驗 (got %d)" % int(ch["exp"]))
-	# 3. 傳返客棧 + 回一半
-	check(int(p["x"]) == sim.inn_pos.x and int(p["y"]) == sim.inn_pos.y, "死: 傳返客棧")
-	check(int(ch["hp"]) == maxi(1, MathX.js_round(sim._eff_max_hp(ch) / 2.0)), "死: HP 回一半")
-	check(int(ch["mp"]) == maxi(0, MathX.js_round(sim._eff_max_mp(ch) / 2.0)), "死: MP 回一半")
+	# 3. 倒地【自訂新增】: 原地(死位) hp=0，未傳送、未回血
+	check(bool(p.get("down", false)), "死: 冇復活道具 → 入倒地狀態")
+	check(int(p["x"]) == dx and int(p["y"]) == dy, "死: 倒地原地企，未傳送")
+	check(int(ch["hp"]) == 0, "死: 倒地 hp=0")
 	# 4. 目擊死亡: 附近 bot 好感 +2 (同情)
 	check(NpcMemory.affinity(mem, pid) == BotSys.W_SEE_DIE, "死: 附近 NPC 目擊死亡好感 +2")
-	# 5. 耐久 -10%【自訂】
+	# 5. 耐久 -10%【自訂】—— 即時
 	check(int(ch["equip"]["dur"][str(ch["equip"]["weapons"][0])]) < dur_before, "死: 武器耐久扣低過之前")
 	# 死亡事件帶齊結算欄位
 	var die: Dictionary = last_die[0]
-	check(die.has("exp_lost") and die.has("dropped") and die.has("revived") and die.has("lucky") and die.has("huhushen"), "死: die 事件帶結算欄位")
+	check(die.has("exp_lost") and die.has("dropped") and die.has("revived") and die.has("lucky") and die.has("huhushen") and die.has("down"), "死: die 事件帶結算欄位")
 	check(int(die.get("exp_lost", 0)) == RulesCombat.death_exp_loss(0, exp_to_next), "死: die 事件 exp_lost 正確")
+	check(bool(die.get("down", false)) == true, "死: die 事件 down=true")
+	# 倒地期間唔可以郁
+	sim.cmd_move(pid, dx + 1, dy)
+	check(int(p["x"]) == dx and int(p["y"]) == dy, "死: 倒地期間唔可以移動")
+	# 5 秒 (50 tick) 前撳回城掣冇反應
+	sim.cmd_self_revive(pid)
+	check(bool(p.get("down", false)), "死: 未夠 5 秒撳回城復活冇反應")
+	for _i in 50:
+		sim.step()
+	sim.cmd_self_revive(pid)
+	check(not bool(p.get("down", false)), "死: 5 秒後撳回城復活 → 成功")
+	check(int(p["x"]) == sim.inn_pos.x and int(p["y"]) == sim.inn_pos.y, "死: 回城復活傳返客棧")
+	check(int(ch["hp"]) == maxi(1, MathX.js_round(sim._eff_max_hp(ch) / 2.0)), "死: 回城復活 HP 回一半")
+	check(int(ch["mp"]) == maxi(0, MathX.js_round(sim._eff_max_mp(ch) / 2.0)), "死: 回城復活 MP 回一半")
 
 
 # ===== 幸運符: 死亡唔掉物品, 消耗 1 =====
