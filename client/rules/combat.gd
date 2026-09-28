@@ -83,10 +83,11 @@ static func roll_death_drop(karma: int, bag: Array, rng: Callable = Callable()) 
 
 
 # ============ S03c 死亡道具 (spec 03 §4)【自訂】============
-# 死亡道具 id (items.json cat 250 消耗/特殊): 幸運符 / 護身符 / 還魂丹
+# 死亡道具 id (items.json cat 250 消耗/特殊): 幸運符 / 護身符 / 還魂丹 / 復活丹
 const LUCKY_CHARM := 65016      # 死亡唔掉物品 (消耗 1)
 const PROTECTION_CHARM := 65029 # 經驗損失減半 (消耗 1)
 const REVIVE_PILL := 65030      # 死亡即喺客棧復活，物品/經驗照掉；天譴無效
+const ONSITE_REVIVE_PILL := 65338 # 復活丹: 倒地期間就地復活（唔使返鎮，回滿血），消耗 1
 
 # 死亡掉物品表【原】spec 03 §4.1: 按善惡階返 {max 最高掉落件數, p 每件獨立機率}
 # 機率【自訂】善劣兩邊 0.8/0.6/0.4/0.3/0.25/0.2 檔 (惡越高跌得越多件 × 每件機率越高)

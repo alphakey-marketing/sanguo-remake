@@ -50,6 +50,10 @@ func _build_body() -> void:
 	list.add_child(btn("撳掣震動：%s" % ("開" if hud.vibrate_on else "關"), func() -> void:
 		hud.vibrate_on = not hud.vibrate_on
 		refresh(true)))
+	list.add_child(btn("打人模式：%s（開 = 所有怪/NPC 都可以 target 攻擊；關 = 淨係怪 + 敵對 NPC）" % ("開" if main.pk_mode else "關"), func() -> void:
+		main.pk_mode = not main.pk_mode
+		main._log("打人模式 %s" % ("開" if main.pk_mode else "關"))
+		refresh(true)))
 	list.add_child(hsep())
 	list.add_child(lbl("測試功能（成品前會換走）", 16, UiTheme.GOLD))
 	var g := GridContainer.new()

@@ -41,6 +41,55 @@ static func init_resident(e: Dictionary, rng: SimRng, residents: Dictionary, cit
 	e["mem"] = NpcMemory.init_memory()
 
 
+# 捕快入場【自訂】: 派 role/homeCity/企定位 + 開一張記憶表。等級/屬性由 sim._bump_level 另設。
+static func init_guard(e: Dictionary, city_id: String, stand: Vector2i) -> void:
+	var ch: Dictionary = e["ch"]
+	ch["role"] = "constable"
+	ch["align"] = "good"
+	ch["homeCity"] = city_id
+	ch["standPos"] = {"x": stand.x, "y": stand.y}
+	ch["patrolStep"] = 0
+	e["mem"] = NpcMemory.init_memory()
+
+
+# 捕快行為【自訂】: 見紅名(罪犯居民/殺人魔玩家)喺 aggroRange 內 -> 鎖定 atk_target (由 _think_player 追擊出手)；
+# 冇紅名: 巡邏時辰內喺企定位附近循環巡邏，其餘時辰返企定位企定 (唔郁)。
+static func _constable_tick(sim, id: int, e: Dictionary) -> void:
+	var ch: Dictionary = e["ch"]
+	if int(e["atk_target"]) != 0:
+		return                                       # 追緊 -> 交返 _think_player 出手
+	var g: Dictionary = RulesGuard.cfg(sim.data.guards)
+	var pid := int(sim.state["player_id"])
+	var pe: Dictionary = sim.ent(pid)
+	if not pe.is_empty() and pe.has("ch") and int(pe["hp"]) > 0 \
+			and RulesGuard.is_red_target(pe["ch"], true) \
+			and RulesGuard.in_aggro_range(int(e["x"]), int(e["y"]), int(pe["x"]), int(pe["y"]), g):
+		e["atk_target"] = pid
+		return
+	for bid in sim.state["bots"]:
+		if int(bid) == id:
+			continue
+		var be: Dictionary = sim.ent(int(bid))
+		if be.is_empty() or not be.has("ch") or int(be["hp"]) <= 0:
+			continue
+		if not RulesGuard.is_red_target(be["ch"], false):
+			continue
+		if RulesGuard.in_aggro_range(int(e["x"]), int(e["y"]), int(be["x"]), int(be["y"]), g):
+			e["atk_target"] = int(bid)
+			return
+	var sp: Dictionary = ch.get("standPos", {})
+	var stand := Vector2i(int(sp.get("x", int(e["x"]))), int(sp.get("y", int(e["y"]))))
+	var shi := RulesClock.shichen_of_ke(int(sim._clock()["ke"]))
+	if RulesGuard.is_patrol_time(g, shi):
+		if int(e["x"]) == int(e["tx"]) and int(e["y"]) == int(e["ty"]):
+			var step := int(ch.get("patrolStep", 0))
+			var pt := RulesGuard.patrol_point(stand, int(g.get("patrolRadius", 6)), step)
+			ch["patrolStep"] = step + 1
+			sim.cmd_move(id, pt.x, pt.y)
+	elif int(e["x"]) != stand.x or int(e["y"]) != stand.y:
+		sim.cmd_move(id, stand.x, stand.y)
+
+
 static func think(sim) -> void:
 	var bc: Dictionary = sim.data.world["bots"]
 	var mobs_by_map := {}              # 地圖 index -> [mob]，每 tick 分組一次 (次序 = ents 插入次序)
@@ -58,6 +107,9 @@ static func think(sim) -> void:
 		var ch: Dictionary = e["ch"]
 		if bool(ch.get("fleePk", false)):          # S03a: 被襲逃跑叫衛兵
 			_pk_flee(sim, id, e, dead)
+			continue
+		if String(ch.get("role", "")) == "constable":   # 捕快: 見紅名主動打, 否則巡邏/企定位
+			_constable_tick(sim, id, e)
 			continue
 		if bool(ch.get("criminal", false)) and _crime_find_player(sim, e):   # S03a: 紅名(殺人魔)主動襲擊玩家
 			continue                                  # (atk_target 已鎖定, 下方 _think_player 出手)
@@ -80,6 +132,26 @@ static func think(sim) -> void:
 				sim.cmd_move(id, inn.x, inn.y)
 			continue
 		if int(e["atk_target"]) != 0:                  # 戰鬥中
+			continue
+		# 居民日程 (S09a, spec 09 §1): in-town 活動 (cfg.inTownActivities: eat/home/sleep) → 留城內行街/休息，唔出野區；
+		# work → 落下方野外練功邏輯。血低返客棧 (上方) 任何時辰都優先。
+		if RulesResident.is_city_activity(sim.data.residents, RulesResident.activity_at(sim.data.residents, RulesClock.shichen_of_ke(int(sim._clock()["ke"])))):
+			var cmap: String = sim.resident_city_map_id(String(ch.get("homeCity", "")))
+			if cmap != "" and sim.map_id_at(int(e["x"]), int(e["y"])) != cmap:
+				sim._route_to_map(e, cmap)          # 唔喺自己城: 返城
+			elif cmap != "" and int(e["x"]) == int(e["tx"]) and int(e["y"]) == int(e["ty"]) and sim.rng.next() < float(bc["wanderChance"]):
+				var rz: Dictionary = sim.zone_by_id(cmap)      # 城內行街: 去城內隨機安全點
+				if not rz.is_empty():
+					var rxc := int(rz.get("x0", 0))
+					var ryc := int(rz.get("y0", 0))
+					var rw := maxi(1, int(rz.get("x1", 0)) - rxc)
+					var rh := maxi(1, int(rz.get("y1", 0)) - ryc)
+					for _t in 8:
+						var nx: int = rxc + int(sim.rng.below(rw))
+						var ny: int = ryc + int(sim.rng.below(rh))
+						if sim.is_free(nx, ny) and sim.is_safe(nx, ny):
+							sim.cmd_move(id, nx, ny)
+							break
 			continue
 		# 揀附近最近嘅怪 (等級唔好高過自己太多；只揀同一張地圖)
 		var best := 0

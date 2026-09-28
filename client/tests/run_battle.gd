@@ -225,10 +225,15 @@ func t_death_no_loss(data: GameData) -> void:
 		if int(b["id"]) == 10001:
 			n = int(b["n"])
 	check(n == 3, "戰役內死亡唔跌物品")
-	check(not sim.ent(id).has("battle"), "死亡自動離開戰役")
-	check(int(sim.ent(id)["x"]) == bx and int(sim.ent(id)["y"]) == by, "死亡傳送返義勇士兵原位")
-	check(_cur_boss(sim, "zhangniujiao").is_empty(), "死亡後殘留 boss 清晒")
-	check(int(sim.ent(id)["hp"]) > 0, "死亡照舊回滿血")
+	# 冇復活道具 → 死亡入倒地狀態【自訂新增】，仍留喺戰役入面 (死位)，等回城復活先真正離開
+	check(bool(sim.ent(id).get("down", false)) and sim.ent(id).has("battle"), "戰役內死亡: 先倒地，未即刻離開戰役")
+	for _i in int(data.world["combat"]["playerDownSelfTicks"]):
+		sim.step()
+	sim.cmd_self_revive(id)
+	check(not sim.ent(id).has("battle"), "回城復活: 自動離開戰役")
+	check(int(sim.ent(id)["x"]) == bx and int(sim.ent(id)["y"]) == by, "回城復活: 傳送返義勇士兵原位")
+	check(_cur_boss(sim, "zhangniujiao").is_empty(), "回城復活後殘留 boss 清晒")
+	check(int(sim.ent(id)["hp"]) > 0, "回城復活: 回半血")
 
 
 # ---------- sim: 放棄戰役 ----------

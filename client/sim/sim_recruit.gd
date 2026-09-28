@@ -707,6 +707,55 @@ func cmd_companion_skill(id: int, kind: String) -> void:
 		c["gen"]["activeCd"] = acd
 
 
+# 主公倒地時，附近同伴道士用超渡就地救返主公【自訂新增】(主公自己 hp<=0 叫唔到 cmd_companion_skill，故獨立一條指令)
+func cmd_companion_revive_owner(owner_id: int) -> void:
+	var o := ent(owner_id)
+	if o.is_empty() or not o.has("ch") or not bool(o.get("down", false)):
+		return
+	var c := _companion_of(o)
+	if c.is_empty() or int(c["hp"]) <= 0:
+		return _msg(owner_id, "冇同伴可以幫手超渡")
+	var cch: Dictionary = c["ch"]
+	if String(cch.get("classSkill", "")) != "chaodu":
+		return _msg(owner_id, "同伴未學「超渡」")
+	if not _aura_near(c, o):
+		return _msg(owner_id, "要同伴行近先超渡得到")
+	var max_hp := maxi(1, int(c.get("max_hp", 1)))
+	var max_mp := maxi(1, RulesStats.max_mp(int(cch["level"]), cch["attrs"]))
+	var cmul := float(_companion_class_skill_mul(c)["cost"])    # 22 職業特技
+	var hp_cost := int(ceil(max_hp * 0.2 * cmul))
+	var mp_cost := int(ceil(max_mp * 0.3 * cmul))
+	if int(cch["hp"]) <= hp_cost:
+		return _msg(owner_id, "同伴體力唔夠做超渡（要留 %d HP）" % hp_cost)
+	if int(cch["mp"]) < mp_cost:
+		return _msg(owner_id, "同伴靈力唔夠做超渡（要 %d MP）" % mp_cost)
+	cch["hp"] = int(cch["hp"]) - hp_cost
+	cch["mp"] = int(cch["mp"]) - mp_cost
+	_sync_stats(c)
+	_revive_onsite(o)
+	_emit({"k": "revive", "dst": owner_id, "id": int(c["id"]), "name": str(c["name"])})
+	_msg(owner_id, "「%s」幫你超渡，起返身回滿血（扣佢 %d HP．%d MP）" % [c["name"], hp_cost, mp_cost])
+
+
+# 倒地狀態 read-model【自訂新增】: UI 畫倒地畫面（倒數/掣可用狀態）。未倒地 = {}
+func player_down_view() -> Dictionary:
+	var pe := ent(int(state.get("player_id", 0)))
+	if pe.is_empty() or not bool(pe.get("down", false)):
+		return {}
+	var cc: Dictionary = data.world["combat"]
+	var down_at := int(pe.get("downAt", 0))
+	var self_at := down_at + int(cc.get("playerDownSelfTicks", 50))
+	var until := down_at + int(cc.get("playerDownMaxTicks", 3000))
+	var c := _companion_of(pe)
+	var comp_chaodu := not c.is_empty() and int(c["hp"]) > 0 \
+		and String(c["ch"].get("classSkill", "")) == "chaodu" and _aura_near(c, pe)
+	return {"down": true, "canSelf": tick >= self_at,
+		"selfInSecs": maxi(0, int(ceil(float(self_at - tick) / 10.0))),
+		"secsLeft": maxi(0, int(ceil(float(until - tick) / 10.0))),
+		"hasPill": RulesShop.has_item(pe["ch"].get("bag", []), RulesCombat.ONSITE_REVIVE_PILL, 1),
+		"hasChaoduComp": comp_chaodu}
+
+
 # 21 無限遁地: 主公 + 同伴即時傳送去最近城池中心 (唔使車費、無限次)。
 # 目標城池 = map 圖 BFS 最近嘅 kind:city 地圖；落腳點 = 地圖內最接近中心嘅行得格。
 func _comp_burrow(id: int, o: Dictionary, c: Dictionary, _eff: Dictionary) -> void:
