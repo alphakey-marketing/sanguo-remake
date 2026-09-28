@@ -136,9 +136,9 @@ func cmd_beast_teleport(id: int) -> void:
 	_msg(id, "戰騎遁地！返到%s" % String(md["name"]))
 
 
-# 霸王熊「背負」: 背包負重上限加成 (底 = world.dropped.capBagWeight)
+# 霸王熊「背負」: 背包負重上限加成 (底 = world.dropped.capBagWeight + bagCapBonus)
 func _bag_cap(ch: Dictionary) -> int:
-	var base := int(data.world.get("dropped", {}).get("capBagWeight", 1000))
+	var base := int(data.world.get("dropped", {}).get("capBagWeight", 1000)) + int(ch.get("bagCapBonus", 0))
 	var wb := active_beast(ch)
 	if wb.is_empty():
 		return base

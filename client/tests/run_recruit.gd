@@ -243,13 +243,14 @@ func t_survey_limits(data: GameData) -> void:
 	_at(sim, 2, 40)
 	sim.cmd_recruit_survey(pid, "wen")
 	check(int(ch["recruit"]["surveyDay"]) == 2, "調查: 第二日可以再調查")
-	ch["recruit"]["lockMonth"] = sim._month()
+	ch["recruit"]["recruitLockUntil"] = 3 + int(sim.data.recruit_cfg.get("recruitLockDays", 15))
 	_at(sim, 3, 40)
 	sim.cmd_recruit_survey(pid, "wen")
-	check(_last(msgs).contains("今個月"), "調查: 成功嗰個月封鎖")
-	_at(sim, 30, 40)
+	check(_last(msgs).contains("登用鎖緊"), "調查: 登用成功後 recruitLockDays 日內封鎖")
+	var unlock_day := 3 + int(sim.data.recruit_cfg.get("recruitLockDays", 15))
+	_at(sim, unlock_day, 40)
 	sim.cmd_recruit_survey(pid, "wen")
-	check(int(ch["recruit"]["surveyDay"]) == 30, "調查: 下個月 (第 30 日) 解封")
+	check(int(ch["recruit"]["surveyDay"]) == unlock_day, "調查: recruitLockDays 日後解封")
 	sim.cmd_recruit_pick(pid, 999999)
 	check(_last(msgs).contains("要先調查"), "揀人: 唔喺候選 = 唔得")
 
@@ -329,7 +330,7 @@ func t_arena_win(data: GameData) -> void:
 	check(sim.ent(int(m["id"])).is_empty(), "擂台: 打到 0 = 制服 (臨時怪收走)")
 	var comp := sim.ent(int(ch["recruit"].get("comp", 0)))
 	check(not comp.is_empty() and String(comp["kind"]) == "gen" and int(comp["gen"]["gid"]) == gid, "擂台贏: 生成同伴")
-	check(int(ch["recruit"]["lockMonth"]) == sim._month() and not ch["recruit"].has("pending"), "擂台贏: 封鎖本月 + 清 pending")
+	check(int(ch["recruit"]["recruitLockUntil"]) == int(sim._clock()["day"]) + int(sim.data.recruit_cfg.get("recruitLockDays", 15)) and not ch["recruit"].has("pending"), "擂台贏: 封鎖 recruitLockDays 日 + 清 pending")
 	check(bool(sim.state["generals"][str(gid)]["serving"]), "擂台贏: 武將標記跟緊人")
 	var won := false
 	for ev in evs:

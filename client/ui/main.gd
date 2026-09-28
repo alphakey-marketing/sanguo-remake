@@ -346,6 +346,7 @@ func _send(d: Dictionary) -> void:
 		"recruit_answer": sim.cmd_recruit_answer(my_id, int(d.answer))
 		"recruit_cancel": sim.cmd_recruit_cancel(my_id)
 		"companion_order": sim.cmd_companion_order(my_id, str(d.order))
+		"companion_skill_mode": sim.cmd_companion_skill_mode(my_id, str(d.mode))
 		"companion_gift": sim.cmd_companion_gift(my_id, int(d.item))
 		"companion_treasure": sim.cmd_companion_treasure(my_id, int(d.item))
 		"companion_dismiss": sim.cmd_companion_dismiss(my_id)
@@ -419,7 +420,7 @@ func _on_llm_request(e: Dictionary) -> void:
 
 func _log(s: String) -> void:
 	log_lines.append(s)
-	if log_lines.size() > 6: log_lines.pop_front()
+	if log_lines.size() > 200: log_lines.pop_front()
 
 const STATUS_NAMES := {"sealed": "封咒", "hex": "中邪", "power1": "聚力", "power2": "強力", "power3": "神力",
 	"armor1": "護甲", "armor2": "金甲", "armor3": "聖鎧", "mirror1": "護鏡", "mirror2": "光鏡", "mirror3": "仙鏡",

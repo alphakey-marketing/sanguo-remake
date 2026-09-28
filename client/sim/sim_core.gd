@@ -986,9 +986,9 @@ func _friend_regen_mult(_e: Dictionary) -> float:
 	return 1.0
 
 
-# 背包負重上限 (S04a)；sim_war_beast 覆寫加上霸王熊「背負」加成
+# 背包負重上限 (S04a)；bagCapBonus = 百寶袋/千歲袋等永久加成道具 (U16)；sim_war_beast 覆寫加上霸王熊「背負」加成
 func _bag_cap(ch: Dictionary) -> int:
-	return int(data.world.get("dropped", {}).get("capBagWeight", 1000))
+	return int(data.world.get("dropped", {}).get("capBagWeight", 1000)) + int(ch.get("bagCapBonus", 0))
 
 
 func order_count(ch: Dictionary, item: int) -> int:
