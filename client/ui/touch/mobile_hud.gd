@@ -319,6 +319,9 @@ func _fire(id: String) -> void:
 			bag_panel().open_filter("")
 		"menu_char", "portrait": open_panel("char")
 		"menu_quest": open_panel("quest")
+		"menu_pk":
+			main.pk_mode = not main.pk_mode
+			main._log("打人模式 %s" % ("開" if main.pk_mode else "關"))
 		"menu_more": open_panel("more")
 		"minimap": open_panel("map")
 		"companion": open_panel("recruit")
@@ -579,8 +582,9 @@ func _draw_menu() -> void:
 	for id in HudLayout.MENU:
 		var r: Rect2 = layout[id]["rect"]
 		var down := _is_down(id)
-		draw_rect(r, Color(0.3, 0.22, 0.12, 0.95) if down else Color(0.12, 0.1, 0.08, 0.85))
-		draw_rect(r, UiTheme.GOLD, false, 1.5)
+		var pk_on := id == "menu_pk" and main.pk_mode
+		draw_rect(r, Color(0.55, 0.12, 0.12, 0.95) if pk_on else (Color(0.3, 0.22, 0.12, 0.95) if down else Color(0.12, 0.1, 0.08, 0.85)))
+		draw_rect(r, Color(1, 0.3, 0.25) if pk_on else UiTheme.GOLD, false, 1.5)
 		_txt_center(r.position.y + r.size.y / 2 + 5, String(HudLayout.MENU_LABELS[id]), Color.WHITE, 14, r.size.x, r.position.x)
 	# 有未分配點數: 角色掣紅點
 	if int(main.ch.get("attrPoints", 0)) > 0:
