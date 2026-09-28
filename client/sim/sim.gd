@@ -188,6 +188,7 @@ func step() -> void:
 	_mount_tick()               # 放牧返嚟 (Step 17a)
 	_beast_tick()               # 戰騎出戰實體同步/回復 (S07b)
 	_beast_orphans()            # 戰騎無主實體清理 (S07b)
+	_tiandi_auto_loot_tick()    # 天地商行訂閱者自動拾取地面掉落物 (U16)
 	_safe_regen_tick()          # 城內安全區自動回復 (S01a, spec 01 §4)
 	_city_guard_check()         # S03b: 殺人魔喺城內/安全區 → 城門衛兵警告 (拒入城)
 	_expire_drops()             # S04a: 過期地面掉落物消失
@@ -213,8 +214,8 @@ func step() -> void:
 		var mv := 2 if (e["kind"] == "mob" and (e.get("mob", {}) as Dictionary).get("state", "") == "flee" and tick % 2 == 0) else 1
 		if e.has("ch"):
 			mv = _ride_steps(e)       # 騎馬: 移速 ×1.5~2 (Step 17a, spec 07 §7)
-		if e["kind"] == "bot" and bool(e.get("fleePk", false)) and tick % 3 == 2:
-			mv = 0                    # 打人模式/S03a: 逃走緊嘅居民行慢啲 (3 tick 行 2 格)，等玩家追得返 (spec 03 §3)
+		if e["kind"] == "bot" and (bool(e.get("fleePk", false)) or bool(e.get("huntedByGuard", false))) and tick % 2 == 1:
+			mv = 0                    # 打人模式/S03a 逃跑 + 捕快追緊嘅紅名: 行慢啲 (2 tick 行 1 格)，等玩家/捕快追得返 (spec 03 §3 + 自訂)
 		var moved := false
 		var moved_n := 0
 		for _k in mv:

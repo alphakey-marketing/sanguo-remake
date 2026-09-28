@@ -39,6 +39,7 @@ func _build_body() -> void:
 	list.add_child(btn("LLM 設定 / 對話", func() -> void: main.hud.llm_panel().open_tab(0)))
 	list.add_child(btn("結婚", func() -> void: main.hud.marriage_panel().open_tab(0)))
 	list.add_child(btn("掉寶表", func() -> void: main.hud.drop_panel().open()))
+	list.add_child(btn("完整日誌", func() -> void: main.hud.log_panel().open()))
 	list.add_child(hsep())
 	list.add_child(lbl("角色 / 存檔", 16, UiTheme.GOLD))
 	list.add_child(btn("切換角色 / 選擇存檔位", func() -> void: main.hud.open_panel("title")))

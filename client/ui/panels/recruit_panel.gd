@@ -114,6 +114,18 @@ func _build_comp(list: VBoxContainer, c: Dictionary) -> void:
 			func() -> void: main._send({"t": "companion_order", "order": order}))
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		g.add_child(b)
+	list.add_child(lbl("招式（絕招/術法）", 14, UiTheme.DIM))
+	var g2 := GridContainer.new()
+	g2.columns = 2
+	g2.add_theme_constant_override("h_separation", 6)
+	g2.add_theme_constant_override("v_separation", 6)
+	list.add_child(g2)
+	for m in RulesRecruit.SKILL_MODES:
+		var mode: String = m
+		var bm := btn(("● " if mode == String(c.get("skillMode", "off")) else "") + str(RulesRecruit.SKILL_MODE_NAMES[mode]),
+			func() -> void: main._send({"t": "companion_skill_mode", "mode": mode}))
+		bm.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		g2.add_child(bm)
 	_build_treasure(list, c)
 	var gifts := _gifts()
 	if not gifts.is_empty():

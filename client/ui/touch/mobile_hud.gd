@@ -106,6 +106,7 @@ func _panel(name_: String) -> GamePanel:
 			"llm": p = LlmPanel.new(main)
 			"marriage": p = MarriagePanel.new(main)
 			"drop": p = DropPanel.new(main)
+			"log": p = LogPanel.new(main)
 			"create": p = CreatePanel.new(main)
 			"title": p = TitlePanel.new(main)
 			"auto_setup": p = AutoPanel.new(main)
@@ -165,6 +166,10 @@ func drop_panel() -> DropPanel:
 	close_panels()
 	return _panel("drop") as DropPanel
 
+func log_panel() -> LogPanel:
+	close_panels()
+	return _panel("log") as LogPanel
+
 func open_panel(name_: String) -> void:
 	close_panels()
 	_panel(name_).open()
@@ -219,6 +224,7 @@ func visible_ids() -> Array:
 	ids.append_array(HudLayout.MENU)
 	ids.append("minimap")
 	ids.append("portrait")
+	ids.append("log")
 	if main != null and not main.comp.is_empty():
 		ids.append("companion")
 	if not mount_btn().is_empty():
@@ -324,6 +330,7 @@ func _fire(id: String) -> void:
 			main._log("打人模式 %s" % ("開" if main.pk_mode else "關"))
 		"menu_more": open_panel("more")
 		"minimap": open_panel("map")
+		"log": log_panel().open()
 		"companion": open_panel("recruit")
 		"mount":
 			var mb := mount_btn()
@@ -402,6 +409,8 @@ func _calc_skill_slots() -> Array:
 func _draw() -> void:
 	if main == null:
 		return
+	if any_panel_open():
+		return                           # 面板開住: HUD 觸控層唔畫，免得遮住面板嘅 ✕/內容 (同 _input 一致)
 	var s := get_viewport_rect().size
 	var sr := safe_rect()
 	_draw_status()

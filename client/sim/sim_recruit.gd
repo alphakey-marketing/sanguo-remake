@@ -57,7 +57,7 @@ func cmd_general_talk(id: int, gid: int) -> void:
 
 
 # ================= 調查 / 考驗 (spec 09 §3.2) =================
-# ch.recruit = {surveyDay, lockMonth, kind, cands:[gid], pending:{gid, kind:"arena"/"quiz", ...}, comp: 同伴 ent id}
+# ch.recruit = {surveyDay, recruitLockUntil, kind, cands:[gid], pending:{gid, kind:"arena"/"quiz", ...}, comp: 同伴 ent id}
 func _rec(ch: Dictionary) -> Dictionary:
 	if not ch.has("recruit"):
 		ch["recruit"] = {}
@@ -393,10 +393,10 @@ func _recruit_fail(pe: Dictionary, g: Dictionary, why: String) -> void:
 	_msg(int(pe["id"]), why)
 
 
-# 成功: 封鎖本月調查 + 生成同伴
+# 成功: 封鎖調查 recruitLockDays 日 (U16: 15 日滾動鎖) + 生成同伴
 func _recruit_success(pe: Dictionary, g: Dictionary) -> void:
 	var rec := _rec(pe["ch"])
-	rec["lockMonth"] = _month()
+	rec["recruitLockUntil"] = int(_clock()["day"]) + int(data.recruit_cfg.get("recruitLockDays", 15))
 	_consume_pass(pe, g)
 	var c := _spawn_companion(pe, g)
 	rec["comp"] = int(c["id"])
@@ -426,7 +426,7 @@ func _spawn_companion(pe: Dictionary, g: Dictionary) -> Dictionary:
 	c["gen"] = {"gid": int(g["id"]), "owner": int(pe["id"]), "since": day,
 		"until": RulesRecruit.until_day(day, data.recruit_cfg),
 		"loyalty": RulesRecruit.loyalty_init(String(pe["ch"].get("ideology", "")), String(g["ideo"]), data.recruit_cfg),
-		"order": "assist", "skillCd": 0}
+		"order": "assist", "skillMode": "off", "skillCd": 0}
 	_sync_stats(c)
 	return c
 
@@ -450,7 +450,7 @@ func companion_view() -> Dictionary:
 	var acd_total := RulesGeneral.active_cd(eff)
 	return {"id": int(c["id"]), "gid": int(gn["gid"]), "name": c["name"], "lv": int(c["level"]), "hp": int(c["hp"]),
 		"maxHp": int(c["max_hp"]), "exp": int(ch["exp"]), "needExp": RulesStats.exp_to_next(int(c["level"])),
-		"loyalty": int(gn["loyalty"]), "order": String(gn["order"]),
+		"loyalty": int(gn["loyalty"]), "order": String(gn["order"]), "skillMode": String(gn.get("skillMode", "off")),
 		"daysLeft": maxi(0, int(gn["until"]) - int(_clock()["day"])), "type": g["type"], "sub": g["sub"], "face": int(c["face"]),
 		"mp": int(ch["mp"]), "maxMp": _eff_max_mp(ch), "sp": int(ch["sp"]), "maxSp": _eff_max_sp(ch),
 		"skill": String(sk.get("name", "")), "skillDesc": String(sk.get("desc", "")),
@@ -525,19 +525,18 @@ func _think_companion(c: Dictionary) -> void:
 	var tgt := ent(int(c["atk_target"]))
 	if d > int(cfg["leashOwner"]) or order == "stop" or order == "follow" or not _hittable(tgt):
 		c["atk_target"] = 0
-	var skill_order := order == "ult" or order == "spell"     # 絕招/術法: 幫主公打，冇就自己搵 (Step 15)
-	if order == "assist" or skill_order:
+	if order == "assist":
 		var ot := ent(int(o["atk_target"]))
 		if _hittable(ot):
 			c["atk_target"] = int(ot["id"])
 		elif int(c["atk_target"]) == 0:
 			c["atk_target"] = _attacker_of(o)      # 主公被打就幫手
-	if (order == "active" or skill_order) and int(c["atk_target"]) == 0 and d <= int(cfg["leashOwner"]):
+	if order == "active" and int(c["atk_target"]) == 0 and d <= int(cfg["leashOwner"]):
 		c["atk_target"] = _hunt_target(c, int(cfg["huntRange"]))
 		if int(c["atk_target"]) == 0:
 			c["atk_target"] = _attacker_of(o)
 	if int(c["atk_target"]) != 0:
-		if skill_order:
+		if String(gn.get("skillMode", "off")) == "on":       # U16: 招式用唔用獨立開關，同 order 正交
 			_comp_skill(c, ent(int(c["atk_target"])))
 		return
 	var want := int(cfg["farFollow"]) if order == "follow" else int(cfg["follow"])
@@ -602,6 +601,16 @@ func cmd_companion_order(id: int, order: String) -> void:
 	c["atk_target"] = 0
 	_emit({"k": "companion", "dst": id, "comp": companion_view()})
 	_msg(id, "%s：遵命！(%s)" % [c["name"], RulesRecruit.ORDER_NAMES[order]])
+
+
+# 招式開關 (U16): 同 cmd_companion_order 正交，控制同伴用唔用絕招/術法 (自動夾邊樣夠 SP/MP 就用邊樣)
+func cmd_companion_skill_mode(id: int, mode: String) -> void:
+	var c := _companion_of(ent(id))
+	if c.is_empty() or not RulesRecruit.SKILL_MODES.has(mode):
+		return
+	c["gen"]["skillMode"] = mode
+	_emit({"k": "companion", "dst": id, "comp": companion_view()})
+	_msg(id, "%s：%s" % [c["name"], RulesRecruit.SKILL_MODE_NAMES[mode]])
 
 
 # 送補品: 主公背包嘅回復品用喺同伴身上，忠誠 +gift (要行近)
@@ -1113,16 +1122,19 @@ func _comp_skill(c: Dictionary, t: Dictionary) -> void:
 	var ch: Dictionary = c["ch"]
 	if tick < int(c["next_atk"]) or tick < int(gn.get("skillCd", 0)) or is_safe(int(c["x"]), int(c["y"])):
 		return
-	var order := String(gn["order"])
 	var uc: Dictionary = data.gen2_cfg["ult"]
 	var sc: Dictionary = data.gen2_cfg["spell"]
-	var reach := int(uc["range"]) if order == "ult" else int(sc["range"])
+	var reach := maxi(int(uc["range"]), int(sc["range"]))   # U16: skillMode 唔分絕招/術法，夠邊樣用邊樣，取遠者做偵測範圍
 	if not RulesCombat.in_range(c["x"], c["y"], t["x"], t["y"], reach):
 		return
 	var lv := int(ch["level"])
 	var mp_need := _mp_cost(ch, RulesGeneral.spell_mp(lv, sc))
 	var sp_need := _sp_cost(ch, int(uc["sp"]))
-	var pick := RulesGeneral.skill_pick(order, int(ch["mp"]), int(ch["sp"]), mp_need, sp_need, true)
+	var pick := RulesGeneral.skill_pick("auto", int(ch["mp"]), int(ch["sp"]), mp_need, sp_need, true)
+	if pick == "ult" and not RulesCombat.in_range(c["x"], c["y"], t["x"], t["y"], int(uc["range"])):
+		pick = "spell" if int(ch["mp"]) >= mp_need and RulesCombat.in_range(c["x"], c["y"], t["x"], t["y"], int(sc["range"])) else ""
+	elif pick == "spell" and not RulesCombat.in_range(c["x"], c["y"], t["x"], t["y"], int(sc["range"])):
+		pick = ""
 	if pick == "":
 		return
 	c["tx"] = c["x"]

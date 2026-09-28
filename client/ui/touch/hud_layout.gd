@@ -64,6 +64,7 @@ static func build(size: Vector2, safe: Rect2 = Rect2()) -> Dictionary:
 	# 騎馬/落馬掣 (Step 17a): 互動掣上面，身邊有座騎先顯示
 	var cr: Rect2 = out["context"]["rect"]
 	out["mount"] = {"kind": "circle", "c": Vector2(cr.position.x + 46, cr.position.y - 30), "r": SMALL_R}
+	out["log"] = {"kind": "rect", "rect": log_rect(safe)}
 	return out
 
 
@@ -91,7 +92,7 @@ static func joy_zone(size: Vector2, safe: Rect2 = Rect2()) -> Rect2:
 	return Rect2(safe.position.x, top, right - safe.position.x, safe.end.y - top)
 
 
-# 日誌（唔撳得，淨係畫）: 角色框下面
+# 日誌預覽（角色框下面，撳到開完整日誌面板）
 static func log_rect(safe: Rect2) -> Rect2:
 	return Rect2(safe.position.x + 6, safe.position.y + 108 + STATUS_ROW_H, 300, 44)
 

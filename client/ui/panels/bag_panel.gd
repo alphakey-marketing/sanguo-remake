@@ -1,11 +1,11 @@
 class_name BagPanel
 extends GamePanel
-# 背包面板: 頁籤 背包 / 天地商行(倉庫)。左 = 裝備列 + 物品格；右 = 詳情 + 動作掣。
+# 背包面板: 頁籤 背包 / 天地商行(倉庫)。左 = 物品格；右 = 詳情 + 動作掣（裝備/卸下一律喺呢度即撳即做）。
+# 裝備格紙娃娃睇 char_panel「裝備」頁 (U16: 拆走呢度重複嘅裝備列，避免兩個面板都有一份)。
 # 一切由玩家揀、玩家撳確認（冇「自動裝第一件」）。filter="spell" = 由空快捷格撳入嚟，只顯示術書。
 
 const CELL := 58.0
 var sel := 0                  # 揀中物品 id（0 = 冇）
-var sel_slot := ""            # 揀中裝備格: "weapon" / "jewel0" / "jewel1" / "book0".."book2"
 var filter := ""
 var want_slot := -1           # 由快捷格入嚟: 裝落邊格
 
@@ -20,7 +20,6 @@ func open_filter(f: String, slot := -1) -> void:
 	filter = f
 	want_slot = slot
 	sel = 0
-	sel_slot = ""
 	tab = 0
 	set_tabs(tab_names)
 	open()
@@ -28,7 +27,6 @@ func open_filter(f: String, slot := -1) -> void:
 
 func set_tab(i: int) -> void:
 	sel = 0
-	sel_slot = ""
 	super(i)
 
 
@@ -40,7 +38,7 @@ func close() -> void:
 
 func sig() -> String:
 	var ch: Dictionary = main.ch
-	return JSON.stringify([tab, sel, sel_slot, filter, ch.get("bag", []), ch.get("storage", []), ch.get("equip", {}),
+	return JSON.stringify([tab, sel, filter, ch.get("bag", []), ch.get("storage", []), ch.get("equip", {}),
 		ch.get("gold", 0), ch.get("storageSub", false), ch.get("tools", {}), ch.get("level", 1), ch.get("tiandi", {})])
 
 
@@ -61,7 +59,6 @@ func _build_body() -> void:
 	right.add_theme_constant_override("separation", 4)
 	row.add_child(right)
 	if tab == 0:
-		_build_equip_strip(left, ch)
 		if filter == "spell":
 			left.add_child(btn("只顯示術書  ✕ 顯示全部", func() -> void:
 				filter = ""
@@ -83,34 +80,6 @@ func _bag_list(ch: Dictionary) -> Array:
 	return out
 
 
-# 裝備列: 武器 / 寶石 1-2 / 快捷 1-3（術書職業先有）
-func _build_equip_strip(parent: Control, ch: Dictionary) -> void:
-	var eq: Dictionary = ch.get("equip", {})
-	var h := HBoxContainer.new()
-	h.add_theme_constant_override("separation", 4)
-	parent.add_child(h)
-	var slots := [["weapon", "武", int(eq.get("weapon", 0))]]
-	var jews: Array = eq.get("jewels", [0, 0])
-	for i in 2:
-		slots.append(["jewel%d" % i, "石%d" % (i + 1), int(jews[i])])
-	if main.class_has_spells():
-		var books: Array = eq.get("spellbooks", [0, 0, 0])
-		for i in 3:
-			slots.append(["book%d" % i, "快%d" % (i + 1), int(books[i])])
-	for s in slots:
-		var id: int = s[2]
-		var t: String = s[1] + "\n" + (item_name(id).substr(0, 3) if id > 0 else "—")
-		var b := btn(t, func() -> void:
-			sel_slot = String(s[0])
-			sel = id
-			refresh(true), 52)
-		b.custom_minimum_size.y = 52
-		b.add_theme_font_size_override("font_size", 12)
-		b.toggle_mode = true
-		b.set_pressed_no_signal(sel_slot == String(s[0]))
-		h.add_child(b)
-
-
 func _build_grid(parent: Control, items: Array) -> void:
 	var sc := scroll()
 	parent.add_child(sc)
@@ -128,13 +97,12 @@ func _build_grid(parent: Control, items: Array) -> void:
 		var id := int(b["id"])
 		var cell := btn("%s\nx%d%s" % [item_name(id).substr(0, 4), int(b["n"]), " 裝" if worn.has(id) else ""], func() -> void:
 			sel = id
-			sel_slot = ""
 			refresh(true), CELL)
 		cell.custom_minimum_size = Vector2(CELL, CELL)
 		cell.add_theme_font_size_override("font_size", 12)
 		cell.add_theme_color_override("font_color", _kind_color(id))
 		cell.toggle_mode = true
-		cell.set_pressed_no_signal(sel == id and sel_slot == "")
+		cell.set_pressed_no_signal(sel == id)
 		g.add_child(cell)
 
 
@@ -166,17 +134,8 @@ func _kind_color(id: int) -> Color:
 
 func _build_detail(p: Control, ch: Dictionary) -> void:
 	if sel == 0:
-		if sel_slot != "":
-			p.add_child(lbl("（空格）", 16, UiTheme.DIM))
-			if sel_slot.begins_with("book"):
-				p.add_child(btn("揀術書裝落呢格", func() -> void:
-					want_slot = int(sel_slot.trim_prefix("book"))
-					filter = "spell"
-					sel_slot = ""
-					refresh(true)))
-		else:
-			p.add_child(lbl("撳物品睇詳情", 14, UiTheme.DIM))
-			p.add_child(lbl("金 %d" % int(ch.get("gold", 0)), 15, Color(1, 0.9, 0.5)))
+		p.add_child(lbl("撳物品睇詳情", 14, UiTheme.DIM))
+		p.add_child(lbl("金 %d" % int(ch.get("gold", 0)), 15, Color(1, 0.9, 0.5)))
 		return
 	var d: GameData = main.data
 	p.add_child(lbl(item_name(sel), 18, UiTheme.GOLD))
@@ -194,18 +153,6 @@ func _build_detail(p: Control, ch: Dictionary) -> void:
 		info.add_child(lbl("任務道具（唔賣得）", 13, UiTheme.BAD))
 	p.add_child(sc)
 	var eq: Dictionary = ch.get("equip", {})
-	# 裝備格揀中: 卸
-	if sel_slot.begins_with("jewel"):
-		var js := int(sel_slot.trim_prefix("jewel"))
-		p.add_child(btn("卸下寶石", func() -> void: main._send({"t": "equip_jewel", "item": 0, "slot": js})))
-		return
-	if sel_slot.begins_with("book"):
-		var bs := int(sel_slot.trim_prefix("book"))
-		p.add_child(btn("由快捷 %d 卸下" % (bs + 1), func() -> void: main._send({"t": "equip_spellbook", "item": 0, "slot": bs})))
-		return
-	if sel_slot == "weapon":
-		p.add_child(lbl("裝備緊", 14, UiTheme.GOOD))
-		return
 	var id := sel
 	var lv_ok := int(ch.get("level", 1)) >= int(d.info.get(id, {}).get("req_lv", 0))
 	if d.weapons.has(id):
