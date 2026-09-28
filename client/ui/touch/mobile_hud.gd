@@ -169,6 +169,13 @@ func open_panel(name_: String) -> void:
 	close_panels()
 	_panel(name_).open()
 
+# 撳空快捷補品格：直接彈快捷欄設定面板，並揀定嗰一格等揀補品
+func open_potion_setup(slot: int) -> void:
+	close_panels()
+	var p := _panel("potion_setup") as PotionSetupPanel
+	p.editing_slot = slot
+	p.open()
+
 func open_dialog(src: Callable) -> void:
 	close_panels()
 	(_panel("dialog") as DialogPanel).open_with(src)
@@ -299,7 +306,11 @@ func _fire(id: String) -> void:
 			else:
 				open_panel("auto_setup")     # 開自動之前，先揀邊種怪打 / 跨唔跨場景
 		"potion0", "potion1", "potion2":
-			main.use_potion(int(id.substr(6)))
+			var pslot := int(id.substr(6))
+			if int(main.potion_slots[pslot]) == 0:
+				open_potion_setup(pslot)          # 空格：直接彈揀補品，唔使行去背包
+			else:
+				main.use_potion(pslot)
 		"context":
 			if not ctx.is_empty():
 				context_pressed.emit(ctx)
