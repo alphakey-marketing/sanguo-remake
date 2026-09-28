@@ -10,7 +10,7 @@ func _init(m: Node) -> void:
 
 
 func sig() -> String:
-	return JSON.stringify([main.auto, main.auto_whitelist, main.auto_roam, main.ents.size()])
+	return JSON.stringify([main.auto, main.auto_whitelist, main.auto_roam, main.pk_mode, main.ents.size()])
 
 
 const NEARBY_RANGE := 14   # 揀怪表只顯示呢個 Chebyshev 距離之內嘅怪（同 zone），唔好成張圖咁多
@@ -19,7 +19,7 @@ func _nearby_names() -> Array:
 	var names := {}
 	var me = main._me()
 	for e in main.ents:
-		if not (bool(e.get("mob", false)) and int(e.get("hp", 0)) > 0):
+		if not (main._is_targetable(e) and int(e.get("hp", 0)) > 0):
 			continue
 		if me != null:
 			if str(main.sim.zone_view(int(e.x), int(e.y)).get("id", "")) != str(main.sim.zone_view(int(me.x), int(me.y)).get("id", "")):

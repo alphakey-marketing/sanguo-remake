@@ -213,6 +213,8 @@ func step() -> void:
 		var mv := 2 if (e["kind"] == "mob" and (e.get("mob", {}) as Dictionary).get("state", "") == "flee" and tick % 2 == 0) else 1
 		if e.has("ch"):
 			mv = _ride_steps(e)       # 騎馬: 移速 ×1.5~2 (Step 17a, spec 07 §7)
+		if e["kind"] == "bot" and bool(e.get("fleePk", false)) and tick % 3 == 2:
+			mv = 0                    # 打人模式/S03a: 逃走緊嘅居民行慢啲 (3 tick 行 2 格)，等玩家追得返 (spec 03 §3)
 		var moved := false
 		var moved_n := 0
 		for _k in mv:
@@ -308,6 +310,7 @@ func view_ents() -> Array:
 		var o: Dictionary = {"id": e["id"], "name": e["name"], "x": e["x"], "y": e["y"], "face": e["face"],
 			"bot": e["kind"] == "bot", "gen": e["kind"] == "gen", "hp": e["hp"], "maxHp": e["max_hp"], "level": e["level"], "mob": e["kind"] == "mob",
 			"criminal": bool(e.get("ch", {}).get("criminal", false)),
+			"atkTarget": int(e.get("atk_target", 0)),   # 打人模式: 居民鎖定緊邊個玩家 (bot_sys._crime_find_player)
 			"resident": bool(e.get("ch", {}).get("resident", false)),
 			"role": String(e.get("ch", {}).get("role", "")),
 			"statuses": st_vis, "casting": e.has("casting"), "castX": csx, "castY": csy, "castSpell": csp,
