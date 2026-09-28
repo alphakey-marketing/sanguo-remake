@@ -40,7 +40,8 @@ GUIDE_LV = {"蔡邕": 6, "王允": 7, "劉琦": 8, "陳珪": 8, "蔣幹": 9, "�
 
 # 登用規則設定 (rules/recruit.gd 讀)【自訂】除註明【原】
 CFG = {
-    "serveDays": 30,            # 【原】登用 30 game 日，到期子時 0 刻離開
+    "serveDays": 15,            # U16: 登用期由 30→15 game 日減半，到期子時 0 刻離開
+    "recruitLockDays": 15,      # U16: 登用成功後封鎖調查嘅日數 (由曆月鎖改做滾動 15 日，配合 serveDays 減半)
     "levelGap": 10,             # 【原】唔可以登用比自己高 10 級以上
     "titleGap": 5,              # 【原】50 級以上人才: 頭銜差 ≤5 階 (Step 14；人才頭銜【自訂】= 戰等 - titleMinLv)
     "titleMinLv": 50,
@@ -52,9 +53,9 @@ CFG = {
               "maxDist": 12},
     "companion": {"strMulWu": 1.2, "strMulWen": 0.7, "intAddWen": 0.5, "regenTicks": 10, "regenPct": 0.01,
                   "follow": 2, "farFollow": 4, "huntRange": 8, "leashOwner": 12, "expShare": 0.5},
-    "loyalty": {"init": 60, "sameIdeo": 10, "leave": 30, "ko": -5, "gift": 2, "badKill": -3,
+    "loyalty": {"init": 15, "sameIdeo": 10, "leave": 5, "ko": -5, "gift": 2, "badKill": -3,
                 "badKillIdeo": ["義理", "治國"],
-                "badNpcKill": -15, "badNpcKillIdeo": ["義理"]},   # S09b: 主公謀殺善 NPC → 義理忠誠 -15 (spec 09 §4)
+                "badNpcKill": -15, "badNpcKillIdeo": ["義理"]},   # U16: init 60→15、leave 30→5 (死 3 次 ko×3=-15 啱啱 0 即走)；S09b 謀殺善 NPC → 義理忠誠 -15 (spec 09 §4)
 }
 
 # Tier1 (spec 09 §2): 許昌 = 曹營；新野 = 劉備軍。x/y = 地圖內座標；window = 出現刻 (96 刻/日, 8 刻一時辰)

@@ -493,11 +493,11 @@ func _run() -> void:
 		press(rp, "主動攻擊")
 		await frames(1)
 		check(String(m.sim.companion_view().get("order", "")) == "active", "同伴指令: 主動攻擊")
-		# 16. 登用 v2 (Step 15): 術法攻擊指令 + 贈與寶物 + 特技顯示
+		# 16. 登用 v2 (Step 15): 招式開關 + 贈與寶物 + 特技顯示
 		rp.refresh(true)
-		press(rp, "術法攻擊")
+		press(rp, "用絕招/術法")
 		await frames(1)
-		check(String(m.sim.companion_view().get("order", "")) == "spell", "同伴指令: 術法攻擊")
+		check(String(m.sim.companion_view().get("skillMode", "")) == "on", "同伴指令: 用絕招/術法")
 		var comp_e: Dictionary = m.sim.ent(int(m.sim.companion_view()["id"]))
 		put(int(comp_e["x"]) + 1, int(comp_e["y"]))
 		RulesShop.add_item(ch["bag"], 54807, 1)

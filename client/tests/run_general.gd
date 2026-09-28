@@ -845,8 +845,9 @@ func t_comp_ult(data: GameData) -> void:
 	var c: Dictionary = r[6]
 	var cch: Dictionary = c["ch"]
 	_with_skill(c, 3)
-	sim.cmd_companion_order(pid, "ult")
-	check(String(c["gen"]["order"]) == "ult", "指令: 絕招攻擊")
+	sim.cmd_companion_order(pid, "assist")
+	sim.cmd_companion_skill_mode(pid, "on")
+	check(String(c["gen"]["skillMode"]) == "on", "指令: 用絕招/術法")
 	cch["sp"] = 100
 	var m := _mob_at(sim, int(c["x"]) + 1, int(c["y"]))
 	var m2 := _mob_at(sim, int(c["x"]), int(c["y"]) + 1)
@@ -885,7 +886,8 @@ func t_comp_spell(data: GameData) -> void:
 	var c: Dictionary = r[6]
 	var cch: Dictionary = c["ch"]
 	_with_skill(c, 3)
-	sim.cmd_companion_order(pid, "spell")
+	sim.cmd_companion_order(pid, "assist")
+	sim.cmd_companion_skill_mode(pid, "on")
 	cch["mp"] = 100
 	var m := _mob_at(sim, int(c["x"]) + 3, int(c["y"]))
 	var sp := sim._comp_spell(c)
@@ -932,13 +934,14 @@ func t_save(data: GameData) -> void:
 	var ch: Dictionary = r[2]
 	RulesShop.add_item(ch["bag"], 54808, 1)
 	sim.cmd_companion_treasure(pid, 54808)
-	sim.cmd_companion_order(pid, "spell")
+	sim.cmd_companion_order(pid, "assist")
+	sim.cmd_companion_skill_mode(pid, "on")
 	for i in 20:
 		sim.step()
 	var s1 := sim.save_string()
 	var l := Sim.load_string(data, s1)
 	check(l.save_string() == s1, "存檔: 寶物/特技/指令 roundtrip")
-	check((l.companion_view()["treasures"] as Array).size() == 1 and String(l.companion_view()["order"]) == "spell", "存檔: 寶物 + 術法指令保留")
+	check((l.companion_view()["treasures"] as Array).size() == 1 and String(l.companion_view()["skillMode"]) == "on", "存檔: 寶物 + 招式開關保留")
 	for i in 40:
 		sim.step()
 		l.step()
@@ -947,7 +950,8 @@ func t_save(data: GameData) -> void:
 	var a := _comp_setup(data, 77)
 	var b := _comp_setup(data, 77)
 	for x in [a, b]:
-		(x[0] as Sim).cmd_companion_order(int(x[1]), "ult")
+		(x[0] as Sim).cmd_companion_order(int(x[1]), "assist")
+		(x[0] as Sim).cmd_companion_skill_mode(int(x[1]), "on")
 		x[6]["ch"]["sp"] = 100
 		_mob_at(x[0], int(x[6]["x"]) + 1, int(x[6]["y"]))
 		for i in 80:
@@ -966,7 +970,8 @@ func t_old_save(data: GameData) -> void:
 	var l := Sim.load_string(data, sim.save_string())
 	var cv := l.companion_view()
 	check(not cv.is_empty() and String(cv["skill"]) == "" and (cv["treasures"] as Array).is_empty(), "舊存檔: 同伴冇特技/寶物照顯示")
-	l.cmd_companion_order(int(r[1]), "ult")
+	l.cmd_companion_order(int(r[1]), "assist")
+	l.cmd_companion_skill_mode(int(r[1]), "on")
 	for i in 30:
 		l.step()
 	check(not l.companion_view().is_empty(), "舊存檔: 絕招指令照行")

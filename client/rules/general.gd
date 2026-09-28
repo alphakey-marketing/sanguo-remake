@@ -167,12 +167,13 @@ static func spell_power(lv: int, sc: Dictionary) -> float:
 
 
 # 指令要唔要用技能: "ult"/"spell"/"" (普通攻擊)。夠 MP/SP + 冷卻完先用【原】唔夠 = 普通攻擊
+# order = "ult"/"spell" 指定招式；"auto" (U16 skillMode 開關用) = 夠 SP 就用絕招，唔夠先試術法
 static func skill_pick(order: String, mp: int, sp: int, mp_need: int, sp_need: int, ready: bool) -> String:
 	if not ready:
 		return ""
-	if order == "ult" and sp >= sp_need:
+	if (order == "ult" or order == "auto") and sp >= sp_need:
 		return "ult"
-	if order == "spell" and mp >= mp_need:
+	if (order == "spell" or order == "auto") and mp >= mp_need:
 		return "spell"
 	return ""
 

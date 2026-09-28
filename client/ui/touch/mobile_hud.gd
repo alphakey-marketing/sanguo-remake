@@ -106,6 +106,7 @@ func _panel(name_: String) -> GamePanel:
 			"llm": p = LlmPanel.new(main)
 			"marriage": p = MarriagePanel.new(main)
 			"drop": p = DropPanel.new(main)
+			"log": p = LogPanel.new(main)
 			"create": p = CreatePanel.new(main)
 			"title": p = TitlePanel.new(main)
 			"auto_setup": p = AutoPanel.new(main)
@@ -164,6 +165,10 @@ func marriage_panel() -> MarriagePanel:
 func drop_panel() -> DropPanel:
 	close_panels()
 	return _panel("drop") as DropPanel
+
+func log_panel() -> LogPanel:
+	close_panels()
+	return _panel("log") as LogPanel
 
 func open_panel(name_: String) -> void:
 	close_panels()

@@ -187,6 +187,7 @@ func step() -> void:
 	_mount_tick()               # 放牧返嚟 (Step 17a)
 	_beast_tick()               # 戰騎出戰實體同步/回復 (S07b)
 	_beast_orphans()            # 戰騎無主實體清理 (S07b)
+	_tiandi_auto_loot_tick()    # 天地商行訂閱者自動拾取地面掉落物 (U16)
 	_safe_regen_tick()          # 城內安全區自動回復 (S01a, spec 01 §4)
 	_city_guard_check()         # S03b: 殺人魔喺城內/安全區 → 城門衛兵警告 (拒入城)
 	_expire_drops()             # S04a: 過期地面掉落物消失
