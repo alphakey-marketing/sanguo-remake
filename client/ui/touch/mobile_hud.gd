@@ -429,7 +429,7 @@ func _draw_potions() -> void:
 		var filled := item_id > 0
 		_circle_btn(id, Color(0.12, 0.28, 0.14, 0.8) if filled else Color(0.12, 0.12, 0.12, 0.55),
 			Color(0.55, 0.95, 0.55) if filled else Color(1, 1, 1, 0.4))
-		var label := main.item_name_for_potion(item_id).substr(0, 3) if filled else "空"
+		var label: String = main.item_name_for_potion(item_id).substr(0, 3) if filled else "空"
 		_txt_center(c.y + 4, label, Color.WHITE if filled else Color(0.7, 0.7, 0.7), 11, r * 2, c.x - r)
 
 # 左上角色框

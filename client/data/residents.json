@@ -1,6 +1,6 @@
 {
   "_note": "居民 NPC 資料 (S09a, spec 09 §1)。bot → 居民: 性格 5 維 / 理念 / 日程 (各時辰去邊) / role / 善惡 / homeZone。每城 12~20 人 (大城多)。名字由 surnames+given 池決定性生成。",
-  "_noteSchedule": "schedule 索引 = 時辰 0(子)..11(亥) → 活動: sleep/work/eat/home。S09a 只做資料 + read-model；真正用日程驅動行動留 S09b/S09d。",
+  "_noteSchedule": "schedule 索引 = 時辰 0(子)..11(亥) → 活動: sleep/work/eat/home。S09a 只做資料 + read-model；而家 (居民日程) 已用 queues驅動: 活動系 cfg.inTownActivities 嗰啲 (eat/home/sleep) → 居民留城內行街/休息，唔出野外；work → 去 homeZone 野外練功。",
   "_noteRole": "roles[].work = 工作區種類 (field/shop/gate/stable/office)，下游 (S09b) 會用嚟揀工作點。",
   "cfg": {
     "minPerCity": 12,
@@ -11,6 +11,7 @@
     "personalityMax": 10,
     "ideologies": ["義理", "霸權", "權謀", "隱遁", "治國"],
     "schedule": ["sleep", "sleep", "sleep", "work", "work", "work", "eat", "work", "work", "work", "home", "sleep"],
+    "inTownActivities": ["eat", "home", "sleep"],
     "rumor": {
       "cap": 16,
       "memCap": 8,
