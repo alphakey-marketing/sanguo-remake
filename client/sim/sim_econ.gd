@@ -152,6 +152,15 @@ func cmd_debug_give(id: int, item: int, n: int = 1) -> void:
 	RulesShop.add_item(e["ch"]["bag"], item, n)
 
 
+# 雜貨店特殊道具 id (U16 重新賦予效果，數值全部【自訂】)
+const ITEM_NAV_MAP := 65001         # 定位導航圖: 一次性顯示最近城池方位
+const ITEM_BAG_100 := 65002         # 百寶袋: 永久負重上限 +100
+const ITEM_LABOR := 65005           # 勞動券: 限時打工經驗 +50%
+const ITEM_TUNNEL := 65020          # 遁地卷軸: 傳送去戰役 (山洞/迷宮) 入口
+const ITEM_BAG_200 := 65024         # 千歲袋: 永久負重上限 +200
+const ITEM_RECALL := 65040          # 回城卷軸: 即時傳送返最近城池
+
+
 # 食用/飲用消耗品【原=食物藥水回 HP、藥丸散回 MP；自訂=冇食用次數限制，用完即扣背包一件】
 func cmd_use_item(id: int, item: int) -> void:
 	var e := ent(id)
@@ -159,6 +168,13 @@ func cmd_use_item(id: int, item: int) -> void:
 		return
 	if item == int(data.office["pillItem"]):
 		return _use_ap_pill(e, item)
+	match item:
+		ITEM_NAV_MAP: return _use_nav_map(id, e)
+		ITEM_BAG_100: return _use_bag_bonus(id, e, item, 100)
+		ITEM_BAG_200: return _use_bag_bonus(id, e, item, 200)
+		ITEM_LABOR: return _use_labor_voucher(id, e)
+		ITEM_TUNNEL: return _use_tunnel_scroll(id, e)
+		ITEM_RECALL: return _use_recall_scroll(id, e)
 	var heal: Dictionary = data.heals.get(item, {})
 	if heal.is_empty():
 		return _msg(id, "呢件唔可以食用")
@@ -176,6 +192,116 @@ func cmd_use_item(id: int, item: int) -> void:
 	ch["sp"] = int(ch["sp"]) + maxi(0, gained_sp)
 	_sync_stats(e)
 	_msg(id, "用咗 %s，回 %d HP %d MP %d SP" % [data.names.get(item, str(item)), maxi(0, gained_hp), maxi(0, gained_mp), maxi(0, gained_sp)])
+
+
+# 定位導航圖: 一次性顯示最近城池方位/距離 (read-model 提示，消耗一件)
+func _use_nav_map(id: int, e: Dictionary) -> void:
+	var ch: Dictionary = e["ch"]
+	if not RulesShop.remove_item(ch["bag"], ITEM_NAV_MAP, 1):
+		return _msg(id, "背包冇呢件")
+	var md := _item_nearest_city_map(map_id_at(int(e["x"]), int(e["y"])))
+	if md.is_empty():
+		return _msg(id, "附近搵唔到城池")
+	_msg(id, "定位導航圖顯示：最近城池係 %s" % String(md["name"]))
+
+
+# 百寶袋/千歲袋: 永久負重上限 +add (消耗一件)
+func _use_bag_bonus(id: int, e: Dictionary, item: int, add: int) -> void:
+	var ch: Dictionary = e["ch"]
+	if not RulesShop.remove_item(ch["bag"], item, 1):
+		return _msg(id, "背包冇呢件")
+	ch["bagCapBonus"] = int(ch.get("bagCapBonus", 0)) + add
+	_msg(id, "用咗 %s，背包負重上限永久 +%d" % [data.names.get(item, str(item)), add])
+
+
+# 勞動券: 限時打工經驗 +50% (掛喺 ch.laborVoucherUntil tick，接 _work_gain hook)
+func _use_labor_voucher(id: int, e: Dictionary) -> void:
+	var ch: Dictionary = e["ch"]
+	if not RulesShop.remove_item(ch["bag"], ITEM_LABOR, 1):
+		return _msg(id, "背包冇呢件")
+	var dur := int(data.world.get("tiandi", {}).get("laborVoucherTicks", 6000))
+	ch["laborVoucherUntil"] = tick + dur
+	_msg(id, "用咗勞動券，打工經驗 +50%% (維持 %d 刻)" % dur)
+
+
+# 遁地卷軸: 傳送去戰役 (山洞/迷宮) 入口義勇士兵處，搵唔到 → 退返回城池
+func _use_tunnel_scroll(id: int, e: Dictionary) -> void:
+	var ch: Dictionary = e["ch"]
+	if not RulesShop.remove_item(ch["bag"], ITEM_TUNNEL, 1):
+		return _msg(id, "背包冇呢件")
+	var herald := {}
+	for n in data.quest_npc_list:
+		if bool(n.get("battle", false)):
+			herald = n
+			break
+	var mid: String
+	var px: int
+	var py: int
+	if not herald.is_empty():
+		mid = String(herald["map"])
+		px = int(herald["x"])
+		py = int(herald["y"])
+	else:
+		var md := _item_nearest_city_map(map_id_at(int(e["x"]), int(e["y"])))
+		if md.is_empty():
+			return _msg(id, "附近搵唔到戰役入口")
+		mid = String(md["id"])
+		var p := _item_city_anchor(md)
+		px = p.x
+		py = p.y
+	_item_teleport(e, px, py)
+	_msg(id, "遁地卷軸生效，傳送到%s" % mid)
+
+
+# 回城卷軸: 即時傳送返最近城池
+func _use_recall_scroll(id: int, e: Dictionary) -> void:
+	var ch: Dictionary = e["ch"]
+	if not RulesShop.remove_item(ch["bag"], ITEM_RECALL, 1):
+		return _msg(id, "背包冇呢件")
+	var md := _item_nearest_city_map(map_id_at(int(e["x"]), int(e["y"])))
+	if md.is_empty():
+		return _msg(id, "附近搵唔到城池")
+	var p := _item_city_anchor(md)
+	_item_teleport(e, p.x, p.y)
+	_msg(id, "回城卷軸生效，傳送返%s" % String(md["name"]))
+
+
+func _item_teleport(e: Dictionary, x: int, y: int) -> void:
+	e["x"] = x
+	e["y"] = y
+	e["tx"] = x
+	e["ty"] = y
+	e.erase("path")
+	e.erase("goto")
+	e["atk_target"] = 0
+	if e.has("casting"):
+		e.erase("casting")
+		_emit({"k": "cast_interrupted", "dst": int(e["id"]), "reason": "travel"})
+
+
+# 最近城池地圖 (map 圖 BFS 最短 hop)；去唔到 = {}
+func _item_nearest_city_map(from_map: String) -> Dictionary:
+	var best: Dictionary = {}
+	var best_hops := 1 << 30
+	for md in data.maps:
+		if String(md.get("kind", "")) != "city":
+			continue
+		var h := map_hops(from_map, String(md["id"]))
+		if h < 0:
+			continue
+		if h < best_hops:
+			best_hops = h
+			best = md
+	return best
+
+
+# 城池落腳點: 地圖範圍內最接近中心嘅行得格
+func _item_city_anchor(md: Dictionary) -> Vector2i:
+	var ox := int(md["ox"])
+	var oy := int(md["oy"])
+	var cx := ox + int(md["w"]) / 2
+	var cy := oy + int(md["h"]) / 2
+	return _free_near(cx, cy)
 
 
 # ================= 天地商行 (Step 7.2)【原=功能：代買賣/存材料/買賣工具/休息；自訂=費用扣法已在 4.5 有嘅市場價/日費】=================
@@ -241,6 +367,57 @@ func cmd_storage_sell(id: int, item: int, n: int = 1) -> void:
 	ch["gold"] = int(ch["gold"]) + gain
 	_cleanup_dur(ch)
 	_msg(id, "天地商行代賣 %d 件，得 %d 金" % [n, gain])
+
+
+# 訂閱天地商行 → 主人附近地面掉落物自動收進背包 (U16，仿 S07c 殘影豹「撿寶」，受負重上限限制)
+func _tiandi_auto_loot_tick() -> void:
+	var rng_cells := int(data.world.get("tiandi", {}).get("autoLootRange", 3))
+	for e in ents.values():
+		if not e.has("ch") or e["kind"] != "player" or int(e.get("hp", 0)) <= 0:
+			continue
+		if not bool((e["ch"] as Dictionary).get("storageSub", false)):
+			continue
+		_auto_loot_near(e, rng_cells, "天地商行代你執到")
+
+
+# 共用: 執實體 o 附近 rng_cells 格內嘅地面掉落物 (受負重上限限制)；label = 提示訊息前綴
+func _auto_loot_near(o: Dictionary, rng_cells: int, label: String) -> void:
+	var drops: Array = []
+	for d in ents.values():
+		if d.get("kind", "") == "dropped" and int(d.get("hp", 1)) > 0 \
+				and RulesCombat.in_range(int(o["x"]), int(o["y"]), int(d["x"]), int(d["y"]), rng_cells):
+			drops.append(int(d["id"]))
+	if drops.is_empty():
+		return
+	var oid := int(o["id"])
+	var ch: Dictionary = o["ch"]
+	var cap := _bag_cap(ch)
+	var wfn := func(i: int) -> int: return int(data.weights.get(i, 0))
+	var cfg: Dictionary = data.world.get("dropped", {})
+	for did in drops:
+		var d := ent(int(did))
+		if d.is_empty() or d.get("kind", "") != "dropped":
+			continue
+		var picked: Array = []
+		var leftover: Array = []
+		for it in d["drop"]["items"] as Array:
+			var iid := int(it["id"])
+			var n := int(it["n"])
+			if RulesShop.bag_fits(ch["bag"], iid, n, wfn, cap):
+				RulesShop.add_item(ch["bag"], iid, n)
+				picked.append({"id": iid, "n": n})
+			else:
+				leftover.append({"id": iid, "n": n})
+		if picked.is_empty():
+			continue
+		if leftover.is_empty():
+			_remove_ent(int(d["id"]))
+		else:
+			d["drop"]["items"] = leftover
+			d["drop"]["until"] = tick + int(cfg.get("capTicks", 300))
+		for it in picked:
+			_msg(oid, "%s %s ×%d" % [label, data.names.get(int(it["id"]), str(it["id"])), int(it["n"])])
+		_emit({"k": "auto_loot", "dst": oid, "items": picked})
 
 
 # ================= 天地商行自動化 (Step 13, spec 05 §3) =================
@@ -538,6 +715,8 @@ func adv_unlocked(ch: Dictionary, skill: String) -> bool:
 # 加技能經驗 + 升級訊息；初階升到解鎖級 → 進階技能開 1 級
 func _work_gain(id: int, ch: Dictionary, skill: String, amount: int) -> void:
 	amount = maxi(1, MathX.js_round(float(amount) * _work_exp_mult(ch, skill)))   # 生產專精 (S09c)
+	if tick < int(ch.get("laborVoucherUntil", 0)):                               # 勞動券 (U16)
+		amount = maxi(1, MathX.js_round(float(amount) * 1.5))
 	if not ch.has("workLv"):
 		ch["workLv"] = {}
 	var w: Dictionary = ch["workLv"].get(skill, {"lv": maxi(1, work_lv(ch, skill)), "exp": 0})

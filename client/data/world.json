@@ -20,7 +20,9 @@
   "bagMatCap": 100,
   "storageCap": 1000,
   "toolSellAt": 2,
-  "restCost": 10
+  "restCost": 10,
+  "autoLootRange": 3,
+  "laborVoucherTicks": 1440
  },
  "_noteDrop": "地面掉落物 (S04a, spec 04 §6)【原=功能；自訂=數值】: 打怪/死亡跌出嘅物品以「跌落地」形式出現，企埋邊度撳拾取收取。capTicks = 跌落地物件存在幾多 tick 後消失【原 300】；capBagWeight = 背包總重量 (items.json weight 乘件數) 上限，滿咗拾取會提示+留落地 (負重系統 S05 城際貿易重磅重用)。",
  "dropped": {

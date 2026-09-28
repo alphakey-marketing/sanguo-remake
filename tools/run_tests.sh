@@ -59,6 +59,7 @@ run battle --script tests/run_battle.gd
 run scene --script tests/run_scene.gd
 run pk --script tests/run_pk.gd
 run karma --script tests/run_karma.gd
+run guard --script tests/run_guard.gd
 run down --script tests/run_down.gd
 run market --script tools/market_sim.gd
 run hud --script tests/run_hud.gd

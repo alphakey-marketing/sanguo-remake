@@ -16,10 +16,11 @@ const IDEO_OK := {
 	"治國": ["治國", "隱遁", "義理"],
 }
 const ARENA_DEF_BASE := 900000          # 擂台臨時怪 def id = BASE + 武將 id (唔入 monsters.json)
-# 戰鬥指令 6 種【原】: 主動/協助/絕招/術法/停止/遠距跟隨 (絕招/術法 = Step 15)
-const ORDERS := ["active", "assist", "ult", "spell", "stop", "follow"]
-const ORDER_NAMES := {"active": "主動攻擊", "assist": "協助攻擊", "ult": "絕招攻擊", "spell": "術法攻擊",
-	"stop": "停止攻擊", "follow": "遠距跟隨"}
+# 戰鬥指令 4 種【原】: 主動/協助/停止/遠距跟隨。招式用唔用 (U16 拆做獨立開關 skillMode) 由 SKILL_MODES 控制，兩者正交組合。
+const ORDERS := ["active", "assist", "stop", "follow"]
+const ORDER_NAMES := {"active": "主動攻擊", "assist": "協助攻擊", "stop": "停止攻擊", "follow": "遠距跟隨"}
+const SKILL_MODES := ["off", "on"]
+const SKILL_MODE_NAMES := {"off": "唔用招式", "on": "用絕招/術法"}
 
 
 # 理念相合: 出仕人人得；玩家未定理念 = 只可以登用出仕
@@ -56,9 +57,11 @@ static func month_of(day: int, month_days: int) -> int:
 
 
 # 調查封鎖原因 → "" = 可以調查。rec = ch.recruit
-static func survey_block(rec: Dictionary, day: int, month: int) -> String:
-	if int(rec.get("lockMonth", -1)) == month:
-		return "今個月已經登用咗人才，下個月先再調查"
+# recruitLockUntil = 登用成功嗰日 + recruitLockDays (U16: 由曆月鎖改做滾動日數鎖，同 serveDays 一齊減半)
+static func survey_block(rec: Dictionary, day: int, _month: int) -> String:
+	var until := int(rec.get("recruitLockUntil", -1))
+	if until >= 0 and day < until:
+		return "登用鎖緊，%d 日後先可以再調查" % (until - day)
 	if int(rec.get("surveyDay", -1)) == day:
 		return "今日已經調查過，聽日再嚟"
 	return ""
