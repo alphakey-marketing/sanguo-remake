@@ -1,0 +1,12 @@
+{
+  "_note": "捕快 NPC【自訂】: 每座 city 地圖生 perCity 隻，50~75 級（照 class 成長公式 attrs_at 推）。patrolShichen 時辰內喺 standPos 附近 patrolRadius 內巡邏，其餘時辰企定喺 standPos 唔郁（客棧側，唔係城門口）。見紅名罪犯(criminal=true，包括玩家)主動追打，aggroRange 內鎖定。",
+  "cfg": {
+    "levelMin": 50,
+    "levelMax": 75,
+    "perCity": 2,
+    "patrolShichen": [3, 4, 5, 6, 7, 8],
+    "patrolRadius": 6,
+    "standOffset": [3, 3],
+    "aggroRange": 10
+  }
+}
