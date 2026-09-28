@@ -68,7 +68,7 @@
 - Windows Python 睇唔到 `/tmp`，暫存用 scratchpad
 
 ## 素材規則（重要）
-`client/assets_placeholder/` = 佔位素材（placeholder，**唔係原版素材**），唔入 git（已 .gitignore）。引用一律經 `res://assets_placeholder/`。成品前全部換走。角色暫用頭像、怪物色塊。APK / web 匯出包含佢冇問題。
+`client/assets_placeholder/` = 佔位素材（placeholder，**唔係原版素材**），入 git（已由 .gitignore 移除，會推上 GitHub）。引用一律經 `res://assets_placeholder/`。成品前全部換走。角色暫用頭像、怪物色塊。APK / web 匯出包含佢冇問題。
 
 ## 工作方式
 - 每細步：spec → `rules/*.gd` + 測試 → sim 指令 + 場景測試 → `run_tests.sh` 全 PASS → 剔 PLAN 格（UI 唔喺呢個範圍，留返後面專門 UI Step 一齊補）
