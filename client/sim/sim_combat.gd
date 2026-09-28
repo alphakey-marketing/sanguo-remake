@@ -157,6 +157,8 @@ func _schedule_respawn(m: Dictionary, d: Dictionary) -> void:
 
 func _kill_player(p: Dictionary) -> void:
 	var ch: Dictionary = p["ch"]
+	ch["hp"] = 0
+	p["hp"] = 0
 	var bt: Dictionary = p.get("battle", {})
 	var sc: Dictionary = p.get("scene", {})
 	# 戰役內陣亡唔跌經驗/物品【原 sy3_8】(除非個別場 dropOnDeath=true, Step 19)；特殊場景 (S04d) 照樣唔跌
@@ -211,15 +213,51 @@ func _kill_player(p: Dictionary) -> void:
 				_drop_items(int(p["x"]), int(p["y"]), dropped)
 			_cleanup_dur(ch)
 
-	# 3. 傳送返客棧: HP/MP/SP 回復一半【自訂】(原版復活後唔滿，要訓覺/食)
+	# 3. 復活: 還魂丹/「還魂」友好技 → 即刻返客棧回半血 (唔入倒地)；
+	#    否則入「倒地」狀態【自訂新增】: 原地企(死位)，強制 5 秒 → 5~300 秒可回城/復活丹/道士超渡就地復活 → 300 秒到期強制回城
 	var die_x := int(p["x"])
 	var die_y := int(p["y"])
+	var down := false
+	if revived:
+		_death_return_to_town(p)
+	else:
+		p["down"] = true
+		p["downAt"] = tick
+		down = true
+	# 4. 目擊死亡: 死亡嗰位附近有記憶表嘅 NPC 記低 (好感微升: 同情 +2【自訂】, spec 03 §4.3)
+	_witness_nearby({"x": die_x, "y": die_y}, int(p["id"]), "die", BotSys.W_SEE_DIE)
+
+	# 5. 裝備耐久: 每件扣 10% 耐久 (spec 03 §4.3, 同時係修理服務需求根源) —— 即時，唔理倒唔倒地
+	_wear_armor_death(ch)
+	_cleanup_fused(ch)              # 跌走咗武器 → 清除融合記錄
+	ch["status"] = {}
+	p.erase("casting")
+	ch.erase("fusing")
+	_mount_drop(p, "die")           # 死亡落馬 (Step 17a)
+	p.erase("path")
+	p.erase("goto")
+	p["atk_target"] = 0
+	_sync_stats(p)
+	var cc: Dictionary = data.world["combat"]
+	var self_at := (tick + int(cc.get("playerDownSelfTicks", 50))) if down else 0
+	var down_until := (tick + int(cc.get("playerDownMaxTicks", 3000))) if down else 0
+	_emit({"k": "die", "dst": p["id"], "exp_lost": exp_lost, "dropped": dropped,
+		"revived": revived, "lucky": lucky, "huhushen": huhushen,
+		"down": down, "selfAt": self_at, "downUntil": down_until})
+
+
+# HP/MP/SP 回一半 (聖靈友好技回滿) + 傳返最近客棧 / 戰役報名點 / 場景入口【自訂】
+# (還魂丹即死路徑 + 玩家自己「回城復活」/ 逾時強制回城 共用)
+func _death_return_to_town(p: Dictionary) -> void:
+	var ch: Dictionary = p["ch"]
 	if _friend_effect_active(p, "holy_elixir"):    # U13 戰騎「聖靈」友好技: 回滿代替回半
 		ch["hp"] = _eff_max_hp(ch)
 		ch["mp"] = _eff_max_mp(ch)
 		ch["sp"] = _eff_max_sp(ch)
 	else:
 		_half_heal(ch)
+	var bt: Dictionary = p.get("battle", {})
+	var sc: Dictionary = p.get("scene", {})
 	if bt.is_empty() and sc.is_empty():
 		var inn := nearest_inn(map_id_at(int(p["x"]), int(p["y"])))    # 返最近客棧 (過圖次數最少) (Step 11.7)
 		p["x"] = int(inn["x"])
@@ -231,22 +269,68 @@ func _kill_player(p: Dictionary) -> void:
 			_battle_exit(p, "died")     # 戰役內死亡: 傳送返報名點 + 清晒呢場遺留 boss (Step 19)
 		if not sc.is_empty():
 			_scene_exit(p, "died")      # S04d: 特殊場景內死亡: 傳送返入口 + 清晒呢場遺留怪
-	# 4. 目擊死亡: 死亡嗰位附近有記憶表嘅 NPC 記低 (好感微升: 同情 +2【自訂】, spec 03 §4.3)
-	_witness_nearby({"x": die_x, "y": die_y}, int(p["id"]), "die", BotSys.W_SEE_DIE)
 
-	# 5. 裝備耐久: 每件扣 10% 耐久 (spec 03 §4.3, 同時係修理服務需求根源)
-	_wear_armor_death(ch)
-	_cleanup_fused(ch)              # 跌走咗武器 → 清除融合記錄
+
+# 倒地狀態清理【自訂新增】: 回城/就地復活共用嘅尾段 (清狀態/goto/atk_target/同步)
+func _revive_finish(p: Dictionary) -> void:
+	var ch: Dictionary = p["ch"]
 	ch["status"] = {}
+	p.erase("down")
+	p.erase("downAt")
 	p.erase("casting")
-	ch.erase("fusing")
-	_mount_drop(p, "die")           # 死亡落馬 (Step 17a)
 	p.erase("path")
 	p.erase("goto")
 	p["atk_target"] = 0
 	_sync_stats(p)
-	_emit({"k": "die", "dst": p["id"], "exp_lost": exp_lost, "dropped": dropped,
-		"revived": revived, "lucky": lucky, "huhushen": huhushen})
+
+
+# 就地復活【自訂新增】: 原地回滿血，唔傳送 (復活丹 / 道士超渡共用)
+func _revive_onsite(p: Dictionary) -> void:
+	_full_heal(p["ch"])
+	_revive_finish(p)
+
+
+# 玩家自己撳「回城復活」【自訂新增】: 倒地滿 5 秒 (playerDownSelfTicks) 先准
+func cmd_self_revive(id: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or not bool(e.get("down", false)):
+		return
+	var cc: Dictionary = data.world["combat"]
+	var self_at := int(e.get("downAt", 0)) + int(cc.get("playerDownSelfTicks", 50))
+	if tick < self_at:
+		return _msg(id, "倒地未夠 5 秒，未可以回城復活")
+	_death_return_to_town(e)
+	_revive_finish(e)
+	_emit({"k": "revive_self", "dst": id, "onsite": false})
+	_msg(id, "返到客棧，精神返嚟（HP/MP/SP 回一半）")
+
+
+# 用「復活丹」就地復活【自訂新增】: 倒地期間隨時可用 (唔使等 5 秒)，消耗 1
+func cmd_revive_pill(id: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or not bool(e.get("down", false)):
+		return
+	var ch: Dictionary = e["ch"]
+	if not RulesShop.has_item(ch["bag"], RulesCombat.ONSITE_REVIVE_PILL, 1):
+		return _msg(id, "冇復活丹")
+	RulesShop.remove_item(ch["bag"], RulesCombat.ONSITE_REVIVE_PILL, 1)
+	_revive_onsite(e)
+	_emit({"k": "revive_self", "dst": id, "onsite": true})
+	_msg(id, "服咗復活丹，原地起返身（消耗 1）")
+
+
+# 倒地逾時未救兜底【自訂新增】: 300 秒 (playerDownMaxTicks) 到期強制回城復活，免得冇道士/復活丹時卡死
+func _player_down_tick() -> void:
+	var pe := ent(int(state.get("player_id", 0)))
+	if pe.is_empty() or not bool(pe.get("down", false)):
+		return
+	var cc: Dictionary = data.world["combat"]
+	if tick < int(pe.get("downAt", 0)) + int(cc.get("playerDownMaxTicks", 3000)):
+		return
+	_death_return_to_town(pe)
+	_revive_finish(pe)
+	_emit({"k": "revive_self", "dst": int(pe["id"]), "onsite": false, "timeout": true})
+	_msg(int(pe["id"]), "倒地太耐，強制送返客棧")
 
 
 # S03a: 殺死居民/紅名(殺人魔) NPC (spec 03 §2, §4)。

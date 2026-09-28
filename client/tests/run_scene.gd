@@ -220,9 +220,14 @@ func t_death_no_loss(data: GameData) -> void:
 		if int(b["id"]) == 10001:
 			n = int(b["n"])
 	check(n == 3, "場景內死亡唔跌物品")
-	check(not sim.ent(id).has("scene"), "死亡自動離開場景")
-	check(int(sim.ent(id)["x"]) == bx and int(sim.ent(id)["y"]) == by, "死亡傳返入口原位")
-	check(_scene_mobs(sim, "taohuadu").is_empty(), "死亡後殘留場景怪清晒")
+	# 冇復活道具 → 死亡入倒地狀態【自訂新增】，仍留喺場景入面，等回城復活先真正離開
+	check(bool(sim.ent(id).get("down", false)) and sim.ent(id).has("scene"), "場景內死亡: 先倒地，未即刻離開場景")
+	for _i in int(data.world["combat"]["playerDownSelfTicks"]):
+		sim.step()
+	sim.cmd_self_revive(id)
+	check(not sim.ent(id).has("scene"), "回城復活: 自動離開場景")
+	check(int(sim.ent(id)["x"]) == bx and int(sim.ent(id)["y"]) == by, "回城復活: 傳返入口原位")
+	check(_scene_mobs(sim, "taohuadu").is_empty(), "回城復活後殘留場景怪清晒")
 
 
 # ---------- sim: 放棄場景 ----------

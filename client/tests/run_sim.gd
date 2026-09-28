@@ -138,7 +138,13 @@ func t_death(data: GameData) -> void:
 			break
 	var e := sim.ent(id)
 	check(died.size() == 1, "死亡: 收到 die 事件")
-	check(int(e["x"]) == sim.inn_pos.x and int(e["y"]) == sim.inn_pos.y, "死亡: 返客棧")
+	# 冇復活道具 → 死亡入倒地狀態【自訂新增】，等 5 秒後撳「回城復活」先返客棧
+	check(bool(e.get("down", false)), "死亡: 冇復活道具 → 倒地")
+	var self_ticks := int(data.world["combat"]["playerDownSelfTicks"])
+	for _i in self_ticks:
+		sim.step()
+	sim.cmd_self_revive(id)
+	check(int(e["x"]) == sim.inn_pos.x and int(e["y"]) == sim.inn_pos.y, "死亡: 回城復活後返客棧")
 	check(int(e["hp"]) == maxi(1, MathX.js_round(int(e["max_hp"]) / 2.0)), "死亡: 回一半 (spec 03 §4.3)")
 
 

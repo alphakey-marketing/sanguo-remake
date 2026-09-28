@@ -263,6 +263,8 @@ func _move(id: int, x: int, y: int, cap: int = 0) -> void:
 	var e := ent(id)
 	if e.is_empty() or not is_free(x, y):
 		return
+	if bool(e.get("down", false)):        # 倒地期間唔可以郁【自訂新增】
+		return
 	var ch: Dictionary = e.get("ch", {})
 	if not ch.is_empty() and RulesSpell.blocks_move(ch.get("status", {}), tick) and not _friend_effect_active(e, "stun_resist"):  # 中邪定身【原】(戰騎「穩重」友好技免疫, U13)
 		if e["kind"] == "player":
