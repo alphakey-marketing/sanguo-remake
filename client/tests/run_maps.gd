@@ -455,17 +455,24 @@ func t_xinye(data: GameData) -> void:
 	var item := int(shop["stock"][0])
 	sim.cmd_buy(id, item, 1)
 	check(RulesShop.count_item(ch["bag"], item) >= 1 and int(ch["gold"]) < 1000, "新野武器店: 買到嘢")
-	# 死亡: 博望坡 → 新野客棧；潁川郊外 → 許昌客棧
+	# 死亡: 冇復活道具 → 先倒地【自訂新增】，撳「回城復活」先傳返最近客棧: 博望坡 → 新野客棧；潁川郊外 → 許昌客棧
+	var self_ticks := int(data.world["combat"]["playerDownSelfTicks"])
 	var bw: Dictionary = data.map_by_id["bowang"]
 	_put(sim, id, int(bw["ox"]) + 48, int(bw["oy"]) + 30)
 	sim._kill_player(sim.ent(id))
+	for _i in self_ticks: sim.step()
+	sim.cmd_self_revive(id)
 	check(int(sim.ent(id)["x"]) == int(inn["x"]) and int(sim.ent(id)["y"]) == int(inn["y"]), "死亡: 博望坡 → 返新野客棧")
 	_put(sim, id, 30, 30)
 	sim._kill_player(sim.ent(id))
+	for _i in self_ticks: sim.step()
+	sim.cmd_self_revive(id)
 	check(int(sim.ent(id)["x"]) == sim.inn_pos.x and int(sim.ent(id)["y"]) == sim.inn_pos.y, "死亡: 潁川郊外 → 返許昌客棧")
 	var rr: Dictionary = data.map_by_id["runan_road"]
 	_put(sim, id, int(rr["ox"]) + 10, int(rr["oy"]) + 20)
 	sim._kill_player(sim.ent(id))
+	for _i in self_ticks: sim.step()
+	sim.cmd_self_revive(id)
 	check(sim.map_id_at(int(sim.ent(id)["x"]), int(sim.ent(id)["y"])) == "runan_city", "死亡: 汝南道 → 返汝南客棧 (B2.5)")
 
 
@@ -524,6 +531,8 @@ func t_b25(data: GameData) -> void:
 					spot = Vector2i(int(md["ox"]) + x, int(md["oy"]) + y)
 		_put(sim, id, spot.x, spot.y)
 		sim._kill_player(sim.ent(id))
+		for _i in int(data.world["combat"]["playerDownSelfTicks"]): sim.step()
+		sim.cmd_self_revive(id)
 		var at := sim.map_id_at(int(sim.ent(id)["x"]), int(sim.ent(id)["y"]))
 		check(at == String(deaths[mid]), "死亡: %s → 返 %s 客棧 (%s)" % [mid, deaths[mid], at])
 	# 怪物等級帶: 陳留 9~20、山寨 11~14、荊州地界 9~11、港口 12~15、樊城 11~14、漢水 16~20；城/室內冇怪

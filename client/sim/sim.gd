@@ -183,6 +183,7 @@ func step() -> void:
 	_advance_clock()
 	BotSys.think(self)
 	_recruit_tick()             # 擂台勝負 (Step 13.5)
+	_player_down_tick()         # 玩家倒地逾時未救 → 強制回城復活【自訂新增】
 	_office_tick()              # 官令護衛/救援 NPC 死咗 → 自動失敗 (S06a)
 	_mount_tick()               # 放牧返嚟 (Step 17a)
 	_beast_tick()               # 戰騎出戰實體同步/回復 (S07b)

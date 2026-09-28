@@ -432,12 +432,13 @@ func _try_chaodu(id: int) -> void:
 	var ch: Dictionary = e["ch"]
 	var target: Dictionary = {}
 	for o in ents.values():
-		if String(o.get("kind", "")) == "gen" and bool(o.get("down", false)) and int(o["hp"]) <= 0 \
+		var kind := String(o.get("kind", ""))
+		if (kind == "gen" or kind == "player") and int(o["id"]) != id and bool(o.get("down", false)) and int(o["hp"]) <= 0 \
 				and RulesCombat.in_range(e["x"], e["y"], o["x"], o["y"], REVIVE_RANGE):
 			target = o
 			break
 	if target.is_empty():
-		return _msg(id, "附近冇倒下嘅同伴（同伴倒下先可以超渡）")
+		return _msg(id, "附近冇倒下嘅人（同伴/主公倒下先可以超渡）")
 	var max_hp := maxi(1, int(e.get("max_hp", 1)))
 	var max_mp := maxi(1, RulesStats.max_mp(int(ch["level"]), ch["attrs"]))
 	var cmul := float(_companion_class_skill_mul(e)["cost"])    # 22 職業特技
@@ -450,16 +451,7 @@ func _try_chaodu(id: int) -> void:
 	ch["hp"] = int(ch["hp"]) - hp_cost
 	ch["mp"] = int(ch["mp"]) - mp_cost
 	_sync_stats(e)
-	var tch: Dictionary = target["ch"]
-	_full_heal(tch)
-	tch["status"] = {}
-	target.erase("down")
-	target.erase("downAt")
-	target.erase("casting")
-	target.erase("path")
-	target.erase("goto")
-	target["atk_target"] = 0
-	_sync_stats(target)
+	_revive_onsite(target)          # 原地回滿血 + 清倒地狀態【自訂新增，同復活丹共用】
 	_emit({"k": "revive", "dst": id, "id": int(target["id"]), "name": str(target["name"])})
 	_msg(id, "超渡！「%s」起返身回滿血（扣自己 %d HP．%d MP）" % [target["name"], hp_cost, mp_cost])
 
