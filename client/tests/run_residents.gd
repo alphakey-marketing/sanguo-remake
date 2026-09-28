@@ -20,6 +20,7 @@ func _init() -> void:
 	t_spawn(data)
 	t_view(data)
 	t_inn(data)
+	t_schedule_move(data)
 	t_roundtrip(data)
 	t_old_save(data)
 	t_determinism(data)
@@ -115,6 +116,11 @@ func t_schedule() -> void:
 	check(RulesResident.activity_at(R, 11) == "sleep", "日程: 亥時 sleep")
 	check(RulesResident.activity_at(R, 15) == "work", "日程: wrap 15 → 3 → work")
 	check(RulesResident.activity_at(R, 12) == "sleep", "日程: wrap 12 → 0")
+	check(RulesResident.is_city_activity(R, "sleep"), "日程: sleep = 留城內")
+	check(RulesResident.is_city_activity(R, "home"), "日程: home = 留城內")
+	check(RulesResident.is_city_activity(R, "eat"), "日程: eat = 留城內")
+	check(not RulesResident.is_city_activity(R, "work"), "日程: work = 出野外")
+	check(not RulesResident.is_city_activity(R, "unknown"), "日程: 未知活動 = 唔留城內")
 
 
 # ================= homeZone =================
@@ -227,6 +233,41 @@ func t_inn(data: GameData) -> void:
 	check(sim.resident_inn_pos(sim.ent(ly)) == Vector2i(-1, -1), "客棧: 洛陽冇客棧 → 唔撤退")
 	var b := sim._spawn_actor("路人", "bot")
 	check(sim.resident_inn_pos(b) == sim.inn_pos, "客棧: legacy bot 用預設客棧")
+
+
+# ============ 居民日程移動 (S09a) ============
+# 用 schedule 驅動: in-town 時辰 (eat/home/sleep) 居民留城內行街/休息，唔出野外；work 先出野外練功。
+func t_schedule_move(data: GameData) -> void:
+	# helper: 居民是否仍喺自己城內地圖 (sim 傳入避免 closure)
+	var sim := Sim.new(data, 91)
+	sim.add_residents()
+	# --- in-town: 子時 (sleep) 起 run 60 tick (ke 0..7 全屬 sleep 時辰)，居民應全部留守城內，唔出野外 ---
+	sim.state["tick"] = 0                       # 子時 sleep
+	for _i in 60:
+		sim.step()
+	var outside := 0
+	var total := int(sim.state["bots"].size())
+	for id in sim.state["bots"]:
+		var e := sim.ent(int(id))
+		var hc := String(e["ch"]["homeCity"])
+		var cm := sim.resident_city_map_id(hc)
+		if cm != "" and sim.map_id_at(int(e["x"]), int(e["y"])) != cm:
+			outside += 1
+	check(outside == 0, "日程 in-town: 子時 sleep 居民全部留城內 (出走 %d/%d)" % [outside, total])
+	# --- work: 卯時 (work) 起 run 150 tick，居民應有人離開城去野外 ---
+	var sim2 := Sim.new(data, 92)
+	sim2.add_residents()
+	sim2.state["tick"] = 192                     # 192 = 卯時 (work)
+	for _i in 150:
+		sim2.step()
+	var went := 0
+	for id in sim2.state["bots"]:
+		var e := sim2.ent(int(id))
+		var hc := String(e["ch"]["homeCity"])
+		var cm := sim2.resident_city_map_id(hc)
+		if cm != "" and sim2.map_id_at(int(e["x"]), int(e["y"])) != cm:
+			went += 1
+	check(went > 0, "日程 work: 卯至巳時居民出野外練功 (出城 %d)" % went)
 
 
 # ================= 存檔 =================

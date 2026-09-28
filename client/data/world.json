@@ -68,7 +68,7 @@
   "seekRange": 14,
   "maxLvAbove": 2,
   "chatChance": 0.002,
-  "wanderChance": 0.15,
+  "wanderChance": 0.05,
   "criminalPct": 0.12,
   "fleeChance": 0.25,
   "crimeAggro": 6,

@@ -81,6 +81,26 @@ static func think(sim) -> void:
 			continue
 		if int(e["atk_target"]) != 0:                  # 戰鬥中
 			continue
+		# 居民日程 (S09a, spec 09 §1): in-town 活動 (cfg.inTownActivities: eat/home/sleep) → 留城內行街/休息，唔出野區；
+		# work → 落下方野外練功邏輯。血低返客棧 (上方) 任何時辰都優先。
+		if RulesResident.is_city_activity(sim.data.residents, RulesResident.activity_at(sim.data.residents, RulesClock.shichen_of_ke(int(sim._clock()["ke"])))):
+			var cmap: String = sim.resident_city_map_id(String(ch.get("homeCity", "")))
+			if cmap != "" and sim.map_id_at(int(e["x"]), int(e["y"])) != cmap:
+				sim._route_to_map(e, cmap)          # 唔喺自己城: 返城
+			elif cmap != "" and int(e["x"]) == int(e["tx"]) and int(e["y"]) == int(e["ty"]) and sim.rng.next() < float(bc["wanderChance"]):
+				var rz: Dictionary = sim.zone_by_id(cmap)      # 城內行街: 去城內隨機安全點
+				if not rz.is_empty():
+					var rxc := int(rz.get("x0", 0))
+					var ryc := int(rz.get("y0", 0))
+					var rw := maxi(1, int(rz.get("x1", 0)) - rxc)
+					var rh := maxi(1, int(rz.get("y1", 0)) - ryc)
+					for _t in 8:
+						var nx: int = rxc + int(sim.rng.below(rw))
+						var ny: int = ryc + int(sim.rng.below(rh))
+						if sim.is_free(nx, ny) and sim.is_safe(nx, ny):
+							sim.cmd_move(id, nx, ny)
+							break
+			continue
 		# 揀附近最近嘅怪 (等級唔好高過自己太多；只揀同一張地圖)
 		var best := 0
 		var best_d := 1 << 30
