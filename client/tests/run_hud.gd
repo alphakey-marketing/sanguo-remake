@@ -40,7 +40,9 @@ func t_layout(size: Vector2, ins: Vector4) -> void:
 	for i in ids.size():
 		for j in range(i + 1, ids.size()):
 			check(not HudLayout.overlaps(lay[ids[i]], lay[ids[j]]), "%s %s 同 %s 重疊" % [tag, ids[i], ids[j]])
-	check(joy.size.x >= 200 and joy.size.y >= 150, "%s 搖桿區太細 %s" % [tag, joy.size])
+	# 高度下限 100（唔係 150）：快捷補品欄 (U-fix) 佔咗搖桿區上面一行，360 高屏幕落驚只有 ~118px 高。
+	# 搖桿本身仍然成個手指目標（>2 倍 MIN_TOUCH），測試只防止佢細到冇得用，唔好假警報。
+	check(joy.size.x >= 200 and joy.size.y >= 100, "%s 搖桿區太細 %s" % [tag, joy.size])
 	check(not joy.intersects(HudLayout.log_rect(safe)), "%s 日誌入咗搖桿區" % tag)
 
 
