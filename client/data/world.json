@@ -58,7 +58,9 @@
   "respawnTicksDefault": 200,
   "wanderChance": 0.05,
   "wanderRadius": 3,
-  "compDownTicks": 600
+  "compDownTicks": 600,
+  "playerDownSelfTicks": 50,
+  "playerDownMaxTicks": 3000
  },
  "_noteBots": "居民 NPC (bot_sys) 規則行為【自訂】: HP 低過 lowHpPct 返客棧、揀怪範圍 seekRange 格 + 最多高自己 maxLvAbove 級、每 tick 講嘢機率、野區閒逛機率",
  "bots": {

@@ -310,6 +310,9 @@ func _send(d: Dictionary) -> void:
 		"donate_gold": sim.cmd_donate_gold(my_id, int(d.amount))
 		"donate_items": sim.cmd_donate_items(my_id, d.items)
 		"use_item": sim.cmd_use_item(my_id, int(d.item))
+		"self_revive": sim.cmd_self_revive(my_id)
+		"revive_pill": sim.cmd_revive_pill(my_id)
+		"companion_revive": sim.cmd_companion_revive_owner(my_id)
 		"raise_attr": sim.cmd_raise_attr(my_id, str(d.attr))
 		"auto_assign": sim.cmd_auto_assign(my_id)
 		"set_name": sim.cmd_set_name(my_id, str(d.name))
@@ -557,8 +560,21 @@ func _on_event(e: Dictionary) -> void:
 					_save_current()             # 死完即存
 				ch["status"] = {}              # 死亡清狀態 (sim 權威，UI 同步)
 				if hud != null and not autotest and not uitest:
-					hud.open_dialog(func() -> Dictionary: return {
-						"title": "你死咗", "text": dr, "options": [{"label": "繼續", "cb": func() -> void: hud.close_panels()}]})
+					if bool(e.get("down", false)):
+						hud.open_dialog(_down_dialog)     # 倒地畫面: 倒數 + 回城/復活丹/同伴超渡掣【自訂新增】
+					else:
+						hud.open_dialog(func() -> Dictionary: return {
+							"title": "你死咗", "text": dr, "options": [{"label": "繼續", "cb": func() -> void: hud.close_panels()}]})
+		"revive_self":                          # 倒地 → 回城/復活丹/逾時兜底復活【自訂新增】
+			if int(e.dst) == my_id:
+				if hud != null:
+					hud.close_panels()
+				if bool(e.get("timeout", false)):
+					_set_banner("倒地太耐，強制送返客棧", Color(1, 0.7, 0.4), 5.0)
+				elif bool(e.get("onsite", false)):
+					_set_banner("服咗復活丹，原地起返身！", Color(0.6, 1, 0.6), 4.0)
+				else:
+					_set_banner("返到客棧，精神返嚟（HP/MP/SP 回一半）", Color(0.6, 1, 0.6), 4.0)
 		"flee":
 			if int(e.get("dst", -1)) == my_id:
 				_log("%s 見你唔夠打，逃咗！" % str(e.get("name", "")))
@@ -648,8 +664,9 @@ func _on_event(e: Dictionary) -> void:
 		"companion_down":                       # S02c 超渡: 同伴倒下
 			if int(e.dst) == my_id and hud != null:
 				_set_banner("%s倒低咗！快啲超渡" % str(e.name), Color(1, 0.6, 0.6), 5.0)
-		"revive":                               # S02c 超渡: 道士復活同伴（sim 已 _msg, 呢度純通標）
+		"revive":                               # S02c 超渡: 道士復活同伴/主公（sim 已 _msg, 呢度純通標）
 			if int(e.dst) == my_id and hud != null:
+				hud.close_panels()              # 若主公自己倒地畫面開緊 → 救返即閂 (自訂新增)
 				_set_banner("超渡！%s 起返身" % str(e.name), Color(0.65, 1, 0.65), 4.0)
 		"companion_ko":
 			if int(e.dst) == my_id and hud != null:
@@ -683,7 +700,8 @@ func _on_event(e: Dictionary) -> void:
 
 # S03c 死亡結算彈窗文案: 跌咗邊啲物品/扣幾多/道具消耗 (spec 03 §4)
 func _death_report(e: Dictionary) -> String:
-	var lines: Array = ["你死咗，精神返到客棧（HP/MP/SP 回一半）"]
+	var lines: Array = ["你死咗，精神返到客棧（HP/MP/SP 回一半）"] if not bool(e.get("down", false)) \
+		else ["你死咗，倒喺地上…"]
 	if int(e.get("exp_lost", 0)) > 0:
 		lines.append("扣經驗 %d" % int(e["exp_lost"]))
 	var dn: Array = []
@@ -699,6 +717,31 @@ func _death_report(e: Dictionary) -> String:
 		lines.append("還魂丹令你復活返客棧（消耗 1）")
 	lines.append("每件裝備耐久扣 10%%")
 	return "\n".join(lines)
+
+
+# 倒地畫面【自訂新增】: 倒數 + 回城/復活丹/同伴超渡掣，source 每 0.2 秒重算 (DialogPanel 機制)
+func _down_dialog() -> Dictionary:
+	var dv := sim.player_down_view()
+	if dv.is_empty():
+		if hud != null:
+			hud.close_panels()
+		return {}
+	var can_self := bool(dv.get("canSelf", false))
+	var text := "你倒喺地上，%d 秒後強制送返客棧。\n" % int(dv.get("secsLeft", 0))
+	if can_self:
+		text += "可以撳「回城復活」返客棧。"
+	else:
+		text += "%d 秒後先可以「回城復活」；呢段時間可以用復活丹，或者等同伴道士超渡。" % int(dv.get("selfInSecs", 0))
+	var opts: Array = [
+		{"label": "回城復活", "disabled": not can_self,
+			"cb": func() -> void: _send({"t": "self_revive"})},
+		{"label": "使用復活丹復活", "disabled": not bool(dv.get("hasPill", false)),
+			"cb": func() -> void: _send({"t": "revive_pill"})},
+	]
+	if bool(dv.get("hasChaoduComp", false)):
+		opts.append({"label": "叫同伴超渡", "disabled": false,
+			"cb": func() -> void: _send({"t": "companion_revive"})})
+	return {"title": "倒地（%d 秒）" % int(dv.get("secsLeft", 0)), "text": text, "options": opts}
 
 func _set_banner(text: String, col: Color, secs: float) -> void:
 	banner = {"text": text, "t": secs, "color": col}
