@@ -34,6 +34,7 @@ var hud: MobileHud                # 手機操控層 (ui/touch/mobile_hud.gd)
 var auto := false                 # 自動掛機
 var auto_whitelist := {}          # U-fix: 自動掛機淨打嘅怪名 (name -> true)；空 = 打晒
 var auto_roam := false            # U-fix: 自動掛機冇怪時可唔可以自動跨場景去搵怪 (預設關，留喺同一場景)
+var pk_mode := false              # 打人模式: 開 = 所有怪+NPC 都可以撳中/target 攻擊；關 = 淨係怪 + 敵對(紅名/鎖定緊我)嘅 NPC 先得
 var potion_slots: Array = [0, 0, 0]   # U-fix: 快捷補品欄 3 格，存 item id（0 = 空），純 UI 偏好唔入 sim 存檔
 var sshot_file := ""             # --sshot: 開場幾秒後截圖存 user:// 退出
 var ch := {}                      # 玩家角色狀態 (sim 內同一個 Dictionary)
@@ -779,6 +780,19 @@ func target_ent():
 		return null
 	return _ent(target_id)
 
+# 呢個 entity 可唔可以俾玩家 target/攻擊：怪一律得；NPC(bot) 要打人模式開，或者本身敵對
+# (紅名殺人魔 / 鎖定緊自己嘅居民) 先得——保持平時淨見到敵對 NPC 可以反擊，其餘要開返打人模式先亂咁打
+func _is_targetable(e) -> bool:
+	if e == null:
+		return false
+	if e.get("mob", false):
+		return true
+	if not e.get("bot", false):
+		return false
+	if pk_mode:
+		return true
+	return bool(e.get("criminal", false)) or int(e.get("atkTarget", 0)) == my_id
+
 # 點怪 = 攻擊；點 NPC/設施 = 行過去自動互動；點地 = 行路（有落點標記）；點自己 = 取消目標
 func _hud_tap(pos: Vector2) -> void:
 	if hud != null and hud.any_panel_open():
@@ -789,11 +803,11 @@ func _hud_tap(pos: Vector2) -> void:
 	if me != null and int(g.x) == int(me.x) and int(g.y) == int(me.y):
 		target_id = -1                            # 點自己 = 取消目標
 		return
-	# 怪優先（戰鬥中最常撳）
+	# 怪/可攻擊 NPC 優先（戰鬥中最常撳）
 	var e = _ent_at(g)
-	if e == null or not e.get("mob", false):
-		e = _mob_near_tap(pos)                    # 手指粗: 容許 tap 埋隔籬格都算中
-	if e != null and e.get("mob", false):
+	if e == null or not _is_targetable(e):
+		e = _targetable_near_tap(pos)              # 手指粗: 容許 tap 埋隔籬格都算中
+	if e != null and _is_targetable(e):
 		target_id = int(e.id)
 		_send({"t": "attack", "target": target_id})
 		return
@@ -864,14 +878,14 @@ func _ui_tick(delta: float) -> void:
 		_ask_seen = key
 		ContextActions.run(self, {"kind": "ask"})
 
-# 切換目標: 附近怪按距離排，揀下一隻（唔會即刻打，撳攻擊先打）
+# 切換目標: 附近怪(+打人模式下嘅 NPC)按距離排，揀下一隻（唔會即刻打，撳攻擊先打）
 func _cycle_target() -> void:
 	var me = _me()
 	if me == null:
 		return
 	var mobs: Array = []
 	for e in ents:
-		if e.get("mob", false) and absf(e.x - me.x) + absf(e.y - me.y) <= TARGET_RANGE:
+		if _is_targetable(e) and absf(e.x - me.x) + absf(e.y - me.y) <= TARGET_RANGE:
 			mobs.append(e)
 	if mobs.is_empty():
 		_log("附近冇怪")
@@ -938,12 +952,12 @@ func _notification(what: int) -> void:
 
 # 容錯: tap 座標喺呢個範圍內揀最近嘅怪 (~1.8 格 ≈ 手指闊), 唔使準確咁啱格先郁到手
 const TAP_TOLERANCE := TILE * 1.8
-func _mob_near_tap(pos: Vector2):
+func _targetable_near_tap(pos: Vector2):
 	var world_pos: Vector2 = pos + cam
 	var best = null
 	var best_d := TAP_TOLERANCE
 	for e in ents:
-		if not e.get("mob", false):
+		if not _is_targetable(e):
 			continue
 		var center: Vector2 = Vector2(e.x, e.y) * TILE + Vector2(TILE, TILE) * 0.5
 		var d: float = world_pos.distance_to(center)
@@ -952,7 +966,7 @@ func _mob_near_tap(pos: Vector2):
 			best = e
 	return best
 
-# S04a: 撳嗰格係咪地面掉落物 (隔籬格都算中，同 _mob_near_tap 一樣容差)
+# S04a: 撳嗰格係咪地面掉落物 (隔籬格都算中，同 _targetable_near_tap 一樣容差)
 func _drop_at_tap(pos: Vector2, g: Vector2):
 	var world_pos: Vector2 = pos + cam
 	var best = null
@@ -975,7 +989,7 @@ func _hud_attack() -> void:
 		auto = false
 		hud.set_auto(false)
 	var t = target_ent()
-	if t != null and t.get("mob", false):
+	if t != null and _is_targetable(t):
 		_send({"t": "attack", "target": target_id})
 		return
 	var me = _me()
@@ -1027,7 +1041,7 @@ func _auto_tick() -> void:
 		return
 	var t = target_ent()
 	var near = _pick_mob(me, true)
-	if t != null and t.get("mob", false):
+	if t != null and _is_targetable(t):
 		# 貼身 / 打緊我 → 繼續打；否則有更近嘅就轉 (例如目標逃走咗)
 		if _mob_dist(me, t) <= 1 or int(t.get("aggro", 0)) == int(me.id):
 			return
@@ -1048,12 +1062,12 @@ func _pick_mob(me: Dictionary, safe_only: bool):
 	var best = null
 	var bd := 1e9
 	for e in ents:
-		if not e.get("mob", false) or int(e.hp) <= 0:
+		if not _is_targetable(e) or int(e.hp) <= 0:
 			continue
 		if str(sim.zone_view(int(e.x), int(e.y)).get("id", "")) != my_zone:
 			continue
-		if safe_only and not auto_whitelist.is_empty() and not auto_whitelist.has(str(e.name)):
-			continue                            # 自動掛機白名單: 冇揀嘅怪唔自動打
+		if safe_only and e.get("mob", false) and not auto_whitelist.is_empty() and not auto_whitelist.has(str(e.name)):
+			continue                            # 自動掛機白名單: 冇揀嘅怪唔自動打 (打人模式 NPC 唔受白名單限制)
 		var attacking := int(e.get("aggro", 0)) == int(me.id)
 		if safe_only and not attacking and int(e.level) > int(ch.level) + 1:
 			continue                            # 唔主動打高自己兩級以上嘅怪
