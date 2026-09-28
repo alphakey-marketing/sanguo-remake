@@ -307,6 +307,7 @@ func view_ents() -> Array:
 		var o: Dictionary = {"id": e["id"], "name": e["name"], "x": e["x"], "y": e["y"], "face": e["face"],
 			"bot": e["kind"] == "bot", "gen": e["kind"] == "gen", "hp": e["hp"], "maxHp": e["max_hp"], "level": e["level"], "mob": e["kind"] == "mob",
 			"criminal": bool(e.get("ch", {}).get("criminal", false)),
+			"atkTarget": int(e.get("atk_target", 0)),   # 打人模式: 居民鎖定緊邊個玩家 (bot_sys._crime_find_player)
 			"resident": bool(e.get("ch", {}).get("resident", false)),
 			"role": String(e.get("ch", {}).get("role", "")),
 			"statuses": st_vis, "casting": e.has("casting"), "castX": csx, "castY": csy, "castSpell": csp,
