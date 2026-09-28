@@ -18,7 +18,7 @@ func _init(m: Node) -> void:
 
 
 func sig() -> String:
-	return JSON.stringify([main.hud.vibrate_on])
+	return JSON.stringify([main.hud.vibrate_on, main.debug_speed])
 
 
 func _build_body() -> void:
@@ -64,3 +64,8 @@ func _build_body() -> void:
 		var act := String(a["action"])
 		var b := btn(String(a["label"]), func() -> void: main._on_debug_pressed(act), 120)
 		g.add_child(b)
+	g.add_child(btn("升 1 級(測試)", func() -> void: main._on_debug_pressed("level_up"), 120))
+	g.add_child(btn("升 10 級(測試)", func() -> void: main._on_debug_pressed("level_up10"), 120))
+	g.add_child(btn("時間 ×%d(測試)" % main.debug_speed, func() -> void:
+		main._on_debug_pressed("speed")
+		refresh(true), 120))

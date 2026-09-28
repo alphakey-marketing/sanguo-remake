@@ -209,6 +209,8 @@ func _check_place(me: Dictionary) -> void:
 	if nm != "":
 		banner = {"text": "— %s —" % nm, "t": 3.0, "color": Color(0.95, 0.85, 0.55)}
 
+var debug_speed := 1    # debug: 時間加速倍率 (1/4/16/64)，唔入存檔
+
 func _process(delta: float) -> void:
 	if autotest:
 		for i in AUTOTEST_STEPS: sim.step()
@@ -218,6 +220,8 @@ func _process(delta: float) -> void:
 		while acc >= TICK:
 			acc -= TICK
 			sim.step()
+			for i in range(debug_speed - 1):    # debug 加速: 額外 sim tick
+				sim.step()
 			_steer_tick()
 			_auto_tick()
 			_refresh()                  # 視圖跟 sim tick (10Hz) 更新，唔使每幀砌
@@ -346,6 +350,7 @@ func _send(d: Dictionary) -> void:
 		"repair": sim.cmd_repair(my_id, int(d.item))
 		"repair_service": sim.cmd_repair_service(my_id, int(d.item))
 		"debug_work_lv": sim.cmd_debug_work_lv(my_id, int(d.add))
+		"debug_level": sim.cmd_debug_level(my_id, int(d.get("n", 1)))
 		"general_talk": sim.cmd_general_talk(my_id, int(d.gid))
 		"recruit_survey": sim.cmd_recruit_survey(my_id, str(d.kind))
 		"recruit_pick": sim.cmd_recruit_pick(my_id, int(d.gid))
@@ -1208,6 +1213,10 @@ func _on_debug_pressed(action: String) -> void:
 				_send({"t": "equip_tool", "skill": "mining", "item": tool})
 			_send({"t": "work", "skill": "mining"})
 		"work_lv": _send({"t": "debug_work_lv", "add": 10})    # debug: 生產技能 +10 級 (Step 12)
+		"level_up": _send({"t": "debug_level", "n": 1})        # debug: 一鍵升 1 級
+		"level_up10": _send({"t": "debug_level", "n": 10})     # debug: 一鍵升 10 級
+		"speed":                                               # debug: 時間加速 1→4→16→64→1
+			debug_speed = {1: 4, 4: 16, 16: 64}.get(debug_speed, 1)
 		"learn_ults":
 			# debug (S02c): 依家職業學晒初階三招絕招（任務鏈喺 S06d）
 			if not ch.is_empty():

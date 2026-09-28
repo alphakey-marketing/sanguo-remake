@@ -144,6 +144,18 @@ func cmd_sell(id: int, item: int, n: int = 1) -> void:
 	_msg(id, "賣出 %d 件，得 %d 金" % [n, gain])
 
 
+# debug 用: 一鍵升 levels 級（送剛好夠嘅經驗，行正常升級流程：派點數/回滿 HP MP）；成品前移除
+func cmd_debug_level(id: int, levels: int = 1) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return
+	var ch: Dictionary = e["ch"]
+	for i in range(maxi(levels, 1)):
+		if int(ch["level"]) >= RulesStats.MAX_LEVEL:
+			break
+		RulesStats.gain_exp(data, ch, RulesStats.exp_to_next(int(ch["level"])) - int(ch["exp"]))
+
+
 # debug 用: 直接派物品落背包 (未有商店/任務可以攞到嘅嘢，方便手機冇鍵盤都測到成條流程；成品前移除)
 func cmd_debug_give(id: int, item: int, n: int = 1) -> void:
 	var e := ent(id)
