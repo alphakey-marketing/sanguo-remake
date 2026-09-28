@@ -114,6 +114,7 @@ func _ready() -> void:
 		# 自動化測試 / dev 快速開新局: 照舊即刻 spawn，唔經「選擇角色」畫面
 		sim.init_mobs()
 		sim.add_residents()
+		sim.add_guards()
 		my_id = sim.spawn_player("玩家")
 	else:
 		# U-fix: 「選擇角色」而家係開場第一個畫面 —— 舊版單一 AUTOSLOT 存檔一次過搬去角色位 1，
@@ -1463,6 +1464,7 @@ func switch_to_slot(n: int, is_new: bool) -> void:
 	if fresh:
 		sim.init_mobs()
 		sim.add_residents()
+		sim.add_guards()
 		my_id = sim.spawn_player("玩家")
 	sim.event_emitted.connect(_on_event)
 	target_id = -1

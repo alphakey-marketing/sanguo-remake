@@ -284,25 +284,17 @@ func _kill_bot(t: Dictionary, by: Dictionary) -> void:
 	_emit(ev)
 
 
-# S03b 天譴 (spec 03 §3)【自訂】: 殺善居民(非自衛)後即時雷劈——現有 HP×50% + 傳送返客棧 + 世界公告
-# 「XXX 因作惡多端遭到天譴」；冇得用還魂丹 (ch.tianqian 旗留俾 S03c 還魂丹檢查, 有測試)。
+# S03b 天譴 (spec 03 §3)【自訂】: 殺善居民(非自衛)後即時雷劈——現有 HP×50% + 世界公告
+# 「XXX 因作惡多端遭到天譴」；原地捱雷劈唔傳送；冇得用還魂丹 (ch.tianqian 旗留俾 S03c 還魂丹檢查, 有測試)。
 func _tianqian_reprisal(p: Dictionary, victim: String) -> void:
 	var ch: Dictionary = p["ch"]
 	var hp_before := int(ch["hp"])
 	ch["hp"] = RulesKarma.tianqian_hp(hp_before)
 	ch["status"] = {}          # 雷劈清狀態
 	ch["tianqian"] = true       # S03c 還魂丹對天譴無效 (RulesKarma.tianqian_blocks_revive)
-	var inn: Dictionary = nearest_inn(map_id_at(int(p["x"]), int(p["y"])))
-	p["x"] = int(inn["x"])
-	p["tx"] = int(inn["x"])
-	p["y"] = int(inn["y"])
-	p["ty"] = int(inn["y"])
-	p.erase("path")
-	p.erase("goto")
-	p["atk_target"] = 0
 	_sync_stats(p)
 	var pid := int(p["id"])
-	_msg(pid, "你天譴上身：雷劈扣 %d HP，被傳返客棧！" % (hp_before - int(ch["hp"])))
+	_msg(pid, "你天譴上身：雷劈扣 %d HP！" % (hp_before - int(ch["hp"])))
 	_emit({"k": "tianqian", "dst": pid, "name": str(p["name"]), "victim": victim,
 		"hp": int(ch["hp"]), "announce": RulesKarma.tianqian_announce(str(p["name"]))})
 
