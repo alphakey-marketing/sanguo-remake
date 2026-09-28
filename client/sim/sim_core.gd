@@ -709,6 +709,17 @@ func _bump_level(e: Dictionary, lv: int) -> void:
 	_sync_stats(e)
 
 
+# S09a 居民日程: 居民 homeCity → 對應城內地圖 id (kind:city 且 city==homeCity；如 runan → runan_city)。
+# 居民喺 in-town 活動 (eat/home/sleep) 時要留喺呢張城內地圖行街，唔出野外。
+func resident_city_map_id(city_id: String) -> String:
+	if city_id == "":
+		return ""
+	for md in data.maps:
+		if String(md.get("kind", "")) == "city" and String(md.get("city", "")) == city_id:
+			return String(md.get("id", ""))
+	return ""
+
+
 # S09a: 居民休息客棧位置。居民 → 自己城嘅客棧 (冇 = Vector2i(-1,-1) 唔撤退)；legacy bot → 預設客棧。
 func resident_inn_pos(e: Dictionary) -> Vector2i:
 	var ch: Dictionary = e.get("ch", {})

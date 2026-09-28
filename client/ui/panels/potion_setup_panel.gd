@@ -39,7 +39,7 @@ func _build_body() -> void:
 		list.add_child(row)
 		row.add_child(lbl("格 %d：%s" % [i + 1, item_name(id) if id > 0 else "（空）"], 15,
 			UiTheme.GOLD if editing_slot == i else UiTheme.TEXT))
-		var i_ := i
+		var i_: int = i
 		row.add_child(btn("揀" if editing_slot != i else "揀緊…", func() -> void:
 			editing_slot = i_
 			refresh(true), 60))

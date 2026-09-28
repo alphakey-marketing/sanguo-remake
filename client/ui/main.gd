@@ -34,6 +34,7 @@ var hud: MobileHud                # 手機操控層 (ui/touch/mobile_hud.gd)
 var auto := false                 # 自動掛機
 var auto_whitelist := {}          # U-fix: 自動掛機淨打嘅怪名 (name -> true)；空 = 打晒
 var auto_roam := false            # U-fix: 自動掛機冇怪時可唔可以自動跨場景去搵怪 (預設關，留喺同一場景)
+var pk_mode := false              # 打人模式: 開 = 所有怪+NPC 都可以撳中/target 攻擊；關 = 淨係怪 + 敵對(紅名/鎖定緊我)嘅 NPC 先得
 var potion_slots: Array = [0, 0, 0]   # U-fix: 快捷補品欄 3 格，存 item id（0 = 空），純 UI 偏好唔入 sim 存檔
 var sshot_file := ""             # --sshot: 開場幾秒後截圖存 user:// 退出
 var ch := {}                      # 玩家角色狀態 (sim 內同一個 Dictionary)
@@ -311,6 +312,9 @@ func _send(d: Dictionary) -> void:
 		"donate_gold": sim.cmd_donate_gold(my_id, int(d.amount))
 		"donate_items": sim.cmd_donate_items(my_id, d.items)
 		"use_item": sim.cmd_use_item(my_id, int(d.item))
+		"self_revive": sim.cmd_self_revive(my_id)
+		"revive_pill": sim.cmd_revive_pill(my_id)
+		"companion_revive": sim.cmd_companion_revive_owner(my_id)
 		"raise_attr": sim.cmd_raise_attr(my_id, str(d.attr))
 		"auto_assign": sim.cmd_auto_assign(my_id)
 		"set_name": sim.cmd_set_name(my_id, str(d.name))
@@ -558,8 +562,21 @@ func _on_event(e: Dictionary) -> void:
 					_save_current()             # 死完即存
 				ch["status"] = {}              # 死亡清狀態 (sim 權威，UI 同步)
 				if hud != null and not autotest and not uitest:
-					hud.open_dialog(func() -> Dictionary: return {
-						"title": "你死咗", "text": dr, "options": [{"label": "繼續", "cb": func() -> void: hud.close_panels()}]})
+					if bool(e.get("down", false)):
+						hud.open_dialog(_down_dialog)     # 倒地畫面: 倒數 + 回城/復活丹/同伴超渡掣【自訂新增】
+					else:
+						hud.open_dialog(func() -> Dictionary: return {
+							"title": "你死咗", "text": dr, "options": [{"label": "繼續", "cb": func() -> void: hud.close_panels()}]})
+		"revive_self":                          # 倒地 → 回城/復活丹/逾時兜底復活【自訂新增】
+			if int(e.dst) == my_id:
+				if hud != null:
+					hud.close_panels()
+				if bool(e.get("timeout", false)):
+					_set_banner("倒地太耐，強制送返客棧", Color(1, 0.7, 0.4), 5.0)
+				elif bool(e.get("onsite", false)):
+					_set_banner("服咗復活丹，原地起返身！", Color(0.6, 1, 0.6), 4.0)
+				else:
+					_set_banner("返到客棧，精神返嚟（HP/MP/SP 回一半）", Color(0.6, 1, 0.6), 4.0)
 		"flee":
 			if int(e.get("dst", -1)) == my_id:
 				_log("%s 見你唔夠打，逃咗！" % str(e.get("name", "")))
@@ -649,8 +666,9 @@ func _on_event(e: Dictionary) -> void:
 		"companion_down":                       # S02c 超渡: 同伴倒下
 			if int(e.dst) == my_id and hud != null:
 				_set_banner("%s倒低咗！快啲超渡" % str(e.name), Color(1, 0.6, 0.6), 5.0)
-		"revive":                               # S02c 超渡: 道士復活同伴（sim 已 _msg, 呢度純通標）
+		"revive":                               # S02c 超渡: 道士復活同伴/主公（sim 已 _msg, 呢度純通標）
 			if int(e.dst) == my_id and hud != null:
+				hud.close_panels()              # 若主公自己倒地畫面開緊 → 救返即閂 (自訂新增)
 				_set_banner("超渡！%s 起返身" % str(e.name), Color(0.65, 1, 0.65), 4.0)
 		"companion_ko":
 			if int(e.dst) == my_id and hud != null:
@@ -684,7 +702,8 @@ func _on_event(e: Dictionary) -> void:
 
 # S03c 死亡結算彈窗文案: 跌咗邊啲物品/扣幾多/道具消耗 (spec 03 §4)
 func _death_report(e: Dictionary) -> String:
-	var lines: Array = ["你死咗，精神返到客棧（HP/MP/SP 回一半）"]
+	var lines: Array = ["你死咗，精神返到客棧（HP/MP/SP 回一半）"] if not bool(e.get("down", false)) \
+		else ["你死咗，倒喺地上…"]
 	if int(e.get("exp_lost", 0)) > 0:
 		lines.append("扣經驗 %d" % int(e["exp_lost"]))
 	var dn: Array = []
@@ -700,6 +719,31 @@ func _death_report(e: Dictionary) -> String:
 		lines.append("還魂丹令你復活返客棧（消耗 1）")
 	lines.append("每件裝備耐久扣 10%%")
 	return "\n".join(lines)
+
+
+# 倒地畫面【自訂新增】: 倒數 + 回城/復活丹/同伴超渡掣，source 每 0.2 秒重算 (DialogPanel 機制)
+func _down_dialog() -> Dictionary:
+	var dv := sim.player_down_view()
+	if dv.is_empty():
+		if hud != null:
+			hud.close_panels()
+		return {}
+	var can_self := bool(dv.get("canSelf", false))
+	var text := "你倒喺地上，%d 秒後強制送返客棧。\n" % int(dv.get("secsLeft", 0))
+	if can_self:
+		text += "可以撳「回城復活」返客棧。"
+	else:
+		text += "%d 秒後先可以「回城復活」；呢段時間可以用復活丹，或者等同伴道士超渡。" % int(dv.get("selfInSecs", 0))
+	var opts: Array = [
+		{"label": "回城復活", "disabled": not can_self,
+			"cb": func() -> void: _send({"t": "self_revive"})},
+		{"label": "使用復活丹復活", "disabled": not bool(dv.get("hasPill", false)),
+			"cb": func() -> void: _send({"t": "revive_pill"})},
+	]
+	if bool(dv.get("hasChaoduComp", false)):
+		opts.append({"label": "叫同伴超渡", "disabled": false,
+			"cb": func() -> void: _send({"t": "companion_revive"})})
+	return {"title": "倒地（%d 秒）" % int(dv.get("secsLeft", 0)), "text": text, "options": opts}
 
 func _set_banner(text: String, col: Color, secs: float) -> void:
 	banner = {"text": text, "t": secs, "color": col}
@@ -780,6 +824,19 @@ func target_ent():
 		return null
 	return _ent(target_id)
 
+# 呢個 entity 可唔可以俾玩家 target/攻擊：怪一律得；NPC(bot) 要打人模式開，或者本身敵對
+# (紅名殺人魔 / 鎖定緊自己嘅居民) 先得——保持平時淨見到敵對 NPC 可以反擊，其餘要開返打人模式先亂咁打
+func _is_targetable(e) -> bool:
+	if e == null:
+		return false
+	if e.get("mob", false):
+		return true
+	if not e.get("bot", false):
+		return false
+	if pk_mode:
+		return true
+	return bool(e.get("criminal", false)) or int(e.get("atkTarget", 0)) == my_id
+
 # 點怪 = 攻擊；點 NPC/設施 = 行過去自動互動；點地 = 行路（有落點標記）；點自己 = 取消目標
 func _hud_tap(pos: Vector2) -> void:
 	if hud != null and hud.any_panel_open():
@@ -790,11 +847,11 @@ func _hud_tap(pos: Vector2) -> void:
 	if me != null and int(g.x) == int(me.x) and int(g.y) == int(me.y):
 		target_id = -1                            # 點自己 = 取消目標
 		return
-	# 怪優先（戰鬥中最常撳）
+	# 怪/可攻擊 NPC 優先（戰鬥中最常撳）
 	var e = _ent_at(g)
-	if e == null or not e.get("mob", false):
-		e = _mob_near_tap(pos)                    # 手指粗: 容許 tap 埋隔籬格都算中
-	if e != null and e.get("mob", false):
+	if e == null or not _is_targetable(e):
+		e = _targetable_near_tap(pos)              # 手指粗: 容許 tap 埋隔籬格都算中
+	if e != null and _is_targetable(e):
 		target_id = int(e.id)
 		_send({"t": "attack", "target": target_id})
 		return
@@ -865,14 +922,14 @@ func _ui_tick(delta: float) -> void:
 		_ask_seen = key
 		ContextActions.run(self, {"kind": "ask"})
 
-# 切換目標: 附近怪按距離排，揀下一隻（唔會即刻打，撳攻擊先打）
+# 切換目標: 附近怪(+打人模式下嘅 NPC)按距離排，揀下一隻（唔會即刻打，撳攻擊先打）
 func _cycle_target() -> void:
 	var me = _me()
 	if me == null:
 		return
 	var mobs: Array = []
 	for e in ents:
-		if e.get("mob", false) and absf(e.x - me.x) + absf(e.y - me.y) <= TARGET_RANGE:
+		if _is_targetable(e) and absf(e.x - me.x) + absf(e.y - me.y) <= TARGET_RANGE:
 			mobs.append(e)
 	if mobs.is_empty():
 		_log("附近冇怪")
@@ -939,12 +996,12 @@ func _notification(what: int) -> void:
 
 # 容錯: tap 座標喺呢個範圍內揀最近嘅怪 (~1.8 格 ≈ 手指闊), 唔使準確咁啱格先郁到手
 const TAP_TOLERANCE := TILE * 1.8
-func _mob_near_tap(pos: Vector2):
+func _targetable_near_tap(pos: Vector2):
 	var world_pos: Vector2 = pos + cam
 	var best = null
 	var best_d := TAP_TOLERANCE
 	for e in ents:
-		if not e.get("mob", false):
+		if not _is_targetable(e):
 			continue
 		var center: Vector2 = Vector2(e.x, e.y) * TILE + Vector2(TILE, TILE) * 0.5
 		var d: float = world_pos.distance_to(center)
@@ -953,7 +1010,7 @@ func _mob_near_tap(pos: Vector2):
 			best = e
 	return best
 
-# S04a: 撳嗰格係咪地面掉落物 (隔籬格都算中，同 _mob_near_tap 一樣容差)
+# S04a: 撳嗰格係咪地面掉落物 (隔籬格都算中，同 _targetable_near_tap 一樣容差)
 func _drop_at_tap(pos: Vector2, g: Vector2):
 	var world_pos: Vector2 = pos + cam
 	var best = null
@@ -976,7 +1033,7 @@ func _hud_attack() -> void:
 		auto = false
 		hud.set_auto(false)
 	var t = target_ent()
-	if t != null and t.get("mob", false):
+	if t != null and _is_targetable(t):
 		_send({"t": "attack", "target": target_id})
 		return
 	var me = _me()
@@ -1028,7 +1085,7 @@ func _auto_tick() -> void:
 		return
 	var t = target_ent()
 	var near = _pick_mob(me, true)
-	if t != null and t.get("mob", false):
+	if t != null and _is_targetable(t):
 		# 貼身 / 打緊我 → 繼續打；否則有更近嘅就轉 (例如目標逃走咗)
 		if _mob_dist(me, t) <= 1 or int(t.get("aggro", 0)) == int(me.id):
 			return
@@ -1049,12 +1106,12 @@ func _pick_mob(me: Dictionary, safe_only: bool):
 	var best = null
 	var bd := 1e9
 	for e in ents:
-		if not e.get("mob", false) or int(e.hp) <= 0:
+		if not _is_targetable(e) or int(e.hp) <= 0:
 			continue
 		if str(sim.zone_view(int(e.x), int(e.y)).get("id", "")) != my_zone:
 			continue
-		if safe_only and not auto_whitelist.is_empty() and not auto_whitelist.has(str(e.name)):
-			continue                            # 自動掛機白名單: 冇揀嘅怪唔自動打
+		if safe_only and e.get("mob", false) and not auto_whitelist.is_empty() and not auto_whitelist.has(str(e.name)):
+			continue                            # 自動掛機白名單: 冇揀嘅怪唔自動打 (打人模式 NPC 唔受白名單限制)
 		var attacking := int(e.get("aggro", 0)) == int(me.id)
 		if safe_only and not attacking and int(e.level) > int(ch.level) + 1:
 			continue                            # 唔主動打高自己兩級以上嘅怪
