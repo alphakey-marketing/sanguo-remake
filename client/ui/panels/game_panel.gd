@@ -118,10 +118,30 @@ func refresh(force: bool) -> void:
 	if not force and s == _last_sig:
 		return
 	_last_sig = s
+	# 定期自動 refresh 會整個 body 拆咗再砌過 (包括入面嘅 ScrollContainer)，
+	# 唔記住捲軸位就會每次彈返去最頂 —— 玩家手指拖緊都會被打斷。
+	# 記低拖緊嗰個 scrollbar 位，砌完之後（等一幀 layout 好）先擺返轉去。
+	var scroll_pos := _find_scroll_v()
 	for c in body.get_children():
 		body.remove_child(c)
 		c.queue_free()
 	_build_body()
+	if scroll_pos >= 0.0:
+		call_deferred("_restore_scroll_v", scroll_pos)
+
+
+func _find_scroll_v() -> float:
+	for c in body.get_children():
+		if c is ScrollContainer:
+			return (c as ScrollContainer).scroll_vertical
+	return -1.0
+
+
+func _restore_scroll_v(v: float) -> void:
+	for c in body.get_children():
+		if c is ScrollContainer:
+			(c as ScrollContainer).scroll_vertical = int(v)
+			return
 
 
 func sig() -> String:
