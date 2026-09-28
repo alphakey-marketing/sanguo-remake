@@ -67,6 +67,7 @@ var ask_now := {}                  # 進行中答題 (_refresh 計，每 tick �
 var _unlock_chest := 0             # 開鎖小遊戲目標寶箱实體 id (unlock_panel 用, S02c)
 var _dirty := false                # 發咗意圖/收咗事件: 下幀要 _refresh (唔使等下個 tick)
 var cur_slot := 0                  # U-fix: 0 = 用返 AUTOSLOT（原有行為）；1~SLOT_COUNT = 揀咗嗰個角色位
+var awaiting_slot_pick := false     # U-fix: 開場等緊玩家喺「選擇角色」揀 slot，未有真正角色（唔好自動存/唔理輸入）
 
 func _ready() -> void:
 	autotest = "--autotest" in OS.get_cmdline_user_args()
@@ -108,17 +109,22 @@ func _ready() -> void:
 			quest_items[int(k)] = true
 	sim = Sim.new(data, 1 if autotest or uitest else randi())
 	var fresh := true
-	if not autotest and not uitest and not ("--newgame" in OS.get_cmdline_user_args()) and SaveSys.has(SaveSys.AUTOSLOT):
-		var loaded := SaveSys.read_autosave(data)
-		if loaded != null:
-			sim = loaded
-			fresh = false
-			my_id = int(sim.state["player_id"])     # 載入: 唔會再 spawn，直接攞玩家 id
-			print("載入自動存檔 (日 %d)" % int(sim.clock_view()["day"]))
-	if fresh:
+	var newgame := "--newgame" in OS.get_cmdline_user_args()
+	if autotest or uitest or newgame:
+		# 自動化測試 / dev 快速開新局: 照舊即刻 spawn，唔經「選擇角色」畫面
 		sim.init_mobs()
 		sim.add_residents()
 		my_id = sim.spawn_player("玩家")
+	else:
+		# U-fix: 「選擇角色」而家係開場第一個畫面 —— 舊版單一 AUTOSLOT 存檔一次過搬去角色位 1，
+		# 等玩家喺個 3 個角色位入面揀（揀有存檔嘅 = 繼續；揀空嘅 = 新建角色走建角面板）。
+		if not SaveSys.slot_exists(1) and SaveSys.has(SaveSys.AUTOSLOT):
+			var f := FileAccess.open(SaveSys.slot_path(1), FileAccess.WRITE)
+			if f != null:
+				f.store_string(FileAccess.get_file_as_string(SaveSys.AUTOSLOT))
+				f.close()
+		fresh = false                # 未 spawn 任何人，淨係等揀 slot（唔算「新開局」）
+		awaiting_slot_pick = true
 	sim.event_emitted.connect(_on_event)
 	llm_client = LlmClient.new()
 	llm_client.load_cfg()
@@ -132,7 +138,9 @@ func _ready() -> void:
 	hud.skill_pressed.connect(_on_skill)
 	hud.context_pressed.connect(func(act: Dictionary) -> void: ContextActions.run(self, act))
 	hud.create_done.connect(_on_create_done)
-	if fresh and not autotest and not uitest:
+	if awaiting_slot_pick:
+		hud.open_panel("title")      # U-fix: 開場第一畫面 = 揀角色位（TitlePanel 標題「選擇角色」）
+	elif fresh and not autotest and not uitest:
 		hud.open_panel("create")
 	for a in OS.get_cmdline_user_args():
 		if a == "--sshot":
@@ -217,7 +225,7 @@ func _process(delta: float) -> void:
 	if not autotest:
 		_ui_tick(delta)
 	t0 += delta
-	if not autotest and not uitest and sim.tick > 0 and sim.tick % _ticks_per_day() == 0 and sim.tick != last_save_tick:
+	if not autotest and not uitest and not awaiting_slot_pick and sim.tick > 0 and sim.tick % _ticks_per_day() == 0 and sim.tick != last_save_tick:
 		last_save_tick = sim.tick
 		_save_current()
 	for f in floats: f.age += delta
@@ -1440,7 +1448,9 @@ func _save_current() -> void:
 # ---- 切換/開新角色位 (U-fix: 「更多」面板嘅「切換角色」入口) ----
 # n=0 keep 用返 AUTOSLOT；n>=1 = 用 SaveSys slot_path(n)。is_new=true 就唔 load，直接開新角。
 func switch_to_slot(n: int, is_new: bool) -> void:
-	_save_current()      # 現有進度先存返落佢自己嗰個 slot
+	if not awaiting_slot_pick:
+		_save_current()   # 現有進度先存返落佢自己嗰個 slot（開場首次揀 slot 冇「現有進度」，唔使存）
+	awaiting_slot_pick = false
 	cur_slot = n
 	sim = Sim.new(data, 1 if autotest or uitest else randi())
 	var fresh := true
