@@ -178,6 +178,7 @@ func _refresh() -> void:
 	ask_now = _calc_active_ask()
 	if hud != null:
 		hud.sim_refreshed()
+		_down_watchdog()
 
 # 鏡頭限喺當前地圖入面；地圖細過畫面就置中 (spec 12 §6)
 func _clamp_cam(c: Vector2) -> Vector2:
@@ -743,6 +744,16 @@ func _down_dialog() -> Dictionary:
 		opts.append({"label": "叫同伴超渡", "disabled": false,
 			"cb": func() -> void: _send({"t": "companion_revive"})})
 	return {"title": "倒地（%d 秒）" % int(dv.get("secsLeft", 0)), "text": text, "options": opts}
+
+# 倒地畫面睇門口【自訂新增】: 防止玩家撳遮罩/✕/返回鍵誤閂咗個倒地畫面之後冇得再開 (卡死)。
+# 每 tick 檢查: 仲倒地緊、又冇開緊任何面板 → 自動彈返個倒地畫面。
+func _down_watchdog() -> void:
+	if hud == null or autotest or uitest:
+		return
+	if not bool(sim.player_down_view().get("down", false)):
+		return
+	if not hud.any_panel_open():
+		hud.open_dialog(_down_dialog)
 
 func _set_banner(text: String, col: Color, secs: float) -> void:
 	banner = {"text": text, "t": secs, "color": col}
