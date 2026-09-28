@@ -54,19 +54,25 @@ static func init_guard(e: Dictionary, city_id: String, stand: Vector2i) -> void:
 
 # 捕快行為【自訂】: 見紅名(罪犯居民/殺人魔玩家)喺 aggroRange 內 -> 鎖定 atk_target (由 _think_player 追擊出手)；
 # 冇紅名: 巡邏時辰內喺企定位附近循環巡邏，其餘時辰返企定位企定 (唔郁)。
-static func _constable_tick(sim, id: int, e: Dictionary) -> void:
+# bots_by_map: think() 每 tick 分好嘅 {map_index: [bot id]}，避免逐個捕快逐 tick 掃成個 sim.state["bots"]（效能）。
+static func _constable_tick(sim, id: int, e: Dictionary, bots_by_map: Dictionary) -> void:
 	var ch: Dictionary = e["ch"]
 	if int(e["atk_target"]) != 0:
+		var t: Dictionary = sim.ent(int(e["atk_target"]))
+		if not t.is_empty() and t.has("ch") and int(t["hp"]) > 0 and String(t.get("kind", "")) == "bot":
+			t["huntedByGuard"] = true    # 持續標記俾追緊嘅紅名 NPC 行慢啲 (等捕快追得到, 自訂)
 		return                                       # 追緊 -> 交返 _think_player 出手
 	var g: Dictionary = RulesGuard.cfg(sim.data.guards)
+	var map_k: int = sim.data.map_index(int(e["x"]), int(e["y"]))
 	var pid := int(sim.state["player_id"])
 	var pe: Dictionary = sim.ent(pid)
 	if not pe.is_empty() and pe.has("ch") and int(pe["hp"]) > 0 \
+			and sim.data.map_index(int(pe["x"]), int(pe["y"])) == map_k \
 			and RulesGuard.is_red_target(pe["ch"], true) \
 			and RulesGuard.in_aggro_range(int(e["x"]), int(e["y"]), int(pe["x"]), int(pe["y"]), g):
 		e["atk_target"] = pid
 		return
-	for bid in sim.state["bots"]:
+	for bid in bots_by_map.get(map_k, []):
 		if int(bid) == id:
 			continue
 		var be: Dictionary = sim.ent(int(bid))
@@ -76,6 +82,7 @@ static func _constable_tick(sim, id: int, e: Dictionary) -> void:
 			continue
 		if RulesGuard.in_aggro_range(int(e["x"]), int(e["y"]), int(be["x"]), int(be["y"]), g):
 			e["atk_target"] = int(bid)
+			be["huntedByGuard"] = true
 			return
 	var sp: Dictionary = ch.get("standPos", {})
 	var stand := Vector2i(int(sp.get("x", int(e["x"]))), int(sp.get("y", int(e["y"]))))
@@ -99,6 +106,15 @@ static func think(sim) -> void:
 			if not mobs_by_map.has(k):
 				mobs_by_map[k] = []
 			mobs_by_map[k].append(m)
+	var bots_by_map := {}              # 地圖 index -> [bot id]，每 tick 分組一次，畀捕快揾紅名用 (自訂，避免逐 tick 掃全部 bots)
+	for bid in sim.state["bots"]:
+		var be: Dictionary = sim.ent(int(bid))
+		if be.is_empty():
+			continue
+		var bk: int = sim.data.map_index(int(be["x"]), int(be["y"]))
+		if not bots_by_map.has(bk):
+			bots_by_map[bk] = []
+		bots_by_map[bk].append(int(bid))
 	var dead: Array = []
 	for id in sim.state["bots"]:
 		var e: Dictionary = sim.ent(id)
@@ -109,7 +125,7 @@ static func think(sim) -> void:
 			_pk_flee(sim, id, e, dead)
 			continue
 		if String(ch.get("role", "")) == "constable":   # 捕快: 見紅名主動打, 否則巡邏/企定位
-			_constable_tick(sim, id, e)
+			_constable_tick(sim, id, e, bots_by_map)
 			continue
 		if bool(ch.get("criminal", false)) and _crime_find_player(sim, e):   # S03a: 紅名(殺人魔)主動襲擊玩家
 			continue                                  # (atk_target 已鎖定, 下方 _think_player 出手)

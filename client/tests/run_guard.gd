@@ -126,11 +126,11 @@ func t_patrol_vs_stand(data: GameData) -> void:
 	e["tx"] = stand.x
 	e["ty"] = stand.y
 	clk["ke"] = 0   # 子時 (shichen 0)，唔喺 patrolShichen
-	BotSys._constable_tick(sim, gid, e)
+	BotSys._constable_tick(sim, gid, e, {})
 	check(int(e["tx"]) == stand.x and int(e["ty"]) == stand.y, "行為: 非巡邏時辰留喺企定位")
 	# 推入巡邏時辰: 應該設新目的地離開企定位去巡邏
 	clk["ke"] = 8 * 3   # shichen 3 (卯)，喺 patrolShichen
-	BotSys._constable_tick(sim, gid, e)
+	BotSys._constable_tick(sim, gid, e, {})
 	check(int(e["tx"]) != stand.x or int(e["ty"]) != stand.y, "行為: 巡邏時辰設目的地離開企定位")
 
 
