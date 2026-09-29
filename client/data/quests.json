@@ -829,7 +829,11 @@
    "type": "history",
    "giver": "simahui",
    "pre": {
-    "minLevel": 10
+    "minLevel": 10,
+    "attr": {
+     "pol": 10,
+     "cha": 10
+    }
    },
    "preHint": "武功 10 級以上，去襄陽城西門內搵水鏡先生司馬徽",
    "stages": [
@@ -1398,6 +1402,13 @@
       1
      ]
     ]
+   },
+   "pre": {
+    "minLevel": 10,
+    "attr": {
+     "pol": 10,
+     "cha": 10
+    }
    }
   },
   {
@@ -1406,7 +1417,12 @@
    "type": "history",
    "giver": "zhanggong",
    "pre": {
-    "karmaMax": 0
+    "karmaMax": 0,
+    "minLevel": 10,
+    "attr": {
+     "pol": 10,
+     "cha": 10
+    }
    },
    "preHint": "PK 值為 0（未曾濫殺），去下邳城內搵張公公",
    "stages": [

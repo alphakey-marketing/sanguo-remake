@@ -253,6 +253,26 @@ static func pre_ok(data: GameData, q: Dictionary, ch: Dictionary) -> bool:
 	return true
 
 
+# F4 門檻提示: 等級 / 屬性 (政治、魅力…) 未達標嘅列表；全部達標回 ""
+const ATTR_NAMES := {"str": "武力", "agi": "敏捷", "int": "智力", "spi": "靈力", "pol": "政治", "cha": "魅力"}
+
+
+static func gate_hint(q: Dictionary, ch: Dictionary) -> String:
+	var pre: Dictionary = q.get("pre", {})
+	var lacks: Array = []
+	var lv := int(ch.get("level", 1))
+	var need_lv := maxi(int(pre.get("minLevel", 0)), int(pre.get("level", 0)))
+	if need_lv > lv:
+		lacks.append("等級 %d（你 %d）" % [need_lv, lv])
+	for k in pre.get("attr", {}):
+		var have := int(ch.get("attrs", {}).get(k, 0))
+		if have < int(pre["attr"][k]):
+			lacks.append("%s %d（你 %d）" % [ATTR_NAMES.get(k, k), int(pre["attr"][k]), have])
+	if lacks.is_empty():
+		return ""
+	return "「%s」要求：%s" % [String(q.get("name", "")), "、".join(PackedStringArray(lacks))]
+
+
 # ================= 進度讀取 =================
 static func stage_of(ch: Dictionary, q: Dictionary) -> Dictionary:
 	var st: Dictionary = ch.get("quests", {}).get(String(q["id"]), {})
@@ -300,6 +320,10 @@ static func on_npc_talk(data: GameData, ch: Dictionary, q: Dictionary, npc_id: S
 		if String(q.get("giver", "")) != npc_id:
 			return out                                   # 只有 quest giver 先可以觸發
 		if not pre_ok(data, q, ch):
+			var gh := gate_hint(q, ch)      # F4: 歷史任務門檻未達 → 話畀玩家知差乜
+			if gh != "" and String(q.get("type", "")) == "history":
+				out["blocked"] = true
+				out["msg"] = gh
 			return out
 		if not ch.has("quests"):
 			ch["quests"] = {}
@@ -374,6 +398,10 @@ static func on_facility(data: GameData, ch: Dictionary, q: Dictionary, key: Stri
 		if bool(ch.get("questDone", {}).get(String(q["id"]), false)):
 			return out
 		if not pre_ok(data, q, ch):
+			var gh := gate_hint(q, ch)      # F4: 歷史任務門檻未達 → 話畀玩家知差乜
+			if gh != "" and String(q.get("type", "")) == "history":
+				out["blocked"] = true
+				out["msg"] = gh
 			return out
 		if not ch.has("quests"):
 			ch["quests"] = {}
