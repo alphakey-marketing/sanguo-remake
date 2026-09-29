@@ -3888,6 +3888,416 @@
    }
   },
   {
+   "id": "expert_kaiken_1",
+   "name": "開墾一級認證",
+   "type": "expert",
+   "giver": "xinye_farmer",
+   "pre": {
+    "minLevel": 5
+   },
+   "preHint": "Lv5 後去搵新野農夫，學習「開墾」專長（一級認證）",
+   "stages": [
+    {
+     "type": "ask",
+     "npc": "xinye_farmer",
+     "dialog": [
+      "新野農夫：「想學『開墾』？先答我一條：開墾荒地，第一步要做乜？」"
+     ],
+     "options": [
+      "先清走石頭雜草，翻鬆泥土",
+      "直接撒種",
+      "放火燒晒佢"
+     ],
+     "answer": 0,
+     "hint": "答啱新野農夫嘅問題，取得「開墾」一級認證",
+     "done": true,
+     "response": [
+      "新野農夫：「啱！你已經識得開墾嘅門道，一級認證通過。」"
+     ],
+     "wrong": [
+      "新野農夫：「唔啱，再諗清楚。」"
+     ]
+    }
+   ],
+   "reward": {
+    "exp": 30,
+    "fame": 10,
+    "expert": {
+     "skill": "kaiken",
+     "level": 1
+    }
+   }
+  },
+  {
+   "id": "expert_zhaolai_1",
+   "name": "招徠一級認證",
+   "type": "expert",
+   "giver": "xinye_clerk",
+   "pre": {
+    "minLevel": 5
+   },
+   "preHint": "Lv5 後去搵新野縣吏，學習「招徠」專長（一級認證）",
+   "stages": [
+    {
+     "type": "ask",
+     "npc": "xinye_clerk",
+     "dialog": [
+      "新野縣吏：「想學『招徠』？先答我一條：招徠流民，點樣先留得住人？」"
+     ],
+     "options": [
+      "強行抓人上工",
+      "安排田地同糧食",
+      "靠口號"
+     ],
+     "answer": 1,
+     "hint": "答啱新野縣吏嘅問題，取得「招徠」一級認證",
+     "done": true,
+     "response": [
+      "新野縣吏：「啱！你已經識得招徠嘅門道，一級認證通過。」"
+     ],
+     "wrong": [
+      "新野縣吏：「唔啱，再諗清楚。」"
+     ]
+    }
+   ],
+   "reward": {
+    "exp": 30,
+    "fame": 10,
+    "expert": {
+     "skill": "zhaolai",
+     "level": 1
+    }
+   }
+  },
+  {
+   "id": "expert_siyu_1",
+   "name": "飼育一級認證",
+   "type": "expert",
+   "giver": "baoma_zhai",
+   "pre": {
+    "minLevel": 5
+   },
+   "preHint": "Lv5 後去搵抱馬窄，學習「飼育」專長（一級認證）",
+   "stages": [
+    {
+     "type": "ask",
+     "npc": "baoma_zhai",
+     "dialog": [
+      "抱馬窄：「想學『飼育』？先答我一條：幼駒初生，最緊要係？」"
+     ],
+     "options": [
+      "每日餵足草料同保暖",
+      "放任自生自滅",
+      "即刻騎上路"
+     ],
+     "answer": 0,
+     "hint": "答啱抱馬窄嘅問題，取得「飼育」一級認證",
+     "done": true,
+     "response": [
+      "抱馬窄：「啱！你已經識得飼育嘅門道，一級認證通過。」"
+     ],
+     "wrong": [
+      "抱馬窄：「唔啱，再諗清楚。」"
+     ]
+    }
+   ],
+   "reward": {
+    "exp": 30,
+    "fame": 10,
+    "expert": {
+     "skill": "siyu",
+     "level": 1
+    }
+   }
+  },
+  {
+   "id": "expert_tankuang_1",
+   "name": "探礦一級認證",
+   "type": "expert",
+   "giver": "miner_boss",
+   "pre": {
+    "minLevel": 5
+   },
+   "preHint": "Lv5 後去搵礦工工頭，學習「探礦」專長（一級認證）",
+   "stages": [
+    {
+     "type": "ask",
+     "npc": "miner_boss",
+     "dialog": [
+      "礦工工頭：「想學『探礦』？先答我一條：入礦洞之前，要先確認乜？」"
+     ],
+     "options": [
+      "通風同支撐夠唔夠穩",
+      "礦石靚唔靚色",
+      "有冇人幫手掂行李"
+     ],
+     "answer": 0,
+     "hint": "答啱礦工工頭嘅問題，取得「探礦」一級認證",
+     "done": true,
+     "response": [
+      "礦工工頭：「啱！你已經識得探礦嘅門道，一級認證通過。」"
+     ],
+     "wrong": [
+      "礦工工頭：「唔啱，再諗清楚。」"
+     ]
+    }
+   ],
+   "reward": {
+    "exp": 30,
+    "fame": 10,
+    "expert": {
+     "skill": "tankuang",
+     "level": 1
+    }
+   }
+  },
+  {
+   "id": "expert_xiuzhu_1",
+   "name": "修築一級認證",
+   "type": "expert",
+   "giver": "craft_boss",
+   "pre": {
+    "minLevel": 5
+   },
+   "preHint": "Lv5 後去搵工匠工頭，學習「修築」專長（一級認證）",
+   "stages": [
+    {
+     "type": "ask",
+     "npc": "craft_boss",
+     "dialog": [
+      "工匠工頭：「想學『修築』？先答我一條：築城牆，最先要打好乜？」"
+     ],
+     "options": [
+      "牆頭裝飾",
+      "地基",
+      "旗幟"
+     ],
+     "answer": 1,
+     "hint": "答啱工匠工頭嘅問題，取得「修築」一級認證",
+     "done": true,
+     "response": [
+      "工匠工頭：「啱！你已經識得修築嘅門道，一級認證通過。」"
+     ],
+     "wrong": [
+      "工匠工頭：「唔啱，再諗清楚。」"
+     ]
+    }
+   ],
+   "reward": {
+    "exp": 30,
+    "fame": 10,
+    "expert": {
+     "skill": "xiuzhu",
+     "level": 1
+    }
+   }
+  },
+  {
+   "id": "expert_gongyi_1",
+   "name": "工藝一級認證",
+   "type": "expert",
+   "giver": "runan_smith",
+   "pre": {
+    "minLevel": 5
+   },
+   "preHint": "Lv5 後去搵汝南鐵匠，學習「工藝」專長（一級認證）",
+   "stages": [
+    {
+     "type": "ask",
+     "npc": "runan_smith",
+     "dialog": [
+      "汝南鐵匠：「想學『工藝』？先答我一條：鍛打兵器，火候過頭會點？」"
+     ],
+     "options": [
+      "更加鋒利",
+      "質地變脆易斷",
+      "冇影響"
+     ],
+     "answer": 1,
+     "hint": "答啱汝南鐵匠嘅問題，取得「工藝」一級認證",
+     "done": true,
+     "response": [
+      "汝南鐵匠：「啱！你已經識得工藝嘅門道，一級認證通過。」"
+     ],
+     "wrong": [
+      "汝南鐵匠：「唔啱，再諗清楚。」"
+     ]
+    }
+   ],
+   "reward": {
+    "exp": 30,
+    "fame": 10,
+    "expert": {
+     "skill": "gongyi",
+     "level": 1
+    }
+   }
+  },
+  {
+   "id": "expert_jiuzai_1",
+   "name": "救災一級認證",
+   "type": "expert",
+   "giver": "town_head",
+   "pre": {
+    "minLevel": 5
+   },
+   "preHint": "Lv5 後去搵鎮長，學習「救災」專長（一級認證）",
+   "stages": [
+    {
+     "type": "ask",
+     "npc": "town_head",
+     "dialog": [
+      "鎮長：「想學『救災』？先答我一條：天災過後，第一時間應該做乜？」"
+     ],
+     "options": [
+      "先安置傷者、派發糧水",
+      "先追收稅款",
+      "關埋城門唔理"
+     ],
+     "answer": 0,
+     "hint": "答啱鎮長嘅問題，取得「救災」一級認證",
+     "done": true,
+     "response": [
+      "鎮長：「啱！你已經識得救災嘅門道，一級認證通過。」"
+     ],
+     "wrong": [
+      "鎮長：「唔啱，再諗清楚。」"
+     ]
+    }
+   ],
+   "reward": {
+    "exp": 30,
+    "fame": 10,
+    "expert": {
+     "skill": "jiuzai",
+     "level": 1
+    }
+   }
+  },
+  {
+   "id": "expert_jiaoyi_1",
+   "name": "交易一級認證",
+   "type": "expert",
+   "giver": "merchant_guild",
+   "pre": {
+    "minLevel": 5
+   },
+   "preHint": "Lv5 後去搵商會長，學習「交易」專長（一級認證）",
+   "stages": [
+    {
+     "type": "ask",
+     "npc": "merchant_guild",
+     "dialog": [
+      "商會長：「想學『交易』？先答我一條：做買賣，貨物幾時出手最著數？」"
+     ],
+     "options": [
+      "價高貨少嗰陣",
+      "全部囤積永遠唔賣",
+      "價低嗰陣"
+     ],
+     "answer": 0,
+     "hint": "答啱商會長嘅問題，取得「交易」一級認證",
+     "done": true,
+     "response": [
+      "商會長：「啱！你已經識得交易嘅門道，一級認證通過。」"
+     ],
+     "wrong": [
+      "商會長：「唔啱，再諗清楚。」"
+     ]
+    }
+   ],
+   "reward": {
+    "exp": 30,
+    "fame": 10,
+    "expert": {
+     "skill": "jiaoyi",
+     "level": 1
+    }
+   }
+  },
+  {
+   "id": "expert_xunlian_1",
+   "name": "訓練一級認證",
+   "type": "expert",
+   "giver": "recruit_officer",
+   "pre": {
+    "minLevel": 5
+   },
+   "preHint": "Lv5 後去搵徵兵官，學習「訓練」專長（一級認證）",
+   "stages": [
+    {
+     "type": "ask",
+     "npc": "recruit_officer",
+     "dialog": [
+      "徵兵官：「想學『訓練』？先答我一條：練兵最重要係？」"
+     ],
+     "options": [
+      "日日操練、紀律嚴明",
+      "淨靠人多",
+      "靠運氣"
+     ],
+     "answer": 0,
+     "hint": "答啱徵兵官嘅問題，取得「訓練」一級認證",
+     "done": true,
+     "response": [
+      "徵兵官：「啱！你已經識得訓練嘅門道，一級認證通過。」"
+     ],
+     "wrong": [
+      "徵兵官：「唔啱，再諗清楚。」"
+     ]
+    }
+   ],
+   "reward": {
+    "exp": 30,
+    "fame": 10,
+    "expert": {
+     "skill": "xunlian",
+     "level": 1
+    }
+   }
+  },
+  {
+   "id": "expert_jingjie_1",
+   "name": "警戒一級認證",
+   "type": "expert",
+   "giver": "hefu_guard",
+   "pre": {
+    "minLevel": 5
+   },
+   "preHint": "Lv5 後去洛陽何府搵何府守衛，學習「警戒」專長（一級認證）",
+   "stages": [
+    {
+     "type": "ask",
+     "npc": "hefu_guard",
+     "dialog": [
+      "何府守衛：「想學『警戒』？先答我一條：夜間巡邏見到可疑人物，應該？」"
+     ],
+     "options": [
+      "即刻示警並繼續監視",
+      "自己衝上去單挑",
+      "扮冇見到"
+     ],
+     "answer": 0,
+     "hint": "答啱何府守衛嘅問題，取得「警戒」一級認證",
+     "done": true,
+     "response": [
+      "何府守衛：「啱！你已經識得警戒嘅門道，一級認證通過。」"
+     ],
+     "wrong": [
+      "何府守衛：「唔啱，再諗清楚。」"
+     ]
+    }
+   ],
+   "reward": {
+    "exp": 30,
+    "fame": 10,
+    "expert": {
+     "skill": "jingjie",
+     "level": 1
+    }
+   }
+  },
+  {
    "id": "marry_letter_m",
    "name": "御賜函（男）",
    "type": "marry",

@@ -31,6 +31,7 @@ func _init() -> void:
 	t_tianwen_chain(data)
 	t_dili_chain(data)
 	t_gates(data)
+	t_intro_quests(data)
 	t_class_gate(data)
 	t_roundtrip(data)
 	t_determinism(data)
@@ -204,6 +205,57 @@ func t_dili_chain(data: GameData) -> void:
 	_give_stones(sim, id, EARTH)
 	_drive(sim, id, "expert_dili_4", "yuji")
 	check(sim.expert_lv(ch, "dili") == 4, "地理四級: 認證到 Lv4")
+
+
+# ---------- F7: 其餘 10 個專長 1 級入門任務 + 成功使用 ----------
+const INTRO := [
+	["kaiken", "xinye_farmer"], ["zhaolai", "xinye_clerk"], ["siyu", "baoma_zhai"], ["tankuang", "miner_boss"],
+	["xiuzhu", "craft_boss"], ["gongyi", "runan_smith"], ["jiuzai", "town_head"], ["jiaoyi", "merchant_guild"],
+	["xunlian", "recruit_officer"], ["jingjie", "hefu_guard"],
+]
+const DOMESTIC_JOB := {"kaiken": "kaiken", "zhaolai": "shangye", "siyu": "xumu", "tankuang": "kuangchan", "xiuzhu": "fangyu", "gongyi": "duanzao"}
+
+
+func t_intro_quests(data: GameData) -> void:
+	for row in INTRO:
+		var sk := String(row[0])
+		var qid := "expert_%s_1" % sk
+		var q := {}
+		for x in data.quests:
+			if String(x["id"]) == qid:
+				q = x
+		check(not q.is_empty() and String(q["type"]) == "expert", "F7: %s 有入門任務" % sk)
+		if q.is_empty():
+			continue
+		var r := _new(data, "yishi", 300 + INTRO.find(row))
+		var sim: Sim = r[0]
+		var id: int = r[1]
+		var ch: Dictionary = r[2]
+		check(sim.expert_lv(ch, sk) == 0, "F7: %s 未學 = 0 級" % sk)
+		# 答錯唔畀過
+		var npc: Dictionary = data.quest_npcs[String(row[1])]
+		sim._sync_quest_npcs()
+		_put(sim, id, int(npc["x"]) + 1, int(npc["y"]))
+		sim.cmd_quest_talk(id, String(row[1]))
+		sim.cmd_quest_answer(id, qid, (int(q["stages"][0]["answer"]) + 1) % 3)
+		check(not _done(ch, qid) and sim.expert_lv(ch, sk) == 0, "F7: %s 答錯唔通過" % sk)
+		_drive(sim, id, qid, String(row[1]))
+		check(_done(ch, qid), "F7: %s 入門任務完成" % sk)
+		check(sim.expert_lv(ch, sk) == 1, "F7: %s 認證到 Lv1" % sk)
+	# 成功使用專長: 認證後做內政，專長 exp 增加、封頂唔超職業上限
+	var r2 := _new(data, "yishi", 400)
+	var sim2: Sim = r2[0]
+	var id2: int = r2[1]
+	var ch2: Dictionary = r2[2]
+	ch2["titleRank"] = 1
+	ch2["ap"] = 100
+	var fac: Dictionary = data.facilities["donate_xc"] if data.facilities.has("donate_xc") else {}
+	if not fac.is_empty():
+		_put(sim2, id2, int(fac["x"]), int(fac["y"]))
+		RulesExpert.certify(ch2, data.experts, "kaiken", 1, 0)
+		var e0 := int((ch2["expert"] as Dictionary).get("kaiken", 0))
+		sim2.cmd_domestic(id2, "kaiken")
+		check(int((ch2["expert"] as Dictionary).get("kaiken", 0)) > e0, "F7: 成功使用專長 (內政開墾) → 專長 exp 增加")
 
 
 # ---------- 前置門檻 ----------
