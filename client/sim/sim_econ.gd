@@ -224,8 +224,156 @@ const ITEM_RECALL := 65040          # 回城卷軸: 即時傳送返最近城池
 # 商城道具單機化 (S11, 精選批次): 行動丸 / 升官令牌 / 歷練神丹 / 技能神丹 / 戰騎神丹
 const ITEM_ACTION_PILL := 65003     # 行動丸
 const ITEM_PROMOTE_TOKEN := 30016   # 升官令牌: 頭銜升 1 階
-const ITEM_LILIAN_ELIXIR := 30012   # 歷練神丹: 歷練 +10
+const ITEM_LILIAN_ELIXIR := 30012   # 歷練神丹: 經驗 +10%
 const ITEM_SKILL_ELIXIR := 30013    # 技能神丹: 全部已學專長 exp +50
+const ITEM_BEAST_ELIXIR := 30014    # 戰騎神丹: 出戰中戰騎經驗 +200 (S11b 之後接)
+# 職業丹 (S11): 食丹 → 施展對應職業特技 (唔使已由導師學到)
+const ITEM_PILL_UNLOCK := 30055     # 開鎖丹 -> unlock
+const ITEM_PILL_QIETING := 30056    # 竊聽丹 -> qieting
+const ITEM_PILL_YINXING := 30057    # 潛行丹 -> yinxing
+const ITEM_PILL_CHAODU := 30058     # 超渡丹 -> chaodu
+const ITEM_PILL_TOUSHI := 30059     # 透視丹 -> toushi
+
+
+# 食用/飲用消耗品【原=食物藥水回 HP、藥丸散回 MP；自訂=冇食用次數限制，用完即扣背包一件】
+func cmd_use_item(id: int, item: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	if item == int(data.office["pillItem"]):
+		return _use_ap_pill(e, item)
+	match item:
+		ITEM_NAV_MAP: return _use_nav_map(id, e)
+		ITEM_BAG_100: return _use_bag_bonus(id, e, item, 100)
+		ITEM_BAG_200: return _use_bag_bonus(id, e, item, 200)
+		ITEM_LABOR: return _use_labor_voucher(id, e)
+		ITEM_TUNNEL: return _use_tunnel_scroll(id, e)
+		ITEM_RECALL: return _use_recall_scroll(id, e)
+		ITEM_ACTION_PILL: return _use_ap_pill(e, item)          # 行動丸: 回滿行動力
+		ITEM_PROMOTE_TOKEN: return _use_promote_token(id, e)    # 升官令牌: 頭銜 +1
+		ITEM_LILIAN_ELIXIR: return _use_lilian_elixir(id, e)    # 歷練神丹
+		ITEM_SKILL_ELIXIR: return _use_skill_elixir(id, e)      # 技能神丹
+		ITEM_BEAST_ELIXIR: return _use_beast_elixir(id, e)      # 戰騎神丹 (S11b)
+	var heal: Dictionary = data.heals.get(item, {})
+	if heal.is_empty():
+		return _msg(id, "呢件唔可以食用")
+	var ch: Dictionary = e["ch"]
+	if not RulesShop.remove_item(ch["bag"], item, 1):
+		return _msg(id, "背包冇呢件")
+	var mhp := _eff_max_hp(ch)
+	var mmp := _eff_max_mp(ch)
+	var msp := _eff_max_sp(ch)
+	var gained_hp := mini(int(heal.get("hp", 0)), mhp - int(ch["hp"]))
+	var gained_mp := mini(int(heal.get("mp", 0)), mmp - int(ch["mp"]))
+	var gained_sp := mini(int(heal.get("sp", 0)), msp - int(ch["sp"]))
+	ch["hp"] = int(ch["hp"]) + maxi(0, gained_hp)
+	ch["mp"] = int(ch["mp"]) + maxi(0, gained_mp)
+	ch["sp"] = int(ch["sp"]) + maxi(0, gained_sp)
+	_sync_stats(e)
+	_msg(id, "用咗 %s，回 %d HP %d MP %d SP" % [data.names.get(item, str(item)), maxi(0, gained_hp), maxi(0, gained_mp), maxi(0, gained_sp)])
+
+
+# 定位導航圖: 一次性顯示最近城池方位/距離 (read-model 提示，消耗一件)
+func _use_nav_map(id: int, e: Dictionary) -> void:
+	var ch: Dictionary = e["ch"]
+	if not RulesShop.remove_item(ch["bag"], ITEM_NAV_MAP, 1):
+		return _msg(id, "背包冇呢件")
+	var md := _item_nearest_city_map(map_id_at(int(e["x"]), int(e["y"])))
+	if md.is_empty():
+		return _msg(id, "附近搵唔到城池")
+	_msg(id, "定位導航圖顯示：最近城池係 %s" % String(md["name"]))
+
+
+# 百寶袋/千歲袋: 永久負重上限 +add (消耗一件)
+func _use_bag_bonus(id: int, e: Dictionary, item: int, add: int) -> void:
+	var ch: Dictionary = e["ch"]
+	if not RulesShop.remove_item(ch["bag"], item, 1):
+		return _msg(id, "背包冇呢件")
+	ch["bagCapBonus"] = int(ch.get("bagCapBonus", 0)) + add
+	_msg(id, "用咗 %s，背包負重上限永久 +%d" % [data.names.get(item, str(item)), add])
+
+
+# 勞動券: 限時打工經驗 +50% (掛喺 ch.laborVoucherUntil tick，接 _work_gain hook)
+func _use_labor_voucher(id: int, e: Dictionary) -> void:
+	var ch: Dictionary = e["ch"]
+	if not RulesShop.remove_item(ch["bag"], ITEM_LABOR, 1):
+		return _msg(id, "背包冇呢件")
+	var dur := int(data.world.get("tiandi", {}).get("laborVoucherTicks", 6000))
+	ch["laborVoucherUntil"] = tick + dur
+	_msg(id, "用咗勞動券，打工經驗 +50%% (維持 %d 刻)" % dur)
+
+
+# 遁地卷軸: 傳送去戰役 (山洞/迷宮) 入口義勇士兵處，搵唔到 → 退返回城池
+func _use_tunnel_scroll(id: int, e: Dictionary) -> void:
+	var ch: Dictionary = e["ch"]
+	if not RulesShop.remove_item(ch["bag"], ITEM_TUNNEL, 1):
+		return _msg(id, "背包冇呢件")
+	var herald := {}
+	for n in data.quest_npc_list:
+		if bool(n.get("battle", false)):
+			herald = n
+			break
+	var mid: String
+	var px: int
+	var py: int
+	if not herald.is_empty():
+		mid = String(herald["map"])
+		px = int(herald["x"])
+		py = int(herald["y"])
+	else:
+		var md := _item_nearest_city_map(map_id_at(int(e["x"]), int(e["y"])))
+		if md.is_empty():
+			return _msg(id, "附近搵唔到戰役入口")
+		mid = String(md["id"])
+		var p := _item_city_anchor(md)
+		px = p.x
+		py = p.y
+	_item_teleport(e, px, py)
+	_msg(id, "遁地卷軸生效，傳送到%s" % mid)
+
+
+# 回城卷軸: 即時傳送返最近城池
+func _use_recall_scroll(id: int, e: Dictionary) -> void:
+	var ch: Dictionary = e["ch"]
+	if not RulesShop.remove_item(ch["bag"], ITEM_RECALL, 1):
+		return _msg(id, "背包冇呢件")
+	var md := _item_nearest_city_map(map_id_at(int(e["x"]), int(e["y"])))
+	if md.is_empty():
+		return _msg(id, "附近搵唔到城池")
+	var p := _item_city_anchor(md)
+	_item_teleport(e, p.x, p.y)
+	_msg(id, "回城卷軸生效，傳送返%s" % String(md["name"]))
+
+
+# ================= 商城道具單機化 (S11, 精選批次) =================
+# 升官令牌: 頭銜升 1 階（封頂喺 titles 最高階，同 cmd_claim_title 同理）
+func _use_promote_token(id: int, e: Dictionary) -> void:
+	var ch: Dictionary = e["ch"]
+	if not RulesShop.remove_item(ch["bag"], ITEM_PROMOTE_TOKEN, 1):
+		return _msg(id, "背包冇呢件")
+	var max_rank := 0
+	for t in data.titles:
+		max_rank = maxi(max_rank, int(t.get("rank", 0)))
+	var cur := int(ch.get("titleRank", 0))
+	if cur >= max_rank:
+		return _msg(id, "已經係最高頭銜 (%d)" % cur)
+	ch["titleRank"] = cur + 1
+	_emit({"k": "title", "id": id, "rank": int(ch["titleRank"]), "name": RulesTitle.name_of(data.titles, int(ch["titleRank"]))})
+	_msg(id, "升官令牌生效：升到「%s」(第 %d 階)！" % [RulesTitle.name_of(data.titles, int(ch["titleRank"])), int(ch["titleRank"])])
+
+
+# 歷練神丹: 直接加 EXP（歷練已取消 F8），約當級升級所需 10%，最少 10
+func _use_lilian_elixir(id: int, e: Dictionary) -> void:
+	var ch: Dictionary = e["ch"]
+	if not RulesShop.remove_item(ch["bag"], ITEM_LILIAN_ELIXIR, 1):
+		return _msg(id, "背包冇呢件")
+	var gain := maxi(10, MathX.js_round(RulesStats.exp_to_next(int(ch["level"])) * 0.1))
+	RulesStats.gain_exp(data, ch, gain)
+	_sync_stats(e)
+	_msg(id, "歷練神丹：經驗 +%d" % gain)
+
+
+# 技能神丹: 全部已學專長 exp +50
 const ITEM_BEAST_ELIXIR := 30014    # 戰騎神丹: 出戰中戰騎經驗 +200 (S11b 之後接)
 # 職業丹 (S11): 食丹 → 施展對應職業特技 (唔使已由導師學到)
 const ITEM_PILL_UNLOCK := 30055     # 開鎖丹 -> unlock
