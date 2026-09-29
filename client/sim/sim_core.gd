@@ -690,7 +690,7 @@ func add_guards() -> void:
 		for i in per_city:
 			var e := _spawn_actor("捕快" + str(i + 1), "bot", "yishi", [stand.x - 1, stand.y - 1, stand.x + 1, stand.y + 1])
 			_bump_level(e, RulesGuard.level_of(g, i, per_city))
-			BotSys.init_guard(e, city_id, stand)
+			BotSys.init_guard(e, city_id, stand, RulesResident.home_zone(data.residents, city_id))
 			state["bots"].append(int(e["id"]))
 
 

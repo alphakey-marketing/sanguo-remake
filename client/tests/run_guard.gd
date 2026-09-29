@@ -147,10 +147,33 @@ func t_aggro_lock(data: GameData) -> void:
 	var e: Dictionary = sim.ent(gid)
 	var pid := sim.spawn_player("賊")
 	var pe: Dictionary = sim.ent(pid)
+	pe["ch"]["karma"] = -20000    # 殺人魔階 = 紅名
+	# 城內唔打人: 紅名同捕快都喺城 (安全區) → 唔鎖定
 	pe["x"] = int(e["x"])
 	pe["y"] = int(e["y"])
 	pe["tx"] = int(e["x"])
 	pe["ty"] = int(e["y"])
-	pe["ch"]["karma"] = -20000    # 殺人魔階 = 紅名
-	sim.step()
-	check(int(e["atk_target"]) == pid, "紅名: 捕快鎖定附近殺人魔玩家")
+	BotSys._constable_tick(sim, gid, e, {})
+	check(int(e["atk_target"]) == 0, "城內: 捕快唔鎖定城內紅名玩家")
+	# 野外: 兩個都放喺野區 → 鎖定
+	var z: Dictionary = sim.zone_by_id(String(e["ch"]["homeZone"]))
+	var wx := (int(z["x0"]) + int(z["x1"])) / 2
+	var wy := (int(z["y0"]) + int(z["y1"])) / 2
+	for ent_ in [e, pe]:
+		ent_["x"] = wx
+		ent_["y"] = wy
+		ent_["tx"] = wx
+		ent_["ty"] = wy
+	check(not sim.is_safe(wx, wy), "野外: 野區中心唔係安全區")
+	BotSys._constable_tick(sim, gid, e, {})
+	check(int(e["atk_target"]) == pid, "紅名: 捕快喺野外鎖定殺人魔玩家")
+	# 攻擊者喺城內 (安全區) → 就算鎖定咗都唔出手，並放棄目標
+	var inn: Vector2i = sim.inn_pos
+	e["x"] = inn.x
+	e["y"] = inn.y
+	pe["x"] = inn.x
+	pe["y"] = inn.y
+	e["atk_target"] = pid
+	sim._think_player(e)
+	check(int(e["atk_target"]) == 0, "城內: 雙方喺安全區 → 唔出手並放棄目標")
+	check(int(pe["hp"]) == int(pe["max_hp"]) if pe.has("max_hp") else true, "城內: 玩家冇受傷")

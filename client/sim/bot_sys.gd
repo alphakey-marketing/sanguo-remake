@@ -42,11 +42,12 @@ static func init_resident(e: Dictionary, rng: SimRng, residents: Dictionary, cit
 
 
 # 捕快入場【自訂】: 派 role/homeCity/企定位 + 開一張記憶表。等級/屬性由 sim._bump_level 另設。
-static func init_guard(e: Dictionary, city_id: String, stand: Vector2i) -> void:
+static func init_guard(e: Dictionary, city_id: String, stand: Vector2i, home_zone: String = "") -> void:
 	var ch: Dictionary = e["ch"]
 	ch["role"] = "constable"
 	ch["align"] = "good"
 	ch["homeCity"] = city_id
+	ch["homeZone"] = home_zone if home_zone != "" else Sim.DEFAULT_ZONE    # 巡邏野區 (同居民一樣: 自己城最近野區)
 	ch["standPos"] = {"x": stand.x, "y": stand.y}
 	ch["patrolStep"] = 0
 	e["mem"] = NpcMemory.init_memory()
@@ -69,6 +70,7 @@ static func _constable_tick(sim, id: int, e: Dictionary, bots_by_map: Dictionary
 	if not pe.is_empty() and pe.has("ch") and int(pe["hp"]) > 0 \
 			and sim.data.map_index(int(pe["x"]), int(pe["y"])) == map_k \
 			and RulesGuard.is_red_target(pe["ch"], true) \
+			and not sim.is_safe(int(pe["x"]), int(pe["y"])) and not sim.is_safe(int(e["x"]), int(e["y"])) \
 			and RulesGuard.in_aggro_range(int(e["x"]), int(e["y"]), int(pe["x"]), int(pe["y"]), g):
 		e["atk_target"] = pid
 		return
@@ -80,6 +82,8 @@ static func _constable_tick(sim, id: int, e: Dictionary, bots_by_map: Dictionary
 			continue
 		if not RulesGuard.is_red_target(be["ch"], false):
 			continue
+		if sim.is_safe(int(be["x"]), int(be["y"])) or sim.is_safe(int(e["x"]), int(e["y"])):
+			continue                                     # 城內唔打人: 紅名喺城入面唔追，等佢出野外
 		if RulesGuard.in_aggro_range(int(e["x"]), int(e["y"]), int(be["x"]), int(be["y"]), g):
 			e["atk_target"] = int(bid)
 			be["huntedByGuard"] = true
@@ -88,13 +92,27 @@ static func _constable_tick(sim, id: int, e: Dictionary, bots_by_map: Dictionary
 	var stand := Vector2i(int(sp.get("x", int(e["x"]))), int(sp.get("y", int(e["y"]))))
 	var shi := RulesClock.shichen_of_ke(int(sim._clock()["ke"]))
 	if RulesGuard.is_patrol_time(g, shi):
+		# 巡邏喺城外野區: 唔喺野區就經門口出城；到咗野區循環行 4 個方向點 (紅名喺野外先打，城內唔郁手)
+		var zone_id := String(ch.get("homeZone", Sim.DEFAULT_ZONE))
+		var z: Dictionary = sim.zone_by_id(zone_id)
+		if z.is_empty():
+			return
+		if sim._route_to_map(e, zone_id):
+			return
 		if int(e["x"]) == int(e["tx"]) and int(e["y"]) == int(e["ty"]):
+			var centre := Vector2i((int(z["x0"]) + int(z["x1"])) / 2, (int(z["y0"]) + int(z["y1"])) / 2)
 			var step := int(ch.get("patrolStep", 0))
-			var pt := RulesGuard.patrol_point(stand, int(g.get("patrolRadius", 6)), step)
+			var pt := RulesGuard.patrol_point(centre, int(g.get("patrolRadius", 6)), step)
+			pt.x = clampi(pt.x, int(z["x0"]), int(z["x1"]) - 1)
+			pt.y = clampi(pt.y, int(z["y0"]), int(z["y1"]) - 1)
 			ch["patrolStep"] = step + 1
 			sim.cmd_move(id, pt.x, pt.y)
-	elif int(e["x"]) != stand.x or int(e["y"]) != stand.y:
-		sim.cmd_move(id, stand.x, stand.y)
+	else:
+		var cmap: String = sim.resident_city_map_id(String(ch.get("homeCity", "")))
+		if cmap != "" and sim.map_id_at(int(e["x"]), int(e["y"])) != cmap:
+			sim._route_to_map(e, cmap)                   # 非巡邏時辰: 返城
+		elif int(e["x"]) != stand.x or int(e["y"]) != stand.y:
+			sim.cmd_move(id, stand.x, stand.y)
 
 
 static func think(sim) -> void:
