@@ -117,11 +117,7 @@ func _kill_mob(m: Dictionary, by: Dictionary, exp_mult: float = 1.0) -> void:
 			continue
 		var mch: Dictionary = member["ch"]
 		var e := int(shares[id_str])
-		if member.get("kind", "") == "player":   # 福日【自訂】：生日嗰日練功 exp +10% (spec 01 §1)
-			var clk: Dictionary = data.world["clock"]
-			e = MathX.js_round(float(e) * RulesStats.birthday_exp_mult(int(_clock()["day"]),
-				int(clk.get("yearDays", 360)), int(clk.get("monthDays", 30)),
-				int(mch.get("birthMonth", 1)), int(mch.get("birthDay", 1))))
+		if member.get("kind", "") == "player":
 			e = MathX.js_round(float(e) * _friend_exp_mult(member))   # U13 戰騎「神獸/王者」加成友好技
 		var mups := RulesStats.gain_exp(data, mch, e)
 		if mups > 0 and member.get("kind", "") in ["bot", "gen"]:   # 機械人/同伴冇人幫手派點: 直接按建議比例自動派

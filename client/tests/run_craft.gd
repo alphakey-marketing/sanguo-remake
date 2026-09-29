@@ -107,7 +107,7 @@ func t_work_levels(data: GameData) -> void:
 	var pid: int = r[1]
 	var ch: Dictionary = r[2]
 	check(sim.work_lv(ch, "mining") == 1 and sim.work_lv(ch, "smithing") == 0, "新角色: 初階 1 級、進階 0 (未解鎖)")
-	_put(sim, pid, 30, 30)
+	_put(sim, pid, 60, 35)          # 東山丘林 = 採礦工作區 (spec 05)
 	_equip_tool(sim, pid, ch, "mining", 26003)
 	var tier0 := int(data.work["mining"]["materials"][0])
 	var only_tier0 := true
@@ -156,7 +156,7 @@ func t_double_yield(data: GameData) -> void:
 	var sim: Sim = r[0]
 	var pid: int = r[1]
 	var ch: Dictionary = r[2]
-	_put(sim, pid, 30, 30)
+	_put(sim, pid, 60, 35)          # 採礦工作區
 	_equip_tool(sim, pid, ch, "mining", 26003)
 	var twos := 0
 	var oks := 0
@@ -224,7 +224,7 @@ func t_unlock(data: GameData) -> void:
 	var sim3: Sim = r3[0]
 	var ch3: Dictionary = r3[2]
 	ch3["workLv"] = {"herbalism": {"lv": 49, "exp": RulesWork.exp_to_next(49, data.work_meta["level"]) - 1}}
-	_put(sim3, r3[1], 30, 30)
+	_put(sim3, r3[1], 70, 60)       # 潁水南岸 = 採藥工作區
 	_equip_tool(sim3, r3[1], ch3, "herbalism", 26008)
 	sim3.cmd_work(r3[1], "herbalism")
 	check(sim3.work_lv(ch3, "herbalism") == 50 and sim3.work_lv(ch3, "alchemy") == 1, "採藥做到 50 級 → 煉丹自動解鎖")

@@ -1,5 +1,5 @@
 {
- "_note": "地圖世界 (spec 12)【自訂】。每張地圖 = data/maps/<id>.txt (一字元一格)，放喺全域格仔 (ox,oy)；地圖之間留空 = 行唔到。其他數據檔寫 map + 地圖內座標，GameData 載入時轉全域。legend.walk = 行得。areas = 地圖內命名區 (HUD 區名橫幅)。landmarks = 史蹟地標 (第一次行近彈典故)。world = 大地圖 (天下) 節點，map=null = 未開放。kind: city/field/cave/house (house = 室內，parent = 所屬城池地圖，大地圖當嗰個城)。 portal.gate (Step 16): window = 時辰窗口先入得 / item = 身上要有道具先入得 / msg = 入唔到嘅提示。 instance=true (Step 19): 戰役等單機教學實例場景，冇門連去，靠 sim 直接傳送入/出，唔計入「由許昌去得」嘅連通檢查。",
+ "_note": "地圖世界 (spec 12)【自訂】。每張地圖 = data/maps/<id>.txt (一字元一格)，放喺全域格仔 (ox,oy)；地圖之間留空 = 行唔到。其他數據檔寫 map + 地圖內座標，GameData 載入時轉全域。legend.walk = 行得。areas = 地圖內命名區 (HUD 區名橫幅)。areas[].work = 野外工作區 (spec 05): 呢區入面做得邊啲初階技能 (farming/hunting/woodcutting/fishing/herbalism/mining)；cmd_work 要企喺有對應 skill 嘅 work 區。landmarks = 史蹟地標 (第一次行近彈典故)。world = 大地圖 (天下) 節點，map=null = 未開放。kind: city/field/cave/house (house = 室內，parent = 所屬城池地圖，大地圖當嗰個城)。 portal.gate (Step 16): window = 時辰窗口先入得 / item = 身上要有道具先入得 / msg = 入唔到嘅提示。 instance=true (Step 19): 戰役等單機教學實例場景，冇門連去，靠 sim 直接傳送入/出，唔計入「由許昌去得」嘅連通檢查。",
  "legend": {
   ".": {
    "name": "草地",
@@ -72,7 +72,8 @@
      "x0": 52,
      "y0": 5,
      "x1": 96,
-     "y1": 22
+     "y1": 22,
+     "work": ["farming"]
     },
     {
      "name": "許昌北郊",
@@ -86,28 +87,32 @@
      "x0": 2,
      "y0": 26,
      "x1": 56,
-     "y1": 62
+     "y1": 62,
+     "work": ["hunting"]
     },
     {
      "name": "東山丘林",
      "x0": 57,
      "y0": 26,
      "x1": 110,
-     "y1": 50
+     "y1": 50,
+     "work": ["woodcutting", "mining"]
     },
     {
      "name": "潁水南岸",
      "x0": 57,
      "y0": 51,
      "x1": 110,
-     "y1": 82
+     "y1": 82,
+     "work": ["fishing", "herbalism"]
     },
     {
      "name": "潁水渡口",
      "x0": 2,
      "y0": 63,
      "x1": 56,
-     "y1": 82
+     "y1": 82,
+     "work": ["fishing"]
     }
    ]
   },
@@ -249,14 +254,16 @@
      "x0": 76,
      "y0": 2,
      "x1": 94,
-     "y1": 16
+     "y1": 16,
+     "work": ["mining"]
     },
     {
      "name": "汝水渡",
      "x0": 36,
      "y0": 2,
      "x1": 50,
-     "y1": 37
+     "y1": 37,
+     "work": ["fishing"]
     },
     {
      "name": "汝南道",
@@ -311,21 +318,24 @@
      "x0": 0,
      "y0": 0,
      "x1": 28,
-     "y1": 49
+     "y1": 49,
+     "work": ["woodcutting", "mining"]
     },
     {
      "name": "淯水",
      "x0": 29,
      "y0": 0,
      "x1": 38,
-     "y1": 49
+     "y1": 49,
+     "work": ["fishing"]
     },
     {
      "name": "淯水田莊",
      "x0": 62,
      "y0": 20,
      "x1": 92,
-     "y1": 40
+     "y1": 40,
+     "work": ["farming", "herbalism"]
     },
     {
      "name": "宛城道",
@@ -349,21 +359,24 @@
      "x0": 0,
      "y0": 0,
      "x1": 95,
-     "y1": 16
+     "y1": 16,
+     "work": ["woodcutting", "hunting"]
     },
     {
      "name": "博望坡",
      "x0": 0,
      "y0": 17,
      "x1": 95,
-     "y1": 44
+     "y1": 44,
+     "work": ["mining"]
     },
     {
      "name": "新野北郊",
      "x0": 0,
      "y0": 45,
      "x1": 95,
-     "y1": 69
+     "y1": 69,
+     "work": ["farming", "herbalism"]
     }
    ]
   },
@@ -412,14 +425,16 @@
      "x0": 54,
      "y0": 0,
      "x1": 66,
-     "y1": 49
+     "y1": 49,
+     "work": ["fishing"]
     },
     {
      "name": "白河田莊",
      "x0": 66,
      "y0": 30,
      "x1": 88,
-     "y1": 44
+     "y1": 44,
+     "work": ["farming", "herbalism"]
     }
    ]
   },
@@ -467,7 +482,8 @@
      "x0": 8,
      "y0": 40,
      "x1": 30,
-     "y1": 52
+     "y1": 52,
+     "work": ["farming"]
     }
    ]
   },
@@ -708,14 +724,16 @@
      "x0": 38,
      "y0": 3,
      "x1": 60,
-     "y1": 20
+     "y1": 20,
+     "work": ["woodcutting", "herbalism"]
     },
     {
      "name": "隴畝",
      "x0": 8,
      "y0": 34,
      "x1": 42,
-     "y1": 46
+     "y1": 46,
+     "work": ["farming", "herbalism"]
     }
    ]
   },

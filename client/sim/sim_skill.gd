@@ -260,7 +260,8 @@ func cmd_use_ultimate(id: int, ult_id: String) -> void:
 
 # ================= 職業特技 (S02c, spec 02 §6) =================
 # 學到 -> ch.classSkill = skill id (導師任務獎勵)；而家得 開鎖（仕女）。
-# 開鎖效果（任務寶箱/門）要 S04 寶箱實體 / S06 任務寶箱先接到 — 而家 sim 指令 + 事件 + UI 已經接通。
+# sim 指令 + 事件 + UI 已接通；進階開鎖（任務寶箱）留 S06 任務寶箱批次。
+# T-07 隨機寶箱已實作（見 _spawn_random_chests）。
 
 func cmd_use_skill(id: int, skill_id: String) -> void:
 	var e := ent(id)
@@ -270,11 +271,16 @@ func cmd_use_skill(id: int, skill_id: String) -> void:
 	var r := RulesClassSkill.can_use(data, ch, skill_id)
 	if not bool(r["ok"]):
 		return _msg(id, str(r["why"]))
+	_use_skill_effect(id, skill_id)
+
+
+# 職業特技施展 (唔帶「已學」門檻，供職業丹用): 系統判定要由 caller 做 (已學 / 職業丹嗰支丹)。
+func _use_skill_effect(id: int, skill_id: String) -> void:
 	match skill_id:
 		"unlock":
-			var chest := _near_locked_chest(e)
+			var chest := _near_locked_chest(ent(id))
 			if chest.is_empty():
-				return _msg(id, "附近冇鎖住嘅寶箱（任務寶箱先用得開鎖）")
+				return _msg(id, "附近冇鎖住嘅寶箱（野外每張地圖有，每日換位）")
 			_emit({"k": "unlock_open", "dst": id, "chest": chest["id"]})
 			_msg(id, "揀真鑰匙…三支得一支啱")
 		"chaodu":
@@ -289,7 +295,33 @@ func cmd_use_skill(id: int, skill_id: String) -> void:
 			_msg(id, "嗰招特技而家用唔到")
 
 
-# 潛行 (巫女, S02c, spec 02 §6): 先過小遊戲「行車之間穿越」，成功先入潛行 10 分鐘 (CD 1 game 日)。
+# 職業丹 (S11, spec 11 §11)：食丹 → 施展對應職業特技（要對應職業；唔使已由導師學到）。
+# 扣丹由呢度做；main.gd use_item 對呢 5 件 id 改路由到呢度。
+const PILL_UNLOCK := 30055
+const PILL_QIETING := 30056
+const PILL_YINXING := 30057
+const PILL_CHAODU := 30058
+const PILL_TOUSHI := 30059
+const PILL_SKILL_IDS := {
+	PILL_UNLOCK: "unlock", PILL_QIETING: "qieting",
+	PILL_YINXING: "yinxing", PILL_CHAODU: "chaodu", PILL_TOUSHI: "toushi",
+}
+
+func cmd_use_class_pill(id: int, item: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var skill_id: String = PILL_SKILL_IDS.get(item, "")
+	if skill_id == "":
+		return _msg(id, "呢件唔係職業丹")
+	var ch: Dictionary = e["ch"]
+	var def: Dictionary = RulesClassSkill.def_of(data, skill_id)
+	if def.is_empty() or String(def.get("class", "")) != String(ch.get("classId", "")):
+		return _msg(id, "你職業用唔到呢粒丹")
+	if not RulesShop.remove_item(ch["bag"], item, 1):
+		return _msg(id, "背包冇呢件")
+	_msg(id, "食咗%s，施展「%s」" % [data.names.get(item, str(item)), String(def.get("name", skill_id))])
+	_use_skill_effect(id, skill_id)
 # 行車空隙 pattern 用 SimRng 生成 (可重現)；sim 權威判定穿越成敗。
 func _try_yinxing(id: int) -> void:
 	var e := ent(id)
@@ -456,7 +488,12 @@ func _try_chaodu(id: int) -> void:
 	_msg(id, "超渡！「%s」起返身回滿血（扣自己 %d HP．%d MP）" % [target["name"], hp_cost, mp_cost])
 
 
-# 開鎖小遊戲揀鑰匙（unlock_panel 三掣）: key_idx 啱 -> 寶箱開，錯 -> 留喺度再試
+# 隨機寶箱 (T-07, spec 02 §6)【自訂】: 野外每張地圖 spawn 一個鎖住寶箱，每日子時更新位置（全地圖每日換位）。
+# 開鎖實體: {kind:"chest", locked, key(0..2), drop={items/gold}}；開岩鎖匙得賞、開錯留返再試。
+# CHEST_KEYS / CHEST_RANGE 定義喺 sim_core.gd (父類，唔好重複宣告)
+
+
+# 開鎖小遊戲揀鑰匙（unlock_panel 三掣）: key_idx 啱 -> 寶箱開，得賞；錯 -> 留喺度再試
 func cmd_skill_pick(id: int, chest_id: int, key_idx: int) -> void:
 	var e := ent(id)
 	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
@@ -469,23 +506,52 @@ func cmd_skill_pick(id: int, chest_id: int, key_idx: int) -> void:
 		return _msg(id, "寶箱唔喺度")
 	if not bool(chest.get("locked", true)):
 		return _msg(id, "寶箱已經開咗")
-	if int(chest.get("key", 0)) == key_idx:
-		chest["locked"] = false
-		_emit({"k": "unlock_done", "dst": id, "chest": chest_id, "ok": true, "name": str(chest.get("name", "寶箱"))})
-		_msg(id, "咔！%s 開咗" % str(chest.get("name", "寶箱")))
-	else:
-		_msg(id, "揀錯鑰匙，%s 紋紋唔肯郁…（再試）" % str(chest.get("name", "寶箱")))
+	if int(chest.get("key", 0)) != key_idx:
+		return _msg(id, "揀錯鑰匙，%s 紋紋唔肯郁…（再試）" % str(chest.get("name", "寶箱")))
+	# 開岩：鎖開 + 得賞 + 收箱
+	chest["locked"] = false
+	var name := str(chest.get("name", "寶箱"))
+	_emit({"k": "unlock_done", "dst": id, "chest": chest_id, "ok": true, "name": name})
+	_msg(id, "咔！%s 開咗！" % name)
+	var dp: Dictionary = chest.get("drop", {})
+	var items: Array = []
+	for it in dp.get("items", []) as Array:
+		items.append({"id": int(it["id"]), "n": int(it.get("n", 1))})
+	var gold := int(dp.get("gold", 0))
+	if not items.is_empty():
+		# 背包物直接落袋（寶箱唔好似野外怪咁跌落地）
+		for it in items:
+			RulesShop.add_item(ch["bag"], int(it["id"]), int(it["n"]))
+			_msg(id, "寶箱出到「%s」×%d！" % [data.names.get(int(it["id"]), str(it["id"])), int(it["n"])])
+	if gold > 0:
+		ch["gold"] = int(ch["gold"]) + gold
+		_msg(id, "寶箱出到金 %d！" % gold)
+	if items.is_empty() and gold == 0:
+		_msg(id, "寶箱空蕩蕩…")
+	_remove_ent(chest_id)
+	_emit({"k": "chest_loot", "dst": id, "chest": chest_id, "items": items, "gold": gold})
 
 
-# 附近鎖住嘅寶箱實體 (S04 地面寶箱/任務寶箱實體化後先會再有)
+# 附近鎖住嘅寶箱實體（開鎖特技喺寶箱旁先用得）
 func _near_locked_chest(e: Dictionary) -> Dictionary:
 	for o in ents.values():
 		if String(o.get("kind", "")) == "chest" and bool(o.get("locked", true)) \
-				and RulesCombat.in_range(e["x"], e["y"], o["x"], o["y"], 2):
+				and RulesCombat.in_range(e["x"], e["y"], o["x"], o["y"], CHEST_RANGE):
 			return o
 	return {}
 
 
+# 每日子時刷新: 清晒現有寶箱再重新 spawn（全地圖換位）
+func _chest_daily(day: int) -> void:
+	var gone: Array = []
+	for o in ents.values():
+		if String(o.get("kind", "")) == "chest":
+			gone.append(int(o["id"]))
+	_remove_ents(gone)
+	_spawn_random_chests()
+
+
+# 喺每張野外（非安全）地圖 spawn 一個隨機寶箱；用 RNG 揀位 + 揀鎖匙，決定性可重現。
 # debug: 直接學絕招/特技（成品前移除；S02c 絕招任務鏈喺 S06d，先畀手機測招式）
 func cmd_debug_learn(id: int, kind: String, what: String) -> void:
 	var e := ent(id)

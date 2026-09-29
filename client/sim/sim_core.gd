@@ -238,6 +238,30 @@ func area_name(x: int, y: int) -> String:
 	return ""
 
 
+# 野外工作區 (spec 05): 企喺呢格係唔係 &skill 可做嘅工作區 (a.work 含 skill)。
+# 唔喺任何工作區 = 否 → cmd_work 唔俾做。
+func work_ok_here(skill: String, x: int, y: int) -> bool:
+	var md := data.map_at(x, y)
+	if md.is_empty():
+		return false
+	for a in md.get("areas", []):
+		if x >= int(a["x0"]) and x <= int(a["x1"]) and y >= int(a["y0"]) and y <= int(a["y1"]):
+			if (a.get("work", []) as Array).has(skill):
+				return true
+	return false
+
+
+# 將一格嘅 工作區技能名 砌好 (read-model，畀 UI 顯示「而家係X地，可以做農耕」)
+func work_area_skills(x: int, y: int) -> Array:
+	var md := data.map_at(x, y)
+	if md.is_empty():
+		return []
+	for a in md.get("areas", []):
+		if x >= int(a["x0"]) and x <= int(a["x1"]) and y >= int(a["y0"]) and y <= int(a["y1"]):
+			return (a.get("work", []) as Array).duplicate()
+	return []
+
+
 # 直線行一步: 先行差距大嗰個軸 (同差距先 x)，被擋就試另一軸；行唔到 = 原位
 # (唔好固定 x 先: 怪同人互追會左右跳舞永遠追唔到)
 func _greedy_step(x: int, y: int, tx: int, ty: int) -> Vector2i:
@@ -619,12 +643,23 @@ func _spawn_actor(ename: String, kind: String, class_id: String = "yishi", spawn
 	return e
 
 
-# 新手城地圖 (world.homeCity)
-func _home_map() -> Dictionary:
+# 新手城地圖 (world.homeCity / ch.homeCity；建角揀城 UAT-feedback)
+func _city_map(city: String) -> Dictionary:
 	for md in data.maps:
-		if String(md.get("city", "")) == String(data.world["homeCity"]):
+		if String(md.get("city", "")) == city:
 			return md
 	return {}
+
+
+# 玩家已揀新手城 → 用玩家嗰個（ch.homeCity）；否則預設 world.homeCity（許昌）
+func _home_map() -> Dictionary:
+	var p := ent(int(state.get("player_id", -1)))
+	var home := String(p.get("ch", {}).get("homeCity", data.world["homeCity"])) if not p.is_empty() and (p.get("ch") is Dictionary) else String(data.world["homeCity"])
+	if String(home) != "":
+		var c := _city_map(home)
+		if not c.is_empty():
+			return c
+	return _city_map(String(data.world["homeCity"]))
 
 
 func add_bots(n: int) -> void:
@@ -684,8 +719,11 @@ func add_guards() -> void:
 			if String(m.get("city", "")) == city_id:
 				inn_here = Vector2i(int(x["x"]), int(x["y"]))
 				break
-		if inn_here.x < 0:
-			continue
+		if inn_here.x < 0:      # 冇客棧嘅城: 用城圖中心做企定位基準 (UAT-001~003)
+			var z: Dictionary = zone_by_id(String(md.get("id", "")))
+			if z.is_empty():
+				continue
+			inn_here = Vector2i((int(z["x0"]) + int(z["x1"])) / 2, (int(z["y0"]) + int(z["y1"])) / 2)
 		var stand := RulesGuard.stand_pos(inn_here.x, inn_here.y, g)
 		for i in per_city:
 			var e := _spawn_actor("捕快" + str(i + 1), "bot", "yishi", [stand.x - 1, stand.y - 1, stand.x + 1, stand.y + 1])
@@ -741,6 +779,49 @@ func init_mobs() -> void:
 			continue                    # 夜怪由 _sync_night_spawns 處理
 		for i in int(sp["count"]):
 			_spawn_mob(int(sp["monster"]), String(sp.get("zone", DEFAULT_ZONE)))
+	_spawn_random_chests()      # T-07 隨機寶箱: 開局即刻 spawn (spec 02 §6), 之後每日子時換位
+
+
+# T-07 隨機寶箱【自訂】: 野外每張地圖 spawn 一個鎖住寶箱（開局 init_mobs + 每日子時換位）。
+# 開鎖實體: {kind:"chest", locked, key(0..2), drop={items/gold}}；開岩鎖匙得賞、開錯留返再試。
+const CHEST_KEYS := 3
+const CHEST_RANGE := 2
+
+
+func _spawn_random_chests() -> void:
+	for z in data.zones as Array:
+		if bool(z.get("safe", false)):
+			continue     # 城/安全區唔生寶箱
+		_spawn_chest_in_zone(z)
+
+
+func _spawn_chest_in_zone(z: Dictionary) -> void:
+	var p := _pick_free(int(z["x0"]), int(z["y0"]), int(z["x1"]), int(z["y1"]))
+	var e := _new_ent("寶箱", "chest", p)
+	e["face"] = 0
+	e["hp"] = 1
+	e["max_hp"] = 1
+	e["locked"] = true
+	e["key"] = int(floor(rng.next() * CHEST_KEYS))     # 0..2
+	e["drop"] = _chest_drop()
+
+
+# 隨機寶箱賞【自訂】: 低機率出武器/防具/寶石/消耗，多數少金。用 data 掉落表（items.json 隨機）
+func _chest_drop() -> Dictionary:
+	var gold := 10 + int(floor(rng.next() * 71))
+	var items: Array = []
+	if rng.next() < 0.3:
+		var pool: Array = []
+		for id in data.info.keys():
+			var cat := int(data.info[id].get("cat", 0))
+			if cat >= 1 and cat <= 18:
+				pool.append(int(id))
+			elif cat >= 20 and cat <= 60:
+				if int(data.info[id].get("req_lv", 1)) <= 5:
+					pool.append(int(id))
+		if not pool.is_empty():
+			items.append({"id": pool[int(floor(rng.next() * pool.size()))], "n": 1})
+	return {"gold": gold, "items": items}
 
 
 # S04a 地面掉落物 (spec 04 §6)【原=跌落地】: 物品堆跌落地，存在 capTicks tick 後消失；

@@ -65,13 +65,13 @@
     }
    ],
    "reward": {
-    "lilian": 10,
     "items": [
      [
       10002,
       1
      ]
-    ]
+    ],
+    "exp": 30
    }
   },
   {
@@ -173,7 +173,13 @@
       "id": 58009,
       "n": 1
      },
-     "hint": "答啱禁衛大隊長嘅問題（得殲盜密函）"
+     "hint": "答啱禁衛大隊長嘅問題（得殲盜密函）",
+     "response": [
+      "禁衛大隊長：「啱！霸盜賊就喺汝南洞窟第十層，攞 20 個霸盜令返嚟。」"
+     ],
+     "wrong": [
+      "禁衛大隊長：「唔啱——霸盜賊明明喺汝南洞窟第十層。再唸吓先答本官。」"
+     ]
     },
     {
      "type": "collect",
@@ -939,7 +945,13 @@
      ],
      "answer": 1,
      "hint": "答啱黃師姐嘅問題（學識開鎖）",
-     "done": true
+     "done": true,
+     "response": [
+      "黃師姐：「啱，揀啱嗰支真鑰匙先係開鎖正道。」"
+     ],
+     "wrong": [
+      "黃師姐：「錯——開鎖靠揀啱嗰支真鑰匙，唔係死鋤。」"
+     ]
     }
    ],
    "reward": {
@@ -971,7 +983,13 @@
      ],
      "answer": 1,
      "hint": "答啱玄真道人嘅問題（學識超渡）",
-     "done": true
+     "done": true,
+     "response": [
+      "玄真道人：「正是，扣自己體力靈力拉返同伴——超渡慈悲有代價。」"
+     ],
+     "wrong": [
+      "玄真道人：「唔係，超渡要扣自己體力靈力先拉得返同伴。」"
+     ]
     }
    ],
    "reward": {
@@ -979,7 +997,6 @@
     "skill": "chaodu"
    }
   },
-
   {
    "id": "skill_unlock_wunu",
    "name": "學特技：潛行",
@@ -1004,7 +1021,13 @@
      ],
      "answer": 1,
      "hint": "答啱巫姬婆嘅問題（學識潛行）",
-     "done": true
+     "done": true,
+     "response": [
+      "巫姬婆：「啱，車與車之間留低嘅空隙先係生路。」"
+     ],
+     "wrong": [
+      "巫姬婆：「傻女，硬衝點會掂？要揀車與車之間嘅空隙先穿。」"
+     ]
     }
    ],
    "reward": {
@@ -1036,7 +1059,13 @@
      ],
      "answer": 1,
      "hint": "答啱蔡師傅嘅問題（學識竊聽）",
-     "done": true
+     "done": true,
+     "response": [
+      "蔡師傅：「正是，靜靜雞埋去聽至聽得到真傳聞。」"
+     ],
+     "wrong": [
+      "蔡師傅：「錯——竊聽要靜靜雞埋去居民側邊，豎起耳仔聽。」"
+     ]
     }
    ],
    "reward": {
@@ -1068,7 +1097,13 @@
      ],
      "answer": 1,
      "hint": "答啱夢韶華嘅問題（學識透視）",
-     "done": true
+     "done": true,
+     "response": [
+      "夢韶華：「啱，細心觀察先睇得穿對方虛實。」"
+     ],
+     "wrong": [
+      "夢韶華：「唔好靠亂估——要細心觀察對方狀態先透視到。」"
+     ]
     }
    ],
    "reward": {
@@ -1392,7 +1427,13 @@
       "id": 56502,
       "n": 1
      },
-     "hint": "答啱南華小童嘅問題（得太平要術）"
+     "hint": "答啱南華小童嘅問題（得太平要術）",
+     "response": [
+      "南華小童：「正是賈島！『推敲』自此成典故。老仙見你知多啲，張角之事正要託你。」"
+     ],
+     "wrong": [
+      "南華小童：「唔係喎——係賈島呀。再唸吓先答。」"
+     ]
     },
     {
      "type": "fight",
@@ -1445,14 +1486,51 @@
    "type": "group",
    "repeat": "monthly",
    "giver": "merchant_guild",
-   "pre": {"militia": true},
+   "pre": {
+    "militia": true
+   },
    "preHint": "要所屬義勇軍先接得；去許昌城中心搵商會長",
    "stages": [
-    {"type": "talk", "npc": "merchant_guild", "getItem": {"id": 56503, "n": 1}, "dialog": ["商會長：「我想同宛城做單大生意，你幫我帶呢塊商會令牌去宛城搵商人，辦妥返嚟重重有賞！」"], "hint": "帶商會令牌去宛城搵商人"},
-    {"type": "talk", "npc": "wancheng_merchant", "takeItems": [[56503, 1]], "dialog": ["宛城商人：「許昌商會嘅令牌？我即刻備貨！」"], "hint": "交商會令牌畀宛城商人"},
-    {"type": "talk", "npc": "merchant_guild", "dialog": ["商會長：「貨銀兩訖，多謝你奔波！呢啲係你嘅報酬。」"], "hint": "返許昌商會長覆命", "done": true}
+    {
+     "type": "talk",
+     "npc": "merchant_guild",
+     "getItem": {
+      "id": 56503,
+      "n": 1
+     },
+     "dialog": [
+      "商會長：「我想同宛城做單大生意，你幫我帶呢塊商會令牌去宛城搵商人，辦妥返嚟重重有賞！」"
+     ],
+     "hint": "帶商會令牌去宛城搵商人"
+    },
+    {
+     "type": "talk",
+     "npc": "wancheng_merchant",
+     "takeItems": [
+      [
+       56503,
+       1
+      ]
+     ],
+     "dialog": [
+      "宛城商人：「許昌商會嘅令牌？我即刻備貨！」"
+     ],
+     "hint": "交商會令牌畀宛城商人"
+    },
+    {
+     "type": "talk",
+     "npc": "merchant_guild",
+     "dialog": [
+      "商會長：「貨銀兩訖，多謝你奔波！呢啲係你嘅報酬。」"
+     ],
+     "hint": "返許昌商會長覆命",
+     "done": true
+    }
    ],
-   "reward": {"gold": 500, "fame": 15}
+   "reward": {
+    "gold": 500,
+    "fame": 15
+   }
   },
   {
    "id": "group_exterminate",
@@ -1460,14 +1538,42 @@
    "type": "group",
    "repeat": "monthly",
    "giver": "wu_lao",
-   "pre": {"militia": true},
+   "pre": {
+    "militia": true
+   },
    "preHint": "要所屬義勇軍先接得；去宛城搵武老",
    "stages": [
-    {"type": "talk", "npc": "wu_lao", "dialog": ["武老：「九命怪狐、殺人凶熊、深山巨蟒王……群獸之首猛獸王出沒汝南道，義勇軍幫手除害啦！」"], "hint": "去汝南道搵猛獸王"},
-    {"type": "fight", "npc": "beast_king", "monster": 1093, "dialog": ["猛獸王怒吼一聲，撲向你！"], "hint": "同猛獸王 PK（行近猛獸王對話開打）"},
-    {"type": "talk", "npc": "wu_lao", "dialog": ["武老：「猛獸王已除，鄉親終於可以安心！多謝義勇軍！」"], "hint": "返宛城同武老覆命", "done": true}
+    {
+     "type": "talk",
+     "npc": "wu_lao",
+     "dialog": [
+      "武老：「九命怪狐、殺人凶熊、深山巨蟒王……群獸之首猛獸王出沒汝南道，義勇軍幫手除害啦！」"
+     ],
+     "hint": "去汝南道搵猛獸王"
+    },
+    {
+     "type": "fight",
+     "npc": "beast_king",
+     "monster": 1093,
+     "dialog": [
+      "猛獸王怒吼一聲，撲向你！"
+     ],
+     "hint": "同猛獸王 PK（行近猛獸王對話開打）"
+    },
+    {
+     "type": "talk",
+     "npc": "wu_lao",
+     "dialog": [
+      "武老：「猛獸王已除，鄉親終於可以安心！多謝義勇軍！」"
+     ],
+     "hint": "返宛城同武老覆命",
+     "done": true
+    }
    ],
-   "reward": {"gold": 800, "fame": 20}
+   "reward": {
+    "gold": 800,
+    "fame": 20
+   }
   },
   {
    "id": "group_weizi",
@@ -1475,14 +1581,41 @@
    "type": "group",
    "repeat": "monthly",
    "giver": "weizi",
-   "pre": {"militia": true},
+   "pre": {
+    "militia": true
+   },
    "preHint": "要所屬義勇軍先接得；去陳留搵衛茲",
    "stages": [
-    {"type": "talk", "npc": "weizi", "dialog": ["衛茲：「我願資助義勇軍軍備，不過……我喜好白玉飾品，搵返嚟送我，軍備即刻奉上！」"], "hint": "搵一件白玉飾品畀衛茲"},
-    {"type": "collect", "item": {"id": 56504, "n": 1}, "hint": "交白玉飾品畀衛茲 (%v/%n)"},
-    {"type": "talk", "npc": "weizi", "dialog": ["衛茲：「好玉！軍備你拎去，義勇軍守城衛民，衛某義不容辭！」"], "hint": "向衛茲覆命", "done": true}
+    {
+     "type": "talk",
+     "npc": "weizi",
+     "dialog": [
+      "衛茲：「我願資助義勇軍軍備，不過……我喜好白玉飾品，搵返嚟送我，軍備即刻奉上！」"
+     ],
+     "hint": "搵一件白玉飾品畀衛茲"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 56504,
+      "n": 1
+     },
+     "hint": "交白玉飾品畀衛茲 (%v/%n)"
+    },
+    {
+     "type": "talk",
+     "npc": "weizi",
+     "dialog": [
+      "衛茲：「好玉！軍備你拎去，義勇軍守城衛民，衛某義不容辭！」"
+     ],
+     "hint": "向衛茲覆命",
+     "done": true
+    }
    ],
-   "reward": {"gold": 600, "fame": 25}
+   "reward": {
+    "gold": 600,
+    "fame": 25
+   }
   },
   {
    "id": "group_miner",
@@ -1490,15 +1623,54 @@
    "type": "group",
    "repeat": "monthly",
    "giver": "miner_boss",
-   "pre": {"militia": true},
+   "pre": {
+    "militia": true
+   },
    "preHint": "要所屬義勇軍先接得；去宛城搵礦工工頭",
    "stages": [
-    {"type": "talk", "npc": "miner_boss", "dialog": ["礦工工頭：「礦坑太暗，又缺工具。送兩支蠟燭同一把鐵鎚嚟，我用礦石回報你！」"], "hint": "收集蠟燭×2 + 鐵鎚×1"},
-    {"type": "collect", "item": {"id": 26015, "n": 2}, "hint": "蠟燭 %v/%n"},
-    {"type": "collect", "item": {"id": 26004, "n": 1}, "hint": "鐵鎚 %v/%n"},
-    {"type": "talk", "npc": "miner_boss", "dialog": ["礦工工頭：「多謝！呢啲礦石你帶走。」"], "hint": "向礦工工頭覆命", "done": true}
+    {
+     "type": "talk",
+     "npc": "miner_boss",
+     "dialog": [
+      "礦工工頭：「礦坑太暗，又缺工具。送兩支蠟燭同一把鐵鎚嚟，我用礦石回報你！」"
+     ],
+     "hint": "收集蠟燭×2 + 鐵鎚×1"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 26015,
+      "n": 2
+     },
+     "hint": "蠟燭 %v/%n"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 26004,
+      "n": 1
+     },
+     "hint": "鐵鎚 %v/%n"
+    },
+    {
+     "type": "talk",
+     "npc": "miner_boss",
+     "dialog": [
+      "礦工工頭：「多謝！呢啲礦石你帶走。」"
+     ],
+     "hint": "向礦工工頭覆命",
+     "done": true
+    }
    ],
-   "reward": {"gold": 300, "items": [[25002, 10]]}
+   "reward": {
+    "gold": 300,
+    "items": [
+     [
+      25002,
+      10
+     ]
+    ]
+   }
   },
   {
    "id": "group_zixu",
@@ -1508,11 +1680,41 @@
    "giver": "zixu",
    "preHint": "紫虛上人每日修行，供材料可得藏寶圖；去許昌城搵佢",
    "stages": [
-    {"type": "talk", "npc": "zixu", "dialog": ["紫虛上人：「貧道每日例行修行，正缺紫色香草。你供我五株，我送你一張藏寶圖。」"], "hint": "收集紫色香草×5"},
-    {"type": "collect", "item": {"id": 25097, "n": 5}, "hint": "紫色香草 %v/%n"},
-    {"type": "talk", "npc": "zixu", "dialog": ["紫虛上人：「善哉。呢張藏寶圖你收好，他日必有大用。」"], "hint": "向紫虛上人覆命", "done": true}
+    {
+     "type": "talk",
+     "npc": "zixu",
+     "dialog": [
+      "紫虛上人：「貧道每日例行修行，正缺紫色香草。你供我五株，我送你一張藏寶圖。」"
+     ],
+     "hint": "收集紫色香草×5"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 25097,
+      "n": 5
+     },
+     "hint": "紫色香草 %v/%n"
+    },
+    {
+     "type": "talk",
+     "npc": "zixu",
+     "dialog": [
+      "紫虛上人：「善哉。呢張藏寶圖你收好，他日必有大用。」"
+     ],
+     "hint": "向紫虛上人覆命",
+     "done": true
+    }
    ],
-   "reward": {"gold": 100, "items": [[61319, 1]]}
+   "reward": {
+    "gold": 100,
+    "items": [
+     [
+      61319,
+      1
+     ]
+    ]
+   }
   },
   {
    "id": "group_court_harm",
@@ -1520,14 +1722,41 @@
    "type": "group",
    "repeat": "monthly",
    "giver": "court_harm",
-   "pre": {"militia": true},
+   "pre": {
+    "militia": true
+   },
    "preHint": "要所屬義勇軍先接得；去許昌城搵朝廷除害官",
    "stages": [
-    {"type": "talk", "npc": "court_harm", "dialog": ["朝廷除害官：「食人惡虎喺荊州地界傷人，朝廷懸賞除害，義勇軍接唔接？」"], "hint": "去荊州地界搵食人惡虎"},
-    {"type": "fight", "npc": "man_eating_tiger", "monster": 1094, "dialog": ["食人惡虎咆哮，直撲過嚟！"], "hint": "同食人惡虎 PK"},
-    {"type": "talk", "npc": "court_harm", "dialog": ["朝廷除害官：「惡虎已除，朝廷賞金即刻發放！」"], "hint": "返許昌覆命", "done": true}
+    {
+     "type": "talk",
+     "npc": "court_harm",
+     "dialog": [
+      "朝廷除害官：「食人惡虎喺荊州地界傷人，朝廷懸賞除害，義勇軍接唔接？」"
+     ],
+     "hint": "去荊州地界搵食人惡虎"
+    },
+    {
+     "type": "fight",
+     "npc": "man_eating_tiger",
+     "monster": 1094,
+     "dialog": [
+      "食人惡虎咆哮，直撲過嚟！"
+     ],
+     "hint": "同食人惡虎 PK"
+    },
+    {
+     "type": "talk",
+     "npc": "court_harm",
+     "dialog": [
+      "朝廷除害官：「惡虎已除，朝廷賞金即刻發放！」"
+     ],
+     "hint": "返許昌覆命",
+     "done": true
+    }
    ],
-   "reward": {"gold": 1000}
+   "reward": {
+    "gold": 1000
+   }
   },
   {
    "id": "group_court_rat",
@@ -1535,14 +1764,40 @@
    "type": "group",
    "repeat": "monthly",
    "giver": "court_rat",
-   "pre": {"militia": true},
+   "pre": {
+    "militia": true
+   },
    "preHint": "要所屬義勇軍先接得；去許昌城搵朝廷滅鼠官",
    "stages": [
-    {"type": "talk", "npc": "court_rat", "dialog": ["朝廷滅鼠官：「鼠害頻傳、農作物欠收！義勇軍去潁川郊外打田鼠，攞 30 塊田鼠碎骨返嚟為證！」"], "hint": "打田鼠收集田鼠碎骨"},
-    {"type": "collect", "item": {"id": 61501, "n": 30}, "hint": "田鼠碎骨 %v/%n"},
-    {"type": "talk", "npc": "court_rat", "dialog": ["朝廷滅鼠官：「好！鼠患平定，賞金奉上！」"], "hint": "返許昌覆命", "done": true}
+    {
+     "type": "talk",
+     "npc": "court_rat",
+     "dialog": [
+      "朝廷滅鼠官：「鼠害頻傳、農作物欠收！義勇軍去潁川郊外打田鼠，攞 30 塊田鼠碎骨返嚟為證！」"
+     ],
+     "hint": "打田鼠收集田鼠碎骨"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 61501,
+      "n": 30
+     },
+     "hint": "田鼠碎骨 %v/%n"
+    },
+    {
+     "type": "talk",
+     "npc": "court_rat",
+     "dialog": [
+      "朝廷滅鼠官：「好！鼠患平定，賞金奉上！」"
+     ],
+     "hint": "返許昌覆命",
+     "done": true
+    }
    ],
-   "reward": {"gold": 400}
+   "reward": {
+    "gold": 400
+   }
   },
   {
    "id": "group_court_thief",
@@ -1550,14 +1805,41 @@
    "type": "group",
    "repeat": "monthly",
    "giver": "court_thief",
-   "pre": {"militia": true},
+   "pre": {
+    "militia": true
+   },
    "preHint": "要所屬義勇軍先接得；去許昌城搵朝廷滅賊官",
    "stages": [
-    {"type": "talk", "npc": "court_thief", "dialog": ["朝廷滅賊官：「何進引董卓入京，賊寇四起！義勇軍去陳留郊外剿滅賊寇，朝廷重重有賞！」"], "hint": "去陳留郊外搵賊寇"},
-    {"type": "fight", "npc": "thief", "monster": 1095, "dialog": ["賊寇頭目獰笑：「就憑你？」"], "hint": "同賊寇 PK"},
-    {"type": "talk", "npc": "court_thief", "dialog": ["朝廷滅賊官：「賊患已平，賞金奉上！」"], "hint": "返許昌覆命", "done": true}
+    {
+     "type": "talk",
+     "npc": "court_thief",
+     "dialog": [
+      "朝廷滅賊官：「何進引董卓入京，賊寇四起！義勇軍去陳留郊外剿滅賊寇，朝廷重重有賞！」"
+     ],
+     "hint": "去陳留郊外搵賊寇"
+    },
+    {
+     "type": "fight",
+     "npc": "thief",
+     "monster": 1095,
+     "dialog": [
+      "賊寇頭目獰笑：「就憑你？」"
+     ],
+     "hint": "同賊寇 PK"
+    },
+    {
+     "type": "talk",
+     "npc": "court_thief",
+     "dialog": [
+      "朝廷滅賊官：「賊患已平，賞金奉上！」"
+     ],
+     "hint": "返許昌覆命",
+     "done": true
+    }
    ],
-   "reward": {"gold": 1000}
+   "reward": {
+    "gold": 1000
+   }
   },
   {
    "id": "group_lin",
@@ -1565,13 +1847,45 @@
    "type": "group",
    "repeat": "monthly",
    "giver": "lin",
-   "pre": {"militia": true},
+   "pre": {
+    "militia": true
+   },
    "preHint": "要所屬義勇軍先接得；去許昌城搵林員外",
    "stages": [
-    {"type": "talk", "npc": "lin", "dialog": ["林員外：「犬子大婚，欠缺料理高手！義勇軍肯推薦廚藝高手，先答我：大型喜宴最緊要乜？」"], "hint": "答林員外嘅問題"},
-    {"type": "ask", "npc": "lin", "dialog": ["林員外：「大型喜宴最緊要係乜？」"], "options": ["材料新鮮", "份量夠多兼快", "擺盤華麗"], "answer": 1, "hint": "答啱林員外嘅問題", "done": true}
+    {
+     "type": "talk",
+     "npc": "lin",
+     "dialog": [
+      "林員外：「犬子大婚，欠缺料理高手！義勇軍肯推薦廚藝高手，先答我：大型喜宴最緊要乜？」"
+     ],
+     "hint": "答林員外嘅問題"
+    },
+    {
+     "type": "ask",
+     "npc": "lin",
+     "dialog": [
+      "林員外：「大型喜宴最緊要係乜？」"
+     ],
+     "options": [
+      "材料新鮮",
+      "份量夠多兼快",
+      "擺盤華麗"
+     ],
+     "answer": 1,
+     "hint": "答啱林員外嘅問題",
+     "done": true,
+     "response": [
+      "林員外：「正是！喜宴賓客多，份量夠又夠快先壓得住場。」"
+     ],
+     "wrong": [
+      "林員外：「唔係——大型喜宴最緊要係份量夠多兼夠快，賓客先食得夠。」"
+     ]
+    }
    ],
-   "reward": {"gold": 800, "fame": 20}
+   "reward": {
+    "gold": 800,
+    "fame": 20
+   }
   },
   {
    "id": "group_thief_camp",
@@ -1579,14 +1893,42 @@
    "type": "group",
    "repeat": "monthly",
    "giver": "yongbo",
-   "pre": {"militia": true},
+   "pre": {
+    "militia": true
+   },
    "preHint": "要所屬義勇軍先接得；去汝南道搵勇伯",
    "stages": [
-    {"type": "talk", "npc": "yongbo", "dialog": ["勇伯：「山洞畀山大王霸咗，禍害鄉民！壯士肯去說服佢收山嗎？」"], "hint": "去于毒山寨搵山大王"},
-    {"type": "fight", "npc": "bandit_king", "monster": 1096, "dialog": ["山大王：「收山？先打低我！」"], "hint": "同山大王 PK"},
-    {"type": "talk", "npc": "yongbo", "dialog": ["勇伯：「山大王肯收山，鄉民有救喇！多謝壯士！」"], "hint": "返汝南道覆命", "done": true}
+    {
+     "type": "talk",
+     "npc": "yongbo",
+     "dialog": [
+      "勇伯：「山洞畀山大王霸咗，禍害鄉民！壯士肯去說服佢收山嗎？」"
+     ],
+     "hint": "去于毒山寨搵山大王"
+    },
+    {
+     "type": "fight",
+     "npc": "bandit_king",
+     "monster": 1096,
+     "dialog": [
+      "山大王：「收山？先打低我！」"
+     ],
+     "hint": "同山大王 PK"
+    },
+    {
+     "type": "talk",
+     "npc": "yongbo",
+     "dialog": [
+      "勇伯：「山大王肯收山，鄉民有救喇！多謝壯士！」"
+     ],
+     "hint": "返汝南道覆命",
+     "done": true
+    }
    ],
-   "reward": {"gold": 700, "fame": 20}
+   "reward": {
+    "gold": 700,
+    "fame": 20
+   }
   },
   {
    "id": "group_ghost",
@@ -1594,14 +1936,47 @@
    "type": "group",
    "repeat": "monthly",
    "giver": "shenjing_lao",
-   "pre": {"militia": true},
+   "pre": {
+    "militia": true
+   },
    "preHint": "要所屬義勇軍先接得；許昌寺廟附近搵神經老人（每月 16~21 日先現身）",
    "stages": [
-    {"type": "talk", "npc": "shenjing_lao", "dialog": ["神經老人：「鬼域喺汝南洞窟三層……巨魎守住豐富礦藏，有膽就去！」"], "hint": "去汝南洞窟三層搵鬼域巨魎"},
-    {"type": "fight", "npc": "ghost_guard", "monster": 1098, "dialog": ["鬼域巨魎陰氣逼人，瞪住你！"], "hint": "同鬼域巨魎 PK"},
-    {"type": "talk", "npc": "shenjing_lao", "dialog": ["神經老人：「礦藏歸你，老朽只要巨魎不得為害。」"], "hint": "返許昌覆命", "done": true}
+    {
+     "type": "talk",
+     "npc": "shenjing_lao",
+     "dialog": [
+      "神經老人：「鬼域喺汝南洞窟三層……巨魎守住豐富礦藏，有膽就去！」"
+     ],
+     "hint": "去汝南洞窟三層搵鬼域巨魎"
+    },
+    {
+     "type": "fight",
+     "npc": "ghost_guard",
+     "monster": 1098,
+     "dialog": [
+      "鬼域巨魎陰氣逼人，瞪住你！"
+     ],
+     "hint": "同鬼域巨魎 PK"
+    },
+    {
+     "type": "talk",
+     "npc": "shenjing_lao",
+     "dialog": [
+      "神經老人：「礦藏歸你，老朽只要巨魎不得為害。」"
+     ],
+     "hint": "返許昌覆命",
+     "done": true
+    }
    ],
-   "reward": {"gold": 900, "items": [[25002, 20]]}
+   "reward": {
+    "gold": 900,
+    "items": [
+     [
+      25002,
+      20
+     ]
+    ]
+   }
   },
   {
    "id": "group_yanshan",
@@ -1609,14 +1984,46 @@
    "type": "group",
    "repeat": "monthly",
    "giver": "yanshan",
-   "pre": {"militia": true},
+   "pre": {
+    "militia": true
+   },
    "preHint": "要所屬義勇軍先接得；去荊州地界搵岩山樵夫",
    "stages": [
-    {"type": "talk", "npc": "yanshan", "dialog": ["岩山樵夫：「岩山瘴林多木料，義勇軍缺資源？我二十根木頭換你情報。」"], "hint": "收集木頭×20"},
-    {"type": "collect", "item": {"id": 25053, "n": 20}, "hint": "木頭 %v/%n"},
-    {"type": "talk", "npc": "yanshan", "dialog": ["岩山樵夫：「多謝！呢啲金礦石回報你。」"], "hint": "覆命", "done": true}
+    {
+     "type": "talk",
+     "npc": "yanshan",
+     "dialog": [
+      "岩山樵夫：「岩山瘴林多木料，義勇軍缺資源？我二十根木頭換你情報。」"
+     ],
+     "hint": "收集木頭×20"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 25053,
+      "n": 20
+     },
+     "hint": "木頭 %v/%n"
+    },
+    {
+     "type": "talk",
+     "npc": "yanshan",
+     "dialog": [
+      "岩山樵夫：「多謝！呢啲金礦石回報你。」"
+     ],
+     "hint": "覆命",
+     "done": true
+    }
    ],
-   "reward": {"gold": 500, "items": [[25005, 5]]}
+   "reward": {
+    "gold": 500,
+    "items": [
+     [
+      25005,
+      5
+     ]
+    ]
+   }
   },
   {
    "id": "group_recruit_soldier",
@@ -1624,13 +2031,33 @@
    "type": "group",
    "repeat": "monthly",
    "giver": "recruit_officer",
-   "pre": {"militia": true},
+   "pre": {
+    "militia": true
+   },
    "preHint": "要所屬義勇軍先接得；去許昌城搵徵兵官",
    "stages": [
-    {"type": "talk", "npc": "recruit_officer", "dialog": ["徵兵官：「戰事頻繁，兵源短缺！憑義勇軍名號，幫我號召熱血勇士入伍！」"], "hint": "號召勇士入伍"},
-    {"type": "talk", "npc": "recruit_officer", "dialog": ["徵兵官：「好！有你號召，招募到一批熱血勇士！」"], "hint": "覆命", "done": true}
+    {
+     "type": "talk",
+     "npc": "recruit_officer",
+     "dialog": [
+      "徵兵官：「戰事頻繁，兵源短缺！憑義勇軍名號，幫我號召熱血勇士入伍！」"
+     ],
+     "hint": "號召勇士入伍"
+    },
+    {
+     "type": "talk",
+     "npc": "recruit_officer",
+     "dialog": [
+      "徵兵官：「好！有你號召，招募到一批熱血勇士！」"
+     ],
+     "hint": "覆命",
+     "done": true
+    }
    ],
-   "reward": {"gold": 300, "fame": 10}
+   "reward": {
+    "gold": 300,
+    "fame": 10
+   }
   },
   {
    "id": "group_maze",
@@ -1638,14 +2065,47 @@
    "type": "group",
    "repeat": "monthly",
    "giver": "luopo_lao",
-   "pre": {"militia": true},
+   "pre": {
+    "militia": true
+   },
    "preHint": "要所屬義勇軍先接得；許昌客棧內搵落魄老人（每月 10~15 日先現身）",
    "stages": [
-    {"type": "talk", "npc": "luopo_lao", "dialog": ["落魄老人：「荊州有前朝寶藏，藏喺汝南洞窟三層，有守衛鎮守……你去試下。」"], "hint": "去汝南洞窟三層搵寶藏守衛"},
-    {"type": "fight", "npc": "treasure_guard", "monster": 1099, "dialog": ["前朝寶藏守衛：「寶藏豈是爾等可染指？」"], "hint": "同寶藏守衛 PK"},
-    {"type": "talk", "npc": "luopo_lao", "dialog": ["落魄老人：「尋得寶藏，總算冇埋沒前朝……」"], "hint": "返許昌覆命", "done": true}
+    {
+     "type": "talk",
+     "npc": "luopo_lao",
+     "dialog": [
+      "落魄老人：「荊州有前朝寶藏，藏喺汝南洞窟三層，有守衛鎮守……你去試下。」"
+     ],
+     "hint": "去汝南洞窟三層搵寶藏守衛"
+    },
+    {
+     "type": "fight",
+     "npc": "treasure_guard",
+     "monster": 1099,
+     "dialog": [
+      "前朝寶藏守衛：「寶藏豈是爾等可染指？」"
+     ],
+     "hint": "同寶藏守衛 PK"
+    },
+    {
+     "type": "talk",
+     "npc": "luopo_lao",
+     "dialog": [
+      "落魄老人：「尋得寶藏，總算冇埋沒前朝……」"
+     ],
+     "hint": "返許昌覆命",
+     "done": true
+    }
    ],
-   "reward": {"gold": 900, "items": [[61319, 1]]}
+   "reward": {
+    "gold": 900,
+    "items": [
+     [
+      61319,
+      1
+     ]
+    ]
+   }
   },
   {
    "id": "group_evil_head",
@@ -1653,15 +2113,50 @@
    "type": "group",
    "repeat": "monthly",
    "giver": "liu_lao",
-   "pre": {"militia": true},
+   "pre": {
+    "militia": true
+   },
    "preHint": "要所屬義勇軍先接得；去許昌城搵劉老",
    "stages": [
-    {"type": "talk", "npc": "liu_lao", "dialog": ["劉老：「有惡頭濫用邪術害人！洛陽抱馬窄知道佢嘅巢穴，先去問佢。」"], "hint": "去洛陽搵抱馬窄"},
-    {"type": "talk", "npc": "baoma_zhai", "dialog": ["抱馬窄：「惡頭喺洛陽城外藏身……你行近搵佢，小心邪術！」"], "hint": "去洛陽城外搵惡頭"},
-    {"type": "fight", "npc": "evil_head", "monster": 1097, "dialog": ["惡頭獰笑：「敢壞我好事？受死！」"], "hint": "同惡頭 PK"},
-    {"type": "talk", "npc": "liu_lao", "dialog": ["劉老：「惡頭伏法，大快人心！多謝義勇軍！」"], "hint": "返許昌覆命", "done": true}
+    {
+     "type": "talk",
+     "npc": "liu_lao",
+     "dialog": [
+      "劉老：「有惡頭濫用邪術害人！洛陽抱馬窄知道佢嘅巢穴，先去問佢。」"
+     ],
+     "hint": "去洛陽搵抱馬窄"
+    },
+    {
+     "type": "talk",
+     "npc": "baoma_zhai",
+     "dialog": [
+      "抱馬窄：「惡頭喺洛陽城外藏身……你行近搵佢，小心邪術！」"
+     ],
+     "hint": "去洛陽城外搵惡頭"
+    },
+    {
+     "type": "fight",
+     "npc": "evil_head",
+     "monster": 1097,
+     "dialog": [
+      "惡頭獰笑：「敢壞我好事？受死！」"
+     ],
+     "hint": "同惡頭 PK"
+    },
+    {
+     "type": "talk",
+     "npc": "liu_lao",
+     "dialog": [
+      "劉老：「惡頭伏法，大快人心！多謝義勇軍！」"
+     ],
+     "hint": "返許昌覆命",
+     "done": true
+    }
    ],
-   "reward": {"gold": 1000, "fame": 30}
+   "reward": {
+    "gold": 1000,
+    "fame": 30
+   }
   },
   {
    "id": "group_imperial_tool",
@@ -1669,14 +2164,45 @@
    "type": "group",
    "repeat": "monthly",
    "giver": "court_official_tool",
-   "pre": {"militia": true},
+   "pre": {
+    "militia": true
+   },
    "preHint": "要所屬義勇軍先接得；去許昌練兵場搵朝廷官吏",
    "stages": [
-    {"type": "talk", "npc": "court_official_tool", "dialog": ["朝廷官吏：「義勇軍朝廷有賞——繳交十件雕刻木，換一件御賜鋤頭！」"], "hint": "收集雕刻木×10"},
-    {"type": "collect", "item": {"id": 25105, "n": 10}, "hint": "雕刻木 %v/%n"},
-    {"type": "talk", "npc": "court_official_tool", "dialog": ["朝廷官吏：「好，御賜鋤頭歸你！」"], "hint": "覆命", "done": true}
+    {
+     "type": "talk",
+     "npc": "court_official_tool",
+     "dialog": [
+      "朝廷官吏：「義勇軍朝廷有賞——繳交十件雕刻木，換一件御賜鋤頭！」"
+     ],
+     "hint": "收集雕刻木×10"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 25105,
+      "n": 10
+     },
+     "hint": "雕刻木 %v/%n"
+    },
+    {
+     "type": "talk",
+     "npc": "court_official_tool",
+     "dialog": [
+      "朝廷官吏：「好，御賜鋤頭歸你！」"
+     ],
+     "hint": "覆命",
+     "done": true
+    }
    ],
-   "reward": {"items": [[26053, 1]]}
+   "reward": {
+    "items": [
+     [
+      26053,
+      1
+     ]
+    ]
+   }
   },
   {
    "id": "group_craftsman",
@@ -1684,342 +2210,1525 @@
    "type": "group",
    "repeat": "monthly",
    "giver": "craft_boss",
-   "pre": {"militia": true},
+   "pre": {
+    "militia": true
+   },
    "preHint": "要所屬義勇軍先接得；去陳留搵工匠工頭",
    "stages": [
-    {"type": "talk", "npc": "craft_boss", "dialog": ["工匠工頭：「急住升級營地，欠雕刻器具！送十件雕刻木嚟，我用木材回報！」"], "hint": "收集雕刻木×10"},
-    {"type": "collect", "item": {"id": 25105, "n": 10}, "hint": "雕刻木 %v/%n"},
-    {"type": "talk", "npc": "craft_boss", "dialog": ["工匠工頭：「多謝！呢堆木材你拎去用。」"], "hint": "覆命", "done": true}
+    {
+     "type": "talk",
+     "npc": "craft_boss",
+     "dialog": [
+      "工匠工頭：「急住升級營地，欠雕刻器具！送十件雕刻木嚟，我用木材回報！」"
+     ],
+     "hint": "收集雕刻木×10"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 25105,
+      "n": 10
+     },
+     "hint": "雕刻木 %v/%n"
+    },
+    {
+     "type": "talk",
+     "npc": "craft_boss",
+     "dialog": [
+      "工匠工頭：「多謝！呢堆木材你拎去用。」"
+     ],
+     "hint": "覆命",
+     "done": true
+    }
    ],
-   "reward": {"gold": 300, "items": [[25053, 20]]}
+   "reward": {
+    "gold": 300,
+    "items": [
+     [
+      25053,
+      20
+     ]
+    ]
+   }
   },
   {
    "id": "ult_shinu_huxiao",
    "name": "虎嘯龍吟（絕招一）",
    "type": "ultimate",
    "giver": "shinu_master",
-   "pre": {"classId": "shinu", "minLevel": 20},
+   "pre": {
+    "classId": "shinu",
+    "minLevel": 20
+   },
    "preHint": "仕女 20 級以上，去許昌城西街搵黃師姐（限環類武器）",
    "stages": [
-    {"type": "ask", "npc": "shinu_master", "dialog": ["黃師姐：「洛陽城南有極惡盜賊擾民。先答我：除害最緊要係咩？」"], "options": ["亂咁衝，殺咗先算", "問清楚情報，知己知彼", "等官府自己搞"], "answer": 1, "getItem": {"id": 58009, "n": 1}, "hint": "答啱黃師姐嘅問題（得殲盜密函）"},
-    {"type": "collect", "item": {"id": 58012, "n": 20}, "hint": "去郊外打極惡盜賊，收集極惡令 %v/%n", "done": true}
+    {
+     "type": "ask",
+     "npc": "shinu_master",
+     "dialog": [
+      "黃師姐：「洛陽城南有極惡盜賊擾民。先答我：除害最緊要係咩？」"
+     ],
+     "options": [
+      "亂咁衝，殺咗先算",
+      "問清楚情報，知己知彼",
+      "等官府自己搞"
+     ],
+     "answer": 1,
+     "getItem": {
+      "id": 58009,
+      "n": 1
+     },
+     "hint": "答啱黃師姐嘅問題（得殲盜密函）",
+     "response": [
+      "黃師姐：「正是，知己知彼，先剿得乾淨。」"
+     ],
+     "wrong": [
+      "黃師姐：「錯——除害至緊要問清楚情報，知己知彼。」"
+     ]
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 58012,
+      "n": 20
+     },
+     "hint": "去郊外打極惡盜賊，收集極惡令 %v/%n",
+     "done": true
+    }
    ],
-   "reward": {"exp": 1500, "gold": 300, "items": [[11042, 1]], "ultimate": "huxiao"}
+   "reward": {
+    "exp": 1500,
+    "gold": 300,
+    "items": [
+     [
+      11042,
+      1
+     ]
+    ],
+    "ultimate": "huxiao"
+   }
   },
   {
    "id": "ult_shinu_jinhu",
    "name": "金環裂地（絕招二）",
    "type": "ultimate",
    "giver": "shinu_master",
-   "pre": {"classId": "shinu", "minLevel": 33, "questDone": ["ult_shinu_huxiao"]},
+   "pre": {
+    "classId": "shinu",
+    "minLevel": 33,
+    "questDone": [
+     "ult_shinu_huxiao"
+    ]
+   },
    "preHint": "已學虎嘯龍吟 + 33 級以上，再搵黃師姐",
    "stages": [
-    {"type": "talk", "npc": "shinu_master", "dialog": ["黃師姐：「濮陽有屍怪作亂，拎住除屍令去洞窟八層，敲透光石柱引骷髏王出嚟。」"], "getItem": {"id": 58020, "n": 1}, "hint": "除屍令到手，去汝南洞窟八層"},
-    {"type": "fight", "npc": "sjs_zhu", "monster": 1100, "dialog": ["透光石柱發出一閃銀光，密室應聲而開——骷髏王殺出！"], "getItem": {"id": 58021, "n": 1}, "hint": "打敗骷髏王，得亮橙水晶"},
-    {"type": "talk", "npc": "shinu_master", "dialog": ["黃師姐：「水晶到手，金環奧武訣歸你！」"], "getItem": {"id": 58024, "n": 1}, "hint": "返去搵黃師姐覆命", "done": true}
+    {
+     "type": "talk",
+     "npc": "shinu_master",
+     "dialog": [
+      "黃師姐：「濮陽有屍怪作亂，拎住除屍令去洞窟八層，敲透光石柱引骷髏王出嚟。」"
+     ],
+     "getItem": {
+      "id": 58020,
+      "n": 1
+     },
+     "hint": "除屍令到手，去汝南洞窟八層"
+    },
+    {
+     "type": "fight",
+     "npc": "sjs_zhu",
+     "monster": 1100,
+     "dialog": [
+      "透光石柱發出一閃銀光，密室應聲而開——骷髏王殺出！"
+     ],
+     "getItem": {
+      "id": 58021,
+      "n": 1
+     },
+     "hint": "打敗骷髏王，得亮橙水晶"
+    },
+    {
+     "type": "talk",
+     "npc": "shinu_master",
+     "dialog": [
+      "黃師姐：「水晶到手，金環奧武訣歸你！」"
+     ],
+     "getItem": {
+      "id": 58024,
+      "n": 1
+     },
+     "hint": "返去搵黃師姐覆命",
+     "done": true
+    }
    ],
-   "reward": {"exp": 3500, "gold": 800, "ultimate": "jinhu"}
+   "reward": {
+    "exp": 3500,
+    "gold": 800,
+    "ultimate": "jinhu"
+   }
   },
   {
    "id": "ult_shinu_jinghua",
    "name": "鏡花水月（絕招三）",
    "type": "ultimate",
    "giver": "shinu_master",
-   "pre": {"classId": "shinu", "minLevel": 43, "questDone": ["ult_shinu_jinhu"]},
+   "pre": {
+    "classId": "shinu",
+    "minLevel": 43,
+    "questDone": [
+     "ult_shinu_jinhu"
+    ]
+   },
    "preHint": "已學金環裂地 + 43 級以上，再搵黃師姐",
    "stages": [
-    {"type": "talk", "npc": "shinu_master", "dialog": ["黃師姐：「呂布要為赤兔馬打造馬甲，急求千年礦石。幫佢收集，佢自會教你絕招。」"], "getItem": {"id": 58039, "n": 1}, "hint": "呂布求礦書到手"},
-    {"type": "collect", "item": {"id": 25120, "n": 50}, "hint": "千年石礦 %v/%n"},
-    {"type": "collect", "item": {"id": 25121, "n": 40}, "hint": "千年鐵礦 %v/%n"},
-    {"type": "collect", "item": {"id": 25122, "n": 30}, "hint": "千年銅礦 %v/%n"},
-    {"type": "collect", "item": {"id": 25123, "n": 20}, "hint": "千年銀礦 %v/%n"},
-    {"type": "collect", "item": {"id": 25124, "n": 10}, "hint": "千年金礦 %v/%n", "done": true}
+    {
+     "type": "talk",
+     "npc": "shinu_master",
+     "dialog": [
+      "黃師姐：「呂布要為赤兔馬打造馬甲，急求千年礦石。幫佢收集，佢自會教你絕招。」"
+     ],
+     "getItem": {
+      "id": 58039,
+      "n": 1
+     },
+     "hint": "呂布求礦書到手"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 25120,
+      "n": 50
+     },
+     "hint": "千年石礦 %v/%n"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 25121,
+      "n": 40
+     },
+     "hint": "千年鐵礦 %v/%n"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 25122,
+      "n": 30
+     },
+     "hint": "千年銅礦 %v/%n"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 25123,
+      "n": 20
+     },
+     "hint": "千年銀礦 %v/%n"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 25124,
+      "n": 10
+     },
+     "hint": "千年金礦 %v/%n",
+     "done": true
+    }
    ],
-   "reward": {"exp": 8000, "gold": 2000, "ultimate": "jinghua"}
+   "reward": {
+    "exp": 8000,
+    "gold": 2000,
+    "ultimate": "jinghua"
+   }
   },
   {
    "id": "ult_daoshi_xuwu",
    "name": "虛無飄渺（絕招一）",
    "type": "ultimate",
    "giver": "daoshi_master",
-   "pre": {"classId": "daoshi", "minLevel": 20},
+   "pre": {
+    "classId": "daoshi",
+    "minLevel": 20
+   },
    "preHint": "道士 20 級以上，去許昌城南角搵玄真道人（限符咒類武器）",
    "stages": [
-    {"type": "talk", "npc": "daoshi_master", "dialog": ["玄真道人：「譙城文成採礦缺人手，幫佢湊 150 個鐵礦石，我引薦你去見道雲道長。」"], "getItem": {"id": 58003, "n": 1}, "hint": "協助採礦書到手，去收集鐵礦石"},
-    {"type": "collect", "item": {"id": 25002, "n": 150}, "hint": "鐵礦石 %v/%n", "done": true}
+    {
+     "type": "talk",
+     "npc": "daoshi_master",
+     "dialog": [
+      "玄真道人：「譙城文成採礦缺人手，幫佢湊 150 個鐵礦石，我引薦你去見道雲道長。」"
+     ],
+     "getItem": {
+      "id": 58003,
+      "n": 1
+     },
+     "hint": "協助採礦書到手，去收集鐵礦石"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 25002,
+      "n": 150
+     },
+     "hint": "鐵礦石 %v/%n",
+     "done": true
+    }
    ],
-   "reward": {"exp": 1500, "gold": 300, "items": [[14038, 1]], "ultimate": "xuwu"}
+   "reward": {
+    "exp": 1500,
+    "gold": 300,
+    "items": [
+     [
+      14038,
+      1
+     ]
+    ],
+    "ultimate": "xuwu"
+   }
   },
   {
    "id": "ult_daoshi_ruhuan",
    "name": "如幻似真（絕招二）",
    "type": "ultimate",
    "giver": "daoshi_master",
-   "pre": {"classId": "daoshi", "minLevel": 30, "questDone": ["ult_daoshi_xuwu"]},
+   "pre": {
+    "classId": "daoshi",
+    "minLevel": 30,
+    "questDone": [
+     "ult_daoshi_xuwu"
+    ]
+   },
    "preHint": "已學虛無飄渺 + 30 級以上，再搵玄真道人",
    "stages": [
-    {"type": "talk", "npc": "daoshi_master", "dialog": ["玄真道人：「文成託你送信去晉陽畀兄長文義，佢要 30 個咆哮結晶先肯傳虛極情報書。」"], "getItem": {"id": 58013, "n": 1}, "hint": "文成親筆信到手，去收集咆哮結晶"},
-    {"type": "collect", "item": {"id": 25009, "n": 30}, "hint": "咆哮結晶 %v/%n", "done": true}
+    {
+     "type": "talk",
+     "npc": "daoshi_master",
+     "dialog": [
+      "玄真道人：「文成託你送信去晉陽畀兄長文義，佢要 30 個咆哮結晶先肯傳虛極情報書。」"
+     ],
+     "getItem": {
+      "id": 58013,
+      "n": 1
+     },
+     "hint": "文成親筆信到手，去收集咆哮結晶"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 25009,
+      "n": 30
+     },
+     "hint": "咆哮結晶 %v/%n",
+     "done": true
+    }
    ],
-   "reward": {"exp": 3500, "gold": 800, "ultimate": "ruhuan"}
+   "reward": {
+    "exp": 3500,
+    "gold": 800,
+    "ultimate": "ruhuan"
+   }
   },
   {
    "id": "ult_daoshi_shenyou",
    "name": "神遊太虛（絕招三）",
    "type": "ultimate",
    "giver": "daoshi_master",
-   "pre": {"classId": "daoshi", "minLevel": 45, "questDone": ["ult_daoshi_ruhuan"]},
+   "pre": {
+    "classId": "daoshi",
+    "minLevel": 45,
+    "questDone": [
+     "ult_daoshi_ruhuan"
+    ]
+   },
    "preHint": "已學如幻似真 + 45 級以上，再搵玄真道人",
    "stages": [
-    {"type": "talk", "npc": "daoshi_master", "dialog": ["玄真道人：「桂陽城外東方有怪人張得施邪法，去擊敗佢，攞術文全書返嚟。」"], "getItem": {"id": 58040, "n": 1}, "hint": "怪人情報書到手"},
-    {"type": "fight", "npc": "zhangde", "monster": 1101, "dialog": ["怪人張得：「邊個敢壞我法事！」"], "getItem": {"id": 58041, "n": 1}, "hint": "打敗張得，得術文全書"},
-    {"type": "talk", "npc": "daoshi_master", "dialog": ["玄真道人：「好，月藍先生收你為徒，神遊殘卷歸你！」"], "getItem": {"id": 58042, "n": 1}, "hint": "返去搵玄真道人覆命", "done": true}
+    {
+     "type": "talk",
+     "npc": "daoshi_master",
+     "dialog": [
+      "玄真道人：「桂陽城外東方有怪人張得施邪法，去擊敗佢，攞術文全書返嚟。」"
+     ],
+     "getItem": {
+      "id": 58040,
+      "n": 1
+     },
+     "hint": "怪人情報書到手"
+    },
+    {
+     "type": "fight",
+     "npc": "zhangde",
+     "monster": 1101,
+     "dialog": [
+      "怪人張得：「邊個敢壞我法事！」"
+     ],
+     "getItem": {
+      "id": 58041,
+      "n": 1
+     },
+     "hint": "打敗張得，得術文全書"
+    },
+    {
+     "type": "talk",
+     "npc": "daoshi_master",
+     "dialog": [
+      "玄真道人：「好，月藍先生收你為徒，神遊殘卷歸你！」"
+     ],
+     "getItem": {
+      "id": 58042,
+      "n": 1
+     },
+     "hint": "返去搵玄真道人覆命",
+     "done": true
+    }
    ],
-   "reward": {"exp": 8000, "gold": 2000, "items": [[28003, 20]], "ultimate": "shenyou"}
+   "reward": {
+    "exp": 8000,
+    "gold": 2000,
+    "items": [
+     [
+      28003,
+      20
+     ]
+    ],
+    "ultimate": "shenyou"
+   }
   },
   {
    "id": "ult_wunu_candeng",
    "name": "殘燈映紅（絕招一）",
    "type": "ultimate",
    "giver": "wunu_master",
-   "pre": {"classId": "wunu", "minLevel": 20},
+   "pre": {
+    "classId": "wunu",
+    "minLevel": 20
+   },
    "preHint": "巫女 20 級以上，去許昌城廣場搵巫姬婆（限卷軸類武器）",
    "stages": [
-    {"type": "talk", "npc": "wunu_master", "dialog": ["巫姬婆：「汝南洞窟十層有妖人紫臣，先睇妖人情報，再照佢吩咐收集材料。」"], "getItem": {"id": 58001, "n": 1}, "hint": "妖人情報到手"},
-    {"type": "collect", "item": {"id": 25100, "n": 20}, "hint": "細毛兔皮 %v/%n"},
-    {"type": "collect", "item": {"id": 25102, "n": 10}, "hint": "昆蟲藥粉 %v/%n"},
-    {"type": "collect", "item": {"id": 25098, "n": 10}, "hint": "芳香軟石 %v/%n", "done": true}
+    {
+     "type": "talk",
+     "npc": "wunu_master",
+     "dialog": [
+      "巫姬婆：「汝南洞窟十層有妖人紫臣，先睇妖人情報，再照佢吩咐收集材料。」"
+     ],
+     "getItem": {
+      "id": 58001,
+      "n": 1
+     },
+     "hint": "妖人情報到手"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 25100,
+      "n": 20
+     },
+     "hint": "細毛兔皮 %v/%n"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 25102,
+      "n": 10
+     },
+     "hint": "昆蟲藥粉 %v/%n"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 25098,
+      "n": 10
+     },
+     "hint": "芳香軟石 %v/%n",
+     "done": true
+    }
    ],
-   "reward": {"exp": 1500, "gold": 300, "items": [[13038, 1]], "ultimate": "candeng"}
+   "reward": {
+    "exp": 1500,
+    "gold": 300,
+    "items": [
+     [
+      13038,
+      1
+     ]
+    ],
+    "ultimate": "candeng"
+   }
   },
   {
    "id": "ult_wunu_danchan",
    "name": "膽顫心驚（絕招二）",
    "type": "ultimate",
    "giver": "wunu_master",
-   "pre": {"classId": "wunu", "minLevel": 30, "questDone": ["ult_wunu_candeng"]},
+   "pre": {
+    "classId": "wunu",
+    "minLevel": 30,
+    "questDone": [
+     "ult_wunu_candeng"
+    ]
+   },
    "preHint": "已學殘燈映紅 + 30 級以上，再搵巫姬婆",
    "stages": [
-    {"type": "talk", "npc": "wunu_master", "dialog": ["巫姬婆：「紫臣捎信嚟，話晉陽洞窟有惡狼團，去收服頭目狼懿。」"], "getItem": {"id": 58034, "n": 1}, "hint": "紫臣親筆信到手"},
-    {"type": "fight", "npc": "wolfyi_head", "monster": 1102, "dialog": ["惡狼團頭目：「想搶我狼爪信物？先問過我對爪！」"], "getItem": {"id": 58037, "n": 1}, "hint": "打敗狼懿，得狼爪信物"},
-    {"type": "talk", "npc": "wunu_master", "dialog": ["巫姬婆：「狼爪到手，紫軒收你為徒！」"], "getItem": {"id": 58036, "n": 1}, "hint": "返去搵巫姬婆覆命", "done": true}
+    {
+     "type": "talk",
+     "npc": "wunu_master",
+     "dialog": [
+      "巫姬婆：「紫臣捎信嚟，話晉陽洞窟有惡狼團，去收服頭目狼懿。」"
+     ],
+     "getItem": {
+      "id": 58034,
+      "n": 1
+     },
+     "hint": "紫臣親筆信到手"
+    },
+    {
+     "type": "fight",
+     "npc": "wolfyi_head",
+     "monster": 1102,
+     "dialog": [
+      "惡狼團頭目：「想搶我狼爪信物？先問過我對爪！」"
+     ],
+     "getItem": {
+      "id": 58037,
+      "n": 1
+     },
+     "hint": "打敗狼懿，得狼爪信物"
+    },
+    {
+     "type": "talk",
+     "npc": "wunu_master",
+     "dialog": [
+      "巫姬婆：「狼爪到手，紫軒收你為徒！」"
+     ],
+     "getItem": {
+      "id": 58036,
+      "n": 1
+     },
+     "hint": "返去搵巫姬婆覆命",
+     "done": true
+    }
    ],
-   "reward": {"exp": 3500, "gold": 800, "ultimate": "danchan"}
+   "reward": {
+    "exp": 3500,
+    "gold": 800,
+    "ultimate": "danchan"
+   }
   },
   {
    "id": "ult_wunu_guiku",
    "name": "鬼哭神號（絕招三）",
    "type": "ultimate",
    "giver": "wunu_master",
-   "pre": {"classId": "wunu", "minLevel": 42, "questDone": ["ult_wunu_danchan"]},
+   "pre": {
+    "classId": "wunu",
+    "minLevel": 42,
+    "questDone": [
+     "ult_wunu_danchan"
+    ]
+   },
    "preHint": "已學膽顫心驚 + 42 級以上，再搵巫姬婆",
    "stages": [
-    {"type": "talk", "npc": "wunu_master", "dialog": ["巫姬婆：「長沙城外西邊有瘋婆子紅菁唸邪咒，去制止佢，攞咒法全書返嚟。」"], "getItem": {"id": 58040, "n": 1}, "hint": "怪人情報書到手"},
-    {"type": "fight", "npc": "hongjing", "monster": 1103, "dialog": ["怪人紅菁：「嘿嘿，聽我咒語嘅人冇一個醒得返！」"], "getItem": {"id": 58044, "n": 1}, "hint": "打敗紅菁，得咒法全書"},
-    {"type": "talk", "npc": "wunu_master", "dialog": ["巫姬婆：「好，月藍先生嘅鬼神卷歸你！」"], "getItem": {"id": 58042, "n": 1}, "hint": "返去搵巫姬婆覆命", "done": true}
+    {
+     "type": "talk",
+     "npc": "wunu_master",
+     "dialog": [
+      "巫姬婆：「長沙城外西邊有瘋婆子紅菁唸邪咒，去制止佢，攞咒法全書返嚟。」"
+     ],
+     "getItem": {
+      "id": 58040,
+      "n": 1
+     },
+     "hint": "怪人情報書到手"
+    },
+    {
+     "type": "fight",
+     "npc": "hongjing",
+     "monster": 1103,
+     "dialog": [
+      "怪人紅菁：「嘿嘿，聽我咒語嘅人冇一個醒得返！」"
+     ],
+     "getItem": {
+      "id": 58044,
+      "n": 1
+     },
+     "hint": "打敗紅菁，得咒法全書"
+    },
+    {
+     "type": "talk",
+     "npc": "wunu_master",
+     "dialog": [
+      "巫姬婆：「好，月藍先生嘅鬼神卷歸你！」"
+     ],
+     "getItem": {
+      "id": 58042,
+      "n": 1
+     },
+     "hint": "返去搵巫姬婆覆命",
+     "done": true
+    }
    ],
-   "reward": {"exp": 8000, "gold": 2000, "items": [[28003, 20]], "ultimate": "guiku"}
+   "reward": {
+    "exp": 8000,
+    "gold": 2000,
+    "items": [
+     [
+      28003,
+      20
+     ]
+    ],
+    "ultimate": "guiku"
+   }
   },
   {
    "id": "ult_bianshi_tiandao",
    "name": "天道循環（絕招一）",
    "type": "ultimate",
    "giver": "bianshi_master",
-   "pre": {"classId": "bianshi", "minLevel": 20},
+   "pre": {
+    "classId": "bianshi",
+    "minLevel": 20
+   },
    "preHint": "辯士 20 級以上，去許昌城十字街搵蔡師傅（限弩類武器）",
    "stages": [
-    {"type": "talk", "npc": "bianshi_master", "dialog": ["蔡師傅：「陳留黃大製弓師欠皮料，幫佢收集狐狸皮、貂皮同高級狼皮，佢送你天道神弩。」"], "hint": "接受獵皮委託"},
-    {"type": "collect", "item": {"id": 25109, "n": 30}, "hint": "狐貍皮 %v/%n"},
-    {"type": "collect", "item": {"id": 25108, "n": 20}, "hint": "貂皮 %v/%n"},
-    {"type": "collect", "item": {"id": 25107, "n": 10}, "hint": "高級狼皮 %v/%n", "done": true}
+    {
+     "type": "talk",
+     "npc": "bianshi_master",
+     "dialog": [
+      "蔡師傅：「陳留黃大製弓師欠皮料，幫佢收集狐狸皮、貂皮同高級狼皮，佢送你天道神弩。」"
+     ],
+     "hint": "接受獵皮委託"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 25109,
+      "n": 30
+     },
+     "hint": "狐貍皮 %v/%n"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 25108,
+      "n": 20
+     },
+     "hint": "貂皮 %v/%n"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 25107,
+      "n": 10
+     },
+     "hint": "高級狼皮 %v/%n",
+     "done": true
+    }
    ],
-   "reward": {"exp": 1500, "gold": 300, "items": [[12038, 1]], "ultimate": "tiandao"}
+   "reward": {
+    "exp": 1500,
+    "gold": 300,
+    "items": [
+     [
+      12038,
+      1
+     ]
+    ],
+    "ultimate": "tiandao"
+   }
   },
   {
    "id": "ult_bianshi_tuohuo",
    "name": "吐火羅語（絕招二）",
    "type": "ultimate",
    "giver": "bianshi_master",
-   "pre": {"classId": "bianshi", "minLevel": 31, "questDone": ["ult_bianshi_tiandao"]},
+   "pre": {
+    "classId": "bianshi",
+    "minLevel": 31,
+    "questDone": [
+     "ult_bianshi_tiandao"
+    ]
+   },
    "preHint": "已學天道循環 + 31 級以上，再搵蔡師傅",
    "stages": [
-    {"type": "talk", "npc": "bianshi_master", "dialog": ["蔡師傅：「零陵製箭商趕唔切 500 支穿心箭，幫佢手；洛陽講師有雙風殲滅令。」"], "getItem": {"id": 58029, "n": 1}, "hint": "箭商委託書到手"},
-    {"type": "fight", "npc": "shuangfeng", "monster": 1104, "dialog": ["雙風黑殺手：「想攞圓薄扇？先過我招！」"], "getItem": {"id": 58032, "n": 1}, "hint": "打敗雙風黑殺手，得園薄扇"},
-    {"type": "talk", "npc": "bianshi_master", "dialog": ["蔡師傅：「圓薄扇入手，武弩術語歸你！」"], "getItem": {"id": 58033, "n": 1}, "hint": "返去搵蔡師傅覆命", "done": true}
+    {
+     "type": "talk",
+     "npc": "bianshi_master",
+     "dialog": [
+      "蔡師傅：「零陵製箭商趕唔切 500 支穿心箭，幫佢手；洛陽講師有雙風殲滅令。」"
+     ],
+     "getItem": {
+      "id": 58029,
+      "n": 1
+     },
+     "hint": "箭商委託書到手"
+    },
+    {
+     "type": "fight",
+     "npc": "shuangfeng",
+     "monster": 1104,
+     "dialog": [
+      "雙風黑殺手：「想攞圓薄扇？先過我招！」"
+     ],
+     "getItem": {
+      "id": 58032,
+      "n": 1
+     },
+     "hint": "打敗雙風黑殺手，得園薄扇"
+    },
+    {
+     "type": "talk",
+     "npc": "bianshi_master",
+     "dialog": [
+      "蔡師傅：「圓薄扇入手，武弩術語歸你！」"
+     ],
+     "getItem": {
+      "id": 58033,
+      "n": 1
+     },
+     "hint": "返去搵蔡師傅覆命",
+     "done": true
+    }
    ],
-   "reward": {"exp": 3500, "gold": 800, "ultimate": "tuohuo"}
+   "reward": {
+    "exp": 3500,
+    "gold": 800,
+    "ultimate": "tuohuo"
+   }
   },
   {
    "id": "ult_bianshi_sanfen",
    "name": "三分天下（絕招三）",
    "type": "ultimate",
    "giver": "bianshi_master",
-   "pre": {"classId": "bianshi", "minLevel": 45, "questDone": ["ult_bianshi_tuohuo"]},
+   "pre": {
+    "classId": "bianshi",
+    "minLevel": 45,
+    "questDone": [
+     "ult_bianshi_tuohuo"
+    ]
+   },
    "preHint": "已學吐火羅語 + 45 級以上，再搵蔡師傅",
    "stages": [
-    {"type": "talk", "npc": "bianshi_master", "dialog": ["蔡師傅：「洛陽講師要考你政學同武體。先去桂陽三個秘密入口收集 10 個滅獸印記。」"], "getItem": {"id": 58046, "n": 1}, "hint": "政學考驗書到手"},
-    {"type": "collect", "item": {"id": 58055, "n": 10}, "hint": "滅獸印記 %v/%n"},
-    {"type": "talk", "npc": "bianshi_master", "dialog": ["蔡師傅：「考驗合格，三分天下傳你！」"], "getItem": {"id": 58050, "n": 1}, "hint": "返去搵蔡師傅覆命", "done": true}
+    {
+     "type": "talk",
+     "npc": "bianshi_master",
+     "dialog": [
+      "蔡師傅：「洛陽講師要考你政學同武體。先去桂陽三個秘密入口收集 10 個滅獸印記。」"
+     ],
+     "getItem": {
+      "id": 58046,
+      "n": 1
+     },
+     "hint": "政學考驗書到手"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 58055,
+      "n": 10
+     },
+     "hint": "滅獸印記 %v/%n"
+    },
+    {
+     "type": "talk",
+     "npc": "bianshi_master",
+     "dialog": [
+      "蔡師傅：「考驗合格，三分天下傳你！」"
+     ],
+     "getItem": {
+      "id": 58050,
+      "n": 1
+     },
+     "hint": "返去搵蔡師傅覆命",
+     "done": true
+    }
    ],
-   "reward": {"exp": 8000, "gold": 2000, "ultimate": "sanfen"}
+   "reward": {
+    "exp": 8000,
+    "gold": 2000,
+    "ultimate": "sanfen"
+   }
   },
   {
    "id": "ult_meinu_xiaobo",
    "name": "笑撥弦步（絕招一）",
    "type": "ultimate",
    "giver": "meinu_master",
-   "pre": {"classId": "meinu", "minLevel": 20},
+   "pre": {
+    "classId": "meinu",
+    "minLevel": 20
+   },
    "preHint": "美女 20 級以上，去許昌城南街搵夢韶華（限琴類武器）",
    "stages": [
-    {"type": "talk", "npc": "meinu_master", "dialog": ["夢韶華：「襄陽陳靈相公身染奇病，要百年狐膽同百年狼肺。你肯幫佢嗎？」"], "getItem": {"id": 58006, "n": 1}, "hint": "獵狼狐情報到手"},
-    {"type": "collect", "item": {"id": 58008, "n": 1}, "hint": "百年狐膽 %v/%n"},
-    {"type": "collect", "item": {"id": 58007, "n": 1}, "hint": "百年狼肺 %v/%n", "done": true}
+    {
+     "type": "talk",
+     "npc": "meinu_master",
+     "dialog": [
+      "夢韶華：「襄陽陳靈相公身染奇病，要百年狐膽同百年狼肺。你肯幫佢嗎？」"
+     ],
+     "getItem": {
+      "id": 58006,
+      "n": 1
+     },
+     "hint": "獵狼狐情報到手"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 58008,
+      "n": 1
+     },
+     "hint": "百年狐膽 %v/%n"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 58007,
+      "n": 1
+     },
+     "hint": "百年狼肺 %v/%n",
+     "done": true
+    }
    ],
-   "reward": {"exp": 1500, "gold": 300, "items": [[15038, 1]], "ultimate": "xiaobo"}
+   "reward": {
+    "exp": 1500,
+    "gold": 300,
+    "items": [
+     [
+      15038,
+      1
+     ]
+    ],
+    "ultimate": "xiaobo"
+   }
   },
   {
    "id": "ult_meinu_songzhu",
    "name": "松竹聽雨（絕招二）",
    "type": "ultimate",
    "giver": "meinu_master",
-   "pre": {"classId": "meinu", "minLevel": 30, "questDone": ["ult_meinu_xiaobo"]},
+   "pre": {
+    "classId": "meinu",
+    "minLevel": 30,
+    "questDone": [
+     "ult_meinu_xiaobo"
+    ]
+   },
    "preHint": "已學笑撥弦步 + 30 級以上，再搵夢韶華",
    "stages": [
-    {"type": "talk", "npc": "meinu_master", "dialog": ["夢韶華：「婈兒細佬被狼懿捉咗！去晉陽洞窟八層打敗狼懿頭目，攞狂兒救助函。」"], "getItem": {"id": 58026, "n": 1}, "hint": "婈兒信函到手"},
-    {"type": "fight", "npc": "langyi_head", "monster": 1102, "dialog": ["狼懿頭目：「細路喺我手上，打我呀！」"], "getItem": {"id": 58028, "n": 1}, "hint": "打敗狼懿頭目，得狂兒救助函"},
-    {"type": "talk", "npc": "meinu_master", "dialog": ["夢韶華：「狂兒救返嚟，五個玄冰丹（冥思散代）送你，松竹聽雨傳你！」"], "getItem": {"id": 28003, "n": 5}, "hint": "返去搵夢韶華覆命", "done": true}
+    {
+     "type": "talk",
+     "npc": "meinu_master",
+     "dialog": [
+      "夢韶華：「婈兒細佬被狼懿捉咗！去晉陽洞窟八層打敗狼懿頭目，攞狂兒救助函。」"
+     ],
+     "getItem": {
+      "id": 58026,
+      "n": 1
+     },
+     "hint": "婈兒信函到手"
+    },
+    {
+     "type": "fight",
+     "npc": "langyi_head",
+     "monster": 1102,
+     "dialog": [
+      "狼懿頭目：「細路喺我手上，打我呀！」"
+     ],
+     "getItem": {
+      "id": 58028,
+      "n": 1
+     },
+     "hint": "打敗狼懿頭目，得狂兒救助函"
+    },
+    {
+     "type": "talk",
+     "npc": "meinu_master",
+     "dialog": [
+      "夢韶華：「狂兒救返嚟，五個玄冰丹（冥思散代）送你，松竹聽雨傳你！」"
+     ],
+     "getItem": {
+      "id": 28003,
+      "n": 5
+     },
+     "hint": "返去搵夢韶華覆命",
+     "done": true
+    }
    ],
-   "reward": {"exp": 3500, "gold": 800, "ultimate": "songzhu"}
+   "reward": {
+    "exp": 3500,
+    "gold": 800,
+    "ultimate": "songzhu"
+   }
   },
   {
    "id": "ult_meinu_feihua",
    "name": "飛花點翠（絕招三）",
    "type": "ultimate",
    "giver": "meinu_master",
-   "pre": {"classId": "meinu", "minLevel": 44, "questDone": ["ult_meinu_songzhu"]},
+   "pre": {
+    "classId": "meinu",
+    "minLevel": 44,
+    "questDone": [
+     "ult_meinu_songzhu"
+    ]
+   },
    "preHint": "已學松竹聽雨 + 44 級以上，再搵夢韶華",
    "stages": [
-    {"type": "talk", "npc": "meinu_master", "dialog": ["夢韶華：「美女武學宗師月婈仙子肯見你喇，先收魅隱考驗書，去桂陽秘密入口收集 10 個滅獸印記。」"], "getItem": {"id": 58051, "n": 1}, "hint": "魅隱考驗書到手"},
-    {"type": "collect", "item": {"id": 58055, "n": 10}, "hint": "滅獸印記 %v/%n"},
-    {"type": "talk", "npc": "meinu_master", "dialog": ["夢韶華：「考驗合格，飛花點翠傳你！」"], "getItem": {"id": 58054, "n": 1}, "hint": "返去搵夢韶華覆命", "done": true}
+    {
+     "type": "talk",
+     "npc": "meinu_master",
+     "dialog": [
+      "夢韶華：「美女武學宗師月婈仙子肯見你喇，先收魅隱考驗書，去桂陽秘密入口收集 10 個滅獸印記。」"
+     ],
+     "getItem": {
+      "id": 58051,
+      "n": 1
+     },
+     "hint": "魅隱考驗書到手"
+    },
+    {
+     "type": "collect",
+     "item": {
+      "id": 58055,
+      "n": 10
+     },
+     "hint": "滅獸印記 %v/%n"
+    },
+    {
+     "type": "talk",
+     "npc": "meinu_master",
+     "dialog": [
+      "夢韶華：「考驗合格，飛花點翠傳你！」"
+     ],
+     "getItem": {
+      "id": 58054,
+      "n": 1
+     },
+     "hint": "返去搵夢韶華覆命",
+     "done": true
+    }
    ],
-   "reward": {"exp": 8000, "gold": 2000, "ultimate": "feihua"}
+   "reward": {
+    "exp": 8000,
+    "gold": 2000,
+    "ultimate": "feihua"
+   }
   },
   {
    "id": "expert_tianwen_1",
    "name": "天文一級認證",
    "type": "expert",
    "giver": "gande",
-   "pre": {"questDone": ["hist_zhangjiao"], "hasItemAny": [{"id": 56027, "n": 1}, {"id": 56028, "n": 1}]},
+   "pre": {
+    "questDone": [
+     "hist_zhangjiao"
+    ],
+    "hasItemAny": [
+     {
+      "id": 56027,
+      "n": 1
+     },
+     {
+      "id": 56028,
+      "n": 1
+     }
+    ]
+   },
    "preHint": "完成討伐張角 + 身上有太平天文書或太平地理書，去長沙城搵甘德",
    "stages": [
-    {"type": "talk", "npc": "gande", "dialog": ["甘德：「你身上有天書之氣！想認證天文一級，就去汝南洞窟深處搵喬玄仙人請教。」"], "hint": "去汝南洞窟深處搵喬玄"},
-    {"type": "talk", "npc": "qiaoxuan", "dialog": ["喬玄：「觀星先要明曆法。呢本《甘石星經》你拿去，返去搵甘德認證。」"], "getItem": {"id": 56045, "n": 1}, "hint": "攞到甘石星經，返去搵甘德"},
-    {"type": "talk", "npc": "gande", "dialog": ["甘德：「星經得手，天文一級認證！」"], "takeItems": [[56045, 1]], "hint": "帶甘石星經返去搵甘德", "done": true}
+    {
+     "type": "talk",
+     "npc": "gande",
+     "dialog": [
+      "甘德：「你身上有天書之氣！想認證天文一級，就去汝南洞窟深處搵喬玄仙人請教。」"
+     ],
+     "hint": "去汝南洞窟深處搵喬玄"
+    },
+    {
+     "type": "talk",
+     "npc": "qiaoxuan",
+     "dialog": [
+      "喬玄：「觀星先要明曆法。呢本《甘石星經》你拿去，返去搵甘德認證。」"
+     ],
+     "getItem": {
+      "id": 56045,
+      "n": 1
+     },
+     "hint": "攞到甘石星經，返去搵甘德"
+    },
+    {
+     "type": "talk",
+     "npc": "gande",
+     "dialog": [
+      "甘德：「星經得手，天文一級認證！」"
+     ],
+     "takeItems": [
+      [
+       56045,
+       1
+      ]
+     ],
+     "hint": "帶甘石星經返去搵甘德",
+     "done": true
+    }
    ],
-   "reward": {"fame": 10, "expert": {"skill": "tianwen", "level": 1}}
+   "reward": {
+    "fame": 10,
+    "expert": {
+     "skill": "tianwen",
+     "level": 1
+    }
+   }
   },
   {
    "id": "expert_dili_1",
    "name": "地理一級認證",
    "type": "expert",
    "giver": "gande",
-   "pre": {"questDone": ["hist_zhangjiao"], "hasItemAny": [{"id": 56027, "n": 1}, {"id": 56028, "n": 1}]},
+   "pre": {
+    "questDone": [
+     "hist_zhangjiao"
+    ],
+    "hasItemAny": [
+     {
+      "id": 56027,
+      "n": 1
+     },
+     {
+      "id": 56028,
+      "n": 1
+     }
+    ]
+   },
    "preHint": "完成討伐張角 + 身上有太平天文書或太平地理書，去長沙城搵甘德",
    "stages": [
-    {"type": "talk", "npc": "gande", "dialog": ["甘德：「地理一級要通曉四方地脈。入汝南洞窟打低地理圖守護者，攞四張地理圖返嚟。」"], "hint": "入汝南洞窟打低地理圖守護者"},
-    {"type": "fight", "npc": "geo_guardian", "monster": 1105, "dialog": ["地理圖守護者：「冇本事就唔好想攞地理圖！」"], "getItems": [[56066, 1], [56067, 1], [56068, 1], [56069, 1]], "hint": "打敗守護者，攞齊四張地理圖"},
-    {"type": "talk", "npc": "gande", "dialog": ["甘德：「四圖齊全，地理一級認證！」"], "takeItems": [[56066, 1], [56067, 1], [56068, 1], [56069, 1]], "hint": "帶四張地理圖返去搵甘德", "done": true}
+    {
+     "type": "talk",
+     "npc": "gande",
+     "dialog": [
+      "甘德：「地理一級要通曉四方地脈。入汝南洞窟打低地理圖守護者，攞四張地理圖返嚟。」"
+     ],
+     "hint": "入汝南洞窟打低地理圖守護者"
+    },
+    {
+     "type": "fight",
+     "npc": "geo_guardian",
+     "monster": 1105,
+     "dialog": [
+      "地理圖守護者：「冇本事就唔好想攞地理圖！」"
+     ],
+     "getItems": [
+      [
+       56066,
+       1
+      ],
+      [
+       56067,
+       1
+      ],
+      [
+       56068,
+       1
+      ],
+      [
+       56069,
+       1
+      ]
+     ],
+     "hint": "打敗守護者，攞齊四張地理圖"
+    },
+    {
+     "type": "talk",
+     "npc": "gande",
+     "dialog": [
+      "甘德：「四圖齊全，地理一級認證！」"
+     ],
+     "takeItems": [
+      [
+       56066,
+       1
+      ],
+      [
+       56067,
+       1
+      ],
+      [
+       56068,
+       1
+      ],
+      [
+       56069,
+       1
+      ]
+     ],
+     "hint": "帶四張地理圖返去搵甘德",
+     "done": true
+    }
    ],
-   "reward": {"fame": 10, "expert": {"skill": "dili", "level": 1}}
+   "reward": {
+    "fame": 10,
+    "expert": {
+     "skill": "dili",
+     "level": 1
+    }
+   }
   },
   {
    "id": "expert_tianwen_2",
    "name": "天文二級認證",
    "type": "expert",
    "giver": "nanhua_immortal",
-   "pre": {"expert": {"tianwen": 1}},
+   "pre": {
+    "expert": {
+     "tianwen": 1
+    }
+   },
    "preHint": "天文一級 + 帶彩虹鑽石，去洛陽南華竹林搵南華老仙",
    "stages": [
-    {"type": "talk", "npc": "nanhua_immortal", "dialog": ["南華老仙：「彩虹鑽石乃天地精華，投入池中，天文二級送你。」"], "takeItems": [[25011, 1]], "hint": "帶彩虹鑽石搵南華老仙", "done": true}
+    {
+     "type": "talk",
+     "npc": "nanhua_immortal",
+     "dialog": [
+      "南華老仙：「彩虹鑽石乃天地精華，投入池中，天文二級送你。」"
+     ],
+     "takeItems": [
+      [
+       25011,
+       1
+      ]
+     ],
+     "hint": "帶彩虹鑽石搵南華老仙",
+     "done": true
+    }
    ],
-   "reward": {"fame": 20, "expert": {"skill": "tianwen", "level": 2}}
+   "reward": {
+    "fame": 20,
+    "expert": {
+     "skill": "tianwen",
+     "level": 2
+    }
+   }
   },
   {
    "id": "expert_dili_2",
    "name": "地理二級認證",
    "type": "expert",
    "giver": "nanhua_immortal",
-   "pre": {"expert": {"dili": 1}},
+   "pre": {
+    "expert": {
+     "dili": 1
+    }
+   },
    "preHint": "地理一級 + 帶彩虹鑽石，去洛陽南華竹林搵南華老仙",
    "stages": [
-    {"type": "talk", "npc": "nanhua_immortal", "dialog": ["南華老仙：「彩虹鑽石乃天地精華，投入池中，地理二級送你。」"], "takeItems": [[25011, 1]], "hint": "帶彩虹鑽石搵南華老仙", "done": true}
+    {
+     "type": "talk",
+     "npc": "nanhua_immortal",
+     "dialog": [
+      "南華老仙：「彩虹鑽石乃天地精華，投入池中，地理二級送你。」"
+     ],
+     "takeItems": [
+      [
+       25011,
+       1
+      ]
+     ],
+     "hint": "帶彩虹鑽石搵南華老仙",
+     "done": true
+    }
    ],
-   "reward": {"fame": 20, "expert": {"skill": "dili", "level": 2}}
+   "reward": {
+    "fame": 20,
+    "expert": {
+     "skill": "dili",
+     "level": 2
+    }
+   }
   },
   {
    "id": "expert_tianwen_3",
    "name": "天文三級認證",
    "type": "expert",
    "giver": "zuoci",
-   "pre": {"classAny": ["daoshi", "wunu", "bianshi", "meinu"], "questDone": ["expert_tianwen_2"]},
+   "pre": {
+    "classAny": [
+     "daoshi",
+     "wunu",
+     "bianshi",
+     "meinu"
+    ],
+    "questDone": [
+     "expert_tianwen_2"
+    ]
+   },
    "preHint": "道士/巫女/辯士/美女 + 天文二級，去襄陽搵左慈仙人",
    "stages": [
-    {"type": "talk", "npc": "zuoci", "dialog": ["左慈：「水之精華、生之石，攞齊十級水石同一粒生之石，天文三級認證。」"], "takeItems": [[32021, 1], [32022, 1], [32023, 1], [32024, 1], [32025, 1], [32026, 1], [32027, 1], [32028, 1], [32029, 1], [32030, 1], [32306, 1]], "hint": "帶齊水屬性石 10%~100% + 生之石搵左慈", "done": true}
+    {
+     "type": "talk",
+     "npc": "zuoci",
+     "dialog": [
+      "左慈：「水之精華、生之石，攞齊十級水石同一粒生之石，天文三級認證。」"
+     ],
+     "takeItems": [
+      [
+       32021,
+       1
+      ],
+      [
+       32022,
+       1
+      ],
+      [
+       32023,
+       1
+      ],
+      [
+       32024,
+       1
+      ],
+      [
+       32025,
+       1
+      ],
+      [
+       32026,
+       1
+      ],
+      [
+       32027,
+       1
+      ],
+      [
+       32028,
+       1
+      ],
+      [
+       32029,
+       1
+      ],
+      [
+       32030,
+       1
+      ],
+      [
+       32306,
+       1
+      ]
+     ],
+     "hint": "帶齊水屬性石 10%~100% + 生之石搵左慈",
+     "done": true
+    }
    ],
-   "reward": {"fame": 30, "expert": {"skill": "tianwen", "level": 3}}
+   "reward": {
+    "fame": 30,
+    "expert": {
+     "skill": "tianwen",
+     "level": 3
+    }
+   }
   },
   {
    "id": "expert_tianwen_4",
    "name": "天文四級認證",
    "type": "expert",
    "giver": "zuoci",
-   "pre": {"classAny": ["daoshi", "wunu"], "questDone": ["expert_tianwen_3"]},
+   "pre": {
+    "classAny": [
+     "daoshi",
+     "wunu"
+    ],
+    "questDone": [
+     "expert_tianwen_3"
+    ]
+   },
    "preHint": "道士/巫女 + 天文三級，去襄陽搵左慈仙人",
    "stages": [
-    {"type": "talk", "npc": "zuoci", "dialog": ["左慈：「風之精華、生之石，攞齊十級風石同一粒生之石，天文四級圓滿。」"], "takeItems": [[32001, 1], [32002, 1], [32003, 1], [32004, 1], [32005, 1], [32006, 1], [32007, 1], [32008, 1], [32009, 1], [32010, 1], [32306, 1]], "hint": "帶齊風屬性石 10%~100% + 生之石搵左慈", "done": true}
+    {
+     "type": "talk",
+     "npc": "zuoci",
+     "dialog": [
+      "左慈：「風之精華、生之石，攞齊十級風石同一粒生之石，天文四級圓滿。」"
+     ],
+     "takeItems": [
+      [
+       32001,
+       1
+      ],
+      [
+       32002,
+       1
+      ],
+      [
+       32003,
+       1
+      ],
+      [
+       32004,
+       1
+      ],
+      [
+       32005,
+       1
+      ],
+      [
+       32006,
+       1
+      ],
+      [
+       32007,
+       1
+      ],
+      [
+       32008,
+       1
+      ],
+      [
+       32009,
+       1
+      ],
+      [
+       32010,
+       1
+      ],
+      [
+       32306,
+       1
+      ]
+     ],
+     "hint": "帶齊風屬性石 10%~100% + 生之石搵左慈",
+     "done": true
+    }
    ],
-   "reward": {"fame": 40, "expert": {"skill": "tianwen", "level": 4}}
+   "reward": {
+    "fame": 40,
+    "expert": {
+     "skill": "tianwen",
+     "level": 4
+    }
+   }
   },
   {
    "id": "expert_dili_3",
    "name": "地理三級認證",
    "type": "expert",
    "giver": "yuji",
-   "pre": {"classAny": ["shinu", "daoshi", "wunu", "bianshi", "meinu"], "questDone": ["expert_dili_2"]},
+   "pre": {
+    "classAny": [
+     "shinu",
+     "daoshi",
+     "wunu",
+     "bianshi",
+     "meinu"
+    ],
+    "questDone": [
+     "expert_dili_2"
+    ]
+   },
    "preHint": "仕女/道士/巫女/辯士/美女 + 地理二級，去長沙搵于吉仙人",
    "stages": [
-    {"type": "talk", "npc": "yuji", "dialog": ["于吉：「火之精華、生之石，攞齊十級火石同一粒生之石，地理三級認證。」"], "takeItems": [[32031, 1], [32032, 1], [32033, 1], [32034, 1], [32035, 1], [32036, 1], [32037, 1], [32038, 1], [32039, 1], [32040, 1], [32306, 1]], "hint": "帶齊火屬性石 10%~100% + 生之石搵于吉", "done": true}
+    {
+     "type": "talk",
+     "npc": "yuji",
+     "dialog": [
+      "于吉：「火之精華、生之石，攞齊十級火石同一粒生之石，地理三級認證。」"
+     ],
+     "takeItems": [
+      [
+       32031,
+       1
+      ],
+      [
+       32032,
+       1
+      ],
+      [
+       32033,
+       1
+      ],
+      [
+       32034,
+       1
+      ],
+      [
+       32035,
+       1
+      ],
+      [
+       32036,
+       1
+      ],
+      [
+       32037,
+       1
+      ],
+      [
+       32038,
+       1
+      ],
+      [
+       32039,
+       1
+      ],
+      [
+       32040,
+       1
+      ],
+      [
+       32306,
+       1
+      ]
+     ],
+     "hint": "帶齊火屬性石 10%~100% + 生之石搵于吉",
+     "done": true
+    }
    ],
-   "reward": {"fame": 30, "expert": {"skill": "dili", "level": 3}}
+   "reward": {
+    "fame": 30,
+    "expert": {
+     "skill": "dili",
+     "level": 3
+    }
+   }
   },
   {
    "id": "expert_dili_4",
    "name": "地理四級認證",
    "type": "expert",
    "giver": "yuji",
-   "pre": {"classAny": ["bianshi", "meinu"], "questDone": ["expert_dili_3"]},
+   "pre": {
+    "classAny": [
+     "bianshi",
+     "meinu"
+    ],
+    "questDone": [
+     "expert_dili_3"
+    ]
+   },
    "preHint": "辯士/美女 + 地理三級，去長沙搵于吉仙人",
    "stages": [
-    {"type": "talk", "npc": "yuji", "dialog": ["于吉：「地之精華、生之石，攞齊十級地石同一粒生之石，地理四級圓滿。」"], "takeItems": [[32011, 1], [32012, 1], [32013, 1], [32014, 1], [32015, 1], [32016, 1], [32017, 1], [32018, 1], [32019, 1], [32020, 1], [32306, 1]], "hint": "帶齊地屬性石 10%~100% + 生之石搵于吉", "done": true}
+    {
+     "type": "talk",
+     "npc": "yuji",
+     "dialog": [
+      "于吉：「地之精華、生之石，攞齊十級地石同一粒生之石，地理四級圓滿。」"
+     ],
+     "takeItems": [
+      [
+       32011,
+       1
+      ],
+      [
+       32012,
+       1
+      ],
+      [
+       32013,
+       1
+      ],
+      [
+       32014,
+       1
+      ],
+      [
+       32015,
+       1
+      ],
+      [
+       32016,
+       1
+      ],
+      [
+       32017,
+       1
+      ],
+      [
+       32018,
+       1
+      ],
+      [
+       32019,
+       1
+      ],
+      [
+       32020,
+       1
+      ],
+      [
+       32306,
+       1
+      ]
+     ],
+     "hint": "帶齊地屬性石 10%~100% + 生之石搵于吉",
+     "done": true
+    }
    ],
-   "reward": {"fame": 40, "expert": {"skill": "dili", "level": 4}}
+   "reward": {
+    "fame": 40,
+    "expert": {
+     "skill": "dili",
+     "level": 4
+    }
+   }
   },
   {
-   "id": "marry_letter_m", "name": "御賜函（男）", "type": "marry", "giver": "marry_official",
-   "pre": {"gender": "M", "minLevel": 10}, "preHint": "男性角色 10 級+, 去許昌結婚村搵朝廷官員拎男方御賜函",
+   "id": "marry_letter_m",
+   "name": "御賜函（男）",
+   "type": "marry",
+   "giver": "marry_official",
+   "pre": {
+    "gender": "M",
+    "minLevel": 10
+   },
+   "preHint": "男性角色 10 級+, 去許昌結婚村搵朝廷官員拎男方御賜函",
    "stages": [
-    {"type": "talk", "npc": "marry_official", "dialog": ["朝廷官員：「男婚女嫁，天作之合。呢封男方御賜函，攞去用喇。」"], "done": true}
+    {
+     "type": "talk",
+     "npc": "marry_official",
+     "dialog": [
+      "朝廷官員：「男婚女嫁，天作之合。呢封男方御賜函，攞去用喇。」"
+     ],
+     "done": true
+    }
    ],
-   "reward": {"items": [[51627, 1]], "fame": 5}
+   "reward": {
+    "items": [
+     [
+      51627,
+      1
+     ]
+    ],
+    "fame": 5
+   }
   },
   {
-   "id": "marry_letter_f", "name": "御賜函（女）", "type": "marry", "giver": "marry_official",
-   "pre": {"gender": "F", "minLevel": 10}, "preHint": "女性角色 10 級+, 去許昌結婚村搵朝廷官員拎女方御賜函",
+   "id": "marry_letter_f",
+   "name": "御賜函（女）",
+   "type": "marry",
+   "giver": "marry_official",
+   "pre": {
+    "gender": "F",
+    "minLevel": 10
+   },
+   "preHint": "女性角色 10 級+, 去許昌結婚村搵朝廷官員拎女方御賜函",
    "stages": [
-    {"type": "talk", "npc": "marry_official", "dialog": ["朝廷官員：「佳偶天成，呢封女方御賜函，攞去用喇。」"], "done": true}
+    {
+     "type": "talk",
+     "npc": "marry_official",
+     "dialog": [
+      "朝廷官員：「佳偶天成，呢封女方御賜函，攞去用喇。」"
+     ],
+     "done": true
+    }
    ],
-   "reward": {"items": [[51628, 1]], "fame": 5}
+   "reward": {
+    "items": [
+     [
+      51628,
+      1
+     ]
+    ],
+    "fame": 5
+   }
   }
  ]
 }

@@ -484,6 +484,10 @@ func t_ride(data: GameData) -> void:
 	sim._kill_player(sim.ent(id))
 	check(not sim.is_riding(ch) and not sim.mount_near_me(ch).is_empty(), "死亡落馬、馬仍然跟身")
 	# 過圖: 騎馬踩門口照過
+	var pe := sim.ent(id)
+	ch["hp"] = int(pe["max_hp"])                          # 死亡入「倒地」(郁唔到/上唔到馬) → 先復原
+	pe["hp"] = int(pe["max_hp"])
+	sim._revive_finish(pe)
 	sim.cmd_mount_ride(id, true)
 	var gate: Dictionary = sim.travel_point_by_id("gate_out")
 	_put(sim, id, int(gate["x"]), int(gate["y"]) - 6)

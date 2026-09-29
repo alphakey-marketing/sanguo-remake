@@ -82,7 +82,8 @@ func _relayout() -> void:
 	for k in pslots:
 		layout[k] = pslots[k]
 	if joy != null:
-		joy.zone = HudLayout.joy_zone(s, sr)
+		# UAT-feedback: 點擊模式 → 隱藏搖桿 (zone 清空)；搖桿模式 → 正常 zone
+		joy.zone = HudLayout.joy_zone(s, sr) if main.move_mode == "stick" else Rect2()
 
 # ================= 面板 =================
 func _panel(name_: String) -> GamePanel:
@@ -91,6 +92,8 @@ func _panel(name_: String) -> GamePanel:
 		match name_:
 			"bag": p = BagPanel.new(main)
 			"shop": p = ShopPanel.new(main)
+			"mall": p = MallPanel.new(main)
+			"help": p = HelpPanel.new(main)
 			"char": p = CharPanel.new(main)
 			"quest": p = QuestPanel.new(main)
 			"more": p = MorePanel.new(main)
@@ -125,6 +128,14 @@ func bag_panel() -> BagPanel:
 func shop_panel() -> ShopPanel:
 	close_panels()
 	return _panel("shop") as ShopPanel
+
+func mall_panel() -> MallPanel:
+	close_panels()
+	return _panel("mall") as MallPanel
+
+func help_panel() -> HelpPanel:
+	close_panels()
+	return _panel("help") as HelpPanel
 
 func craft_panel() -> CraftPanel:
 	close_panels()
@@ -298,7 +309,7 @@ func _input(ev: InputEvent) -> void:
 			_fire(id)                              # 放手仍喺掣入面先算（滑走 = 取消）
 		get_viewport().set_input_as_handled()
 		return
-	if joy.handle_event(ev):
+	if joy.handle_event(ev) and main.move_mode == "stick":
 		get_viewport().set_input_as_handled()
 
 func _fire(id: String) -> void:
@@ -458,8 +469,8 @@ func _draw_status() -> void:
 	var o := fr.position
 	draw_rect(fr, Color(0, 0, 0, 0.7 if _is_down("portrait") else 0.55))
 	draw_rect(fr, Color(1, 1, 1, 0.3), false, 1.0)
-	# 頭像
-	var pr := Rect2(o + Vector2(6, 6), Vector2(64, 64))
+	# 頭像（UAT-feedback: 角色框縮細）
+	var pr := Rect2(o + Vector2(5, 5), Vector2(46, 46))
 	draw_rect(pr, Color(0, 0, 0, 0.4))
 	var me = main._me()
 	if me != null:
@@ -469,15 +480,17 @@ func _draw_status() -> void:
 			if f != null:
 				draw_texture_rect(f, pr, true)
 	draw_rect(pr, Color(1, 1, 1, 0.35), false, 1.0)
-	_txt(o + Vector2(78, 15), "%s  Lv%d" % [main.ch.name, lv], Color.WHITE, 13)
-	_txt(o + Vector2(78, 29), "%s" % RulesKarma.tier_name(int(ch.karma)), Color(1, 0.85, 0.4), 11)
+	_txt(o + Vector2(57, 15), "%s  Lv%d" % [main.ch.name, lv], Color.WHITE, 13)
+	_txt(o + Vector2(57, 28), "%s" % RulesKarma.tier_name(int(ch.karma)), Color(1, 0.85, 0.4), 10)
 	var rows := [["HP", float(ch.hp) / mhp, Color(0.85, 0.2, 0.2)], ["MP", float(ch.mp) / mmp, Color(0.25, 0.45, 0.95)],
 		["SP", float(ch.sp) / msp, Color(0.9, 0.8, 0.2)], ["EXP", float(ch.exp) / maxi(1, need), Color(0.7, 0.4, 0.95)]]
 	for i in rows.size():
-		var y := o.y + 36 + 13 * i
-		_txt(Vector2(o.x + 78, y + 9), rows[i][0], Color(0.95, 0.95, 0.95), 11)
-		_bar(o.x + 114, y + 1, 124, 8, rows[i][1], rows[i][2])
-	_txt(o + Vector2(6, 92), "金 %d" % int(ch.gold), Color(1, 0.9, 0.5), 11)
+		var y := o.y + 32 + 11 * i
+		_txt(Vector2(o.x + 57, y + 8), rows[i][0], Color(0.95, 0.95, 0.95), 10)
+		_bar(o.x + 84, y - 1, 120, 6, rows[i][1], rows[i][2])
+	# 金（右上角細字）
+	var gold_s := "金 %d" % int(ch.gold)
+	_txt(Vector2(o.x + fr.end.x - 6 - gold_s.length() * 6.0, o.y + 10), gold_s, Color(1, 0.9, 0.5), 11)
 	_draw_status_icons(o, fr, main.sim.tick)
 
 # 狀態 icon 列 (S02a, spec 02 §7): 角色框底部一行，短名 + 剩餘秒數

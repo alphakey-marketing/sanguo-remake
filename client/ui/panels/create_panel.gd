@@ -6,7 +6,6 @@ extends GamePanel
 # sim 權威：改動經 main._send 行 sim.cmd_set_*；理念測驗答案喺呢度暫存，答滿 12 題先一次過交。
 # 未撳「出發！」唔可以關（✕ / 撳遮罩都冇效），逼玩家行完全部步。
 
-const MONTH_DAYS := [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 const FACE_NAMES := {"hair": "頭髮", "brow": "眉毛", "nose": "鼻", "mouth": "嘴", "beard": "鬍鬚", "shape": "臉型", "neck": "頸", "bg": "背景"}
 
 var _confirmed := false
@@ -41,7 +40,7 @@ func close() -> void:
 func sig() -> String:
 	var ch: Dictionary = main.ch
 	return JSON.stringify([tab, ch.get("name", ""), ch.get("nameLocked", false), ch.get("title", ""),
-		ch.get("birthMonth", 1), ch.get("birthDay", 1), ch.get("classId", ""), ch.get("face", {}),
+		ch.get("classId", ""), ch.get("face", {}),
 		ch.get("ideology", ""), quiz_i, quiz_answers])
 
 
@@ -71,7 +70,7 @@ func _build_basic(ch: Dictionary) -> void:
 	list.add_child(hsep())
 	_build_title(ch, list)
 	list.add_child(hsep())
-	_build_birth(ch, list)
+	_build_home(ch, list)
 	list.add_child(hsep())
 	_build_class(ch, list)
 	list.add_child(hsep())
@@ -109,35 +108,23 @@ func _build_title(ch: Dictionary, parent: Control) -> void:
 	parent.add_child(btn("確定", func() -> void: main._send({"t": "set_title", "title": title_edit.text}), 120))
 
 
-# ---- 生日（影響福日 exp +10%，隨時可改） ----
-func _build_birth(ch: Dictionary, parent: Control) -> void:
-	var m := int(ch.get("birthMonth", 1))
-	var d := int(ch.get("birthDay", 1))
-	parent.add_child(lbl("生日（福日嗰日練功 exp +10%，隨時可改）", 15, UiTheme.GOLD))
-	parent.add_child(lbl("而家：%d 月 %d 日" % [m, d], 16))
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 6)
-	parent.add_child(row)
-	row.add_child(lbl("月", 14))
-	row.add_child(btn("－", func() -> void: _shift_birth(-1, 0), 48))
-	row.add_child(btn("＋", func() -> void: _shift_birth(1, 0), 48))
-	row.add_child(lbl("日", 14))
-	row.add_child(btn("－", func() -> void: _shift_birth(0, -1), 48))
-	row.add_child(btn("＋", func() -> void: _shift_birth(0, 1), 48))
 
+# ---- 新手城（UAT-feedback, spec 12 §1）【自訂】: 未出發 Lv1 先先揀得，揀完搬去嗰城客棧 ----
+func _build_home(ch: Dictionary, parent: Control) -> void:
+	parent.add_child(lbl("新手城（未出發前可以改，揀完搬去嗰城）", 15, UiTheme.GOLD))
+	var cur := str(ch.get("homeCity", ""))
+	var can_change := int(ch.get("level", 1)) == 1
+	var opts: Array = main.sim.newbie_cities()
+	if opts.is_empty():
+		parent.add_child(lbl("（暫無可揀新手城）", 14, UiTheme.DIM))
+		return
+	for o in opts:
+		var oc := String(o["id"])
+		var is_cur := oc == cur or (cur == "" and oc == String(main.data.world.get("homeCity", "")))
+		var b := btn("%s　%s" % [str(o["name"]), "（現用）" if is_cur else ""], func() -> void: main._send({"t": "set_home", "home": oc}))
+		b.disabled = is_cur or not can_change
+		parent.add_child(b)
 
-func _shift_birth(dm: int, dd: int) -> void:
-	var ch: Dictionary = main.ch
-	var m: int = int(ch.get("birthMonth", 1)) + dm
-	var d: int = int(ch.get("birthDay", 1)) + dd
-	if m < 1: m = 12
-	if m > 12: m = 1
-	if d < 1: d = 1
-	if d > int(MONTH_DAYS[m - 1]): d = int(MONTH_DAYS[m - 1])
-	main._send({"t": "set_birth", "month": m, "day": d})
-
-
-# ---- 職業（六職，未開放灰；只限未出發 Lv1 揀） ----
 func _build_class(ch: Dictionary, parent: Control) -> void:
 	parent.add_child(lbl("職業（未出發前可以改）", 15, UiTheme.GOLD))
 	var cur := str(ch.get("classId", ""))

@@ -215,9 +215,15 @@ func _think_player(p: Dictionary) -> void:
 	# 聚力/強力/神力 buff: 物攻 ×1.15/1.3/1.5 (spec 02 §7) + 輔助石物攻 % (effect 7)
 	var atk_mult := RulesSpell.atk_mult(ch.get("status", {}), tick)
 	atk_mult = atk_mult * (1.0 + float(jb.get("atkPct", 0.0)))
+	# 弩箭威力 (S11c): 武器強度 += 箭威力；傷害 x 箭特效% (有弩先計)
+	var w_power := float(w["power"])
+	if not mounted_combat and int(data.cats.get(int(ch["equip"].get("weapon", 0)), 0)) == RulesAmmo.NU_WEAPON_CAT:
+		var arrow_bonus := RulesAmmo.attack_bonus(data, ch)
+		w_power += float(arrow_bonus.get("power", 0.0))
+		atk_mult = atk_mult * (1.0 + float(arrow_bonus.get("atk_pct", 0.0)) / 100.0)
 	var eff_str := _eff_attr(ch, "str", ab) + float(jb.get("strFlat", 0))
 	var elem_mult := _phys_elem_mult(ch, t_elem)
-	var dmg0 := RulesCombat.calc_damage(eff_str, w["power"], t_def, rng_fn, atk_mult, 1.0)
+	var dmg0 := RulesCombat.calc_damage(eff_str, w_power, t_def, rng_fn, atk_mult, 1.0)
 	var dmg := MathX.js_round(dmg0 * elem_mult)
 	_emit({"k": "hit", "src": p["id"], "dst": t["id"], "dmg": dmg})
 	if not mounted_combat:

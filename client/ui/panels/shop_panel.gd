@@ -13,6 +13,11 @@ func _init(m: Node) -> void:
 	set_tabs(["買", "賣"])
 
 
+# 城際貿易 (spec 05 §6): 呢間店所屬城 (市場 pf 用)；冇 = 故鄉城
+func _city() -> String:
+	return String(shop.get("map", ""))
+
+
 func open_shop(f: Dictionary) -> void:
 	shop = f
 	title_lbl.text = str(f.get("shopName", "商店"))
@@ -78,7 +83,7 @@ func _build_body() -> void:
 		list.add_child(lbl("（背包空）" if tab == 1 else "（冇貨）", 14, UiTheme.DIM))
 	for idv in ids:
 		var id := int(idv)
-		var price: int = main._buy_price(id) if tab == 0 else main._sell_price(id)
+		var price: int = main._buy_price(id, _city()) if tab == 0 else main._sell_price(id, _city())
 		var t := "%s   %d 金" % [item_name(id), price]
 		if tab == 1:
 			t = "%s x%d   %d 金" % [item_name(id), _bag_n(id), price]
@@ -104,7 +109,7 @@ func _build_detail(p: Control, ch: Dictionary) -> void:
 	for s in item_desc(id):
 		p.add_child(wrap_lbl(str(s), 13, UiTheme.DIM))
 	if tab == 0:
-		var price: int = main._buy_price(id)
+		var price: int = main._buy_price(id, _city())
 		var max_n := mini(99, int(ch["gold"]) / maxi(1, price))
 		p.add_child(stepper(qty, max_n, func(n: int) -> void:
 			qty = n
@@ -129,7 +134,7 @@ func _build_detail(p: Control, ch: Dictionary) -> void:
 		p.add_child(stepper(qty, have, func(n: int) -> void:
 			qty = n
 			refresh(true)))
-		p.add_child(lbl("得 %d 金" % (main._sell_price(id) * qty), 15, UiTheme.GOOD))
+		p.add_child(lbl("得 %d 金" % (main._sell_price(id, _city()) * qty), 15, UiTheme.GOOD))
 		p.add_child(btn("確認賣出", func() -> void:
 			main._send({"t": "sell", "item": id, "n": qty})
 			qty = 1))

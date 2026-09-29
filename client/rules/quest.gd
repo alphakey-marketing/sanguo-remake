@@ -281,6 +281,10 @@ static func hint(q: Dictionary, ch: Dictionary) -> String:
 		elif String(stage.get("type", "")) == "repeat":
 			done = int(st.get("flags", {}).get("count", 0))
 			need = int(stage.get("n", 1))
+		elif String(stage.get("type", "")) == "collect":   # UAT: collect stage 顯示背包已收集/需要
+			var item: Dictionary = stage.get("item", {})
+			need = int(item.get("n", 0))
+			done = RulesShop.count_item(ch.get("bag", {}), int(item.get("id", -1))) if need > 0 else 0
 		h = h.replace("%v", str(done)).replace("%n", str(need))
 	return h
 
@@ -422,8 +426,14 @@ static func on_answer(data: GameData, ch: Dictionary, q: Dictionary, answer_idx:
 	if stage.is_empty() or String(stage.get("type", "")) != "ask":
 		return out
 	if int(stage.get("answer", -1)) != answer_idx:
-		out["msg"] = "答錯喇"
+		out["msg"] = "答錯喇，再唸一唸…"
+		var wr: Array = stage.get("wrong", [])
+		if not wr.is_empty():        # UAT: 答錯 → NPC 回應對話（唔推進），唔淨係信息欄一句
+			out["dialog"] = wr
 		return out
+	var rp: Array = stage.get("response", [])   # UAT: 答啱 → NPC 回應對話先至繼續
+	if not rp.is_empty():
+		out["dialog"] = rp
 	return _advance(data, ch, q, st, stage, out)
 
 

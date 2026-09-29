@@ -40,7 +40,7 @@ static func build(size: Vector2, safe: Rect2 = Rect2()) -> Dictionary:
 	var B := safe.end.y
 	var out := {}
 	# 左上角色框（整塊撳得，底部一行 = 狀態 icon 列 S02a）
-	out["portrait"] = {"kind": "rect", "rect": Rect2(L + 6, T + 6, 244, 98 + STATUS_ROW_H)}
+	out["portrait"] = {"kind": "rect", "rect": Rect2(L + 6, T + 6, 210, 84 + STATUS_ROW_H)}
 	# 同伴框 (Step 13.5): 日誌右邊，搖桿區上面
 	out["companion"] = {"kind": "rect", "rect": Rect2(L + 312, T + 108, COMP_SZ.x, COMP_SZ.y)}
 	# 右上選單列（由右向左排）

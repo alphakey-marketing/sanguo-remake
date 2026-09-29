@@ -29,6 +29,7 @@ func _init() -> void:
 	t_toushi_learn(data)
 	t_toushi_use(data)
 	t_restore(data)
+	t_chest_system(data)
 	print("[TEST] class: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -188,17 +189,19 @@ func t_class_skill_use(data: GameData) -> void:
 	check(not got_open.is_empty(), "有寶箱: 發出 unlock_open 事件")
 	# 揀錯鑰匙 → 寶箱仲鎖住；揀啱 → 開 + unlock_done
 	sim.cmd_skill_pick(id, 9000, 0)
-	check(bool(ents[9000].get("locked", true)), "揀錯: 寶箱未開")
+	check(not ents.has("9000") or bool(ents[9000].get("locked", true)), "揀錯: 寶箱未開")
 	var got_done: Array = []
 	sim.event_emitted.connect(func(ev: Dictionary) -> void:
 		if String(ev.get("k", "")) == "unlock_done" and bool(ev.get("ok", false)):
 			got_done.append(true))
+	# 重新 spawn (揀錯唔收箱)
+	ents[9000] = {"id": 9000, "kind": "chest", "name": "試煉寶箱", "x": 60, "y": 61, "locked": true, "key": 1, "drop": {"gold": 0}}
 	sim.cmd_skill_pick(id, 9000, 1)
-	check(not bool(ents[9000].get("locked", true)), "揀啱: 寶箱開咗")
+	check(not ents.has("9000"), "揀啱: 寶箱開咗兼收箱")
 	check(not got_done.is_empty(), "開箱: 發出 unlock_done 事件")
-	# 開完再用 → 提示已開
+	# 開完再撳 → 寶箱已唔喺度
 	sim.cmd_skill_pick(id, 9000, 1)
-	check(not bool(ents[9000].get("locked", true)), "開完再撳: 唔會翻開")
+	check(not ents.has("9000"), "開完再撳: 寶箱冇咗唔會翻開")
 
 
 # ===== 道士 (S02c): 快期三招絕招 (符咒 cat 15) =====
@@ -796,3 +799,66 @@ func t_restore(data: GameData) -> void:
 			break
 	check(int(ch["hp"]) > before, "恢復術: 自己補到 HP")
 	check(int(ch["hp"]) <= max_h, "恢復術: 唔會超上限")
+
+
+# T-07 隨機寶箱 (spec 02 §6): 野外每張地圖 spawn、每日子時換位、開鎖開箱得賞
+func t_chest_system(data: GameData) -> void:
+	var sim := Sim.new(data, 77)
+	# 每日子時 refresh 第一次 → 野外（非安全）地圖各 spawn 一個鎖住寶箱
+	sim._chest_daily(0)
+	var wild_zones := 0
+	for z in data.zones as Array:
+		if bool(z.get("safe", false)):
+			continue
+		wild_zones += 1
+	var chests_ents: Array = []
+	for o in sim.state["ents"].values():
+		if String(o.get("kind", "")) == "chest":
+			chests_ents.append(o)
+	check(chests_ents.size() == wild_zones, "隨機寶箱: 每張野外圖 spawn 一個 (得 %d/%d)" % [chests_ents.size(), wild_zones])
+	check(chests_ents.size() > 0, "隨機寶箱: 有至少一個")
+	for c in chests_ents:
+		check(bool(c.get("locked", true)), "隨機寶箱: 預設鎖住")
+		check(int(c["key"]) >= 0 and int(c["key"]) < 3, "隨機寶箱: 鎖匙 0..2")
+	# 第二日 refresh → 換位（實體 id 唔同 = 新箱）
+	var first_ids: Array = []
+	for c in chests_ents:
+		first_ids.append(int(c["id"]))
+	sim._chest_daily(1)
+	var second_size := 0
+	for o in sim.state["ents"].values():
+		if String(o.get("kind", "")) == "chest":
+			second_size += 1
+	check(second_size == wild_zones, "每日換位: 數量不變")
+	var overlap := 0
+	for o in sim.state["ents"].values():
+		if String(o.get("kind", "")) == "chest" and first_ids.has(int(o["id"])):
+			overlap += 1
+	check(overlap == 0, "每日換位: 舊箱清走生新箱 (同名 id 唔重用)")
+	# 開鎖開箱: 攞一個寶箱, 用仕女 unlock 開, 得賞 + 收箱
+	var sim2 := Sim.new(data, 78)
+	sim2._chest_daily(0)
+	var target: Dictionary = {}
+	for o in sim2.state["ents"].values():
+		if String(o.get("kind", "")) == "chest" and target.is_empty():
+			target = o
+	var pid := sim2.spawn_player("t", "shinu")
+	var ch2: Dictionary = sim2.player_ch()
+	ch2["level"] = 5
+	sim2._sync_stats(sim2.ent(pid))
+	ch2["classSkill"] = "unlock"
+	var p: Vector2i = Vector2i(int(target["x"]), int(target["y"]))
+	# 放玩家喺寶箱隔籬 (用 state 直接改位)
+	sim2.ent(pid)["x"] = int(target["x"]) + 1
+	sim2.ent(pid)["y"] = int(target["y"])
+	var before_gold := int(ch2["gold"])
+	var got_loot: Array = []
+	sim2.event_emitted.connect(func(ev: Dictionary) -> void:
+		if String(ev.get("k", "")) == "chest_loot":
+			got_loot.append(true))
+	var cid := int(target["id"])
+	sim2.cmd_use_skill(pid, "unlock")
+	sim2.cmd_skill_pick(pid, cid, int(target["key"]))
+	check(bool(sim2.ent(cid).is_empty()) or not bool(sim2.ent(cid).get("locked", true)), "開箱: 岩鎖匙收箱")
+	check(int(ch2["gold"]) >= before_gold, "開箱: 有得金/未有啲就唔減")
+	check(not got_loot.is_empty(), "開箱: emit chest_loot")

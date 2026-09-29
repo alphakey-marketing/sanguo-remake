@@ -136,7 +136,7 @@ func t_newbie_chain(data: GameData) -> void:
 	# --- 練兵場 ---
 	_talk(sim, id, "training_recruit")
 	check(bool(ch["questDone"].get("newbie_training", false)), "練兵場: 完成")
-	check(int(ch.get("lilian", 0)) == 10, "練兵場: 歷練 +10")
+	check(int(ch.get("exp", 0)) == 30, "練兵場: +30 exp (由歷練改做 exp, spec 06 UAT)")
 	check(_bag_n(sim, id, 10002) == 1, "練兵場: 新手武器 (鬼頭刀)")
 	# --- 寺廟/私塾退款 ---
 	_put(sim, id, int(data.facilities["temple"]["x"]), int(data.facilities["temple"]["y"]))

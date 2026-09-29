@@ -54,7 +54,7 @@ func t_item_and_shops(data: GameData) -> void:
 				shop = s
 				break
 		check(not shop.is_empty(), "雜貨店 %s 存在" % sid)
-		check((shop.get("stock", []) as Array).has(65338), "雜貨店 %s 有賣復活丹" % sid)
+		check((shop.get("stock", []) as Array).has(65338) or (shop.get("stock", []) as Array).has(65338.0), "雜貨店 %s 有賣復活丹" % sid)
 
 
 # ===== 復活丹: 倒地期間隨時 (唔使等 5 秒) 就地回滿血，消耗 1 =====
@@ -141,7 +141,9 @@ func t_timeout_bailout(data: GameData) -> void:
 	sim.step()
 	check(not bool(p.get("down", false)), "3000 tick 到: 強制回城復活")
 	check(int(p["x"]) == sim.inn_pos.x and int(p["y"]) == sim.inn_pos.y, "逾時兜底: 傳返客棧")
-	check(int(ch["hp"]) == maxi(1, MathX.js_round(sim._eff_max_hp(ch) / 2.0)), "逾時兜底: HP 回一半")
+	# 回一半後同一 tick 客棧安全區回復 (S01a) 可能再加少少 → 下限 = 一半，上限 = 滿血
+	var half := maxi(1, MathX.js_round(sim._eff_max_hp(ch) / 2.0))
+	check(int(ch["hp"]) >= half and int(ch["hp"]) <= sim._eff_max_hp(ch), "逾時兜底: HP 回一半 (>= %d)" % half)
 
 
 # ===== read-model: player_down_view() =====

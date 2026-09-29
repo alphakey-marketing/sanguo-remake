@@ -338,8 +338,8 @@ func t_arena_win(data: GameData) -> void:
 			won = true
 	check(won, "擂台贏: recruit_result ok")
 	var cv := sim.companion_view()
-	check(int(cv.get("gid", 0)) == gid and int(cv["daysLeft"]) == int(data.recruit_cfg["serveDays"]) and int(cv["loyalty"]) >= 60,
-		"companion_view: gid / 30 日 / 忠誠")
+	check(int(cv.get("gid", 0)) == gid and int(cv["daysLeft"]) == int(data.recruit_cfg["serveDays"]) and int(cv["loyalty"]) >= int(data.recruit_cfg["loyalty"]["init"]),
+		"companion_view: gid / serveDays 日 / 忠誠")
 	sim.cmd_recruit_survey(pid, "wu")
 	check(_last(r[3]).contains("已經有人才"), "有同伴: 唔可以再調查")
 
@@ -632,21 +632,24 @@ func t_comp_expire(data: GameData) -> void:
 	var gid: int = r[5]
 	var c: Dictionary = r[6]
 	var cid := int(c["id"])
-	check(int(c["gen"]["until"]) == 1 + 30, "到期: 第 1 日登用 → 第 31 日子時走")
-	_at(sim, 30, 90)
-	check(not sim.ent(cid).is_empty(), "到期: 第 30 日亥時仲喺度")
-	_at(sim, 31, 0)
-	check(sim.ent(cid).is_empty() and int(ch["recruit"].get("comp", 0)) == 0, "到期: 第 31 日子時 0 刻離開")
+	var sd := int(data.recruit_cfg["serveDays"])
+	check(int(c["gen"]["until"]) == 1 + sd, "到期: 第 1 日登用 → 第 %d 日子時走" % (1 + sd))
+	_at(sim, sd, 90)
+	check(not sim.ent(cid).is_empty(), "到期: 第 %d 日亥時仲喺度" % sd)
+	_at(sim, 1 + sd, 0)
+	check(sim.ent(cid).is_empty() and int(ch["recruit"].get("comp", 0)) == 0, "到期: 第 %d 日子時 0 刻離開" % (1 + sd))
 	check(not bool(sim.state["generals"][str(gid)]["serving"]) and not sim._general_away(gid), "到期: 返城 (唔當走人)")
-	_at(sim, 31, 40)
+	_at(sim, 1 + sd, 40)
 	check(sim.general_visible(data.general_by_id[gid]), "到期: Tier1 返到城內企位")
 
 
 func t_comp_loyalty(data: GameData) -> void:
 	var cfg := data.recruit_cfg
-	check(RulesRecruit.loyalty_init("治國", "治國", cfg) == 70 and RulesRecruit.loyalty_init("義理", "出仕", cfg) == 60, "忠誠: 初始 60，同理念 +10")
-	check(RulesRecruit.loyalty_verdict(30, cfg) == "stay" and RulesRecruit.loyalty_verdict(29, cfg) == "leave_daily" \
-		and RulesRecruit.loyalty_verdict(0, cfg) == "leave_now", "忠誠: ≥30 留 / <30 子時走 / 0 即走")
+	var li := int(cfg["loyalty"]["init"])
+	var lv := int(cfg["loyalty"]["leave"])
+	check(RulesRecruit.loyalty_init("治國", "治國", cfg) == li + int(cfg["loyalty"]["sameIdeo"]) and RulesRecruit.loyalty_init("義理", "出仕", cfg) == li, "忠誠: 初始 %d，同理念 +%d" % [li, int(cfg["loyalty"]["sameIdeo"])])
+	check(RulesRecruit.loyalty_verdict(lv, cfg) == "stay" and RulesRecruit.loyalty_verdict(lv - 1, cfg) == "leave_daily" \
+		and RulesRecruit.loyalty_verdict(0, cfg) == "leave_now", "忠誠: ≥%d 留 / <%d 子時走 / 0 即走" % [lv, lv])
 	check(RulesRecruit.loyalty_kill_delta("義理", 100, cfg) < 0 and RulesRecruit.loyalty_kill_delta("霸權", 100, cfg) == 0 \
 		and RulesRecruit.loyalty_kill_delta("義理", -100, cfg) == 0, "忠誠: 殺善 → 義理/治國跌，殺惡唔影響")
 	# 殺善怪 (臨時改田鼠善惡)
@@ -664,11 +667,11 @@ func t_comp_loyalty(data: GameData) -> void:
 	def["alignment"] = al
 	check(int(c["gen"]["loyalty"]) == loy + int(cfg["loyalty"]["badKill"]), "忠誠: 主公殺善怪，治國同伴忠誠 %d" % int(cfg["loyalty"]["badKill"]))
 	# < 30 → 子時走 (唔開心: 呢個月唔返城)
-	c["gen"]["loyalty"] = 29
+	c["gen"]["loyalty"] = lv - 1
 	var cid := int(c["id"])
 	var gid := int(c["gen"]["gid"])
 	_at(sim, 2, 0)
-	check(sim.ent(cid).is_empty() and sim._general_away(gid), "忠誠 <30: 子時離開，呢個月唔返城")
+	check(sim.ent(cid).is_empty() and sim._general_away(gid), "忠誠 <%d: 子時離開，呢個月唔返城" % lv)
 	# = 0 → 即刻走
 	var r2 := _comp_setup(data, 9)
 	var sim2: Sim = r2[0]

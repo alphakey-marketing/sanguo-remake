@@ -151,6 +151,17 @@ func free_away(c: Vector2i, dmin: int) -> Vector2i:
 	return c
 
 
+# 建角面板第 1 頁 (VBox 包住 ScrollContainer) 有冇姓名輸入框 (稱號輸入框唔計)
+func _has_name_edit(n: Node) -> bool:
+	if n is LineEdit and (n as LineEdit).placeholder_text.begins_with("姓名"):
+		return true
+	for c in n.get_children():
+		if _has_name_edit(c):
+			return true
+	return false
+
+
+
 func _run() -> void:
 	await frames(3)
 	hud = m.hud
@@ -164,23 +175,15 @@ func _run() -> void:
 	press(cp, "確定")
 	await frames(1)
 	check(str(cch.get("name", "")) == "劉備", "建角: 確定姓名後 ch.name 應該改咗 (而家 %s)" % str(cch.get("name", "")))
-	cp.set_tab(1)
-	var title_ed: LineEdit = (cp as CreatePanel).title_edit
-	title_ed.text = "遊俠"
-	press(cp, "確定")
+	# 建角面板已合併做 2 頁: 第 1 頁 = 姓名/稱號/新手城/職業/臉譜，第 2 頁 = 理念 + 確認
+	m._send({"t": "set_title", "title": "遊俠"})     # 稱號輸入 F1 將改做事件獎勵解鎖，呢度直接測 set_title 指令
 	await frames(1)
 	check(str(cch.get("title", "")) == "遊俠", "建角: 確定稱號後 ch.title 應該改咗")
-	cp.set_tab(2)
-	var bm0 := int(cch.get("birthMonth", 1))
-	press(cp, "＋")
-	await frames(1)
-	check(int(cch.get("birthMonth", 1)) != bm0, "建角: 生日月＋應該改咗 birthMonth")
-	cp.set_tab(4)
 	var hair0 := int(cch.get("face", {}).get("hair", 1))
 	press(cp, "頭髮")
 	await frames(1)
 	check(int(cch.get("face", {}).get("hair", 1)) != hair0, "建角: 撳臉譜部位應該循環款式")
-	cp.set_tab(5)
+	cp.set_tab(1)
 	for i in (m.data.quiz as Array).size():
 		(cp as CreatePanel)._quiz_pick(0)
 		await frames(1)
@@ -188,9 +191,9 @@ func _run() -> void:
 	check(bool(cch.get("nameLocked", false)), "建角: 理念一決定，姓名應該鎖定")
 	cp.set_tab(0)
 	await frames(1)
-	check(not (cp as CreatePanel).body.get_children().any(func(c): return c is LineEdit), "建角: 姓名鎖定後唔應該再顯示輸入框")
+	check(not (cp as CreatePanel).body.get_children().any(func(c): return _has_name_edit(c)), "建角: 姓名鎖定後唔應該再顯示姓名輸入框")
 	check(str(cch.get("name", "")) == "劉備", "建角: 姓名鎖定後唔可以再改")
-	cp.set_tab(6)
+	cp.set_tab(1)
 	press(cp, "✕")
 	await frames(1)
 	check(cp.visible, "建角未撳出發，撳 ✕ 唔應該關到面板")
@@ -271,7 +274,7 @@ func _run() -> void:
 	var chp: GamePanel = hud.panels["char"]
 	chp.set_tab(1)
 	await frames(1)
-	press(chp, "頭部")
+	press(chp, "頭盔")
 	await frames(1)
 	press(chp, "卸下")
 	await frames(1)
@@ -673,6 +676,7 @@ func _run() -> void:
 	check(int(ch["hp"]) > 0, "死亡: 復活返客棧 (HP>0)")
 	check(int(m.sim.ent(pid_d)["x"]) == m.sim.inn_pos.x and int(m.sim.ent(pid_d)["y"]) == m.sim.inn_pos.y, "死亡: 傳返客棧")
 	check(RulesShop.count_item(ch["bag"], 65030) == 0, "死亡: 還魂丹消耗")
+	ch["storageSub"] = false      # 天地商行訂閱會自動執附近掉落物 (U16) → 手動拾取測試要關
 	# S04a 地面掉落物: 殺怪跌落地 → view_ents 透出 → 互動掣=拾取 → 撳落袋 + 實體消失
 	# 搵一格附近冇設施/NPC/武將嘅自由格 (確保互動掣唔會被搶)
 	var pme_: Dictionary = m._me()

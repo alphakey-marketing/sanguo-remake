@@ -171,7 +171,10 @@ func _mob_hits(data: GameData, body: int) -> Array:
 		sim.cmd_equip(pid, body)
 	var m: Dictionary = sim._spawn_mob(12012, "field_1")   # 野狗 atk 28
 	var p := sim.ent(pid)
-	_put(sim, pid, int(m["x"]) + 1, int(m["y"]))
+	_put(sim, m["id"], 60, 60)                           # 野外 (60,60 非安全區): 城內唔准打人，隨機 spawn 可能落安全區
+	m["mob"]["home_x"] = 60                              # home 都要跟，否則超出 leash 即脫戰
+	m["mob"]["home_y"] = 60
+	_put(sim, pid, 61, 60)
 	m["mob"]["state"] = "chase"
 	m["mob"]["target"] = pid
 	var hits: Array = []

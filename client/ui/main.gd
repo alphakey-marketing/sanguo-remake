@@ -35,6 +35,24 @@ var auto := false                 # 自動掛機
 var auto_whitelist := {}          # U-fix: 自動掛機淨打嘅怪名 (name -> true)；空 = 打晒
 var auto_roam := false            # U-fix: 自動掛機冇怪時可唔可以自動跨場景去搵怪 (預設關，留喺同一場景)
 var pk_mode := false              # 打人模式: 開 = 所有怪+NPC 都可以撳中/target 攻擊；關 = 淨係怪 + 敵對(紅名/鎖定緊我)嘅 NPC 先得
+var move_mode := "stick"           # 移動模式 (UAT-feedback): "stick" = 搖桿 / "tap" = 撳地行；存 user://settings.cfg
+const SETTINGS_FILE := "user://settings.cfg"
+
+func _load_settings() -> void:
+	var cf := ConfigFile.new()
+	if cf.load(SETTINGS_FILE) == OK:
+		move_mode = String(cf.get_value("ui", "move_mode", move_mode))
+		if move_mode != "tap" and move_mode != "stick":
+			move_mode = "stick"
+func _save_settings() -> void:
+	var cf := ConfigFile.new()
+	cf.set_value("ui", "move_mode", move_mode)
+	cf.save(SETTINGS_FILE)
+func _set_move_mode(mode: String) -> void:
+	if mode != "stick" and mode != "tap":
+		return
+	move_mode = mode
+	_save_settings()
 var potion_slots: Array = [0, 0, 0]   # U-fix: 快捷補品欄 3 格，存 item id（0 = 空），純 UI 偏好唔入 sim 存檔
 var sshot_file := ""             # --sshot: 開場幾秒後截圖存 user:// 退出
 var ch := {}                      # 玩家角色狀態 (sim 內同一個 Dictionary)
@@ -71,6 +89,7 @@ var cur_slot := 0                  # U-fix: 0 = 用返 AUTOSLOT（原有行為�
 var awaiting_slot_pick := false     # U-fix: 開場等緊玩家喺「選擇角色」揀 slot，未有真正角色（唔好自動存/唔理輸入）
 
 func _ready() -> void:
+	UiTheme.install_font()   # embed CJK 字形，HUD/panel 中文先顯示到（Web/iOS 唔使睇 browser fallback）
 	autotest = "--autotest" in OS.get_cmdline_user_args()
 	uitest = "--uitest" in OS.get_cmdline_user_args() or "--uishot" in OS.get_cmdline_user_args()
 	# 內建 watchdog: --uitest/--autotest 無論 test script 有冇 load 到 / 有冇 crash / 有冇死迴圈，
@@ -92,7 +111,8 @@ func _ready() -> void:
 		facilities.append({"kind": "inn", "name": String(inn["name"]), "x": int(inn["x"]), "y": int(inn["y"]), "color": Color(0.3, 0.5, 0.9)})
 	for sh in data.shops:
 		facilities.append({"kind": "shop", "name": str(sh["name"]), "x": int(sh["x"]), "y": int(sh["y"]),
-			"color": Color(0.9, 0.7, 0.2), "stock": sh["stock"], "shopName": str(sh["name"])})
+			"color": Color(0.9, 0.7, 0.2), "stock": sh["stock"], "shopName": str(sh["name"]),
+			"map": String(sh.get("map", ""))})
 	for key in data.facilities:
 		var fv: Variant = data.facilities[key]
 		if not fv is Dictionary:          # 跳過 _note
@@ -130,6 +150,7 @@ func _ready() -> void:
 	sim.event_emitted.connect(_on_event)
 	llm_client = LlmClient.new()
 	llm_client.load_cfg()
+	_load_settings()
 	_refresh()
 	hud = MobileHud.new()
 	add_child(hud)
@@ -264,6 +285,7 @@ func _send(d: Dictionary) -> void:
 		"chat": sim.cmd_chat(my_id, str(d.text))
 		"rest": sim.cmd_rest(my_id)
 		"buy": sim.cmd_buy(my_id, int(d.item), int(d.get("n", 1)))
+		"mall_buy": sim.cmd_mall_buy(my_id, int(d.item), int(d.get("n", 1)))
 		"sell": sim.cmd_sell(my_id, int(d.item), int(d.get("n", 1)))
 		"facility": sim.cmd_facility(my_id, str(d.key))
 		"travel": sim.cmd_travel(my_id, str(d.point))
@@ -316,7 +338,7 @@ func _send(d: Dictionary) -> void:
 		"scene_leave": sim.cmd_scene_leave(my_id)
 		"donate_gold": sim.cmd_donate_gold(my_id, int(d.amount))
 		"donate_items": sim.cmd_donate_items(my_id, d.items)
-		"use_item": sim.cmd_use_item(my_id, int(d.item))
+		"use_item": _use_item(my_id, int(d.item))
 		"self_revive": sim.cmd_self_revive(my_id)
 		"revive_pill": sim.cmd_revive_pill(my_id)
 		"companion_revive": sim.cmd_companion_revive_owner(my_id)
@@ -324,11 +346,11 @@ func _send(d: Dictionary) -> void:
 		"auto_assign": sim.cmd_auto_assign(my_id)
 		"set_name": sim.cmd_set_name(my_id, str(d.name))
 		"set_title": sim.cmd_set_title(my_id, str(d.title))
-		"set_birth": sim.cmd_set_birth(my_id, int(d.month), int(d.day))
 		"set_face": sim.cmd_set_face(my_id, str(d.part), int(d.value))
 		"submit_quiz": sim.cmd_submit_quiz(my_id, d.answers)
 		"quest_talk": sim.cmd_quest_talk(my_id, str(d.npc))
 		"select_class": sim.cmd_select_class(my_id, str(d.class_id))
+		"set_home": sim.cmd_set_home(my_id, str(d.home))
 		"promote": sim.cmd_class_promote(my_id)
 		"equip_spellbook": sim.cmd_equip_spellbook(my_id, int(d.item), int(d.get("slot", 0)))
 		"cast_spell": sim.cmd_cast_spell(my_id, int(d.slot), int(d.get("target", 0)))
@@ -398,6 +420,14 @@ func _send(d: Dictionary) -> void:
 		"marry_summon": sim.cmd_marry_summon(my_id)
 		"marry_message": sim.cmd_marry_message(my_id, str(d.text))
 		"marry_divorce": sim.cmd_marry_divorce(my_id)
+
+# 用道具：職業丹（30055~30059）→ cmd_use_class_pill (sim_skill)，其餘 → cmd_use_item。
+const PILL_USE_IDS := [30055, 30056, 30057, 30058, 30059]
+func _use_item(uid: int, item: int) -> void:
+	if PILL_USE_IDS.has(item):
+		sim.cmd_use_class_pill(uid, item)
+	else:
+		sim.cmd_use_item(uid, item)
 
 # sim 發 llm_request（url/headers/body 已砌好，冇 key）；呢度加返 key、真正發 HTTP，
 # 回應餵返 cmd_llm_reply/cmd_llm_summary。冇 key/傳送失敗 = 即刻用空字串回覆 → sim 模板後備。
@@ -563,7 +593,8 @@ func _on_event(e: Dictionary) -> void:
 		"die":
 			if int(e.dst) == my_id:
 				var dr := _death_report(e)
-				_log(dr.split("\n")[0])
+				for _ln in dr.split("\n"):
+					_log(_ln)                       # UAT: 死亡報告全部入信息欄（含跌咗咩/扣經驗）
 				target_id = -1
 				if not uitest:
 					_save_current()             # 死完即存
@@ -596,6 +627,9 @@ func _on_event(e: Dictionary) -> void:
 		"quest":
 			if int(e.dst) == my_id:
 				var qname := String(e.quest)
+				var dlg: Array = e.get("dialog", [])
+				if not dlg.is_empty() and hud != null and not autotest and not uitest:
+					_show_quest_dialog(str(e.get("speaker", "")), dlg)
 				if bool(e.get("started", false)):
 					_log("接咗任務「%s」" % qname)
 				elif bool(e.get("done", false)):
@@ -728,6 +762,18 @@ func _death_report(e: Dictionary) -> String:
 	return "\n".join(lines)
 
 
+func _show_quest_dialog(speaker: String, dlg: Array) -> void:
+	# UAT point 4: 任務對話要用 DialogBox 彈窗（唔淨止信息欄）；確定先行
+	var title := "任務" if speaker == "" else speaker
+	var parts: Array = []
+	for line in dlg:
+		parts.append(str(line))
+	var text := "\n".join(parts)
+	if hud != null:
+		hud.open_dialog(func() -> Dictionary: return {"title": title, "text": text,
+			"options": [{"label": "確定", "cb": func() -> void: hud.close_panels()}]})
+
+
 # 倒地畫面【自訂新增】: 倒數 + 回城/復活丹/同伴超渡掣，source 每 0.2 秒重算 (DialogPanel 機制)
 func _down_dialog() -> Dictionary:
 	var dv := sim.player_down_view()
@@ -822,16 +868,23 @@ func _near_travel() -> Dictionary:
 	return {}
 
 # 市場價 = 基準價 × 價格因子；買入另計魅力折扣【原】，賣出 = 市場價 50%
-func _buy_price(id: int) -> int:
+# 城際貿易 (spec 05 §6): city = 商店所在城 (UI 用) → 用嗰城市場 pf；"" = 故鄉城市場代價
+func _pf_for(city: String, id: int) -> float:
+	var g: Dictionary = {}
+	if city != "":
+		g = sim.market_city(city, str(int(data.cats.get(id, 0))))
+	return float(g.get("pf", 1.0)) if not g.is_empty() else sim.market_factor(id)
+
+func _buy_price(id: int, city := "") -> int:
 	var base: float = item_prices.get(id, 0)
-	var pf: float = sim.market_factor(id)
+	var pf: float = _pf_for(city, id)
 	var cha := int(ch.attrs.cha) if not ch.is_empty() else 0
 	var trade_lv := sim.expert_lv(ch, "jiaoyi") if not ch.is_empty() and sim != null else 0
 	return RulesShop.buy_price(RulesMarket.price(base, pf), cha, 0, trade_lv)
 
-func _sell_price(id: int) -> int:
+func _sell_price(id: int, city := "") -> int:
 	var trade_lv := sim.expert_lv(ch, "jiaoyi") if not ch.is_empty() and sim != null else 0
-	return RulesShop.sell_price(item_prices.get(id, 0) * sim.market_factor(id), trade_lv)
+	return RulesShop.sell_price(item_prices.get(id, 0) * _pf_for(city, id), trade_lv)
 
 func _me():
 	return _ent(my_id)
@@ -882,14 +935,17 @@ func _hud_tap(pos: Vector2) -> void:
 			_send({"t": "move", "x": int(it.ref.x), "y": int(it.ref.y)})
 			marker = {"pos": Vector2(int(it.ref.x), int(it.ref.y)), "t": 1.0}
 		return
-	# S04a 地面掉落物: 撳落地物件 → 行埋邊執 (近就即拾取)
+	# S04a 地面掉落物: 撳落地物件 → 近就即拾取；遠就（點擊模式）行埋邊執
 	var dd = _drop_at_tap(pos, g)
 	if dd != null:
 		if me != null and ContextActions._near(me, int(dd.x), int(dd.y)):
 			_send({"t": "pick", "drop": int(dd.id)})
-		else:
+		elif move_mode == "tap":
 			_send({"t": "move", "x": int(dd.x), "y": int(dd.y)})
 			marker = {"pos": Vector2(int(dd.x), int(dd.y)), "t": 1.0}
+		return
+	# 撳地行路 (點擊模式先得; 搖桿模式 = 撳地唔郁，避免同搖桿互夹扰)
+	if move_mode != "tap":
 		return
 	if not sim.is_free(int(g.x), int(g.y)):           # 撳中屋/樹/河: 行去最近行得嘅格
 		var f := _free_near(Vector2i(g), 2)

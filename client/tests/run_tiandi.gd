@@ -136,7 +136,7 @@ func t_haul(data: GameData) -> void:
 	var pid: int = r[1]
 	var ch: Dictionary = r[2]
 	var msgs: Array = r[3]
-	_put(sim, pid, 30, 30)
+	_put(sim, pid, 60, 35)          # 東山丘林 = 採礦工作區 (spec 05)
 	ch["storageSub"] = true
 	sim.cmd_tiandi_set(pid, "deposit:mining", true)
 	RulesShop.add_item(ch["bag"], 25001, 60)        # 石頭 (採礦)
@@ -173,7 +173,7 @@ func t_haul_storage_full(data: GameData) -> void:
 	var pid: int = r[1]
 	var ch: Dictionary = r[2]
 	var msgs: Array = r[3]
-	_put(sim, pid, 30, 30)
+	_put(sim, pid, 60, 35)          # 採礦工作區
 	ch["storageSub"] = true
 	sim.cmd_tiandi_set(pid, "deposit:mining", true)
 	RulesShop.add_item(ch["storage"], 10001, 995)   # 倉庫剩 5 格
@@ -194,7 +194,7 @@ func t_haul_off(data: GameData) -> void:
 	var sim: Sim = r[0]
 	var pid: int = r[1]
 	var ch: Dictionary = r[2]
-	_put(sim, pid, 30, 30)
+	_put(sim, pid, 60, 35)          # 採礦工作區
 	sim.cmd_tiandi_set(pid, "deposit:mining", true)
 	RulesShop.add_item(ch["bag"], 25001, 150)
 	_equip_tool(sim, pid, ch, "mining", 26003)
@@ -219,7 +219,7 @@ func t_tools(data: GameData) -> void:
 	var sim: Sim = r[0]
 	var pid: int = r[1]
 	var ch: Dictionary = r[2]
-	_put(sim, pid, 30, 30)
+	_put(sim, pid, 60, 35)          # 採礦工作區
 	ch["storageSub"] = true
 	ch["gold"] = 100000
 	# 自動買: 耐久 1 → 用完爛 → 買返新
@@ -236,11 +236,13 @@ func t_tools(data: GameData) -> void:
 	ch["tools"].erase("farming")
 	_equip_tool(sim, pid, ch, "farming", 26031)
 	ch["tools"]["farming"]["dur"] = 1
+	_put(sim, pid, 70, 15)          # 許下屯田 = 農耕工作區
 	_work_n(sim, pid, ch, "farming", 1)
 	check(int(ch["tools"]["farming"]["item"]) == 26031 and int(ch["tools"]["farming"]["dur"]) == 50, "自動買: 新手工具 → 新手工具")
 	# 自動賣: 耐久剩 2 → 賣
 	sim.cmd_tiandi_set(pid, "buyTool", false)
 	sim.cmd_tiandi_set(pid, "sellTool", true)
+	_put(sim, pid, 60, 35)          # 返採礦工作區 (下面自動賣都係採礦)
 	ch["tools"]["mining"]["dur"] = 3
 	g0 = int(ch["gold"])
 	_work_n(sim, pid, ch, "mining", 1)
@@ -393,7 +395,7 @@ func _run_seq(data: GameData) -> String:
 	var sim: Sim = r[0]
 	var pid: int = r[1]
 	var ch: Dictionary = r[2]
-	_put(sim, pid, 30, 30)
+	_put(sim, pid, 60, 35)          # 採礦工作區
 	ch["storageSub"] = true
 	ch["gold"] = 50000
 	sim.cmd_tiandi_set(pid, "deposit:mining", true)

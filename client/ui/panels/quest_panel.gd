@@ -12,7 +12,7 @@ var _guide_open := {}          # quest id -> bool，指引頁撳落展開/摺埋
 func _init(m: Node) -> void:
 	super(m)
 	title_lbl.text = "任務"
-	set_tabs(["進行中", "完成", "戰役", "場景", "指引"])
+	set_tabs(["進行中", "完成", "戰役", "場景", "地標", "指引"])
 
 
 func sig() -> String:
@@ -51,7 +51,9 @@ func _build_body() -> void:
 		_battle_section(list)
 	if tab == 3:                           # 特殊場景日程 (S04d, spec 04 §4)
 		_scene_section(list)
-	if tab == 4:                           # 任務指引 (U17): 全部任務點揀/邊度接，靜態查詢，唔碰 sim
+	if tab == 4:                           # 地標典籍 (UAT-feedback): 探到嘅史蹟可重睇典故
+		_landmark_section(list)
+	if tab == 5:                           # 任務指引 (U17): 全部任務點揀/邊度接，靜態查詢，唔碰 sim
 		_guide_section(list)
 
 
@@ -85,6 +87,52 @@ func _scene_section(list: Node) -> void:
 			vs["sceneName"], int(vs["layer"]), int(vs["totalLayers"])], 14, UiTheme.TEXT))
 	else:
 		list.add_child(wrap_lbl("去荊州港口搵場景入口（開門日先入得）。", 14, UiTheme.DIM))
+
+
+# 地標典籍 (UAT-feedback, spec 12 §5): 按地圖列出探到嘅史蹟地標，撳開得（▸▾）重睇典故全文
+var _lm_open := {}
+func _landmark_section(list: Node) -> void:
+	var lms: Array = main.sim.view_landmarks()
+	if lms.is_empty():
+		list.add_child(lbl("未探到任何史蹟地標——去野外城鎮踩踩（首次踏入會彈典故）", 14, UiTheme.DIM))
+		return
+	var total := 0
+	for s in lms:
+		if bool(s["seen"]):
+			total += 1
+	list.add_child(lbl("史蹟地標　已探 %d / %d" % [total, lms.size()], 14, UiTheme.TEXT))
+	# 按地圖分組 (地圖檔順序派，決定性)
+	var by_map := {}
+	var order: Array = []
+	for s in lms:
+		var k := String(s["map"])
+		if not by_map.has(k):
+			by_map[k] = []
+			order.append(k)
+		(by_map[k] as Array).append(s)
+	for mid in order:
+		list.add_child(lbl("── %s ──" % str(by_map[mid][0]["mapName"]), 15, UiTheme.GOLD))
+		for s in by_map[mid]:
+			list.add_child(_lm_row(s))
+func _lm_row(s: Dictionary) -> Node:
+	var lid := String(s["id"])
+	var open := bool(_lm_open.get(lid, false))
+	var col := UiTheme.TEXT
+	var mark := "☆"
+	if bool(s["seen"]):
+		mark = "●"
+		col = UiTheme.GOLD
+	var head := btn("%s %s %s" % [mark, str(s["name"]), "▾" if open else "▸"], func() -> void:
+		_lm_open[lid] = not open
+		refresh(true))
+	head.add_theme_color_override("font_color", col)
+	head.add_theme_color_override("font_hover_color", col)
+	head.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	var box := VBoxContainer.new()
+	box.add_child(head)
+	if open:
+		box.add_child(wrap_lbl("　　・" + str(s["text"]), 13, UiTheme.TEXT))
+	return box
 
 
 # 任務指引 (U17): 靜態讀 data/quests.json + quest_npcs.json，列晒全部任務點揀/邊度接，

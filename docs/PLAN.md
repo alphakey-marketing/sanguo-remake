@@ -30,7 +30,7 @@
 | 08 名聲義勇軍 | 🟡 | ✅ | 名聲、頭銜 60 階、官宅（討取/官令/捐獻/月俸/行動丹）、**義舉證明（四類 20 項）+ 城池進貢/好感（S08a）**、**城池屬性 8 項 + 官宅內政 6 種（S08b）**、**救災（S08c）**、**名額競爭（S08d）**、**義勇軍成立 + 定居 + 帶兵量（S08e）**、**營地建設 10 設施 + 義勇軍工作 22 項 + 評定會議（S08f）**、**民心 + 6 條城池法令（S08g；邏輯層，城池佔領啟動留 S10c）** | 佔城啟動（→S10c）、法令下游（山洞商店/PK/善惡入城） |
 | 09 登用武將 | 🟡 | 🟡 | 居民 bot/記憶/brain、**居民化 `residents.json`（性格/日程/role，每城 12~20，S09a）**、**傳聞擴散 `rules/rumor.gd` + 每日反思/跨城延遲 1~3 日 + 殺善 NPC→義理忠誠 −15（S09b）**、登用 v1+v2、同伴 6 指令、20 passive 特技、**內政協助 + 內政/生產/經濟被動特技 39~43/45~51（S09c-a）**、**主動特技 21 遁地/22 職業特技/32 挑釁/38 急救（S09c-b）**、**LLM 層 `rules/llm.gd` + `npc_brain_llm.gd` + `llm_client.gd`（白名單/OpenRouter 請求/每日反思摘要/Tier 分配/預算/模板後備，S09d）**、**結婚 `rules/marry.gd` + `sim_marry.gd`（御賜函男/女 + 喜餅 4 價位/開餅盒/分餅回 HP/MP/SP + 禮堂/主婚人/婚禮 + 婚戒無限召喚 50 SP + 配偶頁/叮嚀/離婚 50 萬兩，S09e）** | 鑑定 44（無系統）、國戰類 23~37/53~70（→S10）、LLM UI（設定頁/對話顯示→專 UI Step） |
 | 10 國戰 | ❌ | ❌ | — | 全部（D-3【待決】） |
-| 11 資料對照 | 🟡 | — | items/monsters/generals/recipes/titles 導入器 | `material_ids.json`、箭矢定義、商城道具單機化定案、recruitinfo 說明頁、warbtl 對照 |
+| 11 資料對照 | 🟡 | ✅ | items/monsters/generals/recipes/titles 導入器；**箭矢種類（S11c `ammo.gd`）+ 商城道具單機化（S11a 貨金商城精選 + S11b 道具功能）+ recruitinfo 說明頁（S11d `help_panel.gd`）**，全部 `tests/run_ammo.gd`+`run_mall.gd` PASS | `material_ids.json`（已內建 items.materials，待剔）、warbtl 對照（→S10）、首次彈窗教程 |
 | 12 地圖世界 | ✅(B1~B3) | ✅ | 多地圖/A*/過圖/大地圖/驛站/戰役實例 | 各 Step 需要嘅新地圖（隨 S04/S06/S08 加）；B4 其餘州郡【待決】 |
 
 ---
@@ -99,7 +99,8 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
 - 驗收：各導入器 `--check`
 
 ### S12 地圖世界（spec 12）
-- [ ] 收集 S04~S10 期間加嘅地圖做總驗收；B4 其餘州郡【待決】
+- [x] **UAT-feedback (2026-09-26)**: 建角揀 3 新手城（許昌/襄陽/新野，`cmd_set_home`+`create_panel._build_home`）；左上角色框縮細（hud 244→210）；移動方式設定（搖桿/撳地行，`user://settings.cfg`）；記事面板加「地標」tab（`view_landmarks`）——maps 3410/hud 5056 過
+- [ ] 收集 S04~S10 期間加嘅地圖做總驗收；B4 其餘州郡【待決】；UAT-feedback #5：益州/成都新州郡（怪物已有 def；oy=590 起空位 70 行；行前計劃見 `docs/uat/spec12_地圖世界.md §10`）
 - 驗收：`tests/run_maps.gd` 全過
 
 ### 收尾
@@ -189,6 +190,26 @@ Step 1~5 骨架/戰鬥/存檔/天災/居民 · 7 初階生產 · 7.5 點數+測�
 | S09e | 喜帖/婚禮拋彩球灑喜糖（拾特殊寶物）/刪角強迫離婚 未做（單機冇其他玩家/刪角） | 後續（如要彩球活動再議） |
 | S09e | `game_data` 物品效果 +type 19 → 回復 SP（喜餅點心 29106~29115 等 食物藥水/藥丸散會變可用）| 已接（cmd_use_item 自動支援） |
 | 2026-09-25 討論 | 多存檔 + 共享世界隊友（方向 2.5，見下）| S02c 做完後開新 Step |
+
+---
+
+### 擬改清單（用家 2026-09-26 決定，未開工）
+
+> 用家喺 Spec 02 戰鬥/角色審查後提出嘅控制/UI 修改。**唔好急住做，先記錄等改**。逐項做嗰陣開細步 + 更新 spec + 剔格。
+
+| ID | 範圍 | 要求 | 落實點 | 狀態 |
+|---|---|---|---|---|
+| T-01 | 建角/角色屬性 | **移除生日**（`birthMonth/birthDay` 欄位 + 建角揀生日 UI + **福日 exp+10% 邏輯**一齊刪）；舊存檔 `birthMonth/birthDay` **清走**（遷移規則） | `rules/stats.gd` `birthday_exp_mult` / `sim_combat.gd` 福日 / `create_panel` / save 遷移 | 待改 |
+| T-02 | 角色屬性 | **政治 & 政治經驗合併**：同一屬性 `pol`（現 `polExp` 官令增值係另一條經驗棒，升同一 `pol`）——UI 唔好分兩欄，邏輯統一 | `char_panel.gd`（125 行政治經驗）、`sim_office` 官令 pol 增值 | 待改 |
+| T-03 | 角色屬性 | **魅力 & 魅力經驗合併**：同上（`chaExp` 捐獻增值） | `char_panel.gd`（126 行魅力經驗）、`sim_econ` 捐獻 cha 增值 | 待改 |
+| T-04 | 角色裝備（武器欄） | **武器欄顯示「可裝上」嘅裝備**（只 show 你個職啱用嘅武器，唔好 show 全部）；順便核實「卸下失敗測試」係咪因為未裝備（UAT-009） | `char_panel` / `bag_panel` 武器過濾 `classes.weapons` | 待改 |
+| T-05 | 掉落拾取 | 用家**手測無問題**；UAT-010/011 可能係測試舊結構/誤判，要核實再定唔係真 bug | ui_smoke 掉落 2 項 + `cmd_pick` 接駁 | 待改（核實） |
+| T-06 | 術法 UI | **術法怪吟唱地上紅圈要補**（spec §1「地面警告圈」——code 而家未見 UI 圈）；樣式未定 | `mobile_hud` / ground-target 繪 | 待改（樣式未定） |
+| T-07 | 開鎖 | **新增隨機寶箱 + 任務寶箱**（而家冇寶箱實體，學咗開鎖冇得試）；隨機寶箱**全地圖 spawn、每日更新位置** | `sim_skill` `_near_locked_chest` / 寶箱實體 + 每日刷新 | 待改 |
+| T-08 | 武器類型 | **武器類型要限定職業裝備**（核實有冇漏） → **已核實 `_weapon_ok` 已全面實作**：`cmd_equip` 檢查 `classes.weapons`（cat_label），唔啱職業用唔到；級別限制 `weapon_tier_required` 亦有。**只餘 UI 過濾「可裝上」**（併入 T-04） | `sim_econ.cmd_equip` / `_weapon_ok` | ✅ 已做（UI 落到 T-04） |
+| T-09 | 絕招 | **六職絕招對應武器/裝備設好**：六職絕招要用返啱嘅武器系先放得 → **已核實 `cmd_use_ultimate` 檢查 `weaponCat`**（各職 `ultimates.json` 已定武器），要人手驗證實際觸發 | `cmd_use_ultimate` `weaponCat` | ✅ 已做（需人手驗證） |
+| T-10 | 寶石 | **寶石可裝備 + 有效果**：屬性/輔助/特殊三類直接裝身上（同武器防具方式），屬性相剋攻擊時顯現；取得=工作打怪；「屬性欄睇到所用寶石」 → **已核實邏輯做晒**：`ch.equip.jewels` 2 格 + `support_bonus`/`element_mult`/`spell_jewel_bonus` 已生效、掉落 `npc_drops`/工作合成已通；**「屬性欄顯示所裝寶石」UI 欠** | 邏輯已做；屬性欄寶石顯示 UI | 🟡 邏輯✅；屬性欄顯示待改 |
+| T-11 | 防禦機制 | 防禦分**物理防禦（防物理攻擊）**+**術法防禦（防法術/術法攻擊）**：防具定防禦力；護甲/金甲/聖鎧術→物防 buff，護鏡/光鏡/仙鏡術→術防 buff；寶石可額外提升物/術防 | 已核 = 現 `RulesSpell.def_mult` / `spell_def_mult` 已分物/術防 buff（護甲系=物、護鏡系=術）✅；寶石防禦項已支援（`support_bonus` defPct/sdefPct） | ⚠️ 跟 spec 已做，需人手驗證 |
 
 ---
 

@@ -99,6 +99,7 @@ func _daily_hook(day: int) -> void:
 	_comm_daily(day)             # 居民委託過期 (Step 16)
 	_mount_daily(day)            # 座騎子時結算 (Step 17a)
 	_auction_daily(day)          # S07d NPC 拍賣場換貨 (spec 07 §9)
+	_chest_daily(day)            # T-07 隨機寶箱每日子時更新位置 (spec 02 §6)
 	# S04d: 特殊場景開門日公告（game 日曆窗口）
 	var md := int(data.world["clock"].get("monthDays", 30))
 	var mdow := RulesScene.day_of_month(day, md)

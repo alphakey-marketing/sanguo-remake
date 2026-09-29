@@ -211,8 +211,7 @@ func cmd_marry_hold(id: int) -> void:
 	var gid := int(comp["gen"]["gid"])
 	ms["spouse"] = {"gid": gid, "name": String(comp["name"]), "lv": int(comp["level"]),
 		"classId": String(comp["ch"].get("classId", "")), "ideo": String(comp["ch"].get("ideology", "")),
-		"karma": int(comp["ch"].get("karma", 0)), "birthMonth": int(comp["ch"].get("birthMonth", 1)),
-		"birthDay": int(comp["ch"].get("birthDay", 1)), "day": day,
+		"karma": int(comp["ch"].get("karma", 0)), "day": day,
 		"official": String(data.marry.get("npcs", {}).get("official", "")), "comp": int(comp["id"])}
 	ms["engaged"] = {}
 	ms["booked"] = {}
@@ -378,7 +377,6 @@ func marry_view() -> Dictionary:
 		out["spouse"] = {"gid": int(spouse.get("gid", 0)), "name": String(spouse.get("name", "")),
 			"lv": int(spouse.get("lv", 0)), "classId": String(spouse.get("classId", "")),
 			"ideo": String(spouse.get("ideo", "")), "karma": int(spouse.get("karma", 0)),
-			"birthMonth": int(spouse.get("birthMonth", 1)), "birthDay": int(spouse.get("birthDay", 1)),
 			"day": married_day, "years": years, "official": String(spouse.get("official", "")),
 			"present": not _spouse_ent(ch).is_empty()}
 	return out

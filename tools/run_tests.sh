@@ -24,6 +24,8 @@ else
   echo "[TEST] boot: 冇 script 錯誤"
 fi
 run rules --script tests/run_rules.gd
+run ammo --script tests/run_ammo.gd
+run mall --script tests/run_mall.gd
 run quest --script tests/run_quest.gd
 run hist --script tests/run_hist.gd
 run group --script tests/run_group.gd

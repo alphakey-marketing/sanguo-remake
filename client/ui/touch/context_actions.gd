@@ -49,7 +49,9 @@ static func find(main: Node) -> Dictionary:
 			best = {"kind": "pickup", "label": "拾取", "ref": d_}
 	if not best.is_empty():
 		return best
-	if not main.sim.is_safe(int(me.x), int(me.y)) and has_work_tool(main):
+	# 野外工作區 (spec 05): 要企喺可做嘅工作區 + 有工具先顯示「工作」
+	var skills_here: Array = main.sim.work_area_skills(int(me.x), int(me.y))
+	if not skills_here.is_empty() and has_work_tool_for(main, skills_here):
 		return {"kind": "work", "label": "工作"}
 	if String(main.cur_map.get("kind", "")) == "city":      # 城池街道【原】: 調查 (登用, Step 13.5)
 		return {"kind": "survey", "label": "調查"}
@@ -64,6 +66,19 @@ static func has_work_tool(main: Node) -> bool:
 			return true
 	for b in main.ch.get("bag", []):
 		if main.data.work.has(String(main.data.tool_skill.get(int(b["id"]), ""))):
+			return true
+	return false
+
+
+# 有冇可做 skills_here 入面其中一種嘅初階工具
+static func has_work_tool_for(main: Node, skills_here: Array) -> bool:
+	var tools: Dictionary = main.ch.get("tools", {})
+	for sk in skills_here:
+		if tools.has(String(sk)):
+			return true
+	for b in main.ch.get("bag", []):
+		var sid := String(main.data.tool_skill.get(int(b["id"]), ""))
+		if main.data.work.has(sid) and skills_here.has(sid):
 			return true
 	return false
 
@@ -228,15 +243,23 @@ static func ask_dialog(main: Node) -> Dictionary:
 
 
 # 野外工作 (Step 12): 每個有工具嘅初階技能一個掣；背包有工具未裝 = 「裝備」
+# spec 05: 只顯示喺呢個工作區做到嘅技能；同時提供「小屋休息」(天地商行訂閱 -> 工作區小屋回滿)
 static func work_dialog(main: Node) -> Dictionary:
 	var ch: Dictionary = main.ch
 	var tools: Dictionary = ch.get("tools", {})
+	var me = main._me()
+	var skills_here: Array = (main.sim.work_area_skills(int(me.x), int(me.y)) if me != null else [])
 	var opts: Array = []
 	var lines: Array = []
+	lines.append("%s：呢度可以做到嘅工作：" % main.sim.area_name(int(me.x), int(me.y)))
+	var showed := false
 	for sk in main.data.work:
+		if not skills_here.has(String(sk)):
+			continue
 		var w: Dictionary = main.data.work[sk]
 		var lv: int = main.sim.work_lv(ch, sk)
 		var skill := String(sk)
+		showed = true
 		if tools.has(sk):
 			var cur_item := int(tools[sk]["item"])
 			var cur_tier := String(main.data.tool_tier.get(cur_item, ""))
@@ -253,8 +276,17 @@ static func work_dialog(main: Node) -> Dictionary:
 				var t: int = tid
 				opts.append({"label": "裝%s" % main.item_names.get(tid, "工具"), "cb": func() -> void: main._send({"t": "equip_tool", "skill": skill, "item": t})})
 				break
+	# 天地商行訂閱 -> 工作區小屋休息 (Step 13)：訂閱先見 (未訂閱 = 灰/提示)
+	var sub := bool(ch.get("storageSub", false))
+	var rest_cost := int((main.data.world.get("tiandi", {}) as Dictionary).get("restCost", 10))
+	lines.append("—— 工作區小屋 ——")
+	if sub:
+		lines.append("訂閱咗天地商行：小屋休息 %d 金 回滿 HP/MP/SP" % rest_cost)
+		opts.append({"label": "小屋休息 (%d 金)" % rest_cost, "cb": func() -> void: main._send({"t": "storage_rest"})})
+	else:
+		lines.append("訂閱天地商行（背包→天地商行）之後，工作區有「小屋休息」回滿三值。")
 	opts.append(_leave(main))
-	var text := "\n".join(lines) if not lines.is_empty() else "未裝工具：撳「裝…」裝備背包入面嘅工具。"
+	var text := "\n".join(lines) if showed else "呢度唔合做任何工作。"
 	return {"title": "工作", "text": text + "\nSP %d（每次扣 10%% 最大 SP）" % int(ch.get("sp", 0)), "options": opts}
 
 
