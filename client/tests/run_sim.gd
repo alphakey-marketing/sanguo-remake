@@ -512,12 +512,17 @@ func t_create_fields(data: GameData) -> void:
 func sim_cmd_title_check(data: GameData) -> void:
 	var sim := Sim.new(data, 31)
 	var id := sim.spawn_player("t")
-	sim.cmd_set_title(id, "無")                    # 1 字 OK
-	check(String(sim.player_ch()["title"]) == "無", "稱號: 1 字可以")
-	sim.cmd_set_title(id, "呢個稱號太長會唔得")      # 超過 8 字
-	check(String(sim.player_ch()["title"]) == "無", "稱號: 超過 8 字唔改")
-	sim.cmd_set_title(id, "")                       # 空
-	check(String(sim.player_ch()["title"]) == "無", "稱號: 空唔改")
+	sim.cmd_set_title(id, "無")                    # F1: 未解鎖唔畀戴
+	check(String(sim.player_ch()["title"]) == "", "稱號: 未解鎖唔畀自訂")
+	var pch: Dictionary = sim.player_ch()
+	RulesQuest.apply_reward(data, pch, {"title": "新兵"})
+	check(pch["titles"] == ["新兵"] and String(pch["title"]) == "新兵", "稱號: 獎勵解鎖並自動戴上")
+	RulesQuest.apply_reward(data, pch, {"title": "老兵"})
+	check((pch["titles"] as Array).size() == 2 and String(pch["title"]) == "新兵", "稱號: 第二個只解鎖唔搶戴")
+	sim.cmd_set_title(id, "老兵")
+	check(String(pch["title"]) == "老兵", "稱號: 揀已解鎖嘅可以換")
+	sim.cmd_set_title(id, "")
+	check(String(pch["title"]) == "", "稱號: 空 = 除下")
 	sim.cmd_set_face(id, "hair", 5)
 	check(int(sim.player_ch()["face"]["hair"]) == 1, "臉譜: 款式超出範圍唔改")
 	sim.cmd_set_face(id, "hair", 2)
@@ -631,18 +636,12 @@ func t_upgrade_paths(data: GameData) -> void:
 	var sim := Sim.new(data, 41)
 	var id := sim.spawn_player("t")
 	var ch := sim.player_ch()
-	# --- 歷練: 每 10 歷練升呢時武/智/敏/靈 +1 (同自由點並存) ---
-	ch["lilian"] = 25
-	var lsnap := {}
-	for k in RulesStats.RAIDABLE:
-		lsnap[k] = int(ch["attrs"][k])
+	# --- 升級: 塞足 exp 升一級，派 3 自由點 (歷練已取消 F8) ---
+	var str0 := int(ch["attrs"]["str"])
 	ch["exp"] = RulesStats.exp_to_next(int(ch["level"]))     # 啱啱夠升一級
 	var ups := RulesStats.gain_exp(data, ch, 0)
 	check(ups == 1, "升級路徑: 塞足 exp 升一級")
-	for k in RulesStats.RAIDABLE:
-		check(int(ch["attrs"][k]) == lsnap[k] + 2, "升級路徑: 歷練 25 → %s +2 (每 10 +1)" % k)
-	check(int(ch["lilian"]) == 5, "升級路徑: 歷練用咗 20 剩 5")
-	check(int(ch["attrPoints"]) == 3, "升級路徑: 歷練升級同時派 3 自由點")
+	check(int(ch["attrPoints"]) == 3, "升級路徑: 升級派 3 自由點")
 	# --- 私塾: 政治 +1 (扣 SP/MP+金) ---
 	ch["gold"] = 1000
 	var pol0 := int(ch["attrs"]["pol"])
@@ -655,4 +654,4 @@ func t_upgrade_paths(data: GameData) -> void:
 	sim.cmd_facility(id, "temple")
 	check(int(ch["attrs"]["cha"]) == cha0 + 1, "升級路徑: 寺廟 魅力 +1")
 	# 私塾/寺廟唔會升到武/敏/智/靈
-	check(int(ch["attrs"]["str"]) == lsnap["str"] + 2, "升級路徑: 修練唔郁武力")
+	check(int(ch["attrs"]["str"]) == str0, "升級路徑: 修練唔郁武力")

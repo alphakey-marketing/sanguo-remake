@@ -32,14 +32,14 @@
 
 | ID | 改動 | code 位置參考 | 狀態 |
 |---|---|---|---|
-| F1 | **稱號** → 唔再建角輸入，改為**完成事件獎勵解鎖** | `create_panel` 稱號輸入移除 / `rules/title.gd` 獎勵 mbox + `sim_office`・`sim_quest` 掛鉤 | ❌ 未做 |
-| F2 | **生日** → 唔問玩家（列出：欄位 `birthMonth/birthDay` + 建角 UI + 福日 exp 一齊刪；舊檔遷移清走） | `rules/stats.gd `birthday_exp_mult` / `sim_combat.gd` 福日 / `create_panel` / save 遷移 | ❌ 未做 |
-| F3 | **職業** → 建角加**獨立職業介紹頁**（6 職，copy 附圖文字，預留畫圖位）；**臉譜保留** | `create_panel` 職業頁 → 獨立頁 / `classes.json` 描述 | ❌ 未做 |
+| F1 | **稱號** → 唔再建角輸入，改為**完成事件獎勵解鎖** | `create_panel` 稱號輸入移除 / `rules/title.gd` 獎勵 mbox + `sim_office`・`sim_quest` 掛鉤 | ✅ 已做（2026-09-29，待用家手測） |
+| F2 | **生日** → 唔問玩家（列出：欄位 `birthMonth/birthDay` + 建角 UI + 福日 exp 一齊刪；舊檔遷移清走） | `rules/stats.gd `birthday_exp_mult` / `sim_combat.gd` 福日 / `create_panel` / save 遷移 | ✅ 已做（2026-09-29，待用家手測） |
+| F3 | **職業** → 建角加**獨立職業介紹頁**（6 職，copy 附圖文字，預留畫圖位）；**臉譜保留** | `create_panel` 職業頁 → 獨立頁 / `classes.json` 描述 | ✅ 已做（2026-09-29，待用家手測） |
 | F4 | **政治** → 私塾（消耗 SP/MP）+ **歷史任務獎「政治經驗值」**（如陳宮任務）；高階任務（如《太平要術》）設定**門檻**（政治/魅力/等級 各 10+） | `sim_office` 官令 pol / `sim_quest` 歷史任務獎勵 / 任務門檻檢查 | ❌ 未做 |
 | F5 | **魅力** → **影響登用文官成功率 + 最低要求**（登用成敗 = 魅力+政治+等級+頭銜+親密度） | `rules/recruit.gd` / `sim_recruit.gd` 成功率公式 | ❌ 未做 |
 | F6 | **二/三轉** → **六職業全部**轉職考試 + 任務（唔止義士） | `rules/class.gd` / `sim_quest` 各職轉職任務 | ❌ 未做 |
 | F7 | **專長** → 加**學習任務** + 測試「成功使用專長」 | `rules/expert.gd` / `sim_quest` / `run_char.gd` | ❌ 未做 |
-| F8 | **練兵場** → 直接加 **EXP**（取代「歷練每10下次升4屬+1」）；新手任務 `newbie_training` 獎勵 `lilian:10` 改做 exp | `sim_core` 練兵場 / `quests.json` newbie_training | ❌ 未做 |
+| F8 | **練兵場** → 直接加 **EXP**（取代「歷練每10下次升4屬+1」）；新手任務 `newbie_training` 獎勵 `lilian:10` 改做 exp | `sim_core` 練兵場 / `quests.json` newbie_training | ✅ 已做（2026-09-29，待用家手測） |
 
 > 落 code 前須用家 confirm（見 §0）：練兵場「歷練」系統成唔成個取消？新手任務獎 exp 幾多？生日欄位舊檔點遷移？職業介紹頁每職畫圖位 size/格式？
 

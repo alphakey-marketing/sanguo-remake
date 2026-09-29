@@ -68,7 +68,7 @@ static func create_character(data: GameData, char_name: String, class_id: String
 		"hp": max_hp(1, attrs), "mp": max_mp(1, attrs), "sp": max_sp(1, attrs),
 		"gold": int(st.get("gold", 0)), "karma": 0, "bag": bag, "equip": equip, "status": {},
 		# Step 7.5 建角欄位 (spec 01 §1/§11)
-		"title": "", "face": face,
+		"title": "", "titles": [], "face": face,
 		"ideology": "", "quizAnswers": [], "attrPoints": 0, "raised": {},
 		# Step 8 任務欄位 (spec 06 §1.2): 進行中 questId -> {stage, startDay, flags}；完成記錄
 		"quests": {}, "questDone": {},
@@ -91,13 +91,6 @@ static func gain_exp(data: GameData, ch: Dictionary, amount: int) -> int:
 	if ups > 0:
 		var lv := int(ch["level"])
 		var attrs: Dictionary = ch["attrs"]
-		# 歷練【原】: 練兵場對練儲歷練，升呢時每 10 歷練 武/智/敏/靈 +1，消耗對應歷練 (同自由點並存)
-		var lilian := int(ch.get("lilian", 0))
-		var bonus := lilian / 10
-		if bonus > 0:
-			for k in RAIDABLE:
-				attrs[k] = int(attrs[k]) + bonus
-			ch["lilian"] = lilian - bonus * 10
 		ch["hp"] = max_hp(lv, attrs)
 		ch["mp"] = max_mp(lv, attrs)
 		ch["sp"] = max_sp(lv, attrs)

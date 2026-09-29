@@ -1,8 +1,8 @@
 {
-  "_note": "城內設施 (Step 16.5 B3: station = 驛站，rules/station.gd，車費見 world.json station；Step 3.2；Step 12 加 repair=修理服務、crafts=進階工作區)【原】: 練兵場(2 人對練+歷練)/私塾(政治+1)/寺廟(魅力+1)。成本【自訂】: 練兵場扣 HP/SP 比例、私塾扣 SP/MP+金、寺廟扣 SP+金。歷練: 每 10 點喺下次升級時武/智/敏/靈 +1 (cap 100)。attr cap = 屬性上限。",
+  "_note": "城內設施 (Step 16.5 B3: station = 驛站，rules/station.gd，車費見 world.json station；Step 3.2；Step 12 加 repair=修理服務、crafts=進階工作區)【原】: 練兵場(2 人對練+直接加 EXP)/私塾(政治+1)/寺廟(魅力+1)。成本【自訂】: 練兵場扣 HP/SP 比例、私塾扣 SP/MP+金、寺廟扣 SP+金。練兵場 EXP = max(expMin, 當級升級所需 × expPct)。attr cap = 屬性上限。",
   "training": { "name": "練兵場", "map": "xuchang", "x": 10, "y": 21, "color": [0.25, 0.7, 0.4],
-    "costHp": 0.15, "costSp": 0.15, "lilian": 10, "lilianCap": 100, "cooldownTicks": 300,
-    "desc": "同人對練: 扣 15% HP/SP, +10 歷練; 升呢時每 10 歷練 武/智/敏/靈 +1" },
+    "costHp": 0.15, "costSp": 0.15, "expPct": 0.05, "expMin": 5, "cooldownTicks": 300,
+    "desc": "同人對練: 扣 15% HP/SP, 直接加經驗 (約當級升級所需 5%)" },
   "trainer": { "name": "練兵場小兵", "map": "xuchang", "x": 11, "y": 22, "color": [0.5, 0.75, 0.5],
     "cooldownTicks": 150,
     "desc": "小兵免費回復 SP【原】（`cmd_facility(id,\"restsp\")`）" },
