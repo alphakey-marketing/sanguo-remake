@@ -68,7 +68,7 @@ static func create_character(data: GameData, char_name: String, class_id: String
 		"hp": max_hp(1, attrs), "mp": max_mp(1, attrs), "sp": max_sp(1, attrs),
 		"gold": int(st.get("gold", 0)), "karma": 0, "bag": bag, "equip": equip, "status": {},
 		# Step 7.5 建角欄位 (spec 01 §1/§11)
-		"title": "", "birthMonth": 1, "birthDay": 1, "face": face,
+		"title": "", "face": face,
 		"ideology": "", "quizAnswers": [], "attrPoints": 0, "raised": {},
 		# Step 8 任務欄位 (spec 06 §1.2): 進行中 questId -> {stage, startDay, flags}；完成記錄
 		"quests": {}, "questDone": {},
@@ -180,11 +180,3 @@ static func spent_total(spent: Dictionary) -> int:
 	return t
 
 
-# 福日【自訂】(spec 01 §1): 生日嗰日練功 exp ×1.1。game 年年長 year_days (=12×month_days)，day 由 0 起。
-static func birthday_exp_mult(day: int, year_days: int, month_days: int, bm: int, bd: int) -> float:
-	if year_days <= 0 or month_days <= 0 or bm < 1 or bm > 12 or bd < 1 or bd > month_days:
-		return 1.0
-	var d := day % year_days
-	var m := d / month_days + 1
-	var dd := d % month_days + 1
-	return 1.1 if m == bm and dd == bd else 1.0

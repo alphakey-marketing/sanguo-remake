@@ -104,7 +104,7 @@ func _build_spouse(list: VBoxContainer, v: Dictionary) -> void:
 		return
 	list.add_child(wrap_lbl("%s　Lv%d　%s" % [String(spouse.get("name", "")), int(spouse.get("lv", 0)), String(spouse.get("classId", ""))], 15, UiTheme.GOLD))
 	list.add_child(wrap_lbl("結婚 %d 年（第 %d 日）　主婚人：%s" % [int(spouse.get("years", 0)), int(spouse.get("day", 0)), String(spouse.get("official", ""))], 13))
-	list.add_child(wrap_lbl("生日 %d 月 %d 日　理念 %s" % [int(spouse.get("birthMonth", 1)), int(spouse.get("birthDay", 1)), String(spouse.get("ideo", ""))], 13))
+	list.add_child(wrap_lbl("理念 %s" % String(spouse.get("ideo", "")), 13))
 	list.add_child(wrap_lbl("目前：%s" % ("身邊" if bool(spouse.get("present", false)) else "唔喺身邊"), 13, UiTheme.DIM))
 	list.add_child(hsep())
 	var blocks: Dictionary = v.get("blocks", {})

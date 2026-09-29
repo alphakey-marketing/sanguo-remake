@@ -37,18 +37,35 @@ func _quest_by_id(quest_id: String) -> Dictionary:
 
 
 # quest 進度事件統一出口: 播對話 + emit + 獎勵訊息
-func _quest_emit(e: Dictionary, q: Dictionary, res: Dictionary) -> void:
+# merge() 喺 Godot4 返 void，唔可以畀值用；呢度手動合埋兩個 dict (後覆蓋前)。
+static func dict_merge(base: Dictionary, over: Dictionary) -> Dictionary:
+	var out := base.duplicate()
+	for k in over:
+		out[k] = over[k]
+	return out
+
+
+func _quest_emit(e: Dictionary, q: Dictionary, res: Dictionary, speaker: String = "") -> void:
 	var id := int(e["id"])
-	for line in res.get("dialog", []):
+	var dlg: Array = res.get("dialog", [])
+	for line in dlg:
 		_msg(id, str(line))
+	var payload := {"dst": id, "quest": q["id"], "dialog": dlg}
+	if speaker != "":
+		payload["speaker"] = speaker
 	if bool(res.get("started", false)):
-		_emit({"k": "quest", "dst": id, "quest": q["id"], "started": true, "stage": int(res.get("stage", 0))})
+		payload["started"] = true
+		payload["stage"] = int(res.get("stage", 0))
+		_emit(dict_merge({"k": "quest"}, payload))
 	elif bool(res.get("done", false)):
 		_sync_stats(e)
-		_emit({"k": "quest", "dst": id, "quest": q["id"], "done": true, "reward": res.get("reward", {})})
+		payload["done"] = true
+		payload["reward"] = res.get("reward", {})
+		_emit(dict_merge({"k": "quest"}, payload))
 		_on_militia_quest_done(q)      # S08f: 團體任務完成 → 義勇軍績效 (sim_office override)
 	else:
-		_emit({"k": "quest", "dst": id, "quest": q["id"], "stage": int(res.get("stage", 0))})
+		payload["stage"] = int(res.get("stage", 0))
+		_emit(dict_merge({"k": "quest"}, payload))
 	_sync_quest_npcs()          # 開始/推進/完成都可能改 NPC 常駐 (questOnly boss/內應, Step 16)
 	if not str(res.get("msg", "")).is_empty():
 		_msg(id, str(res["msg"]))
@@ -84,7 +101,7 @@ func cmd_quest_talk(id: int, npc_id: String) -> void:
 		if not bool(res.get("changed", false)):
 			continue
 		spoke = true
-		_quest_emit(e, q, res)
+		_quest_emit(e, q, res, String(npc.get("name", "")))
 	if not spoke:
 		spoke = _quest_talk_auto(e, npc_id)
 	if not spoke:
@@ -166,7 +183,8 @@ func cmd_quest_turnin(id: int, quest_id: String) -> void:
 		if not str(res.get("msg", "")).is_empty():
 			_msg(id, str(res["msg"]))
 		return
-	_quest_emit(e, q, res)
+	var sp := String(data.quest_npcs.get(gv, {}).get("name", ""))
+	_quest_emit(e, q, res, sp)
 
 
 # 答題 (ask stage: 登用問答 / 任務題目)
@@ -179,10 +197,16 @@ func cmd_quest_answer(id: int, quest_id: String, answer_idx: int) -> void:
 		return
 	var res := RulesQuest.on_answer(data, e["ch"], q, answer_idx)
 	if not bool(res.get("changed", false)):
+		# 答錯: 唔推進，但 NPC 回應對話（如有）照彈 + 信息欄提示（UAT point 2）
+		var wdlg: Array = res.get("dialog", [])
+		if not wdlg.is_empty():
+			_emit({"k": "quest", "dst": id, "quest": q["id"], "dialog": wdlg,
+				"speaker": String(data.quest_npcs.get(String(q.get("giver", "")), {}).get("name", ""))})
 		if not str(res.get("msg", "")).is_empty():
 			_msg(id, str(res["msg"]))
 		return
-	_quest_emit(e, q, res)
+	var spn := String(data.quest_npcs.get(String(q.get("giver", "")), {}).get("name", ""))
+	_quest_emit(e, q, res, spn)
 
 
 # 新手修練退款 (spec 06 §2): facility quest 進行中 → 免費；未開始 + pre ok → 由第一次使用自動觸發
@@ -238,7 +262,30 @@ func view_quest_npcs() -> Array:
 	return out
 
 
-# 記事 UI: 進行中任務 + stage 提示 + 完成記錄 (hidden quest 唔顯示)
+# 記事 UI: 地標典籍（spec 12 §5 / UAT-feedback）——探到嘅史蹟地標可重睇典故；唔存 text（data 靜態有），ch.landmarks = 已探 id
+func view_landmarks() -> Array:
+	var ch := player_ch()
+	var seen: Array = (ch.get("landmarks", []) as Array) if ch is Dictionary else []
+	var out: Array = []
+	for lm in data.landmarks:
+		var mid := String(lm["map"])
+		var is_seen := false
+		for sid in seen:
+			if String(sid) == String(lm["id"]):
+				is_seen = true
+				break
+		out.append({"id": String(lm["id"]), "name": String(lm["name"]), "map": mid,
+			"mapName": _lm_map_name(mid), "text": String(lm.get("text", "")), "seen": is_seen})
+	return out
+
+
+func _lm_map_name(map_id: String) -> String:
+	for md in data.maps:
+		if String(md.get("id", "")) == map_id:
+			return String(md.get("name", map_id))
+	return map_id
+
+
 func view_quests() -> Array:
 	var ch := player_ch()
 	var out: Array = []

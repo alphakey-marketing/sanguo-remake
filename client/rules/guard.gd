@@ -19,7 +19,10 @@ static func level_of(g: Dictionary, idx: int, per_city: int) -> int:
 # 而家時辰係咪巡邏時辰 (否則企定位)
 static func is_patrol_time(g: Dictionary, shichen: int) -> bool:
 	var ps: Array = g.get("patrolShichen", [])
-	return ps.has(shichen)
+	for s in ps:      # JSON 載入整數變 float (3.0)，Array.has(int) 唔可靠 → 逐個 int 比
+		if int(s) == shichen:
+			return true
+	return false
 
 
 # 企定位: 客棧座標 + 固定偏移 (唔係城門口)

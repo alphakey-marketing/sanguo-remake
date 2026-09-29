@@ -30,7 +30,6 @@ func _init() -> void:
 	t_attr_points(data)
 	t_upgrade_paths(data)
 	t_quiz_rules(data)
-	t_birthday_exp()
 	print("[TEST] sim scenarios: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -343,7 +342,7 @@ func _rng_seq(vals: Array) -> Callable:
 func t_work_sim(data: GameData) -> void:
 	var sim := Sim.new(data, 6)
 	var pid := sim.spawn_player("t")
-	_put(sim, pid, 30, 30)                                  # field_1 (unsafe)
+	_put(sim, pid, 60, 35)                                  # 東山丘林 = 採礦工作區
 	var ch: Dictionary = sim.player_ch()
 	var sk: Dictionary = data.work["mining"]
 	var bag0: int = ch["bag"].size()
@@ -371,7 +370,7 @@ func t_work_sim(data: GameData) -> void:
 	var bag_before: int = ch["bag"].size()
 	sim.cmd_work(pid, "mining")
 	check(ch["bag"].size() == bag_before, "工作: 城內唔可以工作")
-	_put(sim, pid, 30, 30)
+	_put(sim, pid, 60, 35)                                  # 返採礦工作區
 	var dur := int(ch["tools"]["mining"]["dur"])
 	for i in dur:
 		ch["sp"] = 999999                                    # 測試唔理 SP 限制，淨係試耐久
@@ -496,7 +495,7 @@ func t_use_item(data: GameData) -> void:
 func t_create_fields(data: GameData) -> void:
 	var ch := RulesStats.create_character(data, "測試仔", "yishi")
 	check(ch.get("title", "?") == "", "建角: title 欄位有預設空")
-	check(int(ch.get("birthMonth", 0)) == 1 and int(ch.get("birthDay", 0)) == 1, "建角: 生日預設 1月1日")
+	check(not ch.has("birthMonth") and not ch.has("birthDay"), "建角: 已移除生日欄位 (T-01)")
 	check(int(ch.get("attrPoints", -1)) == 0, "建角: attrPoints 預設 0")
 	check(ch.get("raised", null) is Dictionary and ch["raised"].is_empty(), "建角: raised 預設空")
 	check(str(ch.get("ideology", "?")) == "", "建角: ideology 預設空")
@@ -519,12 +518,6 @@ func sim_cmd_title_check(data: GameData) -> void:
 	check(String(sim.player_ch()["title"]) == "無", "稱號: 超過 8 字唔改")
 	sim.cmd_set_title(id, "")                       # 空
 	check(String(sim.player_ch()["title"]) == "無", "稱號: 空唔改")
-	sim.cmd_set_birth(id, 13, 1)
-	check(int(sim.player_ch()["birthMonth"]) == 1, "生日: 13 月唔受理")
-	sim.cmd_set_birth(id, 2, 30)
-	check(int(sim.player_ch()["birthDay"]) == 1, "生日: 2月30日唔受理")
-	sim.cmd_set_birth(id, 3, 15)
-	check(int(sim.player_ch()["birthMonth"]) == 3 and int(sim.player_ch()["birthDay"]) == 15, "生日: 3月15日受理")
 	sim.cmd_set_face(id, "hair", 5)
 	check(int(sim.player_ch()["face"]["hair"]) == 1, "臉譜: 款式超出範圍唔改")
 	sim.cmd_set_face(id, "hair", 2)
@@ -631,14 +624,6 @@ func t_quiz_rules(data: GameData) -> void:
 	var loaded := Sim.load_string(data, s)
 	check(str(loaded.player_ch()["ideology"]) == str(sim.player_ch()["ideology"]), "存檔: ideology roundtrip")
 	check(loaded.player_ch()["quizAnswers"].size() == 12, "存檔: quizAnswers roundtrip")
-
-
-func t_birthday_exp() -> void:
-	check(RulesStats.birthday_exp_mult(0, 360, 30, 1, 1) == 1.1, "福日: 1月1日 first day → 1.1")
-	check(RulesStats.birthday_exp_mult(14, 360, 30, 1, 15) == 1.1, "福日: 1月15日該日 → 1.1")
-	check(RulesStats.birthday_exp_mult(15, 360, 30, 1, 15) == 1.0, "福日: 第二日唔係生日")
-	check(RulesStats.birthday_exp_mult(44, 360, 30, 2, 15) == 1.1, "福日: 2月15日該日")
-	check(RulesStats.birthday_exp_mult(100, 0, 30, 1, 1) == 1.0, "福日: 無年日設定 → 1.0")
 
 
 # 六屬性提昇路徑驗收 (spec 01 §3/§6): 武/敏/智/靈=升級點+歷練, 政治=私塾, 魅力=寺廟

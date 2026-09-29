@@ -53,6 +53,7 @@ var camp: Dictionary = {}         # 義勇軍營地建設/工作 (data/camp.json
 var mounts: Dictionary = {}       # 座騎設定 (data/mounts.json, Step 17a)
 var mount_weapons: Dictionary = {}  # 馬戰兵器 + 特技 (data/mount_weapons.json, Step 17b)
 var war_beasts: Dictionary = {}   # 戰騎屬性/升級 (data/war_beasts.json, Step 18)
+var mall: Dictionary = {}          # 貨金商城 (data/mall.json, S11a): {stock:[id], prices:{id:金}}
 var battles: Array = []           # 戰役任務 (data/battles.json, Step 19)
 var scenes: Array = []            # 特殊場景 (data/scenes.json, S04d): 怪物/層/日曆窗口
 var quiz: Array = []              # 理念測驗題庫 (data/quiz.json, Step 7.5)
@@ -153,6 +154,7 @@ static func load_all() -> GameData:
 	g.war_beasts = _read("res://data/war_beasts.json")
 	g.battles = (_read("res://data/battles.json") as Dictionary)["battles"]
 	g.scenes = (_read("res://data/scenes.json") as Dictionary)["scenes"]
+	g.mall = _read("res://data/mall.json")
 	for o in g.office["orders"]:
 		o["rankName"] = RulesTitle.name_of(g.titles, int(o["rank"]))
 	var qz: Dictionary = _read("res://data/quiz.json")

@@ -86,7 +86,7 @@ func t_gather_bonus(data: GameData) -> void:
 	var ch: Dictionary = arr[2]
 	ch["level"] = 80
 	ch["workLv"]["farming"] = {"lv": 100, "exp": 0}
-	_put(sim, pid, 20, 15)  # 野外
+	_put(sim, pid, 70, 15)  # 許下屯田 = 農耕工作區
 	_equip_tool(sim, pid, ch, "farming", 26053)  # 御賜鋤頭
 	check(String(data.tool_tier.get(26053, "")) == "godgiven", "26053 = 農耕御賜工具")
 	var got_bonus := false
@@ -103,7 +103,7 @@ func t_gather_bonus(data: GameData) -> void:
 	var pid2: int = arr2[1]
 	var ch2: Dictionary = arr2[2]
 	ch2["workLv"]["farming"] = {"lv": 100, "exp": 0}
-	_put(sim2, pid2, 20, 15)
+	_put(sim2, pid2, 70, 15)
 	_equip_tool(sim2, pid2, ch2, "farming", 26041)  # 特製鋤頭 (非御賜)
 	for i in 50:
 		ch2["sp"] = 999999

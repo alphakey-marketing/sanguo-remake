@@ -29,6 +29,8 @@ func _build_body() -> void:
 	list.add_theme_constant_override("separation", 6)
 	sc.add_child(list)
 	list.add_child(btn("登用人才 / 同伴", func() -> void: main.hud.open_panel("recruit")))
+	list.add_child(btn("貨金商城（系統→店鋪）", func() -> void: main.hud.mall_panel().open()))
+	list.add_child(btn("說明（新手教程）", func() -> void: main.hud.help_panel().open()))
 	list.add_child(btn("座騎", func() -> void: main.hud.mount_panel().open_tab(0)))
 	list.add_child(btn("戰騎", func() -> void: main.hud.war_beast_panel().open_tab(0)))
 	list.add_child(btn("官宅", func() -> void: main.hud.office_panel().open_tab(0)))
@@ -47,6 +49,10 @@ func _build_body() -> void:
 	list.add_child(hsep())
 	list.add_child(lbl("設定", 16, UiTheme.GOLD))
 	var hud = main.hud
+	list.add_child(btn("移動方式：%s" % ("搖桿" if main.move_mode == "stick" else "撳地行"), func() -> void:
+		main._set_move_mode("tap" if main.move_mode == "stick" else "stick")
+		main._log("移動方式 %s" % ("搖桿" if main.move_mode == "stick" else "撳地行"))
+		refresh(true)))
 	list.add_child(btn("撳掣震動：%s" % ("開" if hud.vibrate_on else "關"), func() -> void:
 		hud.vibrate_on = not hud.vibrate_on
 		refresh(true)))

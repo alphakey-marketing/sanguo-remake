@@ -137,6 +137,49 @@ func cmd_auto_assign(id: int) -> void:
 	_msg(id, "自動分配合成 (剩 %d 點)" % int(ch["attrPoints"]))
 
 
+# 新手城建角揀城 (UAT-feedback, spec 12 §1)【自訂】: 未出發(Lv1)先可以揀；揀完搬去嗰城客棧
+# 只允許有 city 地圖嘅「新手城」（許昌/襄陽/新野）
+const NEWBIE_CITIES := ["xuchang", "xiangyang", "xinye"]
+
+func newbie_cities() -> Array:
+	var out: Array = []
+	for c in NEWBIE_CITIES:
+		var md := _city_map(c)
+		if not md.is_empty():
+			out.append({"id": c, "name": String(md.get("name", c)), "spawn": (md.get("spawn", []) as Array)})
+	return out
+
+
+# 揀做新手城: 記低 ch.homeCity + 搬去嗰城（客棧側）
+func cmd_set_home(id: int, city_id: String) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return
+	var ch: Dictionary = e["ch"]
+	if int(ch["level"]) != 1:
+		return _msg(id, "出發咗就唔可以改新手城")
+	var md := _city_map(city_id)
+	if md.is_empty():
+		return _msg(id, "揀嘅城未開放")
+	# 搬去嗰城客棧側（同 cmd_travel 咁直接改座標）
+	var inn := nearest_inn(String(md["id"]))
+	var dest := _free_near(int(inn["x"]), int(inn["y"]))
+	e["x"] = dest.x
+	e["y"] = dest.y
+	e["tx"] = dest.x
+	e["ty"] = dest.y
+	e.erase("path")
+	e["atk_target"] = 0
+	ch["homeCity"] = city_id
+	if e.has("goto"):
+		e.erase("goto")
+	if e.has("casting"):
+		e.erase("casting")
+		_emit({"k": "cast_interrupted", "dst": id, "reason": "travel"})
+	_msg(id, "新手城揀做「%s」" % String(md.get("name", city_id)))
+	_emit({"k": "home", "dst": id, "city": city_id, "x": e["x"], "y": e["y"], "map": map_id_at(int(e["x"]), int(e["y"]))})
+
+
 # 建角期間轉職業 (Step 9): 未出發 (Lv1) 先可以；重新生成角色
 func cmd_select_class(id: int, class_id: String) -> void:
 	var e := ent(id)
@@ -203,19 +246,6 @@ func cmd_set_title(id: int, title: String) -> void:
 		return _msg(id, "稱號要 1~8 字")
 	e["ch"]["title"] = title
 	_msg(id, "稱號改做「%s」" % title)
-
-
-# 生日: 影響福日 (生日嗰日練功 exp +10%) 同結婚年數
-func cmd_set_birth(id: int, month: int, day: int) -> void:
-	var e := ent(id)
-	if e.is_empty() or not e.has("ch"):
-		return
-	var month_days := [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-	if month < 1 or month > 12 or day < 1 or day > int(month_days[month - 1]):
-		return _msg(id, "生日日期唔啱")
-	e["ch"]["birthMonth"] = month
-	e["ch"]["birthDay"] = day
-	_msg(id, "生日設為 %d月%d日 (福日練功 +10%%)" % [month, day])
 
 
 # 臉譜: 8 部位，款式 1..count (data/face.json)

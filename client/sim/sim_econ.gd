@@ -60,6 +60,16 @@ func _shop_for(e: Dictionary) -> Dictionary:
 	return {}
 
 
+# 城際貿易 (spec 05 §6): 買賣價用**所屬商店所在城**嘅市場 pf；商店唔屬任何城 (馬廄/洞窟) = 回歸故鄉城市場價。
+func _shop_pf(shop: Dictionary, item: int) -> float:
+	var city := String(shop.get("map", ""))
+	if city != "":
+		var g := market_city(city, str(int(data.cats.get(item, 0))))
+		if not g.is_empty():
+			return float(g.get("pf", 1.0))
+	return market_factor(item)
+
+
 # S08b：城池「鑄造」屬性影響商店貨單（attr ≥ min → 多啲貨）。呢件貨商店賣唔賣
 func shop_sells(shop: Dictionary, item: int) -> bool:
 	var stock: Array = shop.get("stock", [])
@@ -108,7 +118,7 @@ func cmd_buy(id: int, item: int, n: int = 1) -> void:
 		return _msg(id, shut)
 	var ch: Dictionary = e["ch"]
 	var tm := _companion_trade_mul(ch)                                                    # 商才 (S09c)
-	var cost := maxi(1, MathX.js_round(RulesShop.buy_price(data.prices.get(item, 0.0) * market_factor(item), ch["attrs"]["cha"], int(ch["karma"]), expert_lv(ch, "jiaoyi")) * n * float(tm.get("buy", 1.0))))
+	var cost := maxi(1, MathX.js_round(RulesShop.buy_price(data.prices.get(item, 0.0) * _shop_pf(shop, item), ch["attrs"]["cha"], int(ch["karma"]), expert_lv(ch, "jiaoyi")) * n * float(tm.get("buy", 1.0))))
 	if int(ch["gold"]) < cost:
 		return _msg(id, "金錢不足，要 %d" % cost)
 	ch["gold"] = int(ch["gold"]) - cost
@@ -116,12 +126,51 @@ func cmd_buy(id: int, item: int, n: int = 1) -> void:
 	_msg(id, "買咗 %d 件，花 %d 金" % [n, cost])
 
 
+# ================= 貨金商城 (S11a【自訂】單機化) =================
+# 精選 cat 250 商城道具以金錢(兩)賣，系統→店鋪面板入口 (唔使近任何 NPC)。
+# stock/price 喺 data/mall.json；買受魅力/交易折扣影響（同一般商店），唔受天災缺貨限制。
+func cmd_mall_buy(id: int, item: int, n: int = 1) -> void:
+	var e := ent(id)
+	n = clampi(n, 1, 99)
+	if e.is_empty() or not e.has("ch"):
+		return
+	var stock: Array = data.mall.get("stock", [])
+	if not (stock.has(item) or stock.has(float(item))):
+		return _msg(id, "貨金商城冇呢件")
+	var ch: Dictionary = e["ch"]
+	var base := float(data.mall.get("prices", {}).get(str(item), data.prices.get(item, 0.0)))
+	base = maxf(1.0, base)
+	var tm := _companion_trade_mul(ch)
+	var cost := maxi(1, MathX.js_round(RulesShop.buy_price(base, ch["attrs"]["cha"], int(ch["karma"]), expert_lv(ch, "jiaoyi")) * n * float(tm.get("buy", 1.0))))
+	if int(ch["gold"]) < cost:
+		return _msg(id, "金錢不足，要 %d 金" % cost)
+	ch["gold"] = int(ch["gold"]) - cost
+	RulesShop.add_item(ch["bag"], item, n)
+	_emit({"k": "mall", "dst": id, "item": item, "n": n, "gold": cost})
+	_msg(id, "貨金商城：買咗 %s ×%d，花 %d 金" % [data.names.get(item, str(item)), n, cost])
+
+
+# UI 讀取貨金商城貨單 + 各件價
+func mall_view(id: int) -> Dictionary:
+	var ch: Dictionary = (ent(id) as Dictionary).get("ch", {})
+	if ch.is_empty():
+		return {}
+	var stock: Array = []
+	for it in data.mall.get("stock", []) as Array:
+		var iid := int(it)
+		var base := float(data.mall.get("prices", {}).get(str(iid), data.prices.get(iid, 0.0)))
+		stock.append({"id": iid, "name": data.names.get(iid, str(iid)),
+			"price": maxi(1, MathX.js_round(RulesShop.buy_price(maxf(1.0, base), ch["attrs"]["cha"], int(ch["karma"]), expert_lv(ch, "jiaoyi"))))})
+	return {"stock": stock, "gold": int(ch.get("gold", 0))}
+
+
 func cmd_sell(id: int, item: int, n: int = 1) -> void:
 	var e := ent(id)
 	n = mini(99, n)
 	if e.is_empty() or not e.has("ch") or n < 1:
 		return
-	if _shop_for(e).is_empty():
+	var shop := _shop_for(e)
+	if shop.is_empty():
 		return _msg(id, "附近冇商店")
 	if RulesQuest.is_quest_item(data, item):
 		return _msg(id, "任務道具唔可以賣 (會擋任務)")
@@ -137,7 +186,7 @@ func cmd_sell(id: int, item: int, n: int = 1) -> void:
 		return _msg(id, "快捷列裝備中，唔可以賣")
 	if not RulesShop.remove_item(ch["bag"], item, n):
 		return _msg(id, "背包冇咁多")
-	var gain := maxi(0, MathX.js_round(RulesShop.sell_price(data.prices.get(item, 0.0) * market_factor(item), expert_lv(ch, "jiaoyi")) * n * float(_companion_trade_mul(ch).get("sell", 1.0))))   # 商才 (S09c)
+	var gain := maxi(0, MathX.js_round(RulesShop.sell_price(data.prices.get(item, 0.0) * _shop_pf(shop, item), expert_lv(ch, "jiaoyi")) * n * float(_companion_trade_mul(ch).get("sell", 1.0))))   # 商才 (S09c)
 	ch["gold"] = int(ch["gold"]) + gain
 	_cleanup_dur(ch)
 	_cleanup_fused(ch)                    # 賣晒融合武器 → 清嵌石記錄
@@ -172,6 +221,19 @@ const ITEM_TUNNEL := 65020          # 遁地卷軸: 傳送去戰役 (山洞/迷�
 const ITEM_BAG_200 := 65024         # 千歲袋: 永久負重上限 +200
 const ITEM_RECALL := 65040          # 回城卷軸: 即時傳送返最近城池
 
+# 商城道具單機化 (S11, 精選批次): 行動丸 / 升官令牌 / 歷練神丹 / 技能神丹 / 戰騎神丹
+const ITEM_ACTION_PILL := 65003     # 行動丸
+const ITEM_PROMOTE_TOKEN := 30016   # 升官令牌: 頭銜升 1 階
+const ITEM_LILIAN_ELIXIR := 30012   # 歷練神丹: 歷練 +10
+const ITEM_SKILL_ELIXIR := 30013    # 技能神丹: 全部已學專長 exp +50
+const ITEM_BEAST_ELIXIR := 30014    # 戰騎神丹: 出戰中戰騎經驗 +200 (S11b 之後接)
+# 職業丹 (S11): 食丹 → 施展對應職業特技 (唔使已由導師學到)
+const ITEM_PILL_UNLOCK := 30055     # 開鎖丹 -> unlock
+const ITEM_PILL_QIETING := 30056    # 竊聽丹 -> qieting
+const ITEM_PILL_YINXING := 30057    # 潛行丹 -> yinxing
+const ITEM_PILL_CHAODU := 30058     # 超渡丹 -> chaodu
+const ITEM_PILL_TOUSHI := 30059     # 透視丹 -> toushi
+
 
 # 食用/飲用消耗品【原=食物藥水回 HP、藥丸散回 MP；自訂=冇食用次數限制，用完即扣背包一件】
 func cmd_use_item(id: int, item: int) -> void:
@@ -187,6 +249,11 @@ func cmd_use_item(id: int, item: int) -> void:
 		ITEM_LABOR: return _use_labor_voucher(id, e)
 		ITEM_TUNNEL: return _use_tunnel_scroll(id, e)
 		ITEM_RECALL: return _use_recall_scroll(id, e)
+		ITEM_ACTION_PILL: return _use_ap_pill(e, item)          # 行動丸: 回滿行動力
+		ITEM_PROMOTE_TOKEN: return _use_promote_token(id, e)    # 升官令牌: 頭銜 +1
+		ITEM_LILIAN_ELIXIR: return _use_lilian_elixir(id, e)    # 歷練神丹
+		ITEM_SKILL_ELIXIR: return _use_skill_elixir(id, e)      # 技能神丹
+		ITEM_BEAST_ELIXIR: return _use_beast_elixir(id, e)      # 戰騎神丹 (S11b)
 	var heal: Dictionary = data.heals.get(item, {})
 	if heal.is_empty():
 		return _msg(id, "呢件唔可以食用")
@@ -276,6 +343,82 @@ func _use_recall_scroll(id: int, e: Dictionary) -> void:
 	var p := _item_city_anchor(md)
 	_item_teleport(e, p.x, p.y)
 	_msg(id, "回城卷軸生效，傳送返%s" % String(md["name"]))
+
+
+# ================= 商城道具單機化 (S11, 精選批次) =================
+# 升官令牌: 頭銜升 1 階（封頂喺 titles 最高階，同 cmd_claim_title 同理）
+func _use_promote_token(id: int, e: Dictionary) -> void:
+	var ch: Dictionary = e["ch"]
+	if not RulesShop.remove_item(ch["bag"], ITEM_PROMOTE_TOKEN, 1):
+		return _msg(id, "背包冇呢件")
+	var max_rank := 0
+	for t in data.titles:
+		max_rank = maxi(max_rank, int(t.get("rank", 0)))
+	var cur := int(ch.get("titleRank", 0))
+	if cur >= max_rank:
+		return _msg(id, "已經係最高頭銜 (%d)" % cur)
+	ch["titleRank"] = cur + 1
+	_emit({"k": "title", "id": id, "rank": int(ch["titleRank"]), "name": RulesTitle.name_of(data.titles, int(ch["titleRank"]))})
+	_msg(id, "升官令牌生效：升到「%s」(第 %d 階)！" % [RulesTitle.name_of(data.titles, int(ch["titleRank"])), int(ch["titleRank"])])
+
+
+# 歷練神丹: 歷練 +10（封頂 100，同練兵場 cap 一致）
+func _use_lilian_elixir(id: int, e: Dictionary) -> void:
+	var ch: Dictionary = e["ch"]
+	if not RulesShop.remove_item(ch["bag"], ITEM_LILIAN_ELIXIR, 1):
+		return _msg(id, "背包冇呢件")
+	var cap := 100
+	var cur := int(ch.get("lilian", 0))
+	if cur >= cap:
+		return _msg(id, "歷練已滿 (%d)" % cap)
+	ch["lilian"] = mini(cap, cur + 10)
+	_emit({"k": "train", "src": id, "lilian": int(ch["lilian"])})
+	_msg(id, "歷練神丹：歷練 +%d (%d)" % [int(ch["lilian"]) - cur, int(ch["lilian"])])
+
+
+# 技能神丹: 全部已學專長 exp +50（逐個專長 add，封頂喺職業上限）
+func _use_skill_elixir(id: int, e: Dictionary) -> void:
+	var ch: Dictionary = e["ch"]
+	if not RulesShop.remove_item(ch["bag"], ITEM_SKILL_ELIXIR, 1):
+		return _msg(id, "背包冇呢件")
+	var exp: Dictionary = ch.get("expert", {})
+	if exp.is_empty():
+		return _msg(id, "未有學到任何專長卦，冇得加")
+	for skill_id in exp.keys():
+		RulesExpert.add_exp(ch, data.experts, String(skill_id), 50)
+	_sync_stats(e)
+	_emit({"k": "expert", "id": id})
+	_msg(id, "技能神丹：%d 個專長 exp +50" % exp.size())
+
+
+# 戰騎神丹: 出戰中戰騎 exp +200（S11b 之後接，而家淨提示）
+func _use_beast_elixir(id: int, e: Dictionary) -> void:
+	var ch: Dictionary = e["ch"]
+	if not RulesShop.remove_item(ch["bag"], ITEM_BEAST_ELIXIR, 1):
+		return _msg(id, "背包冇呢件")
+	if not _grant_beast_exp(e, 200):
+		_msg(id, "暫時冇出戰戰騎可吸 exp（戰騎神丹已消耗）")
+	else:
+		_msg(id, "戰騎神丹：出戰戰騎 exp +200")
+
+
+# 職業丹 (S11): 食丹 -> 施展對應職業特技 (唔使已由導師學到)。要對應職業；扣丹由 sim_skill 做。
+# 入口: main.gd use_item -> sim.cmd_use_class_pill (sim_skill.gd)
+
+
+# 出戰戰騎食 exp (戰騎神丹用)。冇出戰戰騎 -> false
+func _grant_beast_exp(e: Dictionary, amount: int) -> bool:
+	var ch: Dictionary = e["ch"]
+	var wb: Dictionary = {}
+	for c in ch.get("warBeasts", []) as Array:
+		if String(c.get("where", "stable")) == "with":
+			wb = c
+			break
+	if wb.is_empty():
+		return false
+	RulesWarBeast.gain_exp(data.war_beasts, wb, amount)
+	_emit({"k": "beast", "dst": int(e["id"]), "act": "exp", "uid": int(wb["uid"]), "level": int(wb["level"])})
+	return true
 
 
 func _item_teleport(e: Dictionary, x: int, y: int) -> void:
@@ -767,8 +910,9 @@ func cmd_work(id: int, skill: String) -> void:
 	var ch: Dictionary = e["ch"]
 	if int(ch["level"]) < WORK_MIN_LEVEL:
 		return _msg(id, "要 %d 級先做得工作技能" % WORK_MIN_LEVEL)
-	if is_safe(int(e["x"]), int(e["y"])):
-		return _msg(id, "城內冇得工作，要出城")
+	# 野外工作區 (spec 05): 要企喺可做呢種 skill 嘅工作區 (maps.json areas[].work)
+	if not work_ok_here(skill, int(e["x"]), int(e["y"])):
+		return _msg(id, "要喺%s嘅工作區先做到（去農田/圍場/林/河邊/山區）" % sk["name"])
 	var tool: Dictionary = ch["tools"].get(skill, {})
 	if tool.is_empty() or int(tool["dur"]) <= 0:
 		return _msg(id, "要裝備%s工具先" % sk["name"])

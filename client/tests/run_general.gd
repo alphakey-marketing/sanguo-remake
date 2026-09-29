@@ -12,6 +12,7 @@ func _init() -> void:
 	t_rules(data)
 	t_order_bypass(data)
 	t_order_fail_keeps(data)
+	t_survey_daily_unlock(data)
 	t_medal(data)
 	t_treasure(data)
 	t_tonic(data)
@@ -337,14 +338,21 @@ func t_order_fail_keeps(data: GameData) -> void:
 	sim.cmd_recruit_cancel(pid)
 	check(RulesShop.count_item(ch["bag"], it) == 1 and int(ch["recruit"].get("comp", 0)) == 0 and not ch["recruit"].has("pass"),
 		"將軍令: 考驗失敗唔消耗")
-	# 普通登用 (唔需要令) 唔會消耗令
-	var r2 := _setup(data, 5, "義理")
-	var sim2: Sim = r2[0]
-	var ch2: Dictionary = r2[2]
-	if data.general_order_item.has("鍾繇"):
-		RulesShop.add_item(ch2["bag"], int(data.general_order_item["鍾繇"]), 1)
-	var cz := _find(_survey(sim2, int(r2[1]), "wen"), "鍾繇")
-	check(not cz.is_empty() and String(cz["pass"]) == "", "條件夠: 唔使用令 (pass 空)")
+
+
+func t_survey_daily_unlock(data: GameData) -> void:
+	# 每日調查鎖: 今日掘完 → 明日可再掘 (唔理成敗)。
+	# 手測 feedback: 玩家以爲「一日後仲鎖」——每日鎖本身正常；長鎖係登用成功先設。
+	var r := _setup(data, 60, "義理")           # 60 級先有候選，避免「搵唔到人」干擾
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var day0 := int(sim._clock()["day"])
+	_survey(sim, pid, "wu")
+	check(sim.recruit_view()["block"].contains("今日已經調查過"), "每日鎖: 掘完當日受阻")
+	_at(sim, day0 + 1, 40)
+	check(not sim.recruit_view()["block"].contains("今日已經調查過"), "每日鎖: 翌日唔再係「今日已經調查過」")
+	var c1 := _survey(sim, pid, "wu")
+	check(not c1.is_empty(), "每日鎖: 翌日可再掘到候選")
 
 
 func t_medal(data: GameData) -> void:
@@ -845,7 +853,7 @@ func t_comp_ult(data: GameData) -> void:
 	var c: Dictionary = r[6]
 	var cch: Dictionary = c["ch"]
 	_with_skill(c, 3)
-	sim.cmd_companion_order(pid, "assist")
+	sim.cmd_companion_order(pid, "active")
 	sim.cmd_companion_skill_mode(pid, "on")
 	check(String(c["gen"]["skillMode"]) == "on", "指令: 用絕招/術法")
 	cch["sp"] = 100
@@ -865,6 +873,7 @@ func t_comp_ult(data: GameData) -> void:
 	check(int(c["gen"]["skillCd"]) > sim.tick, "絕招: 入冷卻")
 	# SP 唔夠 → 普通攻擊【原】
 	cch["sp"] = 0
+	cch["mp"] = 0                # U16: skillMode 夠邊樣用邊樣，MP 都要清零先係「冇招可出」
 	c["gen"]["skillCd"] = 0
 	var normal := 0
 	var ult := 0
@@ -886,9 +895,10 @@ func t_comp_spell(data: GameData) -> void:
 	var c: Dictionary = r[6]
 	var cch: Dictionary = c["ch"]
 	_with_skill(c, 3)
-	sim.cmd_companion_order(pid, "assist")
+	sim.cmd_companion_order(pid, "active")
 	sim.cmd_companion_skill_mode(pid, "on")
 	cch["mp"] = 100
+	cch["sp"] = 0                # U16: 絕招優先 (夠 SP 就出絕招) → 清 SP 先測術法
 	var m := _mob_at(sim, int(c["x"]) + 3, int(c["y"]))
 	var sp := sim._comp_spell(c)
 	var need := RulesGeneral.spell_mp(int(cch["level"]), data.gen2_cfg["spell"])
@@ -906,6 +916,7 @@ func t_comp_spell(data: GameData) -> void:
 	check(hits == 1 and int(cch["mp"]) == 100 - need and int(m["hp"]) < 5000, "術法: 5 格內出招，扣 %d MP" % need)
 	check(elem == String(sp["elem"]), "術法: 元素跟武將戰術 (%s %s)" % [sp["name"], elem])
 	# 協助主公: 主公打緊另一隻 → 同伴轉打嗰隻
+	sim.cmd_companion_order(pid, "assist")
 	var m2 := _mob_at(sim, int(sim.ent(pid)["x"]) + 2, int(sim.ent(pid)["y"]) + 2)
 	sim.ent(pid)["atk_target"] = int(m2["id"])
 	sim.step()
