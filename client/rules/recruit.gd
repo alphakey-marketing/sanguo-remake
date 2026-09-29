@@ -40,10 +40,41 @@ static func title_ok(g: Dictionary, ch: Dictionary, cfg: Dictionary) -> bool:
 	return RulesTitle.recruit_ok(int(g["lv"]), int(ch.get("titleRank", 0)), cfg)
 
 
+# ---- F5 文官登用: 魅力/政治/等級/頭銜/親密度 加權 ----
+# 【自訂】分數 = 魅力 + 政治 + 等級 + 頭銜階 + 親密度；門檻 = 人才戰等 (+ 50 級以上人才嘅頭銜階)。
+# 超過/唔夠門檻每 CIVIL_STEP 分，問答過關題數 -1 / +1 (封頂 CIVIL_MIN_PASS ~ quizN)。魅力另有最低要求 = 戰等 / CIVIL_CHA_DIV。
+const CIVIL_STEP := 10
+const CIVIL_MIN_PASS := 5
+const CIVIL_CHA_DIV := 8
+const AFF_CAP := 20
+
+
+static func civil_score(ch: Dictionary, aff: int) -> int:
+	var a: Dictionary = ch.get("attrs", {})
+	return int(a.get("cha", 0)) + int(a.get("pol", 0)) + int(ch.get("level", 1)) + int(ch.get("titleRank", 0)) + clampi(aff, 0, AFF_CAP)
+
+
+static func civil_need(g: Dictionary, cfg: Dictionary) -> int:
+	return int(g["lv"]) + RulesTitle.general_rank(int(g["lv"]), cfg)
+
+
+static func civil_min_cha(g: Dictionary) -> int:
+	return int(g["lv"]) / CIVIL_CHA_DIV
+
+
+# 問答要答啱幾多題先過 (base = cfg.quizPass)
+static func civil_pass_need(ch: Dictionary, g: Dictionary, aff: int, cfg: Dictionary) -> int:
+	var diff := civil_score(ch, aff) - civil_need(g, cfg)
+	var step := diff / CIVIL_STEP if diff >= 0 else -((-diff + CIVIL_STEP - 1) / CIVIL_STEP)
+	return clampi(int(cfg["quizPass"]) - step, CIVIL_MIN_PASS, int(cfg["quizN"]))
+
+
 # 可唔可以登用呢個人 → "" = 得；否則 = 原因
 static func check(g: Dictionary, ch: Dictionary, cfg: Dictionary) -> String:
 	if not ideology_ok(String(ch.get("ideology", "")), String(g["ideo"])):
 		return "理念唔合"
+	if String(g.get("type", "")) == "wen" and int(ch.get("attrs", {}).get("cha", 99)) < civil_min_cha(g):
+		return "魅力唔夠（要 %d）" % civil_min_cha(g)
 	if not level_ok(int(g["lv"]), int(ch["level"]), int(cfg["levelGap"])):
 		return "等級差太遠"
 	if not title_ok(g, ch, cfg):
@@ -119,8 +150,8 @@ static func arena_def(g: Dictionary, cfg: Dictionary) -> Dictionary:
 
 
 # 問答過關
-static func quiz_pass(ok: int, cfg: Dictionary) -> bool:
-	return ok >= int(cfg["quizPass"])
+static func quiz_pass(ok: int, cfg: Dictionary, need: int = -1) -> bool:
+	return ok >= (int(cfg["quizPass"]) if need < 0 else need)
 
 
 # 登用到期日: 第 start+serveDays 日子時 0 刻離開

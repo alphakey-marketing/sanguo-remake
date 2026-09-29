@@ -307,6 +307,11 @@ func _recruit_tick() -> void:
 
 
 # ---- 文官: 三國問答 ----
+# F5 親密度: ch.recruit.aff[gid]；問答失敗 +2 (誠意)，封頂 AFF_CAP
+func _civil_aff(ch: Dictionary, gid: int) -> int:
+	return int((_rec(ch).get("aff", {}) as Dictionary).get(str(gid), 0))
+
+
 func _quiz_start(e: Dictionary, g: Dictionary) -> void:
 	var n := mini(int(data.recruit_cfg["quizN"]), data.quiz_generals.size())
 	var idx: Array = range(data.quiz_generals.size())
@@ -315,8 +320,9 @@ func _quiz_start(e: Dictionary, g: Dictionary) -> void:
 		var tmp = idx[i]
 		idx[i] = idx[j]
 		idx[j] = tmp
-	_rec(e["ch"])["pending"] = {"gid": int(g["id"]), "kind": "quiz", "qs": idx.slice(0, n), "i": 0, "ok": 0}
-	_msg(int(e["id"]), "%s：「%d 題之中答啱 %d 題，我就跟你。」" % [g["name"], n, int(data.recruit_cfg["quizPass"])])
+	var need := RulesRecruit.civil_pass_need(e["ch"], g, _civil_aff(e["ch"], int(g["id"])), data.recruit_cfg)   # F5: 魅力/政治/等級/頭銜/親密度
+	_rec(e["ch"])["pending"] = {"gid": int(g["id"]), "kind": "quiz", "qs": idx.slice(0, n), "i": 0, "ok": 0, "need": need}
+	_msg(int(e["id"]), "%s：「%d 題之中答啱 %d 題，我就跟你。」" % [g["name"], n, need])
 	_emit_quiz(e, {})
 
 
@@ -357,16 +363,20 @@ func cmd_recruit_answer(id: int, choice: int) -> void:
 	var wrong := int(pend["i"]) - int(pend["ok"])
 	var g: Dictionary = data.general_by_id[int(pend["gid"])]
 	var last := {"right": right, "answer": int(q["a"]), "i": int(pend["i"]), "ok": int(pend["ok"])}
-	var done := wrong > n - int(data.recruit_cfg["quizPass"]) or int(pend["i"]) >= n
+	var need := int(pend.get("need", data.recruit_cfg["quizPass"]))
+	var done := wrong > n - need or int(pend["i"]) >= n
 	if done:
 		rec.erase("pending")
 	_emit_quiz(e, last)
 	if not done:
 		return
-	if RulesRecruit.quiz_pass(int(pend["ok"]), data.recruit_cfg):
+	if RulesRecruit.quiz_pass(int(pend["ok"]), data.recruit_cfg, need):
 		_msg(id, "%s：「果然高明！」(答啱 %d/%d)" % [g["name"], int(pend["ok"]), n])
 		_recruit_success(e, g)
 	else:
+		var aff: Dictionary = rec.get("aff", {})
+		aff[str(g["id"])] = mini(RulesRecruit.AFF_CAP, int(aff.get(str(g["id"]), 0)) + 2)
+		rec["aff"] = aff
 		_recruit_fail(e, g, "%s搖頭：「學問未夠，恕難從命。」(答啱 %d/%d)" % [g["name"], int(pend["ok"]), int(pend["i"])])
 
 

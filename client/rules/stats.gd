@@ -68,7 +68,7 @@ static func create_character(data: GameData, char_name: String, class_id: String
 		"hp": max_hp(1, attrs), "mp": max_mp(1, attrs), "sp": max_sp(1, attrs),
 		"gold": int(st.get("gold", 0)), "karma": 0, "bag": bag, "equip": equip, "status": {},
 		# Step 7.5 建角欄位 (spec 01 §1/§11)
-		"title": "", "titles": [], "face": face,
+		"title": "", "face": face,
 		"ideology": "", "quizAnswers": [], "attrPoints": 0, "raised": {},
 		# Step 8 任務欄位 (spec 06 §1.2): 進行中 questId -> {stage, startDay, flags}；完成記錄
 		"quests": {}, "questDone": {},
