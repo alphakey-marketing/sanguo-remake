@@ -38,6 +38,8 @@ func _new(data: GameData, seed: int, lv: int = 12) -> Array:
 	var id := sim.spawn_player("t")
 	var ch: Dictionary = sim.player_ch()
 	ch["level"] = lv
+	ch["attrs"]["pol"] = 10      # F4: 三顧茅廬門檻 政治/魅力/等級 各 10+
+	ch["attrs"]["cha"] = 10
 	sim._sync_quest_npcs()
 	var msgs: Array = []
 	sim.event_emitted.connect(func(ev: Dictionary) -> void:

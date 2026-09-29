@@ -21,6 +21,7 @@ func _init() -> void:
 	t_arena_walk_away(data)
 	t_quiz(data)
 	t_quiz_fail(data)
+	t_civil_f5(data)
 	t_save_roundtrip(data)
 	t_determinism(data)
 	t_comp_follow(data)
@@ -434,6 +435,44 @@ func t_quiz(data: GameData) -> void:
 	for i in 8:
 		_answer(sim, pid, true)
 	check(int(ch["recruit"].get("comp", 0)) != 0 and int(sim.ent(int(ch["recruit"]["comp"]))["gen"]["gid"]) == gid, "問答: 錯 2 啱 8 = 過關登用")
+
+
+# F5: 文官登用 = 魅力+政治+等級+頭銜+親密度 加權；魅力最低要求；問答過關題數隨分數浮動
+func t_civil_f5(data: GameData) -> void:
+	var cfg: Dictionary = data.recruit_cfg
+	var g := {"id": 1, "name": "測試文官", "type": "wen", "lv": 60, "ideo": "出仕"}
+	var ch := {"level": 30, "titleRank": 0, "attrs": {"cha": 10, "pol": 10}, "ideology": "義理"}
+	check(RulesRecruit.civil_score(ch, 0) == 50, "F5: 分數 = 魅力+政治+等級+頭銜 = 50")
+	check(RulesRecruit.civil_score(ch, 5) == 55 and RulesRecruit.civil_score(ch, 99) == 50 + RulesRecruit.AFF_CAP, "F5: 親密度計入並封頂")
+	check(RulesRecruit.civil_need(g, cfg) == 60 + RulesTitle.general_rank(60, cfg), "F5: 門檻 = 戰等 + 頭銜階")
+	check(RulesRecruit.civil_min_cha(g) == 7, "F5: 魅力最低要求 = 戰等/8")
+	ch["attrs"]["cha"] = 6
+	check(RulesRecruit.check(g, ch, cfg).begins_with("魅力唔夠"), "F5: 魅力低過最低要求 → 唔可以登用")
+	var gw := g.duplicate()
+	gw["type"] = "wu"
+	check(not RulesRecruit.check(gw, ch, cfg).begins_with("魅力"), "F5: 武將唔受魅力最低要求限制")
+	ch["attrs"]["cha"] = 10
+	var base := int(cfg["quizPass"])
+	var need_lo := RulesRecruit.civil_pass_need(ch, g, 0, cfg)     # 分數 50 < 門檻 70 → 要答多啲
+	check(need_lo > base, "F5: 分數唔夠 → 過關題數上升 (%d > %d)" % [need_lo, base])
+	ch["level"] = 90
+	var need_hi := RulesRecruit.civil_pass_need(ch, g, 0, cfg)
+	check(need_hi < base and need_hi >= RulesRecruit.CIVIL_MIN_PASS, "F5: 分數夠高 → 過關題數減少但有下限 (%d)" % need_hi)
+	check(RulesRecruit.civil_pass_need(ch, g, 20, cfg) <= need_hi, "F5: 親密度越高越易過")
+	check(RulesRecruit.quiz_pass(need_hi, cfg, need_hi) and not RulesRecruit.quiz_pass(need_hi - 1, cfg, need_hi), "F5: quiz_pass 用動態題數")
+	# sim: 問答 pending 帶 need；失敗加親密度
+	var r := _quiz_setup(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var pch: Dictionary = r[2]
+	var pend: Dictionary = pch["recruit"]["pending"]
+	check(int(pend.get("need", 0)) >= RulesRecruit.CIVIL_MIN_PASS, "F5: 問答帶動態過關題數 (%d)" % int(pend.get("need", 0)))
+	var gid: int = r[5]
+	for i in 10:
+		if sim.recruit_quiz_view().is_empty():
+			break
+		_answer(sim, pid, false)
+	check(int((pch["recruit"].get("aff", {}) as Dictionary).get(str(gid), 0)) == 2, "F5: 問答失敗 → 親密度 +2")
 
 
 func t_quiz_fail(data: GameData) -> void:
