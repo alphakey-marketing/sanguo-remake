@@ -171,7 +171,9 @@ func _think_player(p: Dictionary) -> void:
 	p["tx"] = p["x"]
 	p["ty"] = p["y"]
 	var tm: Dictionary = t.get("mob", {})
-	if is_safe(int(p["x"]), int(p["y"])) and not tm.has("arena") and not tm.has("quest_boss"):
+	if (is_safe(int(p["x"]), int(p["y"])) or is_safe(int(t["x"]), int(t["y"]))) and not tm.has("arena") and not tm.has("quest_boss"):
+		if t.get("kind", "") != "mob":     # 城內唔准打人: 攻擊者或目標任何一方喺安全區都唔出手，放棄目標 (捕快/紅名都一樣，等出野外先打)
+			p["atk_target"] = 0
 		return     # 安全區唔畀出手 (登用擂台 / 任務 PK boss 例外: 丁刺史府, Step 13.5/16) (理論上怪唔會入城，呢度做多重保險)
 	if tick < int(p["next_atk"]):
 		return
