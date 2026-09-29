@@ -1,7 +1,7 @@
 class_name CreatePanel
 extends GamePanel
 # 建角面板（S01b，正式化取代 mobile_hud 舊 debug 建角覆蓋層；U-fix: 7 tab 精簡做 2 頁）
-# 第 1 頁「基本資料」= 姓名+稱號+生日+職業+臉譜合埋一版；第 2 頁答理念測驗（12題必答）
+# 第 1 頁「職業介紹」= 獨立職業頁 (F3)；第 2 頁「基本資料」= 姓名+新手城+臉譜（稱號改做事件獎勵解鎖）；第 3 頁答理念測驗（12題必答）
 # 答完自動變確認畫面，撳「出發！」先完成。
 # sim 權威：改動經 main._send 行 sim.cmd_set_*；理念測驗答案喺呢度暫存，答滿 12 題先一次過交。
 # 未撳「出發！」唔可以關（✕ / 撳遮罩都冇效），逼玩家行完全部步。
@@ -12,13 +12,12 @@ var _confirmed := false
 var quiz_i := 0
 var quiz_answers: Array = []
 var name_edit: LineEdit
-var title_edit: LineEdit
 
 
 func _init(m: Node) -> void:
 	super(m)
 	title_lbl.text = "建角"
-	set_tabs(["基本資料", "理念 + 確認"])
+	set_tabs(["職業介紹", "基本資料", "理念 + 確認"])
 
 
 func open() -> void:
@@ -39,7 +38,7 @@ func close() -> void:
 
 func sig() -> String:
 	var ch: Dictionary = main.ch
-	return JSON.stringify([tab, ch.get("name", ""), ch.get("nameLocked", false), ch.get("title", ""),
+	return JSON.stringify([tab, ch.get("name", ""), ch.get("nameLocked", false),
 		ch.get("classId", ""), ch.get("face", {}),
 		ch.get("ideology", ""), quiz_i, quiz_answers])
 
@@ -49,16 +48,19 @@ func _build_body() -> void:
 	if ch.is_empty():
 		return
 	if tab == 0:
+		_build_class_page(ch)
+		return
+	if tab == 1:
 		_build_basic(ch)
 		return
-	# 第二頁: 理念未答完先答問卷，答完就直接顯示確認資料 + 出發
+	# 第三頁: 理念未答完先答問卷，答完就直接顯示確認資料 + 出發
 	if str(ch.get("ideology", "")) == "":
 		_build_quiz(ch)
 	else:
 		_build_confirm(ch)
 
 
-# 第一頁: 姓名/稱號/生日/職業/臉譜合埋一版，撳完即刻見到效果，減少嚟回切 tab
+# 第一頁: 姓名/新手城/職業/臉譜合埋一版，撳完即刻見到效果，減少嚟回切 tab
 func _build_basic(ch: Dictionary) -> void:
 	var sc := scroll()
 	body.add_child(sc)
@@ -68,16 +70,12 @@ func _build_basic(ch: Dictionary) -> void:
 	sc.add_child(list)
 	_build_name(ch, list)
 	list.add_child(hsep())
-	_build_title(ch, list)
-	list.add_child(hsep())
 	_build_home(ch, list)
-	list.add_child(hsep())
-	_build_class(ch, list)
 	list.add_child(hsep())
 	_build_face(ch, list)
 	list.add_child(hsep())
 	list.add_child(btn("下一步：理念測驗 →", func() -> void:
-		tab = 1
+		tab = 2
 		refresh(true), 200))
 
 
@@ -96,19 +94,6 @@ func _build_name(ch: Dictionary, parent: Control) -> void:
 	parent.add_child(btn("確定", func() -> void: main._send({"t": "set_name", "name": name_edit.text}), 120))
 
 
-# ---- 稱號（隨時可改） ----
-func _build_title(ch: Dictionary, parent: Control) -> void:
-	parent.add_child(lbl("稱號（隨時可以改）", 15, UiTheme.GOLD))
-	parent.add_child(lbl("而家：「%s」" % (str(ch.get("title", "")) if str(ch.get("title", "")) != "" else "未設"), 14))
-	title_edit = LineEdit.new()
-	title_edit.max_length = 8
-	title_edit.placeholder_text = "稱號 1~8 字"
-	title_edit.text = str(ch.get("title", ""))
-	parent.add_child(title_edit)
-	parent.add_child(btn("確定", func() -> void: main._send({"t": "set_title", "title": title_edit.text}), 120))
-
-
-
 # ---- 新手城（UAT-feedback, spec 12 §1）【自訂】: 未出發 Lv1 先先揀得，揀完搬去嗰城客棧 ----
 func _build_home(ch: Dictionary, parent: Control) -> void:
 	parent.add_child(lbl("新手城（未出發前可以改，揀完搬去嗰城）", 15, UiTheme.GOLD))
@@ -125,18 +110,62 @@ func _build_home(ch: Dictionary, parent: Control) -> void:
 		b.disabled = is_cur or not can_change
 		parent.add_child(b)
 
-func _build_class(ch: Dictionary, parent: Control) -> void:
-	parent.add_child(lbl("職業（未出發前可以改）", 15, UiTheme.GOLD))
+# 第一頁: 獨立職業介紹頁 (F3)。每職一格: 預留畫圖位 + 介紹 + 武器/特技/轉職路線 + 揀選掣
+func _build_class_page(ch: Dictionary) -> void:
+	var sc := scroll()
+	body.add_child(sc)
+	var list := VBoxContainer.new()
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	list.add_theme_constant_override("separation", 10)
+	sc.add_child(list)
+	list.add_child(lbl("揀職業（未出發前可以改）", 15, UiTheme.GOLD))
 	var cur := str(ch.get("classId", ""))
 	var can_change := int(ch.get("level", 1)) == 1
 	for cid in main.data.classes:
 		var cls: Dictionary = main.data.classes[cid]
 		var enabled := bool(cls.get("enabled", false))
 		var is_cur := String(cid) == cur
-		var t := "%s%s%s" % [str(cls.get("name", cid)), "　（現用）" if is_cur else "", "　未開放" if not enabled else ""]
-		var b := btn(t, func() -> void: main._send({"t": "select_class", "class_id": String(cid)}))
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 10)
+		row.add_child(_class_art(String(cid)))
+		var col := VBoxContainer.new()
+		col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		col.add_child(lbl("%s%s" % [str(cls.get("name", cid)), "　（現用）" if is_cur else ""], 15, UiTheme.GOLD))
+		col.add_child(wrap_lbl(str(cls.get("desc", "")), 13))
+		col.add_child(wrap_lbl("武器：%s　特技：%s
+轉職：%s → %s" % [
+			"、".join(PackedStringArray(cls.get("weapons", []))), str(cls.get("skill", "")),
+			str(cls.get("tier2", {}).get("name", "?")), str(cls.get("tier3", {}).get("name", "?"))], 12, UiTheme.DIM))
+		var b := btn("選擇" if enabled else "未開放", func() -> void: main._send({"t": "select_class", "class_id": String(cid)}), 100)
 		b.disabled = not enabled or is_cur or not can_change
-		parent.add_child(b)
+		col.add_child(b)
+		row.add_child(col)
+		list.add_child(row)
+		list.add_child(hsep())
+	list.add_child(btn("下一步：基本資料 →", func() -> void:
+		tab = 1
+		refresh(true), 200))
+
+
+# 職業圖位: 有 res://assets/class_art/<id>.png 就用，冇就灰色佔位框 (之後補圖，size 96x128)
+func _class_art(cid: String) -> Control:
+	var path := "res://assets/class_art/%s.png" % cid
+	if ResourceLoader.exists(path):
+		var tr := TextureRect.new()
+		tr.texture = load(path)
+		tr.custom_minimum_size = Vector2(96, 128)
+		tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		return tr
+	var ph := ColorRect.new()
+	ph.color = Color(0.3, 0.3, 0.3)
+	ph.custom_minimum_size = Vector2(96, 128)
+	var t := lbl("圖", 20, UiTheme.DIM)
+	t.set_anchors_preset(Control.PRESET_FULL_RECT)
+	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	t.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	ph.add_child(t)
+	return ph
 
 
 # ---- 臉譜（8 部位，款式循環） ----
@@ -191,8 +220,6 @@ func _build_confirm(ch: Dictionary) -> void:
 	body.add_child(lbl("確認資料", 15, UiTheme.GOLD))
 	var lines := [
 		"姓名「%s」" % str(ch.get("name", "")),
-		"稱號「%s」" % (str(ch.get("title", "")) if str(ch.get("title", "")) != "" else "未設"),
-		"生日 %d月%d日" % [int(ch.get("birthMonth", 1)), int(ch.get("birthDay", 1))],
 		"職業 %s" % str(cls.get("name", "?")),
 		"理念 %s" % (str(ch.get("ideology", "")) if str(ch.get("ideology", "")) != "" else "未測（可以出發後喺角色面板都測唔到，理念只可以呢度測）"),
 	]

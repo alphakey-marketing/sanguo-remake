@@ -465,7 +465,7 @@ static func _advance(data: GameData, ch: Dictionary, q: Dictionary, st: Dictiona
 
 
 # ================= 獎勵結算 =================
-# reward keys: exp/gold/fame/lilian/items [[id,n]...]/attr {k:+1}/polExp/ultimate/spell/expert
+# reward keys: exp/gold/fame/title/lilian/items [[id,n]...]/attr {k:+1}/polExp/ultimate/spell/expert
 # 回傳 payload（事件/訊息用）；未支援嘅 key 忽略
 static func apply_reward(data: GameData, ch: Dictionary, reward: Dictionary) -> Dictionary:
 	var payload := {}
@@ -500,6 +500,15 @@ static func apply_reward(data: GameData, ch: Dictionary, reward: Dictionary) -> 
 			ch["attrs"][k] = int(ch["attrs"].get(k, 0)) + int(reward["attr"][k])
 			attrs[k] = int(reward["attr"][k])
 		payload["attr"] = attrs
+	if reward.has("title"):             # 稱號 (F1): 完成事件獎勵解鎖 -> ch.titles；未有稱號自動戴上
+		var tn := String(reward["title"])
+		var tl: Array = ch.get("titles", [])
+		if not tl.has(tn):
+			tl.append(tn)
+		ch["titles"] = tl
+		if String(ch.get("title", "")) == "":
+			ch["title"] = tn
+		payload["title"] = tn
 	if reward.has("polExp"):            # 政治經驗 (Step 16 歷史任務): 同官令一樣換算政治點
 		var pe := int(reward["polExp"])
 		var r := RulesTiandi.cha_gain(int(ch["attrs"]["pol"]), int(ch.get("polExp", 0)), pe,

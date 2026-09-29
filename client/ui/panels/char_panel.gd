@@ -23,7 +23,7 @@ func open() -> void:
 func sig() -> String:
 	var ch: Dictionary = main.ch
 	return JSON.stringify([tab, sel_slot, ch.get("equip", {}), ch.get("workLv", {}), ch.get("tools", {}), pending, ch.get("attrs", {}), ch.get("attrPoints", 0), ch.get("level", 1), ch.get("hp", 0),
-		ch.get("mp", 0), ch.get("sp", 0), ch.get("gold", 0), ch.get("karma", 0), ch.get("lilian", 0), ch.get("title", ""), ch.get("fame", 0), ch.get("ap", 0), ch.get("chaExp", 0),
+		ch.get("mp", 0), ch.get("sp", 0), ch.get("gold", 0), ch.get("karma", 0), ch.get("title", ""), ch.get("titles", []), ch.get("fame", 0), ch.get("ap", 0), ch.get("chaExp", 0),
 		ch.get("titleRank", 0), ch.get("thirst", 0), ch.get("contrib", 0), ch.get("polExp", 0), ch.get("expert", {}),
 		ch.get("tier", 0), ch.get("quests", {}), ch.get("questDone", {})])
 
@@ -118,7 +118,6 @@ func _build_body() -> void:
 		"MP %d/%d" % [int(ch["mp"]), RulesStats.max_mp(lv, attrs)],
 		"SP %d/%d" % [int(ch["sp"]), RulesStats.max_sp(lv, attrs)],
 		"經驗 %d/%d" % [int(ch.get("exp", 0)), RulesStats.exp_to_next(lv)],
-		"歷練 %d/100" % int(ch.get("lilian", 0)),
 		"頭銜 %s（第 %d 階）" % [RulesTitle.name_of(main.data.titles, int(ch.get("titleRank", 0))), int(ch.get("titleRank", 0))],
 		"名聲 %d　行動力 %d/%d" % [int(ch.get("fame", 0)), main.sim.ap_of(ch), main.sim.ap_max(ch)],
 		"飲水度 %d/%d　官宅貢獻 %d" % [main.sim.thirst_of(ch), int(main.data.world["thirst"]["max"]), int(ch.get("contrib", 0))],
@@ -127,6 +126,15 @@ func _build_body() -> void:
 	]
 	for l in lines:
 		right.add_child(lbl(str(l), 14))
+	var titles: Array = ch.get("titles", [])
+	if not titles.is_empty():                 # F1: 稱號只可揀已解鎖嘅
+		var tr := HBoxContainer.new()
+		tr.add_theme_constant_override("separation", 6)
+		for tn in titles:
+			var tb := btn(str(tn), func() -> void: main._send({"t": "set_title", "title": String(tn)}), 96)
+			tb.disabled = str(ch.get("title", "")) == str(tn)
+			tr.add_child(tb)
+		right.add_child(tr)
 	# S01d 轉職 (spec 01 §7): 夠等級 + 完成轉職考試任務先顯示
 	var prom := RulesClass.promote_ok(main.data, ch)
 	if bool(prom["ok"]):

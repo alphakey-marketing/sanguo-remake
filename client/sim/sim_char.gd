@@ -29,7 +29,7 @@ func cmd_facility(id: int, key: String) -> void:
 					_finish_fac_quest(e, ch, qid2, "temple")
 
 
-# 練兵場【原】: 2 人對練, 扣 HP+SP, +歷練 (升級時武/智/敏/靈提升)
+# 練兵場【原】: 2 人對練, 扣 HP+SP, 直接加 EXP (F8: 取代歷練)
 func _fac_training(e: Dictionary, ch: Dictionary, f: Dictionary) -> void:
 	var lv := int(ch["level"])
 	var mhp := RulesStats.max_hp(lv, ch["attrs"])
@@ -39,9 +39,6 @@ func _fac_training(e: Dictionary, ch: Dictionary, f: Dictionary) -> void:
 		return _msg(id, "啱啱練完，抖陣先")
 	if int(ch["hp"]) < mhp * 0.35:
 		return _msg(id, "體力唔夠對練 (HP 要 > 35%)")
-	var lilian := int(ch.get("lilian", 0))
-	if lilian >= int(f["lilianCap"]):
-		return _msg(id, "歷練已滿 (%d)" % int(f["lilianCap"]))
 	# 附近要有拍檔 (玩家或 bot)
 	var partner := {}
 	for b in ents.values():
@@ -58,9 +55,11 @@ func _fac_training(e: Dictionary, ch: Dictionary, f: Dictionary) -> void:
 	pch["hp"] = maxi(1, int(pch["hp"]) - MathX.js_round(RulesStats.max_hp(int(pch["level"]), pch["attrs"]) * float(f["costHp"])))
 	partner["hp"] = int(pch["hp"])
 	_sync_stats(e)
-	ch["lilian"] = lilian + int(f["lilian"])
+	var gain := maxi(int(f["expMin"]), MathX.js_round(RulesStats.exp_to_next(lv) * float(f["expPct"])))
+	RulesStats.gain_exp(data, ch, gain)
+	_sync_stats(e)
 	e["train_cd"] = tick + int(f["cooldownTicks"])
-	_emit({"k": "train", "src": id, "partner": partner["name"], "lilian": int(ch["lilian"])})
+	_emit({"k": "train", "src": id, "partner": partner["name"], "exp": gain})
 
 
 # 練兵場小兵【原】: 免費回滿 SP (S01a, spec 01 §6)
@@ -236,16 +235,16 @@ func cmd_set_name(id: int, name: String) -> void:
 	_msg(id, "姓名改做「%s」" % name)
 
 
-# 稱號【原】: ≤8 字，隨時可改
+# 稱號 (F1): 唔可以自由輸入，只可以揀已解鎖 (ch.titles) 嘅；空字串 = 除下稱號
 func cmd_set_title(id: int, title: String) -> void:
 	var e := ent(id)
 	if e.is_empty() or not e.has("ch"):
 		return
 	title = title.strip_edges()
-	if title.length() < 1 or title.length() > 8:
-		return _msg(id, "稱號要 1~8 字")
+	if title != "" and not (e["ch"].get("titles", []) as Array).has(title):
+		return _msg(id, "未解鎖呢個稱號")
 	e["ch"]["title"] = title
-	_msg(id, "稱號改做「%s」" % title)
+	_msg(id, "稱號改做「%s」" % title if title != "" else "已除下稱號")
 
 
 # 臉譜: 8 部位，款式 1..count (data/face.json)

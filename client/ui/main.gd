@@ -621,7 +621,7 @@ func _on_event(e: Dictionary) -> void:
 		"train":
 			if int(e.src) == my_id:
 				if e.has("partner"):
-					_log("同 %s 對練，歷練 %d/100" % [e.partner, int(e.lilian)])
+					_log("同 %s 對練，經驗 +%d" % [e.partner, int(e.exp)])
 				else:
 					_log("%s: %s +1 (而家 %d)" % ["私塾" if e.attr == "政治" else "寺廟", e.attr, int(e.val)])
 		"quest":
@@ -637,7 +637,7 @@ func _on_event(e: Dictionary) -> void:
 					var parts: Array = []
 					if int(rw.get("gold", 0)) > 0: parts.append("+%d 金" % int(rw["gold"]))
 					if int(rw.get("exp", 0)) > 0: parts.append("+%d 經驗" % int(rw["exp"]))
-					if int(rw.get("lilian", 0)) > 0: parts.append("+%d 歷練" % int(rw["lilian"]))
+					if rw.has("title"): parts.append("解鎖稱號「%s」！" % str(rw["title"]))
 					if rw.has("ultimate"): parts.append("學識絕招「%s」！" % str(rw["ultimate"]))
 					if rw.has("skill"):
 						var sd: Dictionary = data.class_skills.get(str(rw["skill"]), {})

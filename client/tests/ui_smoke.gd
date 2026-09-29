@@ -170,30 +170,30 @@ func _run() -> void:
 	var cp: GamePanel = hud.panels["create"]
 	check(cp.visible, "開建角面板應該顯示")
 	var cch: Dictionary = m.ch
+	cp.set_tab(1)
+	await frames(1)
 	var name_ed: LineEdit = (cp as CreatePanel).name_edit
 	name_ed.text = "劉備"
 	press(cp, "確定")
 	await frames(1)
 	check(str(cch.get("name", "")) == "劉備", "建角: 確定姓名後 ch.name 應該改咗 (而家 %s)" % str(cch.get("name", "")))
 	# 建角面板已合併做 2 頁: 第 1 頁 = 姓名/稱號/新手城/職業/臉譜，第 2 頁 = 理念 + 確認
-	m._send({"t": "set_title", "title": "遊俠"})     # 稱號輸入 F1 將改做事件獎勵解鎖，呢度直接測 set_title 指令
-	await frames(1)
-	check(str(cch.get("title", "")) == "遊俠", "建角: 確定稱號後 ch.title 應該改咗")
+	check(not cp.find_children("*", "LineEdit", true, false).any(func(n): return n != name_ed), "建角: 唔再有稱號輸入 (F1)")
 	var hair0 := int(cch.get("face", {}).get("hair", 1))
 	press(cp, "頭髮")
 	await frames(1)
 	check(int(cch.get("face", {}).get("hair", 1)) != hair0, "建角: 撳臉譜部位應該循環款式")
-	cp.set_tab(1)
+	cp.set_tab(2)
 	for i in (m.data.quiz as Array).size():
 		(cp as CreatePanel)._quiz_pick(0)
 		await frames(1)
 	check(str(cch.get("ideology", "")) != "", "建角: 答完 12 題應該決定理念")
 	check(bool(cch.get("nameLocked", false)), "建角: 理念一決定，姓名應該鎖定")
-	cp.set_tab(0)
+	cp.set_tab(1)
 	await frames(1)
 	check(not (cp as CreatePanel).body.get_children().any(func(c): return _has_name_edit(c)), "建角: 姓名鎖定後唔應該再顯示姓名輸入框")
 	check(str(cch.get("name", "")) == "劉備", "建角: 姓名鎖定後唔可以再改")
-	cp.set_tab(1)
+	cp.set_tab(2)
 	press(cp, "✕")
 	await frames(1)
 	check(cp.visible, "建角未撳出發，撳 ✕ 唔應該關到面板")

@@ -181,7 +181,7 @@ func t_newbie_chain(data: GameData) -> void:
 	_talk(sim, id, "stray_dog")
 	check(bool(ch["questDone"].get("newbie_dog", false)), "流浪狗: 第 3 晚完成")
 	check(_bag_n(sim, id, 65002) == 1, "流浪狗: 狗仔袋 (百寶袋)")
-	check(int(ch["lilian"]) == 10 and int(ch["exp"]) >= 100, "流浪狗: +100 exp")
+	check(int(ch["exp"]) >= 100, "流浪狗: +100 exp")
 
 
 # ---------- sim 時辰窗口 ----------

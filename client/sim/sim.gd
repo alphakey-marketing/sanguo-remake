@@ -375,6 +375,11 @@ static func load_string(game_data: GameData, s: String) -> Sim:
 	for e in es.values():
 		if e.has("ch"):
 			sim._ensure_equip(e["ch"])      # 舊存檔裝備欄兼容 (Step 11.6)
+			for k in ["birthMonth", "birthDay", "lilian"]:   # F2/F8: 生日、歷練欄位已取消，舊檔清走
+				e["ch"].erase(k)
+			var oc: Dictionary = e["ch"]                     # F1: 舊檔自訂稱號當已解鎖
+			if not oc.has("titles"):
+				oc["titles"] = [String(oc["title"])] if String(oc.get("title", "")) != "" else []
 	sim._ensure_city_attrs()                # 舊存檔城池屬性兼容 (S08b)
 	sim._ensure_rumors()                    # 舊存檔傳聞欄兼容 (S09b)
 	sim._ensure_llm()                       # 舊存檔 LLM 狀態欄兼容 (S09d)

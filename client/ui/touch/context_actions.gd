@@ -330,9 +330,7 @@ static func fac_dialog(main: Node, f: Dictionary) -> Dictionary:
 	if bool(def.get("donation", false)):
 		return donate_dialog(main, def)
 	var text := str(def.get("desc", ""))
-	if key == "training":
-		text += "\n歷練 %d/100（下次升級 武/智/敏/靈 +%d）" % [int(ch.get("lilian", 0)), int(ch.get("lilian", 0)) / 10]
-	elif key == "trainer":
+	if key == "trainer":
 		text += "\n體力 %d" % int(ch.get("sp", 0))
 		return {"title": str(def["name"]), "text": text,
 			"options": [{"label": "回復體力", "cb": func() -> void: main._send({"t": "facility", "key": key})}, _leave(main)]}
