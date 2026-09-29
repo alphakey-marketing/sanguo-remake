@@ -19,6 +19,7 @@ func _init() -> void:
 	t_yudu(data)
 	t_chengong(data)
 	t_yuanshao(data)
+	t_gate_f4(data)
 	t_dongzhuo(data)
 	t_dingyuan(data)
 	t_book(data)
@@ -283,6 +284,29 @@ func t_chengong(data: GameData) -> void:
 
 
 # ---------- 袁紹義助王允 (魅力 10+) ----------
+# F4: 高階歷史任務門檻 (等級/政治/魅力 各 10+)，未達標唔接、傾偈提示差乜
+func t_gate_f4(data: GameData) -> void:
+	var q := {}
+	for x in data.quests:
+		if String(x["id"]) == "hist_longzhong":
+			q = x
+	check(not q.is_empty(), "F4: hist_longzhong 存在")
+	var ch := {"level": 9, "attrs": {"pol": 5, "cha": 5}, "quests": {}, "questDone": {}}
+	var h := RulesQuest.gate_hint(q, ch)
+	check(h.contains("等級 10") and h.contains("政治 10") and h.contains("魅力 10"), "F4: 提示列出未達等級/政治/魅力 (%s)" % h)
+	check(not RulesQuest.pre_ok(data, q, ch), "F4: 未達標 pre 唔過")
+	var res := RulesQuest.on_npc_talk(data, ch, q, String(q["giver"]), 1)
+	check(bool(res.get("blocked", false)) and String(res["msg"]) == h, "F4: 傾偈被擋並提示")
+	check(not (ch["quests"] as Dictionary).has("hist_longzhong"), "F4: 未達標冇接任務")
+	ch = {"level": 10, "attrs": {"pol": 10, "cha": 10}, "quests": {}, "questDone": {}}
+	check(RulesQuest.gate_hint(q, ch) == "" and RulesQuest.pre_ok(data, q, ch), "F4: 達標 = 無提示可接")
+	var zj := {}
+	for x in data.quests:
+		if String(x["id"]) == "hist_zhangjiao":
+			zj = x
+	check(int(zj["pre"]["attr"]["pol"]) >= 10 and int(zj["pre"]["attr"]["cha"]) >= 10 and int(zj["pre"]["minLevel"]) >= 10, "F4: 太平要術(討伐張角) 門檻 政治/魅力/等級 ≥10")
+
+
 func t_yuanshao(data: GameData) -> void:
 	var r := _new(data, 104)
 	var sim: Sim = r[0]
