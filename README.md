@@ -14,16 +14,17 @@ client/            Godot 4.7 項目 (GDScript) — 整個遊戲喺度
 data_src/          尚未接入嘅原始表 (general_npc.csv)
 tests/vectors/     由舊 TS rules 導出嘅測試向量 (rules.json)
 tools/             run_tests.sh、export_vectors.ts、fetch_guide.py
-docs/              DESIGN.md (整體設計 v2)、PLAN.md (路線圖 v4)、GODOT_NOTES.md、UI_TOUCH.md、普通玩法_系統摘要.md (攻略原文摘錄)
-  spec/            01~11 系統邏輯規格 (角色成長/戰鬥/善惡死亡/怪物地圖/生產經濟/任務/座騎戰騎/名聲義勇軍/登用武將NPC/國戰/資料對照) — 想改機制睇呢啲
-  guide/           攻略原文 113 頁 (sy*.txt) + guide_links.tsv
+docs/              DESIGN.md (整體設計 v2)、PLAN.md (路線圖 v6 + 現況)、GODOT_NOTES.md、UI_TOUCH.md (手機橫屏 UI 現行)、普通玩法_系統摘要.md (攻略原文摘錄)
+  spec/            01~12 系統邏輯規格 (角色成長/戰鬥/善惡死亡/怪物地圖/生產經濟/任務/座騎戰騎/名聲義勇軍/登用武將NPC/國戰/資料對照/地圖世界) — 想改機制睇呢啲
+  guide/           攻略原文 113 頁 (sy*.txt) + guide_links.tsv (133 頁連結，缺 20)
+  archive/         已歸檔舊文檔，唔再當現行 (PLAN_v5_history.md、UX.md)
 legacy/            舊 Node+ws server (已被 Godot sim 取代，只作參考；npm test 仍可跑)
 ```
 
 ## 設計文件點用
 - 想知「而家做到邊」→ `PLAN.md` (路線圖+現況速覽)
 - 想知「每個系統點設計」→ `docs/spec/01~11` (公式/數據結構/數值/測試要點)
-- 想知「攻略原版講咩」→ `普通玩法_系統摘要.md` + `docs/guide/*.txt`
+- 想知「攻略原版講咩」→ `普通玩法_系統摘要.md` + `docs/guide/*.txt`（已歸檔嘅舊版 UI 線框/歷史做法喺 `docs/archive/`，唔係現行）
 - 逆向數據 (items/npc_drops/general_npc/jewel) 導入地圖 → `docs/spec/11_資料對照.md`
 
 ## 跑法
