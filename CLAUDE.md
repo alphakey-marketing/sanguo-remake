@@ -7,7 +7,7 @@
 2. 當前 Step 對應嘅 `docs/spec/NN_*.md` — **完整系統邏輯規格**；改機制前先睇
 3. `docs/DESIGN.md` — 整體設計 v2（手機、豫荊、LLM NPC 架構、市場模擬、待決事項 D-3）
 4. `docs/普通玩法_系統摘要.md` — 玩法規格（【原】= 官方攻略；【自訂】= 自己設計）
-5. 需要時：`docs/PLAN_v5_history.md`（Step 1~19 做法 + 每步「偏離 spec」記錄）、`docs/guide/` 攻略原文 113 頁（連結表 `docs/guide_links.tsv`）、`docs/GODOT_NOTES.md`、`README.md`
+5. 需要時：`docs/archive/PLAN_v5_history.md`（Step 1~19 舊做法 + 每步「偏離 spec」記錄，已歸檔僅備參考）、`docs/guide/` 攻略原文（**已合併成 27 檔**）：索引 `docs/guide/README.md`（每檔含邊啲頁 + 對應 spec），連結全表 `docs/guide_links.tsv`（133 頁，正文缺 20 頁詳見 guide/README）；`docs/普通玩法_系統摘要.md` header 列咗缺邊啲）、`docs/GODOT_NOTES.md`、`docs/UI_TOUCH.md`（手機橫屏 UI 現行設計；舊 `docs/archive/UX.md` 已歸檔）、`README.md`
 
 ## 路線（2026-09-24 定）
 - **由 spec 01 順序做到 spec 12**，每份 spec = 一個大 Step（S01~S12），拆細步 a/b/c…

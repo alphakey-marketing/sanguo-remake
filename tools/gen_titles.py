@@ -16,8 +16,10 @@ import re
 import sys
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
-SRC = os.path.join(ROOT, "docs", "guide", "sy2_8_4.txt")
-SOLDIERS_SRC = os.path.join(ROOT, "docs", "guide", "sy2_9_19.txt")
+# guide 已合併（2026-09-28）：sy2_8_4 / sy2_9_19 分別合併入 → sy2_8_militia.txt / sy2_9_battles.txt
+# parser 靠正文 anchor（『可執行的任務』/『增加兵量』）定位，唔靠頁首行，故兼併後仍啱。
+SRC = os.path.join(ROOT, "docs", "guide", "sy2_8_militia.txt")
+SOLDIERS_SRC = os.path.join(ROOT, "docs", "guide", "sy2_9_battles.txt")
 OUT = os.path.join(ROOT, "client", "data", "titles.json")
 
 FIXES = {41: {"salary": 4100}}      # 攻略筆誤修正 (見頂註)
@@ -27,7 +29,10 @@ def parse():
     lines = [l.strip() for l in open(SRC, encoding="utf-8").read().splitlines()]
     i = lines.index("可執行的任務") + 1
     rows = []
+    # 合併後單檔含多頁，以『=== === ===』頁分隔做段落上界（原單檔無分隔）
     while i < len(lines):
+        if lines[i].startswith("===") and lines[i].strip().replace("=", "").strip() == "":
+            break
         if not re.fullmatch(r"\d+", lines[i] or "x"):
             i += 1
             continue
@@ -54,6 +59,8 @@ def parse_soldiers():
     i = lines.index("增加兵量") + 1
     out = {}
     while i + 4 < len(lines):
+        if lines[i].startswith("===") and lines[i].strip().replace("=", "").strip() == "":
+            break
         if not re.fullmatch(r"\d+", lines[i] or "x"):
             i += 1
             continue
