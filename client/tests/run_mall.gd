@@ -76,10 +76,10 @@ func t_lilian_elixir(data: GameData) -> void:
 	var sim := Sim.new(data, 13)
 	var id := sim.spawn_player("l")
 	var ch := sim.player_ch()
-	ch["lilian"] = 90
+	var exp0 := int(ch["exp"])
 	sim.cmd_debug_give(id, 30012, 1)
 	sim.cmd_use_item(id, 30012)
-	check(int(ch["lilian"]) >= 100, "歷練神丹 +10 封頂 100")
+	check(int(ch["exp"]) > exp0 or int(ch["level"]) > 1, "歷練神丹 加 EXP")
 	check(_bag_n(ch, 30012) == 0, "歷練神丹消耗")
 
 
