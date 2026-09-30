@@ -268,7 +268,27 @@ def imp_mount(src, idx):
     idx["mount_S"] = out
     print(f"座騎 sprite: {len(out)} 馬種")
 
-SETS = {"mount": imp_mount, "actor": imp_actor, "mon": imp_mon, "items": imp_items, "faces": imp_faces, "ui": imp_ui}
+def imp_player_layers(src, idx):
+    """玩家分層 (運行時按裝備疊): player_layers key = "B/C/kind/style"
+    kind: b 身 / w 武 (1~9) / a 甲 (0~6) / h 髮 (0~6)；B=職業 1~6, C=動作 1 走 2 攻。同 cell/原點，直接疊。"""
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    import compose_player as cp
+    os.makedirs(os.path.join(OUT, "player"), exist_ok=True)
+    out = {}
+    for b in range(1, 7):
+        for c in (1, 2):
+            specs = [("b", 0, f"1{b}{c}1300")] + [("w", k, f"1{b}{c}21{k:02d}") for k in range(1, 10)]                 + [("a", k, f"1{b}{c}41{k:02d}") for k in range(0, 7)] + [("h", k, f"1{b}{c}31{k:02d}") for k in range(0, 7)]
+            for kind, k, code in specs:
+                sh = cp.single(code)
+                if sh is None:
+                    continue
+                rel = f"player/{b}_{c}_{kind}{k}.png"
+                sh.save(os.path.join(OUT, rel))
+                out[f"{b}/{c}/{kind}/{k}"] = rel
+    idx["player_layers"] = out
+    print(f"玩家分層: {len(out)} 張")
+
+SETS = {"player": imp_player_layers, "mount": imp_mount, "actor": imp_actor, "mon": imp_mon, "items": imp_items, "faces": imp_faces, "ui": imp_ui}
 
 def check():
     if not os.path.exists(INDEX):

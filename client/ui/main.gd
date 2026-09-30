@@ -223,6 +223,8 @@ func _draw_mon_sprite(e: Dictionary, p: Vector2) -> bool:
 		act = "W"
 	elif int(e.get("aggro", 0)) > 0 or int(e.get("atkTarget", 0)) > 0:
 		act = "A"
+	if not mob and int(e.id) == my_id and _draw_my_layers(a, act, p):
+		return true
 	var tex := AssetLib.mon_sheet(sid, act) if mob else AssetLib.actor_sheet(sid, act)
 	if tex == null:
 		tex = AssetLib.mon_sheet(sid, "S") if mob else AssetLib.actor_sheet(sid, "S")
@@ -233,6 +235,54 @@ func _draw_mon_sprite(e: Dictionary, p: Vector2) -> bool:
 	var src := Rect2(int(t0 * 8.0) % 8 * cw, int(a.get("dir", 4)) * ch_, cw, ch_)
 	var sz := Vector2(cw, ch_) * 0.42
 	draw_texture_rect_region(tex, Rect2(p + Vector2(TILE * 0.5 - sz.x * 0.5, TILE - sz.y), sz), src)
+	return true
+
+# 玩家分層外觀: 身 + 甲 + 髮 + 武器 (按裝備揀款式)；冇圖返 false → 用預疊 sheet
+const _CLASS_B := {"yishi": 1, "shinu": 2, "daoshi": 3, "wunu": 4, "bianshi": 5, "meinu": 6}
+
+func _look_styles() -> Dictionary:
+	var b := int(_CLASS_B.get(str(ch.get("classId", "")), 0))
+	var eq: Dictionary = ch.get("equip", {})
+	var w := 1
+	var wid := int(eq.get("weapon", 0))
+	if wid > 0:
+		var inf: Dictionary = data.info.get(wid, {})
+		var cls: Dictionary = data.classes.get(str(ch.get("classId", "")), {})
+		var ci: int = maxi(0, (cls.get("weapons", []) as Array).find(str(inf.get("cat_label", ""))))
+		var lv := int(inf.get("req_lv", 0))
+		w = ci * 3 + (1 if lv <= 50 else (2 if lv <= 92 else 3))
+	var a := 1
+	var bid := int(eq.get("body", 0))
+	if bid > 0:
+		a = 1 + mini(5, int(data.info.get(bid, {}).get("req_lv", 0)) / 22)
+	var h := 1
+	var hid := int(eq.get("head", 0))
+	if hid > 0:
+		h = 2 + mini(4, int(data.info.get(hid, {}).get("req_lv", 0)) / 33)
+	return {"b": b, "w": w, "a": a, "h": h}
+
+func _draw_my_layers(a: Dictionary, act: String, p: Vector2) -> bool:
+	var k := _look_styles()
+	var b := int(k["b"])
+	if b == 0:
+		return false
+	var c := 2 if act == "A" else 1
+	var body := AssetLib.player_layer(b, c, "b", 0)
+	if body == null:
+		return false
+	var dir := int(a.get("dir", 4))
+	var wtex := AssetLib.player_layer(b, c, "w", int(k["w"]))
+	var order: Array = [wtex, body, AssetLib.player_layer(b, c, "a", int(k["a"])), AssetLib.player_layer(b, c, "h", int(k["h"]))]
+	if not (dir in [0, 1, 7]):
+		order = [body, order[2], order[3], wtex]
+	var cw := body.get_width() / 8
+	var ch_ := body.get_height() / 8
+	var sz := Vector2(cw, ch_) * 0.42
+	var dst := Rect2(p + Vector2(TILE * 0.5 - sz.x * 0.5, TILE - sz.y), sz)
+	var src := Rect2(int(t0 * 8.0) % 8 * cw, dir * ch_, cw, ch_)
+	for t in order:
+		if t != null:
+			draw_texture_rect_region(t, dst, src)
 	return true
 
 # 靜止 NPC/武將: 面向鏡頭站立幀 (row 4)

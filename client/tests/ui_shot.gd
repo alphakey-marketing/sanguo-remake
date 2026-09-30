@@ -59,6 +59,13 @@ func _run() -> void:
 	m._refresh()
 	await frames(10)
 	await shot("mobs")
+	# 外觀跟裝備: 直接塞高階裝備 (繞過等級) 影玩家外觀
+	var eq0: Dictionary = m.sim.player_ch()["equip"]
+	eq0["weapon"] = 10429
+	eq0["body"] = 19759
+	eq0["head"] = 16759
+	m._refresh()
+	await shot("look_equip")
 	hud.bag_panel().open_filter("")
 	var bp: BagPanel = hud.panels["bag"]
 	bp.sel = 10002
