@@ -224,6 +224,18 @@ def imp_actor(src, idx):
                 rel = f"actor/{sid}{a}.png"
                 _keyed_copy(f, os.path.join(OUT, rel))
                 out[a][str(sid)] = rel
+    # 玩家職業身體: role1 分層 sheet CP_1{B}{C}1300 (B=1..6 對應 6 職, C=1 走路 / 2 攻擊; 裸身+褲, 未疊裝備層)
+    PBODY = {"yishi": 1, "shinu": 2, "daoshi": 3, "wunu": 4, "bianshi": 5, "meinu": 6}
+    ACTOR_POOL["player"] = {}
+    for cid, b in PBODY.items():
+        sid = 91000 + b
+        for a, c in (("S", 1), ("W", 1), ("A", 2)):
+            f = os.path.join(src, "sheets", "role1", f"CP_1{b}{c}1300.CP.png")
+            if os.path.exists(f):
+                rel = f"actor/{sid}{a}.png"
+                _keyed_copy(f, os.path.join(OUT, rel))
+                out[a][str(sid)] = rel
+        ACTOR_POOL["player"][cid] = sid
     for a in "ASW":
         idx["actor_" + a] = out[a]
     idx["_actor_by_name"] = {k: str(v) for k, v in by_name.items() if str(v) in out["S"]}
@@ -275,7 +287,8 @@ def main():
     a = ap.parse_args()
     if a.check:
         sys.exit(check())
-    idx = {"_note": "由 tools/import_orig_assets.py 生成，唔好手改。key=id, value=相對 res://assets_orig/ 路徑"}
+    idx = json.load(open(INDEX, encoding="utf-8")) if os.path.exists(INDEX) and a.sets != ",".join(SETS) else {}
+    idx["_note"] = "由 tools/import_orig_assets.py 生成，唔好手改 (單跑部分 --sets 會合併舊索引)"
     for s in a.sets.split(","):
         SETS[s](a.src, idx)
     os.makedirs(os.path.dirname(INDEX), exist_ok=True)

@@ -450,12 +450,12 @@
 20039
 ],
 "player": {
-"bianshi": 20226,
-"daoshi": 20155,
-"meinu": 20144,
-"shinu": 20136,
-"wunu": 20231,
-"yishi": 20208
+"bianshi": 91005,
+"daoshi": 91003,
+"meinu": 91006,
+"shinu": 91002,
+"wunu": 91004,
+"yishi": 91001
 },
 "soldier": [
 20150,
@@ -472,7 +472,7 @@
 20149
 ]
 },
-"_note": "由 tools/import_orig_assets.py 生成，唔好手改。key=id, value=相對 res://assets_orig/ 路徑",
+"_note": "由 tools/import_orig_assets.py 生成，唔好手改 (單跑部分 --sets 會合併舊索引)",
 "actor_A": {
 "20001": "actor/20001A.png",
 "20002": "actor/20002A.png",
@@ -568,7 +568,13 @@
 "30196": "actor/30196A.png",
 "30198": "actor/30198A.png",
 "30335": "actor/30335A.png",
-"30342": "actor/30342A.png"
+"30342": "actor/30342A.png",
+"91001": "actor/91001A.png",
+"91002": "actor/91002A.png",
+"91003": "actor/91003A.png",
+"91004": "actor/91004A.png",
+"91005": "actor/91005A.png",
+"91006": "actor/91006A.png"
 },
 "actor_S": {
 "20001": "actor/20001S.png",
@@ -665,7 +671,13 @@
 "30196": "actor/30196S.png",
 "30198": "actor/30198S.png",
 "30335": "actor/30335S.png",
-"30342": "actor/30342S.png"
+"30342": "actor/30342S.png",
+"91001": "actor/91001S.png",
+"91002": "actor/91002S.png",
+"91003": "actor/91003S.png",
+"91004": "actor/91004S.png",
+"91005": "actor/91005S.png",
+"91006": "actor/91006S.png"
 },
 "actor_W": {
 "20001": "actor/20001W.png",
@@ -762,7 +774,13 @@
 "30196": "actor/30196W.png",
 "30198": "actor/30198W.png",
 "30335": "actor/30335W.png",
-"30342": "actor/30342W.png"
+"30342": "actor/30342W.png",
+"91001": "actor/91001W.png",
+"91002": "actor/91002W.png",
+"91003": "actor/91003W.png",
+"91004": "actor/91004W.png",
+"91005": "actor/91005W.png",
+"91006": "actor/91006W.png"
 },
 "faces": {
 "20001": "faces/20001.jpg",
