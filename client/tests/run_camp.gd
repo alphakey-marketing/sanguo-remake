@@ -21,6 +21,7 @@ func _init() -> void:
 	t_group_hook(data)
 	t_repeat(data)
 	t_daywindow(data)
+	t_adv(data)
 	t_save(data)
 	t_determinism(data)
 	print("[TEST] camp (S08f: camp/work/eval): %d, fail %d" % [total, fails])
@@ -484,3 +485,70 @@ func _seq(data: GameData) -> String:
 
 func t_determinism(data: GameData) -> void:
 	check(_seq(data) == _seq(data), "決定性: 同種子同操作 → 同存檔")
+
+
+# ---- 營地進階【自訂】: 召喚部將 / 材料轉入轉出 / 兵營情報 ----
+func t_adv(data: GameData) -> void:
+	var r := _new(data, 71)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	var msgs: Array = r[3]
+	var m := _mil(sim, ch, "xuchang")
+	var md: Dictionary = sim._city_map("xuchang")
+	var ap: Vector2i = sim._city_anchor(md)
+	_put(sim, pid, ap.x, ap.y)
+	# 兵營情報
+	var iv := sim.camp_intel_view(pid)
+	check(not bool(iv["ok"]), "情報: 未起兵營 → 睇唔到")
+	var c := sim._camp_of(ch)
+	c["facilities"]["barracks"] = 1
+	iv = sim.camp_intel_view(pid)
+	check(bool(iv["ok"]) and not (iv["generals"] as Array).is_empty(), "情報: 兵營 1 級 → 有根據地武將名單")
+	var gid := int(iv["generals"][0]["id"])
+	check(String(iv["generals"][0]["status"]) == "喺城", "情報: 預設喺城")
+	# 召喚部將
+	sim.cmd_camp_call_back(pid, gid)
+	check(_last(msgs).find("5 級") >= 0, "召喚: 營地未夠 5 級拒絕 (%s)" % _last(msgs))
+	c["facilities"]["camp"] = 5
+	sim.cmd_camp_call_back(pid, gid)
+	check(_last(msgs).find("唔使召喚") >= 0, "召喚: 喺城嘅唔使召喚")
+	for i in 7:
+		sim._gen_state(gid)["awayMonth"] = sim._month()
+		sim.cmd_camp_call_back(pid, gid)
+	check(int(sim._gen_state(gid).get("awayMonth", -1)) == sim._month(), "召喚: 每月 6 次用晒 → 第 7 次拒絕")
+	check(int((c["callBack"] as Dictionary)["n"]) == 6, "召喚: 計數 6")
+	sim.state["clock"]["day"] = int(sim.state["clock"]["day"]) + 40
+	sim._gen_state(gid)["awayMonth"] = sim._month()
+	sim.cmd_camp_call_back(pid, gid)
+	check(int(sim._gen_state(gid)["awayMonth"]) == -1, "召喚: 下個月重新計，召得返")
+	_put(sim, pid, 5, 5)
+	sim._gen_state(gid)["awayMonth"] = sim._month()
+	sim.cmd_camp_call_back(pid, gid)
+	check(_last(msgs).find("根據地") >= 0, "召喚: 唔喺根據地拒絕")
+	_put(sim, pid, ap.x, ap.y)
+	# 材料轉入轉出
+	var item := 25001
+	RulesShop.add_item(ch["bag"], item, 50)
+	sim.cmd_camp_mat(pid, item, 10, "in")
+	check(_last(msgs).find("9 級") >= 0, "材料: 材料庫未 9 級唔可以轉入")
+	c["facilities"]["matstore"] = 9
+	sim.cmd_camp_mat(pid, item, 10, "in")
+	check(int(c["matItems"][str(item)]) == 10 and RulesShop.count_item(ch["bag"], item) == 40, "材料: 轉入 10")
+	sim.cmd_camp_mat(pid, item, 5, "out")
+	check(int(c["matItems"][str(item)]) == 10, "材料: 9 級唔可以轉出")
+	sim.cmd_camp_mat(pid, 1001, 1, "in")
+	check(_last(msgs).find("只收材料") >= 0, "材料: 非材料拒絕")
+	c["facilities"]["matstore"] = 10
+	sim.cmd_camp_mat(pid, item, 4, "out")
+	check(int(c["matItems"][str(item)]) == 6 and RulesShop.count_item(ch["bag"], item) == 44, "材料: 10 級轉出 4")
+	sim.cmd_camp_mat(pid, item, 99, "out")
+	check(int(c["matItems"][str(item)]) == 6, "材料: 轉出超量拒絕")
+	sim.cmd_camp_mat(pid, item, 6, "out")
+	check(not (c["matItems"] as Dictionary).has(str(item)), "材料: 清空移除鍵")
+	var cap := RulesCamp.facility_cap(data.camp, "matstore", 10, "stack")
+	RulesShop.add_item(ch["bag"], item, cap + 100)
+	sim.cmd_camp_mat(pid, item, cap + 100, "in")
+	check(int(c["matItems"][str(item)]) == cap, "材料: 堆疊上限 %d" % cap)
+	var v := sim.camp_view(pid)
+	check((v["matItems"] as Dictionary).has(str(item)) and int(v["callBackLeft"]) <= 6, "view: 有 matItems / callBackLeft")

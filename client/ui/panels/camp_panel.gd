@@ -167,3 +167,41 @@ func _build_stores(list: VBoxContainer, v: Dictionary) -> void:
 		list.add_child(wrap_lbl("%s：%d" % [String(c), int(trade[c])], 14))
 	list.add_child(hsep())
 	list.add_child(wrap_lbl("訓練度：%d" % int(v.get("train", 0)), 14, UiTheme.GOLD))
+	_build_adv(list, v)
+
+
+# ---- 營地進階 (召喚部將 / 材料庫轉入轉出 / 兵營情報) ----
+func _build_adv(list: VBoxContainer, v: Dictionary) -> void:
+	var adv: Dictionary = v.get("adv", {})
+	list.add_child(hsep())
+	list.add_child(lbl("進階功能", 15, UiTheme.GOLD))
+	var atk := bool(v.get("atHome", false))
+	if not atk:
+		list.add_child(wrap_lbl("返到根據地先用得。", 13, UiTheme.DIM))
+	var intel: Dictionary = main.sim.camp_intel_view(main.my_id)
+	list.add_child(lbl("兵營情報", 14))
+	if not bool(intel.get("ok", false)):
+		list.add_child(wrap_lbl(String(intel.get("why", "")), 13, UiTheme.DIM))
+	for g in (intel.get("generals", []) as Array):
+		var gd := g as Dictionary
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 6)
+		row.add_child(wrap_lbl("%s　戰等 %d　%s" % [String(gd["name"]), int(gd["lv"]), String(gd["status"])], 13))
+		if String(gd["status"]) == "今月外出" and int(v["level"]) >= int(adv.get("callBackLevel", 5)):
+			var gid := int(gd["id"])
+			row.add_child(btn("召喚回營 (餘 %d)" % int(v.get("callBackLeft", 0)), func() -> void:
+				main._send({"t": "camp_call_back", "gid": gid}), 130))
+		list.add_child(row)
+	list.add_child(lbl("材料庫", 14))
+	var mi: Dictionary = v.get("matItems", {})
+	if mi.is_empty():
+		list.add_child(wrap_lbl("材料庫空。", 13, UiTheme.DIM))
+	for k in mi.keys():
+		var item := int(k)
+		var row2 := HBoxContainer.new()
+		row2.add_theme_constant_override("separation", 6)
+		row2.add_child(wrap_lbl("%s ×%d" % [String(main.sim.data.names.get(item, k)), int(mi[k])], 13))
+		row2.add_child(btn("轉出", func() -> void:
+			main._send({"t": "camp_mat", "item": item, "n": 1, "dir": "out"}), 70))
+		list.add_child(row2)
+	list.add_child(wrap_lbl("轉入：喺背包揀材料 (材料庫 %d 級起)、轉出 (%d 級起)。" % [int(adv.get("matInLevel", 9)), int(adv.get("matOutLevel", 10))], 12, UiTheme.DIM))

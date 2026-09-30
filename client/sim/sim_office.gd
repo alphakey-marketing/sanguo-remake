@@ -1306,9 +1306,129 @@ func camp_view(id: int) -> Dictionary:
 		"roles": cfg.get("roles", []), "role": String(m.get("role", "banner")), "roleName": RulesCamp.role_name(cfg, String(m.get("role", "banner"))),
 		"positions": RulesCamp.positions_at(cfg, level), "facilities": facs, "build": c.get("build", {}),
 		"stores": c.get("stores", {}), "train": int(c.get("train", 0)), "trade": c.get("trade", {}),
+		"matItems": c.get("matItems", {}), "callBackLeft": maxi(0, _camp_adv("callBackMax") - (int((c.get("callBack", {}) as Dictionary).get("n", 0)) if int((c.get("callBack", {}) as Dictionary).get("month", -1)) == _month() else 0)),
+		"adv": camp_cfg().get("advanced", {}),
 		"merit": int(m.get("merit", 0)), "performance": int(m.get("performance", 0)),
 		"canUpgradeRole": RulesCamp.can_upgrade_role(cfg, String(m.get("role", "banner"))),
 	}
+
+
+# ---- 營地進階功能【自訂】(spec 08 §3): 召喚部將回營 (Lv5+) / 材料庫轉入 (Lv9) 轉出 (Lv10) / 兵營情報 (兵營 Lv1+) ----
+func _camp_adv(key: String) -> int:
+	return int((camp_cfg().get("advanced", {}) as Dictionary).get(key, 0))
+
+
+# 共用前置: 已成立 + 喺根據地；回 "" = 可以，否則原因
+func _camp_home_block(e: Dictionary, m: Dictionary) -> String:
+	if not bool(m.get("founded", false)):
+		return "未成立義勇軍"
+	if not _at_home(e, m):
+		return "要返到根據地先做得"
+	return ""
+
+
+# 召喚部將回營: 呢個月走咗嘅 Tier1 武將即時返城；營地 5 級起，每月最多 6 次
+func cmd_camp_call_back(id: int, gid: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return
+	var ch: Dictionary = e["ch"]
+	var m := _militia_read(ch)
+	var why := _camp_home_block(e, m)
+	if why != "":
+		return _msg(id, why)
+	if _fac_level(m, "camp") < _camp_adv("callBackLevel"):
+		return _msg(id, "營地要 %d 級先召喚得部將" % _camp_adv("callBackLevel"))
+	var g: Dictionary = data.general_by_id.get(gid, {})
+	if g.is_empty() or int(g["tier"]) != 1 or String(g.get("map", "")) != String(m.get("city", "")):
+		return _msg(id, "根據地冇呢位部將")
+	var st: Dictionary = _gen_state(gid)
+	if int(st.get("awayMonth", -1)) != _month():
+		return _msg(id, "%s而家喺城，唔使召喚" % String(g["name"]))
+	var c := _camp_of(ch)
+	var cb: Dictionary = c.get("callBack", {})
+	if int(cb.get("month", -1)) != _month():
+		cb = {"month": _month(), "n": 0}
+	if int(cb["n"]) >= _camp_adv("callBackMax"):
+		return _msg(id, "今個月召喚已用晒 (%d 次)" % _camp_adv("callBackMax"))
+	cb["n"] = int(cb["n"]) + 1
+	c["callBack"] = cb
+	st["awayMonth"] = -1
+	_emit({"k": "camp_call_back", "id": id, "gid": gid})
+	_msg(id, "召喚部將「%s」回營 (今月 %d/%d)" % [String(g["name"]), int(cb["n"]), _camp_adv("callBackMax")])
+
+
+# 材料庫轉入 (9 級) / 轉出 (10 級): 只限材料類 (25xxx)，種類數 + 堆疊受材料庫上限
+func cmd_camp_mat(id: int, item: int, n: int, dir: String) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or n < 1:
+		return
+	var ch: Dictionary = e["ch"]
+	var m := _militia_read(ch)
+	var why := _camp_home_block(e, m)
+	if why != "":
+		return _msg(id, why)
+	var lv := _fac_level(m, "matstore")
+	var need := _camp_adv("matInLevel") if dir == "in" else _camp_adv("matOutLevel")
+	if lv < need:
+		return _msg(id, "材料庫要 %d 級先做得「轉%s」" % [need, "入" if dir == "in" else "出"])
+	if item < 25000 or item >= 26000:
+		return _msg(id, "材料庫只收材料")
+	var c := _camp_of(ch)
+	if not c.has("matItems") or not (c["matItems"] is Dictionary):
+		c["matItems"] = {}
+	var mi: Dictionary = c["matItems"]
+	var key := str(item)
+	var cur := int(mi.get(key, 0))
+	var nm := String(data.names.get(item, key))
+	if dir == "in":
+		var kinds_cap := RulesCamp.facility_cap(camp_cfg(), "matstore", lv, "items")
+		var stack_cap := RulesCamp.facility_cap(camp_cfg(), "matstore", lv, "stack")
+		if cur == 0 and mi.size() >= kinds_cap:
+			return _msg(id, "材料庫種類已滿 (%d)" % kinds_cap)
+		var add := mini(n, maxi(0, stack_cap - cur))
+		if add < 1:
+			return _msg(id, "呢種材料堆疊已滿 (%d)" % stack_cap)
+		if not RulesShop.remove_item(ch["bag"], item, add):
+			return _msg(id, "背包冇咁多")
+		mi[key] = cur + add
+		_msg(id, "轉入材料庫：%s ×%d" % [nm, add])
+	else:
+		if cur < n:
+			return _msg(id, "材料庫冇咁多")
+		mi[key] = cur - n
+		if int(mi[key]) <= 0:
+			mi.erase(key)
+		RulesShop.add_item(ch["bag"], item, n)
+		_msg(id, "轉出材料庫：%s ×%d" % [nm, n])
+
+
+# 兵營情報: 兵營有建 (1 級+) → 睇根據地武將動向 (喺城 / 呢個月走咗 / 跟緊人)
+func camp_intel_view(id: int) -> Dictionary:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return {}
+	var m := _militia_read(e["ch"])
+	var lv := _fac_level(m, "barracks")
+	var out := {"ok": false, "why": "", "generals": []}
+	var why := _camp_home_block(e, m)
+	if why == "" and lv < _camp_adv("intelLevel"):
+		why = "要先起兵營"
+	if why != "":
+		out["why"] = why
+		return out
+	out["ok"] = true
+	for g in data.generals_t1:
+		if String(g.get("map", "")) != String(m.get("city", "")):
+			continue
+		var st: Dictionary = state.get("generals", {}).get(str(int(g["id"])), {})
+		var status := "喺城"
+		if bool(st.get("serving", false)):
+			status = "跟緊人"
+		elif int(st.get("awayMonth", -1)) == _month():
+			status = "今月外出"
+		out["generals"].append({"id": int(g["id"]), "name": String(g["name"]), "lv": int(g["lv"]), "status": status})
+	return out
 
 
 func _camp_upgrade_block(e: Dictionary, ch: Dictionary, fac_id: String) -> String:
