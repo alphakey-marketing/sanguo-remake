@@ -125,7 +125,7 @@ func _build_grid(parent: Control, items: Array) -> void:
 		cell.custom_minimum_size = Vector2(CELL, CELL)
 		item_icon_btn(cell, id, true)
 		cell.add_theme_font_size_override("font_size", 12)
-		cell.add_theme_color_override("font_color", _kind_color(id))
+		cell.add_theme_color_override("font_color", _kind_color(id).darkened(0.62))
 		cell.toggle_mode = true
 		cell.set_pressed_no_signal(sel == id)
 		g.add_child(cell)
