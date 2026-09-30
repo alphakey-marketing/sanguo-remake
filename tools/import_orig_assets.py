@@ -288,7 +288,37 @@ def imp_player_layers(src, idx):
     idx["player_layers"] = out
     print(f"玩家分層: {len(out)} 張")
 
-SETS = {"player": imp_player_layers, "mount": imp_mount, "actor": imp_actor, "mon": imp_mon, "items": imp_items, "faces": imp_faces, "ui": imp_ui}
+FX_PICK = {"hit": ("40004E", 12), "spell": ("30516E", 10), "ult": ("22203E", 11), "heal": ("41003E", 15), "levelup": ("41002E", 11)}
+
+def imp_fx(src, idx):
+    """特效 (effect.mrg): 每個取頭 N 個有效 frame (後面係雜訊)，按 frame 偏移烘成橫條 strip。
+    fx key=名; _fx_meta[名]={n,cw,ch,ax,ay} (ax/ay = 錨點喺 cell 入面位置)"""
+    sys.path.insert(0, r"D:/Download/sanguo/tools")
+    from mrg_decode import Mrg
+    from cp_decode import CP
+    from PIL import Image
+    m = Mrg(r"D:/Download/zyxy_client/Sanguo_Client/role/effect.mrg")
+    ix = {n.split(chr(92))[-1].split(".")[0]: i for i, n in enumerate(m.names)}
+    os.makedirs(os.path.join(OUT, "fx"), exist_ok=True)
+    out, meta = {}, {}
+    for key, (code, lim) in FX_PICK.items():
+        c = CP(m.blob(ix[code]))
+        fr = [f for f in range(min(c.n, lim)) if c.recs[f][2] > 0]
+        ims = [(c.image(f)[0], c.recs[f][0], c.recs[f][1]) for f in fr]
+        x0 = min(x for _, x, _y in ims); y0 = min(y for _, _x, y in ims)
+        cw = max(x + im.width for im, x, _y in ims) - x0; chh = max(y + im.height for im, _x, y in ims) - y0
+        sh = Image.new("RGBA", (cw * len(ims), chh), (0, 0, 0, 0))
+        for i, (im, x, y) in enumerate(ims):
+            sh.alpha_composite(im, (i * cw + x - x0, y - y0))
+        rel = f"fx/{key}.png"
+        sh.save(os.path.join(OUT, rel))
+        out[key] = rel
+        meta[key] = {"n": len(ims), "cw": cw, "ch": chh, "ax": -x0, "ay": -y0}
+    idx["fx"] = out
+    idx["_fx_meta"] = meta
+    print(f"特效: {len(out)} 個")
+
+SETS = {"fx": imp_fx, "player": imp_player_layers, "mount": imp_mount, "actor": imp_actor, "mon": imp_mon, "items": imp_items, "faces": imp_faces, "ui": imp_ui}
 
 def check():
     if not os.path.exists(INDEX):

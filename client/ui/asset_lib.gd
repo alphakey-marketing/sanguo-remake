@@ -74,6 +74,18 @@ static func player_layer(b: int, c: int, kind: String, style: int) -> Texture2D:
 	return _tex("player_layers", "%d/%d/%s/%d" % [b, c, kind, style])
 
 
+# 特效 strip: {tex, n, cw, ch, ax, ay}；冇圖回 {}
+static func fx(name: String) -> Dictionary:
+	_ensure()
+	var t := _tex("fx", name)
+	var m: Variant = (_index.get("_fx_meta", {}) as Dictionary).get(name)
+	if t == null or not (m is Dictionary):
+		return {}
+	var r: Dictionary = (m as Dictionary).duplicate()
+	r["tex"] = t
+	return r
+
+
 static func actor_sheet(sid: int, act: String) -> Texture2D:
 	return _tex("actor_" + act, sid)
 
