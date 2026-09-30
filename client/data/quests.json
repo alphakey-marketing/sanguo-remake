@@ -1,8 +1,9 @@
 {
- "_note": "任務定義 (spec 06 §1.1~§2)【原=流程/條件；自訂=數值奬勵/對話措辭】。stage 順序 = array 序；next 欄位省略（照序）。stage type: talk(同 npc 傾偈, getItem=對話中攞到道具) / talk_n(同 n 個 npc 傾偈) / repeat(重複 n 次, perDay=每日最多 1 次) / collect(交道具, 用 cmd_quest_turnin) / ask(答題, 用 cmd_quest_answer) / facility(用設施, 由 cmd_facility 推進) / fight(PK, Step 10+ 用)。hidden=true 唔顯示喺記事（service NPC）。 Step 16 歷史任務 (type=history, spec 06 §4【原】sy3_5): talk.takeItems = 對話要帶齊呢啲道具先推進 (推進時扣)；fight = 行近 npc 對話召喚 boss；pre.attr = 屬性門檻 (魅力)；reward.polExp = 政治經驗。 Step 16.5 (B3): repeat.dialogs = 第 n 次對白、repeat.dayMsg = 同日再嚟嘅提示。對話措辭【自訂】。 S01d+F6: promote_test_<職業id> 六職各一份轉職考試（二轉 Lv50 前置，spec 01 §7），完成先可以由角色面板轉職；三轉任務 S04d 接。",
+ "_note": "任務定義 (spec 06 §1.1~§2)【原=流程/條件；自訂=數值奬勵/對話措辭】。stage 順序 = array 序；next 欄位省略（照序）。stage type: talk(同 npc 傾偈, getItem=對話中攞到道具) / talk_n(同 n 個 npc 傾偈) / repeat(重複 n 次, perDay=每日最多 1 次) / collect(交道具, 用 cmd_quest_turnin) / ask(答題, 用 cmd_quest_answer) / facility(用設施, 由 cmd_facility 推進) / fight(PK, Step 10+ 用)。hidden=true 唔顯示喺記事（service NPC）。 Step 16 歷史任務 (type=history, spec 06 §4【原】sy3_5): talk.takeItems = 對話要帶齊呢啲道具先推進 (推進時扣)；fight = 行近 npc 對話召喚 boss；pre.attr = 屬性門檻 (魅力)；reward.polExp = 政治經驗。 Step 16.5 (B3): repeat.dialogs = 第 n 次對白、repeat.dayMsg = 同日再嚟嘅提示。對話措辭【自訂】。 S01d+F6: promote_test_<職業id> 六職各一份轉職考試（二轉 Lv50 前置，spec 01 §7），完成先可以由角色面板轉職；三轉任務 S04d 接。 【src: custom=remake 自寫；orig=由原版 evt 導入 (未有)，導入器按 src 篩選對照】",
  "quests": [
   {
    "id": "newbie_mystery",
+   "src": "custom",
    "name": "神秘老人嘅考驗",
    "type": "newbie",
    "giver": "mystery_old",
@@ -50,6 +51,7 @@
   },
   {
    "id": "newbie_training",
+   "src": "custom",
    "name": "練兵場新手訓練",
    "type": "newbie",
    "giver": "training_recruit",
@@ -77,6 +79,7 @@
   },
   {
    "id": "newbie_temple",
+   "src": "custom",
    "name": "寺廟初階修行",
    "type": "newbie",
    "stages": [
@@ -91,6 +94,7 @@
   },
   {
    "id": "newbie_school",
+   "src": "custom",
    "name": "私塾初階補習",
    "type": "newbie",
    "stages": [
@@ -105,6 +109,7 @@
   },
   {
    "id": "newbie_dog",
+   "src": "custom",
    "name": "流浪狗嘅祕密",
    "type": "newbie",
    "giver": "stray_dog",
@@ -141,6 +146,7 @@
   },
   {
    "id": "service_miyi",
+   "src": "custom",
    "name": "密醫",
    "type": "service",
    "hidden": true,
@@ -149,6 +155,7 @@
   },
   {
    "id": "ult_wanli",
+   "src": "custom",
    "name": "萬里鷹翔（絕招一）",
    "type": "ultimate",
    "giver": "guard_captain",
@@ -206,6 +213,7 @@
   },
   {
    "id": "ult_dapeng",
+   "src": "custom",
    "name": "大鵬展翅（絕招二）",
    "type": "ultimate",
    "giver": "town_head",
@@ -267,6 +275,7 @@
   },
   {
    "id": "ult_libashan",
+   "src": "custom",
    "name": "力拔山河（絕招三）",
    "type": "ultimate",
    "giver": "lvbu",
@@ -345,6 +354,7 @@
   },
   {
    "id": "xinye_letter",
+   "src": "custom",
    "name": "新野公文",
    "type": "general",
    "giver": "xinye_clerk",
@@ -382,6 +392,7 @@
   },
   {
    "id": "xinye_inn",
+   "src": "custom",
    "name": "客棧缺貨",
    "type": "general",
    "giver": "xinye_innkeeper",
@@ -416,6 +427,7 @@
   },
   {
    "id": "hist_sunjian",
+   "src": "custom",
    "name": "少年孫堅打海賊",
    "type": "history",
    "giver": "sunjian",
@@ -493,6 +505,7 @@
   },
   {
    "id": "hist_yudu",
+   "src": "custom",
    "name": "聲東擊西退于毒",
    "type": "history",
    "giver": "wanggong",
@@ -576,6 +589,7 @@
   },
   {
    "id": "hist_chengong",
+   "src": "custom",
    "name": "搶救曹操大作戰",
    "type": "history",
    "giver": "chengong",
@@ -640,6 +654,7 @@
   },
   {
    "id": "hist_yuanshao",
+   "src": "custom",
    "name": "袁紹義助王允",
    "type": "history",
    "giver": "yuanshao",
@@ -690,6 +705,7 @@
   },
   {
    "id": "hist_dongzhuo",
+   "src": "custom",
    "name": "董卓初登場",
    "type": "history",
    "giver": "liru",
@@ -740,6 +756,7 @@
   },
   {
    "id": "hist_dingyuan",
+   "src": "custom",
    "name": "代呂布斬丁原",
    "type": "history",
    "giver": "lisu",
@@ -825,6 +842,7 @@
   },
   {
    "id": "hist_longzhong",
+   "src": "custom",
    "name": "三顧茅廬",
    "type": "history",
    "giver": "simahui",
@@ -886,6 +904,7 @@
   },
   {
    "id": "promote_test_yishi",
+   "src": "custom",
    "name": "轉職考試（義士→武士）",
    "type": "general",
    "giver": "promote_master",
@@ -929,6 +948,7 @@
   },
   {
    "id": "promote_test_shinu",
+   "src": "custom",
    "name": "轉職考試（仕女→俠女）",
    "type": "general",
    "giver": "promote_master",
@@ -972,6 +992,7 @@
   },
   {
    "id": "promote_test_daoshi",
+   "src": "custom",
    "name": "轉職考試（道士→仙君）",
    "type": "general",
    "giver": "promote_master",
@@ -1015,6 +1036,7 @@
   },
   {
    "id": "promote_test_wunu",
+   "src": "custom",
    "name": "轉職考試（巫女→魔女）",
    "type": "general",
    "giver": "promote_master",
@@ -1058,6 +1080,7 @@
   },
   {
    "id": "promote_test_bianshi",
+   "src": "custom",
    "name": "轉職考試（辯士→策士）",
    "type": "general",
    "giver": "promote_master",
@@ -1101,6 +1124,7 @@
   },
   {
    "id": "promote_test_meinu",
+   "src": "custom",
    "name": "轉職考試（美女→仙女）",
    "type": "general",
    "giver": "promote_master",
@@ -1144,6 +1168,7 @@
   },
   {
    "id": "skill_unlock_shinu",
+   "src": "custom",
    "name": "學特技：開鎖",
    "type": "general",
    "giver": "shinu_master",
@@ -1182,6 +1207,7 @@
   },
   {
    "id": "skill_unlock_daoshi",
+   "src": "custom",
    "name": "學特技：超渡",
    "type": "general",
    "giver": "daoshi_master",
@@ -1220,6 +1246,7 @@
   },
   {
    "id": "skill_unlock_wunu",
+   "src": "custom",
    "name": "學特技：潛行",
    "type": "general",
    "giver": "wunu_master",
@@ -1258,6 +1285,7 @@
   },
   {
    "id": "skill_unlock_bianshi",
+   "src": "custom",
    "name": "學特技：竊聽",
    "type": "general",
    "giver": "bianshi_master",
@@ -1296,6 +1324,7 @@
   },
   {
    "id": "skill_unlock_meinu",
+   "src": "custom",
    "name": "學特技：透視",
    "type": "general",
    "giver": "meinu_master",
@@ -1334,6 +1363,7 @@
   },
   {
    "id": "hist_sunjian_seal",
+   "src": "custom",
    "name": "孫堅匿璽",
    "type": "history",
    "giver": "sunwentai",
@@ -1413,6 +1443,7 @@
   },
   {
    "id": "hist_zhanggong",
+   "src": "custom",
    "name": "張公公謀害何進",
    "type": "history",
    "giver": "zhanggong",
@@ -1501,6 +1532,7 @@
   },
   {
    "id": "hist_huanggai",
+   "src": "custom",
    "name": "玩家打黃蓋一個願打一個願挨",
    "type": "history",
    "giver": "yuji",
@@ -1572,6 +1604,7 @@
   },
   {
    "id": "hist_caoamang",
+   "src": "custom",
    "name": "找尋曹阿瞞任務",
    "type": "history",
    "giver": "caosong",
@@ -1624,6 +1657,7 @@
   },
   {
    "id": "hist_zhangjiao",
+   "src": "custom",
    "name": "替天行道討伐張角",
    "type": "history",
    "giver": "zhangjiao",
@@ -1718,6 +1752,7 @@
   },
   {
    "id": "group_merchant",
+   "src": "custom",
    "name": "商會長經濟交流",
    "type": "group",
    "repeat": "monthly",
@@ -1770,6 +1805,7 @@
   },
   {
    "id": "group_exterminate",
+   "src": "custom",
    "name": "居民除害（猛獸王）",
    "type": "group",
    "repeat": "monthly",
@@ -1813,6 +1849,7 @@
   },
   {
    "id": "group_weizi",
+   "src": "custom",
    "name": "衛茲資助軍備",
    "type": "group",
    "repeat": "monthly",
@@ -1855,6 +1892,7 @@
   },
   {
    "id": "group_miner",
+   "src": "custom",
    "name": "幫助礦工工頭",
    "type": "group",
    "repeat": "monthly",
@@ -1910,6 +1948,7 @@
   },
   {
    "id": "group_zixu",
+   "src": "custom",
    "name": "紫虛上人修行",
    "type": "group",
    "repeat": "daily",
@@ -1954,6 +1993,7 @@
   },
   {
    "id": "group_court_harm",
+   "src": "custom",
    "name": "朝廷除害",
    "type": "group",
    "repeat": "monthly",
@@ -1996,6 +2036,7 @@
   },
   {
    "id": "group_court_rat",
+   "src": "custom",
    "name": "朝廷滅鼠",
    "type": "group",
    "repeat": "monthly",
@@ -2037,6 +2078,7 @@
   },
   {
    "id": "group_court_thief",
+   "src": "custom",
    "name": "朝廷滅賊",
    "type": "group",
    "repeat": "monthly",
@@ -2079,6 +2121,7 @@
   },
   {
    "id": "group_lin",
+   "src": "custom",
    "name": "林員外喜宴",
    "type": "group",
    "repeat": "monthly",
@@ -2125,6 +2168,7 @@
   },
   {
    "id": "group_thief_camp",
+   "src": "custom",
    "name": "勇闖賊寨",
    "type": "group",
    "repeat": "monthly",
@@ -2168,6 +2212,7 @@
   },
   {
    "id": "group_ghost",
+   "src": "custom",
    "name": "鬼域迷陣",
    "type": "group",
    "repeat": "monthly",
@@ -2216,6 +2261,7 @@
   },
   {
    "id": "group_yanshan",
+   "src": "custom",
    "name": "岩山瘴林歷險",
    "type": "group",
    "repeat": "monthly",
@@ -2263,6 +2309,7 @@
   },
   {
    "id": "group_recruit_soldier",
+   "src": "custom",
    "name": "義勇士兵增兵",
    "type": "group",
    "repeat": "monthly",
@@ -2297,6 +2344,7 @@
   },
   {
    "id": "group_maze",
+   "src": "custom",
    "name": "亂數迷宮找寶藏",
    "type": "group",
    "repeat": "monthly",
@@ -2345,6 +2393,7 @@
   },
   {
    "id": "group_evil_head",
+   "src": "custom",
    "name": "斬殺惡頭",
    "type": "group",
    "repeat": "monthly",
@@ -2396,6 +2445,7 @@
   },
   {
    "id": "group_imperial_tool",
+   "src": "custom",
    "name": "初階御賜工具",
    "type": "group",
    "repeat": "monthly",
@@ -2442,6 +2492,7 @@
   },
   {
    "id": "group_craftsman",
+   "src": "custom",
    "name": "協助工匠工頭",
    "type": "group",
    "repeat": "monthly",
@@ -2489,6 +2540,7 @@
   },
   {
    "id": "ult_shinu_huxiao",
+   "src": "custom",
    "name": "虎嘯龍吟（絕招一）",
    "type": "ultimate",
    "giver": "shinu_master",
@@ -2546,6 +2598,7 @@
   },
   {
    "id": "ult_shinu_jinhu",
+   "src": "custom",
    "name": "金環裂地（絕招二）",
    "type": "ultimate",
    "giver": "shinu_master",
@@ -2605,6 +2658,7 @@
   },
   {
    "id": "ult_shinu_jinghua",
+   "src": "custom",
    "name": "鏡花水月（絕招三）",
    "type": "ultimate",
    "giver": "shinu_master",
@@ -2679,6 +2733,7 @@
   },
   {
    "id": "ult_daoshi_xuwu",
+   "src": "custom",
    "name": "虛無飄渺（絕招一）",
    "type": "ultimate",
    "giver": "daoshi_master",
@@ -2724,6 +2779,7 @@
   },
   {
    "id": "ult_daoshi_ruhuan",
+   "src": "custom",
    "name": "如幻似真（絕招二）",
    "type": "ultimate",
    "giver": "daoshi_master",
@@ -2766,6 +2822,7 @@
   },
   {
    "id": "ult_daoshi_shenyou",
+   "src": "custom",
    "name": "神遊太虛（絕招三）",
    "type": "ultimate",
    "giver": "daoshi_master",
@@ -2831,6 +2888,7 @@
   },
   {
    "id": "ult_wunu_candeng",
+   "src": "custom",
    "name": "殘燈映紅（絕招一）",
    "type": "ultimate",
    "giver": "wunu_master",
@@ -2892,6 +2950,7 @@
   },
   {
    "id": "ult_wunu_danchan",
+   "src": "custom",
    "name": "膽顫心驚（絕招二）",
    "type": "ultimate",
    "giver": "wunu_master",
@@ -2951,6 +3010,7 @@
   },
   {
    "id": "ult_wunu_guiku",
+   "src": "custom",
    "name": "鬼哭神號（絕招三）",
    "type": "ultimate",
    "giver": "wunu_master",
@@ -3016,6 +3076,7 @@
   },
   {
    "id": "ult_bianshi_tiandao",
+   "src": "custom",
    "name": "天道循環（絕招一）",
    "type": "ultimate",
    "giver": "bianshi_master",
@@ -3073,6 +3134,7 @@
   },
   {
    "id": "ult_bianshi_tuohuo",
+   "src": "custom",
    "name": "吐火羅語（絕招二）",
    "type": "ultimate",
    "giver": "bianshi_master",
@@ -3132,6 +3194,7 @@
   },
   {
    "id": "ult_bianshi_sanfen",
+   "src": "custom",
    "name": "三分天下（絕招三）",
    "type": "ultimate",
    "giver": "bianshi_master",
@@ -3186,6 +3249,7 @@
   },
   {
    "id": "ult_meinu_xiaobo",
+   "src": "custom",
    "name": "笑撥弦步（絕招一）",
    "type": "ultimate",
    "giver": "meinu_master",
@@ -3239,6 +3303,7 @@
   },
   {
    "id": "ult_meinu_songzhu",
+   "src": "custom",
    "name": "松竹聽雨（絕招二）",
    "type": "ultimate",
    "giver": "meinu_master",
@@ -3298,6 +3363,7 @@
   },
   {
    "id": "ult_meinu_feihua",
+   "src": "custom",
    "name": "飛花點翠（絕招三）",
    "type": "ultimate",
    "giver": "meinu_master",
@@ -3352,6 +3418,7 @@
   },
   {
    "id": "expert_tianwen_1",
+   "src": "custom",
    "name": "天文一級認證",
    "type": "expert",
    "giver": "gande",
@@ -3418,6 +3485,7 @@
   },
   {
    "id": "expert_dili_1",
+   "src": "custom",
    "name": "地理一級認證",
    "type": "expert",
    "giver": "gande",
@@ -3511,6 +3579,7 @@
   },
   {
    "id": "expert_tianwen_2",
+   "src": "custom",
    "name": "天文二級認證",
    "type": "expert",
    "giver": "nanhua_immortal",
@@ -3547,6 +3616,7 @@
   },
   {
    "id": "expert_dili_2",
+   "src": "custom",
    "name": "地理二級認證",
    "type": "expert",
    "giver": "nanhua_immortal",
@@ -3583,6 +3653,7 @@
   },
   {
    "id": "expert_tianwen_3",
+   "src": "custom",
    "name": "天文三級認證",
    "type": "expert",
    "giver": "zuoci",
@@ -3665,6 +3736,7 @@
   },
   {
    "id": "expert_tianwen_4",
+   "src": "custom",
    "name": "天文四級認證",
    "type": "expert",
    "giver": "zuoci",
@@ -3745,6 +3817,7 @@
   },
   {
    "id": "expert_dili_3",
+   "src": "custom",
    "name": "地理三級認證",
    "type": "expert",
    "giver": "yuji",
@@ -3828,6 +3901,7 @@
   },
   {
    "id": "expert_dili_4",
+   "src": "custom",
    "name": "地理四級認證",
    "type": "expert",
    "giver": "yuji",
@@ -3908,6 +3982,7 @@
   },
   {
    "id": "expert_kaiken_1",
+   "src": "custom",
    "name": "開墾一級認證",
    "type": "expert",
    "giver": "xinye_farmer",
@@ -3949,6 +4024,7 @@
   },
   {
    "id": "expert_zhaolai_1",
+   "src": "custom",
    "name": "招徠一級認證",
    "type": "expert",
    "giver": "xinye_clerk",
@@ -3990,6 +4066,7 @@
   },
   {
    "id": "expert_siyu_1",
+   "src": "custom",
    "name": "飼育一級認證",
    "type": "expert",
    "giver": "baoma_zhai",
@@ -4031,6 +4108,7 @@
   },
   {
    "id": "expert_tankuang_1",
+   "src": "custom",
    "name": "探礦一級認證",
    "type": "expert",
    "giver": "miner_boss",
@@ -4072,6 +4150,7 @@
   },
   {
    "id": "expert_xiuzhu_1",
+   "src": "custom",
    "name": "修築一級認證",
    "type": "expert",
    "giver": "craft_boss",
@@ -4113,6 +4192,7 @@
   },
   {
    "id": "expert_gongyi_1",
+   "src": "custom",
    "name": "工藝一級認證",
    "type": "expert",
    "giver": "runan_smith",
@@ -4154,6 +4234,7 @@
   },
   {
    "id": "expert_jiuzai_1",
+   "src": "custom",
    "name": "救災一級認證",
    "type": "expert",
    "giver": "town_head",
@@ -4195,6 +4276,7 @@
   },
   {
    "id": "expert_jiaoyi_1",
+   "src": "custom",
    "name": "交易一級認證",
    "type": "expert",
    "giver": "merchant_guild",
@@ -4236,6 +4318,7 @@
   },
   {
    "id": "expert_xunlian_1",
+   "src": "custom",
    "name": "訓練一級認證",
    "type": "expert",
    "giver": "recruit_officer",
@@ -4277,6 +4360,7 @@
   },
   {
    "id": "expert_jingjie_1",
+   "src": "custom",
    "name": "警戒一級認證",
    "type": "expert",
    "giver": "hefu_guard",
@@ -4318,6 +4402,7 @@
   },
   {
    "id": "marry_letter_m",
+   "src": "custom",
    "name": "御賜函（男）",
    "type": "marry",
    "giver": "marry_official",
@@ -4348,6 +4433,7 @@
   },
   {
    "id": "marry_letter_f",
+   "src": "custom",
    "name": "御賜函（女）",
    "type": "marry",
    "giver": "marry_official",
