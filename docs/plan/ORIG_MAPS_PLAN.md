@@ -39,3 +39,5 @@
 ## 進度
 - [x] 步驟 1 匯出器 `tools/import_orig_maps.py`（三城，--check 已接入 run_tests.sh）。
   實測：許昌 526 物件/145 物件圖、新野 197/95、襄陽 472/140；資產共約 33 MB（assets_orig，gitignore）；JSON 88 KB。
+- [x] 步驟 2 Godot 顯示（2026-09-30）：`client/ui/orig_map.gd` + main.gd 物件遮擋；測試圖 `xuchang_o`（許昌原版，oy=644，WORLD_H=840），舊許昌 (37,1) 有臨時傳送入口。run_world 139/0 fail，截圖 map_orig 正常。
+  未做：NPC/商店/城門（步驟 4）、行走精度（水邊）。

@@ -1252,6 +1252,21 @@
      "y1": 13
     }
    ]
+  },
+  {
+   "id": "xuchang_o",
+   "name": "許昌（原版）",
+   "ox": 0,
+   "oy": 644,
+   "safe": true,
+   "kind": "city",
+   "orig": "xuchang",
+   "spawn": [
+    125,
+    161,
+    125,
+    161
+   ]
   }
  ],
  "landmarks": [
@@ -2477,6 +2492,24 @@
    "x": 23,
    "y": 0,
    "to": "css_lingling",
+   "auto": true
+  },
+  {
+   "id": "orig_xc_in",
+   "name": "原版許昌（測試）",
+   "map": "xuchang",
+   "x": 37,
+   "y": 1,
+   "to": "orig_xc_out",
+   "auto": true
+  },
+  {
+   "id": "orig_xc_out",
+   "name": "返回舊許昌",
+   "map": "xuchang_o",
+   "x": 125,
+   "y": 162,
+   "to": "orig_xc_in",
    "auto": true
   }
  ]
