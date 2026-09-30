@@ -16,7 +16,8 @@
 
 ## 2026-09-29 核實
 
-- 已做核實：collect 提示填數字、答錯 NPC 回應彈窗+信息欄、任務對話 DialogBox 彈窗、死亡報全入信息欄。許昌加大仍留專責 task。
+- 已做核實：collect 提示填數字、答錯 NPC 回應彈窗+信息欄、任務對話 DialogBox 彈窗、死亡報全入信息欄。許昌加大已做（見下）。
+- 2026-09-29 補做：許昌地圖 72×52 → 72×76（南面插入 24 行新街區，南門/公佈欄 y 順移；`xuchang.txt`、南門傳送點、`bulletin_xc`），run_tests ALL OK。討伐張角加採藥 10 級門檻（`pre.workLv`，`rules/quest.gd`）；訂製軍備要接令後喺商店買（`bought` 記數）；朝廷求才要接令後新登用文官（`base` 對比）。
 
 ## ✅ 已修復（UAT 揩 feedback 後改嘅）
 - 練兵場新手任務：獎勵由「歷練 +10」改做「exp +30」（`quests.json` `newbie_training`；對應測試 `run_quest.gd` 已更新）

@@ -364,6 +364,9 @@ func t_order_buy(data: GameData) -> void:
 	sim.cmd_office_turnin(pid)
 	check(_last(msgs).begins_with("仲未買到"), "未買武器覆唔到命")
 	RulesShop.add_item(ch["bag"], item, 1)
+	sim.cmd_office_turnin(pid)
+	check(not (ch["office"]["order"] as Dictionary).is_empty(), "背包有武器但唔係商店買（冇購買記錄）覆唔到命")
+	ch["office"]["order"]["bought"] = 1     # 模擬喺武器店買入 (cmd_buy 記數)
 	var fame0 := int(ch.get("fame", 0))
 	sim.cmd_office_turnin(pid)
 	check((ch["office"]["order"] as Dictionary).is_empty() and int(ch["fame"]) == fame0 + 40, "訂製軍備完成: 名聲 +40")
@@ -397,6 +400,10 @@ func t_order_recruit(data: GameData) -> void:
 	var wen: Dictionary = data.general_by_id[1]
 	var cwen := sim._spawn_companion(pe, wen)
 	ch["recruit"]["comp"] = int(cwen["id"])
+	ch["office"]["order"]["base"] = int(cwen["id"])
+	sim.cmd_office_turnin(pid)
+	check(not (ch["office"]["order"] as Dictionary).is_empty(), "接令前已跟緊嘅文官唔算新登用")
+	ch["office"]["order"]["base"] = 0
 	var fame0 := int(ch.get("fame", 0))
 	sim.cmd_office_turnin(pid)
 	check((ch["office"]["order"] as Dictionary).is_empty() and int(ch["fame"]) == fame0 + 60, "朝廷求才完成 (文官同伴): 名聲 +60")

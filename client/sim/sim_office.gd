@@ -103,6 +103,11 @@ func cmd_office_order(id: int, order_id: String) -> void:
 		RulesShop.add_item(ch["bag"], int(o["item"]), 1)
 	elif String(o["kind"]) == "census":
 		od["met"] = []
+	elif String(o["kind"]) == "buy":
+		od["bought"] = 0                 # 要接令後喺商店買先算 (cmd_buy 記數)
+		od["buyItem"] = int(o["item"])
+	elif String(o["kind"]) == "recruit":
+		od["base"] = int(ch.get("recruit", {}).get("comp", 0))   # 接令時已跟緊嘅同伴唔算
 	elif String(o["kind"]) == "escort":
 		od["npc"] = int(_spawn_office_npc(e, "escort")["id"])
 	elif String(o["kind"]) == "rescue":
@@ -202,11 +207,11 @@ func cmd_office_turnin(id: int) -> void:
 			if (od.get("met", []) as Array).size() < int(o["n"]):
 				return _msg(id, "仲未訪問夠 %d 個人" % int(o["n"]))
 		"buy":
-			if not RulesShop.remove_item(ch["bag"], int(o["item"]), 1):
+			if int(od.get("bought", 0)) < 1 or not RulesShop.remove_item(ch["bag"], int(o["item"]), 1):
 				return _msg(id, "仲未買到指定武器：%s" % data.names.get(int(o["item"]), "武器"))
 		"recruit":
-			if not _office_recruit_ok(ch):
-				return _msg(id, "要登用緊 1 位文官先覆命得")
+			if not _office_recruit_ok(ch) or int(ch.get("recruit", {}).get("comp", 0)) == int(od.get("base", 0)):
+				return _msg(id, "要登用緊 1 位新文官（接令後先算）先覆命得")
 		"escort":
 			var enpc := ent(int(od.get("npc", 0)))
 			if enpc.is_empty() or bool(enpc.get("down", false)):
