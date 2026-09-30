@@ -66,10 +66,11 @@ func t_walk(data: GameData) -> void:
 	_put(sim, id, 5, 5)
 	sim.cmd_move(id, 8, 5)
 	sim.step()
-	check(int(sim.ent(id)["x"]) == 6, "走路: 一 tick 一格")
 	sim.step()
-	sim.step()
-	check(int(sim.ent(id)["x"]) == 8, "走路: 三 tick 到 8")
+	check(int(sim.ent(id)["x"]) == 6, "走路: 慢一半 (walkStepRate 0.5)，兩 tick 一格")
+	for _i in 4:
+		sim.step()
+	check(int(sim.ent(id)["x"]) == 8, "走路: 六 tick 到 8")
 
 
 func t_blocked(data: GameData) -> void:

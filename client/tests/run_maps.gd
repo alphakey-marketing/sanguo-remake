@@ -196,6 +196,7 @@ func t_move_across_river(data: GameData) -> void:
 	sim.cmd_move(id, 30, 30)
 	sim.ent(id)["tx"] = 71
 	sim.step()
+	sim.step()
 	check(not sim.ent(id).has("path"), "行路: 目的地被改 → 路徑作廢")
 
 

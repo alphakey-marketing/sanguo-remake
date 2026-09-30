@@ -1,5 +1,7 @@
 {
  "_note": "世界基建 (Step 4)【自訂】: 時鐘比例、城池、天災、市場。clock.gameMinPerTick=2 → 1 game 日 = 1440 game 分 = 720 tick = 72 秒真實時間。market.cats 數值 = 每 100 人口 每日供/需/庫存基準。disasters 機會 = 每城每日，受季節限制。防災度 defense 0~100 減弱天災效果。",
+ "_noteWalk": "全體步行速度【UAT 用家 confirm】: 玩家/NPC/同伴/怪物每 tick 步數 × walkStepRate (0.5 = 慢一半，約 5 格/秒)；騎乘倍數照乘。1 = 唔縮放。",
+ "walkStepRate": 0.5,
  "clock": {
   "gameMinPerTick": 2,
   "kePerShichen": 8,
