@@ -5404,22 +5404,20 @@
    "drops": [
     {
      "item": 25081,
-     "p": 0.8
-    },
-    {
-     "item": 32052,
-     "p": 0.5
+     "p": 0.59999
     },
     {
      "item": 63004,
-     "p": 0.2
+     "p": 0.59999
     },
     {
-     "item": 63013,
-     "p": 0.5
+     "item": 32052,
+     "p": 0.59999
     }
    ],
-   "_scene": "qicai"
+   "rareDrops": [],
+   "_scene": "qicai",
+   "dropSrc": 27258
   },
   {
    "id": 1081,
@@ -5450,22 +5448,20 @@
    "drops": [
     {
      "item": 25080,
-     "p": 0.8
-    },
-    {
-     "item": 32052,
-     "p": 0.5
+     "p": 0.59999
     },
     {
      "item": 63004,
-     "p": 0.2
+     "p": 0.59999
     },
     {
-     "item": 63013,
-     "p": 0.5
+     "item": 32052,
+     "p": 0.59999
     }
    ],
-   "_scene": "qicai"
+   "rareDrops": [],
+   "_scene": "qicai",
+   "dropSrc": 27259
   },
   {
    "id": 1082,
@@ -5496,22 +5492,20 @@
    "drops": [
     {
      "item": 25079,
-     "p": 0.8
-    },
-    {
-     "item": 32052,
-     "p": 0.5
+     "p": 0.59999
     },
     {
      "item": 63004,
-     "p": 0.2
+     "p": 0.59999
     },
     {
-     "item": 63013,
-     "p": 0.5
+     "item": 32052,
+     "p": 0.59999
     }
    ],
-   "_scene": "qicai"
+   "rareDrops": [],
+   "_scene": "qicai",
+   "dropSrc": 27260
   },
   {
    "id": 1083,
@@ -5542,22 +5536,20 @@
    "drops": [
     {
      "item": 25078,
-     "p": 0.8
-    },
-    {
-     "item": 32052,
-     "p": 0.5
+     "p": 0.59999
     },
     {
      "item": 63004,
-     "p": 0.2
+     "p": 0.59999
     },
     {
-     "item": 63014,
-     "p": 0.5
+     "item": 32052,
+     "p": 0.59999
     }
    ],
-   "_scene": "qicai"
+   "rareDrops": [],
+   "_scene": "qicai",
+   "dropSrc": 27261
   },
   {
    "id": 1084,
@@ -5588,22 +5580,20 @@
    "drops": [
     {
      "item": 25077,
-     "p": 0.8
-    },
-    {
-     "item": 32052,
-     "p": 0.5
+     "p": 0.59999
     },
     {
      "item": 63004,
-     "p": 0.2
+     "p": 0.59999
     },
     {
-     "item": 63014,
-     "p": 0.5
+     "item": 32052,
+     "p": 0.59999
     }
    ],
-   "_scene": "qicai"
+   "rareDrops": [],
+   "_scene": "qicai",
+   "dropSrc": 27262
   },
   {
    "id": 1085,
@@ -5634,22 +5624,20 @@
    "drops": [
     {
      "item": 25076,
-     "p": 0.8
-    },
-    {
-     "item": 32052,
-     "p": 0.5
+     "p": 0.59999
     },
     {
      "item": 63004,
-     "p": 0.2
+     "p": 0.59999
     },
     {
-     "item": 63014,
-     "p": 0.5
+     "item": 32052,
+     "p": 0.59999
     }
    ],
-   "_scene": "qicai"
+   "rareDrops": [],
+   "_scene": "qicai",
+   "dropSrc": 27263
   },
   {
    "id": 1086,
@@ -5684,22 +5672,20 @@
    "drops": [
     {
      "item": 25075,
-     "p": 0.8
-    },
-    {
-     "item": 32052,
-     "p": 0.5
+     "p": 0.59999
     },
     {
      "item": 63004,
-     "p": 0.2
+     "p": 0.59999
     },
     {
-     "item": 63014,
-     "p": 0.5
+     "item": 32052,
+     "p": 0.59999
     }
    ],
-   "_scene": "qicai"
+   "rareDrops": [],
+   "_scene": "qicai",
+   "dropSrc": 27264
   },
   {
    "id": 1087,
@@ -5711,14 +5697,47 @@
    "atkInterval": 15,
    "moveSpeed": 1,
    "exp": 40,
-   "gold": [0, 20],
+   "gold": [
+    0,
+    20
+   ],
    "alignment": -50,
    "aggroRange": 6,
    "leash": 10,
    "element": "none",
    "drops": [
-    {"item": 56494, "p": 0.9}
-   ]
+    {
+     "item": 29055,
+     "p": 0.3
+    },
+    {
+     "item": 28038,
+     "p": 0.1
+    }
+   ],
+   "rareDrops": [
+    {
+     "item": 23005,
+     "p": 0.0006
+    },
+    {
+     "item": 30512,
+     "p": 0.00045
+    },
+    {
+     "item": 30521,
+     "p": 0.00045
+    },
+    {
+     "item": 32109,
+     "p": 6e-05
+    },
+    {
+     "item": 22043,
+     "p": 0.00018
+    }
+   ],
+   "dropSrc": 12042
   },
   {
    "id": 1088,
@@ -5730,13 +5749,19 @@
    "atkInterval": 15,
    "moveSpeed": 1,
    "exp": 42,
-   "gold": [0, 20],
+   "gold": [
+    0,
+    20
+   ],
    "alignment": -50,
    "aggroRange": 6,
    "leash": 10,
    "element": "none",
    "drops": [
-    {"item": 56494, "p": 0.9}
+    {
+     "item": 56494,
+     "p": 0.9
+    }
    ]
   },
   {
@@ -5750,7 +5775,10 @@
    "atkInterval": 13,
    "moveSpeed": 1,
    "exp": 0,
-   "gold": [0, 0],
+   "gold": [
+    0,
+    0
+   ],
    "alignment": 0,
    "aggroRange": 8,
    "leash": 16,
@@ -5768,7 +5796,10 @@
    "atkInterval": 13,
    "moveSpeed": 1,
    "exp": 0,
-   "gold": [0, 0],
+   "gold": [
+    0,
+    0
+   ],
    "alignment": -100,
    "aggroRange": 8,
    "leash": 16,
@@ -5786,7 +5817,10 @@
    "atkInterval": 13,
    "moveSpeed": 1,
    "exp": 0,
-   "gold": [0, 0],
+   "gold": [
+    0,
+    0
+   ],
    "alignment": 0,
    "aggroRange": 8,
    "leash": 16,
@@ -5804,7 +5838,10 @@
    "atkInterval": 13,
    "moveSpeed": 1,
    "exp": 0,
-   "gold": [0, 0],
+   "gold": [
+    0,
+    0
+   ],
    "alignment": -700,
    "aggroRange": 8,
    "leash": 16,
@@ -5822,7 +5859,10 @@
    "atkInterval": 13,
    "moveSpeed": 1,
    "exp": 0,
-   "gold": [0, 0],
+   "gold": [
+    0,
+    0
+   ],
    "alignment": -500,
    "aggroRange": 8,
    "leash": 16,
@@ -5840,7 +5880,10 @@
    "atkInterval": 13,
    "moveSpeed": 1,
    "exp": 0,
-   "gold": [0, 0],
+   "gold": [
+    0,
+    0
+   ],
    "alignment": -500,
    "aggroRange": 8,
    "leash": 16,
@@ -5858,7 +5901,10 @@
    "atkInterval": 13,
    "moveSpeed": 1,
    "exp": 0,
-   "gold": [0, 0],
+   "gold": [
+    0,
+    0
+   ],
    "alignment": -500,
    "aggroRange": 8,
    "leash": 16,
@@ -5876,7 +5922,10 @@
    "atkInterval": 13,
    "moveSpeed": 1,
    "exp": 0,
-   "gold": [0, 0],
+   "gold": [
+    0,
+    0
+   ],
    "alignment": -500,
    "aggroRange": 8,
    "leash": 16,
@@ -5894,7 +5943,10 @@
    "atkInterval": 13,
    "moveSpeed": 1,
    "exp": 0,
-   "gold": [0, 0],
+   "gold": [
+    0,
+    0
+   ],
    "alignment": -600,
    "aggroRange": 8,
    "leash": 16,
@@ -5912,7 +5964,10 @@
    "atkInterval": 13,
    "moveSpeed": 1,
    "exp": 0,
-   "gold": [0, 0],
+   "gold": [
+    0,
+    0
+   ],
    "alignment": -700,
    "aggroRange": 8,
    "leash": 16,
@@ -5930,7 +5985,10 @@
    "atkInterval": 13,
    "moveSpeed": 1,
    "exp": 0,
-   "gold": [0, 0],
+   "gold": [
+    0,
+    0
+   ],
    "alignment": -600,
    "aggroRange": 8,
    "leash": 16,
@@ -5948,12 +6006,30 @@
    "atkInterval": 13,
    "moveSpeed": 1,
    "exp": 0,
-   "gold": [0, 0],
+   "gold": [
+    0,
+    0
+   ],
    "alignment": -700,
    "aggroRange": 8,
    "leash": 16,
    "element": "none",
-   "drops": []
+   "drops": [],
+   "rareDrops": [
+    {
+     "item": 16030,
+     "p": 0.0009
+    },
+    {
+     "item": 17030,
+     "p": 0.0009
+    },
+    {
+     "item": 18030,
+     "p": 0.0009
+    }
+   ],
+   "dropSrc": 26041
   },
   {
    "id": 1101,
@@ -5966,7 +6042,10 @@
    "atkInterval": 13,
    "moveSpeed": 1,
    "exp": 0,
-   "gold": [0, 0],
+   "gold": [
+    0,
+    0
+   ],
    "alignment": -500,
    "aggroRange": 8,
    "leash": 16,
@@ -5984,7 +6063,10 @@
    "atkInterval": 13,
    "moveSpeed": 1,
    "exp": 0,
-   "gold": [0, 0],
+   "gold": [
+    0,
+    0
+   ],
    "alignment": -600,
    "aggroRange": 8,
    "leash": 16,
@@ -6002,7 +6084,10 @@
    "atkInterval": 13,
    "moveSpeed": 1,
    "exp": 0,
-   "gold": [0, 0],
+   "gold": [
+    0,
+    0
+   ],
    "alignment": -600,
    "aggroRange": 8,
    "leash": 16,
@@ -6020,7 +6105,10 @@
    "atkInterval": 13,
    "moveSpeed": 1,
    "exp": 0,
-   "gold": [0, 0],
+   "gold": [
+    0,
+    0
+   ],
    "alignment": -700,
    "aggroRange": 8,
    "leash": 16,
@@ -6038,7 +6126,10 @@
    "atkInterval": 16,
    "moveSpeed": 1,
    "exp": 0,
-   "gold": [0, 0],
+   "gold": [
+    0,
+    0
+   ],
    "alignment": -500,
    "aggroRange": 6,
    "leash": 12,
@@ -7176,14 +7267,24 @@
    "monster": 1087,
    "count": 4,
    "respawnTicks": 200,
-   "area": [2, 2, 37, 21]
+   "area": [
+    2,
+    2,
+    37,
+    21
+   ]
   },
   {
    "zone": "luoyang_well",
    "monster": 1088,
    "count": 4,
    "respawnTicks": 220,
-   "area": [2, 2, 37, 21]
+   "area": [
+    2,
+    2,
+    37,
+    21
+   ]
   }
  ]
 }
