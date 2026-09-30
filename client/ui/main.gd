@@ -21,6 +21,7 @@ var w := Sim.W
 var h := Sim.H
 var ents := []
 var faces := []
+const ORIG_CHAR_SCALE := 2.0
 var cam := Vector2.ZERO
 var autotest := false
 var uitest := false                # --uitest: 觸控 UI 煙霧測試 (tests/ui_smoke.gd)
@@ -1557,7 +1558,7 @@ func _draw() -> void:
 			om = OrigMap.load_map(String(cur_map["orig"]))
 		if om != null:
 			om.draw_terrain(self, org, vs, mod)           # 原版地圖視覺層 (物件喺角色迴圈夾插畫)
-			om.begin(vs, org)
+			om.begin(vs, org, mod, self)
 		else:
 			draw_texture(MapArt.texture(data, cur_map, TILE), org, mod)
 	for f in facilities:
@@ -1574,7 +1575,10 @@ func _draw() -> void:
 			continue                                  # 其他地圖嘅單位唔畫
 		var p := Vector2(e.x, e.y) * TILE - cam
 		if om != null:
+			draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 			om.flush_upto(self, om_org, p.y + TILE - om_org.y, om_mod)    # 腳底 y 以北嘅物件先畫，角色喺佢哋前面
+			var pv := p + Vector2(TILE * 0.5, TILE)           # 原版圖 48px 格: 角色放大 ORIG_CHAR_SCALE 倍 (以腳底為軸)
+			draw_set_transform(pv * (1.0 - ORIG_CHAR_SCALE), 0.0, Vector2(ORIG_CHAR_SCALE, ORIG_CHAR_SCALE))
 		var isme: bool = int(e.id) == my_id
 		var ismob: bool = e.get("mob", false)
 		# S04b 吟唱線索: 術法怪 / boss 吟唱緊 → 落點紅圈 + 怪身框，玩家睇到走位拍
@@ -1633,6 +1637,7 @@ func _draw() -> void:
 		# S03a: 紅名(殺人魔)居民 = 紅字表示（居民警告話你知佢係殺人魔）
 		var nc := Color(1, 0.32, 0.32) if bool(e.get("criminal", false)) else Color(1, 0.7, 0.6) if ismob else Color(0.6, 1, 0.65) if isgen else Color.WHITE
 		_txt(p + Vector2(-8, -18), nm, nc, 11)
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	if om != null:
 		om.flush_all(self, om_org, om_mod)              # 剩低嘅物件 (最南嗰批)
 	for qn in quest_npcs:

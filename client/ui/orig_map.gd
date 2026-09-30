@@ -17,6 +17,9 @@ var rows := 0
 var tiles := PackedInt32Array()
 var atlas: Texture2D = null
 var atlas_cols := 32
+var walk := PackedByteArray()            # 16px 行走層 (1=擋)
+var gw := 0
+var gh := 0
 var objs: Array = []                     # {n,x,y,bot,tex}，已按 bot 排序
 var _draw_objs: Array = []               # 今幀畫得嘅物件 (bot 排序)
 var _next := 0
@@ -61,12 +64,31 @@ func _init_from(k: String, d: Dictionary) -> void:
 	for i in tl.size():
 		tiles[i] = int(tl[i])
 	atlas = _tex(ROOT + k + "/atlas.png")
+	var wd: Dictionary = d.get("walk", {})
+	if not wd.is_empty():
+		gw = int(wd["w"])
+		gh = int(wd["h"])
+		walk = Marshalls.base64_to_raw(String(wd["z"])).decompress(gw * gh, FileAccess.COMPRESSION_DEFLATE)
 	for o in d["objects"]:
 		var t := _tex(ROOT + k + "/obj/" + str(o["n"]) + ".png")
 		if t == null:
 			continue
-		objs.append({"x": int(o["x"]), "y": int(o["y"]), "bot": int(o["y"]) + t.get_height(), "tex": t})
+		objs.append({"x": int(o["x"]), "y": int(o["y"]), "bot": int(o["y"]) + t.get_height(), "tex": t, "floor": _is_floor(int(o["x"]), int(o["y"]), t)})
 	objs.sort_custom(func(a, b): return int(a["bot"]) < int(b["bot"]))
+
+# 貼地物件 (路面/地毯/影子等)：佔嘅格冇一格係擋 → 永遠畫喺角色下面，唔好遮人
+func _is_floor(x: int, y: int, t: Texture2D) -> bool:
+	if walk.size() != gw * gh or gw == 0:
+		return false
+	var c0 := maxi(0, x / 16)
+	var c1 := mini(gw - 1, (x + t.get_width() - 1) / 16)
+	var r0 := maxi(0, y / 16)
+	var r1 := mini(gh - 1, (y + t.get_height() - 1) / 16)
+	for r in range(r0, r1 + 1):
+		for c in range(c0, c1 + 1):
+			if walk[r * gw + c] != 0:
+				return false
+	return true
 
 # 地形：只畫畫面內嗰啲格。origin = 地圖左上角嘅畫布座標 (= 地圖 ox/oy*TILE - cam)
 func draw_terrain(ci: CanvasItem, origin: Vector2, vs: Vector2, mod: Color) -> void:
@@ -81,7 +103,7 @@ func draw_terrain(ci: CanvasItem, origin: Vector2, vs: Vector2, mod: Color) -> v
 			ci.draw_texture_rect_region(atlas, Rect2(origin + Vector2(c * 48, r * 48), Vector2(48, 48)), src, mod)
 
 # 物件：先 begin() 篩出畫面內嘅，然後角色逐個 flush_upto(腳底 y) 再畫，最後 flush_all()
-func begin(vs: Vector2, origin: Vector2) -> void:
+func begin(vs: Vector2, origin: Vector2, mod: Color = Color.WHITE, ci: CanvasItem = null) -> void:
 	_draw_objs.clear()
 	_next = 0
 	for o in objs:
@@ -89,7 +111,10 @@ func begin(vs: Vector2, origin: Vector2) -> void:
 		var t: Texture2D = o["tex"]
 		if p.x > vs.x or p.y > vs.y or p.x + t.get_width() < 0 or p.y + t.get_height() < 0:
 			continue
-		_draw_objs.append(o)
+		if bool(o["floor"]):
+			_draw_one(ci, origin, o, mod)          # 貼地物件：喺角色前面先畫
+		else:
+			_draw_objs.append(o)
 
 func flush_upto(ci: CanvasItem, origin: Vector2, foot_y: float, mod: Color) -> void:
 	while _next < _draw_objs.size() and float(_draw_objs[_next]["bot"]) <= foot_y:
