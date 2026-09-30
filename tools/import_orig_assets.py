@@ -116,6 +116,17 @@ def imp_ui(src, idx):
     save("btn_d", g)
     idx["ui"] = out
 
+def _keyed_copy(f, dst):
+    """sheets/ 底色係實心 (40,90,60) → 轉透明再存 (每次覆寫，方便改規則)"""
+    from PIL import Image
+    im = Image.open(f).convert("RGBA")
+    px = im.load()
+    for y in range(im.height):
+        for x in range(im.width):
+            if px[x, y][:3] == (40, 90, 60):
+                px[x, y] = (0, 0, 0, 0)
+    im.save(dst)
+
 def imp_mon(src, idx):
     """怪物動畫 sheet (8 方向列 x 8 幀欄，見 docs/plan/sprite_layout.md)。
     monsters.json 怪 id -> Npc_Client.Dat 記錄 (先 id，再 dropSrc，再同名) -> sprite id (@offset 150) -> sheets/*/CP_<sprite><A|S|W>.CP.png"""
@@ -135,6 +146,7 @@ def imp_mon(src, idx):
     with open(os.path.join(ROOT, "client", "data", "monsters.json"), encoding="utf-8") as fh:
         mons = json.load(fh)["monsters"]
     out = {"A": {}, "S": {}, "W": {}}
+    done = set()
     os.makedirs(os.path.join(OUT, "mon"), exist_ok=True)
     for m in mons:
         sid = None
@@ -150,14 +162,61 @@ def imp_mon(src, idx):
                 continue
             rel = f"mon/{sid}{a}.png"
             dst = os.path.join(OUT, rel)
-            if not os.path.exists(dst):
-                shutil.copyfile(f, dst)
+            if (sid, a) not in done:
+                _keyed_copy(f, dst)
+                done.add((sid, a))
             out[a][str(m["id"])] = rel
     for a in "ASW":
         idx["mon_" + a] = out[a]
     print(f"怪物動畫覆蓋: {len(out['S'])}/{len(mons)}")
 
-SETS = {"mon": imp_mon, "items": imp_items, "faces": imp_faces, "ui": imp_ui}
+# 通用人形 sprite 池 (由 contact sheet 人手分類，NPC/居民冇專屬 sprite 時按 role 揀)。玩家暫用每職業一個佔位，待疊層解碼 (A4c 後續)
+ACTOR_POOL = {
+    "civ_m": [20110, 20115, 20116, 20120, 20121, 20122, 20140, 20142, 20155, 20156, 20157, 20159, 20095, 20096, 20134],
+    "civ_f": [20091, 20136, 20138, 20144, 20158, 20424],
+    "soldier": [20150, 20151, 20160, 20161, 20163, 20208, 20209, 20218, 20219, 20147, 20148, 20149],
+    "elder": [20018, 20039],
+    "player": {"yishi": 20208, "shinu": 20136, "daoshi": 20155, "wunu": 20231, "bianshi": 20226, "meinu": 20144},
+}
+
+def imp_actor(src, idx):
+    """人形 sprite (NPC/居民/武將/玩家)。actor_A/S/W: sprite id -> sheet；_actor_by_name: 名 -> sprite id (Npc_Client.Dat @150)；_actor_pool: 通用池"""
+    import glob, struct
+    sys.path.insert(0, os.path.join(os.path.dirname(src), "tools"))
+    import npc_dat
+    recs = npc_dat.parse(open(os.path.join(os.path.dirname(src), "reference", "Npc_Client.Dat"), "rb").read())
+    where = {}
+    for f in glob.glob(os.path.join(src, "sheets", "*", "CP_*S.CP.png")):
+        d = os.path.dirname(f)
+        if os.path.basename(d).lower().startswith(("npc", "dnpc")):       # 人形 sheet (排除怪 d2npc01 / effect / warnpc)
+            where[int(os.path.basename(f)[3:-8])] = d
+    by_name = {}
+    for r in recs:
+        sid = struct.unpack_from("<H", r["raw"], 150)[0]
+        if sid in where and r["name"] not in by_name:
+            by_name[r["name"]] = sid
+    used = set(by_name.values())
+    for v in ACTOR_POOL.values():
+        used |= set(v.values() if isinstance(v, dict) else v)
+    out = {"A": {}, "S": {}, "W": {}}
+    os.makedirs(os.path.join(OUT, "actor"), exist_ok=True)
+    for sid in sorted(used):
+        if sid not in where:
+            print("警告: 池 sprite 缺", sid)
+            continue
+        for a in "ASW":
+            f = os.path.join(where[sid], f"CP_{sid}{a}.CP.png")
+            if os.path.exists(f):
+                rel = f"actor/{sid}{a}.png"
+                _keyed_copy(f, os.path.join(OUT, rel))
+                out[a][str(sid)] = rel
+    for a in "ASW":
+        idx["actor_" + a] = out[a]
+    idx["_actor_by_name"] = {k: str(v) for k, v in by_name.items() if str(v) in out["S"]}
+    idx["_actor_pool"] = ACTOR_POOL
+    print(f"人形 sprite: {len(out['S'])} 個，名字對應 {len(idx['_actor_by_name'])}")
+
+SETS = {"actor": imp_actor, "mon": imp_mon, "items": imp_items, "faces": imp_faces, "ui": imp_ui}
 
 def check():
     if not os.path.exists(INDEX):
