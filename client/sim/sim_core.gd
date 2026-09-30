@@ -1116,6 +1116,11 @@ func _companion_class_skill_mul(_e: Dictionary) -> Dictionary:
 	return {"cd": 1.0, "cost": 1.0}
 
 
+# 友好特技「野性」: 玩家攻擊間隔縮放 hook (sim_war_beast 覆寫；預設原值)
+func _atk_interval_scale(_e: Dictionary, base: int) -> int:
+	return base
+
+
 # 友好特技「聖體」: 每刻自動回復倍率 (sim_war_beast 覆寫；1.0 = 冇效果)
 func _friend_regen_mult(_e: Dictionary) -> float:
 	return 1.0

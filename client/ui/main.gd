@@ -67,6 +67,7 @@ var item_prices := {}             # id -> 價錢
 var inn_cost := 0
 var clock_str := ""               # 時辰/日/季節 (sim.clock_view)
 var night_on := false
+var beast_light := false          # 焰牙虎「火焰」友好技: 夜晚照明
 var last_season := -1
 var banner := {"text": "", "t": 0.0}   # 天災/季節橫幅
 var last_save_tick := 0
@@ -197,6 +198,7 @@ func _refresh() -> void:
 	var cv: Variant = sim.clock_view()
 	clock_str = str(cv["text"])
 	night_on = bool(cv["is_night"])
+	beast_light = bool(sim.beast_effects_view(my_id).get("light", false))
 	ask_now = _calc_active_ask()
 	if hud != null:
 		hud.sim_refreshed()
@@ -409,6 +411,7 @@ func _send(d: Dictionary) -> void:
 		"beast_friend_train": sim.cmd_beast_friend_train(my_id, int(d.uid), str(d.breed), str(d.skill))
 		"beast_sell": sim.cmd_beast_sell(my_id, int(d.uid))
 		"beast_teleport": sim.cmd_beast_teleport(my_id)
+		"beast_act": sim.cmd_beast_act(my_id, str(d.effect))
 		"auction_buy": sim.cmd_auction_buy(my_id, int(d.lot))
 		"llm_config": sim.cmd_llm_config(bool(d.enabled), str(d.model))
 		"marry_propose": sim.cmd_marry_propose(my_id)
@@ -1373,7 +1376,7 @@ func _draw() -> void:
 	draw_rect(Rect2(Vector2.ZERO, vs), Color(0.04, 0.04, 0.05))
 	if not cur_map.is_empty():
 		var tex := MapArt.texture(data, cur_map, TILE)
-		var mod := Color(0.5, 0.5, 0.62) if night_on else Color.WHITE      # 夜景
+		var mod := (Color(0.8, 0.8, 0.86) if beast_light else Color(0.5, 0.5, 0.62)) if night_on else Color.WHITE      # 夜景
 		draw_texture(tex, Vector2(int(cur_map.ox), int(cur_map.oy)) * TILE - cam, mod)
 	for f in facilities:
 		_draw_sign(f)
