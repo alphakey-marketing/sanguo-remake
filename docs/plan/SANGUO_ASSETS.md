@@ -34,7 +34,7 @@
 - 接 `bag_panel`/商店/裝備/背包/掉落物 icon；寶石 icon（`jewel.csv`）；報告缺圖 id 清單。
 - 驗收：覆蓋率報告（已配 N/6068）；bag/shop/equip 面板見圖；uitest + hud leg 過。
 
-### A3 — UI 素材 + 頭像
+### A3 — UI 素材 + 頭像 ✅ 已做（頭像 66 名 + 原版木框皮，`[ui] skin="flat"` 可關；臉譜疊圖留後）
 - 揀 `Pic_menu*` 入面：面板底框、按鈕、HP/MP/SP bar、頁籤、金錢/圖示；`ui_theme.gd` 加 StyleBoxTexture 版本，**設定開關**（原版皮 / 現有程式皮）方便比較。
 - 頭像：`Pic_npcFace1/2/3/5`、`Pic_Face/face2` 按 npcid 對 `generals.json`/`Npc_table.tsv`，補晒武將/居民/NPC 頭像；招募/對話/同伴面板用。
 - 驗收：主要面板（bag/char/recruit/office/quest）截圖過目；uitest 過。

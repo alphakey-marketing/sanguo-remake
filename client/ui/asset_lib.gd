@@ -49,6 +49,20 @@ static func item_icon(item_id: int, large := false) -> Texture2D:
 static func face(key: Variant) -> Texture2D:
 	return _tex("faces", key)
 
+# 名 → 頭像 (武將/NPC 有原版頭像先有；冇就 null，呼叫方 fallback)
+static func face_by_name(npc_name: String) -> Texture2D:
+	_ensure()
+	var m: Variant = _index.get("faces_by_name", {})
+	if m is Dictionary and (m as Dictionary).has(npc_name):
+		return face(str((m as Dictionary)[npc_name]).get_file().get_basename())
+	return null
+
+
+# UI 皮件: panel / card / btn_n / btn_p / btn_d
+static func ui(key: String) -> Texture2D:
+	return _tex("ui", key)
+
+
 static func coverage() -> Dictionary:
 	_ensure()
 	var r := {}

@@ -91,7 +91,13 @@ func _build_quiz(list: VBoxContainer, q: Dictionary) -> void:
 
 
 func _build_comp(list: VBoxContainer, c: Dictionary) -> void:
-	list.add_child(lbl("%s　Lv%d　%s%s" % [c["name"], int(c["lv"]), RulesRecruit.type_name(String(c["type"])), c["sub"]], 17, UiTheme.GOLD))
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 8)
+	var pt := portrait(String(c["name"]), 56)
+	if pt != null:
+		head.add_child(pt)
+	head.add_child(lbl("%s　Lv%d　%s%s" % [c["name"], int(c["lv"]), RulesRecruit.type_name(String(c["type"])), c["sub"]], 17, UiTheme.GOLD))
+	list.add_child(head)
 	list.add_child(lbl("HP %d/%d　忠誠 %d　剩 %d 日" % [int(c["hp"]), int(c["maxHp"]), int(c["loyalty"]), int(c["daysLeft"])], 15,
 		UiTheme.BAD if int(c["loyalty"]) < 40 else UiTheme.TEXT))
 	list.add_child(lbl("MP %d/%d　SP %d/%d　術法:%s" % [int(c.get("mp", 0)), int(c.get("maxMp", 0)), int(c.get("sp", 0)),
