@@ -570,7 +570,7 @@ func _on_event(e: Dictionary) -> void:
 		"tianqian":               # S03b: 殺善居民後天譴雷劈 -> 世界公告 + 傳送客棧
 			if int(e.dst) == my_id:
 				_set_banner(str(e.announce), Color(1, 0.3, 0.9), 6.0)
-				_log("天譴雷劈！%s（現有 HP×50%%，被傳返客棧）" % str(e.announce))
+				_log("天譴雷劈！%s（現有 HP×50%%）" % str(e.announce))
 				target_id = -1
 		"guard_warn":             # S03b: 殺人魔喺城內 -> 城門衛兵警告
 			if int(e.dst) == my_id:
