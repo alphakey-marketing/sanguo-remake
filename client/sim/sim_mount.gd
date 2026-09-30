@@ -248,6 +248,7 @@ func cmd_mount_breed_bet(id: int, uid: int, choice: int) -> void:
 		return
 	var res := RulesMount.breed_play(cfg, m, choice, rng.next())
 	var preg: Dictionary = m["preg"]
+	preg["last"] = {"choice": choice, "outcome": int(res["outcome"]), "n": int(preg.get("last", {}).get("n", 0)) + 1}     # 跑馬燈動畫用
 	var msg := "落注「%s」" % String(bets[choice])
 	msg += "，估中！積點 +%d" % int(res["points"]) if bool(res["win"]) else "，估錯咗"
 	msg += "（胎氣 %d/%d）" % [int(preg["taiqi"]), int(cfg["breed"]["taiqiNeed"])]
@@ -670,9 +671,12 @@ func mount_view(id: int) -> Dictionary:
 			"speed": RulesMount.ride_mult(cfg, m), "sex": String(m["sex"]), "adv": bool(m.get("adv", false)),
 			"bpts": int(m.get("bpts", 0)), "totalBpts": int(m.get("totalBpts", 0)),
 			"caps": (m.get("caps", {}) as Dictionary).duplicate(),
+			"coat": RulesMount.coat_name(cfg, String(m["breed"])),
+			"color": RulesMount.breed_def(cfg, String(m["breed"])).get("color", [0.5, 0.5, 0.5]),
 			"breedWhy": RulesMount.breed_why(cfg, m),
 			"preg": ({} if not m.has("preg") else {"sire": String(m["preg"]["sire"]), "motive": int(m["preg"]["motive"]),
 				"taiqi": int(m["preg"]["taiqi"]), "taiqiNeed": int(cfg["breed"]["taiqiNeed"]),
+				"last": (m["preg"].get("last", {}) as Dictionary).duplicate(),
 				"lazy": bool(m["preg"].get("lazy", false)), "ready": RulesMount.breed_ready(cfg, m),
 				"playWhy": RulesMount.breed_can_play(cfg, m)})})
 	var mwcfg := _mwcfg()

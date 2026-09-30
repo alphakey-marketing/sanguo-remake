@@ -11,6 +11,54 @@ var pick_act := ""          # 揀緊道具嘅動作
 var confirm_drop := false   # 丟棄要撳兩下
 var name_edit: LineEdit     # U02: 改名輸入框
 var pick_sire := ""         # U02: 揀緊種馬品種
+var lamp_seen := 0          # 跑馬燈: 已播過嘅落注序號
+var lamp_t0 := 0            # 跑馬燈動畫開始 (ms)
+
+
+# 毛色色塊
+func _swatch(c: Array) -> Control:
+	var r := ColorRect.new()
+	r.color = Color(float(c[0]), float(c[1]), float(c[2]))
+	r.custom_minimum_size = Vector2(22, 22)
+	return r
+
+
+# 圖形跑馬燈: 5 盞燈輪流亮，愈跑愈慢，停喺開獎嗰盞 (金)；你揀嗰盞有框
+class LampRow extends Control:
+	var names: Array = []
+	var choice := 0
+	var outcome := 0
+	var t0 := 0
+
+	func _init() -> void:
+		custom_minimum_size = Vector2(0, 74)
+
+	func _process(_d: float) -> void:
+		queue_redraw()
+
+	func _draw() -> void:
+		var n := names.size()
+		if n == 0:
+			return
+		var total := n * 2 + outcome + 1         # 行 2 圈再停喺開獎位
+		var t := float(Time.get_ticks_msec() - t0) / 1000.0
+		var k := 0
+		while k < total - 1 and t >= 0.07 * (k + 1) + 0.006 * (k + 1) * (k + 1):
+			k += 1
+		var done := k >= total - 1
+		var cur := outcome if done else k % n
+		var w := size.x / float(n)
+		var f := ThemeDB.fallback_font
+		for i in n:
+			var c := Vector2(w * (i + 0.5), 28)
+			var on := i == cur
+			var col := Color(1, 0.85, 0.25) if on and done else (Color(1, 0.55, 0.2) if on else Color(0.35, 0.3, 0.3))
+			draw_circle(c, 16, col)
+			if i == choice:
+				draw_arc(c, 20, 0, TAU, 32, Color(0.4, 0.8, 1), 2.5)
+			draw_string(f, Vector2(c.x - 22, 64), String(names[i]), HORIZONTAL_ALIGNMENT_CENTER, 44, 13, Color(0.85, 0.85, 0.85))
+		if done:
+			draw_string(f, Vector2(2, 12), "估中！" if choice == outcome else "估錯咗", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color(1, 0.85, 0.25))
 
 
 func _init(m: Node) -> void:
@@ -101,7 +149,7 @@ func _build_mine(list: VBoxContainer, v: Dictionary) -> void:
 	var an: Dictionary = cfg["attrNames"]
 	var st: Array = m["status"]
 	var lines: Array = [
-		"%s（%s・%s・%d 日）%s" % [m["name"], m["breed"], m["stageName"], int(m["age"]), "　騎緊" if bool(v["riding"]) else ""],
+		"%s（%s・%s・%s・%d 日）%s" % [m["name"], m["breed"], m["coat"], m["stageName"], int(m["age"]), "　騎緊" if bool(v["riding"]) else ""],
 		"生命 %d/%d　飽食 %d　親密 %d　情緒 %s" % [int(m["life"]), int(m["lifeMax"]), int(m["satiety"]), int(m["intimacy"]), m["moodName"]],
 		"疲勞 %d/%d%s" % [int(m["fatigue"]), int(m["fatigueMax"]), "　異常：" + "、".join(st) if not st.is_empty() else ""],
 		"%s %d　%s %d　%s %d　%s %d　%s %d" % [an["learn"], int(m["attrs"]["learn"]), an["burst"], int(m["attrs"]["burst"]),
@@ -109,7 +157,13 @@ func _build_mine(list: VBoxContainer, v: Dictionary) -> void:
 		"優秀值 %d（成長 %d/%d）　騎乘移速 ×%.2f　行動力 %d" % [int(m["excel"]), int(m["grow"]), int(cfg["graze"]["growNeed"]), float(m["speed"]), int(v["ap"])]]
 	if String(m["where"]) == "graze":
 		lines.append("放牧中，大約仲有 %d 刻返嚟" % int(m["grazeLeft"]))
-	list.add_child(wrap_lbl("\n".join(lines), 15))
+	var crow := HBoxContainer.new()
+	crow.add_theme_constant_override("separation", 8)
+	list.add_child(crow)
+	crow.add_child(_swatch(m["color"]))
+	var tl := wrap_lbl("\n".join(lines), 15)
+	tl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	crow.add_child(tl)
 	# 改名
 	var nrow := HBoxContainer.new()
 	nrow.add_theme_constant_override("separation", 6)
@@ -254,6 +308,17 @@ func _build_breed(list: VBoxContainer, v: Dictionary, m: Dictionary, uid: int) -
 	if bool(preg["ready"]):
 		list.add_child(btn("胎氣夠喇！接生", func() -> void: main._send({"t": "mount_breed_claim", "uid": uid})))
 		return
+	var last: Dictionary = preg.get("last", {})
+	if not last.is_empty():
+		if int(last["n"]) != lamp_seen:
+			lamp_seen = int(last["n"])
+			lamp_t0 = Time.get_ticks_msec()
+		var lamp := LampRow.new()
+		lamp.names = bcfg["bets"]
+		lamp.choice = int(last["choice"])
+		lamp.outcome = int(last["outcome"])
+		lamp.t0 = lamp_t0
+		list.add_child(lamp)
 	var play_why := String(preg["playWhy"])
 	if play_why != "":
 		list.add_child(wrap_lbl(play_why, 13, UiTheme.DIM))
@@ -307,7 +372,8 @@ func _build_stable(list: VBoxContainer, v: Dictionary) -> void:
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 6)
 		var where: String = {"with": "身邊", "graze": "放牧中", "stable": "寄喺" + String(m["stableName"])}.get(String(m["where"]), "")
-		row.add_child(wrap_lbl("%s（%s・%s）親密 %d　%s" % [m["name"], m["breed"], m["stageName"], int(m["intimacy"]), where], 14))
+		row.add_child(_swatch(m["color"]))
+		row.add_child(wrap_lbl("%s（%s・%s・%s）親密 %d　%s" % [m["name"], m["breed"], m["coat"], m["stageName"], int(m["intimacy"]), where], 14))
 		if String(m["where"]) == "stable":
 			var b := btn("領出", func() -> void: main._send({"t": "mount_take", "uid": uid}), 72)
 			b.disabled = at == ""
