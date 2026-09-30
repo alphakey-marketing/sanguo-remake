@@ -41,7 +41,7 @@
   "stable_xy": { "name": "新野馬廄", "map": "xinye", "x": 54, "y": 20, "color": [0.6, 0.42, 0.25], "stable": true, "city": "xinye",
     "desc": "馬廄 (Step 17a, spec 07)【原】: 買馬 / 寄養領馬 / 馬用品 (飼料、玩具、寵物藥、馴馬專用哨)。寄喺馬廄過子時 = 疲勞清零、頭暈好返" },
 
-  "bulletin_xc": { "name": "許昌公佈欄", "map": "xuchang", "x": 37, "y": 49, "color": [0.7, 0.62, 0.4], "bulletin": true,
+  "bulletin_xc": { "name": "許昌公佈欄", "map": "xuchang", "x": 37, "y": 73, "color": [0.7, 0.62, 0.4], "bulletin": true,
     "desc": "公佈欄【原 sy2_8_12】: 城門口查看各城池正發生嘅天災同種類" },
   "bulletin_xy": { "name": "新野公佈欄", "map": "xinye", "x": 33, "y": 45, "color": [0.7, 0.62, 0.4], "bulletin": true,
     "desc": "公佈欄【原 sy2_8_12】: 城門口查看各城池正發生嘅天災同種類" },

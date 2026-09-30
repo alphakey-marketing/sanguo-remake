@@ -244,6 +244,9 @@ static func pre_ok(data: GameData, q: Dictionary, ch: Dictionary) -> bool:
 				break
 		if not any_ok:
 			return false
+	for wk in pre.get("workLv", {}):     # 工作技能等級門檻 (採藥 10 級等)
+		if int(ch.get("workLv", {}).get(wk, {}).get("lv", 1)) < int(pre["workLv"][wk]):
+			return false
 	for qid in pre.get("questDone", []):
 		if not bool(ch.get("questDone", {}).get(String(qid), false)):
 			return false
@@ -257,6 +260,9 @@ static func pre_ok(data: GameData, q: Dictionary, ch: Dictionary) -> bool:
 const ATTR_NAMES := {"str": "武力", "agi": "敏捷", "int": "智力", "spi": "靈力", "pol": "政治", "cha": "魅力"}
 
 
+const WORK_NAMES := {"herbalism": "採藥"}
+
+
 static func gate_hint(q: Dictionary, ch: Dictionary) -> String:
 	var pre: Dictionary = q.get("pre", {})
 	var lacks: Array = []
@@ -268,6 +274,10 @@ static func gate_hint(q: Dictionary, ch: Dictionary) -> String:
 		var have := int(ch.get("attrs", {}).get(k, 0))
 		if have < int(pre["attr"][k]):
 			lacks.append("%s %d（你 %d）" % [ATTR_NAMES.get(k, k), int(pre["attr"][k]), have])
+	for wk in pre.get("workLv", {}):
+		var wl := int(ch.get("workLv", {}).get(wk, {}).get("lv", 1))
+		if wl < int(pre["workLv"][wk]):
+			lacks.append("%s %d 級（你 %d）" % [WORK_NAMES.get(wk, wk), int(pre["workLv"][wk]), wl])
 	if lacks.is_empty():
 		return ""
 	return "「%s」要求：%s" % [String(q.get("name", "")), "、".join(PackedStringArray(lacks))]

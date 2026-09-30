@@ -123,6 +123,9 @@ func cmd_buy(id: int, item: int, n: int = 1) -> void:
 		return _msg(id, "金錢不足，要 %d" % cost)
 	ch["gold"] = int(ch["gold"]) - cost
 	RulesShop.add_item(ch["bag"], item, n)
+	var od: Dictionary = ch.get("office", {}).get("order", {})
+	if od.has("bought") and int(od.get("buyItem", -1)) == item:
+		od["bought"] = int(od["bought"]) + n     # 訂製軍備: 記商店買入
 	_msg(id, "買咗 %d 件，花 %d 金" % [n, cost])
 
 

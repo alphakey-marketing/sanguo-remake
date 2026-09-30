@@ -304,6 +304,11 @@ func t_gate_f4(data: GameData) -> void:
 	for x in data.quests:
 		if String(x["id"]) == "hist_zhangjiao":
 			zj = x
+	check(int(zj["pre"]["workLv"]["herbalism"]) >= 10, "F4: 討伐張角 有採藥 10 級門檻")
+	var cz := {"level": 20, "attrs": {"pol": 10, "cha": 10}, "quests": {}, "questDone": {}}
+	check(not RulesQuest.pre_ok(data, zj, cz) and RulesQuest.gate_hint(zj, cz).contains("採藥 10"), "討伐張角: 採藥未 10 級擋住 + 提示")
+	cz["workLv"] = {"herbalism": {"lv": 10}}
+	check(RulesQuest.pre_ok(data, zj, cz), "討伐張角: 採藥 10 級可接")
 	check(int(zj["pre"]["attr"]["pol"]) >= 10 and int(zj["pre"]["attr"]["cha"]) >= 10 and int(zj["pre"]["minLevel"]) >= 10, "F4: 太平要術(討伐張角) 門檻 政治/魅力/等級 ≥10")
 
 
