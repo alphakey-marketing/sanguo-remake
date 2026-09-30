@@ -28,3 +28,9 @@
 - 怪 → sprite：`monsters.json` 怪 id → `Npc_Client.Dat` 記錄（先 id、再 dropSrc、再同名），sprite id = 記錄 offset 150 (u16)；`npc_dat.py` 舊註解「sprite=id+10000」對怪物**唔啱**。
 - 覆蓋：136 隻怪只有 **30 隻**有 sheet（sprite id 有記錄但 `extracted/sheets` 冇抽到，例：野狗 30176、野豬 30177、惡虎 30173）；`1001~1105` 一批係 remake 自訂怪，原版本無。其餘繼續紅色塊。要補全需再從 `.mrg` 抽（另開 task）。
 - 客戶端：`Sim.view_ents` 加 `mdef`；`main.gd _mon_track/_draw_mon_sprite` 由位置變化推方向/行走，aggro 未郁 = 攻擊，其餘站立；8fps 循環；`AssetLib.mon_sheet(def, act)`。
+
+## 補抽調查（2026-09-30）：缺圖係客戶端本身冇，抽唔到
+- 掃晒 `Sanguo_Client/role/*.mrg` 全部 CP 名 + 全客戶端 mrg 搜 id：`sheets/` 已包含 mrg 內**全部**可用 CP（NPC 325、d2npc01 525、npc02~14 等一一對得），冇漏抽。
+- 缺嘅 sprite（野狗 30176、野豬 30177、惡虎 30173、山羊 30182、瘋貓 30183、狐貍 30170、花鹿 30178、野狼 30171、花豹 30172、大熊 30174、野牛 30179、戰狂 50083、孟獲魔化 57088）喺 mrg **完全冇**；只有 `Sound/sounds4.mrg` 有佢哋嘅音效 → 圖應由後期 patch（`patchlist.txt` 嘅 Data*.zip，本機冇）提供。
+- 有嘅動物 sprite 只有 30165~30169/30175/30181/30185/…（老鼠、雞等）。
+- 結論：要多覆蓋只能「揀相近現有 sprite 頂替」（要用家決定）或畫/用其他素材，唔係抽取問題。
