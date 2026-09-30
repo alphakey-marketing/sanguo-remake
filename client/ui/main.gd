@@ -322,6 +322,8 @@ func _send(d: Dictionary) -> void:
 		"militia_found": sim.cmd_militia_found(my_id, str(d.name), str(d.password))
 		"camp_upgrade": sim.cmd_camp_upgrade(my_id, str(d.fac))
 		"camp_supervise": sim.cmd_camp_supervise(my_id, str(d.fac))
+		"camp_call_back": sim.cmd_camp_call_back(my_id, int(d.gid))
+		"camp_mat": sim.cmd_camp_mat(my_id, int(d.item), int(d.n), str(d.dir))
 		"militia_work": sim.cmd_militia_work(my_id, str(d.work))
 		"eval_assign": sim.cmd_eval_assign(my_id, d.kinds as Array)
 		"eval_meeting": sim.cmd_eval_meeting(my_id, d.kinds as Array)

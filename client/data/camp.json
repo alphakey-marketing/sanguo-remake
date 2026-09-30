@@ -14,6 +14,7 @@
   "positionsByLevel": {"4": ["diannong", "lingtai"], "5": ["sinong"]},
   "supervise": {"base": 0.5, "pol": 0.01, "carpenter": 0.02, "target": 100},
   "callBackPerLevel": 1,
+  "advanced": {"callBackLevel": 5, "callBackMax": 6, "matInLevel": 9, "matOutLevel": 10, "intelLevel": 1},
   "workCapByLevel": {"1": 50, "2": 60, "3": 70, "4": 85, "5": 100},
   "gradeLimitByLevel": {
     "1": [5, 10, 10, 15, 20, 25, 30, 35],
