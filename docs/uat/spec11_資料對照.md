@@ -133,3 +133,10 @@
 
 ## 已知自動測試（相關）
 - `tools/run_tests.sh` 每項導入器 `--check`（drops/recipes/generals/titles）全 PASS 先准剔 —— 本 UAT 純數據核對，冇 interactive handle；變數據後必須重跑全部 `--check`
+## UAT 修正記錄（2026-09-29）
+- ✅ B1 `material_ids.json`：剔走（items.materials 已內建 id），spec §11 該格標已解決
+- ✅ B3 藥膳師價：維持 data 600/800/1500（Spec 05 已定）
+- ✅ feedback 7：`_chest_daily` 已定義（sim_skill.gd:552）；舊測試已修，run_tests ALL OK
+- 🟡 B5 warbtl：跟 Spec 10，Spec 10 未定就唔做
+- 🟡 B6 怪物逃跑 sprite：歸入素材替換批次
+- ⏳ 待用家：箭矢入商店貨單、cat 250 其餘 5xx 道具、首次彈窗教程
