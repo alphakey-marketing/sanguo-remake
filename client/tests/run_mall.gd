@@ -14,6 +14,8 @@ func _init() -> void:
 	t_skill_elixir(data)
 	t_promote_token(data)
 	t_class_pill(data)
+	t_arrow_shop(data)
+	t_help_seen(data)
 	print("[TEST] mall: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -118,3 +120,28 @@ func t_class_pill(data: GameData) -> void:
 	sim.cmd_debug_give(id, 30056, 1)
 	sim.cmd_use_item(id, 30056)
 	check(_bag_n(ch, 30056) == 1, "非竊聽職 (辯士) 唔消耗竊聽丹")
+
+
+# 武器店有賣低階箭 (S11c 箭喺邊買)
+func t_arrow_shop(data: GameData) -> void:
+	var n := 0
+	for sh in data.shops:
+		if String(sh["id"]).begins_with("weapon"):
+			n += 1
+			var ids: Array = []
+			for a in sh["stock"]:
+				ids.append(int(a))
+			check(ids.has(12102) and ids.has(12201), "%s 賣鐵箭/木箭" % sh["id"])
+	check(n >= 5, "武器店 >=5 間")
+
+
+# 首次開面板簡介：只彈一次 (S11d)
+func t_help_seen(data: GameData) -> void:
+	check(RulesHelpIntro.should_show([], "BagPanel"), "未睇過 → 彈")
+	check(not RulesHelpIntro.should_show(["BagPanel"], "BagPanel"), "睇過 → 唔彈")
+	check(not RulesHelpIntro.should_show([], "HelpPanel"), "冇簡介嘅面板 → 唔彈")
+	var sim := Sim.new(data, 13)
+	var id := sim.spawn_player("測試")
+	sim.cmd_help_seen(id, "BagPanel")
+	sim.cmd_help_seen(id, "BagPanel")
+	check((sim.ent(id)["ch"]["helpSeen"] as Array).size() == 1, "helpSeen 唔重複")

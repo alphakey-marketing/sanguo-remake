@@ -563,3 +563,14 @@ func _npc_react(actor_e: Dictionary, actor_id: int) -> void:
 		if _llm_talk(w, String(w["name"]), String(w.get("ch", {}).get("ideology", "")), 0, int(w["x"]), int(w["y"]), actor_id):
 			continue
 		_emit({"k": "npc_say", "id": w["id"], "name": w["name"], "text": res["line"], "action": res["action"], "x": w["x"], "y": w["y"]})
+
+
+# 首次開面板簡介睇過就記低 (ch.helpSeen)，唔再彈
+func cmd_help_seen(id: int, key: String) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return
+	var seen: Array = e["ch"].get("helpSeen", [])
+	if not seen.has(key):
+		seen.append(key)
+	e["ch"]["helpSeen"] = seen

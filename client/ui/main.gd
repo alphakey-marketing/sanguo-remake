@@ -355,6 +355,7 @@ func _send(d: Dictionary) -> void:
 		"quest_talk": sim.cmd_quest_talk(my_id, str(d.npc))
 		"select_class": sim.cmd_select_class(my_id, str(d.class_id))
 		"set_home": sim.cmd_set_home(my_id, str(d.home))
+		"help_seen": sim.cmd_help_seen(my_id, str(d.key))
 		"promote": sim.cmd_class_promote(my_id)
 		"equip_spellbook": sim.cmd_equip_spellbook(my_id, int(d.item), int(d.get("slot", 0)))
 		"cast_spell": sim.cmd_cast_spell(my_id, int(d.slot), int(d.get("target", 0)))
