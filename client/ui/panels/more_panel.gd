@@ -37,7 +37,7 @@ func _build_body() -> void:
 	list.add_child(btn("義勇軍", func() -> void: main.hud.militia_panel().open_tab(0)))
 	list.add_child(btn("營地", func() -> void: main.hud.camp_panel().open_tab(0)))
 	list.add_child(btn("民心/法令", func() -> void: main.hud.civic_panel().open()))
-	list.add_child(btn("情報冊（竊聽）", func() -> void: main.hud.open_panel("rumor")))
+	list.add_child(btn("情報冊 / 傳聞", func() -> void: main.hud.open_panel("rumor")))
 	list.add_child(btn("LLM 設定 / 對話", func() -> void: main.hud.llm_panel().open_tab(0)))
 	list.add_child(btn("結婚", func() -> void: main.hud.marriage_panel().open_tab(0)))
 	list.add_child(btn("掉寶表", func() -> void: main.hud.drop_panel().open()))

@@ -552,6 +552,10 @@ func _npc_react(actor_e: Dictionary, actor_id: int) -> void:
 		if not RulesCombat.in_range(actor_e["x"], actor_e["y"], w["x"], w["y"], WITNESS_RANGE):
 			continue
 		var ctx := {"actor_name": actor_e.get("name", ""), "affinity": NpcMemory.affinity(w["mem"], actor_id), "karma_tier": karma_tier}
+		var wch: Dictionary = w.get("ch", {})
+		if bool(wch.get("resident", false)):       # S09: 居民按 role/當前活動分流對白
+			ctx["role"] = String(wch.get("role", ""))
+			ctx["activity"] = RulesResident.activity_at(data.residents, RulesClock.shichen_of_ke(int(_clock()["ke"])))
 		var res := NpcBrain.decide(ctx, rng.below(4))
 		if res["action"] == "ignore":
 			continue

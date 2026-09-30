@@ -13,6 +13,17 @@ const LINES_WARN_KARMA := ["你...你唔好埋嚟！", "衛兵！呢個唔係好
 const LINES_WARN_AFFINITY := ["走開，我唔想同你講嘢"]
 
 
+# S09 居民 role 對白 (按 role 分流)；activity = eat/home/sleep/work
+const ROLE_LINES := {
+	"villager": ["今年收成唔錯，%s", "田裏面仲有好多嘢要做"],
+	"merchant": ["%s，睇下有冇啱心水嘅貨？", "生意難做，物價成日變"],
+	"guard": ["%s，城內唔准鬧事", "我哋日夜巡邏，有事就叫我"],
+	"stableman": ["%s，想睇匹好馬？", "馬要好好照顧先跑得快"],
+	"official": ["%s，朝廷事務繁忙", "有功之人，官宅自有嘉獎"],
+}
+const ACTIVITY_LINES := {"eat": "食緊飯，遲啲再傾", "sleep": "好眼瞓……", "home": "收工返屋企先"}
+
+
 # ctx: {actor_name: String, affinity: int, karma_tier: int(0大英雄..6殺人魔)}
 # pick_idx: 揀邊句 line 用（外面由種子 RNG 揀，保持決定性），自動 wrap 入池
 # 回傳 {"action": <白名單內>, "line": String}；action 一定喺 ACTIONS 入面
@@ -32,6 +43,15 @@ static func decide(ctx: Dictionary, pick_idx: int = 0) -> Dictionary:
 		pool = LINES_WARM
 	var tpl: String = pool[pick_idx % pool.size()]
 	var line := tpl % name if tpl.contains("%s") else tpl
+	if action == "greet" and aff < 10:
+		var role := String(ctx.get("role", ""))
+		var act := String(ctx.get("activity", ""))
+		if ACTIVITY_LINES.has(act) and pick_idx % 3 == 0:
+			line = ACTIVITY_LINES[act]
+		elif ROLE_LINES.has(role) and pick_idx % 2 == 1:
+			var rp: Array = ROLE_LINES[role]
+			var rt: String = rp[(pick_idx / 2) % rp.size()]
+			line = rt % name if rt.contains("%s") else rt
 	if not ACTIONS.has(action):
 		action = "ignore"
 	return {"action": action, "line": line}
