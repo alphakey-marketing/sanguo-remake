@@ -95,7 +95,6 @@ func _run() -> void:
 	hud.close_panels()
 	hud.bag_panel().open_filter("")
 	bp.sel = 19001
-	bp.sel_slot = ""
 	bp.refresh(true)
 	await shot("bag_armor")
 	hud.close_panels()
