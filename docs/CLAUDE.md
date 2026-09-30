@@ -121,7 +121,7 @@
 ## 10. Spec 09 — 登用武將 / NPC / LLM
 
 記錄喺 `docs/uat/spec09_登用LLM.md`。重點：
-- 🟡 同伴**戰鬥指令 6 → 實作 4 order + skillMode**（偏離 spec）——待用家 confirm 補唔補
+- ✅ 同伴戰鬥指令 = 4 order + skillMode 開關（用家 2026-09-29 confirm 正確，唔補 6 個）
 - 🟡 居民化：資料幾 ✅，**行為分流未驅動**；「傳聞大表」UI 冇
 - ✅ LLM 層（白名單/OpenRouter/反思/Tier/後備）+ U11 設定/對話面板
 - 結婚村 4 NPC 圖示缺失（非阻塞，用通用圖示）

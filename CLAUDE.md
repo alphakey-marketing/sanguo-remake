@@ -120,7 +120,7 @@
 ## 10. Spec 09 — 登用武將 / NPC / LLM
 
 記錄喺 `docs/uat/spec09_登用LLM.md`。重點：
-- 🟡 同伴**戰鬥指令 6 → 實作 4 order + skillMode**（偏離 spec）——待用家 confirm 補唔補
+- ✅ 同伴戰鬥指令 = **4 order + skillMode 開關**（用家 2026-09-29 confirm 係正確設計，唔補 6 個；spec 以此為準）
 - 🟡 居民化：資料幾 ✅，**行為分流未驅動**；「傳聞大表」UI 冇
 - ✅ LLM 層（白名單/OpenRouter/反思/Tier/後備）+ U11 設定/對話面板
 - 結婚村 4 NPC 圖示缺失（非阻塞，用通用圖示）
@@ -177,3 +177,16 @@
 - [ ] `docs/uat/specNN_*.md` 剔格/標狀態
 - [ ] `docs/PLAN.md` §1 現況表 + `CLAUDE.md`（project_instructions）「現況」段更新
 - [ ] 相關 `docs/spec/NN_*.md` 頂「現狀」更新
+---
+
+## 16. 用家 confirm 待做清單（2026-09-29 ask_user 回覆）
+
+| 項 | 決定 |
+|---|---|
+| Spec 10 國戰 | 暫時唔做（P1~P12 留後） |
+| Spec 07 無效友好技（奇門/火焰/飛影/狂力/開光/召喚/脫出/神行/回城/巨力/野性/獅魂） | **而家整晒** |
+| Spec 05 城際貿易（搬運跨城賣） | **做** |
+| Spec 12 揀城 UI（唔再鎖死許昌） | **做** |
+| Spec 08 營地 Lv4+/Lv5 職位功能 | **做** |
+| Spec 08 軍備製作（兵工房 10 類） | **做** |
+| Spec 09 同伴戰鬥指令 | 維持 4 order + skillMode（正確，已更新 notes） |
