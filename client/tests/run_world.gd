@@ -17,6 +17,7 @@ func _init() -> void:
 	t_save_file(data)
 	t_zones_travel(data)
 	t_set_home(data)
+	t_trade_cities(data)
 	print("[TEST] world: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -287,3 +288,46 @@ func t_set_home(data: GameData) -> void:
 	ch["level"] = 2
 	sim.cmd_set_home(id, "xinye")
 	check(String(ch.get("homeCity", "")) == "xiangyang", "揀城: 出發後 (Lv>1) 唔可以改")
+
+
+# 城際貿易 (spec 05 §6): 平城買、貴城賣，買賣價跟所屬城市場 pf，賺差價
+func t_trade_cities(data: GameData) -> void:
+	var sim := Sim.new(data, 62)
+	var id := sim.spawn_player("t")
+	var a := {}
+	var b := {}
+	var item := 0
+	for s1 in data.shops:
+		if String(s1.get("map", "")) == "":
+			continue
+		for s2 in data.shops:
+			if String(s2.get("map", "")) == "" or String(s2["map"]) == String(s1["map"]):
+				continue
+			for it in s1["stock"]:
+				if (s2["stock"] as Array).has(it) and float(data.prices.get(int(it), 0.0)) >= 100.0:
+					a = s1
+					b = s2
+					item = int(it)
+					break
+			if item != 0:
+				break
+		if item != 0:
+			break
+	check(item != 0, "貿易: 搵到兩城同賣一件貨")
+	if item == 0:
+		return
+	var cat := str(int(data.cats.get(item, 0)))
+	sim.market_city(String(a["map"]), cat)["pf"] = 0.6
+	sim.market_city(String(b["map"]), cat)["pf"] = 1.9
+	check(absf(sim._shop_pf(a, item) - 0.6) < 0.001 and absf(sim._shop_pf(b, item) - 1.9) < 0.001, "貿易: _shop_pf 跟所屬城市場價")
+	var ch: Dictionary = sim.player_ch()
+	ch["gold"] = 100000
+	_put(sim, id, int(a["x"]), int(a["y"]))
+	sim.cmd_buy(id, item, 1)
+	var g1 := int(ch["gold"])
+	var cost := 100000 - g1
+	check(cost > 0, "貿易: 平城買到 (花 %d)" % cost)
+	_put(sim, id, int(b["x"]), int(b["y"]))
+	sim.cmd_sell(id, item, 1)
+	var gain := int(ch["gold"]) - g1
+	check(gain > cost, "貿易: 貴城賣賺差價 (買 %d 賣 %d)" % [cost, gain])
