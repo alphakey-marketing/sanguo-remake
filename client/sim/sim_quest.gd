@@ -306,6 +306,38 @@ func view_quests() -> Array:
 	return out
 
 
+# ================= 任務寶箱 (chest stage, S2-2) =================
+# 行近指定 NPC 領路 → 喺 NPC 隔籬 spawn 一個鎖住嘅任務寶箱（標 quest）；仕女開鎖打開 → quest 推進
+func cmd_quest_chest(id: int, quest_id: String) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var q := _quest_by_id(quest_id)
+	if q.is_empty():
+		return
+	var stage := RulesQuest.stage_of(e["ch"], q)
+	if stage.is_empty() or String(stage.get("type", "")) != "chest":
+		return _msg(id, "而家唔係尋寶箱階段")
+	var npc: Dictionary = data.quest_npcs.get(String(stage.get("npc", "")), {})
+	if npc.is_empty() or not _near(e, int(npc["x"]), int(npc["y"])):
+		return _msg(id, "要行近%s先得" % npc.get("name", ""))
+	for o in ents.values():
+		if o["kind"] == "chest" and String(o.get("quest", "")) == quest_id:
+			return _msg(id, "寶箱仲喺度，用開鎖打開佢")
+	var p := _free_near(int(npc["x"]), int(npc["y"]))
+	var c := _new_ent(String(stage.get("chestName", "任務寶箱")), "chest", p)
+	c["face"] = 0
+	c["hp"] = 1
+	c["max_hp"] = 1
+	c["locked"] = true
+	c["key"] = int(floor(rng.next() * CHEST_KEYS))
+	c["drop"] = {"gold": 0, "items": []}
+	c["quest"] = quest_id
+	for line in stage.get("dialog", []):
+		_msg(id, str(line))
+	_msg(id, "%s出現咗，用「開鎖」打開佢" % c["name"])
+
+
 # ================= 任務 PK 戰 (fight stage, Step 10, spec 06 §5) =================
 # 同指定 NPC 對話後召喚 boss (stage.monster)；打贏 → quest 自動推進 (getItem 派條目)
 func cmd_quest_battle(id: int, quest_id: String) -> void:

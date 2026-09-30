@@ -71,7 +71,7 @@ func _think_mob(m: Dictionary) -> void:
 			m["tx"] = m["x"]
 			m["ty"] = m["y"]
 			var cs: Dictionary = {"spell": picked, "target": int(tgt["id"]),
-				"done_at": tick + int(sdef["castTicks"]), "x": int(tgt["x"]), "y": int(tgt["y"])}
+				"done_at": tick + int(sdef["castTicks"]), "start": tick, "x": int(tgt["x"]), "y": int(tgt["y"])}
 			if picked_i >= 0:
 				cs["sk"] = picked_i
 			m["casting"] = cs

@@ -529,6 +529,13 @@ func cmd_skill_pick(id: int, chest_id: int, key_idx: int) -> void:
 	if items.is_empty() and gold == 0:
 		_msg(id, "寶箱空蕩蕩…")
 	_remove_ent(chest_id)
+	var cq := String(chest.get("quest", ""))
+	if cq != "":                                       # 任務寶箱: 開到 → 推進任務
+		var q := _quest_by_id(cq)
+		if not q.is_empty():
+			var res := RulesQuest.on_chest_open(data, ch, q)
+			if bool(res.get("changed", false)):
+				_quest_emit(e, q, res)
 	_emit({"k": "chest_loot", "dst": id, "chest": chest_id, "items": items, "gold": gold})
 
 

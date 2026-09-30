@@ -7,6 +7,7 @@ extends GamePanel
 const CELL := 58.0
 var sel := 0                  # 揀中物品 id（0 = 冇）
 var filter := ""
+var show_all_weapons := false
 var want_slot := -1           # 由快捷格入嚟: 裝落邊格
 
 
@@ -39,7 +40,7 @@ func close() -> void:
 func sig() -> String:
 	var ch: Dictionary = main.ch
 	return JSON.stringify([tab, sel, filter, ch.get("bag", []), ch.get("storage", []), ch.get("equip", {}),
-		ch.get("gold", 0), ch.get("storageSub", false), ch.get("tools", {}), ch.get("level", 1), ch.get("tiandi", {})])
+		ch.get("gold", 0), ch.get("storageSub", false), ch.get("tools", {}), ch.get("level", 1), ch.get("tiandi", {}), show_all_weapons])
 
 
 func _build_body() -> void:
@@ -63,6 +64,11 @@ func _build_body() -> void:
 			left.add_child(btn("只顯示術書  ✕ 顯示全部", func() -> void:
 				filter = ""
 				refresh(true)))
+		var hidden := _hidden_weapon_count(ch)
+		if hidden > 0 or show_all_weapons:
+			left.add_child(btn("顯示全部武器 ✓" if show_all_weapons else "已隱藏 %d 件本職唔可裝武器（撳顯示）" % hidden, func() -> void:
+				show_all_weapons = not show_all_weapons
+				refresh(true)))
 		_build_grid(left, _bag_list(ch))
 		_build_detail(right, ch)
 	elif tab == 1:
@@ -76,8 +82,26 @@ func _bag_list(ch: Dictionary) -> Array:
 	for b in ch["bag"]:
 		if filter == "spell" and not main.data.spell_by_item.has(int(b["id"])):
 			continue
+		if not show_all_weapons and not _weapon_usable(ch, int(b["id"])):
+			continue                                  # S2-10: 預設唔顯示本職著唔到嘅武器
 		out.append(b)
 	return out
+
+
+func _weapon_usable(ch: Dictionary, id: int) -> bool:
+	var d: GameData = main.data
+	if not d.weapons.has(id):
+		return true
+	var cls: Dictionary = d.classes.get(str(ch.get("classId", "")), {})
+	return (cls.get("weapons", []) as Array).has(str(d.info.get(id, {}).get("cat_label", "")))
+
+
+func _hidden_weapon_count(ch: Dictionary) -> int:
+	var n := 0
+	for b in ch["bag"]:
+		if not _weapon_usable(ch, int(b["id"])):
+			n += 1
+	return n
 
 
 func _build_grid(parent: Control, items: Array) -> void:

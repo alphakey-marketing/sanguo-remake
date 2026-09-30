@@ -304,9 +304,11 @@ func view_ents() -> Array:
 		var csx := 0
 		var csy := 0
 		var csp := ""
+		var cprog := 0.0
 		if e.has("casting"):
 			var cs: Dictionary = e["casting"]
 			csp = str(cs.get("spell", ""))
+			cprog = clampf(float(tick - int(cs.get("start", tick))) / maxf(1.0, float(int(cs.get("done_at", tick)) - int(cs.get("start", tick)))), 0.0, 1.0)
 			csx = int(cs.get("x", int(e["x"])))
 			csy = int(cs.get("y", int(e["y"])))
 		var o: Dictionary = {"id": e["id"], "name": e["name"], "x": e["x"], "y": e["y"], "face": e["face"],
@@ -315,7 +317,7 @@ func view_ents() -> Array:
 			"atkTarget": int(e.get("atk_target", 0)),   # 打人模式: 居民鎖定緊邊個玩家 (bot_sys._crime_find_player)
 			"resident": bool(e.get("ch", {}).get("resident", false)),
 			"role": String(e.get("ch", {}).get("role", "")),
-			"statuses": st_vis, "casting": e.has("casting"), "castX": csx, "castY": csy, "castSpell": csp,
+			"statuses": st_vis, "casting": e.has("casting"), "castX": csx, "castY": csy, "castSpell": csp, "castProg": cprog,
 			"aggro": int(e["mob"]["target"]) if e["kind"] == "mob" and e["mob"]["state"] == "chase" else 0}   # 怪追緊邊個
 		if e["kind"] == "dropped":
 			o["dropped"] = true

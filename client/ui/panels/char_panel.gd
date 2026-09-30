@@ -123,6 +123,7 @@ func _build_body() -> void:
 		"飲水度 %d/%d　官宅貢獻 %d" % [main.sim.thirst_of(ch), int(main.data.world["thirst"]["max"]), int(ch.get("contrib", 0))],
 		"金 %d" % int(ch.get("gold", 0)),
 		"武器 %s" % (item_name(int(ch.get("equip", {}).get("weapon", 0))) if int(ch.get("equip", {}).get("weapon", 0)) > 0 else "（冇）"),
+		"寶石 %s" % _jewel_line(ch),
 	]
 	for l in lines:
 		right.add_child(lbl(str(l), 14))
@@ -343,3 +344,12 @@ func _weapon_switch_btn(p: Control, eq: Dictionary, ws: int) -> void:
 	b.disabled = cur
 	p.add_child(b)
 
+
+# S2-13: 屬性欄顯示所裝寶石 + 合計加成
+func _jewel_line(ch: Dictionary) -> String:
+	var d: GameData = main.data
+	var names: Array = []
+	for j in (ch.get("equip", {}).get("jewels", [0, 0]) as Array):
+		if int(j) > 0:
+			names.append(item_name(int(j)))
+	return "、".join(names) if not names.is_empty() else "（冇）"
