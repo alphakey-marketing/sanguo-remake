@@ -8,7 +8,7 @@
 
 - **已做 ✅**：地圖框架（80 map）、A*/過圖/自動尋路、驛站、天災/時辰/日夜、地圖面板（區域/天下/市價）、新手城。
 - **待改（待用家）**：
-  - 新手城 `homeCity=xuchang` 鎖死，**揀城 UI 未見**（想揀 3 城定鎖死？）
+  - 新手城 3 揀一已做（`cmd_set_home` + 建角頁，`run_world t_set_home` 測試）
   - 地標有 `ch.landmarks` 但冇頁面儲起再睇 → 可加「典故」頁
   - HUD 左上縮細 / 移動模式切換 = subsession 自發建議，待 confirm
 - **【待決】B4**：世界 23 節點已全部 open，但正式開通州郡未定 → 開新州郡圖前問用家。
@@ -32,7 +32,7 @@
 | 多地圖並排全域格仔 | — | `maps.json` OX/OY → 全域 `W×H` 網格；地圖之間留空 void | ✅ `game_data.gd` 拼圖 + `map_at/map_id_at` |
 | 地形 13 種字元（`.` `,` `=` `:` `_` `%` `b` `+` `#` `H` `T` `^` `~` 空格） | — | walk 表；`#/H/T/^/~/空格` 唔行得 | ✅ legend 全齊 |
 | 每張 map 自動 zone（id = map id、safe 跟地圖） | zone 名 / 顏色 | old zone id 保留（`field_1`/`runan_f1..10`/`town`） | ✅ `zone_by_id` + old id 兼容 |
-| **新手城 3 揀一（許昌/襄陽/新野）** | 建角揀 hometown？ | `world.homeCity`（現值 = 許昌）；新手 spawn 喺 `_home_map().spawn` 近客棧 | 🟡 `homeCity=xuchang` 已接；**揀城 UI 未見**（spec 01 建角冇收疑似已鎖死許昌） |
+| **新手城 3 揀一（許昌/襄陽/新野）** | 建角揀 hometown？ | `world.homeCity`（現值 = 許昌）；新手 spawn 喺 `_home_map().spawn` 近客棧 | ✅ `cmd_set_home` + 建角頁 `_build_home`；Lv1 先改得；有測試 |
 | **先讀 80 張地圖**（含 33 張戰役/場景副本地圖） | — | 戰役/場景 `.txt` 一齊入 export | ✅ 已見 `zhangniujiao_*`、`qicai_*`、`taohuadu_*`、`shichangshi_*` 等 |
 | **戰役 / 場景大地圖標示** | 天下頁顯示「戰役窗口」+「特殊場景窗口」狀態 | `sim.view_battles` / `sim.view_scenes` read-model | ✅ map_panel `_draw_world()` 頂部兩個指示框 |
 

@@ -16,6 +16,7 @@ func _init() -> void:
 	t_market_disaster(data)
 	t_save_file(data)
 	t_zones_travel(data)
+	t_set_home(data)
 	print("[TEST] world: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -264,3 +265,25 @@ func t_zones_travel(data: GameData) -> void:
 	sim2.cmd_travel(id2, "gate_out")
 	var e2 := sim2.ent(id2)
 	check(int(e2["x"]) == 0 and int(e2["y"]) == 0, "傳送: 唔近傳送點就唔會傳送")
+
+
+# 建角揀新手城 (spec 12 §1): 3 城可揀、Lv1 先改得、搬去嗰城客棧
+func t_set_home(data: GameData) -> void:
+	var sim := Sim.new(data, 61)
+	var id := sim.spawn_player("t")
+	var ids: Array = []
+	for c in sim.newbie_cities():
+		ids.append(String(c["id"]))
+	check(ids.size() == 3 and ids.has("xuchang") and ids.has("xiangyang") and ids.has("xinye"), "揀城: 3 個新手城 (許昌/襄陽/新野)")
+	sim.cmd_set_home(id, "xiangyang")
+	var ch: Dictionary = sim.player_ch()
+	check(String(ch.get("homeCity", "")) == "xiangyang", "揀城: ch.homeCity = 襄陽")
+	var e := sim.ent(id)
+	var md := sim._city_map("xiangyang")
+	check(sim.map_id_at(int(e["x"]), int(e["y"])) == String(md["id"]), "揀城: 搬咗去襄陽城內")
+	check(String(sim._home_map().get("city", "")) == "xiangyang", "揀城: _home_map 跟玩家揀嘅城")
+	sim.cmd_set_home(id, "nowhere")
+	check(String(ch.get("homeCity", "")) == "xiangyang", "揀城: 未開放城拒絕，唔改")
+	ch["level"] = 2
+	sim.cmd_set_home(id, "xinye")
+	check(String(ch.get("homeCity", "")) == "xiangyang", "揀城: 出發後 (Lv>1) 唔可以改")
