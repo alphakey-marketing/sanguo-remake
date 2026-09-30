@@ -172,6 +172,8 @@ func _slot_btn(eq: Dictionary, key: String, label: String) -> Button:
 		sel_slot = key
 		refresh(true), 84)
 	b.custom_minimum_size.y = 54
+	if id > 0:
+		item_icon_btn(b, id)
 	b.add_theme_font_size_override("font_size", 13)
 	b.toggle_mode = true
 	b.set_pressed_no_signal(sel_slot == key)
@@ -231,7 +233,7 @@ func _build_equip(ch: Dictionary) -> void:
 		if RulesEquip.SLOTS.has(sel_slot):
 			_armor_pick_list(right, ch, sel_slot)
 		return
-	right.add_child(lbl(item_name(id), 17, UiTheme.GOLD))
+	right.add_child(item_title(id, 17))
 	for s in item_desc(id):
 		right.add_child(wrap_lbl(str(s), 13, UiTheme.DIM))
 	if main.data.armors.has(id):

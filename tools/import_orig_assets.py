@@ -36,6 +36,15 @@ def imp_items(src, idx):
                 shutil.copyfile(p, dst)
             out[iid] = rel
         idx[name] = out
+    # 冇自己圖嘅物品 (例: 10201) 用 items.json template 嘅圖 (同一模板共用 icon)；只加索引，唔複製檔
+    items_json = os.path.join(ROOT, "client", "data", "items.json")
+    if os.path.exists(items_json):
+        with open(items_json, encoding="utf-8") as fh:
+            for it in json.load(fh):
+                iid, tpl = str(it["id"]), str(it.get("template", ""))
+                for name in ("items", "items_l"):
+                    if iid not in idx[name] and tpl in idx[name]:
+                        idx[name][iid] = idx[name][tpl]
 
 def imp_faces(src, idx):
     """Pic_npcFace1 等: NNNN_<npcid>.jpg / Pic_Face: NNNN_<code>.png -> faces/<key>.<ext>"""
@@ -92,6 +101,11 @@ def main():
     with open(INDEX, "w", encoding="utf-8") as fh:
         json.dump(idx, fh, ensure_ascii=False, indent=0, sort_keys=True)
     print({k: len(v) for k, v in idx.items() if not k.startswith("_")})
+    if os.path.exists(os.path.join(ROOT, "client", "data", "items.json")):
+        with open(os.path.join(ROOT, "client", "data", "items.json"), encoding="utf-8") as fh:
+            ids = [str(i["id"]) for i in json.load(fh)]
+        miss = [i for i in ids if i not in idx.get("items", {})]
+        print(f"覆蓋率 items: {len(ids) - len(miss)}/{len(ids)}；缺圖 id 頭 20: {miss[:20]}")
 
 if __name__ == "__main__":
     main()

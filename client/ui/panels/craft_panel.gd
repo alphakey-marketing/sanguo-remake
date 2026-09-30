@@ -170,6 +170,7 @@ func _build_craft(left: Control, right: Control, ch: Dictionary, skill: String) 
 			sel = id
 			refresh(true))
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		item_icon_btn(b, id)
 		b.toggle_mode = true
 		b.set_pressed_no_signal(sel == id)
 		b.add_theme_color_override("font_color", UiTheme.GOOD if lv_ok and mat_ok else UiTheme.TEXT if lv_ok else UiTheme.DIM)
@@ -178,7 +179,7 @@ func _build_craft(left: Control, right: Control, ch: Dictionary, skill: String) 
 		right.add_child(wrap_lbl("揀一個配方。✓ = 材料齊、等級夠。", 14, UiTheme.DIM))
 		return
 	var rc: Dictionary = main.data.recipes[sel]
-	right.add_child(lbl(item_name(sel), 18, UiTheme.GOLD))
+	right.add_child(item_title(sel))
 	for s in item_desc(sel):
 		right.add_child(wrap_lbl(str(s), 13, UiTheme.DIM))
 	right.add_child(lbl("要%s Lv%d" % [ad["name"], int(rc["lv"])], 14, UiTheme.TEXT if int(rc["lv"]) <= lv else UiTheme.BAD))
