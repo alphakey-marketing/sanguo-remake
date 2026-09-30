@@ -1549,12 +1549,19 @@ func _draw() -> void:
 				draw_arc(cc, cr, 0.0, TAU, 32, Color(1.0, 0.3, 0.2, 0.8), 2.0)
 			draw_rect(Rect2(p - Vector2(2, 2), Vector2(TILE + 4, TILE + 4)), Color(1.0, 0.5, 0.4), false, 2.0)
 		if e.get("dropped", false):                     # S04a 地面掉落物: 小袋圖示 + 件數
-			draw_rect(Rect2(p + Vector2(4, 12), Vector2(16, 10)), Color(0.85, 0.7, 0.35))
-			draw_rect(Rect2(p + Vector2(7, 6), Vector2(10, 7)), Color(0.6, 0.5, 0.22))
-			draw_rect(Rect2(p + Vector2(4, 12), Vector2(16, 10)), Color(0.2, 0.15, 0.05), false, 1.0)
 			var n := 0
+			var icon = null
 			for it in e.get("dropItems", []):
 				n += int(it.get("n", 1))
+				if icon == null:
+					icon = AssetLib.item_icon(int(it.get("id", 0)))      # 第一件嘅原版圖示
+			if icon != null:
+				draw_texture_rect(icon, Rect2(p + Vector2(0, 0), Vector2(TILE, TILE)), false)
+				draw_rect(Rect2(p, Vector2(TILE, TILE)), Color(1.0, 0.9, 0.4, 0.9), false, 1.0)
+			else:
+				draw_rect(Rect2(p + Vector2(4, 12), Vector2(16, 10)), Color(0.85, 0.7, 0.35))
+				draw_rect(Rect2(p + Vector2(7, 6), Vector2(10, 7)), Color(0.6, 0.5, 0.22))
+				draw_rect(Rect2(p + Vector2(4, 12), Vector2(16, 10)), Color(0.2, 0.15, 0.05), false, 1.0)
 			_txt(p + Vector2(-2, 4), "×%d" % n, Color(1, 0.95, 0.6), 11)
 			continue
 		if ismob:
