@@ -216,7 +216,24 @@ def imp_actor(src, idx):
     idx["_actor_pool"] = ACTOR_POOL
     print(f"人形 sprite: {len(out['S'])} 個，名字對應 {len(idx['_actor_by_name'])}")
 
-SETS = {"actor": imp_actor, "mon": imp_mon, "items": imp_items, "faces": imp_faces, "ui": imp_ui}
+# 座騎: npc02 123001~5 披甲馬 (8x8)；6 馬種按毛色對應 5 款
+MOUNT_MAP = {"wusun": 123004, "damo": 123001, "huangbiao": 123003, "dawan": 123005, "shenshan": 123002, "zhongyuan": 123001}
+
+def imp_mount(src, idx):
+    os.makedirs(os.path.join(OUT, "mount"), exist_ok=True)
+    out = {}
+    for breed, sid in MOUNT_MAP.items():
+        f = os.path.join(src, "sheets", "npc02", f"CP_{sid}S.CP.png")
+        if not os.path.exists(f):
+            print("警告: 馬 sprite 缺", sid)
+            continue
+        rel = f"mount/{sid}S.png"
+        _keyed_copy(f, os.path.join(OUT, rel))
+        out[breed] = rel
+    idx["mount_S"] = out
+    print(f"座騎 sprite: {len(out)} 馬種")
+
+SETS = {"mount": imp_mount, "actor": imp_actor, "mon": imp_mon, "items": imp_items, "faces": imp_faces, "ui": imp_ui}
 
 def check():
     if not os.path.exists(INDEX):

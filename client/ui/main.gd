@@ -1559,6 +1559,15 @@ func _draw_my_mount(p: Vector2) -> void:
 			continue
 		var col: Array = RulesMount.breed_def(data.mounts, String(m["breed"])).get("color", [0.5, 0.35, 0.2])
 		var c := Color(float(col[0]), float(col[1]), float(col[2]))
+		var mtex := AssetLib.mount_sheet(String(m["breed"]))
+		if mtex != null:
+			var mw := mtex.get_width() / 8
+			var mh := mtex.get_height() / 8
+			var msz := Vector2(mw, mh) * 0.3
+			var riding: bool = bool(ch.get("riding", false))
+			var mp := p + Vector2(TILE * 0.5 - msz.x * 0.5 + (0 if riding else 22), TILE - msz.y + (4 if riding else 0))
+			draw_texture_rect_region(mtex, Rect2(mp, msz), Rect2(int(t0 * 8.0) % 8 * mw, 4 * mh, mw, mh))
+			return
 		if bool(ch.get("riding", false)):
 			draw_rect(Rect2(p + Vector2(-8, 8), Vector2(32, 11)), c)                 # 馬身
 			draw_rect(Rect2(p + Vector2(20, 2), Vector2(8, 9)), c)                   # 馬頭
