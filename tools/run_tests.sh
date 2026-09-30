@@ -25,6 +25,7 @@ else
 fi
 run rules --script tests/run_rules.gd
 run ammo --script tests/run_ammo.gd
+run assetlib --script tests/run_assetlib.gd
 run mall --script tests/run_mall.gd
 run quest --script tests/run_quest.gd
 run hist --script tests/run_hist.gd
@@ -90,7 +91,7 @@ echo "$out"
 [ $code = 0 ] || { echo "!! titles exit $code"; rc=1; }
 
 # 戰役/特殊場景導入核對 (battles.json / scenes.json 要同 monsters/maps/drops 齊)
-for g in gen_battles gen_scenes; do
+for g in gen_battles gen_scenes import_orig_assets; do
   out=$(PYTHONIOENCODING=utf-8 python tools/$g.py --check 2>&1); code=$?
   echo "$out"
   [ $code = 0 ] || { echo "!! $g exit $code"; rc=1; }
