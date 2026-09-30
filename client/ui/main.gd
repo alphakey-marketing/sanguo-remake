@@ -598,6 +598,7 @@ func _on_event(e: Dictionary) -> void:
 		"die":
 			if int(e.dst) == my_id:
 				var dr := _death_report(e)
+				last_death_report = dr
 				for _ln in dr.split("\n"):
 					_log(_ln)                       # UAT: 死亡報告全部入信息欄（含跌咗咩/扣經驗）
 				target_id = -1
@@ -780,6 +781,9 @@ func _show_quest_dialog(speaker: String, dlg: Array) -> void:
 
 
 # 倒地畫面【自訂新增】: 倒數 + 回城/復活丹/同伴超渡掣，source 每 0.2 秒重算 (DialogPanel 機制)
+var last_death_report := ""     # 倒地畫面顯示嘅死亡報 (S03: 跌咗乜/扣經驗/耐久)
+
+
 func _down_dialog() -> Dictionary:
 	var dv := sim.player_down_view()
 	if dv.is_empty():
@@ -787,7 +791,10 @@ func _down_dialog() -> Dictionary:
 			hud.close_panels()
 		return {}
 	var can_self := bool(dv.get("canSelf", false))
-	var text := "你倒喺地上，%d 秒後強制送返客棧。\n" % int(dv.get("secsLeft", 0))
+	var text := ""
+	if last_death_report != "":
+		text = last_death_report + "\n──────\n"
+	text += "你倒喺地上，%d 秒後強制送返客棧。\n" % int(dv.get("secsLeft", 0))
 	if can_self:
 		text += "可以撳「回城復活」返客棧。"
 	else:
