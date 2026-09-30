@@ -472,6 +472,43 @@
 20149
 ]
 },
+"_fx_meta": {
+"heal": {
+"ax": 73,
+"ay": 58,
+"ch": 143,
+"cw": 146,
+"n": 15
+},
+"hit": {
+"ax": 62,
+"ay": 64,
+"ch": 139,
+"cw": 128,
+"n": 12
+},
+"levelup": {
+"ax": 50,
+"ay": 78,
+"ch": 159,
+"cw": 101,
+"n": 11
+},
+"spell": {
+"ax": 69,
+"ay": 75,
+"ch": 115,
+"cw": 124,
+"n": 10
+},
+"ult": {
+"ax": 36,
+"ay": 62,
+"ch": 112,
+"cw": 71,
+"n": 11
+}
+},
 "_note": "由 tools/import_orig_assets.py 生成，唔好手改 (單跑部分 --sets 會合併舊索引)",
 "actor_A": {
 "20001": "actor/20001A.png",
@@ -781,6 +818,19 @@
 "91004": "actor/91004W.png",
 "91005": "actor/91005W.png",
 "91006": "actor/91006W.png"
+},
+"audio": {
+"bgm_battle": "audio/bgm_battle.ogg",
+"bgm_extra": "audio/bgm_extra.ogg",
+"bgm_field": "audio/bgm_field.ogg",
+"bgm_town": "audio/bgm_town.ogg",
+"click": "audio/click.ogg",
+"heal": "audio/heal.ogg",
+"hit": "audio/hit.ogg",
+"levelup": "audio/levelup.ogg",
+"spell": "audio/spell.ogg",
+"swing": "audio/swing.ogg",
+"ult": "audio/ult.ogg"
 },
 "faces": {
 "20001": "faces/20001.jpg",
@@ -1394,6 +1444,13 @@
 "黃蓋": "faces/20030.jpg",
 "龐德": "faces/20059.jpg",
 "龐統": "faces/20053.jpg"
+},
+"fx": {
+"heal": "fx/heal.png",
+"hit": "fx/hit.png",
+"levelup": "fx/levelup.png",
+"spell": "fx/spell.png",
+"ult": "fx/ult.png"
 },
 "items": {
 "10001": "items/10001.png",
