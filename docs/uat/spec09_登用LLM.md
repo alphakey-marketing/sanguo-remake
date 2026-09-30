@@ -192,3 +192,8 @@
 - **LLM 真實請求**：測試用 mock，**唔碰網絡**；真 HTTPRequest 路徑（`_on_llm_request`）冇自動覆蓋 — OpenRouter 實際連線 + JSON schema 回應靠手測，出錯會喺 LLM 面板「上次錯誤」顯示。
 - **Tier2 居民 15% + cooldown 1200 tick**：自動測試直接砌 `_llm_talk`；真實玩家要傾好多鑊先觸發 → 手測易誤報「LLM 冇反應」。
 - **「每日反思摘要」**：`cmd_llm_summary` 只寫 `mem.summary/goal`，**未驅動任何行為**（目標未接）→ 自動測試唔會出錯，但功能上係半製成品。
+## UAT 修正記錄（2026-09-29）
+- ✅ 居民行為分流：`resident.stays_in_town`（非 field 職業工作留城）+ bot_sys 接駁；日程逐 zone
+- ✅ NpcBrain 按 role/activity 出招呼對白（好感 <10）
+- ✅ 「傳聞」頁：情報冊面板加第 2 頁，列 `rumor_view()`（待用家手測）
+- 維持：登用鎖 15 日；反思 goal 唔接；結婚村 NPC 圖示缺失非阻塞

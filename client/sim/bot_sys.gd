@@ -169,7 +169,7 @@ static func think(sim) -> void:
 			continue
 		# 居民日程 (S09a, spec 09 §1): in-town 活動 (cfg.inTownActivities: eat/home/sleep) → 留城內行街/休息，唔出野區；
 		# work → 落下方野外練功邏輯。血低返客棧 (上方) 任何時辰都優先。
-		if RulesResident.is_city_activity(sim.data.residents, RulesResident.activity_at(sim.data.residents, RulesClock.shichen_of_ke(int(sim._clock()["ke"])))):
+		if RulesResident.stays_in_town(sim.data.residents, String(ch.get("role", "")), RulesResident.activity_at(sim.data.residents, RulesClock.shichen_of_ke(int(sim._clock()["ke"])))):
 			var cmap: String = sim.resident_city_map_id(String(ch.get("homeCity", "")))
 			if cmap != "" and sim.map_id_at(int(e["x"]), int(e["y"])) != cmap:
 				sim._route_to_map(e, cmap)          # 唔喺自己城: 返城

@@ -97,6 +97,14 @@ static func activity_at(residents: Dictionary, shichen: int) -> String:
 
 # 居民日程驅動 (spec 09 §1): 某啲活動 (cfg.inTownActivities，如 eat/home/sleep) → 留城內行街/休息，唔出野外；
 # 其餘 (work) → 去 homeZone 野外練功。非 in-town 活動一律回 false (照舊野外)。
+# role 分流: 只有 work=field 嘅居民 (村民) 工作時辰出野區；商販/衛兵/馬夫/官員 (shop/gate/stable/office) 上班留城
+static func stays_in_town(residents: Dictionary, role_id: String, activity: String) -> bool:
+	if is_city_activity(residents, activity):
+		return true
+	var w := String(role_def(residents, role_id).get("work", "field"))
+	return activity == "work" and w != "field"
+
+
 static func is_city_activity(residents: Dictionary, activity: String) -> bool:
 	var in_town = cfg(residents).get("inTownActivities", [])
 	return in_town is Array and (in_town as Array).has(activity)
