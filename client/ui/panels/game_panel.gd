@@ -179,6 +179,20 @@ func item_icon_btn(b: Button, id: int, vertical := false) -> void:
 		b.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
 
 
+# 原版 NPC/武將頭像 (按名; 冇就 null)
+func portrait(npc_name: String, px := 56) -> TextureRect:
+	var t := AssetLib.face_by_name(npc_name)
+	if t == null:
+		return null
+	var r := TextureRect.new()
+	r.texture = t
+	r.custom_minimum_size = Vector2(px * 0.9, px)
+	r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	r.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	r.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	return r
+
+
 # 標題行: 大圖 (100px 縮 56) + 名，冇圖只出名
 func item_title(id: int, sz := 18) -> Control:
 	var t := AssetLib.item_icon(id, true)

@@ -51,8 +51,19 @@ func _build_body() -> void:
 	title_lbl.text = str(c.get("title", ""))
 	var sc := scroll()
 	sc.custom_minimum_size.y = 40
-	sc.add_child(wrap_lbl(str(c.get("text", "")), 15))
-	body.add_child(sc)
+	var tl := wrap_lbl(str(c.get("text", "")), 15)
+	tl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sc.add_child(tl)
+	var pt := portrait(str(c.get("title", "")).split(" ")[0].split("（")[0], 56)
+	if pt != null:                      # 標題係有原版頭像嘅 NPC/武將名 → 左邊出頭像
+		var hb := HBoxContainer.new()
+		hb.add_theme_constant_override("separation", 8)
+		hb.add_child(pt)
+		sc.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		hb.add_child(sc)
+		body.add_child(hb)
+	else:
+		body.add_child(sc)
 	qte_bar = null
 	if c.has("qte"):
 		var q: Callable = c["qte"]

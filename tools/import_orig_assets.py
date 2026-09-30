@@ -65,8 +65,58 @@ def imp_faces(src, idx):
                 shutil.copyfile(os.path.join(base, d, f), dst)
             out[key] = rel
     idx["faces"] = out
+    # 名 → 頭像 (Npc_table.tsv: npcid/name/sprite；sprite id = 頭像檔名)。同名取先出現有圖者
+    tsv = os.path.join(src, "text", "Npc_table.tsv")
+    by_name = {}
+    if os.path.exists(tsv):
+        with open(tsv, encoding="utf-8") as fh:
+            next(fh, None)
+            for line in fh:
+                c = line.rstrip("\r\n").split("\t")
+                if len(c) >= 3 and c[2] in out and c[1] and c[1] not in by_name:
+                    by_name[c[1]] = out[c[2]]
+    idx["faces_by_name"] = by_name
 
-SETS = {"items": imp_items, "faces": imp_faces}
+def _find(src, d, name):
+    base = os.path.join(src, "sprites", d)
+    for f in os.listdir(base):
+        if f.split("_", 1)[-1] == name:
+            return os.path.join(base, f)
+    raise FileNotFoundError(f"{d}/{name}")
+
+def _blank_button(path, cap=18):
+    """原版掣字燒死喺圖入面 → 保留左右 cap 像素邊框，中間用 cap 內一條直欄橫向拉闊 (去字)，做成 9-slice 空白掣。"""
+    from PIL import Image
+    im = Image.open(path).convert("RGBA")
+    w, h = im.size
+    out = Image.new("RGBA", (cap * 2 + 8, h))
+    out.paste(im.crop((0, 0, cap, h)), (0, 0))
+    out.paste(im.crop((w - cap, 0, w, h)), (cap + 8, 0))
+    col = im.crop((cap + 3, 0, cap + 4, h)).resize((8, h))
+    out.paste(col, (cap, 0))
+    return out
+
+def imp_ui(src, idx):
+    """UI 皮: 視窗底框 (240x330Form 9-slice) + 空白掣 (btnjui_1 正常/ _1s 按下)。"""
+    from PIL import Image, ImageOps
+    os.makedirs(os.path.join(OUT, "ui"), exist_ok=True)
+    out = {}
+    def save(name, im):
+        rel = f"ui/{name}.png"
+        im.save(os.path.join(OUT, rel))
+        out[name] = rel
+    save("panel", Image.open(_find(src, "Pic_menu04", "240x330Form.png")).convert("RGBA"))
+    save("card", Image.open(_find(src, "Pic_menu04", "104x133form.png")).convert("RGBA"))
+    n = _blank_button(_find(src, "Pic_menu24", "btnjui_1.png"))
+    p = _blank_button(_find(src, "Pic_menu24", "btnjui_1s.png"))
+    save("btn_n", n)
+    save("btn_p", p)
+    g = ImageOps.grayscale(n.convert("RGB")).convert("RGBA")
+    g.putalpha(n.getchannel("A"))
+    save("btn_d", g)
+    idx["ui"] = out
+
+SETS = {"items": imp_items, "faces": imp_faces, "ui": imp_ui}
 
 def check():
     if not os.path.exists(INDEX):

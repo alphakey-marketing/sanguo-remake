@@ -1,4 +1,4 @@
-class_name UiTheme
+﻿class_name UiTheme
 extends RefCounted
 # 面板主題（三國風: 墨啡底 + 金邊）。掣最細 44px 高，字 15 號，手機睇得清撳得中。
 
@@ -11,6 +11,8 @@ const BAD := Color(1.0, 0.5, 0.45)
 const FONT := 15
 const BTN_H := 44.0
 
+# 原版皮 (assets_orig/ui，A3): 有素材先生效；user://settings.cfg [ui] skin="flat" 可強制用返舊墨啡金邊
+static var skin_orig := true
 static var _theme: Theme
 static var _font_installed := false
 static var _cjk: Font
@@ -31,6 +33,7 @@ static func get_theme() -> Theme:
 	if _theme != null:
 		return _theme
 	var t := Theme.new()
+	_read_skin_setting()
 	t.default_font_size = FONT
 	t.default_font = _cjk_font()   # panel Label/Button 字形
 	# 掣
@@ -55,8 +58,45 @@ static func get_theme() -> Theme:
 	t.set_stylebox("grabber_highlight", "VScrollBar", grab)
 	t.set_stylebox("grabber_pressed", "VScrollBar", grab)
 	t.set_stylebox("scroll", "VScrollBar", sb(Color(0, 0, 0, 0.3), Color(0, 0, 0, 0), 0, 4, 3))
+	if skin_orig and AssetLib.ui("panel") != null and AssetLib.ui("btn_n") != null:
+		_apply_orig_skin(t)
 	_theme = t
 	return t
+
+
+static func _read_skin_setting() -> void:
+	var cf := ConfigFile.new()
+	if cf.load("user://settings.cfg") == OK:
+		skin_orig = str(cf.get_value("ui", "skin", "orig")) != "flat"
+
+
+static func tex_sb(tex: Texture2D, margin: int, content: int, tint := Color.WHITE) -> StyleBoxTexture:
+	var s := StyleBoxTexture.new()
+	s.texture = tex
+	s.set_texture_margin_all(margin)
+	s.set_content_margin_all(content)
+	s.modulate_color = tint
+	s.axis_stretch_horizontal = StyleBoxTexture.AXIS_STRETCH_MODE_TILE_FIT
+	s.axis_stretch_vertical = StyleBoxTexture.AXIS_STRETCH_MODE_TILE_FIT
+	return s
+
+
+# 原版木板視窗 + 羊皮紙掣；視窗壓暗 (亮字要夠對比)，掣字改深啡色
+static func _apply_orig_skin(t: Theme) -> void:
+	t.set_stylebox("panel", "PanelContainer", tex_sb(AssetLib.ui("panel"), 24, 14, Color(0.5, 0.42, 0.36)))
+	var bn := AssetLib.ui("btn_n")
+	var bp := AssetLib.ui("btn_p")
+	var dark := Color(0.2, 0.1, 0.03)
+	t.set_stylebox("normal", "Button", tex_sb(bn, 18, 8))
+	t.set_stylebox("hover", "Button", tex_sb(bn, 18, 8, Color(1.15, 1.1, 1.0)))
+	t.set_stylebox("pressed", "Button", tex_sb(bp, 18, 8))
+	t.set_stylebox("hover_pressed", "Button", tex_sb(bp, 18, 8))
+	t.set_stylebox("disabled", "Button", tex_sb(AssetLib.ui("btn_d"), 18, 8, Color(0.75, 0.75, 0.75)))
+	t.set_color("font_color", "Button", dark)
+	t.set_color("font_hover_color", "Button", Color.BLACK)
+	t.set_color("font_pressed_color", "Button", Color(0.45, 0.05, 0.02))
+	t.set_color("font_hover_pressed_color", "Button", Color(0.45, 0.05, 0.02))
+	t.set_color("font_disabled_color", "Button", Color(0.35, 0.32, 0.3))
 
 
 static func _cjk_font() -> Font:
