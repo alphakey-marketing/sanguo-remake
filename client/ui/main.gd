@@ -1548,18 +1548,33 @@ func _txt(pos: Vector2, s: String, col := Color.WHITE, sz := FONT_SZ) -> void:
 
 func _draw() -> void:
 	var vs := get_viewport_rect().size
+	var om: OrigMap = null
 	draw_rect(Rect2(Vector2.ZERO, vs), Color(0.04, 0.04, 0.05))
 	if not cur_map.is_empty():
-		var tex := MapArt.texture(data, cur_map, TILE)
 		var mod := (Color(0.8, 0.8, 0.86) if beast_light else Color(0.5, 0.5, 0.62)) if night_on else Color.WHITE      # 夜景
-		draw_texture(tex, Vector2(int(cur_map.ox), int(cur_map.oy)) * TILE - cam, mod)
+		var org := Vector2(int(cur_map.ox), int(cur_map.oy)) * TILE - cam
+		if String(cur_map.get("orig", "")) != "":
+			om = OrigMap.load_map(String(cur_map["orig"]))
+		if om != null:
+			om.draw_terrain(self, org, vs, mod)           # 原版地圖視覺層 (物件喺角色迴圈夾插畫)
+			om.begin(vs, org)
+		else:
+			draw_texture(MapArt.texture(data, cur_map, TILE), org, mod)
 	for f in facilities:
 		_draw_sign(f)
 	var mr := Rect2i(int(cur_map.get("ox", 0)), int(cur_map.get("oy", 0)), int(cur_map.get("w", Sim.W)), int(cur_map.get("h", Sim.H)))
-	for e in ents:
+	var ent_list: Array = ents
+	if om != null:
+		ent_list = ents.duplicate()
+		ent_list.sort_custom(func(a, b): return int(a.y) < int(b.y))      # 由北到南畫，物件按底邊夾插
+	var om_org := Vector2(int(cur_map.get("ox", 0)), int(cur_map.get("oy", 0))) * TILE - cam
+	var om_mod := (Color(0.8, 0.8, 0.86) if beast_light else Color(0.5, 0.5, 0.62)) if night_on else Color.WHITE
+	for e in ent_list:
 		if not mr.has_point(Vector2i(int(e.x), int(e.y))):
 			continue                                  # 其他地圖嘅單位唔畫
 		var p := Vector2(e.x, e.y) * TILE - cam
+		if om != null:
+			om.flush_upto(self, om_org, p.y + TILE - om_org.y, om_mod)    # 腳底 y 以北嘅物件先畫，角色喺佢哋前面
 		var isme: bool = int(e.id) == my_id
 		var ismob: bool = e.get("mob", false)
 		# S04b 吟唱線索: 術法怪 / boss 吟唱緊 → 落點紅圈 + 怪身框，玩家睇到走位拍
@@ -1618,6 +1633,8 @@ func _draw() -> void:
 		# S03a: 紅名(殺人魔)居民 = 紅字表示（居民警告話你知佢係殺人魔）
 		var nc := Color(1, 0.32, 0.32) if bool(e.get("criminal", false)) else Color(1, 0.7, 0.6) if ismob else Color(0.6, 1, 0.65) if isgen else Color.WHITE
 		_txt(p + Vector2(-8, -18), nm, nc, 11)
+	if om != null:
+		om.flush_all(self, om_org, om_mod)              # 剩低嘅物件 (最南嗰批)
 	for qn in quest_npcs:
 		if not mr.has_point(Vector2i(int(qn.x), int(qn.y))):
 			continue

@@ -23,6 +23,29 @@ def sprite_index():
             idx.setdefault(f.split('_', 1)[1][:-4].lower(), SP + d + '/' + f)
     return idx
 
+MAPS = os.path.join(ROOT, 'client', 'data', 'maps.json')
+TEST_OY = 644   # 全域格：放喺 WORLD_H(640) 之下，原版許昌 251x188 格
+
+def register_test_map(key, cn, gw, gh, z):
+    """原版許昌 = 測試地圖 xuchang_o：邏輯層 txt (行走層 -> '.'/'H')、maps.json 條目 + 兩個入口 portal。"""
+    import numpy as np
+    g = np.frombuffer(zlib.decompress(z), np.uint8).reshape(gh, gw)
+    mid = key + '_o'
+    # 出生點 = 底部中間最近嘅可行格
+    best = min(((abs(x - 125) + abs(y - 170), x, y) for y in range(120, gh - 2) for x in range(60, 190) if not g[y, x] and not g[y-1:y+2, x-1:x+2].any()))
+    sx, sy = best[1], best[2]
+    txt = os.path.join(ROOT, 'client', 'data', 'maps', mid + '.txt')
+    with open(txt, 'w', encoding='utf8', newline='\n') as f:
+        f.write('\n'.join(''.join('H' if v else '.' for v in row) for row in g) + '\n')
+    d = json.load(open(MAPS, encoding='utf8'))
+    d['maps'] = [m for m in d['maps'] if m['id'] != mid]
+    d['maps'].append({'id': mid, 'name': cn + '（原版）', 'ox': 0, 'oy': TEST_OY, 'safe': True, 'kind': 'city', 'orig': key, 'spawn': [sx, sy, sx, sy]})
+    d['portals'] = [p for p in d['portals'] if not p['id'].startswith('orig_xc')]
+    d['portals'].append({'id': 'orig_xc_in', 'name': '原版許昌（測試）', 'map': 'xuchang', 'x': 37, 'y': 1, 'to': 'orig_xc_out', 'auto': True})
+    d['portals'].append({'id': 'orig_xc_out', 'name': '返回舊許昌', 'map': mid, 'x': sx, 'y': sy + 1, 'to': 'orig_xc_in', 'auto': True})
+    open(MAPS, 'w', encoding='utf8', newline='\n').write(json.dumps(d, ensure_ascii=False, indent=1) + '\n')
+    print('  測試地圖', mid, '出生', sx, sy)
+
 def run(check):
     tiles = {int(f.split('_')[0]): f for f in os.listdir(TS)}
     sidx = sprite_index(); errs = []
@@ -46,6 +69,7 @@ def run(check):
                'tile': 48, 'cols': cols, 'rows': rows, 'atlas_cols': 32,
                'tiles': [remap[v] for v in d['tiles']], 'objects': sorted(objs, key=lambda o: o['y']),
                'walk': {'w': gw, 'h': gh, 'z': base64.b64encode(w[4:]).decode()}}
+        if key == 'xuchang' and not check: register_test_map(key, cn, gw, gh, w[4:])
         print(key, cn, d['W'], d['H'], 'tile 種', len(used), '物件', len(objs), '物件圖', len(names), 'walk', gw, gh)
         if check: continue
         with open(os.path.join(DATA, key + '.json'), 'w', encoding='utf8') as f: json.dump(out, f, ensure_ascii=False, separators=(',', ':'))

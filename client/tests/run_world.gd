@@ -18,6 +18,7 @@ func _init() -> void:
 	t_zones_travel(data)
 	t_set_home(data)
 	t_trade_cities(data)
+	t_orig_map(data)
 	print("[TEST] world: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -331,3 +332,31 @@ func t_trade_cities(data: GameData) -> void:
 	sim.cmd_sell(id, item, 1)
 	var gain := int(ch["gold"]) - g1
 	check(gain > cost, "貿易: 貴城賣賺差價 (買 %d 賣 %d)" % [cost, gain])
+
+
+# 原版許昌測試地圖 (xuchang_o): 邏輯層由原版行走層生成 + 視覺層 OrigMap 載入
+func t_orig_map(data: GameData) -> void:
+	var md: Dictionary = data.map_by_id.get("xuchang_o", {})
+	check(not md.is_empty(), "原版許昌: maps.json 有 xuchang_o")
+	if md.is_empty():
+		return
+	check(int(md["w"]) == 251 and int(md["h"]) == 188, "原版許昌: 格數 251x188 (=4000x3000 px / 16)")
+	var om := OrigMap.load_map(String(md.get("orig", "")))
+	check(om != null, "原版許昌: OrigMap 載入 (atlas + 物件圖)")
+	if om == null:
+		return
+	check(om.cols == 84 and om.rows == 63 and om.tiles.size() == 84 * 63, "原版許昌: 地形 84x63 格")
+	check(om.objs.size() >= 500, "原版許昌: 物件 >= 500 (%d)" % om.objs.size())
+	var sp: Array = md["spawn"]
+	var gx := int(sp[0])   # spawn 載入後已係全域座標
+	var gy := int(sp[1])
+	var sim := Sim.new(data, 1)
+	check(sim.is_free(gx, gy), "原版許昌: 出生點可行走")
+	check(String(data.map_at(gx, gy).get("id", "")) == "xuchang_o", "原版許昌: map_at 對返 xuchang_o")
+	var blocked := 0
+	for i in range(int(md["w"]) * int(md["h"])):
+		var x := int(md["ox"]) + i % int(md["w"])
+		var y := int(md["oy"]) + i / int(md["w"])
+		if not sim.is_free(x, y):
+			blocked += 1
+	check(blocked > 15000 and blocked < 35000, "原版許昌: 阻擋格數合理 (%d)" % blocked)

@@ -111,6 +111,10 @@ func _run() -> void:
 	put(int(xc["ox"]) + 35, int(xc["oy"]) + 26)
 	await frames(10)
 	await shot("map_city")
+	var xo: Dictionary = m.data.map_by_id["xuchang_o"]
+	put(int(xo["spawn"][0]), int(xo["spawn"][1]))
+	await frames(10)
+	await shot("map_orig")
 	put(int(xc["ox"]) + 35, int(xc["oy"]) + 20)
 	await frames(10)
 	await shot("map_palace")
