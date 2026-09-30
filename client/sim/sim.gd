@@ -320,6 +320,8 @@ func view_ents() -> Array:
 			"role": String(e.get("ch", {}).get("role", "")),
 			"statuses": st_vis, "casting": e.has("casting"), "castX": csx, "castY": csy, "castSpell": csp, "castProg": cprog,
 			"aggro": int(e["mob"]["target"]) if e["kind"] == "mob" and e["mob"]["state"] == "chase" else 0}   # 怪追緊邊個
+		if e["kind"] == "mob":
+			o["mdef"] = int(e["mob"]["def"])            # 客戶端揀怪物動畫 sheet 用
 		if e["kind"] == "dropped":
 			o["dropped"] = true
 			o["dropItems"] = e["drop"]["items"]

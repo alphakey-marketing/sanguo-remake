@@ -22,3 +22,9 @@
 - A4c：NPC/居民/武將（npc0x）✅ 可行；玩家疊層 🟡 需再 spike；退路 = 用 npc 人形 sprite 頂玩家。
 
 工具：`tools/slice_sprites.py`（`contact` 出對照圖、`frames` 印格尺寸）。
+
+## A4b 落地（2026-09-30）
+- 方向列次序（用老鼠驗證）：**順時針 N,NE,E,SE,S,SW,W,NW = 列 0..7**（列 0 背向鏡頭、列 4 面向鏡頭）。
+- 怪 → sprite：`monsters.json` 怪 id → `Npc_Client.Dat` 記錄（先 id、再 dropSrc、再同名），sprite id = 記錄 offset 150 (u16)；`npc_dat.py` 舊註解「sprite=id+10000」對怪物**唔啱**。
+- 覆蓋：136 隻怪只有 **30 隻**有 sheet（sprite id 有記錄但 `extracted/sheets` 冇抽到，例：野狗 30176、野豬 30177、惡虎 30173）；`1001~1105` 一批係 remake 自訂怪，原版本無。其餘繼續紅色塊。要補全需再從 `.mrg` 抽（另開 task）。
+- 客戶端：`Sim.view_ents` 加 `mdef`；`main.gd _mon_track/_draw_mon_sprite` 由位置變化推方向/行走，aggro 未郁 = 攻擊，其餘站立；8fps 循環；`AssetLib.mon_sheet(def, act)`。

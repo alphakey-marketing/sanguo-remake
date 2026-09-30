@@ -116,7 +116,48 @@ def imp_ui(src, idx):
     save("btn_d", g)
     idx["ui"] = out
 
-SETS = {"items": imp_items, "faces": imp_faces, "ui": imp_ui}
+def imp_mon(src, idx):
+    """怪物動畫 sheet (8 方向列 x 8 幀欄，見 docs/plan/sprite_layout.md)。
+    monsters.json 怪 id -> Npc_Client.Dat 記錄 (先 id，再 dropSrc，再同名) -> sprite id (@offset 150) -> sheets/*/CP_<sprite><A|S|W>.CP.png"""
+    import glob, struct
+    sys.path.insert(0, os.path.join(os.path.dirname(src), "tools"))
+    import npc_dat
+    dat = os.path.join(os.path.dirname(src), "reference", "Npc_Client.Dat")
+    recs = npc_dat.parse(open(dat, "rb").read())
+    spr = lambda r: struct.unpack_from("<H", r["raw"], 150)[0]
+    where = {}
+    for f in glob.glob(os.path.join(src, "sheets", "*", "CP_*S.CP.png")):
+        where[int(os.path.basename(f)[3:-8])] = os.path.dirname(f)
+    byid = {r["id"]: r for r in recs}
+    byname = {}
+    for r in recs:
+        byname.setdefault(r["name"], r)
+    with open(os.path.join(ROOT, "client", "data", "monsters.json"), encoding="utf-8") as fh:
+        mons = json.load(fh)["monsters"]
+    out = {"A": {}, "S": {}, "W": {}}
+    os.makedirs(os.path.join(OUT, "mon"), exist_ok=True)
+    for m in mons:
+        sid = None
+        for r in (byid.get(m["id"]), byid.get(m.get("dropSrc")), byname.get(m["name"])):
+            if r and spr(r) in where:
+                sid = spr(r)
+                break
+        if sid is None:
+            continue
+        for a in "ASW":
+            f = os.path.join(where[sid], f"CP_{sid}{a}.CP.png")
+            if not os.path.exists(f):
+                continue
+            rel = f"mon/{sid}{a}.png"
+            dst = os.path.join(OUT, rel)
+            if not os.path.exists(dst):
+                shutil.copyfile(f, dst)
+            out[a][str(m["id"])] = rel
+    for a in "ASW":
+        idx["mon_" + a] = out[a]
+    print(f"怪物動畫覆蓋: {len(out['S'])}/{len(mons)}")
+
+SETS = {"mon": imp_mon, "items": imp_items, "faces": imp_faces, "ui": imp_ui}
 
 def check():
     if not os.path.exists(INDEX):
