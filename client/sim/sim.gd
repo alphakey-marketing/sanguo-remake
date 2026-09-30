@@ -124,10 +124,10 @@ func _storage_daily() -> void:
 			continue
 		if int(ch["gold"]) < cost:
 			ch["storageSub"] = false
-			_msg(int(e["id"]), "天地商行費唔夠錢，自動退訂")
+			_msg(int(e["id"]), "天地商行日費 %d 金唔夠錢，自動退訂" % cost)
 			continue
 		ch["gold"] = int(ch["gold"]) - cost
-		_msg(int(e["id"]), "天地商行扣 %d 金" % cost)
+		_msg(int(e["id"]), "天地商行日費扣 %d 金（尚餘 %d 金）" % [cost, int(ch["gold"])])
 
 
 # 行動力【自訂】: 子時回滿 (Step 13)
