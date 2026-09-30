@@ -318,7 +318,36 @@ def imp_fx(src, idx):
     idx["_fx_meta"] = meta
     print(f"特效: {len(out)} 個")
 
-SETS = {"fx": imp_fx, "player": imp_player_layers, "mount": imp_mount, "actor": imp_actor, "mon": imp_mon, "items": imp_items, "faces": imp_faces, "ui": imp_ui}
+# 音效: 名 → (mrg, 原名)。名直接對原 mrg 條目名 (見 docs/plan/sprite_layout.md 音效節)
+AUDIO_PICK = {
+    "bgm_town": ("sounds5", "BGM01"), "bgm_field": ("sounds5", "BGM02"), "bgm_battle": ("sounds5", "BGM03"), "bgm_extra": ("sounds5", "BGM04"),
+    "swing": ("sounds4", "20142-0"), "hit": ("sounds4", "20142-D"),
+    "spell": ("Sounds3", "30512E"), "ult": ("Sounds3", "22202E"), "heal": ("Sounds3", "41003E"), "levelup": ("Sounds3", "41006E"),
+    "click": ("Sounds", "S03"),
+}
+
+def imp_audio(src, idx):
+    """音效 (Sound/*.mrg 按名抽 RIFF → ogg，需 ffmpeg)"""
+    import subprocess, tempfile
+    sys.path.insert(0, r"D:/Download/sanguo/tools")
+    from mrg_decode import Mrg
+    ff = os.environ.get("FFMPEG", r"D:/ffmpeg/ffmpeg-2026-03-12-git-9dc44b43b2-full_build/bin/ffmpeg.exe")
+    os.makedirs(os.path.join(OUT, "audio"), exist_ok=True)
+    mrgs, out = {}, {}
+    for key, (mn, nm) in AUDIO_PICK.items():
+        if mn not in mrgs:
+            m = Mrg(rf"D:/Download/zyxy_client/Sanguo_Client/Sound/{mn}.mrg")
+            mrgs[mn] = (m, {n.split(chr(92))[-1].split(".")[0]: i for i, n in enumerate(m.names)})
+        m, ix = mrgs[mn]
+        tmp = os.path.join(tempfile.gettempdir(), f"_{key}.wav")
+        open(tmp, "wb").write(m.blob(ix[nm]))
+        rel = f"audio/{key}.ogg"
+        subprocess.run([ff, "-y", "-loglevel", "error", "-i", tmp, "-c:a", "libvorbis", "-q:a", "3", os.path.join(OUT, rel)], check=True)
+        out[key] = rel
+    idx["audio"] = out
+    print(f"音效: {len(out)} 條")
+
+SETS = {"audio": imp_audio, "fx": imp_fx, "player": imp_player_layers, "mount": imp_mount, "actor": imp_actor, "mon": imp_mon, "items": imp_items, "faces": imp_faces, "ui": imp_ui}
 
 def check():
     if not os.path.exists(INDEX):

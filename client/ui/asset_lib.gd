@@ -74,6 +74,15 @@ static func player_layer(b: int, c: int, kind: String, style: int) -> Texture2D:
 	return _tex("player_layers", "%d/%d/%s/%d" % [b, c, kind, style])
 
 
+# 音效檔路徑；冇索引回 ""
+static func audio_path(name: String) -> String:
+	_ensure()
+	var t: Variant = _index.get("audio", {})
+	if t is Dictionary and (t as Dictionary).has(name):
+		return ROOT + str((t as Dictionary)[name])
+	return ""
+
+
 # 特效 strip: {tex, n, cw, ch, ax, ay}；冇圖回 {}
 static func fx(name: String) -> Dictionary:
 	_ensure()
