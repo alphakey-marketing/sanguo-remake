@@ -62,3 +62,9 @@
 - Z 序: 武器喺背向 (N/NE/NW 三行) 放身後，其餘身前；身 → 甲 → 髮。
 - `tools/compose_player.py compose(B,C,hair,armor,weapon)` → 8x8 sheet (cell 144x160, 原點 72,92 = 腳貼底)。importer 用默認款 (髮1/甲1/武1) 預疊 6 職 × 走/攻。
 - 未做：按玩家實際裝備動態換款 (需將各層 + 偏移匯出做運行時疊)。
+
+### 裝備外觀跟身 (2026-09-30)
+- importer `player` set: 匯出 288 張單層 sheet (`assets_orig/player/{B}_{C}_{kind}{style}.png`, 29MB)，index `player_layers` key `"B/C/kind/style"`；同 cell/原點可直接疊。
+- 每職 3 種武器類 × 3 階 = 9 款武器 (`style = 類序×3 + 階`，類序 = classes.json weapons 次序；階 by req_lv ≤50/≤92/其餘)；甲 = `1+min(5,req_lv/22)` (冇著 = 1)；髮 = 冇頭飾 1、有頭飾 `2+min(4,req_lv/33)`。**款式對應係按外觀/階數估，原版裝備→層碼表未搵到。**
+- `main.gd _draw_my_layers` 只用喺玩家本人；其他人形仍用預疊/池 sprite。動作 = 走 (C=1) / 攻擊 (C=2)。
+- `tests/ui_shot.gd` 加 `look_equip` 截圖。

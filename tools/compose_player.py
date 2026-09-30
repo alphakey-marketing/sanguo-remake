@@ -24,6 +24,19 @@ def layer(code):
     _load()
     return CP(_m.blob(_ix[code])) if code in _ix else None
 
+def single(code):
+    """單層 → 8x8 sheet (同 compose 一樣 cell/原點，可直接疊)"""
+    c = layer(code)
+    if c is None:
+        return None
+    sheet = Image.new("RGBA", (CW * 8, CH * 8), (0, 0, 0, 0))
+    for f in range(c.n):
+        im, _ = c.image(f)
+        cell = Image.new("RGBA", (CW, CH), (0, 0, 0, 0))
+        cell.alpha_composite(im, (OX + c.recs[f][0], OY + c.recs[f][1]))
+        sheet.alpha_composite(cell, ((f % 8) * CW, (f // 8) * CH))
+    return sheet
+
 def compose(B, C, hair=0, armor=0, weapon=1, weapon_front=None):
     _load()
     e = {1: ("3", "1"), 2: ("3", "1")}

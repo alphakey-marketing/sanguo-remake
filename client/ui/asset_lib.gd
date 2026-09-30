@@ -69,6 +69,11 @@ static func mount_sheet(breed: String) -> Texture2D:
 	return _tex("mount_S", breed)
 
 
+# 玩家分層 sheet: b=職業 1~6, c=動作 (1 走 2 攻), kind b/w/a/h
+static func player_layer(b: int, c: int, kind: String, style: int) -> Texture2D:
+	return _tex("player_layers", "%d/%d/%s/%d" % [b, c, kind, style])
+
+
 static func actor_sheet(sid: int, act: String) -> Texture2D:
 	return _tex("actor_" + act, sid)
 
