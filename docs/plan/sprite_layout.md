@@ -34,3 +34,10 @@
 - 缺嘅 sprite（野狗 30176、野豬 30177、惡虎 30173、山羊 30182、瘋貓 30183、狐貍 30170、花鹿 30178、野狼 30171、花豹 30172、大熊 30174、野牛 30179、戰狂 50083、孟獲魔化 57088）喺 mrg **完全冇**；只有 `Sound/sounds4.mrg` 有佢哋嘅音效 → 圖應由後期 patch（`patchlist.txt` 嘅 Data*.zip，本機冇）提供。
 - 有嘅動物 sprite 只有 30165~30169/30175/30181/30185/…（老鼠、雞等）。
 - 結論：要多覆蓋只能「揀相近現有 sprite 頂替」（要用家決定）或畫/用其他素材，唔係抽取問題。
+
+## A4c 落地（2026-09-30）
+- `sheets/` 底色係實心 (40,90,60) → 導入器 `_keyed_copy` 轉透明（怪物同人形都適用）。
+- 人形：`import_orig_assets.py --sets actor`：95 個 sprite；`_actor_by_name` 418 個名（Npc_Client.Dat @150，例：武將/NPC 同名）；冇專屬圖就按 role 由 `ACTOR_POOL`（civ_m/civ_f/soldier/elder，人手由 contact sheet 分類）決定性揀。
+- 玩家：暫時每職業一個佔位 sprite（`ACTOR_POOL.player`），因為 role1~12 疊層碼未解。
+- `main.gd`：所有 ent 追蹤方向/行走；`_draw_mon_sprite` 同時畫怪同人形；任務 NPC / 同伴武將用 `_draw_idle_actor`；冇圖 fallback 舊頭像/色塊。
+- 已知：坐騎/戰騎 (role9901~9905) 未接；名字比對係整名（同名多人取先出現者）。

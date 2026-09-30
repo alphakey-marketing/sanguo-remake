@@ -48,7 +48,7 @@
 - 46 隻現有怪（`monsters.json` 嘅 npc id → `CP_<id>{A,S,W}.png`）切幀成 `SpriteFrames`；`main.gd _draw` 紅方塊改 `AnimatedSprite`/`draw_texture_region`（依 tick 選幀、面向、攻擊/行走/站立）；boss/術法怪同套。
 - 驗收：46 隻怪覆蓋率；冇圖 fallback 色塊；戰鬥不卡（同屏 ≤ 50 怪 fps 量度）。
 
-### A4c — 玩家/NPC/居民/同伴 sprite
+### A4c — 玩家/NPC/居民/同伴 sprite 🟡 首批已做：人形 sprite 接玩家(每職佔位)/居民/武將/任務 NPC；玩家疊層未解
 - 玩家六職業用 `role1~12`（先確認邊個 role 係邊職/性別）；NPC/居民/武將用 `npc02~14`；同伴、座騎/戰騎（`role9901~9905`?）逐步接。**分批**：玩家 → 任務 NPC → 居民 → 座騎。
 - 驗收：建角揀職業即見對應 sprite；許昌城 NPC 唔再係色塊。
 

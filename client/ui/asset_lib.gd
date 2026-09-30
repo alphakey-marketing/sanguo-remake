@@ -63,6 +63,33 @@ static func mon_sheet(mob_def: int, act: String) -> Texture2D:
 	return _tex("mon_" + act, mob_def)
 
 
+# 人形 sprite (NPC/居民/武將/玩家): sheet 格式同怪物。sid = 原版 sprite id
+static func actor_sheet(sid: int, act: String) -> Texture2D:
+	return _tex("actor_" + act, sid)
+
+
+# 揀人形 sprite id: 名字有原版 sprite → 用；否則 role 對通用池 (按 seed 決定性揀)；0 = 冇圖
+static func actor_sid(npc_name: String, role := "", seed := 0, class_id := "") -> int:
+	_ensure()
+	var bn: Variant = _index.get("_actor_by_name", {})
+	if npc_name != "" and bn is Dictionary and (bn as Dictionary).has(npc_name):
+		return int((bn as Dictionary)[npc_name])
+	var pool: Variant = _index.get("_actor_pool", {})
+	if not (pool is Dictionary):
+		return 0
+	if class_id != "":
+		return int(((pool as Dictionary).get("player", {}) as Dictionary).get(class_id, 0))
+	var key := "civ_m"
+	match role:
+		"guard": key = "soldier"
+		"official": key = "elder"
+		"merchant", "stableman", "villager": key = "civ_f" if seed % 3 == 0 else "civ_m"
+	var arr: Array = (pool as Dictionary).get(key, [])
+	if arr.is_empty():
+		return 0
+	return int(arr[seed % arr.size()])
+
+
 # UI 皮件: panel / card / btn_n / btn_p / btn_d
 static func ui(key: String) -> Texture2D:
 	return _tex("ui", key)

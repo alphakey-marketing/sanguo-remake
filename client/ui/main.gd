@@ -191,8 +191,8 @@ func _mon_track(e: Dictionary) -> void:
 		var tab := {Vector2i(0, -1): 0, Vector2i(1, -1): 1, Vector2i(1, 0): 2, Vector2i(1, 1): 3, Vector2i(0, 1): 4, Vector2i(-1, 1): 5, Vector2i(-1, 0): 6, Vector2i(-1, -1): 7}
 		a["dir"] = tab.get(Vector2i(signi(dx), signi(dy)), a.dir)
 		a["move_until"] = t0 + 0.35
-	elif int(e.get("aggro", 0)) > 0 and ent_by_id.has(int(e.aggro)):
-		var t: Dictionary = ent_by_id[int(e.aggro)]
+	elif (int(e.get("aggro", 0)) > 0 or int(e.get("atkTarget", 0)) > 0) and ent_by_id.has(int(e.get("aggro", 0)) if int(e.get("aggro", 0)) > 0 else int(e.atkTarget)):
+		var t: Dictionary = ent_by_id[int(e.get("aggro", 0)) if int(e.get("aggro", 0)) > 0 else int(e.atkTarget)]
 		var tx := signi(int(t.x) - int(e.x))
 		var ty := signi(int(t.y) - int(e.y))
 		if tx != 0 or ty != 0:
@@ -201,26 +201,52 @@ func _mon_track(e: Dictionary) -> void:
 	a["y"] = e.y
 	_mon_anim[id] = a
 
-# 畫怪物動畫幀，冇 sheet 返回 false (呼叫方畫色塊)
+# 人形 sprite id 快取 (ent id -> sid；0 = 冇圖走舊頭像)
+var _actor_sid := {}
+
+func _sid_for(e: Dictionary) -> int:
+	var id := int(e.id)
+	if not _actor_sid.has(id):
+		var isme := id == my_id
+		_actor_sid[id] = AssetLib.actor_sid(str(e.get("name", "")), str(e.get("role", "")), id, str(ch.get("classId", "")) if isme else "")
+	return int(_actor_sid[id])
+
+# 畫動畫幀 (怪物用 mdef，人形用 actor sid)；冇 sheet 返回 false (呼叫方畫舊圖/色塊)
 func _draw_mon_sprite(e: Dictionary, p: Vector2) -> bool:
-	var md := int(e.get("mdef", 0))
+	var mob: bool = e.get("mob", false)
+	var sid := int(e.get("mdef", 0)) if mob else _sid_for(e)
+	if sid == 0:
+		return false
 	var a: Dictionary = _mon_anim.get(int(e.id), {})
 	var act := "S"
 	if t0 < float(a.get("move_until", 0.0)):
 		act = "W"
-	elif int(e.get("aggro", 0)) > 0:
+	elif int(e.get("aggro", 0)) > 0 or int(e.get("atkTarget", 0)) > 0:
 		act = "A"
-	var tex := AssetLib.mon_sheet(md, act)
+	var tex := AssetLib.mon_sheet(sid, act) if mob else AssetLib.actor_sheet(sid, act)
 	if tex == null:
-		tex = AssetLib.mon_sheet(md, "S")
+		tex = AssetLib.mon_sheet(sid, "S") if mob else AssetLib.actor_sheet(sid, "S")
 		if tex == null:
 			return false
 	var cw := tex.get_width() / 8
-	var ch := tex.get_height() / 8
-	var src := Rect2(int(t0 * 8.0) % 8 * cw, int(a.get("dir", 4)) * ch, cw, ch)
-	var sc := 0.42
-	var sz := Vector2(cw, ch) * sc
+	var ch_ := tex.get_height() / 8
+	var src := Rect2(int(t0 * 8.0) % 8 * cw, int(a.get("dir", 4)) * ch_, cw, ch_)
+	var sz := Vector2(cw, ch_) * 0.42
 	draw_texture_rect_region(tex, Rect2(p + Vector2(TILE * 0.5 - sz.x * 0.5, TILE - sz.y), sz), src)
+	return true
+
+# 靜止 NPC/武將: 面向鏡頭站立幀 (row 4)
+func _draw_idle_actor(name_: String, key: int, p: Vector2) -> bool:
+	if not _actor_sid.has(-key):
+		_actor_sid[-key] = AssetLib.actor_sid(name_, "", key)
+	var sid := int(_actor_sid[-key])
+	var tex := AssetLib.actor_sheet(sid, "S") if sid != 0 else null
+	if tex == null:
+		return false
+	var cw := tex.get_width() / 8
+	var ch_ := tex.get_height() / 8
+	var sz := Vector2(cw, ch_) * 0.42
+	draw_texture_rect_region(tex, Rect2(p + Vector2(TILE * 0.5 - sz.x * 0.5, TILE - sz.y), sz), Rect2(int(t0 * 8.0) % 8 * cw, 4 * ch_, cw, ch_))
 	return true
 
 func _refresh() -> void:
@@ -229,8 +255,7 @@ func _refresh() -> void:
 	ent_by_id.clear()
 	for e in ents:
 		ent_by_id[int(e.id)] = e
-		if e.get("mob", false):
-			_mon_track(e)
+		_mon_track(e)
 	ch = sim.player_ch()
 	quest_npcs = sim.view_quest_npcs()
 	generals = sim.view_generals()
@@ -1471,7 +1496,8 @@ func _draw() -> void:
 			if isme:
 				_draw_my_mount(p)                     # 座騎 (Step 17a): 騎緊 = 墊喺腳底，跟身 = 企隔籬
 			var f = faces[int(e.face) % faces.size()] if faces.size() > 0 else null
-			if f != null: draw_texture_rect(f, Rect2(p - Vector2(4, 8), Vector2(24, 26)), false)
+			if _draw_mon_sprite(e, p): pass
+			elif f != null: draw_texture_rect(f, Rect2(p - Vector2(4, 8), Vector2(24, 26)), false)
 			else: draw_rect(Rect2(p, Vector2(TILE, TILE)), Color.RED if isme else Color.ORANGE)
 			if isme: draw_rect(Rect2(p - Vector2(4, 8), Vector2(24, 26)), Color.YELLOW, false, 2.0)
 		var isgen: bool = e.get("gen", false)
@@ -1497,8 +1523,10 @@ func _draw() -> void:
 			continue
 		var qp := Vector2(int(qn.x), int(qn.y)) * TILE - cam
 		var qcol := Color(0.45, 0.75, 1.0) if not bool(qn.service) else Color(0.5, 1.0, 0.5)
-		draw_rect(Rect2(qp - Vector2(2, 2), Vector2(TILE + 4, TILE + 4)), qcol, false, 2.0)
-		draw_circle(qp + Vector2(TILE, TILE) * 0.5, 6, Color(0.1, 0.25, 0.45, 0.9))
+		var qnpc_art := _draw_idle_actor(str(qn.name), str(qn.name).hash() & 0xffff, qp)
+		if not qnpc_art:
+			draw_rect(Rect2(qp - Vector2(2, 2), Vector2(TILE + 4, TILE + 4)), qcol, false, 2.0)
+			draw_circle(qp + Vector2(TILE, TILE) * 0.5, 6, Color(0.1, 0.25, 0.45, 0.9))
 		_txt(qp + Vector2(-6, -20), "!" if not bool(qn.service) else "+", Color(1, 0.9, 0.3), 12)
 		_txt(qp + Vector2(-8, -32), str(qn.name), qcol, 11)
 	for gn in generals:                             # Tier1 武將 (Step 13.5): 框色 = 武將橙紅 / 文官金 (名唔加字，隔 3 格會撞)
@@ -1507,7 +1535,9 @@ func _draw() -> void:
 		var gp := Vector2(int(gn.x), int(gn.y)) * TILE - cam
 		var gcol := Color(1.0, 0.55, 0.35) if str(gn.type) == "wu" else Color(1.0, 0.82, 0.3)
 		var gf = faces[int(gn.id) % faces.size()] if faces.size() > 0 else null
-		if gf != null:
+		if _draw_idle_actor(str(gn.name), int(gn.id), gp):
+			pass
+		elif gf != null:
 			draw_texture_rect(gf, Rect2(gp - Vector2(4, 8), Vector2(24, 26)), false)
 		else:
 			draw_rect(Rect2(gp, Vector2(TILE, TILE)), Color(0.6, 0.45, 0.15))
