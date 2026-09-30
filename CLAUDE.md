@@ -157,7 +157,7 @@
 
 ## 14. 已知自動測試問題（跨 spec，一批過改）
 
-基線 `sh tools/run_tests.sh` = **SOME FAILED**（唔係全 PASS）。要修：
+基線 `sh tools/run_tests.sh` = **ALL OK**（2026-09-29）。以下三 leg 已修：
 
 | Leg | 問題 | 屬 spec | 狀態 |
 |---|---|---|---|
@@ -165,7 +165,7 @@
 | down | 復活丹 5 雜貨店判定「冇賣」6 fail（UAT-004/005）→ shop stock float bug + 逾時兜底 HP | 03 | ✅ 已修 (2026-09-29 run_tests ALL OK) |
 | ui_smoke | 建角 3（UAT-006~008 stale test，面板已改 2 頁）+ 卸下 1（UAT-009 疑未裝備）+ 掉落 2（UAT-010/011 疑誤判） | 01/02 | ✅ 已修 (2026-09-29 run_tests ALL OK) |
 
-**系統性 root cause**：JSON 整數陣列載入 Godot 變 **float**（`3.0`），令 `Array.has(int)`/`in` 判定錯。已喺 `sim_econ.shop_sells` 用 `float(item)` 繞過，但 `guard.is_patrol_time` 等冇。修正方向：統一 float-safe 比較 helper 或 JSON load 時轉 int。
+**系統性 root cause**：JSON 整數陣列載入 Godot 變 **float**（`3.0`），令 `Array.has(int)`/`in` 判定錯。已喺 `sim_econ.shop_sells`、`guard.is_patrol_time` 逐個 `int()`/`float()` 比較繞過。修正方向：統一 float-safe 比較 helper 或 JSON load 時轉 int。
 
 ---
 
