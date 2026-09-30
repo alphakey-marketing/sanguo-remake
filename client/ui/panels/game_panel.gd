@@ -165,6 +165,39 @@ func btn(text: String, cb: Callable, min_w := 0.0) -> Button:
 	return b
 
 
+# 道具圖示 (AssetLib, 冇圖返 null → 純文字 fallback)
+func item_icon_btn(b: Button, id: int, vertical := false) -> void:
+	var t := AssetLib.item_icon(id)
+	if t == null:
+		return
+	b.icon = t
+	b.expand_icon = false
+	if vertical:
+		b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
+	else:
+		b.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
+
+
+# 標題行: 大圖 (100px 縮 56) + 名，冇圖只出名
+func item_title(id: int, sz := 18) -> Control:
+	var t := AssetLib.item_icon(id, true)
+	if t == null:
+		return lbl(item_name(id), sz, UiTheme.GOLD)
+	var h := HBoxContainer.new()
+	h.add_theme_constant_override("separation", 8)
+	var r := TextureRect.new()
+	r.texture = t
+	r.custom_minimum_size = Vector2(56, 56)
+	r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	r.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	h.add_child(r)
+	var l := lbl(item_name(id), sz, UiTheme.GOLD)
+	l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	h.add_child(l)
+	return h
+
+
 func lbl(text: String, sz := UiTheme.FONT, col := UiTheme.TEXT) -> Label:
 	var l := Label.new()
 	l.text = text

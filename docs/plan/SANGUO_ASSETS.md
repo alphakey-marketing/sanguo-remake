@@ -29,7 +29,7 @@
 - 寫 `import_orig_assets.py` 骨架 + `asset_index.json` 格式 + `AssetLib` 帶 fallback。
 - 驗收：空 `assets_orig/` 遊戲行為同今日一樣；`--check` 過。
 
-### A2 — 道具圖示
+### A2 — 道具圖示 ✅ 2026-09-30（覆蓋 6024/6114，經 template 後備；背包/商店/配方/裝備欄已接）
 - 以 `Pic_item*` 檔名內嵌 item id（`10001a/b`，a/b 疑為兩尺寸/兩狀態——**先抽樣確認**）map 去 `items.json` id；轉入 `assets_orig/items/<id>.png`（統一 32×32 或原尺寸縮圖）。
 - 接 `bag_panel`/商店/裝備/背包/掉落物 icon；寶石 icon（`jewel.csv`）；報告缺圖 id 清單。
 - 驗收：覆蓋率報告（已配 N/6068）；bag/shop/equip 面板見圖；uitest + hud leg 過。

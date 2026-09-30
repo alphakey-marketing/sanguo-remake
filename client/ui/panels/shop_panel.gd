@@ -92,6 +92,7 @@ func _build_body() -> void:
 			qty = 1
 			refresh(true))
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		item_icon_btn(b, id)
 		b.toggle_mode = true
 		b.set_pressed_no_signal(sel == id)
 		if tab == 1 and main.quest_items.has(id):
@@ -105,7 +106,7 @@ func _build_detail(p: Control, ch: Dictionary) -> void:
 		p.add_child(lbl("揀一件貨品" if tab == 0 else "揀要賣嘅物品", 14, UiTheme.DIM))
 		return
 	var id := sel
-	p.add_child(lbl(item_name(id), 18, UiTheme.GOLD))
+	p.add_child(item_title(id))
 	for s in item_desc(id):
 		p.add_child(wrap_lbl(str(s), 13, UiTheme.DIM))
 	if tab == 0:

@@ -4,7 +4,7 @@ extends GamePanel
 # 裝備格紙娃娃睇 char_panel「裝備」頁 (U16: 拆走呢度重複嘅裝備列，避免兩個面板都有一份)。
 # 一切由玩家揀、玩家撳確認（冇「自動裝第一件」）。filter="spell" = 由空快捷格撳入嚟，只顯示術書。
 
-const CELL := 58.0
+const CELL := 70.0
 var sel := 0                  # 揀中物品 id（0 = 冇）
 var filter := ""
 var show_all_weapons := false
@@ -123,6 +123,7 @@ func _build_grid(parent: Control, items: Array) -> void:
 			sel = id
 			refresh(true), CELL)
 		cell.custom_minimum_size = Vector2(CELL, CELL)
+		item_icon_btn(cell, id, true)
 		cell.add_theme_font_size_override("font_size", 12)
 		cell.add_theme_color_override("font_color", _kind_color(id))
 		cell.toggle_mode = true
@@ -162,7 +163,7 @@ func _build_detail(p: Control, ch: Dictionary) -> void:
 		p.add_child(lbl("金 %d" % int(ch.get("gold", 0)), 15, Color(1, 0.9, 0.5)))
 		return
 	var d: GameData = main.data
-	p.add_child(lbl(item_name(sel), 18, UiTheme.GOLD))
+	p.add_child(item_title(sel))
 	var sc := scroll()
 	sc.custom_minimum_size.y = 60
 	var info := VBoxContainer.new()
