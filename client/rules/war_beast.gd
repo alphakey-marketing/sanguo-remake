@@ -252,9 +252,13 @@ static func has_effect(cfg: Dictionary, wb: Dictionary, effect: String) -> bool:
 
 # 背負: 背包負重上限倍率 (1.0 = 冇效果)；數值喺 cfg.friendEffects.bagCapacityPct
 static func bag_cap_mult(cfg: Dictionary, wb: Dictionary) -> float:
-	if not has_effect(cfg, wb, "bag_capacity"):
-		return 1.0
-	return 1.0 + float((cfg.get("friendEffects", {}) as Dictionary).get("bagCapacityPct", 0.5))
+	var fx := cfg.get("friendEffects", {}) as Dictionary
+	var m := 1.0
+	if has_effect(cfg, wb, "bag_capacity"):
+		m += float(fx.get("bagCapacityPct", 0.5))
+	if has_effect(cfg, wb, "carry_heavy"):      # 巨力 (長牙象 t1): 負重再加
+		m += float(fx.get("carryHeavyPct", 0.3))
+	return m
 
 
 # 聖體: 每刻自動回復倍率 (×2)；數值喺 cfg.friendEffects.regenMult
@@ -276,6 +280,30 @@ static func exp_mult(cfg: Dictionary, wb: Dictionary) -> float:
 	if not has_effect(cfg, wb, "double_exp_buff"):
 		return 1.0
 	return float((cfg.get("friendEffects", {}) as Dictionary).get("doubleExpMult", 2.0))
+
+
+# 飛影/狂力/開光: 主人屬性 +N (key = ch.attrs 嘅 str/agi/int/spi)；數值喺 cfg.friendEffects.attrPlus
+static func attr_plus(cfg: Dictionary, wb: Dictionary, k: String) -> int:
+	if wb.is_empty():
+		return 0
+	var n := int((cfg.get("friendEffects", {}) as Dictionary).get("attrPlus", 3))
+	match k:
+		"agi": return n if has_effect(cfg, wb, "agi_plus3") else 0
+		"str": return n if has_effect(cfg, wb, "str_plus3") else 0
+		"int", "spi": return n if has_effect(cfg, wb, "int_spi_plus3") else 0
+	return 0
+
+
+# 野性: 攻擊間隔倍率 (<1 = 更快；1.0 = 冇效果)；數值喺 cfg.friendEffects.atkSpeedPct
+static func atk_interval_mult(cfg: Dictionary, wb: Dictionary) -> float:
+	if not has_effect(cfg, wb, "atk_speed_buff"):
+		return 1.0
+	return 1.0 / (1.0 + float((cfg.get("friendEffects", {}) as Dictionary).get("atkSpeedPct", 0.25)))
+
+
+# 主動友好技 (奇門/脫出/召喚/神行/回城) 參數 {sp, cd, ticks?}；冇 = {}
+static func active_def(cfg: Dictionary, effect: String) -> Dictionary:
+	return ((cfg.get("friendEffects", {}) as Dictionary).get("actives", {}) as Dictionary).get(effect, {})
 
 
 # ================= 忠誠 / 交易 (Step 18c, spec 07 §8.5) =================

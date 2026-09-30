@@ -130,6 +130,13 @@ func _build_active(list: VBoxContainer, v: Dictionary) -> void:
 	if bool((wb["effects"] as Dictionary).get("tunnel_scroll", false)):
 		list.add_child(hsep())
 		list.add_child(btn("遁地返城", func() -> void: main._send({"t": "beast_teleport"})))
+	# 主動友好技 (奇門/脫出/召喚/神行/回城): 有學就出掣，SP/冷卻由 sim 檢查
+	var acts := {"stealth_noncombat": "奇門隱身", "maze_escape": "脫出迷宮", "summon_friend": "召喚同伴",
+		"haste_scroll": "神行", "return_scroll": "回城"}
+	for eff in acts:
+		if bool((wb["effects"] as Dictionary).get(eff, false)):
+			var eff_id: String = eff
+			list.add_child(btn(String(acts[eff]), func() -> void: main._send({"t": "beast_act", "effect": eff_id})))
 	# 賣出
 	list.add_child(hsep())
 	var sb := btn("賣出（%d 金）" % int(wb["sellPrice"]) if String(wb["sellWhy"]) == "" else String(wb["sellWhy"]),

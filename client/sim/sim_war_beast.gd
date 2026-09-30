@@ -104,6 +104,28 @@ func nearest_city_view(x: int, y: int) -> Dictionary:
 const BEAST_TELEPORT_CD := 200          # U13【自訂】遁地/地行 冷卻 (無限次但唔可以連續刷)
 
 
+# 主人 + 出戰戰騎即時傳送去最近城池中心；回城市名，"" = 附近冇城池 (遁地/地行/回城 共用)
+func _beast_warp_city(e: Dictionary) -> String:
+	var md := _nearest_city_map(map_id_at(int(e["x"]), int(e["y"])))
+	if md.is_empty():
+		return ""
+	var p := _city_anchor(md)
+	_put_ent(e, p.x, p.y)
+	e["atk_target"] = 0
+	e.erase("goto")
+	if e.has("casting"):
+		e.erase("casting")
+		_emit({"k": "cast_interrupted", "dst": int(e["id"]), "reason": "travel"})
+	var be := beast_ent(int(e["id"]))
+	if not be.is_empty():
+		var bp := _free_near(p.x, p.y)
+		_put_ent(be, bp.x, bp.y)
+		be["atk_target"] = 0
+	_emit({"k": "travel", "dst": int(e["id"]), "to": String(md["name"]), "x": e["x"], "y": e["y"],
+		"map": map_id_at(int(e["x"]), int(e["y"])), "station": false, "burrow": true})
+	return String(md["name"])
+
+
 # U13 遁地(niujiao_dundi)/地行(changya_dixing) 友好技: 主公 + 出戰戰騎即時傳送去最近城池中心，仿同伴「無限遁地」
 func cmd_beast_teleport(id: int) -> void:
 	var e := ent(id)
@@ -114,26 +136,123 @@ func cmd_beast_teleport(id: int) -> void:
 		return _msg(id, "戰騎未學遁地/地行")
 	if tick < int(ch.get("beastTeleportCd", 0)):
 		return _msg(id, "遁地冷卻緊 (%d tick 後)" % (int(ch["beastTeleportCd"]) - tick))
-	var cur := map_id_at(int(e["x"]), int(e["y"]))
-	var md := _nearest_city_map(cur)
-	if md.is_empty():
+	var city := _beast_warp_city(e)
+	if city == "":
 		return _msg(id, "附近冇城池可以遁地返去")
-	var p := _city_anchor(md)
-	_put_ent(e, p.x, p.y)
-	e["atk_target"] = 0
-	e.erase("goto")
-	if e.has("casting"):
-		e.erase("casting")
-		_emit({"k": "cast_interrupted", "dst": int(e["id"]), "reason": "travel"})
-	var be := beast_ent(id)
-	if not be.is_empty():
-		var bp := _free_near(p.x, p.y)
-		_put_ent(be, bp.x, bp.y)
-		be["atk_target"] = 0
 	ch["beastTeleportCd"] = tick + BEAST_TELEPORT_CD
-	_emit({"k": "travel", "dst": int(e["id"]), "to": String(md["name"]), "x": e["x"], "y": e["y"],
-		"map": map_id_at(int(e["x"]), int(e["y"])), "station": false, "burrow": true})
-	_msg(id, "戰騎遁地！返到%s" % String(md["name"]))
+	_msg(id, "戰騎遁地！返到%s" % city)
+
+
+# ================= 友好特技補齊 (spec 07 §8.4: 飛影/狂力/開光/野性/巨力/火焰/奇門/脫出/召喚/神行/回城) =================
+# 飛影/狂力/開光: 出戰戰騎令主人屬性 +N (全部經 _eff_attr，即攻/防/命中/迴避都跟)
+func _eff_attr(ch: Dictionary, k: String, ab: Dictionary = {}) -> float:
+	var v := super(ch, k, ab)
+	var wb := active_beast(ch)
+	if not wb.is_empty():
+		v += float(RulesWarBeast.attr_plus(_wbcfg(), wb, k))
+	return v
+
+
+# 野性: 主人攻擊間隔縮短 (最快仍 6 tick，同 RulesCombat.attack_interval)
+func _atk_interval_scale(e: Dictionary, base: int) -> int:
+	if not e.has("ch"):
+		return base
+	var wb := active_beast(e["ch"])
+	if wb.is_empty():
+		return base
+	var m := RulesWarBeast.atk_interval_mult(_wbcfg(), wb)
+	return base if m >= 1.0 else maxi(6, MathX.js_round(float(base) * m))
+
+
+# 神行: 限時移速 (行路格數/tick，騎馬取較快者)
+func _ride_steps(e: Dictionary) -> int:
+	var n := super(e)
+	if e.has("ch") and RulesSpell.has(e["ch"].get("status", {}), "beast_haste", tick):
+		var fx := _wbcfg().get("friendEffects", {}) as Dictionary
+		n = maxi(n, RulesMount.steps_at(float(fx.get("hasteMult", 1.5)), tick))
+	return n
+
+
+# 奇門: 隱身期間唔可以主動攻擊
+func cmd_attack(id: int, target: int) -> void:
+	var e := ent(id)
+	if not e.is_empty() and e.has("ch") and RulesSpell.has(e["ch"].get("status", {}), "qimen", tick):
+		return _msg(id, "奇門隱身中，唔可以攻擊")
+	super(id, target)
+
+
+# 主動友好技 gate: 已學 + 冷卻 + SP；回參數 {} = 唔准 (已 _msg)
+func _beast_act_gate(e: Dictionary, effect: String) -> Dictionary:
+	var id := int(e["id"])
+	if not _friend_effect_active(e, effect):
+		_msg(id, "戰騎未學呢招友好技")
+		return {}
+	var def := RulesWarBeast.active_def(_wbcfg(), effect)
+	if def.is_empty():
+		return {}
+	var ch: Dictionary = e["ch"]
+	var left := int((ch.get("beastActCd", {}) as Dictionary).get(effect, 0)) - tick
+	if left > 0:
+		_msg(id, "冷卻緊 (%d tick 後)" % left)
+		return {}
+	if int(ch["sp"]) < int(def["sp"]):
+		_msg(id, "SP 唔夠 (要 %d)" % int(def["sp"]))
+		return {}
+	return def
+
+
+func _beast_act_pay(e: Dictionary, effect: String, def: Dictionary) -> void:
+	var ch: Dictionary = e["ch"]
+	ch["sp"] = int(ch["sp"]) - int(def["sp"])
+	var cds: Dictionary = ch.get("beastActCd", {})
+	cds[effect] = tick + int(def["cd"])
+	ch["beastActCd"] = cds
+	_sync_stats(e)
+
+
+# 主動友好技: stealth_noncombat 奇門 / maze_escape 脫出 / summon_friend 召喚 / haste_scroll 神行 / return_scroll 回城
+func cmd_beast_act(id: int, effect: String) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0 or bool(e.get("down", false)):
+		return
+	var def := _beast_act_gate(e, effect)
+	if def.is_empty():
+		return
+	var ch: Dictionary = e["ch"]
+	match effect:
+		"stealth_noncombat":
+			var tk := int(def["ticks"])
+			RulesSpell.add_status(ch["status"], "stealth", tk, tick)
+			RulesSpell.add_status(ch["status"], "qimen", tk, tick)
+			e["atk_target"] = 0
+			_msg(id, "奇門遁甲！隱身 %d tick (期間唔可以攻擊)" % tk)
+		"haste_scroll":
+			RulesSpell.add_status(ch["status"], "beast_haste", int(def["ticks"]), tick)
+			_msg(id, "神行！移速提升 %d tick" % int(def["ticks"]))
+		"return_scroll":
+			var city := _beast_warp_city(e)
+			if city == "":
+				return _msg(id, "附近冇城池可以返")
+			_msg(id, "回城！返到%s" % city)
+		"maze_escape":
+			if e.has("battle"):
+				_battle_exit(e, "leave")
+			elif e.has("scene"):
+				_scene_exit(e, "leave")
+			else:
+				return _msg(id, "唔喺迷宮／戰役入面，用唔到脫出")
+			_msg(id, "脫出！離開迷宮")
+		"summon_friend":
+			var c := _companion_of(e)
+			if c.is_empty():
+				return _msg(id, "冇同伴可以召喚")
+			var p := _free_near(int(e["x"]), int(e["y"]))
+			_put_ent(c, p.x, p.y)
+			c["atk_target"] = 0
+			_msg(id, "召喚！%s即時趕到身邊" % String(c["name"]))
+		_:
+			return
+	_beast_act_pay(e, effect, def)
 
 
 # 霸王熊「背負」: 背包負重上限加成 (底 = world.dropped.capBagWeight + bagCapBonus)
@@ -403,6 +522,8 @@ func _apply_friend_passives(e: Dictionary) -> void:
 	if fx.is_empty():
 		return
 	var status: Dictionary = (e["ch"] as Dictionary).get("status", {})
+	if RulesSpell.has(status, "qimen", tick):
+		e["atk_target"] = 0
 	if bool(fx.get("armor_skill", false)):
 		RulesSpell.add_status(status, "armor1", RulesSpell.status_ticks("armor1"), tick)
 	if bool(fx.get("mirror_skill", false)):

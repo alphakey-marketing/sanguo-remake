@@ -36,6 +36,8 @@ func _init() -> void:
 	t_sim_skill_buff_debuff(data)
 	t_sim_friend_view(data)
 	t_auction(data)
+	t_friend_rest_rules(cfg)
+	t_friend_rest_sim(data)
 	print("[TEST] war_beast: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -721,3 +723,123 @@ func t_auction(data: GameData) -> void:
 	check(int(sim4._auction()["day"]) == int(sim._auction()["day"]), "存檔保留拍賣場")
 	sim4.state.erase("auction")
 	check((sim4.auction_view(int(sim4.state["player_id"]))["lots"] as Array).size() > 0, "舊存檔冇 auction → 即時生成")
+
+
+# ---- 友好技補齊 (飛影/狂力/開光/野性/巨力/火焰/奇門/脫出/召喚/神行/回城) ----
+func _learn_chain(sim: Sim, id: int, breed: String, upto: int) -> void:
+	var uid := int(sim._beasts(sim.player_ch())[0]["uid"])
+	var list: Array = sim.data.war_beasts["friendSkills"][breed]
+	for i in upto:
+		_learn(sim, id, uid, breed, String(list[i]["id"]))
+
+
+func t_friend_rest_rules(cfg: Dictionary) -> void:
+	var wb := RulesWarBeast.new_beast(cfg, "yanya", 1)
+	wb["friendPts"] = 999
+	for sk in ["yanya_huoyan", "yanya_feiying", "yanya_kuangli", "yanya_kaiguang"]:
+		RulesWarBeast.friend_train(cfg, wb, "yanya", sk)
+	check(RulesWarBeast.attr_plus(cfg, wb, "agi") == 3, "飛影 → 敏 +3")
+	check(RulesWarBeast.attr_plus(cfg, wb, "str") == 3, "狂力 → 武力 +3")
+	check(RulesWarBeast.attr_plus(cfg, wb, "int") == 3 and RulesWarBeast.attr_plus(cfg, wb, "spi") == 3, "開光 → 智 +3 靈 +3")
+	check(RulesWarBeast.attr_plus(cfg, wb, "pol") == 0, "政治唔受影響")
+	check(RulesWarBeast.attr_plus(cfg, {}, "agi") == 0, "冇戰騎 → 0")
+	var w2 := RulesWarBeast.new_beast(cfg, "shixue", 1)
+	check(RulesWarBeast.atk_interval_mult(cfg, w2) == 1.0, "未學野性 → 攻速 ×1")
+	w2["friendPts"] = 999
+	RulesWarBeast.friend_train(cfg, w2, "shixue", "shixue_xiuxue")
+	RulesWarBeast.friend_train(cfg, w2, "shixue", "shixue_yesheng")
+	check(is_equal_approx(RulesWarBeast.atk_interval_mult(cfg, w2), 0.8), "野性 → 攻擊間隔 ×0.8")
+	var w3 := RulesWarBeast.new_beast(cfg, "changya", 1)
+	w3["friendPts"] = 999
+	RulesWarBeast.friend_train(cfg, w3, "changya", "changya_juli")
+	check(is_equal_approx(RulesWarBeast.bag_cap_mult(cfg, w3), 1.3), "巨力 → 負重 ×1.3")
+	for e in ["stealth_noncombat", "maze_escape", "summon_friend", "haste_scroll", "return_scroll"]:
+		check(not RulesWarBeast.active_def(cfg, e).is_empty(), "主動友好技有參數: " + e)
+
+
+func t_friend_rest_sim(data: GameData) -> void:
+	# 飛影/狂力/開光: _eff_attr 經戰騎加成
+	var r := _adopt(data, 51, "yanya")
+	var sim: Sim = r[0]
+	var id: int = r[1]
+	var ch: Dictionary = r[2]
+	var agi0 := sim._eff_attr(ch, "agi")
+	var str0 := sim._eff_attr(ch, "str")
+	var int0 := sim._eff_attr(ch, "int")
+	_learn_chain(sim, id, "yanya", 4)
+	check(sim._eff_attr(ch, "agi") == agi0 + 3 and sim._eff_attr(ch, "str") == str0 + 3 and sim._eff_attr(ch, "int") == int0 + 3,
+		"sim: 飛影/狂力/開光 令主人屬性 +3")
+	check(bool(sim.beast_effects_view(id).get("light", false)), "火焰: view 透出 light (夜景照明)")
+	# 野性: 攻擊間隔
+	var r2 := _adopt(data, 52, "shixue")
+	var sim2: Sim = r2[0]
+	check(sim2._atk_interval_scale(sim2.ent(r2[1]), 20) == 20, "sim: 未學野性 → 間隔不變")
+	_learn_chain(sim2, r2[1], "shixue", 2)
+	check(sim2._atk_interval_scale(sim2.ent(r2[1]), 20) == 16, "sim: 野性 → 間隔 20 → 16")
+	check(sim2._atk_interval_scale(sim2.ent(r2[1]), 6) == 6, "sim: 野性 → 最快仍 6")
+	# 巨力
+	var r3 := _adopt(data, 53, "changya")
+	var sim3: Sim = r3[0]
+	var base := int(sim3.data.world["dropped"]["capBagWeight"])
+	_learn_chain(sim3, r3[1], "changya", 1)
+	check(sim3._bag_cap(r3[2]) == int(round(float(base) * 1.3)), "sim: 巨力 → 負重上限 ×1.3")
+	# 奇門
+	var r4 := _adopt(data, 54, "niujiao")
+	var sim4: Sim = r4[0]
+	var id4: int = r4[1]
+	var ch4: Dictionary = r4[2]
+	sim4.cmd_beast_act(id4, "stealth_noncombat")
+	check(not RulesSpell.has(ch4["status"], "qimen", sim4.tick), "未學奇門 → 用唔到")
+	_learn_chain(sim4, id4, "niujiao", 4)
+	ch4["sp"] = 999
+	sim4.cmd_beast_act(id4, "stealth_noncombat")
+	check(RulesSpell.has(ch4["status"], "stealth", sim4.tick) and RulesSpell.has(ch4["status"], "qimen", sim4.tick), "奇門 → 隱身狀態")
+	check(int(ch4["sp"]) < 999, "奇門消耗 SP")
+	var sp_after := int(ch4["sp"])
+	sim4.cmd_beast_act(id4, "stealth_noncombat")
+	check(int(ch4["sp"]) == sp_after, "奇門冷卻中 → 唔再扣 SP")
+	sim4.init_mobs()
+	sim4._spawn_mob(1001)
+	var mob_id := 0
+	for e in sim4.ents.values():
+		if e["kind"] == "mob":
+			mob_id = int(e["id"])
+			break
+	sim4.cmd_attack(id4, mob_id)
+	check(int(sim4.ent(id4).get("atk_target", 0)) == 0, "奇門隱身中 → 唔可以攻擊")
+	sim4.state["tick"] = sim4.tick + 400
+	sim4.cmd_attack(id4, mob_id)
+	check(int(sim4.ent(id4).get("atk_target", 0)) == mob_id, "奇門過期 → 可以攻擊")
+	# 疾風狼四招: 脫出/召喚/神行/回城
+	var r5 := _adopt(data, 55, "jifeng")
+	var sim5: Sim = r5[0]
+	var id5: int = r5[1]
+	var ch5: Dictionary = r5[2]
+	_learn_chain(sim5, id5, "jifeng", 4)
+	ch5["sp"] = 999
+	sim5.cmd_beast_act(id5, "maze_escape")
+	check(int(ch5["sp"]) == 999, "脫出: 唔喺迷宮/戰役 → 拒絕且唔扣 SP")
+	sim5.cmd_beast_act(id5, "summon_friend")
+	check(int(ch5["sp"]) == 999, "召喚: 冇同伴 → 拒絕且唔扣 SP")
+	var pe := sim5.ent(id5)
+	var c: Dictionary = sim5._spawn_companion(pe, data.generals[0])
+	ch5["recruit"] = {"comp": int(c["id"])}
+	_put(sim5, int(c["id"]), int(pe["x"]) + 12, int(pe["y"]))
+	sim5.cmd_beast_act(id5, "summon_friend")
+	var cd := maxi(absi(int(c["x"]) - int(pe["x"])), absi(int(c["y"]) - int(pe["y"])))
+	check(cd <= 2 and int(ch5["sp"]) < 999, "召喚: 同伴即時趕到身邊 + 扣 SP")
+	sim5.cmd_beast_act(id5, "haste_scroll")
+	check(RulesSpell.has(ch5["status"], "beast_haste", sim5.tick), "神行 → 加速狀態")
+	var steps := 0
+	for t in 10:
+		sim5.state["tick"] = sim5.tick + 1
+		steps += sim5._ride_steps(pe)
+	check(steps == 15, "神行 ×1.5 → 10 tick 行 15 格 (實際 %d)" % steps)
+	_put(sim5, id5, 30, 30)
+	var expect_md: Dictionary = sim5._nearest_city_map(sim5.map_id_at(30, 30))
+	sim5.cmd_beast_act(id5, "return_scroll")
+	if expect_md.is_empty():
+		check(true, "回城: 附近冇城池 (跳過位置檢查)")
+	else:
+		var ap: Vector2i = sim5._city_anchor(expect_md)
+		check(int(pe["x"]) == ap.x and int(pe["y"]) == ap.y, "回城 → 傳返最近城池中心")

@@ -190,7 +190,7 @@ func _think_player(p: Dictionary) -> void:
 	var w: Dictionary = _mount_weapon_wdef(ch) if mounted_combat else _weapon_def(ch)     # 耐久 0 = 威力減半 (Step 12)
 	var jb := _jewel_bonus(ch)                 # 每下出手計一次 (唔用 RNG)
 	var ab := _armor_bonus(ch)
-	p["next_atk"] = tick + RulesCombat.attack_interval(_eff_attr(ch, "agi", ab))
+	p["next_atk"] = tick + _atk_interval_scale(p, RulesCombat.attack_interval(_eff_attr(ch, "agi", ab)))
 	# 輔助石命中率 % (effect 13) (Step 10, spec 02 §4)
 	var base_hit := RulesCombat.hit_chance(w["hit"], int(ch["level"]), int(t["level"]))
 	var hit := base_hit + float(jb.get("hitPct", 0.0))
