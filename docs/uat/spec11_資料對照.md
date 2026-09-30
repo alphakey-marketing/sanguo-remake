@@ -140,3 +140,6 @@
 - 🟡 B5 warbtl：跟 Spec 10，Spec 10 未定就唔做
 - 🟡 B6 怪物逃跑 sprite：歸入素材替換批次
 - ⏳ 待用家：箭矢入商店貨單、cat 250 其餘 5xx 道具、首次彈窗教程
+- ✅ 箭矢入貨單：5 間武器店加低階箭（鐵箭/鋼箭/木箭/十等箭）；襄陽/宛城/汝南再加獸骨箭～八等箭（待用家手測）
+- ✅ cat 250 其餘 5xx：確認延後
+- ✅ 首次開面板自動彈簡介：`rules/help_intro.gd` + `GamePanel._maybe_intro` + `cmd_help_seen`（`ch.helpSeen` 記低，只彈一次；待用家手測）
