@@ -47,3 +47,11 @@
 - 真馬圖 = `sheets/npc02/CP_123001~5S` (5 款披甲馬, 8x8, cell 159x169)。`imp_mount` 按毛色將 6 馬種對應 5 款 (`MOUNT_MAP`)，index `mount_S` (key=馬種)。
 - `main.gd _draw_my_mount` 有圖畫 sprite (row4, 0.3 倍)，冇就用舊色塊。
 - 戰騎 (war_beasts 10 種) 原版無對應 sprite，仍用舊 fallback。
+
+## A4c 玩家分層 sprite 解碼 (2026-09-30)
+- role1~12 檔名 7 位碼 `A B C D E F G`：`B` = 職業體型 (1~6 = 義士M/士女F/道士M/舞女F/辯士M/美女F)，`E` 同 role 目錄對應動作組，`D` = 層 (1 身體 / 2 武器 / 3 髮 / 4 甲)。
+- 身體 `CP_1{B}{C}1300`：C=1 走路 (cell 62x91, 8x8)、C=2 攻擊、C=3 小圖、C=4 大招。裸身+褲。
+- 其餘層 (武器/髮/甲) cell 大細唔同，冇偏移表，未疊合。
+- 已做：`imp_actor` 加 6 職身體 (sid 91001~91006，S/W=走路、A=攻擊)，`_actor_pool.player` 指向佢；玩家已顯示。
+- 未做：裝備/髮疊層 (需偏移，要再研究)。
+- importer 單跑 `--sets x` 而家會合併舊索引，唔再覆寫。
