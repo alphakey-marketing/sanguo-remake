@@ -7,6 +7,21 @@ extends RefCounted
 # 隨機數由 caller 傳入 (SimRng)，呢度唔擲骰
 
 
+# 毛色: 按品種 color (RGB) 揀最近嘅色名；冇 color 當灰
+static func coat_name(cfg: Dictionary, breed: String) -> String:
+	var c: Array = breed_def(cfg, breed).get("color", [0.5, 0.5, 0.5])
+	var refs := {"黑": [0.1, 0.1, 0.12], "棕": [0.6, 0.42, 0.22], "黃": [0.9, 0.78, 0.3], "紅": [0.8, 0.25, 0.2], "灰": [0.55, 0.55, 0.58], "白": [0.94, 0.94, 0.96]}
+	var best := "灰"
+	var bd := 99.0
+	for k in refs:
+		var r: Array = refs[k]
+		var d := pow(float(c[0]) - r[0], 2) + pow(float(c[1]) - r[1], 2) + pow(float(c[2]) - r[2], 2)
+		if d < bd:
+			bd = d
+			best = k
+	return best + "色"
+
+
 static func breed_def(cfg: Dictionary, breed: String) -> Dictionary:
 	for b in cfg["breeds"]:
 		if String(b["id"]) == breed:

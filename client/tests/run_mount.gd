@@ -717,6 +717,11 @@ func t_breed_sim(data: GameData) -> void:
 	check(_last(msgs).contains("身孕"), "已懷孕唔畀再配")
 	sim.cmd_mount_breed_bet(id, uid, 0)
 	check(int(m["preg"]["taiqi"]) == 1, "落注: 胎氣 +1")
+	var lastb: Dictionary = m["preg"].get("last", {})
+	check(int(lastb.get("n", 0)) == 1 and int(lastb["choice"]) == 0 and lastb.has("outcome"), "落注: 記低跑馬燈結果")
+	var mv: Dictionary = (sim.mount_view(id)["list"] as Array)[0]
+	check(String(mv["coat"]).ends_with("色") and (mv["color"] as Array).size() == 3 and int(mv["preg"]["last"]["n"]) == 1, "座騎 view: 毛色 + 色塊 + 跑馬燈結果")
+	check(RulesMount.coat_name(cfg, "zhongyuan") == "白色" and RulesMount.coat_name(cfg, "dawan") == "紅色" and RulesMount.coat_name(cfg, "wusun") == "黑色", "毛色名按品種色")
 	sim.cmd_mount_breed_lazy(id, uid, true)
 	check(bool(m["preg"]["lazy"]), "懶人胎教開關")
 	m["preg"]["taiqi"] = int(cfg["breed"]["taiqiNeed"])          # 直接催熟去 claim 流程
