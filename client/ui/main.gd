@@ -57,6 +57,7 @@ var potion_slots: Array = [0, 0, 0]   # U-fix: 快捷補品欄 3 格，存 item 
 var sshot_file := ""             # --sshot: 開場幾秒後截圖存 user:// 退出
 var ch := {}                      # 玩家角色狀態 (sim 內同一個 Dictionary)
 var item_names := {}              # id -> 名 (items.json)
+var fxs := []                     # 特效 {name, pos(世界px), age, scale}
 var floats := []                  # 傷害數字 {pos, text, color, age}
 var log_lines := []
 var exp_start := -1
@@ -306,7 +307,11 @@ func _refresh() -> void:
 	for e in ents:
 		ent_by_id[int(e.id)] = e
 		_mon_track(e)
+	var lv0 := int(ch.get("level", 0))
 	ch = sim.player_ch()
+	if lv0 > 0 and int(ch.get("level", 0)) > lv0:
+		var me0 = _me()
+		if me0 != null: _fx_add("levelup", Vector2(me0.x, me0.y), 0.6)
 	quest_npcs = sim.view_quest_npcs()
 	generals = sim.view_generals()
 	comp = sim.companion_view()
@@ -382,6 +387,8 @@ func _process(delta: float) -> void:
 		_save_current()
 	for f in floats: f.age += delta
 	floats = floats.filter(func(f): return f.age < 1.0)
+	for f in fxs: f.age += delta
+	fxs = fxs.filter(func(f): return f.age < 1.2)
 	var me = _me()
 	if autotest and me != null: _autotest_step(me)
 	if autotest and t0 > 60.0:
@@ -623,6 +630,7 @@ func _on_event(e: Dictionary) -> void:
 				var dmg: int = int(e.dmg)
 				floats.append({"pos": Vector2(d.x, d.y) * TILE, "text": "miss" if dmg == 0 else str(dmg),
 					"color": Color.YELLOW if int(e.dst) == my_id else Color.WHITE, "age": 0.0})
+				if dmg > 0: _fx_add("hit", Vector2(d.x, d.y), 0.4)
 		"spell_hit":
 			var d2 = _ent(int(e.dst))
 			if d2 != null:
@@ -630,6 +638,7 @@ func _on_event(e: Dictionary) -> void:
 				floats.append({"pos": Vector2(d2.x, d2.y) * TILE,
 					"text": ("miss" if dmg2 == 0 else str(dmg2)) + " " + String(ELEM_TAG.get(str(e.elem), "")),
 					"color": Color(1, 0.45, 1.0) if int(e.dst) == my_id else Color(0.85, 0.45, 0.95), "age": 0.0})
+				_fx_add("spell", Vector2(d2.x, d2.y), 0.5)
 		"cast_start":
 			if int(e.src) == my_id:
 				_log("開始吟唱 %s…" % item_names.get(int(e.book), str(e.book)))
@@ -668,6 +677,7 @@ func _on_event(e: Dictionary) -> void:
 			if d3 != null:
 				floats.append({"pos": Vector2(d3.x, d3.y) * TILE, "text": str(int(e.dmg)),
 					"color": Color(1, 0.35, 0.1), "age": 0.0})
+				_fx_add("ult", Vector2(d3.x, d3.y), 0.5)
 		"fusion":
 			if int(e.src) == my_id:
 				match str(e.get("state", "")):
@@ -780,6 +790,8 @@ func _on_event(e: Dictionary) -> void:
 		"heal":
 			if int(e.dst) == my_id:
 				_log("密醫幫你醫治，回復 %d HP" % int(e.hp))
+				var me = _ent(my_id)
+				if me != null: _fx_add("heal", Vector2(me.x, me.y), 0.5)
 		"unlock_open":                        # S02c 開鎖小遊戲: sim 搵到附近鎖寶箱 -> 開揀鑰匙面板
 			if int(e.dst) == my_id and hud != null:
 				_unlock_chest = int(e.get("chest", 0))
@@ -1593,6 +1605,7 @@ func _draw() -> void:
 			draw_rect(Rect2(gp, Vector2(TILE, TILE)), Color(0.6, 0.45, 0.15))
 		draw_rect(Rect2(gp - Vector2(5, 9), Vector2(26, 28)), gcol, false, 2.0)
 		_txt(gp + Vector2(-4, -12), str(gn.name), gcol, 11)
+	_draw_fxs(cam)
 	for f in floats:
 		var fp: Vector2 = f.pos - cam + Vector2(2, -20 - 24 * f.age)
 		_txt(fp, f.text, f.color, 14)
@@ -1601,6 +1614,24 @@ func _draw() -> void:
 		var k := float(marker["t"])
 		draw_arc(mc, 4.0 + 10.0 * k, 0, TAU, 24, Color(1, 0.9, 0.4, k), 2.0)
 	_draw_banner(vs)
+
+# 特效: 12fps 播一次；冇素材就唔畫
+func _fx_add(name: String, tile_pos: Vector2, sc: float = 0.5) -> void:
+	if fxs.size() < 24 and not AssetLib.fx(name).is_empty():
+		fxs.append({"name": name, "pos": tile_pos * TILE + Vector2(TILE, TILE) * 0.5, "age": 0.0, "scale": sc})
+
+func _draw_fxs(cam: Vector2) -> void:
+	for f in fxs:
+		var m := AssetLib.fx(str(f.name))
+		var n := int(m.get("n", 0))
+		var i := int(float(f.age) * 12.0)
+		if n == 0 or i >= n:
+			continue
+		var sc: float = f.scale
+		var cw := int(m.cw)
+		var ch_ := int(m.ch)
+		var org: Vector2 = f.pos - cam - Vector2(float(m.ax), float(m.ay)) * sc
+		draw_texture_rect_region(m.tex, Rect2(org, Vector2(cw, ch_) * sc), Rect2(i * cw, 0, cw, ch_))
 
 # 座騎佔位圖 (色塊 = 品種顏色；成品前換 sprite)
 func _draw_my_mount(p: Vector2) -> void:
