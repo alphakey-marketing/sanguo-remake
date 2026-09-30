@@ -224,16 +224,25 @@ def imp_actor(src, idx):
                 rel = f"actor/{sid}{a}.png"
                 _keyed_copy(f, os.path.join(OUT, rel))
                 out[a][str(sid)] = rel
-    # 玩家職業身體: role1 分層 sheet CP_1{B}{C}1300 (B=1..6 對應 6 職, C=1 走路 / 2 攻擊; 裸身+褲, 未疊裝備層)
+    # 玩家職業: role1 分層 sheet 疊合 (身體+甲+髮+武器, 默認款), 見 tools/compose_player.py
+    #   sid 91001~91006 = 義士/士女/道士/舞女/辯士/美女; S/W=走路 (C=1), A=攻擊 (C=2)
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    import compose_player
     PBODY = {"yishi": 1, "shinu": 2, "daoshi": 3, "wunu": 4, "bianshi": 5, "meinu": 6}
     ACTOR_POOL["player"] = {}
     for cid, b in PBODY.items():
         sid = 91000 + b
+        cache = {}
         for a, c in (("S", 1), ("W", 1), ("A", 2)):
-            f = os.path.join(src, "sheets", "role1", f"CP_1{b}{c}1300.CP.png")
-            if os.path.exists(f):
+            if c not in cache:
+                try:
+                    cache[c] = compose_player.compose(b, c, hair=1, armor=1, weapon=1)
+                except Exception as ex:
+                    print("警告: 玩家疊合失敗", cid, c, ex)
+                    cache[c] = None
+            if cache[c] is not None:
                 rel = f"actor/{sid}{a}.png"
-                _keyed_copy(f, os.path.join(OUT, rel))
+                cache[c].save(os.path.join(OUT, rel))
                 out[a][str(sid)] = rel
         ACTOR_POOL["player"][cid] = sid
     for a in "ASW":
