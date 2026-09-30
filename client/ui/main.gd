@@ -178,12 +178,59 @@ func _ready() -> void:
 		if sh != null:
 			add_child(sh.new())
 
+# 怪物動畫狀態 (客戶端推算): 位置變 = 行走 + 面向；aggro 且未郁 = 攻擊；否則站立
+var _mon_anim := {}
+
+func _mon_track(e: Dictionary) -> void:
+	var id := int(e.id)
+	var a: Dictionary = _mon_anim.get(id, {"x": e.x, "y": e.y, "dir": 4, "move_until": 0.0})
+	var dx := int(e.x) - int(a.x)
+	var dy := int(e.y) - int(a.y)
+	if dx != 0 or dy != 0:
+		# 順時針 N,NE,E,SE,S,SW,W,NW = 0..7
+		var tab := {Vector2i(0, -1): 0, Vector2i(1, -1): 1, Vector2i(1, 0): 2, Vector2i(1, 1): 3, Vector2i(0, 1): 4, Vector2i(-1, 1): 5, Vector2i(-1, 0): 6, Vector2i(-1, -1): 7}
+		a["dir"] = tab.get(Vector2i(signi(dx), signi(dy)), a.dir)
+		a["move_until"] = t0 + 0.35
+	elif int(e.get("aggro", 0)) > 0 and ent_by_id.has(int(e.aggro)):
+		var t: Dictionary = ent_by_id[int(e.aggro)]
+		var tx := signi(int(t.x) - int(e.x))
+		var ty := signi(int(t.y) - int(e.y))
+		if tx != 0 or ty != 0:
+			a["dir"] = {Vector2i(0, -1): 0, Vector2i(1, -1): 1, Vector2i(1, 0): 2, Vector2i(1, 1): 3, Vector2i(0, 1): 4, Vector2i(-1, 1): 5, Vector2i(-1, 0): 6, Vector2i(-1, -1): 7}.get(Vector2i(tx, ty), a.dir)
+	a["x"] = e.x
+	a["y"] = e.y
+	_mon_anim[id] = a
+
+# 畫怪物動畫幀，冇 sheet 返回 false (呼叫方畫色塊)
+func _draw_mon_sprite(e: Dictionary, p: Vector2) -> bool:
+	var md := int(e.get("mdef", 0))
+	var a: Dictionary = _mon_anim.get(int(e.id), {})
+	var act := "S"
+	if t0 < float(a.get("move_until", 0.0)):
+		act = "W"
+	elif int(e.get("aggro", 0)) > 0:
+		act = "A"
+	var tex := AssetLib.mon_sheet(md, act)
+	if tex == null:
+		tex = AssetLib.mon_sheet(md, "S")
+		if tex == null:
+			return false
+	var cw := tex.get_width() / 8
+	var ch := tex.get_height() / 8
+	var src := Rect2(int(t0 * 8.0) % 8 * cw, int(a.get("dir", 4)) * ch, cw, ch)
+	var sc := 0.42
+	var sz := Vector2(cw, ch) * sc
+	draw_texture_rect_region(tex, Rect2(p + Vector2(TILE * 0.5 - sz.x * 0.5, TILE - sz.y), sz), src)
+	return true
+
 func _refresh() -> void:
 	_dirty = false
 	ents = sim.view_ents()
 	ent_by_id.clear()
 	for e in ents:
 		ent_by_id[int(e.id)] = e
+		if e.get("mob", false):
+			_mon_track(e)
 	ch = sim.player_ch()
 	quest_npcs = sim.view_quest_npcs()
 	generals = sim.view_generals()
@@ -1418,7 +1465,8 @@ func _draw() -> void:
 			_txt(p + Vector2(-2, 4), "×%d" % n, Color(1, 0.95, 0.6), 11)
 			continue
 		if ismob:
-			draw_rect(Rect2(p, Vector2(TILE, TILE)), Color(0.8, 0.25, 0.2))    # 怪物色塊
+			if not _draw_mon_sprite(e, p):
+				draw_rect(Rect2(p, Vector2(TILE, TILE)), Color(0.8, 0.25, 0.2))    # 怪物色塊 (冇原版動畫圖)
 		else:
 			if isme:
 				_draw_my_mount(p)                     # 座騎 (Step 17a): 騎緊 = 墊喺腳底，跟身 = 企隔籬

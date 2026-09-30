@@ -47,6 +47,18 @@ func _run() -> void:
 	m.target_id = -1
 	await frames(20)
 	await shot("hud_shop_near")
+	# A4b: 怪物動畫 (有原版圖先有 sprite；冇就紅色塊)
+	var me: Dictionary = m.sim.ent(m.my_id)
+	var k := 0
+	for did in [1001, 12003, 1003, 12005, 12017, 12034]:
+		var mb: Variant = m.sim._spawn_mob(did)
+		if mb != null:
+			mb["x"] = int(me["x"]) + 2 + k * 2 % 8
+			mb["y"] = int(me["y"]) - 2 + k / 4 * 3
+			k += 1
+	m._refresh()
+	await frames(10)
+	await shot("mobs")
 	hud.bag_panel().open_filter("")
 	var bp: BagPanel = hud.panels["bag"]
 	bp.sel = 10002

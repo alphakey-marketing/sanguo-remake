@@ -58,6 +58,11 @@ static func face_by_name(npc_name: String) -> Texture2D:
 	return null
 
 
+# 怪物動畫 sheet: act = "A" 攻擊 / "S" 站立 / "W" 行走；8 列(方向 N,NE,E,SE,S,SW,W,NW 順時針) x 8 欄(幀)。冇圖 = null
+static func mon_sheet(mob_def: int, act: String) -> Texture2D:
+	return _tex("mon_" + act, mob_def)
+
+
 # UI 皮件: panel / card / btn_n / btn_p / btn_d
 static func ui(key: String) -> Texture2D:
 	return _tex("ui", key)
