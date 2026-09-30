@@ -259,6 +259,8 @@ func _build_storage(left: Control, right: Control, ch: Dictionary) -> void:
 	if not sub:
 		right.add_child(wrap_lbl("訂閱之後可以喺任何地方存/攞材料同代賣。", 14, UiTheme.DIM))
 		return
+	var fee := int(main.data.world.get("storageFee", 200))
+	left.add_child(wrap_lbl("日費 %d 金／日（子時自動扣，現有 %d 金；唔夠錢自動退訂）" % [fee, int(ch.get("gold", 0))], 13, UiTheme.DIM))
 	var st: Array = ch.get("storage", [])
 	_build_grid(left, st)
 	var n := 0
