@@ -59,6 +59,7 @@ var ch := {}                      # 玩家角色狀態 (sim 內同一個 Diction
 var item_names := {}              # id -> 名 (items.json)
 const AudioBus = preload("res://ui/audio_bus.gd")
 var audio = AudioBus.new()
+const FX_ENABLED := false          # 原版特效效果不佳，暫停用 (素材/掛鉤保留，改 true 可恢復)
 var fxs := []                     # 特效 {name, pos(世界px), age, scale}
 var bubbles := []                # 對話氣球 {id, text, age}
 var floats := []                  # 傷害數字 {pos, text, color, age}
@@ -1662,7 +1663,7 @@ func _draw() -> void:
 
 # 特效: 12fps 播一次；冇素材就唔畫
 func _fx_add(name: String, tile_pos: Vector2, sc: float = 0.5) -> void:
-	if fxs.size() < 24 and not AssetLib.fx(name).is_empty():
+	if FX_ENABLED and fxs.size() < 24 and not AssetLib.fx(name).is_empty():
 		fxs.append({"name": name, "pos": tile_pos * TILE + Vector2(TILE, TILE) * 0.5, "age": 0.0, "scale": sc})
 
 func _draw_fxs(cam: Vector2) -> void:
