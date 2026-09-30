@@ -73,7 +73,9 @@
      "y0": 5,
      "x1": 96,
      "y1": 22,
-     "work": ["farming"]
+     "work": [
+      "farming"
+     ]
     },
     {
      "name": "許昌北郊",
@@ -88,7 +90,9 @@
      "y0": 26,
      "x1": 56,
      "y1": 62,
-     "work": ["hunting"]
+     "work": [
+      "hunting"
+     ]
     },
     {
      "name": "東山丘林",
@@ -96,7 +100,10 @@
      "y0": 26,
      "x1": 110,
      "y1": 50,
-     "work": ["woodcutting", "mining"]
+     "work": [
+      "woodcutting",
+      "mining"
+     ]
     },
     {
      "name": "潁水南岸",
@@ -104,7 +111,10 @@
      "y0": 51,
      "x1": 110,
      "y1": 82,
-     "work": ["fishing", "herbalism"]
+     "work": [
+      "fishing",
+      "herbalism"
+     ]
     },
     {
      "name": "潁水渡口",
@@ -112,7 +122,9 @@
      "y0": 63,
      "x1": 56,
      "y1": 82,
-     "work": ["fishing"]
+     "work": [
+      "fishing"
+     ]
     }
    ]
   },
@@ -255,7 +267,9 @@
      "y0": 2,
      "x1": 94,
      "y1": 16,
-     "work": ["mining"]
+     "work": [
+      "mining"
+     ]
     },
     {
      "name": "汝水渡",
@@ -263,7 +277,9 @@
      "y0": 2,
      "x1": 50,
      "y1": 37,
-     "work": ["fishing"]
+     "work": [
+      "fishing"
+     ]
     },
     {
      "name": "汝南道",
@@ -319,7 +335,10 @@
      "y0": 0,
      "x1": 28,
      "y1": 49,
-     "work": ["woodcutting", "mining"]
+     "work": [
+      "woodcutting",
+      "mining"
+     ]
     },
     {
      "name": "淯水",
@@ -327,7 +346,9 @@
      "y0": 0,
      "x1": 38,
      "y1": 49,
-     "work": ["fishing"]
+     "work": [
+      "fishing"
+     ]
     },
     {
      "name": "淯水田莊",
@@ -335,7 +356,10 @@
      "y0": 20,
      "x1": 92,
      "y1": 40,
-     "work": ["farming", "herbalism"]
+     "work": [
+      "farming",
+      "herbalism"
+     ]
     },
     {
      "name": "宛城道",
@@ -360,7 +384,10 @@
      "y0": 0,
      "x1": 95,
      "y1": 16,
-     "work": ["woodcutting", "hunting"]
+     "work": [
+      "woodcutting",
+      "hunting"
+     ]
     },
     {
      "name": "博望坡",
@@ -368,7 +395,9 @@
      "y0": 17,
      "x1": 95,
      "y1": 44,
-     "work": ["mining"]
+     "work": [
+      "mining"
+     ]
     },
     {
      "name": "新野北郊",
@@ -376,7 +405,10 @@
      "y0": 45,
      "x1": 95,
      "y1": 69,
-     "work": ["farming", "herbalism"]
+     "work": [
+      "farming",
+      "herbalism"
+     ]
     }
    ]
   },
@@ -426,7 +458,9 @@
      "y0": 0,
      "x1": 66,
      "y1": 49,
-     "work": ["fishing"]
+     "work": [
+      "fishing"
+     ]
     },
     {
      "name": "白河田莊",
@@ -434,7 +468,10 @@
      "y0": 30,
      "x1": 88,
      "y1": 44,
-     "work": ["farming", "herbalism"]
+     "work": [
+      "farming",
+      "herbalism"
+     ]
     }
    ]
   },
@@ -483,7 +520,9 @@
      "y0": 40,
      "x1": 30,
      "y1": 52,
-     "work": ["farming"]
+     "work": [
+      "farming"
+     ]
     }
    ]
   },
@@ -725,7 +764,10 @@
      "y0": 3,
      "x1": 60,
      "y1": 20,
-     "work": ["woodcutting", "herbalism"]
+     "work": [
+      "woodcutting",
+      "herbalism"
+     ]
     },
     {
      "name": "隴畝",
@@ -733,7 +775,10 @@
      "y0": 34,
      "x1": 42,
      "y1": 46,
-     "work": ["farming", "herbalism"]
+     "work": [
+      "farming",
+      "herbalism"
+     ]
     }
    ]
   },
@@ -1206,7 +1251,7 @@
      "x1": 16,
      "y1": 13
     }
-    ]
+   ]
   }
  ],
  "landmarks": [
