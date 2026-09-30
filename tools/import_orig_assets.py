@@ -84,7 +84,7 @@ def _find(src, d, name):
             return os.path.join(base, f)
     raise FileNotFoundError(f"{d}/{name}")
 
-def _blank_button(path, cap=18):
+def _blank_button(path, cap=10):
     """原版掣字燒死喺圖入面 → 保留左右 cap 像素邊框，中間用 cap 內一條直欄橫向拉闊 (去字)，做成 9-slice 空白掣。"""
     from PIL import Image
     im = Image.open(path).convert("RGBA")
@@ -92,8 +92,22 @@ def _blank_button(path, cap=18):
     out = Image.new("RGBA", (cap * 2 + 8, h))
     out.paste(im.crop((0, 0, cap, h)), (0, 0))
     out.paste(im.crop((w - cap, 0, w, h)), (cap + 8, 0))
-    col = im.crop((cap + 3, 0, cap + 4, h)).resize((8, h))
-    out.paste(col, (cap, 0))
+    # 中間填色: 每行取內部「淺色 (羊皮紙)」像素中位數 (排除燒死嘅墨字)，再垂直平滑 → 無字無橫紋
+    px = im.load()
+    rows = []
+    for y in range(h):
+        v = [px[x, y] for x in range(cap + 2, w - cap - 2) if px[x, y][3] > 200 and sum(px[x, y][:3]) > 420]
+        rows.append(tuple(sorted(c[i] for c in v)[len(v) // 2] for i in range(3)) if len(v) > 6 else None)
+    for y in range(h):
+        if rows[y] is None:
+            rows[y] = next((rows[k] for d in range(1, h) for k in (y - d, y + d) if 0 <= k < h and rows[k]), (200, 170, 110))
+    sm = []
+    for y in range(h):
+        nb = [rows[k] for k in range(max(0, y - 2), min(h, y + 3))]
+        sm.append(tuple(sum(c[i] for c in nb) // len(nb) for i in range(3)) + (255,))
+    for y in range(h):
+        for x in range(cap, cap + 8):
+            out.putpixel((x, y), sm[y])
     return out
 
 def imp_ui(src, idx):
