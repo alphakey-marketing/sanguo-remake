@@ -142,10 +142,13 @@ func t_import_vectors(data: GameData) -> void:
 		check(not targets.is_empty(), "導入: CSV %d (%s) 有怪用緊" % [mid, f[1]])
 		for d in targets:
 			var actual: Array = []
+			var supp: Array = []          # 補充掉落 (D1: 寶石/技能書/能力石) 唔喺 CSV，比對時略過
+			for sv in d.get("suppDrops", []):
+				supp.append(int(sv))
 			for x in d.get("drops", []):
-				actual.append([int(x["item"]), float(x["p"])])
+				if not supp.has(int(x["item"])): actual.append([int(x["item"]), float(x["p"])])
 			for x in d.get("rareDrops", []):
-				actual.append([int(x["item"]), float(x["p"])])
+				if not supp.has(int(x["item"])): actual.append([int(x["item"]), float(x["p"])])
 			var ok := actual.size() == exp_pair.size()
 			if ok:
 				for i in actual.size():
@@ -163,8 +166,11 @@ func t_import_vectors(data: GameData) -> void:
 		for x in boss.get("drops", []):
 			bd.append([int(x["item"]), float(x["p"])])
 		var br: Array = []
+		var bsupp: Array = []
+		for sv in boss.get("suppDrops", []):
+			bsupp.append(int(sv))
 		for x in boss.get("rareDrops", []):
-			br.append([int(x["item"]), float(x["p"])])
+			if not bsupp.has(int(x["item"])): br.append([int(x["item"]), float(x["p"])])
 		check(bd == BOSS_DROPS and br == BOSS_RARE, "導入: boss 掉落硬編碼對照")
 	check(bool(boss.get("flee", true)) == false, "導入: boss flee=false (唔會逃跑)")
 	check(bool(boss.get("boss", false)) == true, "導入: boss 標記每日重生")
