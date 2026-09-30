@@ -217,6 +217,7 @@ func step() -> void:
 			mv = _ride_steps(e)       # 騎馬: 移速 ×1.5~2 (Step 17a, spec 07 §7)
 		if e["kind"] == "bot" and (bool(e.get("fleePk", false)) or bool(e.get("huntedByGuard", false))) and tick % 2 == 1:
 			mv = 0                    # 打人模式/S03a 逃跑 + 捕快追緊嘅紅名: 行慢啲 (2 tick 行 1 格)，等玩家/捕快追得返 (spec 03 §3 + 自訂)
+		mv = _walk_scale(e, mv)      # 全體步行速度 ×walkStepRate (預設 0.5 = 慢一半)，小數累積喺 e.mvAcc
 		var moved := false
 		var moved_n := 0
 		for _k in mv:
@@ -432,3 +433,15 @@ static func _intify(v: Variant) -> Variant:
 			a.append(_intify(x))
 		return a
 	return v
+
+
+# 步行速度縮放 (UAT 用家 confirm: 玩家/NPC/同伴/怪物全體慢一半)；騎乘倍數喺 mv 內已計，呢度統一乘 rate。
+# 小數步數累積入 e.mvAcc (決定性，冇 RNG)。walkStepRate=1 = 唔縮放。
+func _walk_scale(e: Dictionary, mv: int) -> int:
+	var rate := float(data.world.get("walkStepRate", 1.0))
+	if rate >= 1.0 or mv <= 0:
+		return mv
+	var acc := float(e.get("mvAcc", 0.0)) + float(mv) * rate
+	var n := int(floor(acc + 0.0001))
+	e["mvAcc"] = acc - float(n)
+	return n

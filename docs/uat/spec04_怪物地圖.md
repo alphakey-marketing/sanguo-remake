@@ -12,6 +12,13 @@
 - **掉落拾取** = UAT-010/011（用家手測無問題→疑誤判，待核實）。
 - `gen_battles.py`/`gen_scenes.py` `--check` 未接入 `run_tests.sh` → 待補。
 
+## ✅ 2026-09-29 更新（用家 2026-09-26 已確認項，待手測）
+- **#1 移動速度慢一半**：`world.json walkStepRate=0.5`；`sim.gd _walk_scale` 全體（玩家/NPC/同伴/怪物）步數 ×0.5，小數累積 `mvAcc`。騎乘倍數照乘。舊測試（走路/騎馬/路徑）已按新速度調整。設 1 = 還原。
+- **#2 跑奔力加大**：`mounts.json runSpeed 0.005 → 0.01`（跑奔力 100：×2.0 → ×2.5；相對步行約 2.5 倍）。數值可調。
+- **#3 桃花渡/七彩入口**：靜態查證 **七彩門 (44,34) 係 `b` = 橋（walk=true，非 blocked）**，同起點連通、NPC 3 格內有 31 個可行格 → 「blocked」推測不成立，**未能重現**。仍受日曆（初一~三/十五~十七）+ 等級（桃花 75+/七彩 70+）gate，唔達標 dialog 冇「進入」掣。需用家提供重現步驟（日期/等級/位置）。
+- `gen_battles.py`/`gen_scenes.py` `--check` 已接入 `tools/run_tests.sh`。
+- 掉落拾取 UAT-010/011：ui_smoke 已 PASS（見 CLAUDE.md §14），維持用家手測無問題。
+
 ---
 
 ## ⚠️ 本 session 用家 feedback（2026-09-26，記低待一次過改，暫時未改 code）

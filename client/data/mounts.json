@@ -50,7 +50,7 @@
     "intimacy": [[80, 2], [60, 1], [45, 0], [0, -1]], "recoverBase": 5, "recoverPerStamina": 0.2, "plagueLife": 20},
   "_noteRide": "騎乘移速【原=+50%，奔跑力調】= rideSpeed + run × runSpeed (倍數)；每行 N 格疲勞 +1，N = rideTiles + 體力 × rideTilesPerStamina",
   "rideSpeed": 1.5,
-  "runSpeed": 0.005,
+  "runSpeed": 0.01,
   "rideTiles": 20,
   "rideTilesPerStamina": 0.3,
   "_noteGraze": "放牧【原=一個時辰、爆發力影響結果、馴馬專用哨】；機率/成長/疲勞【自訂】。成長值夠 growNeed → 優秀值 +1、生命力 +2、1 點分配 (學習力加成成長值)",

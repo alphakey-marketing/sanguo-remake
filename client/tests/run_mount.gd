@@ -234,7 +234,7 @@ func t_ride_pure(cfg: Dictionary) -> void:
 	m["attrs"]["run"] = 0
 	check(is_equal_approx(RulesMount.ride_mult(cfg, m), 1.5), "移速 +50%【原】")
 	m["attrs"]["run"] = 100
-	check(is_equal_approx(RulesMount.ride_mult(cfg, m), 2.0), "奔跑力 100 → ×2")
+	check(is_equal_approx(RulesMount.ride_mult(cfg, m), 2.5), "奔跑力 100 → ×2.5")
 	for mult in [1.0, 1.5, 1.75, 2.0]:
 		var sum := 0
 		for t in 100:
@@ -438,17 +438,17 @@ func t_ride(data: GameData) -> void:
 	var oy := int(md["oy"])
 	_put(sim, id, ox + 6, oy + 27)
 	sim.cmd_move(id, ox + 64, oy + 27)
-	for i in 20:
+	for i in 40:
 		sim.step()
 	var ride_dx := int(sim.ent(id)["x"]) - (ox + 6)
 	sim.cmd_mount_ride(id, false)
 	check(not sim.is_riding(ch), "落馬")
 	_put(sim, id, ox + 6, oy + 27)
 	sim.cmd_move(id, ox + 64, oy + 27)
-	for i in 20:
+	for i in 40:
 		sim.step()
 	var walk_dx := int(sim.ent(id)["x"]) - (ox + 6)
-	check(walk_dx == 20 and ride_dx >= 34 and ride_dx <= 40, "騎馬 20 tick 行 %d 格 (行路 %d)" % [ride_dx, walk_dx])
+	check(walk_dx == 20 and ride_dx >= 34 and ride_dx <= 40, "騎馬 40 tick 行 %d 格 (行路 %d)" % [ride_dx, walk_dx])
 	check(int(m["fatigue"]) >= 1, "騎住行會攰")
 	# 騎到頭暈 → 自動落馬
 	sim.cmd_mount_ride(id, true)
@@ -851,7 +851,7 @@ func t_battle_sim(data: GameData) -> void:
 	sim2.cmd_mount_skill_learn(id2, "jian_zhongji")   # 重擊 (aoe)
 	sim2.cmd_mount_ride(id2, true)
 	sim2.cmd_goto_map(id2, "field_1")
-	for i in 50:
+	for i in 300:
 		sim2.step()
 	var base_steps := sim2._ride_steps(sim2.ent(id2))
 	sim2.cmd_mount_skill_use(id2, "jian_jiben")
