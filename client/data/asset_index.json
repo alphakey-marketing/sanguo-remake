@@ -14881,6 +14881,14 @@
 "27008": "mon/20147W.png",
 "27248": "mon/20076W.png"
 },
+"mount_S": {
+"damo": "mount/123001S.png",
+"dawan": "mount/123005S.png",
+"huangbiao": "mount/123003S.png",
+"shenshan": "mount/123002S.png",
+"wusun": "mount/123004S.png",
+"zhongyuan": "mount/123001S.png"
+},
 "ui": {
 "btn_d": "ui/btn_d.png",
 "btn_n": "ui/btn_n.png",

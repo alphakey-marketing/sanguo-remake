@@ -41,3 +41,9 @@
 - 玩家：暫時每職業一個佔位 sprite（`ACTOR_POOL.player`），因為 role1~12 疊層碼未解。
 - `main.gd`：所有 ent 追蹤方向/行走；`_draw_mon_sprite` 同時畫怪同人形；任務 NPC / 同伴武將用 `_draw_idle_actor`；冇圖 fallback 舊頭像/色塊。
 - 已知：坐騎/戰騎 (role9901~9905) 未接；名字比對係整名（同名多人取先出現者）。
+
+## A4c 座騎 (2026-09-30)
+- role9901~9905 **唔係坐騎**：係龍/蝶/鶴/人形變身特效層 (7 位碼分層)，未用。
+- 真馬圖 = `sheets/npc02/CP_123001~5S` (5 款披甲馬, 8x8, cell 159x169)。`imp_mount` 按毛色將 6 馬種對應 5 款 (`MOUNT_MAP`)，index `mount_S` (key=馬種)。
+- `main.gd _draw_my_mount` 有圖畫 sprite (row4, 0.3 倍)，冇就用舊色塊。
+- 戰騎 (war_beasts 10 種) 原版無對應 sprite，仍用舊 fallback。

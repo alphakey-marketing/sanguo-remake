@@ -64,6 +64,11 @@ static func mon_sheet(mob_def: int, act: String) -> Texture2D:
 
 
 # 人形 sprite (NPC/居民/武將/玩家): sheet 格式同怪物。sid = 原版 sprite id
+# 座騎 sheet (8x8, row4 面向鏡頭); key = 馬種 id
+static func mount_sheet(breed: String) -> Texture2D:
+	return _tex("mount_S", breed)
+
+
 static func actor_sheet(sid: int, act: String) -> Texture2D:
 	return _tex("actor_" + act, sid)
 
