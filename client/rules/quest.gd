@@ -5,7 +5,7 @@ extends RefCounted
 # 數值/對話全部喺 data/quests.json + data/quest_npcs.json，呢度只做邏輯。
 
 const QUEST_TYPES := ["newbie", "general", "official", "history", "ultimate", "group", "battle", "expert", "marry", "service"]
-const STAGE_TYPES := ["talk", "talk_n", "repeat", "collect", "ask", "facility", "fight"]
+const STAGE_TYPES := ["talk", "talk_n", "repeat", "collect", "ask", "facility", "fight", "chest"]
 const QUEST_ITEM_CATS := [44, 52]          # 任務雜物 / 任務物品 (spec 06 §1.2: 61501 田鼠碎骨等)
 const HINT_VARS := ["%v", "%n"]            # hint 內 %v=目前進度 %n=需要數量
 const ATTR_KEYS := ["str", "agi", "int", "spi", "pol", "cha"]
@@ -35,7 +35,7 @@ static func validate(data: GameData) -> Array:
 			if not STAGE_TYPES.has(t):
 				errs.append("%s.s%d: stage type 唔啱 (%s)" % [id, si, t])
 				continue
-			if t == "talk" or t == "repeat" or t == "fight":
+			if t == "talk" or t == "repeat" or t == "fight" or t == "chest":
 				if not data.quest_npcs.has(String(st.get("npc", ""))):
 					errs.append("%s.s%d: npc 唔存在 (%s)" % [id, si, st.get("npc", "")])
 			if t == "talk_n":
@@ -425,6 +425,18 @@ static func on_fight_win(data: GameData, ch: Dictionary, q: Dictionary) -> Dicti
 		return out
 	for ti in stage.get("takeItems", []):      # 出兵令之類: 打贏先收 (召喚時已 check 過有)
 		RulesShop.remove_item(ch["bag"], int(ti[0]), int(ti[1]))
+	return _advance(data, ch, q, st, stage, out)
+
+
+# 開鎖打開任務寶箱 (chest stage, S2-2; cmd_skill_pick 開到帶 quest 標記嘅寶箱時由 sim 調用):
+static func on_chest_open(data: GameData, ch: Dictionary, q: Dictionary) -> Dictionary:
+	var out := {"changed": false, "done": false, "msg": "", "reward": {}, "dialog": []}
+	var st: Dictionary = ch.get("quests", {}).get(String(q["id"]), {})
+	if st.is_empty() or bool(st.get("done", false)):
+		return out
+	var stage := _stage(q, int(st.get("stage", 0)))
+	if stage.is_empty() or String(stage.get("type", "")) != "chest":
+		return out
 	return _advance(data, ch, q, st, stage, out)
 
 

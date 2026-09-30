@@ -1394,7 +1394,11 @@ func _draw() -> void:
 			var lx := int(e.get("castX", int(e.x)))
 			var ly := int(e.get("castY", int(e.y)))
 			if mr.has_point(Vector2i(lx, ly)):
-				draw_circle(Vector2(lx, ly) * TILE - cam + Vector2(TILE, TILE) * 0.5, float(TILE) * 1.35, Color(1.0, 0.38, 0.28, 0.28))
+				var cc := Vector2(lx, ly) * TILE - cam + Vector2(TILE, TILE) * 0.5
+				var cr := float(TILE) * 1.35
+				draw_circle(cc, cr, Color(1.0, 0.38, 0.28, 0.18))
+				draw_circle(cc, cr * clampf(float(e.get("castProg", 0.0)), 0.05, 1.0), Color(1.0, 0.25, 0.15, 0.35))   # 漸滿: 由內向外填
+				draw_arc(cc, cr, 0.0, TAU, 32, Color(1.0, 0.3, 0.2, 0.8), 2.0)
 			draw_rect(Rect2(p - Vector2(2, 2), Vector2(TILE + 4, TILE + 4)), Color(1.0, 0.5, 0.4), false, 2.0)
 		if e.get("dropped", false):                     # S04a 地面掉落物: 小袋圖示 + 件數
 			draw_rect(Rect2(p + Vector2(4, 12), Vector2(16, 10)), Color(0.85, 0.7, 0.35))
