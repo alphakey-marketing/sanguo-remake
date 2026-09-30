@@ -60,6 +60,7 @@ var item_names := {}              # id -> 名 (items.json)
 const AudioBus = preload("res://ui/audio_bus.gd")
 var audio = AudioBus.new()
 var fxs := []                     # 特效 {name, pos(世界px), age, scale}
+var bubbles := []                # 對話氣球 {id, text, age}
 var floats := []                  # 傷害數字 {pos, text, color, age}
 var log_lines := []
 var exp_start := -1
@@ -391,6 +392,8 @@ func _process(delta: float) -> void:
 		last_save_tick = sim.tick
 		_save_current()
 	for f in floats: f.age += delta
+	for b in bubbles: b.age += delta
+	bubbles = bubbles.filter(func(b): return b.age < 4.0)
 	floats = floats.filter(func(f): return f.age < 1.0)
 	for f in fxs: f.age += delta
 	fxs = fxs.filter(func(f): return f.age < 1.2)
@@ -773,6 +776,8 @@ func _on_event(e: Dictionary) -> void:
 			if int(e.dst) == my_id:
 				var qname := String(e.quest)
 				var dlg: Array = e.get("dialog", [])
+				if not dlg.is_empty():
+					_bubble_add(str(e.get("speaker", "")), str(dlg[0]))
 				if not dlg.is_empty() and hud != null and not autotest and not uitest:
 					_show_quest_dialog(str(e.get("speaker", "")), dlg)
 				if bool(e.get("started", false)):
@@ -907,6 +912,25 @@ func _death_report(e: Dictionary) -> String:
 		lines.append("還魂丹令你復活返客棧（消耗 1）")
 	lines.append("每件裝備耐久扣 10%%")
 	return "\n".join(lines)
+
+
+# 任務對話氣球: 掛喺講者 NPC 頭頂 (搵唔到同名 = 掛玩家)；4 秒
+func _bubble_add(speaker: String, line: String) -> void:
+	var t := line
+	var i := t.find("：")
+	if i >= 0 and i < 8:
+		t = t.substr(i + 1)
+	t = t.replace("「", "").replace("」", "")
+	if t.length() > 26:
+		t = t.substr(0, 25) + "…"
+	var tid := my_id
+	if speaker != "":
+		for en in ents:
+			if str(en.get("name", "")) == speaker:
+				tid = int(en.id)
+				break
+	bubbles = bubbles.filter(func(b): return b.id != tid)
+	bubbles.append({"id": tid, "text": t, "age": 0.0})
 
 
 func _show_quest_dialog(speaker: String, dlg: Array) -> void:
@@ -1619,6 +1643,14 @@ func _draw() -> void:
 		draw_rect(Rect2(gp - Vector2(5, 9), Vector2(26, 28)), gcol, false, 2.0)
 		_txt(gp + Vector2(-4, -12), str(gn.name), gcol, 11)
 	_draw_fxs(cam)
+	for b in bubbles:
+		var be = _ent(int(b.id))
+		if be == null: continue
+		var bw := float(b.text.length()) * 11.0 + 12.0
+		var bp: Vector2 = Vector2(be.x, be.y) * TILE - cam + Vector2(TILE * 0.5 - bw * 0.5, -46)
+		draw_rect(Rect2(bp, Vector2(bw, 20)), Color(1, 1, 0.92, 0.94))
+		draw_rect(Rect2(bp, Vector2(bw, 20)), Color(0.25, 0.2, 0.1), false, 1.0)
+		_txt(bp + Vector2(6, 15), b.text, Color(0.1, 0.08, 0.02), 11)
 	for f in floats:
 		var fp: Vector2 = f.pos - cam + Vector2(2, -20 - 24 * f.age)
 		_txt(fp, f.text, f.color, 14)
