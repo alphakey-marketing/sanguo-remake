@@ -57,6 +57,8 @@ var potion_slots: Array = [0, 0, 0]   # U-fix: 快捷補品欄 3 格，存 item 
 var sshot_file := ""             # --sshot: 開場幾秒後截圖存 user:// 退出
 var ch := {}                      # 玩家角色狀態 (sim 內同一個 Dictionary)
 var item_names := {}              # id -> 名 (items.json)
+const AudioBus = preload("res://ui/audio_bus.gd")
+var audio = AudioBus.new()
 var fxs := []                     # 特效 {name, pos(世界px), age, scale}
 var floats := []                  # 傷害數字 {pos, text, color, age}
 var log_lines := []
@@ -91,6 +93,9 @@ var cur_slot := 0                  # U-fix: 0 = 用返 AUTOSLOT（原有行為�
 var awaiting_slot_pick := false     # U-fix: 開場等緊玩家喺「選擇角色」揀 slot，未有真正角色（唔好自動存/唔理輸入）
 
 func _ready() -> void:
+	add_child(audio)
+	if not uitest and not autotest:
+		audio.play_bgm("bgm_town")
 	UiTheme.install_font()   # embed CJK 字形，HUD/panel 中文先顯示到（Web/iOS 唔使睇 browser fallback）
 	autotest = "--autotest" in OS.get_cmdline_user_args()
 	uitest = "--uitest" in OS.get_cmdline_user_args() or "--uishot" in OS.get_cmdline_user_args()
@@ -630,7 +635,8 @@ func _on_event(e: Dictionary) -> void:
 				var dmg: int = int(e.dmg)
 				floats.append({"pos": Vector2(d.x, d.y) * TILE, "text": "miss" if dmg == 0 else str(dmg),
 					"color": Color.YELLOW if int(e.dst) == my_id else Color.WHITE, "age": 0.0})
-				if dmg > 0: _fx_add("hit", Vector2(d.x, d.y), 0.4)
+				if dmg > 0:
+					_fx_add("hit", Vector2(d.x, d.y), 0.4)
 		"spell_hit":
 			var d2 = _ent(int(e.dst))
 			if d2 != null:
