@@ -161,9 +161,9 @@
 
 | Leg | 問題 | 屬 spec | 狀態 |
 |---|---|---|---|
-| guard | 城捕快 spawn 14 fail（UAT-001~003）→ `guard.gd` float bug（`patrolShichen` 載入變 `3.0`）+ `add_guards` 只限有客棧城 | 03 | ❌ |
-| down | 復活丹 5 雜貨店判定「冇賣」6 fail（UAT-004/005）→ shop stock float bug + 逾時兜底 HP | 03 | ❌ |
-| ui_smoke | 建角 3（UAT-006~008 stale test，面板已改 2 頁）+ 卸下 1（UAT-009 疑未裝備）+ 掉落 2（UAT-010/011 疑誤判） | 01/02 | ❌（stale test 更新） |
+| guard | 城捕快 spawn 14 fail（UAT-001~003）→ `guard.gd` float bug（`patrolShichen` 載入變 `3.0`）+ `add_guards` 只限有客棧城 | 03 | ✅ 已修 (2026-09-29 run_tests ALL OK) |
+| down | 復活丹 5 雜貨店判定「冇賣」6 fail（UAT-004/005）→ shop stock float bug + 逾時兜底 HP | 03 | ✅ 已修 (2026-09-29 run_tests ALL OK) |
+| ui_smoke | 建角 3（UAT-006~008 stale test，面板已改 2 頁）+ 卸下 1（UAT-009 疑未裝備）+ 掉落 2（UAT-010/011 疑誤判） | 01/02 | ✅ 已修 (2026-09-29 run_tests ALL OK) |
 
 **系統性 root cause**：JSON 整數陣列載入 Godot 變 **float**（`3.0`），令 `Array.has(int)`/`in` 判定錯。已喺 `sim_econ.shop_sells` 用 `float(item)` 繞過，但 `guard.is_patrol_time` 等冇。修正方向：統一 float-safe 比較 helper 或 JSON load 時轉 int。
 
