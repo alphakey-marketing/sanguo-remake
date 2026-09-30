@@ -14,6 +14,10 @@
 - **未做（待用家決定）**：6b 許昌地圖加大——試過手郁 .txt 易整爛世界（邊界/傳送/runan_road 相爭位），**留專責 task 手砌**。許昌 52×72 另有 1593 可行格，散開後已好闊。
 - **未完**：四~六招絕招、左慈渾天儀任務、國戰專長。
 
+## 2026-09-29 核實
+
+- 已做核實：collect 提示填數字、答錯 NPC 回應彈窗+信息欄、任務對話 DialogBox 彈窗、死亡報全入信息欄。許昌加大仍留專責 task。
+
 ## ✅ 已修復（UAT 揩 feedback 後改嘅）
 - 練兵場新手任務：獎勵由「歷練 +10」改做「exp +30」（`quests.json` `newbie_training`；對應測試 `run_quest.gd` 已更新）
 - 絕招任務答題：答錯會 block 住（原有框架已保證，加咗端到端驗證）；答對/答錯依家都會彈 NPC 回應對話（DialogBox），唔淨止信息欄一句（`rules/quest.gd on_answer` 加 `response`/`wrong`，已落全部 9 條 ask stage）
