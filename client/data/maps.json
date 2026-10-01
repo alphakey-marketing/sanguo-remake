@@ -1270,6 +1270,108 @@
    "cityOf": "xuchang"
   },
   {
+   "id": "xc1928",
+   "name": "許昌·許昌外圍28",
+   "ox": 342,
+   "oy": 2005,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc1928",
+   "cityOf": "xuchang",
+   "spawn": [
+    79,
+    56,
+    79,
+    56
+   ],
+   "orphan": true
+  },
+  {
+   "id": "xc1851",
+   "name": "許昌·許昌洞穴一",
+   "ox": 0,
+   "oy": 1872,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc1851",
+   "cityOf": "xuchang",
+   "spawn": [
+    75,
+    56,
+    75,
+    56
+   ],
+   "orphan": true
+  },
+  {
+   "id": "xc1852",
+   "name": "許昌·許昌洞穴二",
+   "ox": 171,
+   "oy": 1872,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc1852",
+   "cityOf": "xuchang",
+   "spawn": [
+    69,
+    56,
+    69,
+    56
+   ],
+   "orphan": true
+  },
+  {
+   "id": "xc1853",
+   "name": "許昌·許昌洞穴三",
+   "ox": 342,
+   "oy": 1872,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc1853",
+   "cityOf": "xuchang",
+   "spawn": [
+    75,
+    56,
+    75,
+    56
+   ],
+   "orphan": true
+  },
+  {
+   "id": "xc1854",
+   "name": "許昌·許昌洞穴四",
+   "ox": 0,
+   "oy": 2005,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc1854",
+   "cityOf": "xuchang",
+   "spawn": [
+    75,
+    56,
+    75,
+    56
+   ],
+   "orphan": true
+  },
+  {
+   "id": "xc1855",
+   "name": "許昌·許昌洞穴五",
+   "ox": 171,
+   "oy": 2005,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc1855",
+   "cityOf": "xuchang",
+   "spawn": [
+    75,
+    56,
+    75,
+    56
+   ],
+   "orphan": true
+  },
+  {
    "id": "xc1901",
    "name": "許昌·官宅",
    "ox": 121,
@@ -1277,13 +1379,13 @@
    "safe": true,
    "kind": "house",
    "orig": "xc1901",
+   "cityOf": "xuchang",
    "spawn": [
     71,
     38,
     71,
     38
-   ],
-   "cityOf": "xuchang"
+   ]
   },
   {
    "id": "xc1902",
@@ -1293,13 +1395,13 @@
    "safe": true,
    "kind": "house",
    "orig": "xc1902",
+   "cityOf": "xuchang",
    "spawn": [
     71,
     40,
     71,
     40
-   ],
-   "cityOf": "xuchang"
+   ]
   },
   {
    "id": "xc1903",
@@ -1309,13 +1411,13 @@
    "safe": true,
    "kind": "house",
    "orig": "xc1903",
+   "cityOf": "xuchang",
    "spawn": [
     36,
     34,
     36,
     34
-   ],
-   "cityOf": "xuchang"
+   ]
   },
   {
    "id": "xc1904",
@@ -1325,13 +1427,13 @@
    "safe": true,
    "kind": "house",
    "orig": "xc1904",
+   "cityOf": "xuchang",
    "spawn": [
     46,
     26,
     46,
     26
-   ],
-   "cityOf": "xuchang"
+   ]
   },
   {
    "id": "xc1905",
@@ -1341,13 +1443,13 @@
    "safe": true,
    "kind": "house",
    "orig": "xc1905",
+   "cityOf": "xuchang",
    "spawn": [
     3,
     30,
     3,
     30
-   ],
-   "cityOf": "xuchang"
+   ]
   },
   {
    "id": "xc1906",
@@ -1357,13 +1459,13 @@
    "safe": true,
    "kind": "house",
    "orig": "xc1906",
+   "cityOf": "xuchang",
    "spawn": [
     3,
     27,
     3,
     27
-   ],
-   "cityOf": "xuchang"
+   ]
   },
   {
    "id": "xc1907",
@@ -1373,13 +1475,13 @@
    "safe": true,
    "kind": "house",
    "orig": "xc1907",
+   "cityOf": "xuchang",
    "spawn": [
     3,
     39,
     3,
     39
-   ],
-   "cityOf": "xuchang"
+   ]
   },
   {
    "id": "xc1908",
@@ -1389,13 +1491,13 @@
    "safe": true,
    "kind": "house",
    "orig": "xc1908",
+   "cityOf": "xuchang",
    "spawn": [
     34,
     3,
     34,
     3
-   ],
-   "cityOf": "xuchang"
+   ]
   },
   {
    "id": "xc1909",
@@ -1405,14 +1507,14 @@
    "safe": true,
    "kind": "house",
    "orig": "xc1909",
+   "cityOf": "xuchang",
    "spawn": [
     25,
     7,
     25,
     7
    ],
-   "orphan": true,
-   "cityOf": "xuchang"
+   "orphan": true
   },
   {
    "id": "xc1910",
@@ -1422,13 +1524,13 @@
    "safe": true,
    "kind": "house",
    "orig": "xc1910",
+   "cityOf": "xuchang",
    "spawn": [
     3,
     29,
     3,
     29
-   ],
-   "cityOf": "xuchang"
+   ]
   },
   {
    "id": "xc1911",
@@ -1438,13 +1540,13 @@
    "safe": true,
    "kind": "house",
    "orig": "xc1911",
+   "cityOf": "xuchang",
    "spawn": [
     45,
     32,
     45,
     32
-   ],
-   "cityOf": "xuchang"
+   ]
   },
   {
    "id": "xc1912",
@@ -1454,14 +1556,14 @@
    "safe": true,
    "kind": "house",
    "orig": "xc1912",
+   "cityOf": "xuchang",
    "spawn": [
     3,
     24,
     3,
     24
    ],
-   "orphan": true,
-   "cityOf": "xuchang"
+   "orphan": true
   },
   {
    "id": "xc1913",
@@ -1471,13 +1573,13 @@
    "safe": true,
    "kind": "house",
    "orig": "xc1913",
+   "cityOf": "xuchang",
    "spawn": [
     3,
     23,
     3,
     23
-   ],
-   "cityOf": "xuchang"
+   ]
   },
   {
    "id": "xc1914",
@@ -1487,13 +1589,13 @@
    "safe": true,
    "kind": "house",
    "orig": "xc1914",
+   "cityOf": "xuchang",
    "spawn": [
     45,
     30,
     45,
     30
-   ],
-   "cityOf": "xuchang"
+   ]
   },
   {
    "id": "xc1916",
@@ -1503,13 +1605,13 @@
    "safe": true,
    "kind": "house",
    "orig": "xc1916",
+   "cityOf": "xuchang",
    "spawn": [
     46,
     26,
     46,
     26
-   ],
-   "cityOf": "xuchang"
+   ]
   },
   {
    "id": "xc1917",
@@ -1519,14 +1621,14 @@
    "safe": true,
    "kind": "house",
    "orig": "xc1917",
+   "cityOf": "xuchang",
    "spawn": [
     65,
     75,
     65,
     75
    ],
-   "orphan": true,
-   "cityOf": "xuchang"
+   "orphan": true
   },
   {
    "id": "xc1918",
@@ -1536,13 +1638,13 @@
    "safe": true,
    "kind": "house",
    "orig": "xc1918",
+   "cityOf": "xuchang",
    "spawn": [
     3,
     27,
     3,
     27
-   ],
-   "cityOf": "xuchang"
+   ]
   },
   {
    "id": "xc1919",
@@ -1552,13 +1654,13 @@
    "safe": true,
    "kind": "house",
    "orig": "xc1919",
+   "cityOf": "xuchang",
    "spawn": [
     45,
     33,
     45,
     33
-   ],
-   "cityOf": "xuchang"
+   ]
   },
   {
    "id": "xc1920",
@@ -1568,14 +1670,14 @@
    "safe": true,
    "kind": "house",
    "orig": "xc1920",
+   "cityOf": "xuchang",
    "spawn": [
     43,
     35,
     43,
     35
    ],
-   "orphan": true,
-   "cityOf": "xuchang"
+   "orphan": true
   },
   {
    "id": "xc1921",
@@ -1585,14 +1687,14 @@
    "safe": true,
    "kind": "house",
    "orig": "xc1921",
+   "cityOf": "xuchang",
    "spawn": [
     43,
     35,
     43,
     35
    ],
-   "orphan": true,
-   "cityOf": "xuchang"
+   "orphan": true
   },
   {
    "id": "xc1922",
@@ -1602,13 +1704,13 @@
    "safe": true,
    "kind": "field",
    "orig": "xc1922",
+   "cityOf": "xuchang",
    "spawn": [
     100,
     7,
     100,
     7
-   ],
-   "cityOf": "xuchang"
+   ]
   },
   {
    "id": "xc1923",
@@ -1618,13 +1720,13 @@
    "safe": true,
    "kind": "field",
    "orig": "xc1923",
+   "cityOf": "xuchang",
    "spawn": [
     98,
     5,
     98,
     5
-   ],
-   "cityOf": "xuchang"
+   ]
   },
   {
    "id": "xc1924",
@@ -1634,13 +1736,46 @@
    "safe": true,
    "kind": "house",
    "orig": "xc1924",
+   "cityOf": "xuchang",
    "spawn": [
     46,
     26,
     46,
     26
+   ]
+  },
+  {
+   "id": "xc1925",
+   "name": "許昌·外圍25",
+   "ox": 0,
+   "oy": 1359,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc1925",
+   "cityOf": "xuchang",
+   "spawn": [
+    100,
+    75,
+    100,
+    75
    ],
-   "cityOf": "xuchang"
+   "orphan": true
+  },
+  {
+   "id": "xc1929",
+   "name": "許昌·外圍29",
+   "ox": 221,
+   "oy": 1359,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc1929",
+   "cityOf": "xuchang",
+   "spawn": [
+    100,
+    75,
+    100,
+    75
+   ]
   },
   {
    "id": "xc1942",
@@ -1650,13 +1785,13 @@
    "safe": true,
    "kind": "house",
    "orig": "xc1942",
+   "cityOf": "xuchang",
    "spawn": [
     3,
     32,
     3,
     32
-   ],
-   "cityOf": "xuchang"
+   ]
   },
   {
    "id": "xc1943",
@@ -1666,13 +1801,13 @@
    "safe": true,
    "kind": "house",
    "orig": "xc1943",
+   "cityOf": "xuchang",
    "spawn": [
     44,
     35,
     44,
     35
-   ],
-   "cityOf": "xuchang"
+   ]
   },
   {
    "id": "xc1944",
@@ -1682,13 +1817,13 @@
    "safe": true,
    "kind": "house",
    "orig": "xc1944",
+   "cityOf": "xuchang",
    "spawn": [
     46,
     31,
     46,
     31
-   ],
-   "cityOf": "xuchang"
+   ]
   },
   {
    "id": "xc1945",
@@ -1698,13 +1833,13 @@
    "safe": true,
    "kind": "house",
    "orig": "xc1945",
+   "cityOf": "xuchang",
    "spawn": [
     46,
     27,
     46,
     27
-   ],
-   "cityOf": "xuchang"
+   ]
   },
   {
    "id": "xc1946",
@@ -1714,13 +1849,13 @@
    "safe": true,
    "kind": "house",
    "orig": "xc1946",
+   "cityOf": "xuchang",
    "spawn": [
     46,
     31,
     46,
     31
-   ],
-   "cityOf": "xuchang"
+   ]
   },
   {
    "id": "xc1947",
@@ -1730,13 +1865,80 @@
    "safe": true,
    "kind": "house",
    "orig": "xc1947",
+   "cityOf": "xuchang",
    "spawn": [
     2,
     27,
     2,
     27
+   ]
+  },
+  {
+   "id": "xc1949",
+   "name": "許昌·外圍49",
+   "ox": 0,
+   "oy": 1530,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc1949",
+   "cityOf": "xuchang",
+   "spawn": [
+    100,
+    75,
+    100,
+    75
    ],
-   "cityOf": "xuchang"
+   "orphan": true
+  },
+  {
+   "id": "xc1725",
+   "name": "陳留·外圍25",
+   "ox": 221,
+   "oy": 1530,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc1925",
+   "cityOf": "chenliu",
+   "spawn": [
+    5,
+    82,
+    5,
+    82
+   ],
+   "orphan": true
+  },
+  {
+   "id": "xc1729",
+   "name": "陳留·外圍29",
+   "ox": 0,
+   "oy": 1701,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc1929",
+   "cityOf": "chenliu",
+   "spawn": [
+    5,
+    110,
+    5,
+    110
+   ],
+   "orphan": true
+  },
+  {
+   "id": "xc1749",
+   "name": "陳留·外圍49",
+   "ox": 221,
+   "oy": 1701,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc1949",
+   "cityOf": "chenliu",
+   "spawn": [
+    5,
+    104,
+    5,
+    104
+   ]
   }
  ],
  "landmarks": [
@@ -3874,6 +4076,82 @@
     27
    ],
    "to": "xc_in_1947",
+   "auto": true
+  },
+  {
+   "id": "xc_ln_1929_E",
+   "name": "去 陳留外圍",
+   "map": "xc1929",
+   "x": 198,
+   "y": 62,
+   "rect": [
+    197,
+    58,
+    200,
+    66
+   ],
+   "land": [
+    5,
+    104
+   ],
+   "to": "xc_ln_1749_W",
+   "auto": true
+  },
+  {
+   "id": "xc_ln_1749_W",
+   "name": "去 許昌外圍",
+   "map": "xc1749",
+   "x": 1,
+   "y": 104,
+   "rect": [
+    0,
+    100,
+    3,
+    108
+   ],
+   "land": [
+    194,
+    62
+   ],
+   "to": "xc_ln_1929_E",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_w",
+   "name": "出城西門",
+   "map": "xuchang_o",
+   "x": 2,
+   "y": 157,
+   "rect": [
+    0,
+    146,
+    4,
+    168
+   ],
+   "land": [
+    5,
+    110
+   ],
+   "to": "xc_gate_w_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_w_o",
+   "name": "入許昌城",
+   "map": "xc1929",
+   "x": 1,
+   "y": 110,
+   "rect": [
+    0,
+    106,
+    3,
+    114
+   ],
+   "land": [
+    6,
+    157
+   ],
+   "to": "xc_gate_w",
    "auto": true
   }
  ]
