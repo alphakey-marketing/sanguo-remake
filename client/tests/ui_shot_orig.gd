@@ -36,7 +36,7 @@ func _run() -> void:
 	var d: GameData = m.data
 	var W := GameData.WORLD_W
 	if OS.get_environment("LINKSHOT") != "":        # 許昌西門 -> 1929 -> 陳留1749: 每個傳送點門口 + 落腳點
-		for q in ["xc_gate_w", "xc_gate_w_o", "xc_ln_1929_E", "xc_ln_1749_W"]:
+		for q in OS.get_environment("LINKSHOT").split(","):
 			var pd: Dictionary = d.tp_by_id.get(q, {})
 			if pd.is_empty():
 				continue

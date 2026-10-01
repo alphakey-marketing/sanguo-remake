@@ -35,6 +35,8 @@ FIELDS = {1851: '許昌洞穴一', 1852: '許昌洞穴二', 1853: '許昌洞穴�
 LINKS = json.load(open(os.path.join(ROOT, 'client', 'data', 'city_links.json'), encoding='utf8'))   # tools/city_links.py 生成
 CITY_NAME = {c['id'] // 100: n for n, c in LINKS['cities'].items()}
 TPLS = (25, 29, 49)
+TOWNS = {1700: '陳留'}                    # 城圖 (4000x3000)；許昌城圖由 import_orig_maps 負責 (xuchang_o)
+CITY_MAPID = {19: CITY, 17: 'xc1700'}     # 城 id(//100) -> 城圖 map id
 INSTANCES = sorted({m for l in LINKS['links'] for m in (l['a_out'], l['b_out'])} - {1925, 1929, 1949})   # 非許昌嘅外圍實例
 SIDE_DIR = {'E': (1, 0), 'W': (-1, 0), 'N': (0, -1), 'S': (0, 1)}
 GATE_W = [0, 146, 4, 168]                 # 許昌城西邊緣 (用家確認 A 位) -> 許昌外圍29 西口
@@ -69,38 +71,55 @@ def tpl_runs(g, gw, gh):
     return res
 
 
-def plan_links(runs):
+OPP = {'E': 'W', 'W': 'E', 'N': 'S', 'S': 'N'}
+
+
+def plan_links(runs, cruns):
     """每條連線 -> 兩端各揀一邊 (按對方城方位)；回 {map id: [conn]}。許昌1929 另加西門口 (side W, key 0)"""
     cities = LINKS['cities']; conns = {}
     def add(m, other, ocity, vec):
         side = max(runs[m % 100], key=lambda sd: SIDE_DIR[sd][0] * vec[0] + SIDE_DIR[sd][1] * vec[1])
         key = vec[1] if side in 'EW' else vec[0]
-        conns.setdefault(m, []).append({'side': side, 'other': other, 'ocity': ocity, 'key': key})
+        conns.setdefault(m, []).append({'side': side, 'other': other, 'ocity': ocity, 'key': key, 'vec': vec})
     for l in LINKS['links']:
         ca, cb = cities[l['a']], cities[l['b']]
         add(l['a_out'], l['b_out'], l['b'], (cb['x'] - ca['x'], cb['y'] - ca['y']))
         add(l['b_out'], l['a_out'], l['a'], (ca['x'] - cb['x'], ca['y'] - cb['y']))
-    conns.setdefault(1929, []).append({'side': 'W', 'other': None, 'ocity': '許昌', 'key': 0})
+    # 城口: 每座有城圖嘅城，向每張有連線嘅外圍開一個邊緣口；城邊 = 該外圍鄰城平均方位，外圍邊 = 對面。許昌 1929 = 用家定嘅 A 位 (西/西)
+    for m in sorted(list(conns)):
+        city = m // 100
+        if city not in cruns: continue
+        vs = [c['vec'] for c in conns[m]]; vec = (sum(v[0] for v in vs), sum(v[1] for v in vs))
+        cs = 'W' if m == 1929 else max(cruns[city], key=lambda sd: SIDE_DIR[sd][0] * vec[0] + SIDE_DIR[sd][1] * vec[1])
+        os_ = 'W' if m == 1929 else max(runs[m % 100], key=lambda sd: SIDE_DIR[sd][0] * SIDE_DIR[OPP[cs]][0] + SIDE_DIR[sd][1] * SIDE_DIR[OPP[cs]][1])
+        key = 0 if m == 1929 else (vec[1] if os_ in 'EW' else vec[0])
+        conns[m].append({'side': os_, 'cside': cs, 'other': None, 'gate_city': city, 'ocity': [n for n, c in cities.items() if c['id'] // 100 == city][0], 'key': key, 'vec': vec})
     return conns
 
 
+def place_slots(lst, run_of, gw, gh):
+    """同一邊 n 個口: 沿該邊行得段等分，口闊 9 格深 4 格；回填 rect/cell/land/idx"""
+    for side in {c['side'] for c in lst}:
+        cs = sorted([c for c in lst if c['side'] == side], key=lambda c: c['key']); run = run_of(side)
+        if not run: continue
+        for i, c in enumerate(cs):
+            mid = run[min(len(run) - 1, int(len(run) * (i + 0.5) / len(cs)))]
+            lo = max(run[0], mid - 4); hi = min(run[-1], mid + 4)
+            if side in 'EW':
+                x1, x2 = (0, 3) if side == 'W' else (gw - 4, gw - 1); r = [x1, lo, x2, hi]
+            else:
+                y1, y2 = (0, 3) if side == 'N' else (gh - 4, gh - 1); r = [lo, y1, hi, y2]
+            cx, cy = (r[0] + r[2]) // 2, (r[1] + r[3]) // 2
+            lx, ly = {'W': (cx + 4, cy), 'E': (cx - 4, cy), 'N': (cx, cy + 4), 'S': (cx, cy - 4)}[side]
+            c['idx'] = i; c['rect'] = r; c['cell'] = (cx, cy); c['land'] = (lx, ly)
+
+
 def slot_rects(runs, conns, gw, gh):
-    """同一邊 n 個口: 沿該邊行得段等分，口闊 9 格深 4 格；回填 conn rect/cell/land"""
     for m, lst in conns.items():
-        for side in {c['side'] for c in lst}:
-            cs = sorted([c for c in lst if c['side'] == side], key=lambda c: c['key']); run = runs[m % 100][side]
-            for i, c in enumerate(cs):
-                mid = run[min(len(run) - 1, int(len(run) * (i + 0.5) / len(cs)))]
-                lo = max(run[0], mid - 4); hi = min(run[-1], mid + 4)
-                if side in 'EW':
-                    x1, x2 = (0, 3) if side == 'W' else (gw - 4, gw - 1); r = [x1, lo, x2, hi]
-                else:
-                    y1, y2 = (0, 3) if side == 'N' else (gh - 4, gh - 1); r = [lo, y1, hi, y2]
-                cx, cy = (r[0] + r[2]) // 2, (r[1] + r[3]) // 2
-                lx, ly = {'W': (cx + 4, cy), 'E': (cx - 4, cy), 'N': (cx, cy + 4), 'S': (cx, cy - 4)}[side]
-                c['idx'] = i; c['rect'] = r; c['cell'] = (cx, cy); c['land'] = (lx, ly)
+        place_slots(lst, lambda sd: runs[m % 100][sd], gw, gh)
+
 ROAD_GATES = {600089: 1923, 600865: 1922}
-TILESET = {1907: 'grd02', 1923: 'grd00'}   # 其餘 grd03
+TILESET = {1907: 'grd02', 1923: 'grd00', 1700: 'grd00'}   # 其餘 grd03
 
 def sprite_index():
     idx = {}
@@ -201,7 +220,7 @@ def run(check):
     city = json.load(open(DATA + '/xuchang.json', encoding='utf8'))['walk']
     import zlib
     cg = zlib.decompress(base64.b64decode(city['z'])); cgw, cgh = city['w'], city['h']
-    targets = dict(INTERIORS); targets.update(ROADS); targets.update(FIELDS)
+    targets = dict(INTERIORS); targets.update(ROADS); targets.update(FIELDS); targets.update(TOWNS)
     built = {}
     for mid, cn in sorted(targets.items()):
         name = '%05d' % mid
@@ -243,8 +262,8 @@ def run(check):
         print('錯:'); [print(' -', e) for e in errs[:30]]; sys.exit(1)
 
     # 地圖擺位: 全域格仔 x 0..511；許昌原版 (oy 644 + 188) 之下
-    pos, bottom = shelf_pack([(m, b["gw"], b["gh"]) for m, b in built.items() if m not in FIELDS], 512, 860)
-    fitems = [(m, b["gw"], b["gh"]) for m, b in built.items() if m in FIELDS]
+    pos, bottom = shelf_pack([(m, b["gw"], b["gh"]) for m, b in built.items() if m not in FIELDS and m not in TOWNS], 512, 860)
+    fitems = [(m, b["gw"], b["gh"]) for m, b in built.items() if m in FIELDS or m in TOWNS]
     fitems += [(m, 201, 151) for m in INSTANCES]
     fpos, bottom = shelf_pack(fitems, 512, bottom + 20)
     pos.update(fpos)
@@ -259,7 +278,7 @@ def run(check):
         elif k in ROAD_GATES: door_of[ROAD_GATES[k]] = (x1, y1, x2, y2)
     for mid, b in sorted(built.items()):
         key = 'xc%d' % mid; g = b['g']; gw, gh = b['gw'], b['gh']
-        if mid in FIELDS:
+        if mid in FIELDS or mid in TOWNS:
             b['spawn'] = nearest_outside(g, gw, gh, (0, 0, -1, -1), (gw // 2, gh // 2)); continue
         is_road = mid in ROADS
         # 室內出口 / 道路出口 (北邊整條)
@@ -293,28 +312,49 @@ def run(check):
             portals.append({'id': 'xc_out_%d' % mid, 'name': '出 ' + b['cn'], 'map': key, 'x': ec[0], 'y': ec[1],
                             'rect': erc, 'land': list(in_land), 'to': 'xc_in_%d' % mid, 'auto': True})
         b['spawn'] = in_land
-    # 外圍線 (外圍 <-> 對方外圍，地圖邊緣傳送) + 許昌西邊緣 -> 許昌外圍29 西口
+    # 外圍線 (外圍 <-> 對方外圍，地圖邊緣傳送) + 城圖邊緣口 <-> 本城外圍
     runs = {t: tpl_runs(built[1900 + t]['g'], built[1900 + t]['gw'], built[1900 + t]['gh']) for t in TPLS}
-    conns = plan_links(runs)
+    cityg = {19: (cg, cgw, cgh)} | {t // 100: (built[t]['g'], built[t]['gw'], built[t]['gh']) for t in TOWNS if t in built}
+    cruns = {k: tpl_runs(*v) for k, v in cityg.items()}
+    conns = plan_links(runs, cruns)
     slot_rects(runs, conns, built[1929]['gw'], built[1929]['gh'])
     pid = lambda m, c: 'xc_ln_%d_%s_%d' % (m, c['side'], c['idx'])
+    gates = {}                                   # 城 id -> [城口 conn]
+    for m, lst in sorted(conns.items()):
+        for c in lst:
+            if c['other'] is None: gates.setdefault(c['gate_city'], []).append(dict(c, out=m, side=c['cside']))
+    for city, lst in gates.items():
+        cw, ch2 = cityg[city][1], cityg[city][2]
+        place_slots(lst, lambda sd: cruns[city][sd], cw, ch2)
+        for gc in lst:
+            if gc['out'] == 1929:                # 許昌 A 位: 用家確認
+                gc['rect'] = GATE_W; gc['cell'] = (2, 157); gc['land'] = (6, 157)
+            else:                                # 落腳點要行得 (城邊可能有牆)
+                gcg, gcw, gch = cityg[city]
+                gc['land'] = tuple(nearest_outside(gcg, gcw, gch, gc['rect'], gc['land']))
     for m, lst in sorted(conns.items()):
         for c in lst:
             if c['other'] is None:
-                portals.append({'id': 'xc_gate_w_o', 'name': '入許昌城', 'map': 'xc%d' % m, 'x': c['cell'][0], 'y': c['cell'][1], 'rect': c['rect'],
-                                'land': list(c['land']), 'to': 'xc_gate_w', 'auto': True})
-                portals.append({'id': 'xc_gate_w', 'name': '出城西門', 'map': CITY, 'x': 2, 'y': 157, 'rect': GATE_W, 'land': [6, 157],
-                                'to': 'xc_gate_w_o', 'auto': True})
+                gc = [x for x in gates[c['gate_city']] if x['out'] == m][0]
+                old = (m == 1929)
+                gid, gido = ('xc_gate_w', 'xc_gate_w_o') if old else ('xc_gate_%d_%d' % (c['gate_city'], m), 'xc_gate_%d_%d_o' % (c['gate_city'], m))
+                portals.append({'id': gido, 'name': '入' + c['ocity'] + '城', 'map': 'xc%d' % m, 'x': c['cell'][0], 'y': c['cell'][1], 'rect': c['rect'],
+                                'land': list(c['land']), 'to': gid, 'auto': True})
+                portals.append({'id': gid, 'name': '去外圍', 'map': CITY_MAPID[c['gate_city']], 'x': gc['cell'][0], 'y': gc['cell'][1], 'rect': gc['rect'],
+                                'land': list(gc['land']), 'to': gido, 'auto': True})
                 continue
             back = [d for d in conns[c['other']] if d['other'] == m][0]
             portals.append({'id': pid(m, c), 'name': '去 ' + c['ocity'] + '外圍', 'map': 'xc%d' % m, 'x': c['cell'][0], 'y': c['cell'][1],
                             'rect': c['rect'], 'land': list(c['land']), 'to': pid(c['other'], back), 'auto': True})
-    # 由許昌可達: 外圍之間按連線 (城中心未建，同城各外圍互不相通)
-    reach = {1929}; ch = True
+    # 由許昌可達 (節點 = 城 id*100 或外圍 id): 城口連本城外圍、外圍連線連對方外圍
+    reach = {1900}; ch = True
+    edges = [(l['a_out'], l['b_out']) for l in LINKS['links']] + [(g['out'] // 100 * 100, g['out']) for g in sum(gates.values(), [])]
     while ch:
         ch = False
-        for l in LINKS['links']:
-            if (l['a_out'] in reach) != (l['b_out'] in reach): reach |= {l['a_out'], l['b_out']}; ch = True
+        for a2, b2 in edges:
+            if (a2 in reach) != (b2 in reach): reach |= {a2, b2}; ch = True
+    for t in TOWNS:
+        if t in built and gates.get(t // 100): built[t]['spawn'] = gates[t // 100][0]['land']
     # 寫資產 / 資料 / txt
     for mid, b in sorted(built.items()):
         key = 'xc%d' % mid
@@ -333,6 +373,10 @@ def run(check):
     mj['maps'] = [m for m in mj['maps'] if m['id'] not in keep]
     for mid, b in sorted(built.items()):
         ox, oy = pos[mid]; sp = b.get('spawn') or (b['gw'] // 2, b['gh'] // 2)
+        if mid in TOWNS:
+            mj['maps'].append({'id': 'xc%d' % mid, 'name': b['cn'] + '（原版）', 'ox': ox, 'oy': oy, 'safe': True, 'kind': 'field', 'orig': 'xc%d' % mid,
+                               'cityOf': 'chenliu', 'spawn': [sp[0], sp[1], sp[0], sp[1]]} | ({} if mid in reach else {'orphan': True}))
+            continue
         mj['maps'].append({'id': 'xc%d' % mid, 'name': '許昌·' + b['cn'], 'ox': ox, 'oy': oy, 'safe': mid not in FIELDS,
                            'kind': 'field' if (mid in ROADS or mid in FIELDS) else 'house', 'orig': 'xc%d' % mid, 'cityOf': 'xuchang',
                            'spawn': [sp[0], sp[1], sp[0], sp[1]]}
