@@ -53,5 +53,6 @@
   "relief_xy": { "name": "新野救災區", "map": "bowang", "x": 62, "y": 10, "color": [0.9, 0.45, 0.3], "relief": true, "cityId": "xinye",
     "desc": "救災區【原 sy2_8_12】: 領咗救災官令 + 帶對應救災物品，喺呢度執行救災工作（每次扣 SP + 用 1 份物品）" },
   "relief_xyc": { "name": "襄陽救災區", "map": "longzhong", "x": 38, "y": 10, "color": [0.9, 0.45, 0.3], "relief": true, "cityId": "xiangyang",
-    "desc": "救災區【原 sy2_8_12】: 領咗救災官令 + 帶對應救災物品，喺呢度執行救災工作（每次扣 SP + 用 1 份物品）" }
+    "desc": "救災區【原 sy2_8_12】: 領咗救災官令 + 帶對應救災物品，喺呢度執行救災工作（每次扣 SP + 用 1 份物品）" },
+  "station_xco": { "name": "許昌驛站（原版）", "map": "xuchang_o", "x": 114, "y": 140, "color": [0.75, 0.55, 0.25], "station": true, "desc": "原版許昌驛站（步驟 4 臨時位置）" }
 }

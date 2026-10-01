@@ -391,4 +391,11 @@ func t_orig_map(data: GameData) -> void:
 	var t0 := Time.get_ticks_msec()
 	var pth := RulesPath.find(data.walk, W, gy * W + gx, far, 200000, data.portal_at)
 	check(not RulesPath.find(data.walk, W, gy * W + gx, far, Sim.PATH_CAP, data.portal_at).is_empty(), "原版許昌: 預設 PATH_CAP 搵得到最遠路")
+	var inn_o: Dictionary = {}
+	for iv in data.inns:
+		if String(iv.get("map", "")) == "xuchang_o":
+			inn_o = iv
+	check(not inn_o.is_empty() and data.walk[int(inn_o.y) * W + int(inn_o.x)] != 0 and seen.has(int(inn_o.y) * W + int(inn_o.x)), "原版許昌: 客棧位行得到")
+	var st_o: Dictionary = data.facilities.get("station_xco", {})
+	check(not st_o.is_empty() and seen.has(int(st_o.y) * W + int(st_o.x)), "原版許昌: 驛站位行得到")
 	check(not pth.is_empty(), "原版許昌: A* 出生點 → 最遠可達格 (路長 %d, %d ms)" % [pth.size(), Time.get_ticks_msec() - t0])

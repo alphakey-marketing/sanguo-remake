@@ -792,6 +792,14 @@
  ],
  "inns": [
   {
+   "id": "xuchang_o",
+   "name": "許昌客棧（原版）",
+   "x": 159,
+   "y": 84,
+   "restCost": 5,
+   "map": "xuchang_o"
+  },
+  {
    "id": "xinye",
    "name": "新野客棧",
    "x": 43,
