@@ -124,6 +124,8 @@ func t_placements(data: GameData) -> void:
 func t_connected(data: GameData) -> void:
 	var sim := Sim.new(data, 1)
 	for md in data.maps:
+		if md.has("orig"):
+			continue                                  # 原版行走層有孤立小格，另有 run_world t_orig_map 連通率測試
 		var start := Vector2i(-1, -1)
 		var total_walk := 0
 		for y in int(md.h):

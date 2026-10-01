@@ -360,3 +360,35 @@ func t_orig_map(data: GameData) -> void:
 		if not sim.is_free(x, y):
 			blocked += 1
 	check(blocked > 15000 and blocked < 35000, "原版許昌: 阻擋格數合理 (%d)" % blocked)
+	# 步驟 3: 連通性 + A* 尋路 (出生點 flood fill; 最遠可達格 A* 要搵到路)
+	var W := GameData.WORLD_W
+	var ow := int(md["w"])
+	var oh := int(md["h"])
+	var ox := int(md["ox"])
+	var oy := int(md["oy"])
+	var seen := {}
+	var q: Array = [gy * W + gx]
+	seen[q[0]] = true
+	var far: int = q[0]
+	var qi := 0
+	while qi < q.size():
+		var c: int = q[qi]
+		qi += 1
+		far = c
+		var cx := c % W
+		var cy := c / W
+		for d in [[1, 0], [-1, 0], [0, 1], [0, -1]]:
+			var nx: int = cx + d[0]
+			var ny: int = cy + d[1]
+			if nx < ox or ny < oy or nx >= ox + ow or ny >= oy + oh:
+				continue
+			var nc := ny * W + nx
+			if not seen.has(nc) and data.walk[nc] != 0:
+				seen[nc] = true
+				q.append(nc)
+	var open_total := ow * oh - blocked
+	check(seen.size() * 100 >= open_total * 70, "原版許昌: 出生點連通 >=70%% 可行走格 (%d/%d)" % [seen.size(), open_total])
+	var t0 := Time.get_ticks_msec()
+	var pth := RulesPath.find(data.walk, W, gy * W + gx, far, 200000, data.portal_at)
+	check(not RulesPath.find(data.walk, W, gy * W + gx, far, Sim.PATH_CAP, data.portal_at).is_empty(), "原版許昌: 預設 PATH_CAP 搵得到最遠路")
+	check(not pth.is_empty(), "原版許昌: A* 出生點 → 最遠可達格 (路長 %d, %d ms)" % [pth.size(), Time.get_ticks_msec() - t0])
