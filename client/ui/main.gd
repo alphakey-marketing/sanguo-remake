@@ -1574,6 +1574,11 @@ func _draw() -> void:
 		if String(cur_map.get("orig", "")) != "":
 			om = OrigMap.load_map(String(cur_map["orig"]))
 		if om != null:
+			var meo = _me()
+			if meo != null:
+				var lp := (Vector2(float(meo.x) - float(cur_map.ox), float(meo.y) - float(cur_map.oy)) * TILE)
+				om.fade_rect = Rect2(lp.x + TILE * 0.5 - TILE, lp.y + TILE - TILE * 3.0, TILE * 2.0, TILE * 3.0)   # 角色放大 2 倍後嘅身形
+				om.fade_foot = lp.y + TILE
 			om.draw_terrain(self, org, vs, mod)           # 原版地圖視覺層 (物件喺角色迴圈夾插畫)
 			om.begin(vs, org, mod, self)
 		else:
