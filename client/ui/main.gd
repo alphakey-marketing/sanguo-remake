@@ -1872,10 +1872,13 @@ func switch_to_slot(n: int, is_new: bool) -> void:
 			fresh = false
 			my_id = int(sim.state["player_id"])
 	if fresh:
-		sim.init_mobs()
-		sim.add_residents()
-		sim.add_guards()
-		my_id = sim.spawn_player("玩家")
+		if bool(data.world.get("origStart", false)):
+			my_id = sim.spawn_player_orig("玩家")           # 原版世界: 淨係原版許昌，舊 ASCII 怪/居民/捕快抽起
+		else:
+			sim.init_mobs()
+			sim.add_residents()
+			sim.add_guards()
+			my_id = sim.spawn_player("玩家")
 	sim.event_emitted.connect(_on_event)
 	target_id = -1
 	exp_start = -1

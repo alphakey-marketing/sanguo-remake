@@ -272,6 +272,11 @@ func t_zones_travel(data: GameData) -> void:
 # 建角揀新手城 (spec 12 §1): 3 城可揀、Lv1 先改得、搬去嗰城客棧
 func t_set_home(data: GameData) -> void:
 	var sim := Sim.new(data, 61)
+	var orig_ids: Array = sim.newbie_cities()
+	check(bool(data.world.get("origStart", false)) and orig_ids.size() == 1, "原版開局: 只得原版許昌一個新手城")
+	var id0 := sim.spawn_player_orig("o")
+	check(sim.map_id_at(int(sim.ent(id0)["x"]), int(sim.ent(id0)["y"])) == "xuchang_o", "原版開局: 出生喺 xuchang_o")
+	data.world["origStart"] = false      # 以下測舊 3 城揀法
 	var id := sim.spawn_player("t")
 	var ids: Array = []
 	for c in sim.newbie_cities():

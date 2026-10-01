@@ -142,6 +142,9 @@ const NEWBIE_CITIES := ["xuchang", "xiangyang", "xinye"]
 
 func newbie_cities() -> Array:
 	var out: Array = []
+	if bool(data.world.get("origStart", false)):
+		var om: Dictionary = data.map_by_id.get(String(data.world.get("origHome", "")), {})
+		return [{"id": "xuchang", "name": String(om.get("name", "許昌")), "spawn": (om.get("spawn", []) as Array)}]
 	for c in NEWBIE_CITIES:
 		var md := _city_map(c)
 		if not md.is_empty():

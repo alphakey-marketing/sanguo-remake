@@ -41,8 +41,9 @@ def register_test_map(key, cn, gw, gh, z):
     d['maps'] = [m for m in d['maps'] if m['id'] != mid]
     d['maps'].append({'id': mid, 'name': cn + '（原版）', 'ox': 0, 'oy': TEST_OY, 'safe': True, 'kind': 'city', 'orig': key, 'spawn': [sx, sy, sx, sy]})
     d['portals'] = [p for p in d['portals'] if not p['id'].startswith('orig_xc')]
-    d['portals'].append({'id': 'orig_xc_in', 'name': '原版許昌（測試）', 'map': 'xuchang', 'x': 37, 'y': 1, 'to': 'orig_xc_out', 'auto': True})
-    d['portals'].append({'id': 'orig_xc_out', 'name': '返回舊許昌', 'map': mid, 'x': sx, 'y': sy + 1, 'to': 'orig_xc_in', 'auto': True})
+    # 臨時傳送點已取消 (2026-10-01: 新局直接喺原版許昌開始，舊 ASCII 圖抽起)
+    #d['portals'].append({'id': 'orig_xc_in', 'name': '原版許昌（測試）', 'map': 'xuchang', 'x': 37, 'y': 1, 'to': 'orig_xc_out', 'auto': True})
+    #d['portals'].append({'id': 'orig_xc_out', 'name': '返回舊許昌', 'map': mid, 'x': sx, 'y': sy + 1, 'to': 'orig_xc_in', 'auto': True})
     open(MAPS, 'w', encoding='utf8', newline='\n').write(json.dumps(d, ensure_ascii=False, indent=1) + '\n')
     print('  測試地圖', mid, '出生', sx, sy)
 

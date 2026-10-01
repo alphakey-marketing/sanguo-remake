@@ -16,6 +16,8 @@
   "endKe": 24
  },
  "homeCity": "xuchang",
+ "origStart": true,
+ "origHome": "xuchang_o",
  "storageFee": 200,
  "_noteTiandi": "天地商行自動化 (Step 13, spec 05 §3)【原=功能；自訂=數值】: 冇負重系統，改用「背包工作材料件數」> bagMatCap 當負重滿 → 勾咗嘅技能材料自動入倉 (倉庫總件數上限 storageCap)，其餘/入唔落 → 市集價賣。toolSellAt = 耐久剩幾多自動賣【原=2】；工具轉賣價 = 原價 × 耐久%/2。restCost = 工作區小屋休息 (客棧價 ×2)",
  "tiandi": {
