@@ -4,21 +4,21 @@
   {
    "id": "mystery_old",
    "name": "神秘老人",
-   "x": 33,
-   "y": 45,
+   "x": 130,
+   "y": 160,
    "maxLevel": 4,
    "idle": [
     "神秘老人上下打量你，冇出聲。",
     "神秘老人微微點頭，繼續閉目養神。"
    ],
    "desc": "城門口神秘兮兮嘅老人，專幫等級不到 5 級嘅新手。",
-   "map": "xuchang"
+   "map": "xuchang_o"
   },
   {
    "id": "miyi",
    "name": "密醫",
-   "x": 39,
-   "y": 46,
+   "x": 108,
+   "y": 147,
    "maxLevel": 4,
    "service": {
     "kind": "heal",
@@ -29,13 +29,13 @@
     "密醫壓低聲音：「快啲，睇完快走。」"
    ],
    "desc": "偷偷摸摸提供醫療服務嘅大夫，每日 3 次免費醫療。",
-   "map": "xuchang"
+   "map": "xuchang_o"
   },
   {
    "id": "stray_dog",
    "name": "流浪狗",
-   "x": 49,
-   "y": 33,
+   "x": 135,
+   "y": 161,
    "minLevel": 5,
    "window": {
     "startKe": 1,
@@ -46,80 +46,80 @@
     "流浪狗喺客棧門口踱來踱去。"
    ],
    "desc": "客棧外亂吠嘅流浪狗，子時 2~5 刻先見到。",
-   "map": "xuchang"
+   "map": "xuchang_o"
   },
   {
    "id": "training_recruit",
    "name": "練兵場小兵",
-   "x": 12,
-   "y": 19,
+   "x": 27,
+   "y": 42,
    "idle": [
     "練兵場小兵：「新丁？去練兵場報到！」",
     "練兵場小兵揸住木槍，有模有樣。"
    ],
    "desc": "練兵場嘅見習兵，可以陪你對練。",
-   "map": "xuchang"
+   "map": "xc1907"
   },
   {
    "id": "citizen_1",
    "name": "賣菜嬸",
-   "x": 30,
-   "y": 38,
+   "x": 108,
+   "y": 142,
    "idle": [
     "賣菜嬸：「靚仔，幫襯下啦，菜好新鮮㗎。」"
    ],
    "desc": "許昌城內賣菜嘅大嬸。",
-   "map": "xuchang",
+   "map": "xuchang_o",
    "commission": true
   },
   {
    "id": "citizen_2",
    "name": "算命先生",
-   "x": 22,
-   "y": 18,
+   "x": 103,
+   "y": 148,
    "idle": [
     "算命先生：「少年，你印堂發亮，日後必成大器。」"
    ],
    "desc": "喺街邊擺檔嘅算命先生。",
-   "map": "xuchang"
+   "map": "xuchang_o"
   },
   {
    "id": "citizen_3",
    "name": "茶館老闆",
-   "x": 52,
-   "y": 33,
+   "x": 120,
+   "y": 136,
    "idle": [
     "茶館老闆：「得閒嚟飲杯茶，聽下三國新聞。」"
    ],
    "desc": "城內茶館嘅老闆。",
-   "map": "xuchang",
+   "map": "xuchang_o",
    "commission": true
   },
   {
    "id": "guard_captain",
    "name": "禁衛大隊長",
-   "x": 13,
-   "y": 23,
+   "x": 137,
+   "y": 166,
    "minLevel": 20,
    "window": {
     "startKe": 32,
     "endKe": 72
    },
    "desc": "小沛練兵場門口禁衛大隊長【原】— 自訂改編: 許昌練兵場門口 (Step 10 絕招任務)",
-   "map": "xuchang"
+   "map": "xuchang_o"
   },
   {
    "id": "town_head",
    "name": "鎮長",
-   "x": 44,
-   "y": 26,
+   "x": 39,
+   "y": 40,
    "minLevel": 35,
    "window": {
     "startKe": 0,
     "endKe": 32
    },
    "desc": "晉陽鎮長【原】— 自訂改編: 許昌城內 (Step 10)",
-   "map": "xuchang"
+   "map": "xc1901"
   },
   {
    "id": "stray_soldier",
@@ -133,15 +133,15 @@
   {
    "id": "lvbu",
    "name": "呂布",
-   "x": 20,
-   "y": 12,
+   "x": 115,
+   "y": 135,
    "minLevel": 45,
    "window": {
     "startKe": 48,
     "endKe": 64
    },
    "desc": "河內官宅附近呂布【原】— 自訂改編: 許昌城內 (Step 10)",
-   "map": "xuchang"
+   "map": "xuchang_o"
   },
   {
    "id": "xinye_clerk",
@@ -170,13 +170,13 @@
   {
    "id": "xuchang_courier",
    "name": "許昌驛丞",
-   "x": 27,
-   "y": 46,
+   "x": 125,
+   "y": 135,
    "idle": [
     "許昌驛丞：「南來北往嘅公文，都要經我手。」"
    ],
    "desc": "許昌南門附近嘅驛丞，收發各地公文。",
-   "map": "xuchang"
+   "map": "xuchang_o"
   },
   {
    "id": "sunjian",
@@ -346,8 +346,8 @@
   {
    "id": "laozhang",
    "name": "老丈",
-   "x": 45,
-   "y": 44,
+   "x": 103,
+   "y": 143,
    "service": {
     "kind": "book"
    },
@@ -355,7 +355,7 @@
     "老丈：「後生仔，收集將軍令？老夫有好嘢。」"
    ],
    "desc": "許昌城內嘅老丈【原】：地/水/火/風/生/無之石各 1 粒換武將收集冊。",
-   "map": "xuchang"
+   "map": "xuchang_o"
   },
   {
    "id": "xinye_farmer",
@@ -440,9 +440,9 @@
   {
    "id": "battle_herald",
    "name": "義勇士兵",
-   "x": 36,
-   "y": 2,
-   "map": "xuchang",
+   "x": 27,
+   "y": 34,
+   "map": "xc1907",
    "idle": [
     "義勇士兵：「戰役快開始喇，把握機會！」"
    ],
@@ -452,9 +452,9 @@
   {
    "id": "promote_master",
    "name": "轉職導師",
-   "x": 30,
-   "y": 31,
-   "map": "xuchang",
+   "x": 140,
+   "y": 161,
+   "map": "xuchang_o",
    "minLevel": 50,
    "idle": [
     "轉職導師：「有志提升境界嘅人，可以過嚟傾下。」",
@@ -465,9 +465,9 @@
   {
    "id": "shinu_master",
    "name": "黃師姐",
-   "x": 52,
-   "y": 40,
-   "map": "xuchang",
+   "x": 130,
+   "y": 136,
+   "map": "xuchang_o",
    "minLevel": 5,
    "idle": [
     "黃師姐：「眼光要準，手要穩——揀鑰匙嗰下最見功夫。」",
@@ -478,9 +478,9 @@
   {
    "id": "daoshi_master",
    "name": "玄真道人",
-   "x": 5,
-   "y": 44,
-   "map": "xuchang",
+   "x": 136,
+   "y": 139,
+   "map": "xuchang_o",
    "minLevel": 5,
    "idle": [
     "玄真道人：「生死有命，但道友倒喺眼前，豈能見死不救？超渡可救同伴於危難。」",
@@ -491,9 +491,9 @@
   {
    "id": "wunu_master",
    "name": "巫姬婆",
-   "x": 17,
-   "y": 33,
-   "map": "xuchang",
+   "x": 98,
+   "y": 146,
+   "map": "xuchang_o",
    "minLevel": 5,
    "idle": [
     "巫姬婆：「行車之間要有客路——睇準空隙先穿，咪求其。」",
@@ -504,9 +504,9 @@
   {
    "id": "bianshi_master",
    "name": "蔡師傅",
-   "x": 59,
-   "y": 43,
-   "map": "xuchang",
+   "x": 110,
+   "y": 177,
+   "map": "xuchang_o",
    "minLevel": 5,
    "idle": [
     "蔡師傅：「傳聞喺邊？喺人哋牙罅之間——豎起耳仔就聽到。」",
@@ -517,9 +517,9 @@
   {
    "id": "meinu_master",
    "name": "夢韶華",
-   "x": 51,
-   "y": 31,
-   "map": "xuchang",
+   "x": 142,
+   "y": 166,
+   "map": "xuchang_o",
    "minLevel": 5,
    "idle": [
     "夢韶華：「琴音既起，眼前一切無所遁形——透視，睇穿啲嘢。」",
@@ -674,9 +674,9 @@
   {
    "id": "merchant_guild",
    "name": "商會長",
-   "x": 29,
-   "y": 42,
-   "map": "xuchang",
+   "x": 104,
+   "y": 174,
+   "map": "xuchang_o",
    "idle": [
     "商會長：「經濟交流，利國利民。」"
    ],
@@ -718,9 +718,9 @@
   {
    "id": "zixu",
    "name": "紫虛上人",
-   "x": 48,
-   "y": 35,
-   "map": "xuchang",
+   "x": 29,
+   "y": 25,
+   "map": "xc1906",
    "idle": [
     "紫虛上人：「修行貴在日行一善。」"
    ],
@@ -729,9 +729,9 @@
   {
    "id": "court_harm",
    "name": "朝廷除害官",
-   "x": 26,
-   "y": 23,
-   "map": "xuchang",
+   "x": 35,
+   "y": 36,
+   "map": "xc1901",
    "idle": [
     "朝廷除害官：「猛獸傷人，朝廷懸賞。」"
    ],
@@ -740,9 +740,9 @@
   {
    "id": "court_rat",
    "name": "朝廷滅鼠官",
-   "x": 48,
-   "y": 18,
-   "map": "xuchang",
+   "x": 43,
+   "y": 36,
+   "map": "xc1901",
    "idle": [
     "朝廷滅鼠官：「鼠害頻傳，農作欠收。」"
    ],
@@ -751,9 +751,9 @@
   {
    "id": "court_thief",
    "name": "朝廷滅賊官",
-   "x": 22,
-   "y": 25,
-   "map": "xuchang",
+   "x": 40,
+   "y": 32,
+   "map": "xc1901",
    "idle": [
     "朝廷滅賊官：「賊寇四起，人心惶惶。」"
    ],
@@ -762,9 +762,9 @@
   {
    "id": "lin",
    "name": "林員外",
-   "x": 56,
-   "y": 27,
-   "map": "xuchang",
+   "x": 141,
+   "y": 141,
+   "map": "xuchang_o",
    "idle": [
     "林員外：「犬子大婚，排場要大。」"
    ],
@@ -784,9 +784,9 @@
   {
    "id": "shenjing_lao",
    "name": "神經老人",
-   "x": 56,
-   "y": 42,
-   "map": "xuchang",
+   "x": 25,
+   "y": 21,
+   "map": "xc1906",
    "dayWindow": {
     "startDay": 16,
     "endDay": 21
@@ -810,9 +810,9 @@
   {
    "id": "recruit_officer",
    "name": "徵兵官",
-   "x": 48,
-   "y": 26,
-   "map": "xuchang",
+   "x": 31,
+   "y": 38,
+   "map": "xc1907",
    "idle": [
     "徵兵官：「兵源短缺，號召勇士！」"
    ],
@@ -821,9 +821,9 @@
   {
    "id": "luopo_lao",
    "name": "落魄老人",
-   "x": 24,
-   "y": 32,
-   "map": "xuchang",
+   "x": 38,
+   "y": 38,
+   "map": "xc1902",
    "dayWindow": {
     "startDay": 10,
     "endDay": 15
@@ -836,9 +836,9 @@
   {
    "id": "liu_lao",
    "name": "劉老",
-   "x": 56,
-   "y": 23,
-   "map": "xuchang",
+   "x": 116,
+   "y": 180,
+   "map": "xuchang_o",
    "idle": [
     "劉老：「惡頭害人，天理不容！」"
    ],
@@ -847,9 +847,9 @@
   {
    "id": "court_official_tool",
    "name": "朝廷官吏",
-   "x": 28,
-   "y": 18,
-   "map": "xuchang",
+   "x": 35,
+   "y": 40,
+   "map": "xc1901",
    "idle": [
     "朝廷官吏：「御賜工具，只賞有功之人。」"
    ],
@@ -1048,9 +1048,9 @@
   {
    "id": "marry_baker",
    "name": "禮餅商",
-   "x": 19,
-   "y": 32,
-   "map": "xuchang",
+   "x": 135,
+   "y": 134,
+   "map": "xuchang_o",
    "idle": [
     "禮餅商：「訂喜餅？四款價錢，豐儉由人。」"
    ],
@@ -1059,9 +1059,9 @@
   {
    "id": "marry_box",
    "name": "開餅盒師傅",
-   "x": 21,
-   "y": 32,
-   "map": "xuchang",
+   "x": 137,
+   "y": 134,
+   "map": "xuchang_o",
    "idle": [
     "開餅盒師傅：「餅盒交俾我，開出靚餅。」"
    ],
@@ -1070,9 +1070,9 @@
   {
    "id": "marry_official",
    "name": "朝廷官員",
-   "x": 19,
-   "y": 35,
-   "map": "xuchang",
+   "x": 135,
+   "y": 136,
+   "map": "xuchang_o",
    "idle": [
     "朝廷官員：「男婚女嫁，天作之合。」"
    ],
@@ -1081,9 +1081,9 @@
   {
    "id": "marry_divorce",
    "name": "斷情絕愛郎",
-   "x": 21,
-   "y": 35,
-   "map": "xuchang",
+   "x": 137,
+   "y": 136,
+   "map": "xuchang_o",
    "idle": [
     "斷情絕愛郎：「情人易得，真情難求。」"
    ],

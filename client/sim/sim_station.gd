@@ -15,7 +15,19 @@ func station_near(e: Dictionary) -> String:
 func _station_hops(from_key: String, to_key: String) -> int:
 	var a: Dictionary = data.facilities[from_key]
 	var b: Dictionary = data.facilities[to_key]
-	return map_hops(map_id_at(int(a["x"]), int(a["y"])), map_id_at(int(b["x"]), int(b["y"])))
+	return map_hops(_hop_map(int(a["x"]), int(a["y"])), _hop_map(int(b["x"]), int(b["y"])))
+
+
+# 驛站車費用嘅「地圖」: 原版圖 (cityOf) 借返所屬城嘅舊圖算過圖數，因為原版世界未連去其他城
+func _hop_map(x: int, y: int) -> String:
+	var mid := map_id_at(x, y)
+	var md: Dictionary = data.map_by_id.get(mid, {})
+	var c := String(md.get("cityOf", ""))
+	if c != "":
+		var cm := _city_map(c)
+		if not cm.is_empty():
+			return String(cm["id"])
+	return mid
 
 
 # 驛站面板視圖 (UI): 喺邊個驛站 + 其他驛站車費 (唔喺驛站 = from "")；S07c「玄妙」→ 唔喺驛站都用到
@@ -36,7 +48,7 @@ func station_view(id: int) -> Dictionary:
 			hops = _station_hops(from, k)
 		elif remote:
 			var f: Dictionary = data.facilities[k]
-			hops = map_hops(map_id_at(int(e["x"]), int(e["y"])), map_id_at(int(f["x"]), int(f["y"])))
+			hops = map_hops(_hop_map(int(e["x"]), int(e["y"])), _hop_map(int(f["x"]), int(f["y"])))
 		list.append({"key": k, "name": String(data.facilities[k]["name"]), "hops": hops,
 			"fare": RulesStation.fare(hops, cfg) if hops >= 0 else 0,
 			"why": RulesStation.check(from, k, data.facilities, hops, gold, cfg, remote)})
@@ -58,7 +70,7 @@ func cmd_station(id: int, to_key: String) -> void:
 			hops = _station_hops(from, to_key)
 		elif remote:
 			var tt: Dictionary = data.facilities[to_key]
-			hops = map_hops(map_id_at(int(e["x"]), int(e["y"])), map_id_at(int(tt["x"]), int(tt["y"])))
+			hops = map_hops(_hop_map(int(e["x"]), int(e["y"])), _hop_map(int(tt["x"]), int(tt["y"])))
 	var cfg: Dictionary = data.world["station"]
 	var why := RulesStation.check(from, to_key, data.facilities, hops, int(ch["gold"]), cfg, remote)
 	if why != "":

@@ -855,7 +855,9 @@ func t_battle_sim(data: GameData) -> void:
 	sim2.cmd_mount_skill_learn(id2, "jian_hudun")     # 護盾
 	sim2.cmd_mount_skill_learn(id2, "jian_zhongji")   # 重擊 (aoe)
 	sim2.cmd_mount_ride(id2, true)
-	sim2.cmd_goto_map(id2, "field_1")
+	var fm1: Dictionary = sim2.data.map_by_id["field_1"]      # 原版許昌未連去舊野外圖 → 直接放喺 field_1
+	var fp1 := sim2._free_near(int(fm1["ox"]) + 20, int(fm1["oy"]) + 20)
+	_put(sim2, id2, fp1.x, fp1.y)
 	for i in 300:
 		sim2.step()
 	var base_steps := sim2._ride_steps(sim2.ent(id2))

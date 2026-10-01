@@ -120,11 +120,11 @@ func _ready() -> void:
 		item_prices[id] = int(data.prices[id])
 	inn_cost = int(data.inn["restCost"])
 	for inn in data.inns:
-		facilities.append({"kind": "inn", "name": String(inn["name"]), "x": int(inn["x"]), "y": int(inn["y"]), "color": Color(0.3, 0.5, 0.9)})
+		facilities.append({"kind": "inn", "name": String(inn["name"]), "x": int(inn["x"]), "y": int(inn["y"]), "color": Color(0.3, 0.5, 0.9), "npc": inn.get("npc", {})})
 	for sh in data.shops:
 		facilities.append({"kind": "shop", "name": str(sh["name"]), "x": int(sh["x"]), "y": int(sh["y"]),
 			"color": Color(0.9, 0.7, 0.2), "stock": sh["stock"], "shopName": str(sh["name"]),
-			"map": String(sh.get("map", ""))})
+			"map": String(sh.get("map", "")), "npc": sh.get("npc", {})})
 	for key in data.facilities:
 		var fv: Variant = data.facilities[key]
 		if not fv is Dictionary:          # 跳過 _note
@@ -132,7 +132,7 @@ func _ready() -> void:
 		var f: Dictionary = fv
 		var col: Array = f["color"]
 		facilities.append({"kind": "fac", "fac": key, "name": f["name"], "x": int(f["x"]), "y": int(f["y"]),
-			"color": Color(float(col[0]), float(col[1]), float(col[2]))})
+			"color": Color(float(col[0]), float(col[1]), float(col[2])), "npc": f.get("npc", {})})
 	for tp in data.travel_points:
 		facilities.append({"kind": "travel", "point": String(tp["id"]), "name": String(tp["name"]),
 			"x": int(tp["x"]), "y": int(tp["y"]), "color": Color(0.6, 0.9, 0.4)})
@@ -301,9 +301,9 @@ func _draw_my_layers(a: Dictionary, act: String, p: Vector2) -> bool:
 	return true
 
 # 靜止 NPC/武將: 面向鏡頭站立幀 (row 4)
-func _draw_idle_actor(name_: String, key: int, p: Vector2) -> bool:
+func _draw_idle_actor(name_: String, key: int, p: Vector2, orig_sprite := 0) -> bool:
 	if not _actor_sid.has(-key):
-		_actor_sid[-key] = AssetLib.actor_sid(name_, "", key)
+		_actor_sid[-key] = AssetLib.npc_sid(orig_sprite, name_) if orig_sprite != 0 else AssetLib.actor_sid(name_, "", key)
 	var sid := int(_actor_sid[-key])
 	var tex := AssetLib.actor_sheet(sid, "S") if sid != 0 else null
 	if tex == null:
@@ -311,7 +311,13 @@ func _draw_idle_actor(name_: String, key: int, p: Vector2) -> bool:
 	var cw := tex.get_width() / 8
 	var ch_ := tex.get_height() / 8
 	var sz := Vector2(cw, ch_) * 0.42
+	var is_orig := cur_map.has("orig")
+	if is_orig:                                       # 原版圖: 同角色一樣放大 (以腳底為軸)
+		var pv := p + Vector2(TILE * 0.5, TILE)
+		draw_set_transform(pv * (1.0 - ORIG_CHAR_SCALE) * zoom, 0.0, Vector2(ORIG_CHAR_SCALE, ORIG_CHAR_SCALE) * zoom)
 	draw_texture_rect_region(tex, Rect2(p + Vector2(TILE * 0.5 - sz.x * 0.5, TILE - sz.y), sz), Rect2(int(t0 * 8.0) % 8 * cw, 4 * ch_, cw, ch_))
+	if is_orig:
+		draw_set_transform(Vector2.ZERO, 0.0, Vector2(zoom, zoom))
 	return true
 
 func _refresh() -> void:
@@ -1584,7 +1590,8 @@ func _draw() -> void:
 		else:
 			draw_texture(MapArt.texture(data, cur_map, TILE), org, mod)
 	for f in facilities:
-		_draw_sign(f)
+		if (f.get("npc", {}) as Dictionary).is_empty():
+			_draw_sign(f)
 	var mr := Rect2i(int(cur_map.get("ox", 0)), int(cur_map.get("oy", 0)), int(cur_map.get("w", Sim.W)), int(cur_map.get("h", Sim.H)))
 	var ent_list: Array = ents
 	if om != null:
@@ -1662,6 +1669,9 @@ func _draw() -> void:
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2(zoom, zoom))
 	if om != null:
 		om.flush_all(self, om_org, om_mod)              # 剩低嘅物件 (最南嗰批)
+	for f in facilities:                            # 原版功能 NPC 人形: 最後畫，唔俾物件遮
+		if not (f.get("npc", {}) as Dictionary).is_empty() and mr.has_point(Vector2i(int(f.x), int(f.y))):
+			_draw_sign(f)
 	for qn in quest_npcs:
 		if not mr.has_point(Vector2i(int(qn.x), int(qn.y))):
 			continue
@@ -1763,9 +1773,15 @@ func _draw_sign(f: Dictionary) -> void:
 	if fp.x < -80 or fp.y < -40 or fp.x > vs.x + 80 or fp.y > vs.y + 40:
 		return
 	var col: Color = f.color
-	draw_rect(Rect2(fp, Vector2(TILE, TILE)), Color(col, 0.35))
-	draw_rect(Rect2(fp, Vector2(TILE, TILE)), col, false, 1.5)
 	var nm := str(f.name)
+	var npc: Dictionary = f.get("npc", {})
+	if not npc.is_empty():                            # 原版功能 NPC: 人形 + 原版名 (取代色塊牌)
+		nm = str(npc["name"])
+		if not _draw_idle_actor(nm, 100000 + int(npc["sprite"]), fp, int(npc["sprite"])):
+			npc = {}
+	if npc.is_empty():
+		draw_rect(Rect2(fp, Vector2(TILE, TILE)), Color(col, 0.35))
+		draw_rect(Rect2(fp, Vector2(TILE, TILE)), col, false, 1.5)
 	var tw := ThemeDB.fallback_font.get_string_size(nm, HORIZONTAL_ALIGNMENT_LEFT, -1, 11).x
 	var r := Rect2(fp + Vector2(TILE / 2.0 - tw / 2.0 - 4, -18), Vector2(tw + 8, 15))
 	draw_rect(r, Color(0.12, 0.08, 0.05, 0.85))

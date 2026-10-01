@@ -138,7 +138,7 @@ func cmd_auto_assign(id: int) -> void:
 
 # 新手城建角揀城 (UAT-feedback, spec 12 §1)【自訂】: 未出發(Lv1)先可以揀；揀完搬去嗰城客棧
 # 只允許有 city 地圖嘅「新手城」（許昌/襄陽/新野）
-const NEWBIE_CITIES := ["xuchang", "xiangyang", "xinye"]
+const NEWBIE_CITIES := ["xuchang"]    # 新手城只限許昌
 
 func newbie_cities() -> Array:
 	var out: Array = []
@@ -161,7 +161,7 @@ func cmd_set_home(id: int, city_id: String) -> void:
 	if int(ch["level"]) != 1:
 		return _msg(id, "出發咗就唔可以改新手城")
 	var md := _city_map(city_id)
-	if md.is_empty():
+	if md.is_empty() or not (city_id in NEWBIE_CITIES):
 		return _msg(id, "揀嘅城未開放")
 	# 搬去嗰城客棧側（同 cmd_travel 咁直接改座標）
 	var inn := nearest_inn(String(md["id"]))

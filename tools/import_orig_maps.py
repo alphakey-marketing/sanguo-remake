@@ -39,7 +39,7 @@ def register_test_map(key, cn, gw, gh, z):
         f.write('\n'.join(''.join('H' if v else '.' for v in row) for row in g) + '\n')
     d = json.load(open(MAPS, encoding='utf8'))
     d['maps'] = [m for m in d['maps'] if m['id'] != mid]
-    d['maps'].append({'id': mid, 'name': cn + '（原版）', 'ox': 0, 'oy': TEST_OY, 'safe': True, 'kind': 'city', 'orig': key, 'spawn': [sx, sy, sx, sy]})
+    d['maps'].append({'id': mid, 'name': cn + '（原版）', 'ox': 0, 'oy': TEST_OY, 'safe': True, 'kind': 'city', 'orig': key, 'cityOf': 'xuchang', 'spawn': [sx, sy, sx, sy]})
     d['portals'] = [p for p in d['portals'] if not p['id'].startswith('orig_xc')]
     # 臨時傳送點已取消 (2026-10-01: 新局直接喺原版許昌開始，舊 ASCII 圖抽起)
     #d['portals'].append({'id': 'orig_xc_in', 'name': '原版許昌（測試）', 'map': 'xuchang', 'x': 37, 'y': 1, 'to': 'orig_xc_out', 'auto': True})

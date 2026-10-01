@@ -60,9 +60,15 @@ func _shop_for(e: Dictionary) -> Dictionary:
 	return {}
 
 
+# 商店/設施 map id → 所屬城池 id (原版室內/城街 = cityOf；舊圖 map id 本身就係城 id)
+func _shop_city(map_id: String) -> String:
+	var c := GameData.map_city_of(data.map_by_id.get(map_id, {}))
+	return c if c != "" else map_id
+
+
 # 城際貿易 (spec 05 §6): 買賣價用**所屬商店所在城**嘅市場 pf；商店唔屬任何城 (馬廄/洞窟) = 回歸故鄉城市場價。
 func _shop_pf(shop: Dictionary, item: int) -> float:
-	var city := String(shop.get("map", ""))
+	var city := _shop_city(String(shop.get("map", "")))
 	if city != "":
 		var g := market_city(city, str(int(data.cats.get(item, 0))))
 		if not g.is_empty():
@@ -75,7 +81,7 @@ func shop_sells(shop: Dictionary, item: int) -> bool:
 	var stock: Array = shop.get("stock", [])
 	if stock.has(item) or stock.has(float(item)):
 		return true
-	var city := String(shop.get("map", ""))
+	var city := _shop_city(String(shop.get("map", "")))
 	if city == "":
 		return false
 	return RulesCity.shop_extra_items(city_attrs(city), _city_attr_cfg()).has(item)
@@ -86,7 +92,7 @@ func _shop_shutdown_reason(shop: Dictionary, item: int) -> String:
 	# 救災物品唔停賣 (S08c): 天災期間都要買得到先救到災
 	if RulesDisaster.relief_items(data.world["disasters"]).has(item):
 		return ""
-	var city_id := String(shop.get("map", ""))
+	var city_id := _shop_city(String(shop.get("map", "")))
 	if city_id == "":
 		return ""
 	var cat := int(data.cats.get(item, -1))

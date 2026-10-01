@@ -178,7 +178,7 @@ func _run() -> void:
 	await frames(1)
 	check(str(cch.get("name", "")) == "劉備", "建角: 確定姓名後 ch.name 應該改咗 (而家 %s)" % str(cch.get("name", "")))
 	# 建角面板已合併做 2 頁: 第 1 頁 = 姓名/稱號/新手城/職業/臉譜，第 2 頁 = 理念 + 確認
-	check(not cp.find_children("*", "LineEdit", true, false).any(func(n): return n != name_ed), "建角: 唔再有稱號輸入 (F1)")
+	check(not cp.find_children("*", "LineEdit", true, false).any(func(n): return not (n is LineEdit and (n as LineEdit).placeholder_text.begins_with("姓名"))), "建角: 唔再有稱號輸入 (F1)")
 	var hair0 := int(cch.get("face", {}).get("hair", 1))
 	press(cp, "頭髮")
 	await frames(1)
@@ -343,15 +343,22 @@ func _run() -> void:
 	await frames(1)
 	check(not hud.joy_active(), "放手搖桿應該停")
 	# 10. 點遠處設施 → 自動行過去 → 到咗開面板
+	for sh in m.data.shops:                         # 原版許昌: 武器店喺屋入面，點遠處商店改用街上工具店
+		if String(sh["id"]) == "tool":
+			sp0 = Vector2i(int(sh["x"]), int(sh["y"]))
 	var far := free_away(sp0, 7)
 	put(far.x, far.y)
 	await frames(2)
-	var shop_screen: Vector2 = Vector2(sp0) * m.TILE + Vector2(m.TILE, m.TILE) * 0.5 - m.cam
+	var shop_screen: Vector2 = (Vector2(sp0) * m.TILE + Vector2(m.TILE, m.TILE) * 0.5 - m.cam) * m.zoom
 	await click(shop_screen)
 	check(not m.pending.is_empty(), "點遠處商店應該記住 pending 行過去")
 	check(await until(func() -> bool: return hud.panels.has("shop") and hud.panels["shop"].visible, 15.0), "行到商店應該自動開商店面板")
 	hud.close_panels()
 	# 11. 地圖面板天下頁: 撳新野 →「自動前往」→ sim 記住目的地；搖桿郁 = 取消 (Step 11.7)
+	var oldxc: Dictionary = m.data.map_by_id["xuchang"]      # 原版許昌未連去新野 → 搬去舊許昌圖先試自動前往
+	var oldp: Vector2i = m.sim._free_near(int(oldxc["ox"]) + 20, int(oldxc["oy"]) + 20)
+	put(oldp.x, oldp.y)
+	await frames(2)
 	await click(center("minimap"))
 	var mp = hud.panels.get("map")
 	check(mp != null and mp.visible, "撳小地圖應該開地圖面板")
@@ -674,7 +681,8 @@ func _run() -> void:
 	m.sim.damage(m.sim.ent(pid_d), 99999, {})
 	check(int(died0[0]) == 1, "死亡: die 事件觸發")
 	check(int(ch["hp"]) > 0, "死亡: 復活返客棧 (HP>0)")
-	check(int(m.sim.ent(pid_d)["x"]) == m.sim.inn_pos.x and int(m.sim.ent(pid_d)["y"]) == m.sim.inn_pos.y, "死亡: 傳返客棧")
+	var inn_d: Dictionary = m.sim.nearest_inn(m.sim.map_id_at(int(m.sim.ent(pid_d)["x"]), int(m.sim.ent(pid_d)["y"])))
+	check(int(m.sim.ent(pid_d)["x"]) == int(inn_d["x"]) and int(m.sim.ent(pid_d)["y"]) == int(inn_d["y"]), "死亡: 傳返客棧")
 	check(RulesShop.count_item(ch["bag"], 65030) == 0, "死亡: 還魂丹消耗")
 	ch["storageSub"] = false      # 天地商行訂閱會自動執附近掉落物 (U16) → 手動拾取測試要關
 	# S04a 地面掉落物: 殺怪跌落地 → view_ents 透出 → 互動掣=拾取 → 撳落袋 + 實體消失

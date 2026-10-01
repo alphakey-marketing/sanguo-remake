@@ -317,7 +317,7 @@ func _office_on_talk(e: Dictionary, key: String, x: int, y: int) -> void:
 	if od.is_empty() or String(order_def(String(od["id"])).get("kind", "")) != "census":
 		return
 	var f: Dictionary = data.facilities[String(od["from"])]
-	if map_id_at(x, y) != map_id_at(int(f["x"]), int(f["y"])):
+	if GameData.map_city_of(data.map_at(x, y)) != GameData.map_city_of(data.map_at(int(f["x"]), int(f["y"]))):    # 同城就得
 		return
 	var met: Array = od["met"]
 	if met.has(key):
@@ -424,7 +424,7 @@ func _tribute_cfg() -> Dictionary:
 
 # 設施 key → world city id ("" = 唔屬 any 城池)
 func _facility_city_id(key: String) -> String:
-	var mp := String((data.facilities.get(key, {}) as Dictionary).get("map", ""))
+	var mp := _shop_city(String((data.facilities.get(key, {}) as Dictionary).get("map", "")))
 	for c in data.world["cities"]:
 		if String(c["id"]) == mp:
 			return mp
@@ -900,7 +900,7 @@ func _militia_read(ch: Dictionary) -> Dictionary:
 
 # 單位格 → 城池 id ("" = 唔喺城池)
 func city_at(e: Dictionary) -> String:
-	return String(data.map_at(int(e["x"]), int(e["y"])).get("city", ""))
+	return GameData.map_city_of(data.map_at(int(e["x"]), int(e["y"])))
 
 
 # 定居城市清單 (maps.json kind:city；去重；newbie flag) —— 唔另開地圖，用現有城池
