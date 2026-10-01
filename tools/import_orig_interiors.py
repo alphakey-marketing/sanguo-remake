@@ -241,13 +241,13 @@ def run(check):
         for m, side, o, oside in ((a, sa, b2, sb), (b2, sb, a, sa)):
             r = list(EXITS[m % 100][side]); c = ((r[0] + r[2]) // 2, (r[1] + r[3]) // 2)
             portals.append({'id': 'xc_ln_%d_%s' % (m, side), 'name': '去 ' + CITY_NAME[o // 100] + '外圍', 'map': 'xc%d' % m,
-                            'x': c[0], 'y': c[1], 'rect': r, 'land': list(side_land(o % 100, oside)),
+                            'x': c[0], 'y': c[1], 'rect': r, 'land': list(side_land(m % 100, side)),
                             'to': 'xc_ln_%d_%s' % (o, oside), 'auto': True})
     # 許昌城西門 -> 許昌外圍29 西口 (暫定位置 A，待用家確認)
     gr = [0, 146, 4, 168]; tr = EXITS[29]['W']; tc = ((tr[0] + tr[2]) // 2, (tr[1] + tr[3]) // 2)
-    portals.append({'id': 'xc_gate_w', 'name': '出城西門', 'map': CITY, 'x': 2, 'y': 157, 'rect': gr, 'land': [tc[0] + 4, tc[1]],
+    portals.append({'id': 'xc_gate_w', 'name': '出城西門', 'map': CITY, 'x': 2, 'y': 157, 'rect': gr, 'land': [6, 157],
                     'to': 'xc_gate_w_o', 'auto': True})
-    portals.append({'id': 'xc_gate_w_o', 'name': '入許昌城', 'map': 'xc1929', 'x': tc[0], 'y': tc[1], 'rect': list(tr), 'land': [6, 157],
+    portals.append({'id': 'xc_gate_w_o', 'name': '入許昌城', 'map': 'xc1929', 'x': tc[0], 'y': tc[1], 'rect': list(tr), 'land': [tc[0] + 4, tc[1]],
                     'to': 'xc_gate_w', 'auto': True})
     # 寫資產 / 資料 / txt
     for mid, b in sorted(built.items()):
