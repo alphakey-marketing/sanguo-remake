@@ -1,12 +1,18 @@
 extends "res://sim/sim_core.gd"
 # Sim 繼承鏈 第 2 層: 任務系統 (Step 8) + 任務 PK 戰 + 任務讀取
 
-func spawn_player(pname: String, class_id: String = "yishi") -> int:
-	var e := _spawn_actor(pname, "player", class_id)
+func spawn_player(pname: String, class_id: String = "yishi", spawn_range: Array = []) -> int:
+	var e := _spawn_actor(pname, "player", class_id, spawn_range)
 	state["player_id"] = e["id"]
 	_sync_quest_npcs()
 	return int(e["id"])
 
+
+
+# 原版世界開局 (maps.json world.origStart): 只喺原版許昌出生，唔放舊 ASCII 圖嘅怪/居民/捕快 (舊邏輯抽起，唔實裝)
+func spawn_player_orig(pname: String, class_id: String = "yishi") -> int:
+	var md: Dictionary = data.map_by_id.get(String(data.world.get("origHome", "xuchang_o")), {})
+	return spawn_player(pname, class_id, (md.get("spawn", []) as Array))
 
 
 # ================= 任務系統 (Step 8, spec 06 §1~2) =================
