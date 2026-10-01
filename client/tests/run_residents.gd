@@ -38,7 +38,7 @@ func check(cond: bool, msg: String) -> void:
 func _city_maps(data: GameData) -> Array:
 	var out: Array = []
 	for md in data.maps:
-		if String(md.get("kind", "")) == "city":
+		if String(md.get("kind", "")) == "city" and not md.has("orig"):      # 原版圖 (步驟 4 先放居民) 暫唔計
 			out.append(md)
 	return out
 

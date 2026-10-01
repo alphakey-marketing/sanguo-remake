@@ -82,7 +82,7 @@ func t_spawn(data: GameData) -> void:
 	var per_city := int(G.get("perCity", 2))
 	var maps := []
 	for md in data.maps:
-		if String(md.get("kind", "")) == "city":
+		if String(md.get("kind", "")) == "city" and not md.has("orig"):      # 原版圖 (步驟 4 先放 NPC/捕快) 暫唔計
 			maps.append(md)
 	var by_city := {}
 	var n := 0
