@@ -214,14 +214,14 @@ func t_station(data: GameData) -> void:
 	# 唔夠錢
 	ch["gold"] = fare - 1
 	sim.cmd_station(id, "station_xyc")
-	check(_map_of(sim, id) == "xuchang" and int(ch["gold"]) == fare - 1 and String(msgs.back()).contains("唔夠錢"), "唔夠錢: 搭唔到、唔扣錢")
+	check(_map_of(sim, id) == "xuchang_o" and int(ch["gold"]) == fare - 1 and String(msgs.back()).contains("唔夠錢"), "唔夠錢: 搭唔到、唔扣錢")
 	check(String(sim.station_view(id)["list"].filter(func(x): return String(x["key"]) == "station_xyc")[0]["why"]).contains("唔夠錢"), "視圖: 唔夠錢有原因")
 	# 同一站 / 亂嚟
 	ch["gold"] = 1000
 	sim.cmd_station(id, "station_xc")
-	check(_map_of(sim, id) == "xuchang" and int(ch["gold"]) == 1000, "同一站: 唔郁")
+	check(_map_of(sim, id) == "xuchang_o" and int(ch["gold"]) == 1000, "同一站: 唔郁")
 	sim.cmd_station(id, "training")
-	check(_map_of(sim, id) == "xuchang" and int(ch["gold"]) == 1000, "目的地唔係驛站: 唔郁")
+	check(_map_of(sim, id) == "xuchang_o" and int(ch["gold"]) == 1000, "目的地唔係驛站: 唔郁")
 	# 成功: 扣錢、去到襄陽驛站隔籬、travel 事件、斷自動尋路/攻擊
 	var evs: Array = []
 	sim.event_emitted.connect(func(ev: Dictionary) -> void:
@@ -333,7 +333,7 @@ func t_roundtrip(data: GameData) -> void:
 	_at_fac(sim2, id2, "station_xyc")
 	ch2["gold"] = 1000
 	sim2.cmd_station(id2, "station_xc")
-	check(_map_of(sim2, id2) == "xuchang", "載入後搭驛站")
+	check(_map_of(sim2, id2) == "xuchang_o", "載入後搭驛站")
 
 
 # ---------- 決定性 ----------

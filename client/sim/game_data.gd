@@ -399,6 +399,12 @@ func mob_def(def_id: int) -> Dictionary:
 
 
 # 全域格屬邊張地圖 ({} = 虛空)
+# 地圖所屬城池 id: 原版室內/城街用 cityOf (唔係 kind:city，免得居民/捕快重複生成)；舊圖用 city；冇 = ""
+static func map_city_of(md: Dictionary) -> String:
+	var c := String(md.get("cityOf", ""))
+	return c if c != "" else String(md.get("city", ""))
+
+
 func map_at(x: int, y: int) -> Dictionary:
 	var i := map_index(x, y)
 	return maps[i] if i >= 0 else {}

@@ -239,7 +239,7 @@ func t_data(data: GameData) -> void:
 	for s in data.shops:
 		if String(s["id"]) == "herbalist":
 			herb = s
-	check(not herb.is_empty() and String(herb["map"]) == "xuchang" and data.walk[int(herb["y"]) * GameData.WORLD_W + int(herb["x"])] == 1,
+	check(not herb.is_empty() and String(herb["map"]) == "xc1903" and data.walk[int(herb["y"]) * GameData.WORLD_W + int(herb["x"])] == 1,
 		"藥膳師: 許昌市集，站位行得")
 	check((herb.get("stock", []) as Array).has(30015.0) and float(data.prices[30015]) > 0, "藥膳師: 賣武將體力丸 + 有價")
 

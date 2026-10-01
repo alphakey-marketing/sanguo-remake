@@ -1,58 +1,388 @@
 {
-  "_note": "城內設施 (Step 16.5 B3: station = 驛站，rules/station.gd，車費見 world.json station；Step 3.2；Step 12 加 repair=修理服務、crafts=進階工作區)【原】: 練兵場(2 人對練+直接加 EXP)/私塾(政治+1)/寺廟(魅力+1)。成本【自訂】: 練兵場扣 HP/SP 比例、私塾扣 SP/MP+金、寺廟扣 SP+金。練兵場 EXP = max(expMin, 當級升級所需 × expPct)。attr cap = 屬性上限。",
-  "training": { "name": "練兵場", "map": "xuchang", "x": 10, "y": 21, "color": [0.25, 0.7, 0.4],
-    "costHp": 0.15, "costSp": 0.15, "expPct": 0.05, "expMin": 5, "cooldownTicks": 300,
-    "desc": "同人對練: 扣 15% HP/SP, 直接加經驗 (約當級升級所需 5%)" },
-  "trainer": { "name": "練兵場小兵", "map": "xuchang", "x": 11, "y": 22, "color": [0.5, 0.75, 0.5],
-    "cooldownTicks": 150,
-    "desc": "小兵免費回復 SP【原】（`cmd_facility(id,\"restsp\")`）" },
-  "school": { "name": "私塾", "map": "xuchang", "x": 55, "y": 23, "color": [0.3, 0.55, 0.95],
-    "costSp": 0.2, "costMp": 0.2, "gold": 5, "attr": "pol", "attrCap": 99,
-    "desc": "讀書: 政治 +1 (扣 20% SP/MP + 5 金)" },
-  "temple": { "name": "寺廟", "map": "xuchang", "x": 58, "y": 42, "color": [0.85, 0.65, 0.3],
-    "costSp": 0.2, "gold": 8, "attr": "cha", "attrCap": 99,
-    "desc": "參拜: 魅力 +1 (扣 20% SP + 8 金)" },
-  "forge": { "name": "打鐵鋪", "map": "xuchang", "x": 14, "y": 40, "color": [0.55, 0.5, 0.65], "fusion": true,
-    "desc": "義士融合特技【原】: 將屬性石燒入武器 (只能 1 粒)。QTE: 集氣棒行到 50%±20% 時撳實 (Step 10, spec 02 §6)", "repair": true },
-  "smithy_xy": { "name": "新野打鐵鋪", "map": "xinye", "x": 26, "y": 41, "color": [0.55, 0.5, 0.65], "repair": true,
-    "desc": "修理服務【原】: 俾錢修武器/防具 (費用 = 價錢 × 損耗% × 0.3)" },
-  "kitchen": { "name": "廚房", "map": "xuchang", "x": 58, "y": 34, "color": [0.9, 0.5, 0.3], "crafts": ["cooking"],
-    "desc": "進階工作區【原】: 廚藝 (菜餚回 HP)。要裝備鍋子" },
-  "pharmacy": { "name": "藥房", "map": "xuchang", "x": 40, "y": 40, "color": [0.4, 0.75, 0.55], "crafts": ["alchemy"],
-    "desc": "進階工作區【原】: 煉丹 (補藥回 MP)。要裝備藥缽" },
-  "workshop": { "name": "工房", "map": "xuchang", "x": 8, "y": 40, "color": [0.6, 0.45, 0.3], "crafts": ["smithing", "mending", "carpentry"],
-    "desc": "進階工作區【原】: 冶鐵 (武器)/修繕 (防具)/木匠 (戒指/項鍊/箭) + 自己修理裝備" },
-  "donate_xc": { "name": "許昌官宅", "map": "xuchang", "x": 35, "y": 18, "color": [0.85, 0.3, 0.3], "donation": true, "office": true, "city": "許昌",
-    "desc": "官宅【原】: 討取頭銜 / 官令 (每日 1 次) / 捐贈官令 (捐 3000~50000 金或物資 100 單位起 → 名聲 + 魅力經驗) / 貢獻換行動丹 (Step 13~14)" },
-  "donate_xy": { "name": "新野縣衙", "map": "xinye", "x": 27, "y": 18, "color": [0.85, 0.3, 0.3], "donation": true, "office": true, "city": "新野",
-    "desc": "官宅【原】: 討取頭銜 / 官令 / 捐贈官令 / 貢獻換行動丹 (任何城池官宅都得, Step 13~14)" },
-  "station_xc": { "name": "許昌驛站", "map": "xuchang", "x": 40, "y": 34, "color": [0.75, 0.55, 0.25], "station": true,
-    "desc": "驛站【自訂】(B3): 收費快速傳送去其他城池驛站，車費 = 基本費 + 每過一張圖加價 (一開始全部開放)" },
-  "station_xy": { "name": "新野驛站", "map": "xinye", "x": 6, "y": 20, "color": [0.75, 0.55, 0.25], "station": true,
-    "desc": "驛站【自訂】(B3): 收費快速傳送去其他城池驛站，車費 = 基本費 + 每過一張圖加價 (一開始全部開放)" },
-  "station_rn": { "name": "汝南驛站", "map": "runan_city", "x": 6, "y": 19, "color": [0.75, 0.55, 0.25], "station": true,
-    "desc": "驛站【自訂】(B3): 收費快速傳送去其他城池驛站，車費 = 基本費 + 每過一張圖加價 (一開始全部開放)" },
-  "station_wc": { "name": "宛城驛站", "map": "wancheng", "x": 65, "y": 24, "color": [0.75, 0.55, 0.25], "station": true,
-    "desc": "驛站【自訂】(B3): 收費快速傳送去其他城池驛站，車費 = 基本費 + 每過一張圖加價 (一開始全部開放)" },
-  "station_xyc": { "name": "襄陽驛站", "map": "xiangyang", "x": 31, "y": 53, "color": [0.75, 0.55, 0.25], "station": true,
-    "desc": "驛站【自訂】(B3): 收費快速傳送去其他城池驛站，車費 = 基本費 + 每過一張圖加價 (一開始全部開放)" },
-  "stable_xc": { "name": "許昌馬廄", "map": "xuchang", "x": 61, "y": 20, "color": [0.6, 0.42, 0.25], "stable": true, "city": "xuchang",
-    "desc": "馬廄 (Step 17a, spec 07)【原】: 買馬 / 寄養領馬 / 馬用品 (飼料、玩具、寵物藥、馴馬專用哨)。寄喺馬廄過子時 = 疲勞清零、頭暈好返" },
-  "stable_xy": { "name": "新野馬廄", "map": "xinye", "x": 54, "y": 20, "color": [0.6, 0.42, 0.25], "stable": true, "city": "xinye",
-    "desc": "馬廄 (Step 17a, spec 07)【原】: 買馬 / 寄養領馬 / 馬用品 (飼料、玩具、寵物藥、馴馬專用哨)。寄喺馬廄過子時 = 疲勞清零、頭暈好返" },
-
-  "bulletin_xc": { "name": "許昌公佈欄", "map": "xuchang", "x": 37, "y": 73, "color": [0.7, 0.62, 0.4], "bulletin": true,
-    "desc": "公佈欄【原 sy2_8_12】: 城門口查看各城池正發生嘅天災同種類" },
-  "bulletin_xy": { "name": "新野公佈欄", "map": "xinye", "x": 33, "y": 45, "color": [0.7, 0.62, 0.4], "bulletin": true,
-    "desc": "公佈欄【原 sy2_8_12】: 城門口查看各城池正發生嘅天災同種類" },
-  "bulletin_xyc": { "name": "襄陽公佈欄", "map": "xiangyang", "x": 39, "y": 57, "color": [0.7, 0.62, 0.4], "bulletin": true,
-    "desc": "公佈欄【原 sy2_8_12】: 城門口查看各城池正發生嘅天災同種類" },
-
-  "relief_xc": { "name": "許昌救災區", "map": "field_1", "x": 104, "y": 10, "color": [0.9, 0.45, 0.3], "relief": true, "cityId": "xuchang",
-    "desc": "救災區【原 sy2_8_12】: 領咗救災官令 + 帶對應救災物品，喺呢度執行救災工作（每次扣 SP + 用 1 份物品）" },
-  "relief_xy": { "name": "新野救災區", "map": "bowang", "x": 62, "y": 10, "color": [0.9, 0.45, 0.3], "relief": true, "cityId": "xinye",
-    "desc": "救災區【原 sy2_8_12】: 領咗救災官令 + 帶對應救災物品，喺呢度執行救災工作（每次扣 SP + 用 1 份物品）" },
-  "relief_xyc": { "name": "襄陽救災區", "map": "longzhong", "x": 38, "y": 10, "color": [0.9, 0.45, 0.3], "relief": true, "cityId": "xiangyang",
-    "desc": "救災區【原 sy2_8_12】: 領咗救災官令 + 帶對應救災物品，喺呢度執行救災工作（每次扣 SP + 用 1 份物品）" },
-  "station_xco": { "name": "許昌驛站（原版）", "map": "xuchang_o", "x": 114, "y": 140, "color": [0.75, 0.55, 0.25], "station": true, "desc": "原版許昌驛站（步驟 4 臨時位置）" }
+ "_note": "城內設施 (Step 16.5 B3: station = 驛站，rules/station.gd，車費見 world.json station；Step 3.2；Step 12 加 repair=修理服務、crafts=進階工作區)【原】: 練兵場(2 人對練+直接加 EXP)/私塾(政治+1)/寺廟(魅力+1)。成本【自訂】: 練兵場扣 HP/SP 比例、私塾扣 SP/MP+金、寺廟扣 SP+金。練兵場 EXP = max(expMin, 當級升級所需 × expPct)。attr cap = 屬性上限。",
+ "training": {
+  "name": "練兵場",
+  "map": "xc1907",
+  "x": 27,
+  "y": 38,
+  "color": [
+   0.25,
+   0.7,
+   0.4
+  ],
+  "costHp": 0.15,
+  "costSp": 0.15,
+  "expPct": 0.05,
+  "expMin": 5,
+  "cooldownTicks": 300,
+  "desc": "同人對練: 扣 15% HP/SP, 直接加經驗 (約當級升級所需 5%)",
+  "npc": {
+   "name": "民團校尉",
+   "sprite": 21022
+  }
+ },
+ "trainer": {
+  "name": "練兵場小兵",
+  "map": "xc1907",
+  "x": 23,
+  "y": 38,
+  "color": [
+   0.5,
+   0.75,
+   0.5
+  ],
+  "cooldownTicks": 150,
+  "desc": "小兵免費回復 SP【原】（`cmd_facility(id,\"restsp\")`）",
+  "npc": {
+   "name": "練兵將",
+   "sprite": 20151
+  }
+ },
+ "school": {
+  "name": "私塾",
+  "map": "xc1905",
+  "x": 20,
+  "y": 18,
+  "color": [
+   0.3,
+   0.55,
+   0.95
+  ],
+  "costSp": 0.2,
+  "costMp": 0.2,
+  "gold": 5,
+  "attr": "pol",
+  "attrCap": 99,
+  "desc": "讀書: 政治 +1 (扣 20% SP/MP + 5 金)",
+  "npc": {
+   "name": "夫子",
+   "sprite": 52181
+  }
+ },
+ "temple": {
+  "name": "寺廟",
+  "map": "xc1906",
+  "x": 25,
+  "y": 25,
+  "color": [
+   0.85,
+   0.65,
+   0.3
+  ],
+  "costSp": 0.2,
+  "gold": 8,
+  "attr": "cha",
+  "attrCap": 99,
+  "desc": "參拜: 魅力 +1 (扣 20% SP + 8 金)",
+  "npc": {
+   "name": "廟公",
+   "sprite": 52051
+  }
+ },
+ "forge": {
+  "name": "打鐵鋪",
+  "map": "xc1911",
+  "x": 28,
+  "y": 26,
+  "color": [
+   0.55,
+   0.5,
+   0.65
+  ],
+  "fusion": true,
+  "desc": "義士融合特技【原】: 將屬性石燒入武器 (只能 1 粒)。QTE: 集氣棒行到 50%±20% 時撳實 (Step 10, spec 02 §6)",
+  "repair": true,
+  "npc": {
+   "name": "打鐵鋪掌櫃",
+   "sprite": 52131
+  }
+ },
+ "smithy_xy": {
+  "name": "新野打鐵鋪",
+  "map": "xinye",
+  "x": 26,
+  "y": 41,
+  "color": [
+   0.55,
+   0.5,
+   0.65
+  ],
+  "repair": true,
+  "desc": "修理服務【原】: 俾錢修武器/防具 (費用 = 價錢 × 損耗% × 0.3)"
+ },
+ "kitchen": {
+  "name": "廚房",
+  "map": "xc1924",
+  "x": 26,
+  "y": 28,
+  "color": [
+   0.9,
+   0.5,
+   0.3
+  ],
+  "crafts": [
+   "cooking"
+  ],
+  "desc": "進階工作區【原】: 廚藝 (菜餚回 HP)。要裝備鍋子",
+  "npc": {
+   "name": "大廚",
+   "sprite": 52211
+  }
+ },
+ "pharmacy": {
+  "name": "藥房",
+  "map": "xc1903",
+  "x": 26,
+  "y": 29,
+  "color": [
+   0.4,
+   0.75,
+   0.55
+  ],
+  "crafts": [
+   "alchemy"
+  ],
+  "desc": "進階工作區【原】: 煉丹 (補藥回 MP)。要裝備藥缽",
+  "npc": {
+   "name": "煉丹師傅",
+   "sprite": 52051
+  }
+ },
+ "workshop": {
+  "name": "工房",
+  "map": "xc1910",
+  "x": 33,
+  "y": 28,
+  "color": [
+   0.6,
+   0.45,
+   0.3
+  ],
+  "crafts": [
+   "smithing",
+   "mending",
+   "carpentry"
+  ],
+  "desc": "進階工作區【原】: 冶鐵 (武器)/修繕 (防具)/木匠 (戒指/項鍊/箭) + 自己修理裝備",
+  "npc": {
+   "name": "木工廠掌櫃",
+   "sprite": 52211
+  }
+ },
+ "donate_xc": {
+  "name": "許昌官宅",
+  "map": "xc1901",
+  "x": 39,
+  "y": 36,
+  "color": [
+   0.85,
+   0.3,
+   0.3
+  ],
+  "donation": true,
+  "office": true,
+  "city": "許昌",
+  "desc": "官宅【原】: 討取頭銜 / 官令 (每日 1 次) / 捐贈官令 (捐 3000~50000 金或物資 100 單位起 → 名聲 + 魅力經驗) / 貢獻換行動丹 (Step 13~14)",
+  "npc": {
+   "name": "地方功曹",
+   "sprite": 52183
+  }
+ },
+ "donate_xy": {
+  "name": "新野縣衙",
+  "map": "xinye",
+  "x": 27,
+  "y": 18,
+  "color": [
+   0.85,
+   0.3,
+   0.3
+  ],
+  "donation": true,
+  "office": true,
+  "city": "新野",
+  "desc": "官宅【原】: 討取頭銜 / 官令 / 捐贈官令 / 貢獻換行動丹 (任何城池官宅都得, Step 13~14)"
+ },
+ "station_xc": {
+  "name": "許昌驛站",
+  "map": "xuchang_o",
+  "x": 130,
+  "y": 155,
+  "color": [
+   0.75,
+   0.55,
+   0.25
+  ],
+  "station": true,
+  "desc": "驛站【自訂】(B3): 收費快速傳送去其他城池驛站，車費 = 基本費 + 每過一張圖加價 (一開始全部開放)",
+  "npc": {
+   "name": "驛站長",
+   "sprite": 52071
+  }
+ },
+ "station_xy": {
+  "name": "新野驛站",
+  "map": "xinye",
+  "x": 6,
+  "y": 20,
+  "color": [
+   0.75,
+   0.55,
+   0.25
+  ],
+  "station": true,
+  "desc": "驛站【自訂】(B3): 收費快速傳送去其他城池驛站，車費 = 基本費 + 每過一張圖加價 (一開始全部開放)"
+ },
+ "station_rn": {
+  "name": "汝南驛站",
+  "map": "runan_city",
+  "x": 6,
+  "y": 19,
+  "color": [
+   0.75,
+   0.55,
+   0.25
+  ],
+  "station": true,
+  "desc": "驛站【自訂】(B3): 收費快速傳送去其他城池驛站，車費 = 基本費 + 每過一張圖加價 (一開始全部開放)"
+ },
+ "station_wc": {
+  "name": "宛城驛站",
+  "map": "wancheng",
+  "x": 65,
+  "y": 24,
+  "color": [
+   0.75,
+   0.55,
+   0.25
+  ],
+  "station": true,
+  "desc": "驛站【自訂】(B3): 收費快速傳送去其他城池驛站，車費 = 基本費 + 每過一張圖加價 (一開始全部開放)"
+ },
+ "station_xyc": {
+  "name": "襄陽驛站",
+  "map": "xiangyang",
+  "x": 31,
+  "y": 53,
+  "color": [
+   0.75,
+   0.55,
+   0.25
+  ],
+  "station": true,
+  "desc": "驛站【自訂】(B3): 收費快速傳送去其他城池驛站，車費 = 基本費 + 每過一張圖加價 (一開始全部開放)"
+ },
+ "stable_xc": {
+  "name": "許昌馬廄",
+  "map": "xc1914",
+  "x": 21,
+  "y": 28,
+  "color": [
+   0.6,
+   0.42,
+   0.25
+  ],
+  "stable": true,
+  "city": "xuchang",
+  "desc": "馬廄 (Step 17a, spec 07)【原】: 買馬 / 寄養領馬 / 馬用品 (飼料、玩具、寵物藥、馴馬專用哨)。寄喺馬廄過子時 = 疲勞清零、頭暈好返",
+  "npc": {
+   "name": "馬廄老闆",
+   "sprite": 52131
+  }
+ },
+ "stable_xy": {
+  "name": "新野馬廄",
+  "map": "xinye",
+  "x": 54,
+  "y": 20,
+  "color": [
+   0.6,
+   0.42,
+   0.25
+  ],
+  "stable": true,
+  "city": "xinye",
+  "desc": "馬廄 (Step 17a, spec 07)【原】: 買馬 / 寄養領馬 / 馬用品 (飼料、玩具、寵物藥、馴馬專用哨)。寄喺馬廄過子時 = 疲勞清零、頭暈好返"
+ },
+ "bulletin_xc": {
+  "name": "許昌公佈欄",
+  "map": "xuchang_o",
+  "x": 110,
+  "y": 152,
+  "color": [
+   0.7,
+   0.62,
+   0.4
+  ],
+  "bulletin": true,
+  "desc": "公佈欄【原 sy2_8_12】: 城門口查看各城池正發生嘅天災同種類"
+ },
+ "bulletin_xy": {
+  "name": "新野公佈欄",
+  "map": "xinye",
+  "x": 33,
+  "y": 45,
+  "color": [
+   0.7,
+   0.62,
+   0.4
+  ],
+  "bulletin": true,
+  "desc": "公佈欄【原 sy2_8_12】: 城門口查看各城池正發生嘅天災同種類"
+ },
+ "bulletin_xyc": {
+  "name": "襄陽公佈欄",
+  "map": "xiangyang",
+  "x": 39,
+  "y": 57,
+  "color": [
+   0.7,
+   0.62,
+   0.4
+  ],
+  "bulletin": true,
+  "desc": "公佈欄【原 sy2_8_12】: 城門口查看各城池正發生嘅天災同種類"
+ },
+ "relief_xc": {
+  "name": "許昌救災區",
+  "map": "field_1",
+  "x": 104,
+  "y": 10,
+  "color": [
+   0.9,
+   0.45,
+   0.3
+  ],
+  "relief": true,
+  "cityId": "xuchang",
+  "desc": "救災區【原 sy2_8_12】: 領咗救災官令 + 帶對應救災物品，喺呢度執行救災工作（每次扣 SP + 用 1 份物品）"
+ },
+ "relief_xy": {
+  "name": "新野救災區",
+  "map": "bowang",
+  "x": 62,
+  "y": 10,
+  "color": [
+   0.9,
+   0.45,
+   0.3
+  ],
+  "relief": true,
+  "cityId": "xinye",
+  "desc": "救災區【原 sy2_8_12】: 領咗救災官令 + 帶對應救災物品，喺呢度執行救災工作（每次扣 SP + 用 1 份物品）"
+ },
+ "relief_xyc": {
+  "name": "襄陽救災區",
+  "map": "longzhong",
+  "x": 38,
+  "y": 10,
+  "color": [
+   0.9,
+   0.45,
+   0.3
+  ],
+  "relief": true,
+  "cityId": "xiangyang",
+  "desc": "救災區【原 sy2_8_12】: 領咗救災官令 + 帶對應救災物品，喺呢度執行救災工作（每次扣 SP + 用 1 份物品）"
+ }
 }

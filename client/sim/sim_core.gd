@@ -187,7 +187,7 @@ func city_pop_set(city_id: String, v: int) -> void:
 
 # 座標 → 城池 id（"" = 唔喺城池）；各層共用（法令 gate 用）
 func city_id_at(x: int, y: int) -> String:
-	return String(data.map_at(x, y).get("city", ""))
+	return GameData.map_city_of(data.map_at(x, y))
 
 
 # ---- 讀取 ----

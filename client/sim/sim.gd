@@ -63,7 +63,7 @@ func _city_guard_check() -> void:
 	var ch: Dictionary = p["ch"]
 	var last: int = int(ch.get("lastGuardWarn", -99999))
 	# S08b：城池「防禦」屬性影響衛兵警告間隔（城牆越好 → 衛兵越密）
-	var map_city := String(data.map_by_id.get(map_id_at(int(p["x"]), int(p["y"])), {}).get("city", ""))
+	var map_city := GameData.map_city_of(data.map_by_id.get(map_id_at(int(p["x"]), int(p["y"])), {}))
 	# S08g 法令：冇僱護衛（guard 關）→ 冇衛兵攔路（未佔城 = 照舊）
 	if not law_allows(map_city, "guard"):
 		return

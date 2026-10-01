@@ -427,6 +427,8 @@ func t_shops_4cats(data: GameData) -> void:
 	var by_map := {}
 	for s in data.shops:
 		var m := String(s["map"])
+		if data.map_by_id.has(m) and data.map_by_id[m].has("cityOf"):
+			m = String(data.map_by_id[m]["cityOf"])      # 原版許昌圖 → 歸返許昌城
 		if not by_map.has(m):
 			by_map[m] = {"tool": false, "herb": false, "food": false, "grocery": false}
 		var name := String(s["name"])

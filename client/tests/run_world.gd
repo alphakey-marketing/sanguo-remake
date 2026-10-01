@@ -276,24 +276,20 @@ func t_set_home(data: GameData) -> void:
 	check(bool(data.world.get("origStart", false)) and orig_ids.size() == 1, "原版開局: 只得原版許昌一個新手城")
 	var id0 := sim.spawn_player_orig("o")
 	check(sim.map_id_at(int(sim.ent(id0)["x"]), int(sim.ent(id0)["y"])) == "xuchang_o", "原版開局: 出生喺 xuchang_o")
-	data.world["origStart"] = false      # 以下測舊 3 城揀法
+	data.world["origStart"] = false      # 以下測舊圖路徑: 新手城都係淨得許昌
 	var id := sim.spawn_player("t")
 	var ids: Array = []
 	for c in sim.newbie_cities():
 		ids.append(String(c["id"]))
-	check(ids.size() == 3 and ids.has("xuchang") and ids.has("xiangyang") and ids.has("xinye"), "揀城: 3 個新手城 (許昌/襄陽/新野)")
+	check(ids == ["xuchang"], "揀城: 新手城淨係許昌")
 	sim.cmd_set_home(id, "xiangyang")
 	var ch: Dictionary = sim.player_ch()
-	check(String(ch.get("homeCity", "")) == "xiangyang", "揀城: ch.homeCity = 襄陽")
-	var e := sim.ent(id)
-	var md := sim._city_map("xiangyang")
-	check(sim.map_id_at(int(e["x"]), int(e["y"])) == String(md["id"]), "揀城: 搬咗去襄陽城內")
-	check(String(sim._home_map().get("city", "")) == "xiangyang", "揀城: _home_map 跟玩家揀嘅城")
-	sim.cmd_set_home(id, "nowhere")
-	check(String(ch.get("homeCity", "")) == "xiangyang", "揀城: 未開放城拒絕，唔改")
+	check(String(ch.get("homeCity", "")) != "xiangyang", "揀城: 襄陽唔係新手城，拒絕")
+	sim.cmd_set_home(id, "xuchang")
+	check(String(ch.get("homeCity", "")) == "xuchang", "揀城: ch.homeCity = 許昌")
 	ch["level"] = 2
-	sim.cmd_set_home(id, "xinye")
-	check(String(ch.get("homeCity", "")) == "xiangyang", "揀城: 出發後 (Lv>1) 唔可以改")
+	sim.cmd_set_home(id, "xuchang")
+	check(String(ch.get("homeCity", "")) == "xuchang", "揀城: 出發後 (Lv>1) 仍然係許昌")
 
 
 # 城際貿易 (spec 05 §6): 平城買、貴城賣，買賣價跟所屬城市場 pf，賺差價
@@ -307,7 +303,7 @@ func t_trade_cities(data: GameData) -> void:
 		if String(s1.get("map", "")) == "":
 			continue
 		for s2 in data.shops:
-			if String(s2.get("map", "")) == "" or String(s2["map"]) == String(s1["map"]):
+			if String(s2.get("map", "")) == "" or sim._shop_city(String(s2["map"])) == sim._shop_city(String(s1["map"])):
 				continue
 			for it in s1["stock"]:
 				if (s2["stock"] as Array).has(it) and float(data.prices.get(int(it), 0.0)) >= 100.0:
@@ -323,8 +319,8 @@ func t_trade_cities(data: GameData) -> void:
 	if item == 0:
 		return
 	var cat := str(int(data.cats.get(item, 0)))
-	sim.market_city(String(a["map"]), cat)["pf"] = 0.6
-	sim.market_city(String(b["map"]), cat)["pf"] = 1.9
+	sim.market_city(sim._shop_city(String(a["map"])), cat)["pf"] = 0.6
+	sim.market_city(sim._shop_city(String(b["map"])), cat)["pf"] = 1.9
 	check(absf(sim._shop_pf(a, item) - 0.6) < 0.001 and absf(sim._shop_pf(b, item) - 1.9) < 0.001, "貿易: _shop_pf 跟所屬城市場價")
 	var ch: Dictionary = sim.player_ch()
 	ch["gold"] = 100000
@@ -397,7 +393,7 @@ func t_orig_map(data: GameData) -> void:
 	var pth := RulesPath.find(data.walk, W, gy * W + gx, far, 200000, data.portal_at)
 	check(not RulesPath.find(data.walk, W, gy * W + gx, far, Sim.PATH_CAP, data.portal_at).is_empty(), "原版許昌: 預設 PATH_CAP 搵得到最遠路")
 	_orig_interiors(data, seen)
-	var st_o: Dictionary = data.facilities.get("station_xco", {})
+	var st_o: Dictionary = data.facilities.get("station_xc", {})
 	check(not st_o.is_empty() and seen.has(int(st_o.y) * W + int(st_o.x)), "原版許昌: 驛站位行得到")
 	check(not pth.is_empty(), "原版許昌: A* 出生點 → 最遠可達格 (路長 %d, %d ms)" % [pth.size(), Time.get_ticks_msec() - t0])
 

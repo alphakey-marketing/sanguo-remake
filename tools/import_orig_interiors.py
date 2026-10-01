@@ -236,7 +236,7 @@ def run(check):
     for mid, b in sorted(built.items()):
         ox, oy = pos[mid]; sp = b.get('spawn') or (b['gw'] // 2, b['gh'] // 2)
         mj['maps'].append({'id': 'xc%d' % mid, 'name': '許昌·' + b['cn'], 'ox': ox, 'oy': oy, 'safe': True,
-                           'kind': 'field' if mid in ROADS else 'house', 'orig': 'xc%d' % mid,
+                           'kind': 'field' if mid in ROADS else 'house', 'orig': 'xc%d' % mid, 'cityOf': 'xuchang',
                            'spawn': [sp[0], sp[1], sp[0], sp[1]]}
                   | ({'orphan': True} if mid in nodoor else {}))     # orphan = 未知城內門，暫時去唔到
     mj['portals'] = [p for p in mj['portals'] if not (p['id'].startswith('xc_in_') or p['id'].startswith('xc_out_'))] + portals

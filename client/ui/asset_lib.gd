@@ -121,6 +121,26 @@ static func actor_sid(npc_name: String, role := "", seed := 0, class_id := "") -
 	return int(arr[seed % arr.size()])
 
 
+# 原版 NPC (okm sprite 編號)：有圖就用；冇 (52xxx 圖包未搵到) → 通用人形，同編號永遠同一款
+static func npc_sid(sprite: int, npc_name: String) -> int:
+	_ensure()
+	var s: Variant = _index.get("actor_S", {})
+	if s is Dictionary and (s as Dictionary).has(str(sprite)):
+		return sprite
+	var pool: Variant = _index.get("_actor_pool", {})
+	if not (pool is Dictionary):
+		return 0
+	var key := "civ_m"
+	for w in ["老", "師", "公", "夫子", "長"]:
+		if npc_name.contains(w):
+			key = "elder"
+	for w in ["婦", "嫂", "妹", "女"]:
+		if npc_name.contains(w):
+			key = "civ_f"
+	var arr: Array = (pool as Dictionary).get(key, [])
+	return 0 if arr.is_empty() else int(arr[sprite % arr.size()])
+
+
 # UI 皮件: panel / card / btn_n / btn_p / btn_d
 static func ui(key: String) -> Texture2D:
 	return _tex("ui", key)
