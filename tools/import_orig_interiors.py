@@ -30,16 +30,21 @@ INTERIORS = {
 ROADS = {1923: '許昌道路（木礦藥）', 1922: '許昌道路（農漁獵）'}
 # 工作區入口: 城內 k2 觸發區 -> 道路圖 (用家 2026-09-30 指定: 600089 -> A=1923, 600865 -> B=1922)
 FIELDS = {1851: '許昌洞穴一', 1852: '許昌洞穴二', 1853: '許昌洞穴三', 1854: '許昌洞穴四', 1855: '許昌洞穴五',     # N51-55 = 洞穴 (用家睇圖確認)
-          1925: '外圍25', 1929: '外圍29', 1949: '外圍49'}
+          1925: '外圍25'}
 # 外圍模板 (所有城共用同一份圖資料): 每城一個邏輯實例 (自己 map id/擺位)，orig 指向模板
 LINKS = json.load(open(os.path.join(ROOT, 'client', 'data', 'city_links.json'), encoding='utf8'))   # tools/city_links.py 生成
 CITY_NAME = {c['id'] // 100: n for n, c in LINKS['cities'].items()}
-TPLS = (25, 29, 49)
+TPLS = (25,)                              # v2: 每城只有一張外圍 xx25 (所有城共用)
 TOWNS = {1700: '陳留'}                    # 城圖 (4000x3000)；許昌城圖由 import_orig_maps 負責 (xuchang_o)
 CITY_MAPID = {19: CITY, 17: 'xc1700'}     # 城 id(//100) -> 城圖 map id
-INSTANCES = sorted({m for l in LINKS['links'] for m in (l['a_out'], l['b_out'])} - {1925, 1929, 1949})   # 非許昌嘅外圍實例
+INSTANCES = sorted({m for l in LINKS['links'] for m in (l['a_out'], l['b_out'])} - {1925})   # 非許昌嘅外圍實例
 SIDE_DIR = {'E': (1, 0), 'W': (-1, 0), 'N': (0, -1), 'S': (0, 1)}
-GATE_W = [0, 146, 4, 168]                 # 許昌城西邊緣 (用家確認 A 位) -> 許昌外圍29 西口
+GATE_W = [0, 146, 4, 168]                 # 許昌城西邊緣 (用家確認 A 位) -> 許昌外圍25 正中
+MODEL = 'ad022'                           # 城池模型 (原版城牆望樓建築 480x600)，放外圍 25 正中
+MODEL_XY = (1360, 900)                    # 模型左上 px (外圍 3200x2400 正中)
+MODEL_BLOCK = (90, 77, 110, 90)           # 模型佔格 (格，閉區間)
+GATE_RECT = [96, 91, 104, 94]             # 入城傳送區 (模型正下方)
+GATE_LAND = (100, 97)                     # 由城出來嘅落腳點
 
 
 def tpl_runs(g, gw, gh):
@@ -75,25 +80,11 @@ OPP = {'E': 'W', 'W': 'E', 'N': 'S', 'S': 'N'}
 
 
 def plan_links(runs, cruns):
-    """每條連線 -> 兩端各揀一邊 (按對方城方位)；回 {map id: [conn]}。許昌1929 另加西門口 (side W, key 0)"""
-    cities = LINKS['cities']; conns = {}
-    def add(m, other, ocity, vec):
-        side = max(runs[m % 100], key=lambda sd: SIDE_DIR[sd][0] * vec[0] + SIDE_DIR[sd][1] * vec[1])
-        key = vec[1] if side in 'EW' else vec[0]
-        conns.setdefault(m, []).append({'side': side, 'other': other, 'ocity': ocity, 'key': key, 'vec': vec})
+    """v2: 每條線兩端各用 city_links.json 定好嘅方向邊 (a_dir/b_dir)；每城外圍每邊最多一口。回 {外圍 id: [conn]}"""
+    conns = {}
     for l in LINKS['links']:
-        ca, cb = cities[l['a']], cities[l['b']]
-        add(l['a_out'], l['b_out'], l['b'], (cb['x'] - ca['x'], cb['y'] - ca['y']))
-        add(l['b_out'], l['a_out'], l['a'], (ca['x'] - cb['x'], ca['y'] - cb['y']))
-    # 城口: 每座有城圖嘅城，向每張有連線嘅外圍開一個邊緣口；城邊 = 該外圍鄰城平均方位，外圍邊 = 對面。許昌 1929 = 用家定嘅 A 位 (西/西)
-    for m in sorted(list(conns)):
-        city = m // 100
-        if city not in cruns: continue
-        vs = [c['vec'] for c in conns[m]]; vec = (sum(v[0] for v in vs), sum(v[1] for v in vs))
-        cs = 'W' if m == 1929 else max(cruns[city], key=lambda sd: SIDE_DIR[sd][0] * vec[0] + SIDE_DIR[sd][1] * vec[1])
-        os_ = 'W' if m == 1929 else max(runs[m % 100], key=lambda sd: SIDE_DIR[sd][0] * SIDE_DIR[OPP[cs]][0] + SIDE_DIR[sd][1] * SIDE_DIR[OPP[cs]][1])
-        key = 0 if m == 1929 else (vec[1] if os_ in 'EW' else vec[0])
-        conns[m].append({'side': os_, 'cside': cs, 'other': None, 'gate_city': city, 'ocity': [n for n, c in cities.items() if c['id'] // 100 == city][0], 'key': key, 'vec': vec})
+        conns.setdefault(l['a_out'], []).append({'side': l['a_dir'], 'other': l['b_out'], 'ocity': l['b'], 'key': 0})
+        conns.setdefault(l['b_out'], []).append({'side': l['b_dir'], 'other': l['a_out'], 'ocity': l['a'], 'key': 0})
     return conns
 
 
@@ -261,6 +252,12 @@ def run(check):
     if errs:
         print('錯:'); [print(' -', e) for e in errs[:30]]; sys.exit(1)
 
+    b25 = built[1925]                              # 外圍 25: 正中加城池模型 (佔格擋路，門口留空)
+    g25 = bytearray(b25['g'])
+    for yy in range(MODEL_BLOCK[1], MODEL_BLOCK[3] + 1):
+        for xx in range(MODEL_BLOCK[0], MODEL_BLOCK[2] + 1): g25[yy * b25['gw'] + xx] = 1
+    b25['g'] = bytes(g25); b25['out']['walk']['z'] = base64.b64encode(zlib.compress(bytes(g25), 9)).decode()
+    b25['out']['objects'].append({'n': MODEL, 'x': MODEL_XY[0], 'y': MODEL_XY[1]}); b25['out']['objects'].sort(key=lambda o: o['y']); b25['names'].add(MODEL)
     # 地圖擺位: 全域格仔 x 0..511；許昌原版 (oy 644 + 188) 之下
     pos, bottom = shelf_pack([(m, b["gw"], b["gh"]) for m, b in built.items() if m not in FIELDS and m not in TOWNS], 512, 860)
     fitems = [(m, b["gw"], b["gh"]) for m, b in built.items() if m in FIELDS or m in TOWNS]
@@ -317,44 +314,36 @@ def run(check):
     cityg = {19: (cg, cgw, cgh)} | {t // 100: (built[t]['g'], built[t]['gw'], built[t]['gh']) for t in TOWNS if t in built}
     cruns = {k: tpl_runs(*v) for k, v in cityg.items()}
     conns = plan_links(runs, cruns)
-    slot_rects(runs, conns, built[1929]['gw'], built[1929]['gh'])
+    for m, lst in conns.items(): place_slots(lst, lambda sd: runs[25][sd], built[1925]['gw'], built[1925]['gh'])
     pid = lambda m, c: 'xc_ln_%d_%s_%d' % (m, c['side'], c['idx'])
-    gates = {}                                   # 城 id -> [城口 conn]
     for m, lst in sorted(conns.items()):
         for c in lst:
-            if c['other'] is None: gates.setdefault(c['gate_city'], []).append(dict(c, out=m, side=c['cside']))
-    for city, lst in gates.items():
-        cw, ch2 = cityg[city][1], cityg[city][2]
-        place_slots(lst, lambda sd: cruns[city][sd], cw, ch2)
-        for gc in lst:
-            if gc['out'] == 1929:                # 許昌 A 位: 用家確認
-                gc['rect'] = GATE_W; gc['cell'] = (2, 157); gc['land'] = (6, 157)
-            else:                                # 落腳點要行得 (城邊可能有牆)
-                gcg, gcw, gch = cityg[city]
-                gc['land'] = tuple(nearest_outside(gcg, gcw, gch, gc['rect'], gc['land']))
-    for m, lst in sorted(conns.items()):
-        for c in lst:
-            if c['other'] is None:
-                gc = [x for x in gates[c['gate_city']] if x['out'] == m][0]
-                old = (m == 1929)
-                gid, gido = ('xc_gate_w', 'xc_gate_w_o') if old else ('xc_gate_%d_%d' % (c['gate_city'], m), 'xc_gate_%d_%d_o' % (c['gate_city'], m))
-                portals.append({'id': gido, 'name': '入' + c['ocity'] + '城', 'map': 'xc%d' % m, 'x': c['cell'][0], 'y': c['cell'][1], 'rect': c['rect'],
-                                'land': list(c['land']), 'to': gid, 'auto': True})
-                portals.append({'id': gid, 'name': '去外圍', 'map': CITY_MAPID[c['gate_city']], 'x': gc['cell'][0], 'y': gc['cell'][1], 'rect': gc['rect'],
-                                'land': list(gc['land']), 'to': gido, 'auto': True})
-                continue
             back = [d for d in conns[c['other']] if d['other'] == m][0]
             portals.append({'id': pid(m, c), 'name': '去 ' + c['ocity'] + '外圍', 'map': 'xc%d' % m, 'x': c['cell'][0], 'y': c['cell'][1],
                             'rect': c['rect'], 'land': list(c['land']), 'to': pid(c['other'], back), 'auto': True})
-    # 由許昌可達 (節點 = 城 id*100 或外圍 id): 城口連本城外圍、外圍連線連對方外圍
-    reach = {1900}; ch = True
-    edges = [(l['a_out'], l['b_out']) for l in LINKS['links']] + [(g['out'] // 100 * 100, g['out']) for g in sum(gates.values(), [])]
+    # 城口: 每城單一邊緣出口 <-> 本城外圍 25 正中城池模型門口。許昌 = 西邊緣 A 位 (用家確認)；其他城 = 西邊緣行得段
+    gates = {}
+    for city in sorted(cityg):
+        gcg, gcw, gch = cityg[city]; out25 = city * 100 + 25
+        if city == 19: rect, cell, land = GATE_W, (2, 157), (6, 157)
+        else:
+            side = 'W' if 'W' in cruns[city] else sorted(cruns[city])[0]; sl = [{'side': side, 'key': 0}]
+            place_slots(sl, lambda sd: cruns[city][sd], gcw, gch); rect, cell = sl[0]['rect'], sl[0]['cell']
+            land = tuple(nearest_outside(gcg, gcw, gch, rect, sl[0]['land']))
+        gid, gido = ('xc_gate_w', 'xc_gate_w_o') if city == 19 else ('xc_gate_%d' % city, 'xc_gate_%d_o' % city)
+        cx = (GATE_RECT[0] + GATE_RECT[2]) // 2; cy = (GATE_RECT[1] + GATE_RECT[3]) // 2
+        portals.append({'id': gido, 'name': '入' + CITY_NAME[city] + '城', 'map': 'xc%d' % out25, 'x': cx, 'y': cy, 'rect': GATE_RECT,
+                        'land': list(GATE_LAND), 'to': gid, 'auto': True})
+        portals.append({'id': gid, 'name': '出城', 'map': CITY_MAPID[city], 'x': cell[0], 'y': cell[1], 'rect': rect, 'land': list(land), 'to': gido, 'auto': True})
+        gates[city] = land
+    # 由許昌可達: 外圍之間按連線
+    reach = {1925}; ch = True
     while ch:
         ch = False
-        for a2, b2 in edges:
-            if (a2 in reach) != (b2 in reach): reach |= {a2, b2}; ch = True
+        for l in LINKS['links']:
+            if (l['a_out'] in reach) != (l['b_out'] in reach): reach |= {l['a_out'], l['b_out']}; ch = True
     for t in TOWNS:
-        if t in built and gates.get(t // 100): built[t]['spawn'] = gates[t // 100][0]['land']
+        if t in built: built[t]['spawn'] = gates[t // 100]
     # 寫資產 / 資料 / txt
     for mid, b in sorted(built.items()):
         key = 'xc%d' % mid
@@ -381,18 +370,22 @@ def run(check):
                            'kind': 'field' if (mid in ROADS or mid in FIELDS) else 'house', 'orig': 'xc%d' % mid, 'cityOf': 'xuchang',
                            'spawn': [sp[0], sp[1], sp[0], sp[1]]}
                   | ({'orphan': True} if (mid in nodoor or mid in FIELDS) else {}))     # orphan = 未知城內門，暫時去唔到
-    tplids = ('xc1925', 'xc1929', 'xc1949')
-    stale = {m['id'] for m in mj['maps'] if m['id'].startswith('xc') and m.get('orig') in tplids and m['id'] not in tplids}
+    tplids = ('xc1925', 'xc1929', 'xc1949')            # 1929/1949 係 v1 舊模板，一併清走
+    stale = {m['id'] for m in mj['maps'] if m['id'].startswith('xc') and m.get('orig') in tplids and m['id'] != 'xc1925' and int(m['id'][2:]) not in INSTANCES}
     for sid in stale:
         try: os.remove(os.path.join(ROOT, 'client', 'data', 'maps', sid + '.txt'))
         except OSError: pass
-    mj['maps'] = [m for m in mj['maps'] if m['id'] not in stale]
+        if sid in ('xc1929', 'xc1949'):
+            shutil.rmtree(os.path.join(ASSET, sid), ignore_errors=True)
+            try: os.remove(os.path.join(DATA, sid + '.json'))
+            except OSError: pass
+    mj['maps'] = [m for m in mj['maps'] if m['id'] not in stale and m['id'] not in {'xc%d' % i for i in INSTANCES}]
     for mid in INSTANCES:
         ox, oy = pos[mid]; sp = conns[mid][0]['land']
         mj['maps'].append({'id': 'xc%d' % mid, 'name': CITY_NAME[mid // 100] + '·外圍%d' % (mid % 100), 'ox': ox, 'oy': oy, 'safe': False,
-                           'kind': 'field', 'orig': 'xc%d' % (1900 + mid % 100),
+                           'kind': 'field', 'orig': 'xc1925',
                            'spawn': [sp[0], sp[1], sp[0], sp[1]]} | ({} if mid in reach else {'orphan': True}))
-        shutil.copyfile(os.path.join(ROOT, 'client', 'data', 'maps', 'xc%d.txt' % (1900 + mid % 100)), os.path.join(ROOT, 'client', 'data', 'maps', 'xc%d.txt' % mid))
+        shutil.copyfile(os.path.join(ROOT, 'client', 'data', 'maps', 'xc1925.txt'), os.path.join(ROOT, 'client', 'data', 'maps', 'xc%d.txt' % mid))
     for m in mj['maps']:
         if m['id'] in ('xc%d' % x for x in reach) and m.get('orphan'): del m['orphan']
     mj['portals'] = [p for p in mj['portals'] if not (p['id'].startswith('xc_in_') or p['id'].startswith('xc_out_') or p['id'].startswith('xc_ln_') or p['id'].startswith('xc_gate_'))] + portals
