@@ -74,22 +74,23 @@ def cobble_fix(tl, used, tiles, cols, rows, objs, sizes):
     cob = Image.open(os.path.join(here, 'orig_cobble.png')).convert('RGBA')
     cv = [cob, cob.transpose(Image.FLIP_LEFT_RIGHT), cob.transpose(Image.FLIP_TOP_BOTTOM), cob.transpose(Image.ROTATE_180)]
     brk = seamless(Image.open(os.path.join(here, 'orig_brick.png')))
-    base = len(used); rep = set()
-    rects = []
-    for o in objs:                                  # 大型物件 (樓/廟) 底部 45% + 48px 外擴 = 石仔區
-        w, h = sizes[o['n']]
-        if w >= 250 and h >= 250 and not o['n'].startswith(('up', 'fg')):
-            rects.append((o['x'] - 48, o['y'] + h * 0.55 - 48, o['x'] + w + 48, o['y'] + h + 48))
-    for n, v in enumerate(used):
-        if v not in tiles: continue
-        px = list(Image.open(TS + tiles[v]).convert('RGB').resize((8, 8)).getdata())
-        r = sum(p[0] for p in px) / 64; g = sum(p[1] for p in px) / 64; b = sum(p[2] for p in px) / 64
-        if max(r, g, b) - min(r, g, b) > 20 and (g > b + 12 or r > b + 25): rep.add(n)
+    base = len(used)
+    pos = {v: n for n, v in enumerate(used)}
+    # 地圖資料入面「草地」有兩個值：37 = 街道 (新版美術係磚塊路)、39 = 建築庭院 (新版係圓石仔)。
+    # 灰石板 (768/804/1024...) 同泥地 (2075/258...) 保持原圖。已用 val2 疊圖對照原版截圖確認。
+    n37 = pos.get(37, -1); n39 = pos.get(39, -1)
+    # 灰石板/沙泥 (舊美術) 喺街道入面零星出現，原版冇呢啲塊 → 一併當磚塊路
+    slab = set()
+    for v, n in pos.items():
+        if v in tiles and v not in (37, 39):
+            px = list(Image.open(TS + tiles[v]).convert('RGB').resize((8, 8)).getdata())
+            r = sum(q[0] for q in px) / 64; g = sum(q[1] for q in px) / 64; b = sum(q[2] for q in px) / 64
+            if (r + g + b) / 3 > 100: slab.add(n)     # 淺色地磚 (灰石板/沙泥)；深色泥保留 (屋簷影)
     out = list(tl); nb = nc = 0
     for i, n in enumerate(tl):
         r, c = divmod(i, cols)
-        if n in rep and r * 48 + 24 < _wall_y(c * 48 + 24) - 40:
-            if _near_building(rects, c * 48 + 24, r * 48 + 24): out[i] = base + 1 + (c & 1) + 2 * (r & 1); nc += 1
+        if (n in (n37, n39) or n in slab) and r * 48 + 24 < _wall_y(c * 48 + 24) - 40:
+            if n == n39: out[i] = base + 1 + (c & 1) + 2 * (r & 1); nc += 1
             else: out[i] = base; nb += 1
     print('  磚塊', nb, '格 / 石仔', nc, '格')
     return out, [brk] + cv
