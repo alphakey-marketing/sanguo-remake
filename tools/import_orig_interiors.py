@@ -40,11 +40,11 @@ CITY_MAPID = {19: CITY, 17: 'xc1700'}     # 城 id(//100) -> 城圖 map id
 INSTANCES = sorted({m for l in LINKS['links'] for m in (l['a_out'], l['b_out'])} - {1925})   # 非許昌嘅外圍實例
 SIDE_DIR = {'E': (1, 0), 'W': (-1, 0), 'N': (0, -1), 'S': (0, 1)}
 GATE_W = [0, 146, 4, 168]                 # 許昌城西邊緣 (用家確認 A 位) -> 許昌外圍25 正中
-MODEL = 'ad022'                           # 城池模型 (原版城牆望樓建築 480x600)，放外圍 25 正中
-MODEL_XY = (1360, 900)                    # 模型左上 px (外圍 3200x2400 正中)
-MODEL_BLOCK = (90, 77, 110, 90)           # 模型佔格 (格，閉區間)
-GATE_RECT = [96, 91, 104, 94]             # 入城傳送區 (模型正下方)
-GATE_LAND = (100, 97)                     # 由城出來嘅落腳點
+MODEL = ('ad021', 'ad022')                # 城池模型: 兩張相鄰切片 (320+480 px 闊) 合成一座完整城堡，放外圍 25 正中
+MODEL_XY = (1200, 900)                    # 模型左上 px (外圍 3200x2400 正中；合成 800x600)
+MODEL_DIAMOND = (400, 410, 340, 165)      # 模型地面菱形 (中心 x, y, 半闊, 半高；模型 px) -> 佔格擋路
+GATE_RECT = [84, 89, 91, 92]              # 入城傳送區 = 城門 (模型左前牆，約模型 px (230,480)) 門口
+GATE_LAND = (80, 94)                      # 由城出來嘅落腳點 (城門外)
 
 
 def tpl_runs(g, gw, gh):
@@ -252,12 +252,16 @@ def run(check):
     if errs:
         print('錯:'); [print(' -', e) for e in errs[:30]]; sys.exit(1)
 
-    b25 = built[1925]                              # 外圍 25: 正中加城池模型 (佔格擋路，門口留空)
-    g25 = bytearray(b25['g'])
-    for yy in range(MODEL_BLOCK[1], MODEL_BLOCK[3] + 1):
-        for xx in range(MODEL_BLOCK[0], MODEL_BLOCK[2] + 1): g25[yy * b25['gw'] + xx] = 1
+    b25 = built[1925]                              # 外圍 25: 正中加城池模型 (地面菱形擋路，城門口留空)
+    g25 = bytearray(b25['g']); mcx, mcy, mhw, mhh = MODEL_DIAMOND
+    for yy in range(b25['gh']):
+        for xx in range(b25['gw']):
+            if abs(xx * 16 + 8 - MODEL_XY[0] - mcx) / mhw + abs(yy * 16 + 8 - MODEL_XY[1] - mcy) / mhh <= 1: g25[yy * b25['gw'] + xx] = 1
     b25['g'] = bytes(g25); b25['out']['walk']['z'] = base64.b64encode(zlib.compress(bytes(g25), 9)).decode()
-    b25['out']['objects'].append({'n': MODEL, 'x': MODEL_XY[0], 'y': MODEL_XY[1]}); b25['out']['objects'].sort(key=lambda o: o['y']); b25['names'].add(MODEL)
+    ox2 = MODEL_XY[0]
+    for nm in MODEL:
+        b25['out']['objects'].append({'n': nm, 'x': ox2, 'y': MODEL_XY[1]}); b25['names'].add(nm); ox2 += Image.open(sidx[nm]).size[0]
+    b25['out']['objects'].sort(key=lambda o: o['y'])
     # 地圖擺位: 全域格仔 x 0..511；許昌原版 (oy 644 + 188) 之下
     pos, bottom = shelf_pack([(m, b["gw"], b["gh"]) for m, b in built.items() if m not in FIELDS and m not in TOWNS], 512, 860)
     fitems = [(m, b["gw"], b["gh"]) for m, b in built.items() if m in FIELDS or m in TOWNS]
