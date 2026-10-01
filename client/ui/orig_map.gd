@@ -73,13 +73,15 @@ func _init_from(k: String, d: Dictionary) -> void:
 		var t := _tex(ROOT + k + "/obj/" + str(o["n"]) + ".png")
 		if t == null:
 			continue
+		var ur_rect := Rect2(0, 0, t.get_width(), t.get_height())
 		var bot_h := t.get_height()                       # 排序用底邊 = 有色像素嘅底 (圖底透明留白唔計，否則牆/樓梯會蓋住前面嘅人)
 		var timg := t.get_image()
 		if timg != null:
 			var ur := timg.get_used_rect()
 			if ur.size.y > 0:
 				bot_h = ur.end.y
-		objs.append({"x": int(o["x"]), "y": int(o["y"]), "bot": int(o["y"]) + bot_h, "tex": t, "floor": bool(o.get("floor", false)) or str(o["n"]).begins_with("up6") or _is_floor(int(o["x"]), int(o["y"]), t)})   # up6xx = 96px 石帶/鋪面，永遠貼地
+				ur_rect = Rect2(ur)
+		objs.append({"x": int(o["x"]), "y": int(o["y"]), "bot": int(o["y"]) + bot_h, "ur": Rect2(Vector2(int(o["x"]), int(o["y"])) + ur_rect.position, ur_rect.size), "tex": t, "floor": bool(o.get("floor", false)) or str(o["n"]).begins_with("up6") or _is_floor(int(o["x"]), int(o["y"]), t)})   # up6xx = 96px 石帶/鋪面，永遠貼地
 	objs.sort_custom(func(a, b): return int(a["bot"]) < int(b["bot"]))
 
 # 貼地物件 (路面/地毯/影子等)：佔嘅格冇一格係擋 → 永遠畫喺角色下面，唔好遮人
@@ -132,5 +134,11 @@ func flush_all(ci: CanvasItem, origin: Vector2, mod: Color) -> void:
 		_draw_one(ci, origin, _draw_objs[_next], mod)
 		_next += 1
 
+# 玩家遮擋透視: 喺角色後面 (腳底 y 以北) 又同角色重疊嘅物件畫半透明，人唔會被樹冠/屋頂/牆消失
+var fade_rect := Rect2()       # 玩家喺地圖內嘅像素範圍 (地圖座標)；size 0 = 唔做透視
+var fade_foot := 0.0
+
 func _draw_one(ci: CanvasItem, origin: Vector2, o: Dictionary, mod: Color) -> void:
+	if fade_rect.size.x > 0.0 and float(o["bot"]) > fade_foot and not bool(o["floor"]) and (o["ur"] as Rect2).intersects(fade_rect):
+		mod = Color(mod.r, mod.g, mod.b, mod.a * 0.45)
 	ci.draw_texture(o["tex"], origin + Vector2(int(o["x"]), int(o["y"])), mod)
