@@ -46,6 +46,31 @@ def register_test_map(key, cn, gw, gh, z):
     open(MAPS, 'w', encoding='utf8', newline='\n').write(json.dumps(d, ensure_ascii=False, indent=1) + '\n')
     print('  測試地圖', mid, '出生', sx, sy)
 
+# 許昌城牆線 (像素, 由左至右折線): 線以北 = 城內
+WALL_XC = [(0, 1540), (920, 2020), (2160, 2700), (2400, 2760), (4000, 3160)]
+def _wall_y(x):
+    for (x0, y0), (x1, y1) in zip(WALL_XC, WALL_XC[1:]):
+        if x <= x1: return y0 + (y1 - y0) * (x - x0) / (x1 - x0)
+    return WALL_XC[-1][1]
+
+def cobble_fix(tl, used, tiles, cols, rows):
+    """舊版客戶端地面係草/泥；原版新版城內係圓石仔路。城牆內非灰色地磚 → 石仔 (截圖切出 tools/orig_cobble.png，鏡像拼接無縫)。"""
+    cob = Image.open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'orig_cobble.png')).convert('RGBA')
+    var = [cob, cob.transpose(Image.FLIP_LEFT_RIGHT), cob.transpose(Image.FLIP_TOP_BOTTOM), cob.transpose(Image.ROTATE_180)]
+    base = len(used); rep = set()
+    for n, v in enumerate(used):
+        if v not in tiles: continue
+        px = list(Image.open(TS + tiles[v]).convert('RGB').resize((8, 8)).getdata())
+        r = sum(p[0] for p in px) / 64; g = sum(p[1] for p in px) / 64; b = sum(p[2] for p in px) / 64
+        if max(r, g, b) - min(r, g, b) > 20 and (g > b + 12 or r > b + 25): rep.add(n)
+    out = list(tl); cnt = 0
+    for i, n in enumerate(tl):
+        r, c = divmod(i, cols)
+        if n in rep and r * 48 + 24 < _wall_y(c * 48 + 24) - 40:
+            out[i] = base + (c & 1) + 2 * (r & 1); cnt += 1
+    print('  石仔路替換', cnt, '格')
+    return out, var
+
 def run(check):
     tiles = {int(f.split('_')[0]): f for f in os.listdir(TS)}
     sidx = sprite_index(); errs = []
@@ -65,18 +90,21 @@ def run(check):
         wf = SRC + 'extracted/maps/walk/%s_%05d.walk' % (mrg, i)
         w = open(wf, 'rb').read(); gw, gh = struct.unpack('<HH', w[:4])
         if gw != d['W'] // 16 + 1 or gh != d['H'] // 16 + 1: errs.append('%s walk 尺寸 %dx%d 不符' % (key, gw, gh))
+        tl = [remap[v] for v in d['tiles']]; extra = []
+        if key == 'xuchang': tl, extra = cobble_fix(tl, used, tiles, cols, rows)
         out = {'key': key, 'name': cn, 'orig': {'mrg': mrg, 'id': name, 'idx': i}, 'W': d['W'], 'H': d['H'],
                'tile': 48, 'cols': cols, 'rows': rows, 'atlas_cols': 32,
-               'tiles': [remap[v] for v in d['tiles']], 'objects': sorted(objs, key=lambda o: o['y']),
+               'tiles': tl, 'objects': sorted(objs, key=lambda o: o['y']),
                'walk': {'w': gw, 'h': gh, 'z': base64.b64encode(w[4:]).decode()}}
         if key == 'xuchang' and not check: register_test_map(key, cn, gw, gh, w[4:])
         print(key, cn, d['W'], d['H'], 'tile 種', len(used), '物件', len(objs), '物件圖', len(names), 'walk', gw, gh)
         if check: continue
         with open(os.path.join(DATA, key + '.json'), 'w', encoding='utf8') as f: json.dump(out, f, ensure_ascii=False, separators=(',', ':'))
         ad = os.path.join(ASSET, key); os.makedirs(ad + '/obj', exist_ok=True)
-        rws = (len(used) + 31) // 32; at = Image.new('RGBA', (32 * 48, rws * 48))
+        rws = (len(used) + len(extra) + 31) // 32; at = Image.new('RGBA', (32 * 48, rws * 48))
         for n, v in enumerate(used):
             if v in tiles: at.paste(Image.open(TS + tiles[v]).convert('RGBA'), ((n % 32) * 48, (n // 32) * 48))
+        for j, im in enumerate(extra): at.paste(im, (((len(used) + j) % 32) * 48, ((len(used) + j) // 32) * 48))
         at.save(ad + '/atlas.png')
         for k in names: shutil.copyfile(sidx[k], ad + '/obj/%s.png' % k)
         print('  資產', ad, '%.1f MB' % (sum(os.path.getsize(os.path.join(dp, f)) for dp, _, fs in os.walk(ad) for f in fs) / 1e6))
