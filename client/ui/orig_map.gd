@@ -73,7 +73,7 @@ func _init_from(k: String, d: Dictionary) -> void:
 		var t := _tex(ROOT + k + "/obj/" + str(o["n"]) + ".png")
 		if t == null:
 			continue
-		objs.append({"x": int(o["x"]), "y": int(o["y"]), "bot": int(o["y"]) + t.get_height(), "tex": t, "floor": str(o["n"]).begins_with("up6") or _is_floor(int(o["x"]), int(o["y"]), t)})   # up6xx = 96px 石帶/鋪面，永遠貼地
+		objs.append({"x": int(o["x"]), "y": int(o["y"]), "bot": int(o["y"]) + t.get_height(), "tex": t, "floor": bool(o.get("floor", false)) or str(o["n"]).begins_with("up6") or _is_floor(int(o["x"]), int(o["y"]), t)})   # up6xx = 96px 石帶/鋪面，永遠貼地
 	objs.sort_custom(func(a, b): return int(a["bot"]) < int(b["bot"]))
 
 # 貼地物件 (路面/地毯/影子等)：佔嘅格冇一格係擋 → 永遠畫喺角色下面，唔好遮人

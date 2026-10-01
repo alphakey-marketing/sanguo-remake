@@ -326,7 +326,11 @@ func cmd_travel(id: int, point_id: String) -> void:
 	var from_p := travel_point_by_id(point_id)
 	if from_p.is_empty():
 		return
-	if not _near(e, int(from_p["x"]), int(from_p["y"])):
+	var in_rect := false
+	if from_p.has("rect"):               # 矩形門: 企喺區入面就得，唔使行近
+		var rc: Array = from_p["rect"]
+		in_rect = int(e["x"]) >= int(rc[0]) and int(e["x"]) <= int(rc[2]) and int(e["y"]) >= int(rc[1]) and int(e["y"]) <= int(rc[3])
+	if not in_rect and not _near(e, int(from_p["x"]), int(from_p["y"])):
 		return _msg(id, "要行近%s先得" % String(from_p["name"]))
 	var to_p := travel_point_by_id(String(from_p["to"]))
 	if to_p.is_empty():
@@ -334,8 +338,9 @@ func cmd_travel(id: int, point_id: String) -> void:
 	var why := _gate_why(e, from_p.get("gate", {}))
 	if why != "":
 		return _msg(id, why)
-	e["x"] = int(to_p["x"])
-	e["y"] = int(to_p["y"])
+	var land: Array = to_p.get("land", [int(to_p["x"]), int(to_p["y"])])   # 有 land = 落喺門外，唔會即刻彈返轉頭
+	e["x"] = int(land[0])
+	e["y"] = int(land[1])
 	e["tx"] = e["x"]
 	e["ty"] = e["y"]
 	e.erase("path")

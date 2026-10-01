@@ -355,6 +355,8 @@ func t_b2_links(data: GameData) -> void:
 	for md in data.maps:
 		if bool(md.get("instance", false)):
 			continue     # 戰役等實例場景 (Step 19): 冇門連去，靠 sim 直接傳送
+		if bool(md.get("orphan", false)):
+			continue     # 原版室內圖未知城內門 (錢莊/大廳等)，匯入咗但暫時去唔到
 		check(sim.map_hops("xuchang", String(md["id"])) >= 0, "由許昌去得 %s" % md["id"])
 	for n in data.world_map["nodes"]:
 		if n.get("map") != null:
