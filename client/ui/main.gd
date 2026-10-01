@@ -21,8 +21,10 @@ var w := Sim.W
 var h := Sim.H
 var ents := []
 var faces := []
+const ZOOM_OUT := 0.5                              # 全圖縮放 (0.5 = 拉遠一倍，手機睇得多啲)；world 座標 * zoom = 畫面
 const ORIG_CHAR_SCALE := 2.0
 var cam := Vector2.ZERO
+var zoom := ZOOM_OUT                            # 現時縮放：室內細圖會自動放大至成幅畫面剛好裝得落
 var autotest := false
 var uitest := false                # --uitest: 觸控 UI 煙霧測試 (tests/ui_smoke.gd)
 var t0 := 0.0
@@ -326,7 +328,8 @@ func _refresh() -> void:
 	var me = _me()
 	if me != null:
 		cur_map = sim.map_at(int(me.x), int(me.y))
-		cam = _clamp_cam(Vector2(me.x, me.y) * TILE + Vector2(TILE, TILE) * 0.5 - get_viewport_rect().size / 2)
+		zoom = _map_zoom()
+		cam = _clamp_cam(Vector2(me.x, me.y) * TILE + Vector2(TILE, TILE) * 0.5 - get_viewport_rect().size / zoom / 2)
 		_check_place(me)
 	if target_id >= 0 and _ent(target_id) == null: target_id = -1
 	if exp_start < 0 and not ch.is_empty(): exp_start = _exp_total()
@@ -339,11 +342,19 @@ func _refresh() -> void:
 		hud.sim_refreshed()
 		_down_watchdog()
 
+# 室內 (house) 細圖: 放大到成張圖剛好裝入畫面 (最多 1 倍)；其他地圖用 ZOOM_OUT
+func _map_zoom() -> float:
+	if cur_map.is_empty() or String(cur_map.get("kind", "")) != "house" or not cur_map.has("orig"):
+		return ZOOM_OUT
+	var vs := get_viewport_rect().size
+	var fit := minf(vs.x / (float(cur_map.w) * TILE), vs.y / (float(cur_map.h) * TILE))
+	return clampf(fit, ZOOM_OUT, 1.0)
+
 # 鏡頭限喺當前地圖入面；地圖細過畫面就置中 (spec 12 §6)
 func _clamp_cam(c: Vector2) -> Vector2:
 	if cur_map.is_empty():
 		return c
-	var vs := get_viewport_rect().size
+	var vs := get_viewport_rect().size / zoom
 	var r := Rect2(Vector2(int(cur_map.ox), int(cur_map.oy)) * TILE, Vector2(int(cur_map.w), int(cur_map.h)) * TILE)
 	var out := c
 	for a in 2:
@@ -1090,7 +1101,7 @@ func _is_targetable(e) -> bool:
 func _hud_tap(pos: Vector2) -> void:
 	if hud != null and hud.any_panel_open():
 		return
-	var g: Vector2 = ((pos + cam) / TILE).floor()
+	var g: Vector2 = ((pos / zoom + cam) / TILE).floor()
 	pending = {}
 	var me = _me()
 	if me != null and int(g.x) == int(me.x) and int(g.y) == int(me.y):
@@ -1249,7 +1260,7 @@ func _notification(what: int) -> void:
 # 容錯: tap 座標喺呢個範圍內揀最近嘅怪 (~1.8 格 ≈ 手指闊), 唔使準確咁啱格先郁到手
 const TAP_TOLERANCE := TILE * 1.8
 func _targetable_near_tap(pos: Vector2):
-	var world_pos: Vector2 = pos + cam
+	var world_pos: Vector2 = pos / zoom + cam
 	var best = null
 	var best_d := TAP_TOLERANCE
 	for e in ents:
@@ -1264,7 +1275,7 @@ func _targetable_near_tap(pos: Vector2):
 
 # S04a: 撳嗰格係咪地面掉落物 (隔籬格都算中，同 _targetable_near_tap 一樣容差)
 func _drop_at_tap(pos: Vector2, g: Vector2):
-	var world_pos: Vector2 = pos + cam
+	var world_pos: Vector2 = pos / zoom + cam
 	var best = null
 	var best_d := TAP_TOLERANCE
 	for e in ents:
@@ -1390,7 +1401,7 @@ func _ent_at(g: Vector2):
 # S03a: 長按位置附近格嘅居民 (bot) → 出「攻擊」menu (二次確認)。
 # 短按照正常 tap (行路/打怪)；長按唔係撳中居民就照做 normal tap。
 func _handle_long_press(pos: Vector2) -> void:
-	var g := (pos + cam) / TILE
+	var g := (pos / zoom + cam) / TILE
 	var gx := int(floor(g.x))
 	var gy := int(floor(g.y))
 	var hit: Dictionary = {}
@@ -1548,7 +1559,9 @@ func _txt(pos: Vector2, s: String, col := Color.WHITE, sz := FONT_SZ) -> void:
 	draw_string(ThemeDB.fallback_font, pos, s, HORIZONTAL_ALIGNMENT_LEFT, -1, sz, col)
 
 func _draw() -> void:
-	var vs := get_viewport_rect().size
+	var vs_screen := get_viewport_rect().size
+	var vs := vs_screen / zoom
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2(zoom, zoom))
 	var om: OrigMap = null
 	draw_rect(Rect2(Vector2.ZERO, vs), Color(0.04, 0.04, 0.05))
 	if not cur_map.is_empty():
@@ -1575,10 +1588,10 @@ func _draw() -> void:
 			continue                                  # 其他地圖嘅單位唔畫
 		var p := Vector2(e.x, e.y) * TILE - cam
 		if om != null:
-			draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+			draw_set_transform(Vector2.ZERO, 0.0, Vector2(zoom, zoom))
 			om.flush_upto(self, om_org, p.y + TILE - om_org.y, om_mod)    # 腳底 y 以北嘅物件先畫，角色喺佢哋前面
 			var pv := p + Vector2(TILE * 0.5, TILE)           # 原版圖 48px 格: 角色放大 ORIG_CHAR_SCALE 倍 (以腳底為軸)
-			draw_set_transform(pv * (1.0 - ORIG_CHAR_SCALE), 0.0, Vector2(ORIG_CHAR_SCALE, ORIG_CHAR_SCALE))
+			draw_set_transform(pv * (1.0 - ORIG_CHAR_SCALE) * zoom, 0.0, Vector2(ORIG_CHAR_SCALE, ORIG_CHAR_SCALE) * zoom)
 		var isme: bool = int(e.id) == my_id
 		var ismob: bool = e.get("mob", false)
 		# S04b 吟唱線索: 術法怪 / boss 吟唱緊 → 落點紅圈 + 怪身框，玩家睇到走位拍
@@ -1637,7 +1650,7 @@ func _draw() -> void:
 		# S03a: 紅名(殺人魔)居民 = 紅字表示（居民警告話你知佢係殺人魔）
 		var nc := Color(1, 0.32, 0.32) if bool(e.get("criminal", false)) else Color(1, 0.7, 0.6) if ismob else Color(0.6, 1, 0.65) if isgen else Color.WHITE
 		_txt(p + Vector2(-8, -18), nm, nc, 11)
-	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2(zoom, zoom))
 	if om != null:
 		om.flush_all(self, om_org, om_mod)              # 剩低嘅物件 (最南嗰批)
 	for qn in quest_npcs:
@@ -1681,7 +1694,8 @@ func _draw() -> void:
 		var mc: Vector2 = marker["pos"] * TILE + Vector2(TILE, TILE) * 0.5 - cam
 		var k := float(marker["t"])
 		draw_arc(mc, 4.0 + 10.0 * k, 0, TAU, 24, Color(1, 0.9, 0.4, k), 2.0)
-	_draw_banner(vs)
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	_draw_banner(vs_screen)
 
 # 特效: 12fps 播一次；冇素材就唔畫
 func _fx_add(name: String, tile_pos: Vector2, sc: float = 0.5) -> void:
@@ -1736,7 +1750,7 @@ func _draw_my_mount(p: Vector2) -> void:
 # 設施招牌: 門口一格框 + 上面招牌 (屋已經畫喺地圖貼圖)
 func _draw_sign(f: Dictionary) -> void:
 	var fp := Vector2(f.x, f.y) * TILE - cam
-	var vs := get_viewport_rect().size
+	var vs := get_viewport_rect().size / zoom
 	if fp.x < -80 or fp.y < -40 or fp.x > vs.x + 80 or fp.y > vs.y + 40:
 		return
 	var col: Color = f.color

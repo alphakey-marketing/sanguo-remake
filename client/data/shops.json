@@ -794,10 +794,10 @@
   {
    "id": "xuchang_o",
    "name": "許昌客棧（原版）",
-   "x": 159,
-   "y": 84,
+   "x": 45,
+   "y": 30,
    "restCost": 5,
-   "map": "xuchang_o"
+   "map": "xc1902"
   },
   {
    "id": "xinye",

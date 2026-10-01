@@ -391,11 +391,44 @@ func t_orig_map(data: GameData) -> void:
 	var t0 := Time.get_ticks_msec()
 	var pth := RulesPath.find(data.walk, W, gy * W + gx, far, 200000, data.portal_at)
 	check(not RulesPath.find(data.walk, W, gy * W + gx, far, Sim.PATH_CAP, data.portal_at).is_empty(), "原版許昌: 預設 PATH_CAP 搵得到最遠路")
-	var inn_o: Dictionary = {}
-	for iv in data.inns:
-		if String(iv.get("map", "")) == "xuchang_o":
-			inn_o = iv
-	check(not inn_o.is_empty() and data.walk[int(inn_o.y) * W + int(inn_o.x)] != 0 and seen.has(int(inn_o.y) * W + int(inn_o.x)), "原版許昌: 客棧位行得到")
+	_orig_interiors(data, seen)
 	var st_o: Dictionary = data.facilities.get("station_xco", {})
 	check(not st_o.is_empty() and seen.has(int(st_o.y) * W + int(st_o.x)), "原版許昌: 驛站位行得到")
 	check(not pth.is_empty(), "原版許昌: A* 出生點 → 最遠可達格 (路長 %d, %d ms)" % [pth.size(), Time.get_ticks_msec() - t0])
+
+# 原版室內圖: 城內門 <-> 室內出口成對、踩門入屋、踩出口返城、客棧喺 xc1902 內
+func _orig_interiors(data: GameData, city_seen: Dictionary) -> void:
+	var W := GameData.WORLD_W
+	var n_pair := 0
+	for p in data.travel_points:
+		var pid := String(p["id"])
+		if not pid.begins_with("xc_in_"):
+			continue
+		n_pair += 1
+		var back := data.tp_by_id.get(String(p["to"]), {}) as Dictionary
+		check(not back.is_empty() and String(back["to"]) == pid, "原版室內: %s 成對" % pid)
+		var land: Array = back["land"]
+		check(data.walk[int(land[1]) * W + int(land[0])] == 1 and not data.portal_at.has(int(land[1]) * W + int(land[0])), "原版室內: %s 落地點行得且唔係觸發格" % pid)
+		var cl: Array = p["land"]
+		check(city_seen.has(int(cl[1]) * W + int(cl[0])), "原版室內: %s 返城落地點喺城內連通區" % pid)
+	check(n_pair >= 20, "原版室內: 入屋門 >= 20 (%d)" % n_pair)
+	var inn_o: Dictionary = {}
+	for iv in data.inns:
+		if String(iv.get("map", "")) == "xc1902":
+			inn_o = iv
+	check(not inn_o.is_empty() and data.walk[int(inn_o.y) * W + int(inn_o.x)] == 1, "原版室內: 客棧喺 xc1902 內行得到")
+	var sim := Sim.new(data, 1)
+	var door := data.tp_by_id.get("xc_in_1902", {}) as Dictionary
+	var rc: Array = door["rect"]
+	var id := sim.spawn_player("入屋")
+	var e := sim.ent(id)
+	for cy in range(int(rc[1]), int(rc[3]) + 1):
+		for cx in range(int(rc[0]), int(rc[2]) + 1):
+			if data.portal_at.get(cy * W + cx, "") == "xc_in_1902":
+				e["x"] = cx
+				e["y"] = cy
+				sim._on_moved(e)
+				check(String(data.map_at(int(e["x"]), int(e["y"])).get("id", "")) == "xc1902", "原版室內: 踩客棧門 → 入 xc1902")
+				sim._on_moved(e)
+				check(String(data.map_at(int(e["x"]), int(e["y"])).get("id", "")) == "xc1902", "原版室內: 落地後唔會即刻彈返")
+				return

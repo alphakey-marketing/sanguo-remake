@@ -4,7 +4,7 @@ extends RefCounted
 
 const NEWBIE_LEVEL := 5
 const WORLD_W := 512              # 全域格仔 (所有地圖拼埋一張，spec 12 §2)
-const WORLD_H := 840               # 640 + 原版許昌測試地圖 (oy=644, 188 格)，S06b 由 512 加高
+const WORLD_H := 1345              # 640 + 原版許昌 (oy=644) + 原版室內/道路圖 (oy 840 起 shelf 排)
 
 var classes: Dictionary = {}     # id(String) -> def
 var monsters: Dictionary = {}    # id(int) -> def
@@ -359,8 +359,23 @@ func _place_all() -> void:
 		place(x)
 	for p in travel_points:
 		place(p)
+		if p.has("rect"):                 # 矩形觸發區 (原版門): rect/land 都係地圖內座標 → 全域
+			var md: Dictionary = map_by_id[String(p["map"])]
+			var r: Array = p["rect"]
+			var ox := int(md["ox"])
+			var oy := int(md["oy"])
+			p["rect"] = [int(r[0]) + ox, int(r[1]) + oy, int(r[2]) + ox, int(r[3]) + oy]
+			if p.has("land"):
+				p["land"] = [int(p["land"][0]) + ox, int(p["land"][1]) + oy]
 		if bool(p.get("auto", false)):
-			portal_at[int(p["y"]) * WORLD_W + int(p["x"])] = String(p["id"])
+			if p.has("rect"):
+				var rr: Array = p["rect"]
+				for cy in range(int(rr[1]), int(rr[3]) + 1):
+					for cx in range(int(rr[0]), int(rr[2]) + 1):
+						if walk[cy * WORLD_W + cx] == 1 and not portal_at.has(cy * WORLD_W + cx):
+							portal_at[cy * WORLD_W + cx] = String(p["id"])
+			else:
+				portal_at[int(p["y"]) * WORLD_W + int(p["x"])] = String(p["id"])
 	for lm in landmarks:
 		place(lm)
 	for sp in spawns:                     # spawn area = zone 地圖內座標 → 全域
