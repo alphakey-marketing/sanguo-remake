@@ -53,23 +53,46 @@ def _wall_y(x):
         if x <= x1: return y0 + (y1 - y0) * (x - x0) / (x1 - x0)
     return WALL_XC[-1][1]
 
-def cobble_fix(tl, used, tiles, cols, rows):
-    """舊版客戶端地面係草/泥；原版新版城內係圓石仔路。城牆內非灰色地磚 → 石仔 (截圖切出 tools/orig_cobble.png，鏡像拼接無縫)。"""
-    cob = Image.open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'orig_cobble.png')).convert('RGBA')
-    var = [cob, cob.transpose(Image.FLIP_LEFT_RIGHT), cob.transpose(Image.FLIP_TOP_BOTTOM), cob.transpose(Image.ROTATE_180)]
+def seamless(im):
+    """半格錯位 + 中心權重混合 → 四方連續 (磚紋唔做鏡像，免得砌出菱形)"""
+    import numpy as np
+    a = np.asarray(im.convert('RGB'), dtype=float); h, w = a.shape[:2]
+    sh = np.roll(np.roll(a, h // 2, 0), w // 2, 1)
+    wy = np.sin(np.linspace(0, np.pi, h, endpoint=False)) ** 2; wx = np.sin(np.linspace(0, np.pi, w, endpoint=False)) ** 2
+    m = (wy[:, None] * wx[None, :])[:, :, None]
+    return Image.fromarray((a * m + sh * (1 - m)).astype('uint8'), 'RGB').convert('RGBA')
+
+def _near_building(objs_rects, cx, cy):
+    for x0, y0, x1, y1 in objs_rects:
+        if x0 <= cx <= x1 and y0 <= cy <= y1: return True
+    return False
+
+def cobble_fix(tl, used, tiles, cols, rows, objs, sizes):
+    """舊版客戶端地面係草/泥；原版新版城內主要係磚塊路，圓石仔只喺建築物周圍。
+    城牆內非灰色地磚 → 磚塊 (tools/orig_brick.png) / 建築腳附近 → 圓石仔 (tools/orig_cobble.png)；都係用戶原版截圖切出。"""
+    here = os.path.dirname(os.path.abspath(__file__))
+    cob = Image.open(os.path.join(here, 'orig_cobble.png')).convert('RGBA')
+    cv = [cob, cob.transpose(Image.FLIP_LEFT_RIGHT), cob.transpose(Image.FLIP_TOP_BOTTOM), cob.transpose(Image.ROTATE_180)]
+    brk = seamless(Image.open(os.path.join(here, 'orig_brick.png')))
     base = len(used); rep = set()
+    rects = []
+    for o in objs:                                  # 大型物件 (樓/廟) 底部 45% + 48px 外擴 = 石仔區
+        w, h = sizes[o['n']]
+        if w >= 250 and h >= 250 and not o['n'].startswith(('up', 'fg')):
+            rects.append((o['x'] - 48, o['y'] + h * 0.55 - 48, o['x'] + w + 48, o['y'] + h + 48))
     for n, v in enumerate(used):
         if v not in tiles: continue
         px = list(Image.open(TS + tiles[v]).convert('RGB').resize((8, 8)).getdata())
         r = sum(p[0] for p in px) / 64; g = sum(p[1] for p in px) / 64; b = sum(p[2] for p in px) / 64
         if max(r, g, b) - min(r, g, b) > 20 and (g > b + 12 or r > b + 25): rep.add(n)
-    out = list(tl); cnt = 0
+    out = list(tl); nb = nc = 0
     for i, n in enumerate(tl):
         r, c = divmod(i, cols)
         if n in rep and r * 48 + 24 < _wall_y(c * 48 + 24) - 40:
-            out[i] = base + (c & 1) + 2 * (r & 1); cnt += 1
-    print('  石仔路替換', cnt, '格')
-    return out, var
+            if _near_building(rects, c * 48 + 24, r * 48 + 24): out[i] = base + 1 + (c & 1) + 2 * (r & 1); nc += 1
+            else: out[i] = base; nb += 1
+    print('  磚塊', nb, '格 / 石仔', nc, '格')
+    return out, [brk] + cv
 
 def run(check):
     tiles = {int(f.split('_')[0]): f for f in os.listdir(TS)}
@@ -91,7 +114,7 @@ def run(check):
         w = open(wf, 'rb').read(); gw, gh = struct.unpack('<HH', w[:4])
         if gw != d['W'] // 16 + 1 or gh != d['H'] // 16 + 1: errs.append('%s walk 尺寸 %dx%d 不符' % (key, gw, gh))
         tl = [remap[v] for v in d['tiles']]; extra = []
-        if key == 'xuchang': tl, extra = cobble_fix(tl, used, tiles, cols, rows)
+        if key == 'xuchang': tl, extra = cobble_fix(tl, used, tiles, cols, rows, objs, {k: Image.open(sidx[k]).size for k in names})
         out = {'key': key, 'name': cn, 'orig': {'mrg': mrg, 'id': name, 'idx': i}, 'W': d['W'], 'H': d['H'],
                'tile': 48, 'cols': cols, 'rows': rows, 'atlas_cols': 32,
                'tiles': tl, 'objects': sorted(objs, key=lambda o: o['y']),
