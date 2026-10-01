@@ -4,7 +4,7 @@ extends RefCounted
 
 const NEWBIE_LEVEL := 5
 const WORLD_W := 512              # 全域格仔 (所有地圖拼埋一張，spec 12 §2)
-const WORLD_H := 1345              # 640 + 原版許昌 (oy=644) + 原版室內/道路圖 (oy 840 起 shelf 排)
+const WORLD_H := 9820             # 640 + 原版許昌 + 室內/道路 + 洞穴 + 各城外圍實例 (shelf 排，import_orig_interiors 報最低值)
 
 var classes: Dictionary = {}     # id(String) -> def
 var monsters: Dictionary = {}    # id(int) -> def
