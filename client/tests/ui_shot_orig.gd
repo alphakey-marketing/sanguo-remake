@@ -25,7 +25,7 @@ func put(x: int, y: int) -> void:
 
 
 func shot(name_: String) -> void:
-	await frames(6)
+	await frames(30)
 	var p := "user://origshot_%s.png" % name_
 	get_viewport().get_texture().get_image().save_png(p)
 	print("SHOT ", ProjectSettings.globalize_path(p))
@@ -35,6 +35,18 @@ func _run() -> void:
 	await frames(5)
 	var d: GameData = m.data
 	var W := GameData.WORLD_W
+	if OS.get_environment("LINKSHOT") != "":        # 許昌西門 -> 1929 -> 陳留1749: 每個傳送點門口 + 落腳點
+		for q in ["xc_gate_w", "xc_gate_w_o", "xc_ln_1929_E", "xc_ln_1749_W"]:
+			var pd: Dictionary = d.tp_by_id.get(q, {})
+			if pd.is_empty():
+				continue
+			put(int(pd["x"]), int(pd["y"]))
+			await shot("link_" + q + "_door")
+			var lc: Array = pd["land"]
+			put(int(lc[0]), int(lc[1]))
+			await shot("link_" + q + "_land")
+		get_tree().quit()
+		return
 	for md in d.maps:
 		var id := String(md["id"])
 		if not (id.begins_with("xc") or id == "xuchang_o"):
