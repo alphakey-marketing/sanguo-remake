@@ -153,6 +153,14 @@ def run(check):
             o = {'n': k, 'x': x, 'y': y}
             im = Image.open(sidx[k]).convert('RGBA')
             if min(im.size) >= 250 and im.getchannel('A').getextrema()[0] == 255: o['floor'] = True   # 整塊不透明大圖 = 室內地板底圖，要貼地
+            elif im.size[1] <= 300:
+                # 矮嘅無碰撞裝飾 (草叢/地上雜物): 輪廓底下大部分格行得 = 角色會行入去 → 貼地，唔好蓋住角色
+                bb = im.getchannel('A').getbbox()
+                if bb:
+                    c0, c1 = (x + bb[0]) // 16, (x + bb[2] - 1) // 16
+                    r0, r1 = (y + bb[1]) // 16, (y + bb[3] - 1) // 16
+                    cells = [(cx, cy) for cy in range(max(0, r0), min(gh - 1, r1) + 1) for cx in range(max(0, c0), min(gw - 1, c1) + 1)]
+                    if cells and sum(1 for cx, cy in cells if not g[cy * gw + cx]) >= 0.6 * len(cells): o['floor'] = True
             objs.append(o); names.add(k)
         key = 'xc%d' % mid
         out = {'key': key, 'name': cn, 'orig': {'mrg': mrgname, 'id': name, 'idx': i}, 'W': d['W'], 'H': d['H'], 'tile': 48,

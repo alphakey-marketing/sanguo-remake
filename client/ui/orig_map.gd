@@ -73,7 +73,13 @@ func _init_from(k: String, d: Dictionary) -> void:
 		var t := _tex(ROOT + k + "/obj/" + str(o["n"]) + ".png")
 		if t == null:
 			continue
-		objs.append({"x": int(o["x"]), "y": int(o["y"]), "bot": int(o["y"]) + t.get_height(), "tex": t, "floor": bool(o.get("floor", false)) or str(o["n"]).begins_with("up6") or _is_floor(int(o["x"]), int(o["y"]), t)})   # up6xx = 96px 石帶/鋪面，永遠貼地
+		var bot_h := t.get_height()                       # 排序用底邊 = 有色像素嘅底 (圖底透明留白唔計，否則牆/樓梯會蓋住前面嘅人)
+		var timg := t.get_image()
+		if timg != null:
+			var ur := timg.get_used_rect()
+			if ur.size.y > 0:
+				bot_h = ur.end.y
+		objs.append({"x": int(o["x"]), "y": int(o["y"]), "bot": int(o["y"]) + bot_h, "tex": t, "floor": bool(o.get("floor", false)) or str(o["n"]).begins_with("up6") or _is_floor(int(o["x"]), int(o["y"]), t)})   # up6xx = 96px 石帶/鋪面，永遠貼地
 	objs.sort_custom(func(a, b): return int(a["bot"]) < int(b["bot"]))
 
 # 貼地物件 (路面/地毯/影子等)：佔嘅格冇一格係擋 → 永遠畫喺角色下面，唔好遮人

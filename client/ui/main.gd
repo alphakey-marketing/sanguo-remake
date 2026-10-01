@@ -103,7 +103,7 @@ func _ready() -> void:
 		audio.play_bgm("bgm_town")
 	UiTheme.install_font()   # embed CJK 字形，HUD/panel 中文先顯示到（Web/iOS 唔使睇 browser fallback）
 	autotest = "--autotest" in OS.get_cmdline_user_args()
-	uitest = "--uitest" in OS.get_cmdline_user_args() or "--uishot" in OS.get_cmdline_user_args()
+	uitest = "--uitest" in OS.get_cmdline_user_args() or "--uishot" in OS.get_cmdline_user_args() or "--origshot" in OS.get_cmdline_user_args()
 	# 內建 watchdog: --uitest/--autotest 無論 test script 有冇 load 到 / 有冇 crash / 有冇死迴圈，
 	# 超過呢個時間都會強制 quit，唔會令 Godot 無限跑 → bash 永久等 → relay leg 掛死。
 	# 要喺 load test script 之前裝好，先至唔會因 smoke parse error 而失效。
@@ -184,6 +184,10 @@ func _ready() -> void:
 		var sm := load("res://tests/ui_smoke.gd")
 		if sm != null:   # guard: smoke parse error 都唔會 crash main._ready (斷續 -> watchdog 接住 quit)
 			add_child(sm.new())
+	elif "--origshot" in OS.get_cmdline_user_args():
+		var os_ := load("res://tests/ui_shot_orig.gd")
+		if os_ != null:
+			add_child(os_.new())
 	elif "--uishot" in OS.get_cmdline_user_args():
 		var sh := load("res://tests/ui_shot.gd")
 		if sh != null:
