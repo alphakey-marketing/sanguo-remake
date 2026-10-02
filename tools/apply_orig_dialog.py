@@ -22,7 +22,7 @@ def load_convs():
             c.setdefault(int(f[0]), []).append((int(f[2]), f[3]))
     return c
 
-def lines(conv, npc_name):
+def lines(conv, npc_name, speakers=None):
     out = []
     for slot, t in conv:
         if slot == 1:
@@ -30,7 +30,7 @@ def lines(conv, npc_name):
         t = re.sub(r'ok_\d+', '你', t.replace('~^', '').strip())      # ok_NNN = 玩家名佔位
         if not re.search(r'[\u4e00-\u9fff]', t) or len(t) <= 4 and not re.search(r'[。！？]', t):
             continue                                    # 純表情/音效
-        out.append('%s：「%s」' % ('你' if slot == 0 else npc_name, t))
+        out.append('%s：「%s」' % ('你' if slot == 0 else (speakers or {}).get(slot, npc_name), t))
     return out
 
 def main():
@@ -56,4 +56,5 @@ def main():
         json.dump(qd, open(QJ, 'w', encoding='utf8', newline='\n'), ensure_ascii=False, indent=1)
     print('ok' if not bad else 'bad', len(MAP), 'quests')
 
-main()
+if __name__ == '__main__':
+    main()
