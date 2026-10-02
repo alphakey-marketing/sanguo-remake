@@ -163,8 +163,8 @@ def imp_mon(src, idx):
     done = set()
     os.makedirs(os.path.join(OUT, "mon"), exist_ok=True)
     for m in mons:
-        sid = None
-        for r in (byid.get(m["id"]), byid.get(m.get("dropSrc")), byname.get(m["name"])):
+        sid = m.get("sprite") if m.get("sprite") in where else None   # 洞穴怪表冇 id -> 用 okm sprite
+        for r in () if sid else (byid.get(m["id"]), byid.get(m.get("dropSrc")), byname.get(m["name"])):
             if r and spr(r) in where:
                 sid = spr(r)
                 break
