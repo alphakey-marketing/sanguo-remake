@@ -447,7 +447,7 @@ func t_bulletin(data: GameData) -> void:
 	var sim: Sim = r[0]
 	var pid: int = r[1]
 	var v0 := sim.bulletin_view(pid)
-	check(not bool(v0["at"]) and (v0["cities"] as Array).size() == 3, "唔喺公佈欄: at=false，3 城")
+	check(not bool(v0["at"]) and (v0["cities"] as Array).size() == 4, "唔喺公佈欄: at=false，4 城 (含陳留)")
 	_put_fac(sim, pid, data, "bulletin_xc")
 	var v1 := sim.bulletin_view(pid)
 	check(bool(v1["at"]), "企喺許昌公佈欄: at=true")

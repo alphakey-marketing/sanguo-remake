@@ -50,7 +50,8 @@ def pick(mid, n, near_spawn=False):
 # 許昌模板 id -> 陳留室內。shops 用 shops.json id，fac 用 facilities.json key
 SHOP_IN = {'weapon': 'xc1704', 'herbalist': 'xc1703'}
 SHOP_STREET = ['tool', 'food', 'grocery']          # 城街攤
-FAC_IN = {'pharmacy': 'xc1703', 'workshop': 'xc1710', 'forge': 'xc1711', 'kitchen': 'xc1724', 'school': 'xc1705', 'stable_xc': 'xc1714', 'donate_xc': 'xc1701', 'station_xc': 'xc1715'}
+FAC_IN = {'pharmacy': 'xc1703', 'workshop': 'xc1710', 'forge': 'xc1711', 'kitchen': 'xc1724', 'school': 'xc1705', 'stable_xc': 'xc1714', 'donate_xc': 'xc1701', 'station_xc': 'xc1715',
+          'bulletin_xc': CITY, 'relief_xc': 'xc1725'}      # 救災區放陳留外圍25 (近正中城模型以外嘅空地)
 INN_IN = 'xc1702'
 
 shops = jl('shops.json'); fac = jl('facilities.json')
@@ -81,6 +82,7 @@ for mid, lst in by.items():
             n = copy.deepcopy(fac[src]); n['name'] = n['name'].replace('許昌', '陳留') if '許昌' in n['name'] else '陳留' + n['name']
             n.update(map=m, x=x, y=y)
             if src == 'school': n['type'] = 'school'
+            if 'cityId' in n: n['cityId'] = 'chenliu'
             if 'city' in n: n['city'] = '陳留' if src.startswith('donate') else 'chenliu'     # 官宅 city = 顯示名；馬廄 city = 城 id
             fac[src + SFX] = n
     print(mid, [t[2] for t in lst])

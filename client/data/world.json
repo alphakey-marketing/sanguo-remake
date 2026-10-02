@@ -104,6 +104,10 @@
    "pop": 450,
    "defense": 30,
    "attrs": { "kaiken": 50, "shangye": 50, "xumu": 50, "kuangchan": 50, "duanzao": 50, "fangyu": 50, "fangzai": 30, "zhian": 50 }
+  },
+  {
+   "id": "chenliu", "name": "陳留", "province": "兗州", "pop": 600, "defense": 40,
+   "attrs": { "kaiken": 50, "shangye": 50, "xumu": 50, "kuangchan": 50, "duanzao": 50, "fangyu": 50, "fangzai": 40, "zhian": 50 }
   }
  ],
  "_noteCityAttrs": "城池屬性 (S08b, spec 08 §3)【自訂數值】：8 項 0~100。開墾/商業/畜牧/礦產 → 市場 prod (prodCats 對應 cat，per = 每點偏離 default 嘅倍率)；防災 → 天災減弱；鑄造 → 商店貨單 (shopGoods：attr ≥ min 就賣嗰批貨)；防禦 → 城門衛兵警告間隔 (guardAttr)；治安 → 居民犯案率 (crimeAttr)。真值存喺 sim state[\"cityAttrs\"]（官宅內政/義勇軍工作會改）；world 呢度只係開局初值 + 連動設定。",
