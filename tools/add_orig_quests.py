@@ -38,7 +38,23 @@ QUESTS = [
      ],
      "reward": {"fame": 40, "exp": 5000, "gold": 1000}},
 ]
+QUESTS.append({"id": "orig_xiapi", "src": "orig", "name": "水淹下邳", "type": "history", "giver": "xunyou",
+     "pre": {"minLevel": 25, "attr": {"int": 12}},
+     "preHint": "武功 25 級以上、智力 12 以上，去陳留搵荀攸",
+     "stages": [
+         {"type": "talk", "npc": "xunyou", "conv": [1281], "sp": {2: '荀攸'},
+          "hint": "荀攸獻水淹下邳之計，要你去下邳搵呂布探路"},
+         {"type": "talk", "npc": "lvbu_xp", "conv": [1290], "sp": {2: '曹操', 3: '呂布', 4: '劉備'},
+          "hint": "白門樓下見到被擒嘅呂布，返去回報曹操"},
+         {"type": "talk", "npc": "caocao_cl", "conv": [1286, 1291], "sp": {2: '曹操'}, "done": True,
+          "hint": "返去陳留搵曹操領賞"},
+     ],
+     "reward": {"fame": 50, "exp": 6000, "gold": 1200}})
 NEW_NPCS = [
+    {"id": "xunyou", "name": "荀攸", "x": 45, "y": 13, "map": "chenliu", "questOnly": True,
+     "idle": ["荀攸：「下邳久攻不下，需要一位勇士相助……」"], "desc": "曹操軍師【原版】"},
+    {"id": "lvbu_xp", "name": "呂布", "x": 20, "y": 14, "map": "xiapi", "questOnly": True,
+     "idle": ["呂布：「天要亡我啊！」"], "desc": "下邳城內被圍嘅呂布【原版】"},
     {"id": "liubei", "name": "劉備", "x": 9, "y": 17, "map": "xiaopei", "questOnly": True,
      "idle": ["劉備：「曹操相請，此去兇多吉少……」"], "desc": "小沛城內劉玄德【原版】"},
 ]
