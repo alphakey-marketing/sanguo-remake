@@ -1,5 +1,5 @@
 # 陳留(原版)功能 NPC / 商店 / 設施: 由許昌同類條目複製 (id 加 _cl)，放入陳留各室內 xc17NN + 城街 xc1700。座標自動估，之後人手調。
-# 室內分配按 named_locations.tsv (陳留 1700~1724)。官宅/驛站/公佈欄/練兵場/廟 暫不複製 (官令/驛站網絡/廟 係許昌專屬邏輯)。
+# 室內分配按 named_locations.tsv (陳留 1700~1724)。公佈欄/練兵場/廟 暫不複製；官宅(donate)+驛站(station) 同新野一樣係通用設施 (flag 驅動)；義舉證明仍只許昌官員受理。
 # 用法: python tools/place_chenliu_npcs.py   (可重跑，先清走舊 _cl 條目)
 import json, os, copy
 C = os.path.join(os.path.dirname(__file__), '..', 'client', 'data')
@@ -50,7 +50,7 @@ def pick(mid, n, near_spawn=False):
 # 許昌模板 id -> 陳留室內。shops 用 shops.json id，fac 用 facilities.json key
 SHOP_IN = {'weapon': 'xc1704', 'herbalist': 'xc1703'}
 SHOP_STREET = ['tool', 'food', 'grocery']          # 城街攤
-FAC_IN = {'pharmacy': 'xc1703', 'workshop': 'xc1710', 'forge': 'xc1711', 'kitchen': 'xc1724', 'school': 'xc1705', 'stable_xc': 'xc1714'}
+FAC_IN = {'pharmacy': 'xc1703', 'workshop': 'xc1710', 'forge': 'xc1711', 'kitchen': 'xc1724', 'school': 'xc1705', 'stable_xc': 'xc1714', 'donate_xc': 'xc1701', 'station_xc': 'xc1715'}
 INN_IN = 'xc1702'
 
 shops = jl('shops.json'); fac = jl('facilities.json')
@@ -81,7 +81,7 @@ for mid, lst in by.items():
             n = copy.deepcopy(fac[src]); n['name'] = n['name'].replace('許昌', '陳留') if '許昌' in n['name'] else '陳留' + n['name']
             n.update(map=m, x=x, y=y)
             if src == 'school': n['type'] = 'school'
-            if 'city' in n: n['city'] = 'chenliu'
+            if 'city' in n: n['city'] = '陳留' if src.startswith('donate') else 'chenliu'     # 官宅 city = 顯示名；馬廄 city = 城 id
             fac[src + SFX] = n
     print(mid, [t[2] for t in lst])
 jw('shops.json', shops); jw('facilities.json', fac)

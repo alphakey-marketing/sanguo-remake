@@ -15,7 +15,31 @@ func station_near(e: Dictionary) -> String:
 func _station_hops(from_key: String, to_key: String) -> int:
 	var a: Dictionary = data.facilities[from_key]
 	var b: Dictionary = data.facilities[to_key]
-	return map_hops(_hop_map(int(a["x"]), int(a["y"])), _hop_map(int(b["x"]), int(b["y"])))
+	var ma := map_id_at(int(a["x"]), int(a["y"]))
+	var mb := map_id_at(int(b["x"]), int(b["y"]))
+	if _is_orig_map(ma) and _is_orig_map(mb):    # 兩站都喺原版世界: 外圍 25 連線已通，用真實過圖數
+		return map_hops(ma, mb)
+	var extra := 0                                # 一邊係原版、本城冇舊圖 (如陳留) = 經許昌: 真實過圖去許昌 + 舊圖由許昌起計
+	var xa := _hop_map(int(a["x"]), int(a["y"]))
+	var xb := _hop_map(int(b["x"]), int(b["y"]))
+	if _is_orig_map(ma) and _city_map(String(data.map_by_id[ma].get("cityOf", ""))).is_empty():
+		var h := map_hops(ma, "xuchang_o")
+		if h < 0:
+			return -1
+		extra = h
+		xa = "xuchang"
+	elif _is_orig_map(mb) and _city_map(String(data.map_by_id[mb].get("cityOf", ""))).is_empty():
+		var h2 := map_hops(mb, "xuchang_o")
+		if h2 < 0:
+			return -1
+		extra = h2
+		xb = "xuchang"
+	var base := map_hops(xa, xb)
+	return base + extra if base >= 0 else -1
+
+
+func _is_orig_map(mid: String) -> bool:
+	return data.map_by_id.get(mid, {}).has("orig")
 
 
 # 驛站車費用嘅「地圖」: 原版圖 (cityOf) 借返所屬城嘅舊圖算過圖數，因為原版世界未連去其他城

@@ -89,7 +89,7 @@ func t_data(data: GameData) -> void:
 	for k in data.facilities:
 		if data.facilities[k] is Dictionary and bool(data.facilities[k].get("donation", false)):
 			n_don += 1
-	check(n_don == 2, "捐獻處: 許昌 + 新野")
+	check(n_don == 3, "捐獻處: 許昌 + 新野 + 陳留")
 
 
 func t_rules(_data: GameData) -> void:

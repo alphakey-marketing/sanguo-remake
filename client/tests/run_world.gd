@@ -325,6 +325,14 @@ func t_chenliu_npcs(data: GameData) -> void:
 	ch["gold"] = 100; ch["sp"] = int(ch["sp"]); ch["mp"] = int(ch["mp"])
 	sim.cmd_facility(id, "school_cl")
 	check(int(ch["gold"]) < 100 or int(ch["attrs"]["pol"]) != pol0, "陳留私塾: school_cl 行私塾邏輯 (扣金或加政治)")
+	e["x"] = int(data.facilities["donate_xc_cl"]["x"]); e["y"] = int(data.facilities["donate_xc_cl"]["y"])
+	check(sim.office_near(e) == "donate_xc_cl", "陳留官宅: 企喺度 office_near = donate_xc_cl")
+	var st_cl: Dictionary = data.facilities["station_xc_cl"]
+	check(RulesStation.keys(data.facilities).has("station_xc_cl") and String(st_cl["map"]) == "xc1715", "陳留驛站: 入咗驛站網絡 (xc1715)")
+	var xc: Dictionary = data.facilities["station_xc"]
+	e["x"] = int(xc["x"]); e["y"] = int(xc["y"]); ch["gold"] = 500
+	sim.cmd_station(id, "station_xc_cl")
+	check(sim.map_id_at(int(e["x"]), int(e["y"])) == "xc1715" and int(ch["gold"]) < 500, "陳留驛站: 許昌驛站搭得去陳留 (扣車費)")
 	for k in data.facilities:
 		if String(k).ends_with("_cl"):
 			var f: Dictionary = data.facilities[k]
