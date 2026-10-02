@@ -473,7 +473,10 @@ func _draw_status() -> void:
 	var pr := Rect2(o + Vector2(5, 5), Vector2(46, 46))
 	draw_rect(pr, Color(0, 0, 0, 0.4))
 	var me = main._me()
-	if me != null:
+	var cf := AssetLib.face_image(main.ch.get("face", {}))
+	if cf != null:
+		draw_texture_rect(cf, Rect2(pr.position + Vector2(2.3, 0), Vector2(41.4, 46)), false)
+	elif me != null:
 		var faces: Array = main.faces
 		if faces.size() > 0:
 			var f = faces[int(me.face) % faces.size()]

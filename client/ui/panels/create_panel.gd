@@ -6,7 +6,7 @@ extends GamePanel
 # sim 權威：改動經 main._send 行 sim.cmd_set_*；理念測驗答案喺呢度暫存，答滿 12 題先一次過交。
 # 未撳「出發！」唔可以關（✕ / 撳遮罩都冇效），逼玩家行完全部步。
 
-const FACE_NAMES := {"set": "臉型組", "hair": "頭髮", "brow": "眉眼", "shape": "臉型", "neck": "頸", "bg": "背景"}
+const FACE_NAMES := {"set": "臉型組", "hair": "頭髮", "brow": "眉眼", "nose": "鼻", "mouth": "嘴", "beard": "鬍鬚（款1無）", "shape": "臉型", "neck": "頸", "bg": "背景"}
 
 var _confirmed := false
 var quiz_i := 0
@@ -163,9 +163,10 @@ func _build_face(ch: Dictionary, parent: Control) -> void:
 	var face: Dictionary = ch.get("face", {})
 	var pv := Control.new()
 	pv.custom_minimum_size = Vector2(144, 160)
-	for t in AssetLib.face_layers(face):
+	var ft := AssetLib.face_image(face)
+	if ft != null:
 		var tr := TextureRect.new()
-		tr.texture = t
+		tr.texture = ft
 		tr.set_anchors_preset(Control.PRESET_FULL_RECT)
 		tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED

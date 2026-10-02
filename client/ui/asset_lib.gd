@@ -107,6 +107,94 @@ static func face_layers(face: Dictionary) -> Array:
 	return out
 
 
+# 臉譜合成圖 (4x = 288x320): 疊層後喺眉眼下面程序畫鼻/口/鬚 (原版冇呢三層)；key 同 face 一樣就用 cache
+const FACE_SS := 4
+static var _face_cache: Dictionary = {}
+
+
+static func face_image(face: Dictionary) -> Texture2D:
+	var ck := JSON.stringify(face)
+	if _face_cache.has(ck):
+		return _face_cache[ck]
+	var layers := face_layers(face)
+	if layers.is_empty():
+		return null
+	var img := Image.create(72 * FACE_SS, 80 * FACE_SS, false, Image.FORMAT_RGBA8)
+	for t in layers:
+		var li: Image = (t as Texture2D).get_image().duplicate()
+		li.convert(Image.FORMAT_RGBA8)
+		li.resize(img.get_width(), img.get_height(), Image.INTERPOLATE_BILINEAR)
+		img.blend_rect(li, Rect2i(Vector2i.ZERO, li.get_size()), Vector2i.ZERO)
+	_draw_face_features(face, img)
+	var tex := ImageTexture.create_from_image(img)
+	_face_cache[ck] = tex
+	return tex
+
+
+static func _draw_face_features(face: Dictionary, img: Image) -> void:
+	var grp: String = FACE_SETS[clampi(int(face.get("set", 1)), 1, FACE_SETS.size()) - 1]
+	var et := _tex("face_layers", "%se%02d" % [grp, clampi(int(face.get("brow", 1)), 1, 3)])
+	var ft := _tex("face_layers", "%sf%02d" % [grp, clampi(int(face.get("shape", 1)), 1, 3)])
+	if et == null or ft == null:
+		return
+	var eb: Rect2i = (et as Texture2D).get_image().get_used_rect()
+	var ss := FACE_SS
+	var cx := (eb.position.x + eb.end.x) * 0.5 * ss
+	var ey := eb.end.y * ss
+	var fi: Image = (ft as Texture2D).get_image()
+	var skin := fi.get_pixel(clampi(int(cx / ss), 0, 71), clampi(int(ey / ss) + 6, 0, 79))
+	if skin.a < 0.5:
+		skin = Color(0.93, 0.72, 0.6)
+	skin.a = 1.0
+	var dark := skin.darkened(0.3)
+	var lip := Color(0.7, 0.28, 0.25).lerp(skin, 0.25)
+	var nw: float = [2.2, 3.0, 3.8][clampi(int(face.get("nose", 1)), 1, 3) - 1]
+	var ny := ey + 9.0 * ss
+	_fdot_line(img, Vector2(cx, ny - 5.0 * ss), Vector2(cx - 0.4 * ss, ny), dark, 0.6 * ss, 0.3)   # 鼻樑影
+	_fdot_line(img, Vector2(cx - nw * ss, ny + 0.5 * ss), Vector2(cx + nw * ss, ny + 0.5 * ss), dark, 0.8 * ss, 0.45)
+	_fdot_line(img, Vector2(cx - nw * ss * 0.6, ny + 1.6 * ss), Vector2(cx - nw * ss * 0.4, ny + 1.6 * ss), dark.darkened(0.3), 0.5 * ss, 0.5)
+	_fdot_line(img, Vector2(cx + nw * ss * 0.4, ny + 1.6 * ss), Vector2(cx + nw * ss * 0.6, ny + 1.6 * ss), dark.darkened(0.3), 0.5 * ss, 0.5)
+	var mw: float = [4.5, 3.5, 5.5][clampi(int(face.get("mouth", 1)), 1, 3) - 1]
+	var my := ey + 19.0 * ss
+	var curve: float = [1.2, 0.0, -0.8][clampi(int(face.get("mouth", 1)), 1, 3) - 1] * ss
+	var prev := Vector2(cx - mw * ss, my - curve)
+	for i in range(1, 9):
+		var t := i / 8.0
+		var cur := Vector2(cx + (t * 2.0 - 1.0) * mw * ss, my - curve + curve * 1.0 * (1.0 - pow(2.0 * t - 1.0, 2.0)) * 1.0)
+		_fdot_line(img, prev, cur, lip, 0.9 * ss, 0.7)
+		prev = cur
+	_fdot_line(img, Vector2(cx - mw * ss * 0.5, my + 1.2 * ss), Vector2(cx + mw * ss * 0.5, my + 1.2 * ss), dark, 0.7 * ss, 0.3)
+	var bd := int(face.get("beard", 1))
+	if bd >= 2 and grp.begins_with("b"):
+		var hc := Color(0.12, 0.08, 0.06)
+		if bd == 2:   # 八字鬚
+			_fdot_line(img, Vector2(cx - 5.0 * ss, my - 2.5 * ss), Vector2(cx - 0.5 * ss, my - 3.2 * ss), hc, 0.9 * ss, 0.7)
+			_fdot_line(img, Vector2(cx + 0.5 * ss, my - 3.2 * ss), Vector2(cx + 5.0 * ss, my - 2.5 * ss), hc, 0.9 * ss, 0.7)
+		else:         # 山羊鬚
+			_fdot_line(img, Vector2(cx, my + 3.0 * ss), Vector2(cx, my + 9.0 * ss), hc, 1.2 * ss, 0.7)
+
+
+static func _fdot_line(img: Image, a: Vector2, b: Vector2, col: Color, r: float, alpha: float) -> void:
+	var n := maxi(1, int(a.distance_to(b)))
+	var ri := int(ceil(r))
+	for i in n + 1:
+		var c := a.lerp(b, float(i) / n)
+		for dy in range(-ri, ri + 1):
+			for dx in range(-ri, ri + 1):
+				var d := sqrt(dx * dx + dy * dy)
+				if d > r:
+					continue
+				var x := int(c.x) + dx
+				var y := int(c.y) + dy
+				if x < 0 or y < 0 or x >= img.get_width() or y >= img.get_height():
+					continue
+				var base := img.get_pixel(x, y)
+				if base.a < 0.5:
+					continue
+				var k := alpha * (1.0 - d / (r + 0.5))
+				img.set_pixel(x, y, base.lerp(col, clampf(k, 0.0, 1.0)))
+
+
 # 職業預覽: 面向鏡頭站立第一幀，Lv1 起手造型 (武 1 / 甲 1 / 臉譜髮)；疊序同遊戲內 (身 → 甲 → 髮 → 武)
 static func player_preview(b: int, face: Dictionary) -> Array:
 	var body := player_layer(b, 1, "b", 0)

@@ -1,9 +1,12 @@
 {
-  "_note": "建角臉譜【自訂】: 疊層 set 臉型組(男5女6)/bg 背景12/shape 臉型3/neck 頸3/brow 眉眼3/hair 髮3 (原版 Pic_Face 疊層，無鼻/口/鬚獨立圖)。存檔只存款式 id (1..count)；舊檔缺 set 當 1。hair 同步接分層 sprite 髮層。",
+  "_note": "建角臉譜【自訂】: 疊層 set 臉型組(男5女6)/bg 背景12/shape 臉型/neck 頸/brow 眉眼/hair 髮 (原版 Pic_Face，各 3)；原版冇鼻/口/鬚圖 → nose/mouth/beard 各 3 款由 AssetLib.face_image 程序畫(鬚只限男組，款 1=無)。存檔只存款式 id；舊檔缺欄位當 1。hair 同步接分層 sprite 髮層。",
   "parts": {
     "set": 11,
     "hair": 3,
     "brow": 3,
+    "nose": 3,
+    "mouth": 3,
+    "beard": 3,
     "shape": 3,
     "neck": 3,
     "bg": 12
