@@ -83,6 +83,47 @@ static func player_layer(b: int, c: int, kind: String, style: int) -> Texture2D:
 	return _tex("player_layers", "%d/%d/%s/%d" % [b, c, kind, style])
 
 
+# 臉譜 hair 款 1~3 → 分層 sprite 髮層款 (h 0~6 入面裸髮款 1/3/6，其餘係頭盔)
+const HAIR_STYLE := [1, 3, 6]
+# 臉譜「臉型組」1~11 → Pic_Face 組碼 (男 5 + 女 6)
+const FACE_SETS := ["b02", "b03", "b04", "b05", "b06", "g01", "g02", "g03", "g04", "g05", "g06"]
+
+
+static func hair_style(face: Dictionary) -> int:
+	return int(HAIR_STYLE[clampi(int(face.get("hair", 1)), 1, HAIR_STYLE.size()) - 1])
+
+
+# 臉譜疊層 (72x80，由底到頂: 背景/頸/臉型/眉眼/髮)；缺圖跳過
+static func face_layers(face: Dictionary) -> Array:
+	var grp: String = FACE_SETS[clampi(int(face.get("set", 1)), 1, FACE_SETS.size()) - 1]
+	var keys := ["b01b%02d" % clampi(int(face.get("bg", 1)), 1, 12)]
+	for pair in [["c", "neck"], ["f", "shape"], ["e", "brow"], ["h", "hair"]]:
+		keys.append("%s%s%02d" % [grp, pair[0], clampi(int(face.get(pair[1], 1)), 1, 3)])
+	var out: Array = []
+	for k in keys:
+		var t := _tex("face_layers", k)
+		if t != null:
+			out.append(t)
+	return out
+
+
+# 職業預覽: 面向鏡頭站立第一幀，Lv1 起手造型 (武 1 / 甲 1 / 臉譜髮)；疊序同遊戲內 (身 → 甲 → 髮 → 武)
+static func player_preview(b: int, face: Dictionary) -> Array:
+	var body := player_layer(b, 1, "b", 0)
+	if body == null:
+		return []
+	var cw := body.get_width() / 8
+	var chh := body.get_height() / 8
+	var out: Array = []
+	for t in [body, player_layer(b, 1, "a", 1), player_layer(b, 1, "h", hair_style(face)), player_layer(b, 1, "w", 1)]:
+		if t != null:
+			var at := AtlasTexture.new()
+			at.atlas = t
+			at.region = Rect2(0, 4 * chh, cw, chh)
+			out.append(at)
+	return out
+
+
 # 音效檔路徑；冇索引回 ""
 static func audio_path(name: String) -> String:
 	_ensure()

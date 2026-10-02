@@ -148,7 +148,7 @@
 
 記錄喺 `docs/uat/spec12_地圖世界.md`。重點：
 - ✅ 地圖框架（80 map）、A*/過圖/自動尋路、驛站、天災/時辰/日夜
-- ✅ 新手城 3 揀一（許昌/襄陽/新野）：`cmd_set_home` + 建角頁 `_build_home`，Lv1 先改得；2026-09-29 補測試 `run_world t_set_home`
+- ✅ 新手城：建角 UI **已移除揀城**（2026-10-02，用家決定固定許昌）；`cmd_set_home`/`newbie_cities` 指令保留 + `run_world t_set_home` 測試
 - 🟡 地標 `ch.landmarks` 已存 id，但**冇頁面儲起再睇** → 可加「典故」頁
 - 🟢 HUD 左上角色框縮細、移動模式（搖桿 vs 點擊）切換 —— subsession 自發建議，待用家 confirm
 - 世界 23 節點**已全部 open**（無灰節點）；B4 其餘州郡【待決】── 開新州郡圖要先問用家

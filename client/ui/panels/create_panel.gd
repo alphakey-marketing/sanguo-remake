@@ -1,12 +1,12 @@
 class_name CreatePanel
 extends GamePanel
 # 建角面板（S01b，正式化取代 mobile_hud 舊 debug 建角覆蓋層；U-fix: 7 tab 精簡做 2 頁）
-# 第 1 頁「職業介紹」= 獨立職業頁 (F3)；第 2 頁「基本資料」= 姓名+新手城+臉譜（稱號改做事件獎勵解鎖）；第 3 頁答理念測驗（12題必答）
+# 第 1 頁「職業介紹」= 獨立職業頁 (F3)；第 2 頁「基本資料」= 姓名+臉譜 (新手城固定許昌，唔再揀)（稱號改做事件獎勵解鎖）；第 3 頁答理念測驗（12題必答）
 # 答完自動變確認畫面，撳「出發！」先完成。
 # sim 權威：改動經 main._send 行 sim.cmd_set_*；理念測驗答案喺呢度暫存，答滿 12 題先一次過交。
 # 未撳「出發！」唔可以關（✕ / 撳遮罩都冇效），逼玩家行完全部步。
 
-const FACE_NAMES := {"hair": "頭髮", "brow": "眉毛", "nose": "鼻", "mouth": "嘴", "beard": "鬍鬚", "shape": "臉型", "neck": "頸", "bg": "背景"}
+const FACE_NAMES := {"set": "臉型組", "hair": "頭髮", "brow": "眉眼", "shape": "臉型", "neck": "頸", "bg": "背景"}
 
 var _confirmed := false
 var quiz_i := 0
@@ -70,8 +70,6 @@ func _build_basic(ch: Dictionary) -> void:
 	sc.add_child(list)
 	_build_name(ch, list)
 	list.add_child(hsep())
-	_build_home(ch, list)
-	list.add_child(hsep())
 	_build_face(ch, list)
 	list.add_child(hsep())
 	list.add_child(btn("下一步：理念測驗 →", func() -> void:
@@ -94,22 +92,6 @@ func _build_name(ch: Dictionary, parent: Control) -> void:
 	parent.add_child(btn("確定", func() -> void: main._send({"t": "set_name", "name": name_edit.text}), 120))
 
 
-# ---- 新手城（UAT-feedback, spec 12 §1）【自訂】: 未出發 Lv1 先先揀得，揀完搬去嗰城客棧 ----
-func _build_home(ch: Dictionary, parent: Control) -> void:
-	parent.add_child(lbl("新手城（未出發前可以改，揀完搬去嗰城）", 15, UiTheme.GOLD))
-	var cur := str(ch.get("homeCity", ""))
-	var can_change := int(ch.get("level", 1)) == 1
-	var opts: Array = main.sim.newbie_cities()
-	if opts.is_empty():
-		parent.add_child(lbl("（暫無可揀新手城）", 14, UiTheme.DIM))
-		return
-	for o in opts:
-		var oc := String(o["id"])
-		var is_cur := oc == cur or (cur == "" and oc == String(main.data.world.get("homeCity", "")))
-		var b := btn("%s　%s" % [str(o["name"]), "（現用）" if is_cur else ""], func() -> void: main._send({"t": "set_home", "home": oc}))
-		b.disabled = is_cur or not can_change
-		parent.add_child(b)
-
 # 第一頁: 獨立職業介紹頁 (F3)。每職一格: 預留畫圖位 + 介紹 + 武器/特技/轉職路線 + 揀選掣
 func _build_class_page(ch: Dictionary) -> void:
 	var sc := scroll()
@@ -127,7 +109,7 @@ func _build_class_page(ch: Dictionary) -> void:
 		var is_cur := String(cid) == cur
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 10)
-		row.add_child(_class_art(String(cid)))
+		row.add_child(_class_art(String(cid), ch))
 		var col := VBoxContainer.new()
 		col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		col.add_child(lbl("%s%s" % [str(cls.get("name", cid)), "　（現用）" if is_cur else ""], 15, UiTheme.GOLD))
@@ -147,8 +129,8 @@ func _build_class_page(ch: Dictionary) -> void:
 		refresh(true), 200))
 
 
-# 職業圖位: 有 res://assets/class_art/<id>.png 就用，冇就灰色佔位框 (之後補圖，size 96x128)
-func _class_art(cid: String) -> Control:
+# 職業圖位: 有 res://assets/class_art/<id>.png 就用 (96x128)；冇就用原版分層 sprite 砌 Lv1 起手造型 (面向鏡頭)
+func _class_art(cid: String, ch: Dictionary) -> Control:
 	var path := "res://assets/class_art/%s.png" % cid
 	if ResourceLoader.exists(path):
 		var tr := TextureRect.new()
@@ -157,21 +139,38 @@ func _class_art(cid: String) -> Control:
 		tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		return tr
-	var ph := ColorRect.new()
-	ph.color = Color(0.3, 0.3, 0.3)
-	ph.custom_minimum_size = Vector2(96, 128)
-	var t := lbl("圖", 20, UiTheme.DIM)
-	t.set_anchors_preset(Control.PRESET_FULL_RECT)
-	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	t.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	ph.add_child(t)
-	return ph
+	var box := Control.new()
+	box.custom_minimum_size = Vector2(96, 128)
+	var b := int(main._CLASS_B.get(cid, 0))
+	for t in AssetLib.player_preview(b, ch.get("face", {})):
+		var tr := TextureRect.new()
+		tr.texture = t
+		tr.set_anchors_preset(Control.PRESET_FULL_RECT)
+		tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		box.add_child(tr)
+	if box.get_child_count() == 0:
+		var ph := ColorRect.new()
+		ph.color = Color(0.3, 0.3, 0.3)
+		ph.set_anchors_preset(Control.PRESET_FULL_RECT)
+		box.add_child(ph)
+	return box
 
 
 # ---- 臉譜（8 部位，款式循環） ----
 func _build_face(ch: Dictionary, parent: Control) -> void:
 	parent.add_child(lbl("臉譜（撳格循環款式）", 15, UiTheme.GOLD))
 	var face: Dictionary = ch.get("face", {})
+	var pv := Control.new()
+	pv.custom_minimum_size = Vector2(144, 160)
+	for t in AssetLib.face_layers(face):
+		var tr := TextureRect.new()
+		tr.texture = t
+		tr.set_anchors_preset(Control.PRESET_FULL_RECT)
+		tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		pv.add_child(tr)
+	parent.add_child(pv)
 	for part in main.data.face_parts:
 		var cnt := int(main.data.face_parts[part])
 		var cur := int(face.get(part, 1))

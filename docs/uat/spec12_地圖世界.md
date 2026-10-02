@@ -32,7 +32,7 @@
 | 多地圖並排全域格仔 | — | `maps.json` OX/OY → 全域 `W×H` 網格；地圖之間留空 void | ✅ `game_data.gd` 拼圖 + `map_at/map_id_at` |
 | 地形 13 種字元（`.` `,` `=` `:` `_` `%` `b` `+` `#` `H` `T` `^` `~` 空格） | — | walk 表；`#/H/T/^/~/空格` 唔行得 | ✅ legend 全齊 |
 | 每張 map 自動 zone（id = map id、safe 跟地圖） | zone 名 / 顏色 | old zone id 保留（`field_1`/`runan_f1..10`/`town`） | ✅ `zone_by_id` + old id 兼容 |
-| **新手城 3 揀一（許昌/襄陽/新野）** | 建角揀 hometown？ | `world.homeCity`（現值 = 許昌）；新手 spawn 喺 `_home_map().spawn` 近客棧 | ✅ `cmd_set_home` + 建角頁 `_build_home`；Lv1 先改得；有測試 |
+| **新手城 3 揀一（許昌/襄陽/新野）** | 建角揀 hometown？ | `world.homeCity`（現值 = 許昌）；新手 spawn 喺 `_home_map().spawn` 近客棧 | ✅ 指令 `cmd_set_home` 保留+有測試；建角 UI 已移除揀城（2026-10-02 用家決定固定許昌） |
 | **先讀 80 張地圖**（含 33 張戰役/場景副本地圖） | — | 戰役/場景 `.txt` 一齊入 export | ✅ 已見 `zhangniujiao_*`、`qicai_*`、`taohuadu_*`、`shichangshi_*` 等 |
 | **戰役 / 場景大地圖標示** | 天下頁顯示「戰役窗口」+「特殊場景窗口」狀態 | `sim.view_battles` / `sim.view_scenes` read-model | ✅ map_panel `_draw_world()` 頂部兩個指示框 |
 

@@ -1,13 +1,11 @@
 {
-  "_note": "建角臉譜 8 部位 (spec 01 §1)【自訂】: 每部位 ≥3 款，存檔只存部位 id (1..count)。款式索引由 1 起。",
+  "_note": "建角臉譜【自訂】: 疊層 set 臉型組(男5女6)/bg 背景12/shape 臉型3/neck 頸3/brow 眉眼3/hair 髮3 (原版 Pic_Face 疊層，無鼻/口/鬚獨立圖)。存檔只存款式 id (1..count)；舊檔缺 set 當 1。hair 同步接分層 sprite 髮層。",
   "parts": {
+    "set": 11,
     "hair": 3,
     "brow": 3,
-    "nose": 3,
-    "mouth": 3,
-    "beard": 3,
     "shape": 3,
     "neck": 3,
-    "bg": 3
+    "bg": 12
   }
 }

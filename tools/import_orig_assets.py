@@ -77,6 +77,25 @@ def imp_faces(src, idx):
                     by_name[c[1]] = out[c[2]]
     idx["faces_by_name"] = by_name
 
+def imp_facelayers(src, idx):
+    """臉譜疊層 (Pic_Face/Pic_face2, 72x80 同座標): key = 小寫碼 (b01bNN 背景 / <組>c|f|e|h0N 頸/臉型/眉眼/髮)；跳過 32x36 細圖 (尾 s)"""
+    base = os.path.join(src, "sprites")
+    out = {}
+    for d in ("Pic_Face", "Pic_face2"):
+        for f in sorted(os.listdir(os.path.join(base, d))):
+            m = re.match(r"\d+_(\w+)\.png$", f)
+            if not m or m.group(1).lower().endswith("s"):
+                continue
+            key = m.group(1).lower()
+            rel = f"facelayers/{key}.png"
+            dst = os.path.join(OUT, rel)
+            os.makedirs(os.path.dirname(dst), exist_ok=True)
+            if not os.path.exists(dst):
+                shutil.copyfile(os.path.join(base, d, f), dst)
+            out[key] = rel
+    idx["face_layers"] = out
+    print(f"臉譜疊層: {len(out)} 張")
+
 def _find(src, d, name):
     base = os.path.join(src, "sprites", d)
     for f in os.listdir(base):
@@ -382,7 +401,7 @@ def imp_audio(src, idx):
     idx["audio"] = out
     print(f"音效: {len(out)} 條")
 
-SETS = {"audio": imp_audio, "fx": imp_fx, "player": imp_player_layers, "mount": imp_mount, "actor": imp_actor, "mon": imp_mon, "items": imp_items, "faces": imp_faces, "ui": imp_ui}
+SETS = {"audio": imp_audio, "fx": imp_fx, "player": imp_player_layers, "mount": imp_mount, "actor": imp_actor, "mon": imp_mon, "items": imp_items, "faces": imp_faces, "facelayers": imp_facelayers, "ui": imp_ui}
 
 def check():
     if not os.path.exists(INDEX):

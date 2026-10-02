@@ -270,7 +270,7 @@ func _look_styles() -> Dictionary:
 	var bid := int(eq.get("body", 0))
 	if bid > 0:
 		a = 1 + mini(5, int(data.info.get(bid, {}).get("req_lv", 0)) / 22)
-	var h := 1
+	var h := AssetLib.hair_style(ch.get("face", {}))
 	var hid := int(eq.get("head", 0))
 	if hid > 0:
 		h = 2 + mini(4, int(data.info.get(hid, {}).get("req_lv", 0)) / 33)
