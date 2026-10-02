@@ -355,10 +355,10 @@ func t_dingyuan(data: GameData) -> void:
 	var id: int = r[1]
 	var ch: Dictionary = r[2]
 	ch["attrs"]["cha"] = 10
-	var door := _portal(sim, "rn_ding")
+	var door := _portal(sim, "xc_in_2001")
 	_put(sim, id, int(door["x"]), int(door["y"]))
-	sim.cmd_travel(id, "rn_ding")
-	check(_map_of(sim, id) == "runan_city", "冇鑰匙: 入唔到丁刺史府")
+	sim.cmd_travel(id, "xc_in_2001")
+	check(_map_of(sim, id) == "xc2000", "冇鑰匙: 入唔到丁刺史府")
 	_talk(sim, id, "lisu")
 	check(_n(ch, 56017) == 1, "李肅: 得董卓勸降書")
 	_talk(sim, id, "lvbu_rn")
@@ -368,13 +368,13 @@ func t_dingyuan(data: GameData) -> void:
 	_talk(sim, id, "lisu")
 	check(_n(ch, 56018) == 1 and _n(ch, 56019) == 0 and _stage(ch, "hist_dingyuan") == 3, "李肅: 收投降書、得丁原家鑰匙")
 	_put(sim, id, int(door["x"]), int(door["y"]))
-	sim.cmd_travel(id, "rn_ding")
-	check(_map_of(sim, id) == "ding_fu", "有鑰匙: 入到丁刺史府")
-	check(bool(data.map_by_id["ding_fu"]["safe"]), "丁刺史府仍然係安全區")
+	sim.cmd_travel(id, "xc_in_2001")
+	check(_map_of(sim, id) == "xc2001", "有鑰匙: 入到丁刺史府")
+	check(bool(data.map_by_id["xc2001"]["safe"]), "丁刺史府仍然係安全區")
 	# 安全區內打得任務 boss
 	_talk(sim, id, "dingyuan")
 	var b := _boss(sim, "hist_dingyuan")
-	check(not b.is_empty() and sim.map_id_at(int(b["x"]), int(b["y"])) == "ding_fu", "丁原 boss 喺府內出現")
+	check(not b.is_empty() and sim.map_id_at(int(b["x"]), int(b["y"])) == "xc2001", "丁原 boss 喺府內出現")
 	check(sim.is_free(int(b["x"]), int(b["y"])), "boss 出喺行得嘅格")
 	var hp0 := int(b["hp"])
 	sim.ent(id)["ch"]["hp"] = 99999

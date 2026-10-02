@@ -349,7 +349,7 @@ func t_xinye_quests(data: GameData) -> void:
 	var ch: Dictionary = sim.player_ch()
 	for nid in ["xinye_clerk", "xinye_innkeeper", "xuchang_courier"]:
 		check(_npc_visible(sim, nid), "新野任務: %s 可見" % nid)
-	check(sim.map_id_at(int(data.quest_npcs["xinye_clerk"]["x"]), int(data.quest_npcs["xinye_clerk"]["y"])) == "xinye", "新野縣吏喺新野城")
+	check(sim.map_id_at(int(data.quest_npcs["xinye_clerk"]["x"]), int(data.quest_npcs["xinye_clerk"]["y"])) == "xc2700", "新野縣吏喺新野城")
 	var gold0 := int(ch["gold"])
 	_talk(sim, id, "xinye_clerk")
 	check(int(ch["quests"]["xinye_letter"]["stage"]) == 1, "公文: stage 1 (去許昌)")

@@ -124,11 +124,11 @@
   {
    "id": "stray_soldier",
    "name": "守門流浪兵",
-   "x": 43,
-   "y": 8,
+   "x": 91,
+   "y": 68,
    "minLevel": 35,
    "desc": "晉陽洞窟守門流浪兵【原】— 自訂改編: 潁川郊外北口 (Step 10）",
-   "map": "field_1"
+   "map": "xc1925"
   },
   {
    "id": "lvbu",
@@ -146,26 +146,26 @@
   {
    "id": "xinye_clerk",
    "name": "新野縣吏",
-   "x": 34,
-   "y": 19,
+   "x": 0,
+   "y": 0,
    "idle": [
     "新野縣吏：「劉皇叔屯兵新野，四方豪傑多來投奔。」",
     "新野縣吏埋頭抄寫文書。"
    ],
    "desc": "新野縣衙門口嘅縣吏，成日要人幫手送公文。",
-   "map": "xinye"
+   "map": "xc2700"
   },
   {
    "id": "xinye_innkeeper",
    "name": "新野客棧掌櫃",
-   "x": 48,
-   "y": 23,
+   "x": 2,
+   "y": 2,
    "idle": [
     "新野客棧掌櫃：「客官裡面請！」",
     "新野客棧掌櫃撥緊算盤。"
    ],
    "desc": "新野客棧嘅掌櫃，最近酸梅湯賣斷市。",
-   "map": "xinye"
+   "map": "xc2700"
   },
   {
    "id": "xuchang_courier",
@@ -181,79 +181,79 @@
   {
    "id": "sunjian",
    "name": "孫堅",
-   "x": 90,
-   "y": 20,
+   "x": 54,
+   "y": 141,
    "idle": [
     "孫堅望住白河，眉頭深鎖。"
    ],
    "desc": "新野城外荊州地界，為海賊之事悶悶不樂嘅孫堅【原】。",
-   "map": "jingzhou"
+   "map": "xc2925"
   },
   {
    "id": "huyu",
    "name": "胡玉",
-   "x": 45,
-   "y": 42,
+   "x": 185,
+   "y": 51,
    "questOnly": true,
    "desc": "港口渡船處嘅海賊首領【原】。",
-   "map": "gangkou"
+   "map": "xc2125"
   },
   {
    "id": "wanggong",
    "name": "王肱",
-   "x": 38,
-   "y": 25,
+   "x": 0,
+   "y": 35,
    "idle": [
     "王肱：「于毒嚟勢洶洶，點算好……」"
    ],
    "desc": "宛城牌樓附近嘅地方官【原】，山賊于毒正殺向宛城。",
-   "map": "wancheng"
+   "map": "xc2800"
   },
   {
    "id": "caocao_cl",
    "name": "曹操",
-   "x": 47,
-   "y": 12,
+   "x": 0,
+   "y": 155,
    "idle": [
     "曹操：「亂世之中，正是用人之際。」"
    ],
    "desc": "陳留城門口嘅曹都尉【原】。",
-   "map": "chenliu"
+   "map": "xc1700"
   },
   {
    "id": "yudu",
    "name": "于毒",
-   "x": 15,
-   "y": 25,
+   "x": 192,
+   "y": 147,
    "questOnly": true,
    "desc": "于毒山寨嘅山賊頭目【原】。",
-   "map": "yudu"
+   "map": "xc2851"
   },
   {
    "id": "chengong",
    "name": "陳宮",
-   "x": 37,
-   "y": 21,
+   "x": 0,
+   "y": 84,
    "idle": [
     "陳宮來回踱步，自言自語：「孟德……」"
    ],
    "desc": "襄陽宮宅外憂心如焚嘅陳宮【原】。",
-   "map": "xiangyang"
+   "map": "xc2900"
   },
   {
    "id": "prison_clerk",
    "name": "獄吏",
-   "x": 18,
-   "y": 2,
+   "x": 62,
+   "y": 35,
    "questOnly": true,
    "desc": "陳宮安插喺監獄嘅獄吏【自訂】，見縣官令就放行。",
-   "map": "xy_prison"
+   "map": "xc2901"
   },
   {
    "id": "caocao_pr",
    "name": "曹操（囚）",
-   "x": 6,
-   "y": 10,
+   "x": 68,
+   "y": 35,
    "questOnly": true,
    "window": {
     "startKe": 0,
@@ -261,46 +261,46 @@
    },
    "strictWindow": true,
    "desc": "被陳宮拘留喺襄陽監獄嘅曹操【原】；子時~丑時先見得到。",
-   "map": "xy_prison"
+   "map": "xc2901"
   },
   {
    "id": "yuanshao",
    "name": "袁紹",
-   "x": 6,
-   "y": 17,
+   "x": 0,
+   "y": 133,
    "idle": [
     "袁紹：「董卓殘暴，天下共討之！」"
    ],
    "desc": "小沛城門口內嘅袁太守【原】，想助司徒王允推翻董卓。",
-   "map": "xiaopei"
+   "map": "xc1400"
   },
   {
    "id": "wangyun",
    "name": "王允",
-   "x": 43,
-   "y": 32,
+   "x": 2,
+   "y": 39,
    "idle": [
     "王允長嘆：「國賊當道，漢室危矣。」"
    ],
    "desc": "身喺宛城嘅司徒王允【原】。",
-   "map": "wancheng"
+   "map": "xc2800"
   },
   {
    "id": "liru",
    "name": "李儒",
-   "x": 12,
-   "y": 16,
+   "x": 0,
+   "y": 103,
    "idle": [
     "李儒陰陰嘴笑，冇出聲。"
    ],
    "desc": "長沙城賭場旁嘅李儒【原】。",
-   "map": "changsha"
+   "map": "xc2200"
   },
   {
    "id": "dongzhuo",
    "name": "董卓",
-   "x": 91,
-   "y": 20,
+   "x": 54,
+   "y": 141,
    "window": {
     "startKe": 24,
     "endKe": 80
@@ -310,38 +310,38 @@
     "董卓：「哼，閒人勿近！」"
    ],
    "desc": "汝南城外門口嘅董卓【原】，每日卯時~酉時先出現。",
-   "map": "runan_road"
+   "map": "xc2025"
   },
   {
    "id": "lisu",
    "name": "李肅",
-   "x": 13,
-   "y": 13,
+   "x": 0,
+   "y": 167,
    "idle": [
     "李肅：「呂奉先天下無雙，可惜跟錯人。」"
    ],
    "desc": "汝南城李府嘅李肅【原】，代董卓招降呂布。",
-   "map": "runan_city"
+   "map": "xc2000"
   },
   {
    "id": "lvbu_rn",
    "name": "呂布",
-   "x": 30,
-   "y": 30,
+   "x": 2,
+   "y": 171,
    "idle": [
     "呂布抱住方天畫戟，睬你都傻。"
    ],
    "desc": "汝南城內嘅呂奉先【原】。",
-   "map": "runan_city"
+   "map": "xc2000"
   },
   {
    "id": "dingyuan",
    "name": "丁原",
-   "x": 15,
-   "y": 14,
+   "x": 62,
+   "y": 35,
    "questOnly": true,
    "desc": "丁刺史府內嘅并州刺史丁原【原】。",
-   "map": "ding_fu"
+   "map": "xc2001"
   },
   {
    "id": "laozhang",
@@ -360,82 +360,82 @@
   {
    "id": "xinye_farmer",
    "name": "新野農夫",
-   "x": 14,
-   "y": 31,
+   "x": 8,
+   "y": 2,
    "commission": true,
    "idle": [
     "新野農夫：「今年收成都幾好。」"
    ],
    "desc": "新野城嘅農夫，間中有委託【自訂】。",
-   "map": "xinye"
+   "map": "xc2700"
   },
   {
    "id": "wancheng_merchant",
    "name": "宛城商人",
-   "x": 20,
-   "y": 31,
+   "x": 8,
+   "y": 39,
    "commission": true,
    "idle": [
     "宛城商人：「貨如輪轉，客似雲來。」"
    ],
    "desc": "宛城行商，間中有委託【自訂】。",
-   "map": "wancheng"
+   "map": "xc2800"
   },
   {
    "id": "runan_smith",
    "name": "汝南鐵匠",
-   "x": 30,
-   "y": 24,
+   "x": 8,
+   "y": 171,
    "commission": true,
    "idle": [
     "汝南鐵匠揮汗打鐵。"
    ],
    "desc": "汝南城嘅鐵匠，間中有委託【自訂】。",
-   "map": "runan_city"
+   "map": "xc2000"
   },
   {
    "id": "xiangyang_scholar",
    "name": "襄陽書生",
-   "x": 58,
-   "y": 24,
+   "x": 2,
+   "y": 88,
    "commission": true,
    "idle": [
     "襄陽書生：「荊州學風鼎盛，名士雲集。」"
    ],
    "desc": "襄陽城嘅書生，間中有委託【自訂】。",
-   "map": "xiangyang"
+   "map": "xc2900"
   },
   {
    "id": "simahui",
    "name": "司馬徽",
-   "x": 9,
-   "y": 23,
+   "x": 8,
+   "y": 88,
    "idle": [
     "司馬徽撚鬚微笑：「好，好。」"
    ],
    "desc": "襄陽名士水鏡先生【自訂】，識得臥龍鳳雛。",
-   "map": "xiangyang"
+   "map": "xc2900"
   },
   {
    "id": "caolu_boy",
    "name": "書童",
-   "x": 14,
-   "y": 12,
+   "x": 36,
+   "y": 48,
    "idle": [
     "書童：「先生讀書嘅時候唔好嘈。」",
     "書童掃緊門前落葉。"
    ],
    "desc": "隆中草廬嘅書童【自訂】。",
-   "map": "caolu"
+   "map": "xc2902"
   },
   {
    "id": "zhugeliang",
    "name": "諸葛亮",
-   "x": 14,
-   "y": 5,
+   "x": 45,
+   "y": 48,
    "questOnly": true,
    "desc": "隱居隆中嘅臥龍先生【自訂】；第三次拜訪先見得到。",
-   "map": "caolu"
+   "map": "xc2902"
   },
   {
    "id": "battle_herald",
@@ -530,9 +530,9 @@
   {
    "id": "scene_taohuadu",
    "name": "桃花渡入口",
-   "x": 40,
-   "y": 30,
-   "map": "gangkou",
+   "x": 191,
+   "y": 51,
+   "map": "xc2125",
    "idle": [
     "桃花渡入口：「桃花仙境美得反常——梗有古怪。」"
    ],
@@ -542,9 +542,9 @@
   {
    "id": "scene_qicai",
    "name": "七彩奪寶陣入口",
-   "x": 44,
-   "y": 34,
-   "map": "gangkou",
+   "x": 197,
+   "y": 51,
+   "map": "xc2125",
    "idle": [
     "七彩奪寶陣入口：「孟獲分身七色囂張，入去教訓吓！」"
    ],
@@ -554,122 +554,122 @@
   {
    "id": "sunwentai",
    "name": "孫文臺",
-   "x": 30,
-   "y": 12,
+   "x": 0,
+   "y": 103,
    "idle": [
     "孫文臺：「這口古井，古怪得很。」"
    ],
    "desc": "洛陽城內宮宅旁嘅孫堅【原】，聽聞井底有異，托人查探。",
-   "map": "luoyang"
+   "map": "xc2600"
   },
   {
    "id": "chengpu",
    "name": "程普",
-   "x": 14,
-   "y": 12,
+   "x": 60,
+   "y": 31,
    "questOnly": true,
    "desc": "程府民房內嘅程德謀【原】。",
-   "map": "chengfu"
+   "map": "xc2602"
   },
   {
    "id": "zhangjiao",
    "name": "張角",
-   "x": 10,
-   "y": 13,
+   "x": 2,
+   "y": 103,
    "idle": [
     "張角捧住一卷天書，喃喃自語。"
    ],
    "desc": "洛陽私塾黃巾道場內嘅張角【原】，暗中興兵作亂。",
-   "map": "luoyang"
+   "map": "xc2600"
   },
   {
    "id": "nanhua_child",
    "name": "南華小童",
-   "x": 10,
-   "y": 31,
+   "x": 8,
+   "y": 103,
    "questOnly": true,
    "desc": "洛陽城外南華竹林嘅小童【原】。",
-   "map": "luoyang"
+   "map": "xc2600"
   },
   {
    "id": "nanhua_old",
    "name": "南華老仙",
-   "x": 13,
-   "y": 31,
+   "x": 14,
+   "y": 103,
    "questOnly": true,
    "desc": "洛陽城外南華竹林嘅南華老仙【原】。",
-   "map": "luoyang"
+   "map": "xc2600"
   },
   {
    "id": "zhanggong",
    "name": "張公公",
-   "x": 25,
-   "y": 16,
+   "x": 0,
+   "y": 147,
    "idle": [
     "張公公尖聲細語：「宮中之事，唔可外傳……」"
    ],
    "desc": "下邳城內嘅張公公【原】，受託秘密殺害何進。",
-   "map": "xiapi"
+   "map": "xc1500"
   },
   {
    "id": "hefu_guard",
    "name": "何府守衛",
-   "x": 11,
-   "y": 12,
+   "x": 68,
+   "y": 37,
    "idle": [
     "何府守衛：「冇通行文書，唔准入內。」"
    ],
    "desc": "何府門口嘅守衛【原】。",
-   "map": "hefu"
+   "map": "xc2601"
   },
   {
    "id": "hejin",
    "name": "何進",
-   "x": 12,
-   "y": 4,
+   "x": 74,
+   "y": 37,
    "questOnly": true,
    "desc": "何府內嘅大將軍何進【原】。",
-   "map": "hefu"
+   "map": "xc2601"
   },
   {
    "id": "yuji",
    "name": "于吉",
-   "x": 35,
-   "y": 16,
+   "x": 2,
+   "y": 107,
    "idle": [
     "于吉：「黃公覆武功蓋世，隱世太可惜。」"
    ],
    "desc": "長沙城賭場附近嘅于吉【原】，想請黃蓋重出江湖。",
-   "map": "changsha"
+   "map": "xc2200"
   },
   {
    "id": "huanggai",
    "name": "黃蓋",
-   "x": 20,
-   "y": 17,
+   "x": 8,
+   "y": 107,
    "questOnly": true,
    "desc": "長沙城黃蓋家民房內嘅黃蓋【原】。",
-   "map": "changsha"
+   "map": "xc2200"
   },
   {
    "id": "caosong",
    "name": "曹阿嵩",
-   "x": 25,
-   "y": 29,
+   "x": 0,
+   "y": 135,
    "idle": [
     "曹阿嵩四處張望：「阿瞞呢個死仔又走咗去邊……」"
    ],
    "desc": "零陵城客棧門口嘅曹阿嵩【原】，四處尋找兒子曹阿瞞。",
-   "map": "lingling"
+   "map": "xc3200"
   },
   {
    "id": "caoamang",
    "name": "曹阿瞞",
-   "x": 10,
-   "y": 10,
+   "x": 2,
+   "y": 139,
    "questOnly": true,
    "desc": "零陵城練兵場門口街道嘅曹阿瞞【原】。",
-   "map": "lingling"
+   "map": "xc3200"
   },
   {
    "id": "merchant_guild",
@@ -685,9 +685,9 @@
   {
    "id": "wu_lao",
    "name": "武老",
-   "x": 35,
-   "y": 30,
-   "map": "wancheng",
+   "x": 14,
+   "y": 39,
+   "map": "xc2800",
    "idle": [
     "武老：「猛獸為禍，苦不堪言。」"
    ],
@@ -696,9 +696,9 @@
   {
    "id": "weizi",
    "name": "衛茲",
-   "x": 45,
-   "y": 25,
-   "map": "chenliu",
+   "x": 2,
+   "y": 156,
+   "map": "xc1700",
    "idle": [
     "衛茲：「除害救民，義勇軍好樣的。」"
    ],
@@ -707,9 +707,9 @@
   {
    "id": "miner_boss",
    "name": "礦工工頭",
-   "x": 33,
-   "y": 25,
-   "map": "wancheng",
+   "x": 0,
+   "y": 31,
+   "map": "xc2800",
    "idle": [
     "礦工工頭：「礦坑黑漆漆，缺照明。」"
    ],
@@ -773,9 +773,9 @@
   {
    "id": "yongbo",
    "name": "勇伯",
-   "x": 46,
-   "y": 19,
-   "map": "runan_road",
+   "x": 60,
+   "y": 141,
+   "map": "xc2025",
    "idle": [
     "勇伯：「山洞畀山賊霸咗，唉。」"
    ],
@@ -799,9 +799,9 @@
   {
    "id": "yanshan",
    "name": "岩山樵夫",
-   "x": 47,
-   "y": 24,
-   "map": "jingzhou",
+   "x": 60,
+   "y": 141,
+   "map": "xc2925",
    "idle": [
     "岩山樵夫：「岩山瘴林，木料多。」"
    ],
@@ -858,9 +858,9 @@
   {
    "id": "craft_boss",
    "name": "工匠工頭",
-   "x": 51,
-   "y": 26,
-   "map": "chenliu",
+   "x": 5,
+   "y": 157,
+   "map": "xc1700",
    "idle": [
     "工匠工頭：「急住升級營地，欠木材！」"
    ],
@@ -869,9 +869,9 @@
   {
    "id": "baoma_zhai",
    "name": "抱馬窄",
-   "x": 20,
-   "y": 17,
-   "map": "luoyang",
+   "x": 0,
+   "y": 105,
+   "map": "xc2600",
    "idle": [
     "抱馬窄：「惡頭個巢穴喺城外……唔好話係我講。」"
    ],
@@ -880,126 +880,126 @@
   {
    "id": "beast_king",
    "name": "猛獸王",
-   "x": 50,
-   "y": 22,
-   "map": "runan_road",
+   "x": 66,
+   "y": 141,
+   "map": "xc2025",
    "questOnly": true,
    "desc": "汝南道猛獸王【原 sy3_4】：居民除害任務目標。"
   },
   {
    "id": "man_eating_tiger",
    "name": "食人惡虎",
-   "x": 48,
-   "y": 27,
-   "map": "jingzhou",
+   "x": 66,
+   "y": 141,
+   "map": "xc2925",
    "questOnly": true,
    "desc": "荊州地界食人惡虎【原 sy3_4】：朝廷除害任務目標。"
   },
   {
    "id": "thief",
    "name": "賊寇",
-   "x": 48,
-   "y": 31,
-   "map": "chenliu",
+   "x": 9,
+   "y": 159,
+   "map": "xc1700",
    "questOnly": true,
    "desc": "陳留郊外賊寇頭目【原 sy3_4】：朝廷滅賊任務目標。"
   },
   {
    "id": "bandit_king",
    "name": "山大王",
-   "x": 36,
-   "y": 25,
-   "map": "yudu",
+   "x": 196,
+   "y": 147,
+   "map": "xc2851",
    "questOnly": true,
    "desc": "于毒山寨山大王【原 sy3_4】：勇闖賊寨任務目標。"
   },
   {
    "id": "evil_head",
    "name": "惡頭",
-   "x": 26,
-   "y": 21,
-   "map": "luoyang",
+   "x": 4,
+   "y": 101,
+   "map": "xc2600",
    "questOnly": true,
    "desc": "洛陽城外惡頭【原 sy3_4】：斬殺惡頭任務目標。"
   },
   {
    "id": "ghost_guard",
    "name": "鬼域巨魎",
-   "x": 20,
-   "y": 10,
-   "map": "runan_f3",
+   "x": 191,
+   "y": 147,
+   "map": "xc2053",
    "questOnly": true,
    "desc": "汝南洞窟三層鬼域巨魎【原 sy3_4】：鬼域迷陣任務目標。"
   },
   {
    "id": "treasure_guard",
    "name": "前朝寶藏守衛",
-   "x": 24,
-   "y": 16,
-   "map": "runan_f3",
+   "x": 197,
+   "y": 147,
+   "map": "xc2053",
    "questOnly": true,
    "desc": "汝南洞窟三層寶藏守衛【原 sy3_4】：亂數迷宮任務目標。"
   },
   {
    "id": "sjs_zhu",
    "name": "透光石柱",
-   "x": 11,
-   "y": 13,
-   "map": "runan_f8",
+   "x": 183,
+   "y": 146,
+   "map": "xc2051",
    "questOnly": true,
    "desc": "洞窟八層透光石柱【原 sy3_6_2 仕女金環裂地】：敲石柱引出密室骷髏王（自訂改編: 汝南洞窟八層）。"
   },
   {
    "id": "wolfyi_head",
    "name": "惡狼團頭目",
-   "x": 34,
-   "y": 13,
-   "map": "runan_f8",
+   "x": 188,
+   "y": 146,
+   "map": "xc2051",
    "questOnly": true,
    "desc": "惡狼團頭目狼懿【原 sy3_6_2 巫女膽顫心驚】：打敗佢得狼爪信物（自訂改編: 汝南洞窟八層）。"
   },
   {
    "id": "shuangfeng",
    "name": "雙風黑殺手",
-   "x": 30,
-   "y": 13,
-   "map": "runan_f5",
+   "x": 191,
+   "y": 147,
+   "map": "xc2052",
    "questOnly": true,
    "desc": "雙風黑殺手【原 sy3_6_2 辯士吐火羅語】：打敗佢得園薄扇（自訂改編: 汝南洞窟五層）。"
   },
   {
    "id": "zhangde",
    "name": "怪人張得",
-   "x": 50,
-   "y": 25,
-   "map": "jingzhou",
+   "x": 72,
+   "y": 141,
+   "map": "xc2925",
    "questOnly": true,
    "desc": "怪人張得【原 sy3_6_3 道士神遊太虛】：打敗佢得術文全書（自訂改編: 荊州地界）。"
   },
   {
    "id": "hongjing",
    "name": "怪人紅菁",
-   "x": 10,
-   "y": 18,
-   "map": "changsha",
+   "x": 14,
+   "y": 107,
+   "map": "xc2200",
    "questOnly": true,
    "desc": "怪人紅菁【原 sy3_6_3 巫女鬼哭神號】：打敗佢得咒法全書（自訂改編: 長沙城）。"
   },
   {
    "id": "langyi_head",
    "name": "狼懿頭目",
-   "x": 20,
-   "y": 13,
-   "map": "runan_f8",
+   "x": 192,
+   "y": 148,
+   "map": "xc2051",
    "questOnly": true,
    "desc": "狼懿頭目【原 sy3_6_2 美女松竹聽雨】：打敗佢得狂兒救助函（自訂改編: 汝南洞窟八層）。"
   },
   {
    "id": "gande",
    "name": "甘德",
-   "x": 30,
-   "y": 20,
-   "map": "changsha",
+   "x": 0,
+   "y": 105,
+   "map": "xc2200",
    "idle": [
     "甘德：「觀天察地，學問無涯。」"
    ],
@@ -1008,9 +1008,9 @@
   {
    "id": "nanhua_immortal",
    "name": "南華老仙",
-   "x": 16,
-   "y": 31,
-   "map": "luoyang",
+   "x": 9,
+   "y": 98,
+   "map": "xc2600",
    "idle": [
     "南華老仙：「彩虹鑽石，天地精華所凝。」"
    ],
@@ -1019,27 +1019,27 @@
   {
    "id": "qiaoxuan",
    "name": "喬玄",
-   "x": 26,
-   "y": 11,
-   "map": "runan_f3",
+   "x": 203,
+   "y": 147,
+   "map": "xc2053",
    "questOnly": true,
    "desc": "汝南洞窟深處喬玄仙人【原 sy3_9_2】：天文一級任務目標（原作江夏山洞，搬豫荊）。"
   },
   {
    "id": "geo_guardian",
    "name": "地理圖守護者",
-   "x": 30,
-   "y": 17,
-   "map": "runan_f3",
+   "x": 206,
+   "y": 144,
+   "map": "xc2053",
    "questOnly": true,
    "desc": "汝南洞窟深處地理圖守護者【原 sy3_9_2】：地理一級任務目標（原作江夏山洞，搬豫荊）。"
   },
   {
    "id": "zuoci",
    "name": "左慈",
-   "x": 45,
-   "y": 28,
-   "map": "xiangyang",
+   "x": 14,
+   "y": 88,
+   "map": "xc2900",
    "idle": [
     "左慈：「天地水風，皆有其道。」"
    ],
@@ -1092,9 +1092,9 @@
   {
    "id": "dz_guard",
    "name": "太師府衛兵",
-   "x": 92,
-   "y": 19,
-   "map": "runan_road",
+   "x": 72,
+   "y": 141,
+   "map": "xc2025",
    "questOnly": true,
    "idle": [
     "衛兵：「太師府重地，閒人免進！」"
@@ -1104,9 +1104,9 @@
   {
    "id": "awu",
    "name": "阿武",
-   "x": 88,
-   "y": 19,
-   "map": "runan_road",
+   "x": 54,
+   "y": 137,
+   "map": "xc2025",
    "questOnly": true,
    "idle": [
     "阿武：「太師出巡，閒人迴避！」"
@@ -1116,9 +1116,9 @@
   {
    "id": "zangba",
    "name": "臧霸",
-   "x": 34,
-   "y": 14,
-   "map": "xiapi",
+   "x": 2,
+   "y": 150,
+   "map": "xc1500",
    "questOnly": true,
    "idle": [
     "臧霸：「想破我河道？先過我呢關！」"
@@ -1128,9 +1128,9 @@
   {
    "id": "xunyou",
    "name": "荀攸",
-   "x": 45,
-   "y": 13,
-   "map": "chenliu",
+   "x": 0,
+   "y": 148,
+   "map": "xc1700",
    "questOnly": true,
    "idle": [
     "荀攸：「下邳久攻不下，需要一位勇士相助……」"
@@ -1140,9 +1140,9 @@
   {
    "id": "lvbu_xp",
    "name": "呂布",
-   "x": 20,
-   "y": 14,
-   "map": "xiapi",
+   "x": 7,
+   "y": 150,
+   "map": "xc1500",
    "questOnly": true,
    "idle": [
     "呂布：「天要亡我啊！」"
@@ -1152,9 +1152,9 @@
   {
    "id": "liubei",
    "name": "劉備",
-   "x": 9,
-   "y": 17,
-   "map": "xiaopei",
+   "x": 2,
+   "y": 137,
+   "map": "xc1400",
    "questOnly": true,
    "idle": [
     "劉備：「曹操相請，此去兇多吉少……」"
@@ -1164,9 +1164,9 @@
   {
    "id": "xs_merchant",
    "name": "行腳商人",
-   "x": 14,
-   "y": 16,
-   "map": "changsha",
+   "x": 2,
+   "y": 103,
+   "map": "xc2200",
    "questOnly": true,
    "idle": [
     "行腳商人：「最近風聲好緊……」"
@@ -1176,9 +1176,9 @@
   {
    "id": "xugong_ke",
    "name": "許貢家客",
-   "x": 32,
-   "y": 22,
-   "map": "jingzhou",
+   "x": 54,
+   "y": 137,
+   "map": "xc2925",
    "questOnly": true,
    "idle": [
     "許貢家客：「孫策呢個殺人兇手！」"
@@ -1188,9 +1188,9 @@
   {
    "id": "sunce",
    "name": "孫策",
-   "x": 30,
-   "y": 20,
-   "map": "jingzhou",
+   "x": 60,
+   "y": 137,
+   "map": "xc2925",
    "questOnly": true,
    "idle": [
     "孫策：「大恩不言謝，日後有事儘管搵我。」"
@@ -1200,9 +1200,9 @@
   {
    "id": "ys_guard",
    "name": "祭壇守衛",
-   "x": 22,
-   "y": 18,
-   "map": "changsha",
+   "x": 8,
+   "y": 103,
+   "map": "xc2200",
    "questOnly": true,
    "idle": [
     "守衛：「于仙人將於午時祈風禱雨……」"
@@ -1212,9 +1212,9 @@
   {
    "id": "sunce_guard",
    "name": "孫策護衛",
-   "x": 28,
-   "y": 16,
-   "map": "changsha",
+   "x": 14,
+   "y": 103,
+   "map": "xc2200",
    "questOnly": true,
    "idle": [
     "護衛：「軍家重地，速速退去！」"
@@ -1224,9 +1224,9 @@
   {
    "id": "guanyu",
    "name": "關羽",
-   "x": 38,
-   "y": 16,
-   "map": "chenliu",
+   "x": 2,
+   "y": 148,
+   "map": "xc1700",
    "questOnly": true,
    "idle": [
     "關羽：「大哥……」"
@@ -1236,9 +1236,9 @@
   {
    "id": "qinqi",
    "name": "秦琪",
-   "x": 28,
-   "y": 18,
-   "map": "hanshui",
+   "x": 66,
+   "y": 137,
+   "map": "xc2925",
    "questOnly": true,
    "idle": [
     "秦琪：「黃河渡口，閒人免進！」"
@@ -1248,9 +1248,9 @@
   {
    "id": "wangzhi",
    "name": "王植",
-   "x": 40,
-   "y": 20,
-   "map": "wancheng_road",
+   "x": 54,
+   "y": 141,
+   "map": "xc2825",
    "questOnly": true,
    "idle": [
     "王植：「滎陽城外，此路不通！」"
@@ -1260,9 +1260,9 @@
   {
    "id": "bianxi",
    "name": "卞喜",
-   "x": 39,
-   "y": 19,
-   "map": "runan_road",
+   "x": 60,
+   "y": 137,
+   "map": "xc2025",
    "questOnly": true,
    "idle": [
     "卞喜：「沂水關重地！」"
@@ -1272,9 +1272,9 @@
   {
    "id": "mengtan",
    "name": "孟坦",
-   "x": 20,
-   "y": 20,
-   "map": "luoyang",
+   "x": 14,
+   "y": 99,
+   "map": "xc2600",
    "questOnly": true,
    "idle": [
     "孟坦：「洛陽關口，速速退去！」"
@@ -1284,9 +1284,9 @@
   {
    "id": "kongxiu",
    "name": "孔秀",
-   "x": 30,
-   "y": 24,
-   "map": "chenliu",
+   "x": 4,
+   "y": 147,
+   "map": "xc1700",
    "questOnly": true,
    "idle": [
     "孔秀：「東嶺關豈容你闖！」"
@@ -1296,9 +1296,9 @@
   {
    "id": "caiyang",
    "name": "蔡陽",
-   "x": 20,
-   "y": 17,
-   "map": "xiaopei",
+   "x": 8,
+   "y": 137,
+   "map": "xc1400",
    "questOnly": true,
    "idle": [
     "蔡陽：「逆賊關羽，拿命來！」"
@@ -1308,9 +1308,9 @@
   {
    "id": "xushu",
    "name": "徐庶",
-   "x": 38,
-   "y": 30,
-   "map": "xuchang",
+   "x": 116,
+   "y": 158,
+   "map": "xuchang_o",
    "questOnly": true,
    "idle": [
     "徐庶：「唉……老母被曹操所困……」"
@@ -1320,9 +1320,9 @@
   {
    "id": "ganning",
    "name": "甘寧",
-   "x": 20,
-   "y": 14,
-   "map": "gangkou",
+   "x": 200,
+   "y": 48,
+   "map": "xc2125",
    "questOnly": true,
    "idle": [
     "甘寧：「咳……痛死我了……」"
@@ -1332,9 +1332,9 @@
   {
    "id": "huangzu",
    "name": "黃祖",
-   "x": 30,
-   "y": 18,
-   "map": "changsha",
+   "x": 2,
+   "y": 105,
+   "map": "xc2200",
    "questOnly": true,
    "idle": [
     "黃祖：「何方小賊，敢闖我營！」"
@@ -1344,9 +1344,9 @@
   {
    "id": "zhouyu_gk",
    "name": "周瑜",
-   "x": 28,
-   "y": 14,
-   "map": "gangkou",
+   "x": 185,
+   "y": 47,
+   "map": "xc2125",
    "questOnly": true,
    "idle": [
     "周瑜：「戰事吃緊，不可延誤！」"
@@ -1356,9 +1356,9 @@
   {
    "id": "well_guard",
    "name": "守井小兵",
-   "x": 26,
-   "y": 14,
-   "map": "luoyang",
+   "x": 0,
+   "y": 88,
+   "map": "xc2600",
    "questOnly": true,
    "idle": [
     "守井小兵：「真是一口詭異的井呀！」"
