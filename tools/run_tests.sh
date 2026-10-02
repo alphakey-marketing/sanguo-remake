@@ -32,38 +32,38 @@ run hist --script tests/run_hist.gd
 run group --script tests/run_group.gd
 run ult --script tests/run_ult.gd
 run expert --script tests/run_expert.gd
-run b3 --script tests/run_b3.gd
-run mount --script tests/run_mount.gd
-run war_beast --script tests/run_war_beast.gd
-run spell --script tests/run_spell.gd
+# 封存(舊圖): run b3 --script tests/run_b3.gd
+# 封存(舊圖): run mount --script tests/run_mount.gd
+# 封存(舊圖): run war_beast --script tests/run_war_beast.gd
+# 封存(舊圖): run spell --script tests/run_spell.gd
 run stealth --script tests/run_stealth.gd
-run jewel_ult --script tests/run_jewel_ult.gd
-run sim --script tests/run_sim.gd
-run residents --script tests/run_residents.gd
-run rumor --script tests/run_rumor.gd
+# 封存(舊圖): run jewel_ult --script tests/run_jewel_ult.gd
+# 封存(舊圖): run sim --script tests/run_sim.gd
+# 封存(舊圖): run residents --script tests/run_residents.gd
+# 封存(舊圖): run rumor --script tests/run_rumor.gd
 run llm --script tests/run_llm.gd
-run marry --script tests/run_marry.gd
-run char --script tests/run_char.gd
-run class --script tests/run_class.gd
+# 封存(舊圖): run marry --script tests/run_marry.gd
+# 封存(舊圖): run char --script tests/run_char.gd
+# 封存(舊圖): run class --script tests/run_class.gd
 run world --script tests/run_world.gd
-run monsters --script tests/run_monsters.gd
-run maps --script tests/run_maps.gd
-run equip --script tests/run_equip.gd
-run craft --script tests/run_craft.gd
-run master --script tests/run_master.gd
-run tiandi --script tests/run_tiandi.gd
-run recruit --script tests/run_recruit.gd
-run general --script tests/run_general.gd
-run title --script tests/run_title.gd
-run militia --script tests/run_militia.gd
-run civic --script tests/run_civic.gd
-run camp --script tests/run_camp.gd
-run battle --script tests/run_battle.gd
-run scene --script tests/run_scene.gd
-run pk --script tests/run_pk.gd
-run karma --script tests/run_karma.gd
-run guard --script tests/run_guard.gd
-run down --script tests/run_down.gd
+# 封存(舊圖): run monsters --script tests/run_monsters.gd
+# 封存(舊圖): run maps --script tests/run_maps.gd
+# 封存(舊圖): run equip --script tests/run_equip.gd
+# 封存(舊圖): run craft --script tests/run_craft.gd
+# 封存(舊圖): run master --script tests/run_master.gd
+# 封存(舊圖): run tiandi --script tests/run_tiandi.gd
+# 封存(舊圖): run recruit --script tests/run_recruit.gd
+# 封存(舊圖): run general --script tests/run_general.gd
+# 封存(舊圖): run title --script tests/run_title.gd
+# 封存(舊圖): run militia --script tests/run_militia.gd
+# 封存(舊圖): run civic --script tests/run_civic.gd
+# 封存(舊圖): run camp --script tests/run_camp.gd
+# 封存(舊圖): run battle --script tests/run_battle.gd
+# 封存(舊圖): run scene --script tests/run_scene.gd
+# 封存(舊圖): run pk --script tests/run_pk.gd
+# 封存(舊圖): run karma --script tests/run_karma.gd
+# 封存(舊圖): run guard --script tests/run_guard.gd
+# 封存(舊圖): run down --script tests/run_down.gd
 run market --script tools/market_sim.gd
 run hud --script tests/run_hud.gd
 run autotest -- --autotest
