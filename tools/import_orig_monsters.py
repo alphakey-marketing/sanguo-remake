@@ -9,8 +9,11 @@ MP = os.path.join(ROOT, 'client/data/monsters.json')
 ML = 'D:/Download/sanguo/extracted/map_list/'
 TX = 'D:/Download/sanguo/extracted/text/'
 # 城id -> 洞穴等級帶 (lo, hi)；spec 04 §2 有嘅用原文，冇嘅按鄰近帶估【自訂】
-CAVE_BAND = {11: (81, 90), 16: (14, 40), 17: (20, 35), 18: (46, 50), 20: (5, 20), 22: (51, 60), 23: (46, 50),
-             24: (15, 30), 25: (46, 50), 27: (14, 25), 28: (51, 60), 30: (40, 50), 32: (30, 45)}
+CAVE_BAND = {11: (51, 80), 16: (14, 40), 17: (21, 50), 18: (46, 50), 20: (5, 20), 22: (51, 60), 23: (46, 50),
+             24: (61, 70), 25: (25, 45), 27: (81, 90), 28: (51, 60), 30: (71, 80), 32: (61, 70)}
+# 依用家 Drive 攻略：汝南/濮陽/晉陽/譙/桂陽/長沙/宛 按怪名對上 (可靠)；其餘 6 組 (11/17/24/27/30/32) 對應攻略 鄴/廬江/襄平/建業/一轉/二轉神秘，按怪名猜【猜】
+GUIDE_EXTRA = {22: '光頭劍客 匕首流氓 武棍流氓 銀甲劍兵 光頭射手 青甲劍兵 短刀地痞 金甲劍兵 破斧土匪 銀甲弓兵 長劍士兵 山賊劍手 輕裝劍客 金甲弓兵 飛賊劍手 護甲劍客 紅髮地痞 金裝甲兵 野戰劍將 金鎧劍將 長矛土匪'.split(),
+               28: '光頭劍客 匕首流氓 武棍流氓 銀甲劍兵 光頭射手 青甲劍兵 短刀地痞 金甲劍兵 破斧土匪 銀甲弓兵 長劍士兵 山賊劍手 輕裝劍客 金甲弓兵 飛賊劍手 護甲劍客 紅髮地痞 金裝甲兵 野戰劍將 金鎧劍將 長矛土匪'.split()}   # 攻略長沙/宛 名單 (spawn_maps 冇)
 def cave_level(city, floor): lo, hi = CAVE_BAND[city]; return round(lo + (hi - lo) * (floor - 1) / 4)
 
 def main(check=False):
@@ -29,9 +32,10 @@ def main(check=False):
         if r[4] != '洞穴/營地': continue
         mid = int(r[0]); city, floor = mid // 100, mid % 100 - 50
         if city not in CAVE_BAND or not 1 <= floor <= 5: continue
-        rows_cave.append((mid, [n for col in (5, 6) for n in r[col].split('、') if n]))
-        for col in (5, 6):
-            for n in r[col].split('、'):
+        ex = GUIDE_EXTRA.get(city, [])[floor - 1::5]            # 攻略名單按層攤 (每層取 1/5)
+        rows_cave.append((mid, [n for col in (5, 6, 7) for n in r[col].split('、') if n] + ex))
+        for col in (5, 6, 7):
+            for n in r[col].split('、') + ex:
                 if n: lv[n].append(cave_level(city, floor))
     spr = {}                                  # 名 -> okm sprite (洞穴圖 okm 記錄)
     for r in list(csv.reader(open(ML + 'okm_records.tsv', encoding='utf8'), delimiter='	'))[1:]:
