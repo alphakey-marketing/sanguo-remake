@@ -9,12 +9,12 @@ MP = os.path.join(ROOT, 'client/data/monsters.json')
 ML = 'D:/Download/sanguo/extracted/map_list/'
 TX = 'D:/Download/sanguo/extracted/text/'
 # 城id -> 洞穴等級帶 (lo, hi)；spec 04 §2 有嘅用原文，冇嘅按鄰近帶估【自訂】
-CAVE_BAND = {11: (81, 90), 16: (14, 40), 17: (20, 35), 18: (1, 10), 20: (5, 20), 22: (51, 60), 23: (46, 50),
-             24: (15, 30), 25: (25, 45), 27: (14, 25), 28: (51, 60), 30: (40, 50), 32: (30, 45)}
+CAVE_BAND = {11: (81, 90), 16: (14, 40), 17: (20, 35), 18: (46, 50), 20: (5, 20), 22: (51, 60), 23: (46, 50),
+             24: (15, 30), 25: (46, 50), 27: (14, 25), 28: (51, 60), 30: (40, 50), 32: (30, 45)}
 def cave_level(city, floor): lo, hi = CAVE_BAND[city]; return round(lo + (hi - lo) * (floor - 1) / 4)
 
 def main(check=False):
-    d = json.load(open(MP, encoding='utf8')); mons = d['monsters']
+    d = json.load(open(MP, encoding='utf8')); d['monsters'] = mons = [m for m in d['monsters'] if not m.get('orig')]   # 重跑先清走上次匯入嘅，等級帶改咗會更新
     have_n = {m['name'] for m in mons}; have_id = {m['id'] for m in mons}
     tab = collections.defaultdict(list)
     for r in list(csv.reader(open(TX + 'Npc_table.tsv', encoding='utf8'), delimiter='\t'))[1:]: tab[r[1]].append(int(r[0]))

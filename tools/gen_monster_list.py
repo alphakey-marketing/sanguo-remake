@@ -11,7 +11,7 @@ for m in mons: by.setdefault(m['name'].rstrip('0123456789'), m)
 have = lambda m: str(m['id']) in idx['mon_S']
 names = {}
 for r in list(csv.reader(open(ML + 'locations.tsv', encoding='utf8'), delimiter='\t'))[:0]: pass
-CITY = {11: '吳', 16: '濮陽', 17: '陳留', 18: '許昌', 20: '汝南', 22: '長沙', 23: '桂陽', 24: '河內', 25: '晉陽', 27: '新野', 28: '宛', 30: '江陵', 32: '零陵'}
+CITY = {11: '吳', 16: '濮陽', 17: '陳留', 18: '譙', 20: '汝南', 22: '長沙', 23: '桂陽', 24: '河內', 25: '晉陽', 27: '新野', 28: '宛', 30: '江陵', 32: '零陵'}
 o = ['# 原版洞穴怪名單', '', '由 `tools/gen_monster_list.py` 生成。等級 = 該城洞穴等級帶 (spec 04 §2) 按層線性內插【自訂】，之後可調平衡。',
      '圖示：✅ 有原版 sprite　⚠️ 缺 sprite (原圖包冇，遊戲內退回舊色塊/舊圖，**冇借用任何武將 sprite**)', '']
 rows = list(csv.reader(open(ML + 'spawn_maps.tsv', encoding='utf8'), delimiter='\t'))[1:]
