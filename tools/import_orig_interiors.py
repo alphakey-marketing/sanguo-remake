@@ -37,6 +37,9 @@ INTERIORS |= {1701: '陳留官宅', 1702: '陳留客棧', 1703: '陳留藥房', 
 # 工作區入口: 城內 k2 觸發區 -> 道路圖 (用家 2026-09-30 指定: 600089 -> A=1923, 600865 -> B=1922)
 FIELDS = {1851: '許昌洞穴一', 1852: '許昌洞穴二', 1853: '許昌洞穴三', 1854: '許昌洞穴四', 1855: '許昌洞穴五',     # N51-55 = 洞穴 (用家睇圖確認)
           1925: '外圍25'}
+# 其餘城洞穴 (xx51-55，各城有幾層唔同；見 spawn_maps 洞穴/營地)
+CAVES = [1155,1651,1652,1653,1654,1655,1751,1752,1753,1754,1755,2051,2052,2053,2054,2055,2251,2252,2253,2254,2255,2351,2352,2353,2354,2355,2451,2452,2453,2454,2455,2551,2552,2553,2554,2555,2751,2752,2753,2754,2755,2851,2852,2855,3051,3052,3053,3054,3055,3251,3252,3253,3254]
+FIELDS.update({m: '洞穴%d' % (m % 100 - 50) for m in CAVES})
 # 外圍模板 (所有城共用同一份圖資料): 每城一個邏輯實例 (自己 map id/擺位)，orig 指向模板
 LINKS = json.load(open(os.path.join(ROOT, 'client', 'data', 'city_links.json'), encoding='utf8'))   # tools/city_links.py 生成
 CITY_NAME = {c['id'] // 100: n for n, c in LINKS['cities'].items()}
@@ -302,12 +305,12 @@ def run(check):
         for alt in ('grd00', 'grd02', 'grd01'):         # 本 tileset 冇嘅 tile id，借其他 tileset 同號 (例如 1913 嘅 1536)
             for f in os.listdir(SP + 'grd_' + alt): tiles.setdefault(int(f.split('_')[0]), SP + 'grd_' + alt + '/' + f)
         used = sorted(set(d['tiles'])); miss = [v for v in used if v not in tiles]
-        if miss: errs.append('%d 缺 tile %s' % (mid, miss[:5]))
+        if miss: (print if mid in CAVES else errs.append)('%d 缺 tile %s (洞穴只警告，留空格)' % (mid, miss[:5]))
         remap = {v: n for n, v in enumerate(used)}
         objs = []; names = set()
         for n, x, y in d['objs']:
             k = n.lower().rsplit('.', 1)[0]
-            if k not in sidx: errs.append('%d 缺物件圖 %s' % (mid, n)); continue
+            if k not in sidx: (print if mid in CAVES else errs.append)('%d 缺物件圖 %s (洞穴只警告)' % (mid, n)); continue
             o = {'n': k, 'x': x, 'y': y}
             im = Image.open(sidx[k]).convert('RGBA')
             if min(im.size) >= 250 and im.getchannel('A').getextrema()[0] == 255: o['floor'] = True   # 整塊不透明大圖 = 室內地板底圖，要貼地
