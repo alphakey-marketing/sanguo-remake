@@ -76,6 +76,46 @@ NEW_NPCS = NEW_NPCS_EXTRA + [
      "idle": ["劉備：「曹操相請，此去兇多吉少……」"], "desc": "小沛城內劉玄德【原版】"},
 ]
 
+# ---- 批次 2: 孫策/于吉 ----
+BOSSES += [(1109, '許貢家客', 30), (1110, '孫策護衛', 32)]
+NEW_NPCS_EXTRA += [
+    {"id": "xs_merchant", "name": "行腳商人", "x": 14, "y": 16, "map": "changsha", "questOnly": True,
+     "idle": ["行腳商人：「最近風聲好緊……」"], "desc": "打探到許貢家客情報嘅商人【原版】"},
+    {"id": "xugong_ke", "name": "許貢家客", "x": 32, "y": 22, "map": "jingzhou", "questOnly": True,
+     "idle": ["許貢家客：「孫策呢個殺人兇手！」"], "desc": "許貢舊家客【原版】"},
+    {"id": "sunce", "name": "孫策", "x": 30, "y": 20, "map": "jingzhou", "questOnly": True,
+     "idle": ["孫策：「大恩不言謝，日後有事儘管搵我。」"], "desc": "小霸王孫策【原版】"},
+    {"id": "ys_guard", "name": "祭壇守衛", "x": 22, "y": 18, "map": "changsha", "questOnly": True,
+     "idle": ["守衛：「于仙人將於午時祈風禱雨……」"], "desc": "長沙祭壇守衛【原版】"},
+    {"id": "sunce_guard", "name": "孫策護衛", "x": 28, "y": 16, "map": "changsha", "questOnly": True,
+     "idle": ["護衛：「軍家重地，速速退去！」"], "desc": "孫策護衛【原版】"},
+]
+QUESTS += [
+    {"id": "orig_sunce", "src": "orig", "name": "保護孫策", "type": "history", "giver": "xs_merchant",
+     "pre": {"minLevel": 28},
+     "preHint": "武功 28 級以上，去長沙搵行腳商人探情報",
+     "stages": [
+         {"type": "talk", "npc": "xs_merchant", "conv": [1296], "sp": {2: '行腳商人'},
+          "hint": "商人話許貢家客要伏擊孫策，去荊州地界丹徒山睇睇"},
+         {"type": "fight", "npc": "xugong_ke", "monster": 1109, "conv": [1298], "sp": {3: '孫策', 4: '許貢家客'},
+          "hint": "喺荊州地界打退行刺孫策嘅許貢家客"},
+         {"type": "talk", "npc": "sunce", "conv": [1299], "sp": {3: '孫策', 4: '許貢家客'}, "done": True,
+          "hint": "孫策想多謝你"}],
+     "reward": {"fame": 45, "exp": 5500, "gold": 1100}},
+    {"id": "orig_yuji", "src": "orig", "name": "解救于吉", "type": "history", "giver": "ys_guard",
+     "pre": {"minLevel": 30},
+     "preHint": "武功 30 級以上，去長沙祭壇搵守衛",
+     "stages": [
+         {"type": "talk", "npc": "ys_guard", "conv": [1307, 1309], "sp": {2: '祭壇守衛'},
+          "hint": "守衛畀咗祭壇通行令，去祭壇見孫策同于吉"},
+         {"type": "fight", "npc": "sunce_guard", "monster": 1110, "conv": [1314], "sp": {3: '孫策', 4: '護衛'},
+          "hint": "孫策要燒死于吉，打低孫策護衛救人"},
+         {"type": "talk", "npc": "yuji", "conv": [1313], "sp": {2: '于吉'}, "done": True,
+          "hint": "于吉脫困，向你道謝"}],
+     "reward": {"fame": 50, "exp": 6000, "gold": 1200}},
+]
+
+
 def add_bosses():
     p = 'client/data/monsters.json'
     md = json.load(open(p, encoding='utf8'))
@@ -90,12 +130,17 @@ def add_bosses():
 
 
 def main():
+    ALL_NPCS = NEW_NPCS + [n for n in NEW_NPCS_EXTRA if n not in NEW_NPCS]
     add_bosses()
     convs = load_convs()
+
+    for n in ALL_NPCS:
+        g = open('client/data/maps/%s.txt' % n['map'], encoding='utf8').read().split(chr(10))
+        assert g[n['y']][n['x']] in '.:=,_+', 'NPC 位置唔行得: %s %s' % (n['id'], g[n['y']][n['x']])
     qd = json.load(open(QJ, encoding='utf8'))
     nd = json.load(open(NJ, encoding='utf8'))
     names = {n['id']: n['name'] for n in nd['npcs']}
-    for n in NEW_NPCS:
+    for n in ALL_NPCS:
         names[n['id']] = n['name']
         nd['npcs'] = [x for x in nd['npcs'] if x['id'] != n['id']] + [n]
     ids = {q['id'] for q in QUESTS}
@@ -112,7 +157,7 @@ def main():
         qd['quests'].append(q)
     json.dump(qd, open(QJ, 'w', encoding='utf8', newline='\n'), ensure_ascii=False, indent=1)
     json.dump(nd, open(NJ, 'w', encoding='utf8', newline='\n'), ensure_ascii=False, indent=1)
-    print('ok', len(QUESTS), 'quests', len(NEW_NPCS), 'npcs')
+    print('ok', len(QUESTS), 'quests', len(ALL_NPCS), 'npcs')
 
 if __name__ == '__main__':
     main()

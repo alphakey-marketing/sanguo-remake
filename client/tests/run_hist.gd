@@ -120,8 +120,8 @@ func t_validate(data: GameData) -> void:
 	check(errs.is_empty(), "quests/quest_npcs 驗證 (errors: %s)" % str(errs))
 	var e2 := RulesCommission.validate(data)
 	check(e2.is_empty(), "commissions 驗證 (errors: %s)" % str(e2))
-	var hist := data.quests.filter(func(q): return String(q["type"]) == "history")
-	check(hist.size() == 15, "歷史任務 15 條 (12 + 原版 王允/煮酒/水淹下邳；S06b 加齊 5 條：孫堅匿璽/張公公謀害何進/黃蓋/曹阿瞞/討伐張角) (而家 %d)" % hist.size())
+	var hist := data.quests.filter(func(q): return String(q["type"]) == "history" and String(q.get("src", "")) != "orig")
+	check(hist.size() == 12, "歷史任務 12 條 (不計 src=orig 原版導入；S06b 加齊 5 條：孫堅匿璽/張公公謀害何進/黃蓋/曹阿瞞/討伐張角) (而家 %d)" % hist.size())
 	for q in hist:
 		var items: Array = (q["reward"]["items"] as Array).map(func(x): return int(x[0]))
 		check(items.has(int(ORDERS[String(q["id"])])), "%s 獎勵有將軍令" % q["id"])

@@ -1160,6 +1160,66 @@
     "劉備：「曹操相請，此去兇多吉少……」"
    ],
    "desc": "小沛城內劉玄德【原版】"
+  },
+  {
+   "id": "xs_merchant",
+   "name": "行腳商人",
+   "x": 14,
+   "y": 16,
+   "map": "changsha",
+   "questOnly": true,
+   "idle": [
+    "行腳商人：「最近風聲好緊……」"
+   ],
+   "desc": "打探到許貢家客情報嘅商人【原版】"
+  },
+  {
+   "id": "xugong_ke",
+   "name": "許貢家客",
+   "x": 32,
+   "y": 22,
+   "map": "jingzhou",
+   "questOnly": true,
+   "idle": [
+    "許貢家客：「孫策呢個殺人兇手！」"
+   ],
+   "desc": "許貢舊家客【原版】"
+  },
+  {
+   "id": "sunce",
+   "name": "孫策",
+   "x": 30,
+   "y": 20,
+   "map": "jingzhou",
+   "questOnly": true,
+   "idle": [
+    "孫策：「大恩不言謝，日後有事儘管搵我。」"
+   ],
+   "desc": "小霸王孫策【原版】"
+  },
+  {
+   "id": "ys_guard",
+   "name": "祭壇守衛",
+   "x": 22,
+   "y": 18,
+   "map": "changsha",
+   "questOnly": true,
+   "idle": [
+    "守衛：「于仙人將於午時祈風禱雨……」"
+   ],
+   "desc": "長沙祭壇守衛【原版】"
+  },
+  {
+   "id": "sunce_guard",
+   "name": "孫策護衛",
+   "x": 28,
+   "y": 16,
+   "map": "changsha",
+   "questOnly": true,
+   "idle": [
+    "護衛：「軍家重地，速速退去！」"
+   ],
+   "desc": "孫策護衛【原版】"
   }
  ]
 }
