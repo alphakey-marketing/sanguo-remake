@@ -347,8 +347,17 @@ func _run() -> void:
 		if String(sh["id"]) == "tool":
 			sp0 = Vector2i(int(sh["x"]), int(sh["y"]))
 	var far := free_away(sp0, 7)
+	for r in range(8, 14):                         # 玩家企商店左下 → 商店喺螢幕右上（避開左下搖桿區）
+		var hit := false
+		for ddx in range(r, 0, -1):
+			if m.sim.is_free(sp0.x - ddx, sp0.y + r):
+				far = Vector2i(sp0.x - ddx, sp0.y + r)
+				hit = true
+				break
+		if hit:
+			break
 	put(far.x, far.y)
-	await frames(2)
+	await frames(10)                                # 鏡頭要追到玩家身上
 	var shop_screen: Vector2 = (Vector2(sp0) * m.TILE + Vector2(m.TILE, m.TILE) * 0.5 - m.cam) * m.zoom
 	await click(shop_screen)
 	check(not m.pending.is_empty(), "點遠處商店應該記住 pending 行過去")

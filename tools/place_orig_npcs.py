@@ -52,6 +52,31 @@ def in_zone(x, y, zs):
         elif z[0] <= x <= z[2] and z[1] <= y <= z[3]: return True
     return False
 
+def pick_spread(mid, n, taken):
+    """城內街: 全街最遠點取樣 (取代擠喺出生點附近)，離出生點 >=8、離行走邊 >=2、互相盡量遠"""
+    g = load(mid); H = len(g); W = len(g[0])
+    zs = blocked_zones(mid); sp = MD[mid]['spawn']
+    def ok(x, y, r):
+        for dy in range(-r, r + 1):
+            for dx in range(-r, r + 1):
+                xx, yy = x + dx, y + dy
+                if not (0 <= xx < W and 0 <= yy < H) or g[yy][xx] != '.': return False
+        return True
+    seen = {(sp[0], sp[1])}; dq = [(sp[0], sp[1])]          # 由出生點 BFS: 只放行得到嘅位
+    for (cx0, cy0) in dq:
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            nx, ny = cx0 + dx, cy0 + dy
+            if 0 <= nx < W and 0 <= ny < H and (nx, ny) not in seen and g[ny][nx] == '.':
+                seen.add((nx, ny)); dq.append((nx, ny))
+    cands = [(x, y) for y in range(0, H, 2) for x in range(0, W, 2) if (x, y) in seen and ok(x, y, 2) and not in_zone(x, y, zs)
+             and 8 <= max(abs(x - sp[0]), abs(y - sp[1])) <= 45]
+    out = []
+    ref = list(taken) + [(sp[0], sp[1])]
+    for _ in range(n):
+        best = max(cands, key=lambda c: (min(max(abs(c[0] - t[0]), abs(c[1] - t[1])) for t in ref + out), -c[1], -c[0]))
+        out.append(best)
+    return out
+
 def pick(mid, n, taken, near_spawn=False):
     g = load(mid); H = len(g); W = len(g[0])
     zs = blocked_zones(mid)
@@ -87,11 +112,11 @@ def pick(mid, n, taken, near_spawn=False):
 shops = jl('shops.json'); fac = jl('facilities.json'); qn = jl('quest_npcs.json')
 items = []   # (key, dict)
 for s in shops['shops']:
-    if s['map'] == 'xuchang': items.append(('shop:' + s['id'], s))
+    if s['map'] in ('xuchang', CITY): items.append(('shop:' + s['id'], s))
 for k, v in fac.items():
-    if isinstance(v, dict) and v.get('map') == 'xuchang': items.append(('fac:' + k, v))
+    if isinstance(v, dict) and v.get('map') in ('xuchang', CITY): items.append(('fac:' + k, v))
 for n in qn['npcs']:
-    if n['map'] == 'xuchang': items.append(('qn:' + n['id'], n))
+    if n['map'] in ('xuchang', CITY): items.append(('qn:' + n['id'], n))
 by = {}
 for k, d in items:
     by.setdefault(IN.get(k, CITY), []).append((k, d))
@@ -101,7 +126,7 @@ st = None
 if st: taken_city.append((st['x'], st['y']))
 if 'inn' in shops and shops['inn'].get('map') == 'xc1902': pass
 for mid, lst in by.items():
-    pts = pick(mid, len(lst), taken_city if mid == CITY else [], near_spawn=(mid == CITY))
+    pts = pick_spread(mid, len(lst), taken_city) if mid == CITY else pick(mid, len(lst), [])
     assert len(pts) == len(lst), (mid, len(pts), len(lst))
     for (k, d), (x, y) in zip(lst, pts):
         d['map'] = mid; d['x'] = x; d['y'] = y
