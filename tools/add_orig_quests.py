@@ -199,6 +199,30 @@ def add_drop_mons():
     json.dump(md, open(p, 'w', encoding='utf8', newline=chr(10)), ensure_ascii=False, indent=1)
 
 
+# ---- 批次 5: 甘寧殺黃祖 ----
+BOSSES += [(1119, '黃祖', 44)]
+NEW_NPCS_EXTRA += [
+    _npc("ganning", "甘寧", 20, 14, "gangkou", "咳……痛死我了……", "身受重傷嘅東吳將軍"),
+    _npc("huangzu", "黃祖", 30, 18, "changsha", "何方小賊，敢闖我營！", "江夏太守黃祖"),
+    _npc("zhouyu_gk", "周瑜", 28, 14, "gangkou", "戰事吃緊，不可延誤！", "東吳都督"),
+]
+QUESTS += [
+    {"id": "orig_ganning", "src": "orig", "name": "替甘寧復仇", "type": "history", "giver": "liubei",
+     "pre": {"minLevel": 42},
+     "preHint": "武功 42 級以上，去小沛搵劉備",
+     "stages": [
+         {"type": "talk", "npc": "liubei", "conv": [1388], "sp": {2: '劉備'},
+          "hint": "劉備要你去殺黃祖，先去港口搵受傷嘅甘寧"},
+         {"type": "talk", "npc": "ganning", "conv": [1392, 1393], "sp": {2: '甘寧'},
+          "hint": "去港口搵甘寧，了解黃祖嘅仇怨"},
+         {"type": "fight", "npc": "huangzu", "monster": 1119, "conv": [], "win": 1394,
+          "hint": "去長沙城打低黃祖（Lv44）"},
+         {"type": "talk", "npc": "zhouyu_gk", "conv": [1395], "sp": {2: '周瑜'}, "done": True,
+          "hint": "返港口向東吳都督周瑜覆命"}],
+     "reward": {"fame": 70, "exp": 10000, "gold": 1800}},
+]
+
+
 def snap(g, x, y, others):
     for r in range(0, 20):
         for dy in range(-r, r + 1):

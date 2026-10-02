@@ -1316,6 +1316,42 @@
     "徐庶：「唉……老母被曹操所困……」"
    ],
    "desc": "被曹操騙回許昌嘅徐元直【原版】"
+  },
+  {
+   "id": "ganning",
+   "name": "甘寧",
+   "x": 20,
+   "y": 14,
+   "map": "gangkou",
+   "questOnly": true,
+   "idle": [
+    "甘寧：「咳……痛死我了……」"
+   ],
+   "desc": "身受重傷嘅東吳將軍【原版】"
+  },
+  {
+   "id": "huangzu",
+   "name": "黃祖",
+   "x": 30,
+   "y": 18,
+   "map": "changsha",
+   "questOnly": true,
+   "idle": [
+    "黃祖：「何方小賊，敢闖我營！」"
+   ],
+   "desc": "江夏太守黃祖【原版】"
+  },
+  {
+   "id": "zhouyu_gk",
+   "name": "周瑜",
+   "x": 28,
+   "y": 14,
+   "map": "gangkou",
+   "questOnly": true,
+   "idle": [
+    "周瑜：「戰事吃緊，不可延誤！」"
+   ],
+   "desc": "東吳都督【原版】"
   }
  ]
 }
