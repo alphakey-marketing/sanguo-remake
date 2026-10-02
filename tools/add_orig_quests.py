@@ -254,6 +254,9 @@ QUESTS += [
 # ---- 批次 7: 張公公謀害何進 (取代自訂) + 代呂布斬丁原 (補原版對白) ----
 REPLACED += ['hist_zhanggong']
 PATCH_STAGES += [('hist_dingyuan', 3, [3189], {2: '丁原'})]
+PATCH_STAGES += [('hist_dongzhuo', 0, [2860, 2861], {2: '李儒'}), ('hist_dongzhuo', 1, [2866], {2: '董卓'}),
+                 ('hist_yuanshao', 0, [2880, 2881], {2: '袁紹'}), ('hist_yuanshao', 1, [2885], {2: '王允'}),
+                 ('hist_caoamang', 1, [2980, 2982], {2: '曹阿瞞'}), ('hist_caoamang', 2, [2986], {2: '曹嵩'})]
 QUESTS += [
     {"id": "orig_zhanggong", "src": "orig", "name": "張公公謀害何進", "type": "history", "giver": "zhanggong",
      "pre": {"karmaMax": 0, "minLevel": 10, "attr": {"pol": 10, "cha": 10}},
