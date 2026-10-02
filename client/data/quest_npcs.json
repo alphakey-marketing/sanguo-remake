@@ -1220,6 +1220,90 @@
     "護衛：「軍家重地，速速退去！」"
    ],
    "desc": "孫策護衛【原版】"
+  },
+  {
+   "id": "guanyu",
+   "name": "關羽",
+   "x": 38,
+   "y": 16,
+   "map": "chenliu",
+   "questOnly": true,
+   "idle": [
+    "關羽：「大哥……」"
+   ],
+   "desc": "曹營中嘅關雲長【原版】"
+  },
+  {
+   "id": "qinqi",
+   "name": "秦琪",
+   "x": 28,
+   "y": 18,
+   "map": "hanshui",
+   "questOnly": true,
+   "idle": [
+    "秦琪：「黃河渡口，閒人免進！」"
+   ],
+   "desc": "黃河渡口守將【原版】"
+  },
+  {
+   "id": "wangzhi",
+   "name": "王植",
+   "x": 40,
+   "y": 20,
+   "map": "wancheng_road",
+   "questOnly": true,
+   "idle": [
+    "王植：「滎陽城外，此路不通！」"
+   ],
+   "desc": "滎陽守將【原版】"
+  },
+  {
+   "id": "bianxi",
+   "name": "卞喜",
+   "x": 39,
+   "y": 19,
+   "map": "runan_road",
+   "questOnly": true,
+   "idle": [
+    "卞喜：「沂水關重地！」"
+   ],
+   "desc": "沂水關守將【原版】"
+  },
+  {
+   "id": "mengtan",
+   "name": "孟坦",
+   "x": 20,
+   "y": 20,
+   "map": "luoyang",
+   "questOnly": true,
+   "idle": [
+    "孟坦：「洛陽關口，速速退去！」"
+   ],
+   "desc": "洛陽守將【原版】"
+  },
+  {
+   "id": "kongxiu",
+   "name": "孔秀",
+   "x": 30,
+   "y": 24,
+   "map": "chenliu",
+   "questOnly": true,
+   "idle": [
+    "孔秀：「東嶺關豈容你闖！」"
+   ],
+   "desc": "東嶺關守將【原版】"
+  },
+  {
+   "id": "caiyang",
+   "name": "蔡陽",
+   "x": 20,
+   "y": 17,
+   "map": "xiaopei",
+   "questOnly": true,
+   "idle": [
+    "蔡陽：「逆賊關羽，拿命來！」"
+   ],
+   "desc": "追兵蔡陽【原版】"
   }
  ]
 }

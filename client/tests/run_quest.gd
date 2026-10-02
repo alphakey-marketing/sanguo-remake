@@ -22,6 +22,7 @@ func _init() -> void:
 	t_roundtrip(data)
 	t_xinye_quests(data)
 	t_escort(data)
+	t_win_dialog(data)
 	print("[TEST] quest: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -395,4 +396,15 @@ func t_escort(data: GameData) -> void:
 	_talk(sim, id, "dz_guard")
 	check(int(ch["quests"]["orig_lianhuan"]["stage"]) == si + 1, "escort: 跟埋到埗推進")
 	check(sim._escort_ents("orig_lianhuan").is_empty(), "escort: 完 stage 貂蟬散走")
+
+# fight stage winDialog (千里走單騎): 打贏後返敗將對白 + 推進
+func t_win_dialog(data: GameData) -> void:
+	var sim := Sim.new(data, 7)
+	var id := sim.spawn_player("勝利對白", "yishi")
+	var ch: Dictionary = sim.ent(id)["ch"]
+	var q := sim._quest_by_id("orig_guanyu")
+	ch["quests"] = {"orig_guanyu": {"stage": 1, "startDay": 0, "flags": {}}}
+	var res := RulesQuest.on_fight_win(data, ch, q)
+	check(bool(res["changed"]) and (res["dialog"] as Array).size() > 0, "winDialog: 打贏有敗將對白")
+	check(int(ch["quests"]["orig_guanyu"]["stage"]) == 2, "winDialog: 打贏推進下一關")
 

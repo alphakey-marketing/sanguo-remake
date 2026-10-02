@@ -116,6 +116,55 @@ QUESTS += [
 ]
 
 
+# ---- 批次 3: 千里走單騎 (過五關斬六將) ----
+BOSSES += [(1111, '秦琪', 30), (1112, '王植', 32), (1113, '卞喜', 34), (1114, '孟坦', 36), (1115, '孔秀', 38), (1116, '蔡陽', 40)]
+def _npc(i, name, x, y, m, idle, desc):
+    return {"id": i, "name": name, "x": x, "y": y, "map": m, "questOnly": True, "idle": [name + "：「" + idle + "」"], "desc": desc + "【原版】"}
+NEW_NPCS_EXTRA += [
+    _npc("guanyu", "關羽", 38, 16, "chenliu", "大哥……", "曹營中嘅關雲長"),
+    _npc("qinqi", "秦琪", 30, 20, "hanshui", "黃河渡口，閒人免進！", "黃河渡口守將"),
+    _npc("wangzhi", "王植", 40, 20, "wancheng_road", "滎陽城外，此路不通！", "滎陽守將"),
+    _npc("bianxi", "卞喜", 40, 20, "runan_road", "沂水關重地！", "沂水關守將"),
+    _npc("mengtan", "孟坦", 20, 20, "luoyang", "洛陽關口，速速退去！", "洛陽守將"),
+    _npc("kongxiu", "孔秀", 30, 24, "chenliu", "東嶺關豈容你闖！", "東嶺關守將"),
+    _npc("caiyang", "蔡陽", 20, 17, "xiaopei", "逆賊關羽，拿命來！", "追兵蔡陽"),
+]
+QUESTS += [
+    {"id": "orig_guanyu", "src": "orig", "name": "千里走單騎", "type": "history", "giver": "liubei",
+     "pre": {"minLevel": 32},
+     "preHint": "武功 32 級以上，去小沛搵劉備",
+     "stages": [
+         {"type": "talk", "npc": "liubei", "conv": [1326], "sp": {2: '劉備'},
+          "hint": "劉備要你去曹營搵關羽，沿途要闖五關：先去漢水渡口打秦琪"},
+         {"type": "fight", "npc": "qinqi", "monster": 1111, "conv": [1342], "win": 1327, "hint": "漢水渡口打低守將秦琪"},
+         {"type": "fight", "npc": "wangzhi", "monster": 1112, "conv": [1342], "win": 1328, "hint": "宛城道打低守將王植"},
+         {"type": "fight", "npc": "bianxi", "monster": 1113, "conv": [1342], "win": 1329, "hint": "汝南道打低沂水關守將卞喜"},
+         {"type": "fight", "npc": "mengtan", "monster": 1114, "conv": [1342], "win": 1330, "hint": "洛陽打低守將孟坦"},
+         {"type": "fight", "npc": "kongxiu", "monster": 1115, "conv": [1342], "win": 1331, "hint": "陳留郊外打低東嶺關孔秀"},
+         {"type": "talk", "npc": "guanyu", "conv": [1333], "sp": {2: '關羽'},
+          "hint": "五關已破，面呈家書畀關羽"},
+         {"type": "escort", "npc": "liubei", "escortName": "關羽", "conv": [1322], "sp": {2: '劉備'},
+          "hint": "護送關羽返小沛見劉備，唔好行太遠"},
+         {"type": "fight", "npc": "caiyang", "monster": 1116, "conv": [1340], "sp": {3: '蔡陽', 4: '關羽'}, "win": 1341,
+          "hint": "蔡陽追到小沛，打低佢"},
+         {"type": "talk", "npc": "liubei", "conv": [1323], "sp": {3: '劉備', 4: '關羽'}, "done": True,
+          "hint": "兄弟團聚，向劉備領謝禮"}],
+     "reward": {"fame": 60, "exp": 8000, "gold": 1600}},
+]
+
+
+def snap(g, x, y, others):
+    for r in range(0, 20):
+        for dy in range(-r, r + 1):
+            for dx in range(-r, r + 1):
+                if max(abs(dx), abs(dy)) != r:
+                    continue
+                xx, yy = x + dx, y + dy
+                if 0 <= yy < len(g) and 0 <= xx < len(g[yy]) and g[yy][xx] in '.:=,_+'                         and all(max(abs(xx - ox), abs(yy - oy)) >= 2 for ox, oy in others):
+                    return xx, yy
+    raise SystemExit('搵唔到位 %d,%d' % (x, y))
+
+
 def add_bosses():
     p = 'client/data/monsters.json'
     md = json.load(open(p, encoding='utf8'))
@@ -134,9 +183,9 @@ def main():
     add_bosses()
     convs = load_convs()
 
-    for n in ALL_NPCS:
+    for n in ALL_NPCS:      # 位置係估嘅: 唔行得就搵最近行得嘅格 (同圖其他 NPC ≥2 格)
         g = open('client/data/maps/%s.txt' % n['map'], encoding='utf8').read().split(chr(10))
-        assert g[n['y']][n['x']] in '.:=,_+', 'NPC 位置唔行得: %s %s' % (n['id'], g[n['y']][n['x']])
+        n['x'], n['y'] = snap(g, n['x'], n['y'], [(o['x'], o['y']) for o in ALL_NPCS if o['map'] == n['map'] and o is not n])
     qd = json.load(open(QJ, encoding='utf8'))
     nd = json.load(open(NJ, encoding='utf8'))
     names = {n['id']: n['name'] for n in nd['npcs']}
@@ -152,7 +201,13 @@ def main():
             for cid in st['conv']:
                 ls += lines(convs[cid], names[st['npc']], st.get('sp'))
             st['dialog'] = ls
-            st['origConv'] = st.pop('conv')
+            oc = list(st.pop('conv'))
+            if 'win' in st:      # 打贏後敗將對白
+                w = st.pop('win')
+                nm = names[st['npc']]
+                st['winDialog'] = lines(convs[w], nm, {2: nm, 3: nm})
+                oc.append(w)
+            st['origConv'] = oc
             st.pop('sp', None)
         qd['quests'].append(q)
     json.dump(qd, open(QJ, 'w', encoding='utf8', newline='\n'), ensure_ascii=False, indent=1)

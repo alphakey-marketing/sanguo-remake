@@ -435,6 +435,7 @@ static func on_fight_win(data: GameData, ch: Dictionary, q: Dictionary) -> Dicti
 		return out
 	for ti in stage.get("takeItems", []):      # 出兵令之類: 打贏先收 (召喚時已 check 過有)
 		RulesShop.remove_item(ch["bag"], int(ti[0]), int(ti[1]))
+	out["dialog"] = stage.get("winDialog", [])      # 打贏後嘅敗將對白 (原版過五關斬六將)
 	return _advance(data, ch, q, st, stage, out)
 
 
