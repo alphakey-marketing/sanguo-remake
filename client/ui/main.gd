@@ -1887,6 +1887,11 @@ func switch_to_slot(n: int, is_new: bool) -> void:
 			sim = loaded
 			fresh = false
 			my_id = int(sim.state["player_id"])
+			var pe: Dictionary = sim.ent(my_id)
+			if not pe.is_empty() and sim.map_id_at(int(pe["x"]), int(pe["y"])) == "":    # 舊檔企喺已封存嘅舊圖 → 搬返原版許昌
+				var hm: Dictionary = data.map_by_id.get(String(data.world.get("origHome", "xuchang_o")), {})
+				var sp: Array = hm.get("spawn", [0, 0])
+				pe["x"] = int(sp[0]); pe["y"] = int(sp[1])
 	if fresh:
 		if bool(data.world.get("origStart", false)):
 			my_id = sim.spawn_player_orig("玩家")           # 原版世界: 淨係原版許昌，舊 ASCII 怪/居民/捕快抽起
