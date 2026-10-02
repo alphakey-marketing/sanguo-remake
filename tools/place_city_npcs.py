@@ -49,7 +49,7 @@ def pick(mid, n, near_spawn=False):
 # 設施表 (docs/plan/city_facilities.md 同 importer 嘅室內命名)：按室內名關鍵字決定放咩。cityOf 無 world.json 城，故唔放公佈欄/救災區
 import sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import import_orig_interiors as _I
-CITIES = {c: (n, _I.CITY_SLUG[c]) for c, n in _I.NEWCITIES.items()}      # importer 匯入咗室內嘅城
+CITIES = {c: (n, _I.CITY_SLUG[c]) for c, n in {**_I.NEWCITIES, **_I.PARTIAL}.items() if c in _I.NEWCITIES or any(r // 100 == c for r in _I.PARTIAL_DOOR)}      # importer 匯入咗室內嘅城
 ROOM_FAC = {'官宅': 'donate_xc', '藥房': 'pharmacy', '私塾': 'school', '廟': 'temple', '練兵場': 'training', '木工廠': 'workshop', '打鐵鋪': 'forge',
             '馬廄': 'stable_xc', '驛站': 'station_xc', '廚房': 'kitchen'}
 ROOM_SHOP = {'藥房': 'herbalist', '武器店': 'weapon'}
@@ -72,7 +72,7 @@ for c, (cn, slug) in CITIES.items():
     todo = []   # (map, kind, src)
     for m in maps['maps']:
         mid = m['id']
-        if not (mid.startswith('xc%d' % c) and mid[2:].isdigit() and len(mid) == 6) or m.get('orphan'): continue
+        if not (mid[:2] == 'xc' and mid[2:].isdigit() and int(mid[2:]) // 100 == c) or m.get('orphan'): continue
         n = int(mid[2:]) % 100; nm = m['name'].split('·')[-1]
         if n in EXTRA_ROOM.get(c, {}): todo.append((mid, 'fac', EXTRA_ROOM[c][n]))
         if '客棧' in nm: todo.append((mid, 'inn', 'xuchang_o'))
@@ -80,7 +80,7 @@ for c, (cn, slug) in CITIES.items():
             if k in nm: todo.append((mid, 'fac', f))
         for k, s in ROOM_SHOP.items():
             if k in nm: todo.append((mid, 'shop', s))
-    for sid in STREET_SHOP: todo.append((city_map, 'shop', sid))
+    for sid in ([] if c in _I.PARTIAL else STREET_SHOP): todo.append((city_map, 'shop', sid))
     by = {}
     for t in todo: by.setdefault(t[0], []).append(t)
     for mid, lst in by.items():

@@ -127,7 +127,7 @@ def slot_rects(runs, conns, gw, gh):
 # 新增完整城 (用家 2026-10 指定: 譙/汝南/洛陽/宛)：室內 = locations.tsv 該城「城內設施」+ 該城 k2 門指向嘅其他室內；道路 xx22/xx23
 NEWCITIES = {t // 100: CITY_NAME[t // 100] for t in TOWNS if t // 100 not in (17, 19)}     # 全部有城圖嘅城
 _ALL_NEW = dict(NEWCITIES)
-FULLCITIES = [19, 17] + sorted(NEWCITIES)
+FULLCITIES = [19, 17] + sorted(NEWCITIES)  # PARTIAL 門另處理
 _FAC_KW = [('官宅', '地方功曹'), ('客棧', '客棧掌櫃'), ('藥房', '藥房掌櫃'), ('藥房', '煉丹師傅'), ('武器店', '武器商'), ('私塾', '夫子'), ('廟', '廟公'), ('練兵場', '練兵將'),
            ('木工廠', '木匠師傅'), ('打鐵鋪', '火爐師傅'), ('錢莊', '錢莊掌櫃'), ('拍賣屋', '拍賣屋掌櫃'), ('馬廄', '馬廄老闆'), ('驛站', '驛站長'), ('賭場', '賭場'),
            ('監牢', '獄卒'), ('廚房', '大廚')]
@@ -145,6 +145,10 @@ def _load_new_interiors():
         for m, n in ((c * 100 + 22, '道路B'), (c * 100 + 23, '道路A')):
             if m not in info: continue
             out[m] = cn + n; tsets[m] = info[m][4]
+    for room in PARTIAL_DOOR:
+        names = info[room][7]; fx = next((k for k, w in _FAC_KW if w in names), None)
+        out[room] = '%s%s' % (PARTIAL[room // 100], fx) if fx else '%s室內%02d' % (PARTIAL[room // 100], room % 100)
+        tsets[room] = info[room][4]
     return out, tsets
 ROAD_GATES = {600089: 1923, 600865: 1922, 600857: 1722}
 def _auto_road_gates():
@@ -181,6 +185,24 @@ def k2_rects():
 _rc0 = k2_rects()
 NEWCITIES = {c: n for c, n in NEWCITIES.items() if any(c * 100 < k < c * 100 + 100 for k, *_ in _rc0[c * 100])}
 print('匯入室內嘅城:', sorted(n for n in NEWCITIES.values()), '| 只有城圖:', sorted(n for c, n in _ALL_NEW.items() if c not in NEWCITIES))
+# 另一套門編號嘅城 (6xxxxx/13xxxxx)：房↔門對應喺 data 搵唔到，只匯 功曹(01)/客棧(02) (用家 2026-10 指定)
+# 門 = 城圖該城最長連號 k2 門串嘅頭兩個 (已避開 6008xx 道路閘、>=1400000 邊緣)
+PARTIAL = {c: n for c, n in _ALL_NEW.items() if c not in NEWCITIES}
+PARTIAL_DOOR = {}
+def _partial_doors():
+    rows = {int(r.split(chr(9))[0]): r.split(chr(9)) for r in list(open(os.path.join(SRC, 'extracted', 'map_list', 'locations.tsv'), encoding='utf8'))[1:]}
+    for c in PARTIAL:
+        ds = sorted((k, x1, y1, x2, y2) for k, sub, x1, y1, x2, y2 in _rc0[c * 100] if 600000 <= k < 1400000 and not 600800 <= k < 600900 and sub == 1)
+        runs = []; cur = []
+        for d in ds:
+            if cur and d[0] - cur[-1][0] > 3: runs.append(cur); cur = []
+            cur.append(d)
+        if cur: runs.append(cur)
+        if not runs: continue
+        best = max(runs, key=len)
+        for room, d in zip((c * 100 + 1, c * 100 + 2), best[:2]):
+            if room in rows and _rc0[room]: PARTIAL_DOOR[room] = d[1:]
+_partial_doors()
 NEW_INT, NEW_TS = _load_new_interiors()
 ROADS |= {m: n for m, n in NEW_INT.items() if m % 100 in (22, 23)}
 INTERIORS |= {m: n for m, n in NEW_INT.items() if m % 100 not in (22, 23)}
@@ -333,6 +355,7 @@ def run(check):
         for k, sub, x1, y1, x2, y2 in sorted(cr):
             if k in INTERIORS: door_of.setdefault(k, (x1, y1, x2, y2))
             elif k in ROAD_GATES: door_of[ROAD_GATES[k]] = (x1, y1, x2, y2)
+    door_of.update(PARTIAL_DOOR)
     cityg = {19: (cg, cgw, cgh)} | {t // 100: (built[t]['g'], built[t]['gw'], built[t]['gh']) for t in TOWNS if t in built}
     for mid, b in sorted(built.items()):
         key = 'xc%d' % mid; g = b['g']; gw, gh = b['gw'], b['gh']

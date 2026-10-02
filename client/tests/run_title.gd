@@ -91,7 +91,7 @@ func t_data(data: GameData) -> void:
 	for k in data.facilities:
 		if data.facilities[k] is Dictionary and bool(data.facilities[k].get("office", false)):
 			offs += 1
-	check(offs == 20, "官宅 20 間")
+	check(offs == 36, "官宅 36 間")
 
 
 func t_rules(data: GameData) -> void:
