@@ -63,6 +63,15 @@ static func mon_sheet(mob_def: int, act: String) -> Texture2D:
 	return _tex("mon_" + act, mob_def)
 
 
+# 借圖怪染色 (importer BORROW 表)；原版圖或冇登記 = 白色 (唔染)
+static func mon_tint(mob_def: int) -> Color:
+	_ensure()
+	var t: Variant = _index.get("_mon_tint", {})
+	if t is Dictionary and (t as Dictionary).has(str(mob_def)):
+		return Color.html(str((t as Dictionary)[str(mob_def)]))
+	return Color.WHITE
+
+
 # 人形 sprite (NPC/居民/武將/玩家): sheet 格式同怪物。sid = 原版 sprite id
 # 座騎 sheet (8x8, row4 面向鏡頭); key = 馬種 id
 static func mount_sheet(breed: String) -> Texture2D:

@@ -249,7 +249,7 @@ func _draw_mon_sprite(e: Dictionary, p: Vector2) -> bool:
 	var ch_ := tex.get_height() / 8
 	var src := Rect2(int(t0 * 8.0) % 8 * cw, int(a.get("dir", 4)) * ch_, cw, ch_)
 	var sz := Vector2(cw, ch_) * 0.42
-	draw_texture_rect_region(tex, Rect2(p + Vector2(TILE * 0.5 - sz.x * 0.5, TILE - sz.y), sz), src)
+	draw_texture_rect_region(tex, Rect2(p + Vector2(TILE * 0.5 - sz.x * 0.5, TILE - sz.y), sz), src, AssetLib.mon_tint(sid) if mob else Color.WHITE)
 	return true
 
 # 玩家分層外觀: 身 + 甲 + 髮 + 武器 (按裝備揀款式)；冇圖返 false → 用預疊 sheet

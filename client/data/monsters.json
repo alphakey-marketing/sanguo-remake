@@ -16002,18 +16002,6 @@
   },
   {
    "zone": "field_1",
-   "monster": 1004,
-   "count": 3,
-   "respawnTicks": 250,
-   "area": [
-    10,
-    26,
-    50,
-    56
-   ]
-  },
-  {
-   "zone": "field_1",
    "monster": 1005,
    "count": 1,
    "respawnTicks": 600,
@@ -16177,21 +16165,9 @@
   },
   {
    "zone": "runan_f5",
-   "monster": 12018,
-   "count": 3,
-   "respawnTicks": 280
-  },
-  {
-   "zone": "runan_f5",
    "monster": 12030,
    "count": 2,
    "respawnTicks": 280
-  },
-  {
-   "zone": "runan_f6",
-   "monster": 12013,
-   "count": 3,
-   "respawnTicks": 300
   },
   {
    "zone": "runan_f6",
@@ -16212,12 +16188,6 @@
    "respawnTicks": 320
   },
   {
-   "zone": "runan_f8",
-   "monster": 12014,
-   "count": 2,
-   "respawnTicks": 300
-  },
-  {
    "zone": "runan_f9",
    "monster": 12028,
    "count": 4,
@@ -16236,28 +16206,10 @@
    "respawnTicks": 200
   },
   {
-   "zone": "runan_f10",
-   "monster": 19001,
-   "count": 1,
-   "respawnTicks": 0
-  },
-  {
    "zone": "runan_road",
    "monster": 12006,
    "count": 3,
    "respawnTicks": 320,
-   "area": [
-    4,
-    4,
-    36,
-    36
-   ]
-  },
-  {
-   "zone": "runan_road",
-   "monster": 12014,
-   "count": 2,
-   "respawnTicks": 300,
    "area": [
     4,
     4,
@@ -16303,18 +16255,6 @@
   },
   {
    "zone": "kunyang",
-   "monster": 12018,
-   "count": 3,
-   "respawnTicks": 280,
-   "area": [
-    4,
-    2,
-    88,
-    30
-   ]
-  },
-  {
-   "zone": "kunyang",
    "monster": 12019,
    "count": 3,
    "respawnTicks": 300,
@@ -16322,18 +16262,6 @@
     4,
     31,
     32,
-    62
-   ]
-  },
-  {
-   "zone": "kunyang",
-   "monster": 12013,
-   "count": 3,
-   "respawnTicks": 300,
-   "area": [
-    62,
-    36,
-    88,
     62
    ]
   },
@@ -16455,18 +16383,6 @@
     17,
     93,
     44
-   ]
-  },
-  {
-   "zone": "bowang",
-   "monster": 1004,
-   "count": 3,
-   "respawnTicks": 250,
-   "area": [
-    2,
-    2,
-    93,
-    16
    ]
   },
   {
@@ -16688,30 +16604,6 @@
   },
   {
    "zone": "fancheng",
-   "monster": 12018,
-   "count": 3,
-   "respawnTicks": 280,
-   "area": [
-    4,
-    22,
-    36,
-    38
-   ]
-  },
-  {
-   "zone": "fancheng",
-   "monster": 12013,
-   "count": 3,
-   "respawnTicks": 300,
-   "area": [
-    8,
-    40,
-    30,
-    52
-   ]
-  },
-  {
-   "zone": "fancheng",
    "monster": 12030,
    "count": 3,
    "respawnTicks": 280,
@@ -16748,18 +16640,6 @@
   },
   {
    "zone": "hanshui",
-   "monster": 12014,
-   "count": 2,
-   "respawnTicks": 300,
-   "area": [
-    4,
-    28,
-    36,
-    40
-   ]
-  },
-  {
-   "zone": "hanshui",
    "monster": 12028,
    "count": 3,
    "respawnTicks": 240,
@@ -16772,18 +16652,6 @@
   },
   {
    "zone": "longzhong",
-   "monster": 12018,
-   "count": 4,
-   "respawnTicks": 260,
-   "area": [
-    26,
-    3,
-    38,
-    22
-   ]
-  },
-  {
-   "zone": "longzhong",
    "monster": 12006,
    "count": 3,
    "respawnTicks": 320,
@@ -16792,18 +16660,6 @@
     3,
     58,
     22
-   ]
-  },
-  {
-   "zone": "longzhong",
-   "monster": 12013,
-   "count": 4,
-   "respawnTicks": 260,
-   "area": [
-    4,
-    34,
-    26,
-    46
    ]
   },
   {
@@ -17038,18 +16894,6 @@
     28,
     76,
     40
-   ]
-  },
-  {
-   "zone": "fancheng",
-   "monster": 1035,
-   "count": 3,
-   "respawnTicks": 260,
-   "area": [
-    8,
-    40,
-    30,
-    52
    ]
   },
   {
@@ -17870,13 +17714,6 @@
   },
   {
    "zone": "xc2052",
-   "monster": 12018,
-   "count": 4,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc2052",
    "monster": 11072,
    "count": 4,
    "respawnTicks": 300,
@@ -17911,22 +17748,8 @@
    "orig": true
   },
   {
-   "zone": "xc2054",
-   "monster": 1004,
-   "count": 4,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
    "zone": "xc2055",
    "monster": 70024,
-   "count": 4,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc2055",
-   "monster": 12014,
    "count": 4,
    "respawnTicks": 300,
    "orig": true
@@ -18612,13 +18435,6 @@
   },
   {
    "zone": "xc125",
-   "monster": 12014,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc125",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -18634,13 +18450,6 @@
   {
    "zone": "xc125",
    "monster": 1019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc125",
-   "monster": 1035,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -18696,13 +18505,6 @@
   },
   {
    "zone": "xc225",
-   "monster": 12014,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc225",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -18718,13 +18520,6 @@
   {
    "zone": "xc225",
    "monster": 1019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc225",
-   "monster": 1035,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -18780,13 +18575,6 @@
   },
   {
    "zone": "xc325",
-   "monster": 12014,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc325",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -18802,13 +18590,6 @@
   {
    "zone": "xc325",
    "monster": 1019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc325",
-   "monster": 1035,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -18864,13 +18645,6 @@
   },
   {
    "zone": "xc425",
-   "monster": 12014,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc425",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -18886,13 +18660,6 @@
   {
    "zone": "xc425",
    "monster": 1019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc425",
-   "monster": 1035,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -18948,13 +18715,6 @@
   },
   {
    "zone": "xc525",
-   "monster": 12014,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc525",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -18970,13 +18730,6 @@
   {
    "zone": "xc525",
    "monster": 1019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc525",
-   "monster": 1035,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -19032,13 +18785,6 @@
   },
   {
    "zone": "xc625",
-   "monster": 12014,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc625",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -19054,13 +18800,6 @@
   {
    "zone": "xc625",
    "monster": 1019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc625",
-   "monster": 1035,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -19116,13 +18855,6 @@
   },
   {
    "zone": "xc725",
-   "monster": 12014,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc725",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -19138,13 +18870,6 @@
   {
    "zone": "xc725",
    "monster": 1019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc725",
-   "monster": 1035,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -19200,13 +18925,6 @@
   },
   {
    "zone": "xc825",
-   "monster": 12014,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc825",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -19222,13 +18940,6 @@
   {
    "zone": "xc825",
    "monster": 1019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc825",
-   "monster": 1035,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -19284,13 +18995,6 @@
   },
   {
    "zone": "xc925",
-   "monster": 12014,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc925",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -19306,13 +19010,6 @@
   {
    "zone": "xc925",
    "monster": 1019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc925",
-   "monster": 1035,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -19368,13 +19065,6 @@
   },
   {
    "zone": "xc1025",
-   "monster": 12014,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc1025",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -19390,13 +19080,6 @@
   {
    "zone": "xc1025",
    "monster": 1019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc1025",
-   "monster": 1035,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -19452,13 +19135,6 @@
   },
   {
    "zone": "xc1125",
-   "monster": 12014,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc1125",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -19474,13 +19150,6 @@
   {
    "zone": "xc1125",
    "monster": 1019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc1125",
-   "monster": 1035,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -19536,13 +19205,6 @@
   },
   {
    "zone": "xc1225",
-   "monster": 12014,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc1225",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -19558,13 +19220,6 @@
   {
    "zone": "xc1225",
    "monster": 1019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc1225",
-   "monster": 1035,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -19620,13 +19275,6 @@
   },
   {
    "zone": "xc1325",
-   "monster": 12014,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc1325",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -19642,13 +19290,6 @@
   {
    "zone": "xc1325",
    "monster": 1019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc1325",
-   "monster": 1035,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -19704,13 +19345,6 @@
   },
   {
    "zone": "xc1425",
-   "monster": 12014,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc1425",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -19726,13 +19360,6 @@
   {
    "zone": "xc1425",
    "monster": 1019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc1425",
-   "monster": 1035,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -19788,13 +19415,6 @@
   },
   {
    "zone": "xc1525",
-   "monster": 12014,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc1525",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -19810,13 +19430,6 @@
   {
    "zone": "xc1525",
    "monster": 1019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc1525",
-   "monster": 1035,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -19872,13 +19485,6 @@
   },
   {
    "zone": "xc1625",
-   "monster": 12014,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc1625",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -19894,13 +19500,6 @@
   {
    "zone": "xc1625",
    "monster": 1019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc1625",
-   "monster": 1035,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -19984,21 +19583,7 @@
   },
   {
    "zone": "xc1725",
-   "monster": 12018,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc1725",
    "monster": 12019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc1725",
-   "monster": 1004,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -20054,21 +19639,7 @@
   },
   {
    "zone": "xc1825",
-   "monster": 12018,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc1825",
    "monster": 12019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc1825",
-   "monster": 1004,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -20124,21 +19695,7 @@
   },
   {
    "zone": "xc1925",
-   "monster": 12018,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc1925",
    "monster": 12019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc1925",
-   "monster": 1004,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -20194,13 +19751,6 @@
   },
   {
    "zone": "xc2025",
-   "monster": 12018,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc2025",
    "monster": 12019,
    "count": 1,
    "respawnTicks": 300,
@@ -20208,13 +19758,6 @@
   },
   {
    "zone": "xc2025",
-   "monster": 1004,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc2025",
    "monster": 11068,
    "count": 1,
    "respawnTicks": 300,
@@ -20272,13 +19815,6 @@
   {
    "zone": "xc2125",
    "monster": 12019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc2125",
-   "monster": 1004,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -20355,13 +19891,6 @@
   },
   {
    "zone": "xc2225",
-   "monster": 1004,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc2225",
    "monster": 12030,
    "count": 1,
    "respawnTicks": 300,
@@ -20432,13 +19961,6 @@
   },
   {
    "zone": "xc2325",
-   "monster": 1004,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc2325",
    "monster": 12030,
    "count": 1,
    "respawnTicks": 300,
@@ -20495,21 +20017,7 @@
   },
   {
    "zone": "xc2425",
-   "monster": 12018,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc2425",
    "monster": 12019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc2425",
-   "monster": 1004,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -20572,21 +20080,7 @@
   },
   {
    "zone": "xc2525",
-   "monster": 12018,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc2525",
    "monster": 12019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc2525",
-   "monster": 1004,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -20649,21 +20143,7 @@
   },
   {
    "zone": "xc2625",
-   "monster": 12018,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc2625",
    "monster": 12019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc2625",
-   "monster": 1004,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -20740,13 +20220,6 @@
   },
   {
    "zone": "xc2725",
-   "monster": 1004,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc2725",
    "monster": 12030,
    "count": 1,
    "respawnTicks": 300,
@@ -20817,13 +20290,6 @@
   },
   {
    "zone": "xc2825",
-   "monster": 1004,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc2825",
    "monster": 12030,
    "count": 1,
    "respawnTicks": 300,
@@ -20894,13 +20360,6 @@
   },
   {
    "zone": "xc2925",
-   "monster": 1004,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc2925",
    "monster": 12030,
    "count": 1,
    "respawnTicks": 300,
@@ -20971,13 +20430,6 @@
   },
   {
    "zone": "xc3025",
-   "monster": 1004,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc3025",
    "monster": 12030,
    "count": 1,
    "respawnTicks": 300,
@@ -21042,13 +20494,6 @@
   {
    "zone": "xc3125",
    "monster": 12019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc3125",
-   "monster": 1004,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -21125,13 +20570,6 @@
   },
   {
    "zone": "xc3225",
-   "monster": 1004,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc3225",
    "monster": 12030,
    "count": 1,
    "respawnTicks": 300,
@@ -21188,21 +20626,7 @@
   },
   {
    "zone": "xc3325",
-   "monster": 12018,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc3325",
    "monster": 12019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc3325",
-   "monster": 1004,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -21265,21 +20689,7 @@
   },
   {
    "zone": "xc3425",
-   "monster": 12018,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc3425",
    "monster": 12019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc3425",
-   "monster": 1004,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -21342,21 +20752,7 @@
   },
   {
    "zone": "xc3525",
-   "monster": 12018,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc3525",
    "monster": 12019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc3525",
-   "monster": 1004,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -21419,21 +20815,7 @@
   },
   {
    "zone": "xc3625",
-   "monster": 12018,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc3625",
    "monster": 12019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc3625",
-   "monster": 1004,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -21496,21 +20878,7 @@
   },
   {
    "zone": "xc3725",
-   "monster": 12018,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc3725",
    "monster": 12019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc3725",
-   "monster": 1004,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -21573,21 +20941,7 @@
   },
   {
    "zone": "xc3825",
-   "monster": 12018,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc3825",
    "monster": 12019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc3825",
-   "monster": 1004,
    "count": 1,
    "respawnTicks": 300,
    "orig": true
@@ -21650,21 +21004,7 @@
   },
   {
    "zone": "xc3925",
-   "monster": 12018,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc3925",
    "monster": 12019,
-   "count": 1,
-   "respawnTicks": 300,
-   "orig": true
-  },
-  {
-   "zone": "xc3925",
-   "monster": 1004,
    "count": 1,
    "respawnTicks": 300,
    "orig": true

@@ -60,11 +60,15 @@ def main(check=False):
     if check: return
     mons.extend(new)
     d['spawns'] = [x for x in d['spawns'] if not x.get('orig')] + gen_spawns(mons, rows_cave)
+    hid = {m['id'] for m in mons if m['name'] in NO_SPRITE_HIDE}      # 冇圖又冇相似圖可借 -> 唔出場 (搵到圖包後清空 NO_SPRITE_HIDE 重跑)
+    d['spawns'] = [x for x in d['spawns'] if x['monster'] not in hid]
     json.dump(d, open(MP, 'w', encoding='utf8', newline='\n'), ensure_ascii=False, indent=1)
 # 外圍野怪名單: 官方攻略 (docs/plan/ORIG_MONSTERS.md 來源 = 用家 Drive 攻略截圖) 按州分；各州適合等級 荊/豫/并司 1-10、兗徐 10-20
 WILD = {'荊': '田鼠 水鴨 野兔 蜻蜓 野貂 母雞 猴子 瘋貓 野豬 飛蛾怪 流氓', '豫': '田鼠 水鴨 野兔 野貂 母雞 公雞 山羊 瘋貓 野豬 流氓',
         '并司': '田鼠 水鴨 野兔 蝴蝶精 野貂 母雞 山羊 瘋貓 野豬 盜賊 流氓', '兗徐': '野狗 狐貍 花鹿 大蟒 黃蜂 野狼 野牛 花豹 老虎 大熊 流氓 地痞'}
 REGION = {'荊': (29, 27, 28, 30, 21, 22, 31, 32, 23), '豫': (19, 18, 20, 17), '并司': (26, 24, 25, 34, 33, 35, 36, 37, 38, 39)}   # 其餘城用兗徐 (近似【自訂】)
+# 缺 sprite 又冇相似圖可借，暫時隱藏嘅怪 (見 import_orig_assets.BORROW 借圖表)
+NO_SPRITE_HIDE = {'野豬', '野牛', '山羊', '花鹿', '洞窟獸王'}
 def gen_spawns(mons, rows):
     import re
     by = {}

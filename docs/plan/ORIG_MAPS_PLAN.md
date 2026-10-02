@@ -80,3 +80,5 @@
 - **未做**：怪等級重平衡；洞穴所屬外圍同攻略城名未必同城 (鄴/廬江/襄平/建業 無 xx25 對應，洞口仍按 id//100 掛)；一/二轉神秘洞窟位置未確認。
 - **決定 (2026-10-02)**：鄴/廬江/襄平/建業 冇 25 外圍圖 → 洞口唔掛 (現況已冇)，待用家確認六組洞穴對應。一轉神秘洞窟暫對陳留組 (Lv21-50)、二轉暫對吳組 (Lv51-80)，只係按等級帶估。
 - **缺 sprite 查證**：缺圖 18 隻原版怪嘅 sprite 編號 (50xxx-54xxx 人形) 喺 `d2npc01.lst` (810 筆 52001+)/`editnpc01.lst`/`hsnpc01.lst` 有列，但對應 .mrg (hsnpc01/editnpc01/warnpc/npc01) 唔喺 Sanguo_Client.rar 同 zyxy_client/vm_extract/回收桶；d2npc01.mrg 實際只得 20003-20039/50011-50070 共 175 套。patchlist 嘅 Data*.zip 補丁亦冇下載。→ 搵到呢幾個 mrg 先補到。
+- **借圖 (2026-10-02，用家同意)**：缺 sprite 嘅怪借相似怪嘅圖 + 染色區分。對照表 `tools/import_orig_assets.py BORROW` (怪名→借圖怪名,#色)，染色存 `asset_index.json _mon_tint`，`AssetLib.mon_tint()` + `main.gd _draw_mon_sprite` 套用。搵到真圖包後刪走對應項即用真圖。
+- **隱藏**：野豬/野牛/山羊/花鹿/洞窟獸王 冇相似圖，`import_orig_monsters.py NO_SPRITE_HIDE` 令佢哋唔出場 (資料仍在)。怪動畫覆蓋 101→166/225，所有出場怪都有圖。
