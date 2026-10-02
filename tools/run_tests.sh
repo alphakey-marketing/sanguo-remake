@@ -75,6 +75,13 @@ if [ -f /d/Download/sanguo/extracted/text/npc_drops.csv ]; then
   [ $code = 0 ] || { echo "!! drops exit $code"; rc=1; }
 fi
 
+# 怪物數值核對 (orig 怪要同 mob_curve.json 曲線一致，要本機有原版 Npc_table.tsv)
+if [ -f /d/Download/sanguo/extracted/text/Npc_table.tsv ]; then
+  out=$(PYTHONIOENCODING=utf-8 python tools/balance_monsters.py --check 2>&1); code=$?
+  echo "$out"
+  [ $code = 0 ] || { echo "!! balance exit $code"; rc=1; }
+fi
+
 # 配方導入核對 (recipes.json 要同 items.json 一致)
 out=$(PYTHONIOENCODING=utf-8 python tools/import_recipes.py --check 2>&1); code=$?
 echo "$out"
