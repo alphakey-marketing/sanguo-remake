@@ -41,8 +41,17 @@ FIELDS = {1851: '許昌洞穴一', 1852: '許昌洞穴二', 1853: '許昌洞穴�
 LINKS = json.load(open(os.path.join(ROOT, 'client', 'data', 'city_links.json'), encoding='utf8'))   # tools/city_links.py 生成
 CITY_NAME = {c['id'] // 100: n for n, c in LINKS['cities'].items()}
 TPLS = (25,)                              # v2: 每城只有一張外圍 xx25 (所有城共用)
-TOWNS = {1700: '陳留'}                    # 城圖 (4000x3000)；許昌城圖由 import_orig_maps 負責 (xuchang_o)
-CITY_MAPID = {19: CITY, 17: 'xc1700'}     # 城 id(//100) -> 城圖 map id
+# 城圖 (3200x2400 / 4000x3000，type=城市)：除許昌 (import_orig_maps 負責 xuchang_o) 外全部城池；(漢中/梓潼 係 map22 大圖，天水/武都 冇城圖 -> 跳過)
+SKIP_TOWNS = {1900, 3600, 3700, 3800, 3900}
+TOWNS = {c['id']: n for n, c in LINKS['cities'].items() if c['id'] not in SKIP_TOWNS}
+CITY_MAPID = {19: CITY} | {t // 100: 'xc%d' % t for t in TOWNS}     # 城 id(//100) -> 城圖 map id
+# cityOf slug: 有舊圖嘅城沿用舊 city id (驛站/市場借舊圖)，其餘拼音
+SLUG = {'許昌': 'xuchang', '陳留': 'chenliu', '洛陽': 'luoyang', '汝南': 'runan', '宛': 'wancheng', '襄陽': 'xiangyang', '新野': 'xinye', '長沙': 'changsha',
+        '小沛': 'xiaopei', '下邳': 'xiapi', '零陵': 'lingling', '襄平': 'xiangping', '北平': 'beiping', '薊': 'ji', '北海': 'beihai', '平原': 'pingyuan',
+        '南皮': 'nanpi', '鄴': 'ye', '盧江': 'lujiang', '壽春': 'shouchun', '柴桑': 'chaisang', '吳': 'wu', '會稽': 'kuaiji', '建業': 'jianye', '濮陽': 'puyang',
+        '譙': 'qiao', '江夏': 'jiangxia', '桂陽': 'guiyang', '河內': 'henei', '晉陽': 'jinyang', '江陵': 'jiangling', '武陵': 'wuling', '安定': 'anding',
+        '長安': 'changan', '西涼': 'xiliang'}
+CITY_SLUG = {c['id'] // 100: SLUG[n] for n, c in LINKS['cities'].items() if n in SLUG}
 INSTANCES = sorted({m for l in LINKS['links'] for m in (l['a_out'], l['b_out'])} - {1925})   # 非許昌嘅外圍實例
 SIDE_DIR = {'E': (1, 0), 'W': (-1, 0), 'N': (0, -1), 'S': (0, 1)}
 GATE_W = [0, 146, 4, 168]                 # 許昌城西邊緣 (用家確認 A 位) -> 許昌外圍25 正中
@@ -376,10 +385,10 @@ def run(check):
         ox, oy = pos[mid]; sp = b.get('spawn') or (b['gw'] // 2, b['gh'] // 2)
         if mid in TOWNS:
             mj['maps'].append({'id': 'xc%d' % mid, 'name': b['cn'] + '（原版）', 'ox': ox, 'oy': oy, 'safe': True, 'kind': 'field', 'orig': 'xc%d' % mid,
-                               'cityOf': 'chenliu', 'spawn': [sp[0], sp[1], sp[0], sp[1]]} | ({} if mid in reach else {'orphan': True}))
+                               'cityOf': CITY_SLUG[mid // 100], 'spawn': [sp[0], sp[1], sp[0], sp[1]]} | ({} if mid in reach else {'orphan': True}))
             continue
-        mj['maps'].append({'id': 'xc%d' % mid, 'name': ('許昌·' if mid // 100 == 19 else '陳留·') + b['cn'], 'ox': ox, 'oy': oy, 'safe': mid not in FIELDS,
-                           'kind': 'field' if (mid in ROADS or mid in FIELDS) else 'house', 'orig': 'xc%d' % mid, 'cityOf': 'xuchang' if mid // 100 == 19 else 'chenliu',
+        mj['maps'].append({'id': 'xc%d' % mid, 'name': CITY_NAME[mid // 100] + '·' + b['cn'], 'ox': ox, 'oy': oy, 'safe': mid not in FIELDS,
+                           'kind': 'field' if (mid in ROADS or mid in FIELDS) else 'house', 'orig': 'xc%d' % mid, 'cityOf': CITY_SLUG[mid // 100],
                            'spawn': [sp[0], sp[1], sp[0], sp[1]]}
                   | ({'orphan': True} if (mid in nodoor or mid in FIELDS) else {}))     # orphan = 未知城內門，暫時去唔到
     tplids = ('xc1925', 'xc1929', 'xc1949')            # 1929/1949 係 v1 舊模板，一併清走

@@ -1270,10 +1270,266 @@
    "cityOf": "xuchang"
   },
   {
+   "id": "xc100",
+   "name": "襄平（原版）",
+   "ox": 271,
+   "oy": 6357,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc100",
+   "cityOf": "xiangping",
+   "spawn": [
+    5,
+    75,
+    5,
+    75
+   ]
+  },
+  {
+   "id": "xc200",
+   "name": "北平（原版）",
+   "ox": 0,
+   "oy": 6565,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc200",
+   "cityOf": "beiping",
+   "spawn": [
+    5,
+    75,
+    5,
+    75
+   ]
+  },
+  {
+   "id": "xc300",
+   "name": "薊（原版）",
+   "ox": 221,
+   "oy": 6565,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc300",
+   "cityOf": "ji",
+   "spawn": [
+    5,
+    75,
+    5,
+    75
+   ]
+  },
+  {
+   "id": "xc400",
+   "name": "北海（原版）",
+   "ox": 0,
+   "oy": 6736,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc400",
+   "cityOf": "beihai",
+   "spawn": [
+    5,
+    140,
+    5,
+    140
+   ]
+  },
+  {
+   "id": "xc500",
+   "name": "平原（原版）",
+   "ox": 0,
+   "oy": 1781,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc500",
+   "cityOf": "pingyuan",
+   "spawn": [
+    5,
+    170,
+    5,
+    170
+   ]
+  },
+  {
+   "id": "xc600",
+   "name": "南皮（原版）",
+   "ox": 0,
+   "oy": 1989,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc600",
+   "cityOf": "nanpi",
+   "spawn": [
+    5,
+    62,
+    5,
+    62
+   ]
+  },
+  {
+   "id": "xc700",
+   "name": "鄴（原版）",
+   "ox": 0,
+   "oy": 2197,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc700",
+   "cityOf": "ye",
+   "spawn": [
+    5,
+    176,
+    5,
+    176
+   ]
+  },
+  {
+   "id": "xc800",
+   "name": "盧江（原版）",
+   "ox": 0,
+   "oy": 2405,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc800",
+   "cityOf": "lujiang",
+   "spawn": [
+    5,
+    117,
+    5,
+    117
+   ]
+  },
+  {
+   "id": "xc900",
+   "name": "壽春（原版）",
+   "ox": 0,
+   "oy": 2613,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc900",
+   "cityOf": "shouchun",
+   "spawn": [
+    5,
+    177,
+    5,
+    177
+   ]
+  },
+  {
+   "id": "xc1000",
+   "name": "柴桑（原版）",
+   "ox": 0,
+   "oy": 2821,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc1000",
+   "cityOf": "chaisang",
+   "spawn": [
+    5,
+    116,
+    5,
+    116
+   ]
+  },
+  {
+   "id": "xc1100",
+   "name": "吳（原版）",
+   "ox": 0,
+   "oy": 3029,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc1100",
+   "cityOf": "wu",
+   "spawn": [
+    5,
+    178,
+    5,
+    178
+   ]
+  },
+  {
+   "id": "xc1200",
+   "name": "會稽（原版）",
+   "ox": 221,
+   "oy": 6736,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc1200",
+   "cityOf": "kuaiji",
+   "spawn": [
+    5,
+    34,
+    5,
+    34
+   ]
+  },
+  {
+   "id": "xc1300",
+   "name": "建業（原版）",
+   "ox": 0,
+   "oy": 3237,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc1300",
+   "cityOf": "jianye",
+   "spawn": [
+    5,
+    174,
+    5,
+    174
+   ]
+  },
+  {
+   "id": "xc1400",
+   "name": "小沛（原版）",
+   "ox": 0,
+   "oy": 6907,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc1400",
+   "cityOf": "xiaopei",
+   "spawn": [
+    5,
+    140,
+    5,
+    140
+   ]
+  },
+  {
+   "id": "xc1500",
+   "name": "下邳（原版）",
+   "ox": 0,
+   "oy": 3445,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc1500",
+   "cityOf": "xiapi",
+   "spawn": [
+    5,
+    153,
+    5,
+    153
+   ]
+  },
+  {
+   "id": "xc1600",
+   "name": "濮陽（原版）",
+   "ox": 221,
+   "oy": 6907,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc1600",
+   "cityOf": "puyang",
+   "spawn": [
+    5,
+    136,
+    5,
+    136
+   ]
+  },
+  {
    "id": "xc1700",
    "name": "陳留（原版）",
    "ox": 0,
-   "oy": 1781,
+   "oy": 3653,
    "safe": true,
    "kind": "field",
    "orig": "xc1700",
@@ -1786,14 +2042,30 @@
    ]
   },
   {
-   "id": "xc1851",
-   "name": "陳留·許昌洞穴一",
+   "id": "xc1800",
+   "name": "譙（原版）",
    "ox": 0,
-   "oy": 5238,
+   "oy": 3861,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc1800",
+   "cityOf": "qiao",
+   "spawn": [
+    5,
+    173,
+    5,
+    173
+   ]
+  },
+  {
+   "id": "xc1851",
+   "name": "譙·許昌洞穴一",
+   "ox": 221,
+   "oy": 10669,
    "safe": false,
    "kind": "field",
    "orig": "xc1851",
-   "cityOf": "chenliu",
+   "cityOf": "qiao",
    "spawn": [
     75,
     56,
@@ -1804,13 +2076,13 @@
   },
   {
    "id": "xc1852",
-   "name": "陳留·許昌洞穴二",
-   "ox": 171,
-   "oy": 5238,
+   "name": "譙·許昌洞穴二",
+   "ox": 0,
+   "oy": 10840,
    "safe": false,
    "kind": "field",
    "orig": "xc1852",
-   "cityOf": "chenliu",
+   "cityOf": "qiao",
    "spawn": [
     69,
     56,
@@ -1821,13 +2093,13 @@
   },
   {
    "id": "xc1853",
-   "name": "陳留·許昌洞穴三",
-   "ox": 342,
-   "oy": 5238,
+   "name": "譙·許昌洞穴三",
+   "ox": 171,
+   "oy": 10840,
    "safe": false,
    "kind": "field",
    "orig": "xc1853",
-   "cityOf": "chenliu",
+   "cityOf": "qiao",
    "spawn": [
     75,
     56,
@@ -1838,13 +2110,13 @@
   },
   {
    "id": "xc1854",
-   "name": "陳留·許昌洞穴四",
-   "ox": 0,
-   "oy": 5371,
+   "name": "譙·許昌洞穴四",
+   "ox": 342,
+   "oy": 10840,
    "safe": false,
    "kind": "field",
    "orig": "xc1854",
-   "cityOf": "chenliu",
+   "cityOf": "qiao",
    "spawn": [
     75,
     56,
@@ -1855,13 +2127,13 @@
   },
   {
    "id": "xc1855",
-   "name": "陳留·許昌洞穴五",
-   "ox": 171,
-   "oy": 5371,
+   "name": "譙·許昌洞穴五",
+   "ox": 0,
+   "oy": 10973,
    "safe": false,
    "kind": "field",
    "orig": "xc1855",
-   "cityOf": "chenliu",
+   "cityOf": "qiao",
    "spawn": [
     75,
     56,
@@ -2246,8 +2518,8 @@
   {
    "id": "xc1925",
    "name": "許昌·外圍25",
-   "ox": 271,
-   "oy": 1781,
+   "ox": 0,
+   "oy": 7078,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2356,10 +2628,266 @@
    ]
   },
   {
+   "id": "xc2000",
+   "name": "汝南（原版）",
+   "ox": 0,
+   "oy": 4069,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc2000",
+   "cityOf": "runan",
+   "spawn": [
+    5,
+    174,
+    5,
+    174
+   ]
+  },
+  {
+   "id": "xc2100",
+   "name": "江夏（原版）",
+   "ox": 0,
+   "oy": 4277,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc2100",
+   "cityOf": "jiangxia",
+   "spawn": [
+    5,
+    144,
+    5,
+    144
+   ]
+  },
+  {
+   "id": "xc2200",
+   "name": "長沙（原版）",
+   "ox": 0,
+   "oy": 4485,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc2200",
+   "cityOf": "changsha",
+   "spawn": [
+    5,
+    110,
+    5,
+    110
+   ]
+  },
+  {
+   "id": "xc2300",
+   "name": "桂陽（原版）",
+   "ox": 0,
+   "oy": 4693,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc2300",
+   "cityOf": "guiyang",
+   "spawn": [
+    5,
+    108,
+    5,
+    108
+   ]
+  },
+  {
+   "id": "xc2400",
+   "name": "河內（原版）",
+   "ox": 0,
+   "oy": 4901,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc2400",
+   "cityOf": "henei",
+   "spawn": [
+    5,
+    161,
+    5,
+    161
+   ]
+  },
+  {
+   "id": "xc2500",
+   "name": "晉陽（原版）",
+   "ox": 0,
+   "oy": 5109,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc2500",
+   "cityOf": "jinyang",
+   "spawn": [
+    5,
+    147,
+    5,
+    147
+   ]
+  },
+  {
+   "id": "xc2600",
+   "name": "洛陽（原版）",
+   "ox": 0,
+   "oy": 5317,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc2600",
+   "cityOf": "luoyang",
+   "spawn": [
+    5,
+    106,
+    5,
+    106
+   ]
+  },
+  {
+   "id": "xc2700",
+   "name": "新野（原版）",
+   "ox": 221,
+   "oy": 7078,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc2700",
+   "cityOf": "xinye",
+   "spawn": [
+    5,
+    5,
+    5,
+    5
+   ]
+  },
+  {
+   "id": "xc2800",
+   "name": "宛（原版）",
+   "ox": 0,
+   "oy": 5525,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc2800",
+   "cityOf": "wancheng",
+   "spawn": [
+    5,
+    42,
+    5,
+    42
+   ]
+  },
+  {
+   "id": "xc2900",
+   "name": "襄陽（原版）",
+   "ox": 0,
+   "oy": 5733,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc2900",
+   "cityOf": "xiangyang",
+   "spawn": [
+    5,
+    91,
+    5,
+    91
+   ]
+  },
+  {
+   "id": "xc3000",
+   "name": "江陵（原版）",
+   "ox": 0,
+   "oy": 5941,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc3000",
+   "cityOf": "jiangling",
+   "spawn": [
+    5,
+    178,
+    5,
+    178
+   ]
+  },
+  {
+   "id": "xc3100",
+   "name": "武陵（原版）",
+   "ox": 0,
+   "oy": 7249,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc3100",
+   "cityOf": "wuling",
+   "spawn": [
+    5,
+    35,
+    5,
+    35
+   ]
+  },
+  {
+   "id": "xc3200",
+   "name": "零陵（原版）",
+   "ox": 221,
+   "oy": 7249,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc3200",
+   "cityOf": "lingling",
+   "spawn": [
+    5,
+    142,
+    5,
+    142
+   ]
+  },
+  {
+   "id": "xc3300",
+   "name": "安定（原版）",
+   "ox": 0,
+   "oy": 7420,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc3300",
+   "cityOf": "anding",
+   "spawn": [
+    5,
+    141,
+    5,
+    141
+   ]
+  },
+  {
+   "id": "xc3400",
+   "name": "長安（原版）",
+   "ox": 0,
+   "oy": 6149,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc3400",
+   "cityOf": "changan",
+   "spawn": [
+    5,
+    84,
+    5,
+    84
+   ]
+  },
+  {
+   "id": "xc3500",
+   "name": "西涼（原版）",
+   "ox": 0,
+   "oy": 6357,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc3500",
+   "cityOf": "xiliang",
+   "spawn": [
+    5,
+    148,
+    5,
+    148
+   ]
+  },
+  {
    "id": "xc125",
    "name": "襄平·外圍25",
-   "ox": 0,
-   "oy": 1989,
+   "ox": 221,
+   "oy": 7420,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2373,8 +2901,8 @@
   {
    "id": "xc225",
    "name": "北平·外圍25",
-   "ox": 221,
-   "oy": 1989,
+   "ox": 0,
+   "oy": 7591,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2388,8 +2916,8 @@
   {
    "id": "xc325",
    "name": "薊·外圍25",
-   "ox": 0,
-   "oy": 2160,
+   "ox": 221,
+   "oy": 7591,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2403,8 +2931,8 @@
   {
    "id": "xc425",
    "name": "北海·外圍25",
-   "ox": 221,
-   "oy": 2160,
+   "ox": 0,
+   "oy": 7762,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2418,8 +2946,8 @@
   {
    "id": "xc525",
    "name": "平原·外圍25",
-   "ox": 0,
-   "oy": 2331,
+   "ox": 221,
+   "oy": 7762,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2433,8 +2961,8 @@
   {
    "id": "xc625",
    "name": "南皮·外圍25",
-   "ox": 221,
-   "oy": 2331,
+   "ox": 0,
+   "oy": 7933,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2448,8 +2976,8 @@
   {
    "id": "xc725",
    "name": "鄴·外圍25",
-   "ox": 0,
-   "oy": 2502,
+   "ox": 221,
+   "oy": 7933,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2463,8 +2991,8 @@
   {
    "id": "xc825",
    "name": "盧江·外圍25",
-   "ox": 221,
-   "oy": 2502,
+   "ox": 0,
+   "oy": 8104,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2478,8 +3006,8 @@
   {
    "id": "xc925",
    "name": "壽春·外圍25",
-   "ox": 0,
-   "oy": 2673,
+   "ox": 221,
+   "oy": 8104,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2493,8 +3021,8 @@
   {
    "id": "xc1025",
    "name": "柴桑·外圍25",
-   "ox": 221,
-   "oy": 2673,
+   "ox": 0,
+   "oy": 8275,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2508,8 +3036,8 @@
   {
    "id": "xc1125",
    "name": "吳·外圍25",
-   "ox": 0,
-   "oy": 2844,
+   "ox": 221,
+   "oy": 8275,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2523,8 +3051,8 @@
   {
    "id": "xc1225",
    "name": "會稽·外圍25",
-   "ox": 221,
-   "oy": 2844,
+   "ox": 0,
+   "oy": 8446,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2538,8 +3066,8 @@
   {
    "id": "xc1325",
    "name": "建業·外圍25",
-   "ox": 0,
-   "oy": 3015,
+   "ox": 221,
+   "oy": 8446,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2553,8 +3081,8 @@
   {
    "id": "xc1425",
    "name": "小沛·外圍25",
-   "ox": 221,
-   "oy": 3015,
+   "ox": 0,
+   "oy": 8617,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2568,8 +3096,8 @@
   {
    "id": "xc1525",
    "name": "下邳·外圍25",
-   "ox": 0,
-   "oy": 3186,
+   "ox": 221,
+   "oy": 8617,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2583,8 +3111,8 @@
   {
    "id": "xc1625",
    "name": "濮陽·外圍25",
-   "ox": 221,
-   "oy": 3186,
+   "ox": 0,
+   "oy": 8788,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2598,8 +3126,8 @@
   {
    "id": "xc1725",
    "name": "陳留·外圍25",
-   "ox": 0,
-   "oy": 3357,
+   "ox": 221,
+   "oy": 8788,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2613,8 +3141,8 @@
   {
    "id": "xc1825",
    "name": "譙·外圍25",
-   "ox": 221,
-   "oy": 3357,
+   "ox": 0,
+   "oy": 8959,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2628,8 +3156,8 @@
   {
    "id": "xc2025",
    "name": "汝南·外圍25",
-   "ox": 0,
-   "oy": 3528,
+   "ox": 221,
+   "oy": 8959,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2643,8 +3171,8 @@
   {
    "id": "xc2125",
    "name": "江夏·外圍25",
-   "ox": 221,
-   "oy": 3528,
+   "ox": 0,
+   "oy": 9130,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2658,8 +3186,8 @@
   {
    "id": "xc2225",
    "name": "長沙·外圍25",
-   "ox": 0,
-   "oy": 3699,
+   "ox": 221,
+   "oy": 9130,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2673,8 +3201,8 @@
   {
    "id": "xc2325",
    "name": "桂陽·外圍25",
-   "ox": 221,
-   "oy": 3699,
+   "ox": 0,
+   "oy": 9301,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2688,8 +3216,8 @@
   {
    "id": "xc2425",
    "name": "河內·外圍25",
-   "ox": 0,
-   "oy": 3870,
+   "ox": 221,
+   "oy": 9301,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2703,8 +3231,8 @@
   {
    "id": "xc2525",
    "name": "晉陽·外圍25",
-   "ox": 221,
-   "oy": 3870,
+   "ox": 0,
+   "oy": 9472,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2718,8 +3246,8 @@
   {
    "id": "xc2625",
    "name": "洛陽·外圍25",
-   "ox": 0,
-   "oy": 4041,
+   "ox": 221,
+   "oy": 9472,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2733,8 +3261,8 @@
   {
    "id": "xc2725",
    "name": "新野·外圍25",
-   "ox": 221,
-   "oy": 4041,
+   "ox": 0,
+   "oy": 9643,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2748,8 +3276,8 @@
   {
    "id": "xc2825",
    "name": "宛·外圍25",
-   "ox": 0,
-   "oy": 4212,
+   "ox": 221,
+   "oy": 9643,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2763,8 +3291,8 @@
   {
    "id": "xc2925",
    "name": "襄陽·外圍25",
-   "ox": 221,
-   "oy": 4212,
+   "ox": 0,
+   "oy": 9814,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2778,8 +3306,8 @@
   {
    "id": "xc3025",
    "name": "江陵·外圍25",
-   "ox": 0,
-   "oy": 4383,
+   "ox": 221,
+   "oy": 9814,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2793,8 +3321,8 @@
   {
    "id": "xc3125",
    "name": "武陵·外圍25",
-   "ox": 221,
-   "oy": 4383,
+   "ox": 0,
+   "oy": 9985,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2808,8 +3336,8 @@
   {
    "id": "xc3225",
    "name": "零陵·外圍25",
-   "ox": 0,
-   "oy": 4554,
+   "ox": 221,
+   "oy": 9985,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2823,8 +3351,8 @@
   {
    "id": "xc3325",
    "name": "安定·外圍25",
-   "ox": 221,
-   "oy": 4554,
+   "ox": 0,
+   "oy": 10156,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2838,8 +3366,8 @@
   {
    "id": "xc3425",
    "name": "長安·外圍25",
-   "ox": 0,
-   "oy": 4725,
+   "ox": 221,
+   "oy": 10156,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2853,8 +3381,8 @@
   {
    "id": "xc3525",
    "name": "西涼·外圍25",
-   "ox": 221,
-   "oy": 4725,
+   "ox": 0,
+   "oy": 10327,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2868,8 +3396,8 @@
   {
    "id": "xc3625",
    "name": "天水·外圍25",
-   "ox": 0,
-   "oy": 4896,
+   "ox": 221,
+   "oy": 10327,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2883,8 +3411,8 @@
   {
    "id": "xc3725",
    "name": "漢中·外圍25",
-   "ox": 221,
-   "oy": 4896,
+   "ox": 0,
+   "oy": 10498,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2898,8 +3426,8 @@
   {
    "id": "xc3825",
    "name": "武都·外圍25",
-   "ox": 0,
-   "oy": 5067,
+   "ox": 221,
+   "oy": 10498,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2913,8 +3441,8 @@
   {
    "id": "xc3925",
    "name": "梓潼·外圍25",
-   "ox": 221,
-   "oy": 5067,
+   "ox": 0,
+   "oy": 10669,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -8028,6 +8556,614 @@
    "auto": true
   },
   {
+   "id": "xc_gate_1_o",
+   "name": "入襄平城",
+   "map": "xc125",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_1",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_1",
+   "name": "出城",
+   "map": "xc100",
+   "x": 1,
+   "y": 75,
+   "rect": [
+    0,
+    71,
+    3,
+    79
+   ],
+   "land": [
+    5,
+    75
+   ],
+   "to": "xc_gate_1_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_2_o",
+   "name": "入北平城",
+   "map": "xc225",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_2",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_2",
+   "name": "出城",
+   "map": "xc200",
+   "x": 1,
+   "y": 75,
+   "rect": [
+    0,
+    71,
+    3,
+    79
+   ],
+   "land": [
+    5,
+    75
+   ],
+   "to": "xc_gate_2_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_3_o",
+   "name": "入薊城",
+   "map": "xc325",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_3",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_3",
+   "name": "出城",
+   "map": "xc300",
+   "x": 1,
+   "y": 75,
+   "rect": [
+    0,
+    71,
+    3,
+    79
+   ],
+   "land": [
+    5,
+    75
+   ],
+   "to": "xc_gate_3_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_4_o",
+   "name": "入北海城",
+   "map": "xc425",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_4",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_4",
+   "name": "出城",
+   "map": "xc400",
+   "x": 1,
+   "y": 140,
+   "rect": [
+    0,
+    136,
+    3,
+    144
+   ],
+   "land": [
+    5,
+    140
+   ],
+   "to": "xc_gate_4_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_5_o",
+   "name": "入平原城",
+   "map": "xc525",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_5",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_5",
+   "name": "出城",
+   "map": "xc500",
+   "x": 1,
+   "y": 170,
+   "rect": [
+    0,
+    166,
+    3,
+    174
+   ],
+   "land": [
+    5,
+    170
+   ],
+   "to": "xc_gate_5_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_6_o",
+   "name": "入南皮城",
+   "map": "xc625",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_6",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_6",
+   "name": "出城",
+   "map": "xc600",
+   "x": 1,
+   "y": 62,
+   "rect": [
+    0,
+    58,
+    3,
+    66
+   ],
+   "land": [
+    5,
+    62
+   ],
+   "to": "xc_gate_6_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_7_o",
+   "name": "入鄴城",
+   "map": "xc725",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_7",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_7",
+   "name": "出城",
+   "map": "xc700",
+   "x": 1,
+   "y": 176,
+   "rect": [
+    0,
+    172,
+    3,
+    180
+   ],
+   "land": [
+    5,
+    176
+   ],
+   "to": "xc_gate_7_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_8_o",
+   "name": "入盧江城",
+   "map": "xc825",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_8",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_8",
+   "name": "出城",
+   "map": "xc800",
+   "x": 1,
+   "y": 117,
+   "rect": [
+    0,
+    113,
+    3,
+    121
+   ],
+   "land": [
+    5,
+    117
+   ],
+   "to": "xc_gate_8_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_9_o",
+   "name": "入壽春城",
+   "map": "xc925",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_9",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_9",
+   "name": "出城",
+   "map": "xc900",
+   "x": 1,
+   "y": 177,
+   "rect": [
+    0,
+    173,
+    3,
+    181
+   ],
+   "land": [
+    5,
+    177
+   ],
+   "to": "xc_gate_9_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_10_o",
+   "name": "入柴桑城",
+   "map": "xc1025",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_10",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_10",
+   "name": "出城",
+   "map": "xc1000",
+   "x": 1,
+   "y": 116,
+   "rect": [
+    0,
+    112,
+    3,
+    120
+   ],
+   "land": [
+    5,
+    116
+   ],
+   "to": "xc_gate_10_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_11_o",
+   "name": "入吳城",
+   "map": "xc1125",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_11",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_11",
+   "name": "出城",
+   "map": "xc1100",
+   "x": 1,
+   "y": 178,
+   "rect": [
+    0,
+    174,
+    3,
+    182
+   ],
+   "land": [
+    5,
+    178
+   ],
+   "to": "xc_gate_11_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_12_o",
+   "name": "入會稽城",
+   "map": "xc1225",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_12",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_12",
+   "name": "出城",
+   "map": "xc1200",
+   "x": 1,
+   "y": 34,
+   "rect": [
+    0,
+    31,
+    3,
+    37
+   ],
+   "land": [
+    5,
+    34
+   ],
+   "to": "xc_gate_12_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_13_o",
+   "name": "入建業城",
+   "map": "xc1325",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_13",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_13",
+   "name": "出城",
+   "map": "xc1300",
+   "x": 1,
+   "y": 174,
+   "rect": [
+    0,
+    170,
+    3,
+    178
+   ],
+   "land": [
+    5,
+    174
+   ],
+   "to": "xc_gate_13_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_14_o",
+   "name": "入小沛城",
+   "map": "xc1425",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_14",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_14",
+   "name": "出城",
+   "map": "xc1400",
+   "x": 1,
+   "y": 140,
+   "rect": [
+    0,
+    136,
+    3,
+    144
+   ],
+   "land": [
+    5,
+    140
+   ],
+   "to": "xc_gate_14_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_15_o",
+   "name": "入下邳城",
+   "map": "xc1525",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_15",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_15",
+   "name": "出城",
+   "map": "xc1500",
+   "x": 1,
+   "y": 153,
+   "rect": [
+    0,
+    149,
+    3,
+    157
+   ],
+   "land": [
+    5,
+    153
+   ],
+   "to": "xc_gate_15_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_16_o",
+   "name": "入濮陽城",
+   "map": "xc1625",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_16",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_16",
+   "name": "出城",
+   "map": "xc1600",
+   "x": 1,
+   "y": 136,
+   "rect": [
+    0,
+    132,
+    3,
+    140
+   ],
+   "land": [
+    5,
+    136
+   ],
+   "to": "xc_gate_16_o",
+   "auto": true
+  },
+  {
    "id": "xc_gate_17_o",
    "name": "入陳留城",
    "map": "xc1725",
@@ -8066,6 +9202,44 @@
    "auto": true
   },
   {
+   "id": "xc_gate_18_o",
+   "name": "入譙城",
+   "map": "xc1825",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_18",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_18",
+   "name": "出城",
+   "map": "xc1800",
+   "x": 1,
+   "y": 173,
+   "rect": [
+    0,
+    169,
+    3,
+    177
+   ],
+   "land": [
+    5,
+    173
+   ],
+   "to": "xc_gate_18_o",
+   "auto": true
+  },
+  {
    "id": "xc_gate_w_o",
    "name": "入許昌城",
    "map": "xc1925",
@@ -8101,6 +9275,614 @@
     157
    ],
    "to": "xc_gate_w_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_20_o",
+   "name": "入汝南城",
+   "map": "xc2025",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_20",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_20",
+   "name": "出城",
+   "map": "xc2000",
+   "x": 1,
+   "y": 174,
+   "rect": [
+    0,
+    170,
+    3,
+    178
+   ],
+   "land": [
+    5,
+    174
+   ],
+   "to": "xc_gate_20_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_21_o",
+   "name": "入江夏城",
+   "map": "xc2125",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_21",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_21",
+   "name": "出城",
+   "map": "xc2100",
+   "x": 1,
+   "y": 144,
+   "rect": [
+    0,
+    140,
+    3,
+    148
+   ],
+   "land": [
+    5,
+    144
+   ],
+   "to": "xc_gate_21_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_22_o",
+   "name": "入長沙城",
+   "map": "xc2225",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_22",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_22",
+   "name": "出城",
+   "map": "xc2200",
+   "x": 1,
+   "y": 110,
+   "rect": [
+    0,
+    106,
+    3,
+    114
+   ],
+   "land": [
+    5,
+    110
+   ],
+   "to": "xc_gate_22_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_23_o",
+   "name": "入桂陽城",
+   "map": "xc2325",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_23",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_23",
+   "name": "出城",
+   "map": "xc2300",
+   "x": 1,
+   "y": 108,
+   "rect": [
+    0,
+    104,
+    3,
+    112
+   ],
+   "land": [
+    5,
+    108
+   ],
+   "to": "xc_gate_23_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_24_o",
+   "name": "入河內城",
+   "map": "xc2425",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_24",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_24",
+   "name": "出城",
+   "map": "xc2400",
+   "x": 1,
+   "y": 161,
+   "rect": [
+    0,
+    157,
+    3,
+    165
+   ],
+   "land": [
+    5,
+    161
+   ],
+   "to": "xc_gate_24_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_25_o",
+   "name": "入晉陽城",
+   "map": "xc2525",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_25",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_25",
+   "name": "出城",
+   "map": "xc2500",
+   "x": 1,
+   "y": 147,
+   "rect": [
+    0,
+    143,
+    3,
+    151
+   ],
+   "land": [
+    5,
+    147
+   ],
+   "to": "xc_gate_25_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_26_o",
+   "name": "入洛陽城",
+   "map": "xc2625",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_26",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_26",
+   "name": "出城",
+   "map": "xc2600",
+   "x": 1,
+   "y": 106,
+   "rect": [
+    0,
+    103,
+    3,
+    109
+   ],
+   "land": [
+    5,
+    106
+   ],
+   "to": "xc_gate_26_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_27_o",
+   "name": "入新野城",
+   "map": "xc2725",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_27",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_27",
+   "name": "出城",
+   "map": "xc2700",
+   "x": 1,
+   "y": 5,
+   "rect": [
+    0,
+    1,
+    3,
+    9
+   ],
+   "land": [
+    5,
+    5
+   ],
+   "to": "xc_gate_27_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_28_o",
+   "name": "入宛城",
+   "map": "xc2825",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_28",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_28",
+   "name": "出城",
+   "map": "xc2800",
+   "x": 1,
+   "y": 42,
+   "rect": [
+    0,
+    38,
+    3,
+    46
+   ],
+   "land": [
+    5,
+    42
+   ],
+   "to": "xc_gate_28_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_29_o",
+   "name": "入襄陽城",
+   "map": "xc2925",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_29",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_29",
+   "name": "出城",
+   "map": "xc2900",
+   "x": 1,
+   "y": 91,
+   "rect": [
+    0,
+    87,
+    3,
+    95
+   ],
+   "land": [
+    5,
+    91
+   ],
+   "to": "xc_gate_29_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_30_o",
+   "name": "入江陵城",
+   "map": "xc3025",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_30",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_30",
+   "name": "出城",
+   "map": "xc3000",
+   "x": 1,
+   "y": 178,
+   "rect": [
+    0,
+    174,
+    3,
+    182
+   ],
+   "land": [
+    5,
+    178
+   ],
+   "to": "xc_gate_30_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_31_o",
+   "name": "入武陵城",
+   "map": "xc3125",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_31",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_31",
+   "name": "出城",
+   "map": "xc3100",
+   "x": 1,
+   "y": 35,
+   "rect": [
+    0,
+    31,
+    3,
+    39
+   ],
+   "land": [
+    5,
+    35
+   ],
+   "to": "xc_gate_31_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_32_o",
+   "name": "入零陵城",
+   "map": "xc3225",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_32",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_32",
+   "name": "出城",
+   "map": "xc3200",
+   "x": 1,
+   "y": 142,
+   "rect": [
+    0,
+    138,
+    3,
+    146
+   ],
+   "land": [
+    5,
+    142
+   ],
+   "to": "xc_gate_32_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_33_o",
+   "name": "入安定城",
+   "map": "xc3325",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_33",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_33",
+   "name": "出城",
+   "map": "xc3300",
+   "x": 1,
+   "y": 141,
+   "rect": [
+    0,
+    137,
+    3,
+    145
+   ],
+   "land": [
+    5,
+    141
+   ],
+   "to": "xc_gate_33_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_34_o",
+   "name": "入長安城",
+   "map": "xc3425",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_34",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_34",
+   "name": "出城",
+   "map": "xc3400",
+   "x": 1,
+   "y": 84,
+   "rect": [
+    0,
+    80,
+    3,
+    88
+   ],
+   "land": [
+    5,
+    84
+   ],
+   "to": "xc_gate_34_o",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_35_o",
+   "name": "入西涼城",
+   "map": "xc3525",
+   "x": 87,
+   "y": 90,
+   "rect": [
+    84,
+    89,
+    91,
+    92
+   ],
+   "land": [
+    80,
+    94
+   ],
+   "to": "xc_gate_35",
+   "auto": true
+  },
+  {
+   "id": "xc_gate_35",
+   "name": "出城",
+   "map": "xc3500",
+   "x": 1,
+   "y": 148,
+   "rect": [
+    0,
+    144,
+    3,
+    152
+   ],
+   "land": [
+    5,
+    148
+   ],
+   "to": "xc_gate_35_o",
    "auto": true
   }
  ]
