@@ -633,7 +633,7 @@ func _think_beast(e: Dictionary) -> void:
 func _beast_target_def(t: Dictionary) -> float:
 	var base: float
 	if t.get("kind", "") == "mob":
-		base = float(data.mob_def(int(t["mob"]["def"]))["def"])
+		base = float(data.mob_def(int(t["mob"]["def"]), int(t["mob"].get("lv", 0)))["def"])
 	else:
 		base = float(RulesCombat.player_def(int(t.get("level", 1))))
 	return RulesCombat.debuffed(base, t.get("beastDebuff", {}), "def", tick)

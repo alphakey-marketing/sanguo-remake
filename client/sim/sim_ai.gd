@@ -4,7 +4,7 @@ extends "res://sim/sim_skill.gd"
 # 怪物 AI: 遊蕩 / 仇恨追擊 / 脫戰回歸 / 術法吟唱 (Step 9) / 逃跑 (Step 11)
 func _think_mob(m: Dictionary) -> void:
 	var s: Dictionary = m["mob"]
-	var d: Dictionary = data.mob_def(int(s["def"]))
+	var d: Dictionary = data.mob_def(int(s["def"]), int(s.get("lv", 0)))
 	var tgt := ent(int(s["target"]))
 	# 術法怪吟唱中: 停低，tick 到生效；受擊中斷喺 damage() 處理
 	if m.has("casting"):
@@ -207,7 +207,7 @@ func _think_player(p: Dictionary) -> void:
 	var t_def := 0.0
 	var t_elem := "none"
 	if not tm.is_empty():
-		var mdef := data.mob_def(int(t["mob"]["def"]))
+		var mdef := data.mob_def(int(t["mob"]["def"]), int(t["mob"].get("lv", 0)))
 		t_def = float(mdef["def"])
 		t_elem = str(mdef.get("element", "none"))
 	else:

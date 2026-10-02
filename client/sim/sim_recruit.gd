@@ -977,7 +977,7 @@ func _down_bailout() -> void:
 
 # 同伴殺怪: 掉落/金/善惡歸主公，經驗按隊伍經驗池分 (S02b, 同伴有自己 exp/level)；殺善怪 → 義理/治國同伴忠誠跌
 func _kill_mob(m: Dictionary, by: Dictionary, exp_mult: float = 1.0) -> void:
-	var d := data.mob_def(int(m["mob"]["def"]))
+	var d := data.mob_def(int(m["mob"]["def"]), int(m["mob"].get("lv", 0)))
 	var killer := by
 	if by.get("kind", "") == "gen":
 		var o := ent(int(by["gen"]["owner"]))
@@ -1163,7 +1163,7 @@ func _comp_skill(c: Dictionary, t: Dictionary) -> void:
 		var eff_str := _eff_attr(ch, "str") + float(_jewel_bonus(ch).get("strFlat", 0))
 		_emit({"k": "comp_skill", "src": int(c["id"]), "dst": owner, "skill": "ult", "name": String(uc["name"]), "sp": sp_need})
 		for o in targets:
-			var mdef: Dictionary = data.mob_def(int(o["mob"]["def"]))
+			var mdef: Dictionary = data.mob_def(int(o["mob"]["def"]), int(o["mob"].get("lv", 0)))
 			var dmg := MathX.js_round(RulesCombat.calc_damage(eff_str, wdef["power"], mdef["def"], rng_fn, atk_mult, 1.0) * float(uc["mult"]))
 			_emit({"k": "ult_hit", "src": int(c["id"]), "dst": o["id"], "dmg": dmg, "ult": "gen"})
 			damage(o, dmg, c)
@@ -1171,7 +1171,7 @@ func _comp_skill(c: Dictionary, t: Dictionary) -> void:
 		ch["mp"] = int(ch["mp"]) - mp_need
 		gn["skillCd"] = tick + int(sc["cd"])
 		var sp := _comp_spell(c)
-		var mdef2: Dictionary = data.mob_def(int(t["mob"]["def"]))
+		var mdef2: Dictionary = data.mob_def(int(t["mob"]["def"]), int(t["mob"].get("lv", 0)))
 		var power := RulesGeneral.spell_power(lv, sc) * (1.0 + float(_jewel_bonus(ch).get("spellAtkPct", 0.0)))
 		var dmg2 := RulesSpell.calc_spell_damage(power, _eff_attr(ch, "int"), float(mdef2.get("spellDef", 0)),
 			String(sp["elem"]), str(mdef2.get("element", "none")), 0.0, rng_fn)

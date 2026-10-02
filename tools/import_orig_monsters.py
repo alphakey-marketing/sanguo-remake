@@ -73,6 +73,7 @@ def gen_spawns(mons, rows):
     import re
     by = {}
     for m in mons: by.setdefault(m['name'].rstrip('0123456789'), m['id'])
+    lvl = {m['id']: m['level'] for m in mons}
     mj = json.load(open(os.path.join(ROOT, 'client/data/maps.json'), encoding='utf8'))['maps']
     ids = {m['id'] for m in mj}; out = []
     def dims(mid):
@@ -82,12 +83,13 @@ def gen_spawns(mons, rows):
         if z not in ids: continue
         n = 4 if dims(z) >= 300 else 3
         for nm in names:
-            if nm in by: out.append({'zone': z, 'monster': by[nm], 'count': n, 'respawnTicks': 300, 'orig': True})
+            if nm in by: out.append({'zone': z, 'monster': by[nm], 'count': n, 'respawnTicks': 300, 'orig': True, 'lv': cave_level(mid // 100, mid % 100 - 50)})   # 每層一個等級 (spawn 級別覆蓋)
     for c in range(1, 40):
         z = 'xc%d25' % c
         if z not in ids: continue
         reg = next((k for k, v in REGION.items() if c in v), '兗徐')
+        lo, hi = (10, 20) if reg == '兗徐' else (1, 10)                    # 攻略外圍等級帶
         for nm in WILD[reg].split():
-            if nm in by: out.append({'zone': z, 'monster': by[nm], 'count': 1, 'respawnTicks': 300, 'orig': True})
+            if nm in by: out.append({'zone': z, 'monster': by[nm], 'count': 1, 'respawnTicks': 300, 'orig': True, 'lv': min(hi, max(lo, lvl[by[nm]]))})
     return out
 if __name__ == '__main__': main('--check' in sys.argv)

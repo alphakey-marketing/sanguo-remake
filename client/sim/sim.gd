@@ -159,7 +159,7 @@ func _sync_night_spawns() -> void:
 	if not bool(_clock()["is_night"]):
 		var gone: Array = []
 		for e in ents.values():
-			if e["kind"] == "mob" and data.mob_def(int(e["mob"]["def"])).get("night", false):
+			if e["kind"] == "mob" and data.mob_def(int(e["mob"]["def"]), int(e["mob"].get("lv", 0))).get("night", false):
 				gone.append(int(e["id"]))
 		_remove_ents(gone)
 		return

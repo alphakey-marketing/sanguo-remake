@@ -30,7 +30,7 @@ static func player_spell_def(lv: int, spi: int) -> int:
 
 # 升到下一級所需經驗
 static func exp_to_next(lv: int) -> int:
-	return MathX.js_round(20.0 * pow(lv, 1.8))
+	return ExpTable.need(lv)             # 用家提供升級表 (rules/exp_table.gd)
 
 
 # 基礎屬性 (建角用) + 自動派點後嘅預期屬性 (UI 預覽用)

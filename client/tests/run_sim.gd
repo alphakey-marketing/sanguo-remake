@@ -534,7 +534,7 @@ func t_attr_points(data: GameData) -> void:
 	var sim := Sim.new(data, 21)
 	var id := sim.spawn_player("t")
 	var ch := sim.player_ch()
-	RulesStats.gain_exp(data, ch, 100)               # Lv1 exp100 -> Lv3, 兩級
+	RulesStats.gain_exp(data, ch, 35)                # Lv1 exp35 -> Lv3, 兩級 (10+20)
 	check(int(ch["attrPoints"]) == 6, "升級: 每級 +3 點 (升兩級 = 6 點)")
 	# attrs 唔再自動加，除非分配
 	check(int(ch["attrs"]["str"]) == 12, "升級: 唔自動加 str (等玩家分配)")

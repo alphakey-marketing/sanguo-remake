@@ -517,7 +517,7 @@ func _mount_skill_hit(e: Dictionary, ch: Dictionary, s: Dictionary, target: int)
 				targets.append(o)
 	var hits := int(s["hits"]) if String(s["kind"]) == "combo" else 1
 	for o in targets:
-		var mdef: Dictionary = data.mob_def(int(o["mob"]["def"]))
+		var mdef: Dictionary = data.mob_def(int(o["mob"]["def"]), int(o["mob"].get("lv", 0)))
 		var elem_mult := _phys_elem_mult(ch, str(mdef.get("element", "none")))
 		var dmg0 := RulesCombat.calc_damage(eff_str, wdef["power"], mdef["def"], rng_fn, atk_mult, 1.0)
 		var dmg := MathX.js_round(dmg0 * float(s["mult"]) * elem_mult)

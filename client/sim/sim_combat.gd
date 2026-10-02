@@ -20,7 +20,7 @@ func damage(t: Dictionary, dmg: int, by: Dictionary) -> void:
 	if t["kind"] == "mob" and by.has("ch"):
 		t["mob"]["state"] = "chase"
 		t["mob"]["target"] = by["id"]
-		var md: Dictionary = data.mob_def(int(t["mob"]["def"]))
+		var md: Dictionary = data.mob_def(int(t["mob"]["def"]), int(t["mob"].get("lv", 0)))
 		# 群居怪【自訂】(spec 04 §3): 打 1 隻，附近 GROUP_RANGE 格內同類一齊仇恨
 		if dmg > 0 and bool(md.get("groups", false)):
 			for o in ents.values():
@@ -64,7 +64,7 @@ func damage(t: Dictionary, dmg: int, by: Dictionary) -> void:
 
 # exp_mult: 同伴代打 → 主公分經驗 (Step 13.5)
 func _kill_mob(m: Dictionary, by: Dictionary, exp_mult: float = 1.0) -> void:
-	var d: Dictionary = data.mob_def(int(m["mob"]["def"]))
+	var d: Dictionary = data.mob_def(int(m["mob"]["def"]), int(m["mob"].get("lv", 0)))
 	# 任務 boss (PK 戰, Step 10): 唔掉落/唔重生，轉交 quest 推進
 	var quest_boss := str(m.get("mob", {}).get("quest_boss", ""))
 	if quest_boss != "":

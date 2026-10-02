@@ -188,7 +188,7 @@ func _spell_hit(p: Dictionary, def: Dictionary, t: Dictionary) -> void:
 	else:
 		targets.append(t)
 	for o in targets:
-		var mdef: Dictionary = data.mob_def(int(o["mob"]["def"]))
+		var mdef: Dictionary = data.mob_def(int(o["mob"]["def"]), int(o["mob"].get("lv", 0)))
 		var dmg := RulesSpell.calc_spell_damage(float(def["power"]) * spell_atk_mult, attr,
 			float(mdef.get("spellDef", 0)), str(def["elem"]), str(mdef.get("element", "none")), jewel_pct, rng_fn)
 		_emit({"k": "spell_hit", "src": p["id"], "dst": o["id"], "dmg": dmg, "elem": str(def["elem"])})
@@ -244,7 +244,7 @@ func cmd_use_ultimate(id: int, ult_id: String) -> void:
 	_emit({"k": "ult", "src": id, "ult": ult_id, "name": str(ult["name"]), "mp": mp_cost, "sp": sp_cost})
 	_msg(id, "「%s」！" % ult["name"])
 	for o in targets:
-		var mdef: Dictionary = data.mob_def(int(o["mob"]["def"]))
+		var mdef: Dictionary = data.mob_def(int(o["mob"]["def"]), int(o["mob"].get("lv", 0)))
 		var elem_mult := _phys_elem_mult(ch, str(mdef.get("element", "none")))
 		var dmg0 := RulesCombat.calc_damage(eff_str, wdef["power"], mdef["def"], rng_fn, atk_mult, 1.0)
 		var dmg := MathX.js_round(dmg0 * float(ult["mult"]) * elem_mult)
@@ -440,7 +440,7 @@ func _try_toushi(id: int) -> void:
 		"hp": int(best.get("hp", 0)), "maxHp": int(best.get("max_hp", 0)),
 		"mp": 0, "maxMp": 0, "elem": "none", "weakness": ""}
 	if k == "mob":
-		var mdef: Dictionary = data.mob_def(int(best["mob"]["def"]))
+		var mdef: Dictionary = data.mob_def(int(best["mob"]["def"]), int(best["mob"].get("lv", 0)))
 		info["elem"] = str(mdef.get("element", "none"))
 	else:
 		# 居民/NPC: 有 ch 先顯示藝/靈力 (bot 無 ch)

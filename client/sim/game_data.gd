@@ -78,6 +78,8 @@ var generals_t1: Array = []       # Tier1 城內常駐 (已轉全域座標)
 var recruit_cfg: Dictionary = {}  # generals.json cfg
 var general_skill_names: Dictionary = {}  # skill id(String) -> 名
 var quiz_generals: Array = []     # 文官問答題庫 (data/quiz_generals.json) [{q, opts[4], a}]
+var mob_curve: Dictionary = {}    # data/mob_curve.json (怪物數值曲線)
+var _lv_defs: Dictionary = {}     # spawn 級別覆蓋 def 快取
 var _arena_defs: Dictionary = {}  # 擂台臨時怪 def 快取 (mob_def 用)
 var gen2_cfg: Dictionary = {}     # 登用 v2 (data/general_skills.json cfg, Step 15)
 var gen_skills: Array = []        # 70 項特技
@@ -112,6 +114,7 @@ static func load_all() -> GameData:
 	var m: Dictionary = _read("res://data/monsters.json")
 	var sh: Dictionary = _read("res://data/shops.json")
 	var items: Array = _read("res://data/items.json")
+	g.mob_curve = _read("res://data/mob_curve.json")
 	g.world = _read("res://data/world.json")
 	g.facilities = _read("res://data/facilities.json")
 	g._load_maps(_read("res://data/maps.json"))
@@ -387,9 +390,16 @@ func _place_all() -> void:
 
 
 # 怪物 def: monsters.json；擂台臨時怪 (id ≥ ARENA_DEF_BASE) 由武將資料即時生成 (Step 13.5)
-func mob_def(def_id: int) -> Dictionary:
+# lv > 0 且同基準等級唔同 = spawn 級別覆蓋：hp/atk/def/exp/gold 按等級比例縮放 (有快取)
+func mob_def(def_id: int, lv: int = 0) -> Dictionary:
 	if monsters.has(def_id):
-		return monsters[def_id]
+		var b: Dictionary = monsters[def_id]
+		if lv <= 0 or lv == int(b["level"]):
+			return b
+		var key := def_id * 1000 + lv
+		if not _lv_defs.has(key):
+			_lv_defs[key] = RulesMobScale.scaled(b, lv, mob_curve)
+		return _lv_defs[key]
 	if not _arena_defs.has(def_id):
 		var g: Dictionary = general_by_id.get(def_id - RulesRecruit.ARENA_DEF_BASE, {})
 		if g.is_empty():

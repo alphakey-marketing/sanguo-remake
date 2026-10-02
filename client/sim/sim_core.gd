@@ -847,7 +847,12 @@ func _expire_drops() -> void:
 
 
 func _spawn_mob(def_id: int, zone_id: String = DEFAULT_ZONE) -> Variant:
-	var d: Dictionary = data.mob_def(def_id)
+	var lv := 0                           # spawn 可選 lv = 呢個地圖嘅等級覆蓋
+	for sp0 in data.spawns:
+		if int(sp0["monster"]) == def_id and String(sp0.get("zone", DEFAULT_ZONE)) == zone_id:
+			lv = int(sp0.get("lv", 0))
+			break
+	var d: Dictionary = data.mob_def(def_id, lv)
 	if d.get("night", false) and not _clock().is_night:
 		return null                     # 夜怪白天唔生
 	var z := zone_by_id(zone_id)
@@ -864,7 +869,7 @@ func _spawn_mob(def_id: int, zone_id: String = DEFAULT_ZONE) -> Variant:
 	e["hp"] = int(d["hp"])
 	e["max_hp"] = int(d["hp"])
 	e["level"] = int(d["level"])
-	e["mob"] = {"def": def_id, "home_x": p.x, "home_y": p.y, "state": "wander", "target": 0, "next_atk": 0, "zone": zone_id}
+	e["mob"] = {"def": def_id, "home_x": p.x, "home_y": p.y, "state": "wander", "target": 0, "next_atk": 0, "zone": zone_id, "lv": lv}
 	return e
 
 
