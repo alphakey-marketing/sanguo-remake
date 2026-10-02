@@ -15866,6 +15866,4129 @@
     37,
     21
    ]
+  },
+  {
+   "zone": "xc3251",
+   "monster": 70000,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3251",
+   "monster": 70005,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3251",
+   "monster": 70011,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3251",
+   "monster": 1015,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3252",
+   "monster": 70000,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3252",
+   "monster": 70005,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3252",
+   "monster": 70011,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3252",
+   "monster": 1015,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3253",
+   "monster": 70000,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3253",
+   "monster": 70005,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3253",
+   "monster": 70011,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3253",
+   "monster": 1015,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3254",
+   "monster": 70011,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2751",
+   "monster": 70004,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2751",
+   "monster": 21012,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2751",
+   "monster": 70030,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2752",
+   "monster": 70028,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2752",
+   "monster": 70016,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2752",
+   "monster": 70034,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2753",
+   "monster": 70006,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2753",
+   "monster": 70020,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2754",
+   "monster": 70033,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2754",
+   "monster": 70021,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2755",
+   "monster": 70022,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2451",
+   "monster": 27050,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2451",
+   "monster": 27047,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2451",
+   "monster": 27046,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2451",
+   "monster": 27048,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2451",
+   "monster": 27049,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2452",
+   "monster": 27047,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2452",
+   "monster": 27046,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2452",
+   "monster": 27048,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2452",
+   "monster": 27049,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2453",
+   "monster": 27047,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2453",
+   "monster": 27046,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2453",
+   "monster": 27048,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2453",
+   "monster": 27049,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2454",
+   "monster": 27047,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2454",
+   "monster": 27046,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2454",
+   "monster": 27048,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2454",
+   "monster": 27049,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2455",
+   "monster": 1030,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1155",
+   "monster": 27170,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2251",
+   "monster": 70035,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2252",
+   "monster": 70035,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2253",
+   "monster": 70035,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2254",
+   "monster": 70035,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2255",
+   "monster": 70035,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3051",
+   "monster": 27079,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3051",
+   "monster": 27075,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3051",
+   "monster": 27080,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3051",
+   "monster": 1054,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3051",
+   "monster": 27070,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3052",
+   "monster": 27078,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3052",
+   "monster": 27074,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3052",
+   "monster": 27080,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3052",
+   "monster": 1054,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3052",
+   "monster": 27070,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3053",
+   "monster": 26007,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3053",
+   "monster": 27077,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3053",
+   "monster": 27080,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3053",
+   "monster": 1054,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3053",
+   "monster": 27070,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3054",
+   "monster": 27072,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3054",
+   "monster": 27076,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3054",
+   "monster": 27080,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3054",
+   "monster": 1054,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3054",
+   "monster": 27070,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3055",
+   "monster": 27079,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3055",
+   "monster": 27078,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3055",
+   "monster": 27072,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3055",
+   "monster": 27074,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3055",
+   "monster": 27075,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3055",
+   "monster": 26007,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3055",
+   "monster": 27076,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3055",
+   "monster": 27077,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3055",
+   "monster": 1054,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3055",
+   "monster": 27070,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2051",
+   "monster": 12019,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2051",
+   "monster": 11072,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2052",
+   "monster": 12018,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2052",
+   "monster": 11072,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2053",
+   "monster": 12011,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2053",
+   "monster": 1002,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2054",
+   "monster": 12006,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2054",
+   "monster": 70024,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2054",
+   "monster": 1004,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2055",
+   "monster": 70023,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2055",
+   "monster": 12014,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2055",
+   "monster": 11068,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2055",
+   "monster": 70025,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2351",
+   "monster": 13027,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2351",
+   "monster": 70018,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2352",
+   "monster": 13027,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2352",
+   "monster": 70031,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2353",
+   "monster": 70003,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2353",
+   "monster": 13027,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2354",
+   "monster": 70001,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2354",
+   "monster": 13027,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2355",
+   "monster": 70035,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2355",
+   "monster": 13027,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2551",
+   "monster": 12039,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2551",
+   "monster": 1024,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2551",
+   "monster": 11070,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2551",
+   "monster": 70014,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2552",
+   "monster": 12039,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2552",
+   "monster": 1038,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2553",
+   "monster": 12038,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2553",
+   "monster": 70017,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2553",
+   "monster": 70026,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2554",
+   "monster": 70007,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2554",
+   "monster": 70017,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2555",
+   "monster": 70013,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2555",
+   "monster": 70008,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2555",
+   "monster": 70015,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2555",
+   "monster": 70032,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2555",
+   "monster": 1104,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2851",
+   "monster": 70009,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2852",
+   "monster": 70010,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2855",
+   "monster": 70012,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1851",
+   "monster": 13027,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1851",
+   "monster": 70018,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1852",
+   "monster": 13027,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1852",
+   "monster": 70031,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1853",
+   "monster": 70003,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1853",
+   "monster": 13027,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1854",
+   "monster": 70035,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1854",
+   "monster": 70001,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1854",
+   "monster": 13027,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1855",
+   "monster": 70027,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1855",
+   "monster": 70035,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1855",
+   "monster": 13027,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1751",
+   "monster": 1048,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1752",
+   "monster": 1048,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1753",
+   "monster": 1048,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1754",
+   "monster": 1048,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1755",
+   "monster": 1048,
+   "count": 3,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1651",
+   "monster": 70019,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1651",
+   "monster": 1037,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1651",
+   "monster": 11098,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1652",
+   "monster": 12033,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1652",
+   "monster": 11070,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1653",
+   "monster": 12037,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1653",
+   "monster": 70029,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1653",
+   "monster": 1024,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1654",
+   "monster": 12039,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1654",
+   "monster": 70002,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1655",
+   "monster": 1038,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc125",
+   "monster": 1002,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc125",
+   "monster": 12006,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc125",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc125",
+   "monster": 12017,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc125",
+   "monster": 12028,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc125",
+   "monster": 1019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc125",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc125",
+   "monster": 1020,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc125",
+   "monster": 1033,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc125",
+   "monster": 1034,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc125",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc125",
+   "monster": 11070,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc225",
+   "monster": 1002,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc225",
+   "monster": 12006,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc225",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc225",
+   "monster": 12017,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc225",
+   "monster": 12028,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc225",
+   "monster": 1019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc225",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc225",
+   "monster": 1020,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc225",
+   "monster": 1033,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc225",
+   "monster": 1034,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc225",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc225",
+   "monster": 11070,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc325",
+   "monster": 1002,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc325",
+   "monster": 12006,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc325",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc325",
+   "monster": 12017,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc325",
+   "monster": 12028,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc325",
+   "monster": 1019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc325",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc325",
+   "monster": 1020,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc325",
+   "monster": 1033,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc325",
+   "monster": 1034,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc325",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc325",
+   "monster": 11070,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc425",
+   "monster": 1002,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc425",
+   "monster": 12006,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc425",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc425",
+   "monster": 12017,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc425",
+   "monster": 12028,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc425",
+   "monster": 1019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc425",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc425",
+   "monster": 1020,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc425",
+   "monster": 1033,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc425",
+   "monster": 1034,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc425",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc425",
+   "monster": 11070,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc525",
+   "monster": 1002,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc525",
+   "monster": 12006,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc525",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc525",
+   "monster": 12017,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc525",
+   "monster": 12028,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc525",
+   "monster": 1019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc525",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc525",
+   "monster": 1020,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc525",
+   "monster": 1033,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc525",
+   "monster": 1034,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc525",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc525",
+   "monster": 11070,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc625",
+   "monster": 1002,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc625",
+   "monster": 12006,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc625",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc625",
+   "monster": 12017,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc625",
+   "monster": 12028,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc625",
+   "monster": 1019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc625",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc625",
+   "monster": 1020,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc625",
+   "monster": 1033,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc625",
+   "monster": 1034,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc625",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc625",
+   "monster": 11070,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc725",
+   "monster": 1002,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc725",
+   "monster": 12006,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc725",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc725",
+   "monster": 12017,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc725",
+   "monster": 12028,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc725",
+   "monster": 1019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc725",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc725",
+   "monster": 1020,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc725",
+   "monster": 1033,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc725",
+   "monster": 1034,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc725",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc725",
+   "monster": 11070,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc825",
+   "monster": 1002,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc825",
+   "monster": 12006,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc825",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc825",
+   "monster": 12017,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc825",
+   "monster": 12028,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc825",
+   "monster": 1019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc825",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc825",
+   "monster": 1020,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc825",
+   "monster": 1033,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc825",
+   "monster": 1034,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc825",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc825",
+   "monster": 11070,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc925",
+   "monster": 1002,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc925",
+   "monster": 12006,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc925",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc925",
+   "monster": 12017,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc925",
+   "monster": 12028,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc925",
+   "monster": 1019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc925",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc925",
+   "monster": 1020,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc925",
+   "monster": 1033,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc925",
+   "monster": 1034,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc925",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc925",
+   "monster": 11070,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1025",
+   "monster": 1002,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1025",
+   "monster": 12006,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1025",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1025",
+   "monster": 12017,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1025",
+   "monster": 12028,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1025",
+   "monster": 1019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1025",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1025",
+   "monster": 1020,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1025",
+   "monster": 1033,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1025",
+   "monster": 1034,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1025",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1025",
+   "monster": 11070,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1125",
+   "monster": 1002,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1125",
+   "monster": 12006,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1125",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1125",
+   "monster": 12017,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1125",
+   "monster": 12028,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1125",
+   "monster": 1019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1125",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1125",
+   "monster": 1020,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1125",
+   "monster": 1033,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1125",
+   "monster": 1034,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1125",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1125",
+   "monster": 11070,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1225",
+   "monster": 1002,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1225",
+   "monster": 12006,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1225",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1225",
+   "monster": 12017,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1225",
+   "monster": 12028,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1225",
+   "monster": 1019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1225",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1225",
+   "monster": 1020,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1225",
+   "monster": 1033,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1225",
+   "monster": 1034,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1225",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1225",
+   "monster": 11070,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1325",
+   "monster": 1002,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1325",
+   "monster": 12006,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1325",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1325",
+   "monster": 12017,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1325",
+   "monster": 12028,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1325",
+   "monster": 1019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1325",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1325",
+   "monster": 1020,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1325",
+   "monster": 1033,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1325",
+   "monster": 1034,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1325",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1325",
+   "monster": 11070,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1425",
+   "monster": 1002,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1425",
+   "monster": 12006,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1425",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1425",
+   "monster": 12017,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1425",
+   "monster": 12028,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1425",
+   "monster": 1019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1425",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1425",
+   "monster": 1020,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1425",
+   "monster": 1033,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1425",
+   "monster": 1034,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1425",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1425",
+   "monster": 11070,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1525",
+   "monster": 1002,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1525",
+   "monster": 12006,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1525",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1525",
+   "monster": 12017,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1525",
+   "monster": 12028,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1525",
+   "monster": 1019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1525",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1525",
+   "monster": 1020,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1525",
+   "monster": 1033,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1525",
+   "monster": 1034,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1525",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1525",
+   "monster": 11070,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1625",
+   "monster": 1002,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1625",
+   "monster": 12006,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1625",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1625",
+   "monster": 12017,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1625",
+   "monster": 12028,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1625",
+   "monster": 1019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1625",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1625",
+   "monster": 1020,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1625",
+   "monster": 1033,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1625",
+   "monster": 1034,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1625",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1625",
+   "monster": 11070,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1725",
+   "monster": 1001,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1725",
+   "monster": 12022,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1725",
+   "monster": 12003,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1725",
+   "monster": 12021,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1725",
+   "monster": 12005,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1725",
+   "monster": 1021,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1725",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1725",
+   "monster": 12019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1725",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1725",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1825",
+   "monster": 1001,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1825",
+   "monster": 12022,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1825",
+   "monster": 12003,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1825",
+   "monster": 12021,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1825",
+   "monster": 12005,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1825",
+   "monster": 1021,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1825",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1825",
+   "monster": 12019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1825",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1825",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1925",
+   "monster": 1001,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1925",
+   "monster": 12022,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1925",
+   "monster": 12003,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1925",
+   "monster": 12021,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1925",
+   "monster": 12005,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1925",
+   "monster": 1021,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1925",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1925",
+   "monster": 12019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1925",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc1925",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2025",
+   "monster": 1001,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2025",
+   "monster": 12022,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2025",
+   "monster": 12003,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2025",
+   "monster": 12021,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2025",
+   "monster": 12005,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2025",
+   "monster": 1021,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2025",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2025",
+   "monster": 12019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2025",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2025",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2125",
+   "monster": 1001,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2125",
+   "monster": 12022,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2125",
+   "monster": 12003,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2125",
+   "monster": 12031,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2125",
+   "monster": 12021,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2125",
+   "monster": 12005,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2125",
+   "monster": 12011,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2125",
+   "monster": 12019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2125",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2125",
+   "monster": 12030,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2125",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2225",
+   "monster": 1001,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2225",
+   "monster": 12022,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2225",
+   "monster": 12003,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2225",
+   "monster": 12031,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2225",
+   "monster": 12021,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2225",
+   "monster": 12005,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2225",
+   "monster": 12011,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2225",
+   "monster": 12019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2225",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2225",
+   "monster": 12030,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2225",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2325",
+   "monster": 1001,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2325",
+   "monster": 12022,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2325",
+   "monster": 12003,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2325",
+   "monster": 12031,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2325",
+   "monster": 12021,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2325",
+   "monster": 12005,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2325",
+   "monster": 12011,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2325",
+   "monster": 12019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2325",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2325",
+   "monster": 12030,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2325",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2425",
+   "monster": 1001,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2425",
+   "monster": 12022,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2425",
+   "monster": 12003,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2425",
+   "monster": 12029,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2425",
+   "monster": 12021,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2425",
+   "monster": 12005,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2425",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2425",
+   "monster": 12019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2425",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2425",
+   "monster": 11072,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2425",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2525",
+   "monster": 1001,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2525",
+   "monster": 12022,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2525",
+   "monster": 12003,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2525",
+   "monster": 12029,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2525",
+   "monster": 12021,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2525",
+   "monster": 12005,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2525",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2525",
+   "monster": 12019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2525",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2525",
+   "monster": 11072,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2525",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2625",
+   "monster": 1001,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2625",
+   "monster": 12022,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2625",
+   "monster": 12003,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2625",
+   "monster": 12029,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2625",
+   "monster": 12021,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2625",
+   "monster": 12005,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2625",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2625",
+   "monster": 12019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2625",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2625",
+   "monster": 11072,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2625",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2725",
+   "monster": 1001,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2725",
+   "monster": 12022,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2725",
+   "monster": 12003,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2725",
+   "monster": 12031,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2725",
+   "monster": 12021,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2725",
+   "monster": 12005,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2725",
+   "monster": 12011,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2725",
+   "monster": 12019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2725",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2725",
+   "monster": 12030,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2725",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2825",
+   "monster": 1001,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2825",
+   "monster": 12022,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2825",
+   "monster": 12003,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2825",
+   "monster": 12031,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2825",
+   "monster": 12021,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2825",
+   "monster": 12005,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2825",
+   "monster": 12011,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2825",
+   "monster": 12019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2825",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2825",
+   "monster": 12030,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2825",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2925",
+   "monster": 1001,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2925",
+   "monster": 12022,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2925",
+   "monster": 12003,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2925",
+   "monster": 12031,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2925",
+   "monster": 12021,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2925",
+   "monster": 12005,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2925",
+   "monster": 12011,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2925",
+   "monster": 12019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2925",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2925",
+   "monster": 12030,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc2925",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3025",
+   "monster": 1001,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3025",
+   "monster": 12022,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3025",
+   "monster": 12003,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3025",
+   "monster": 12031,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3025",
+   "monster": 12021,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3025",
+   "monster": 12005,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3025",
+   "monster": 12011,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3025",
+   "monster": 12019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3025",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3025",
+   "monster": 12030,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3025",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3125",
+   "monster": 1001,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3125",
+   "monster": 12022,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3125",
+   "monster": 12003,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3125",
+   "monster": 12031,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3125",
+   "monster": 12021,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3125",
+   "monster": 12005,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3125",
+   "monster": 12011,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3125",
+   "monster": 12019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3125",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3125",
+   "monster": 12030,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3125",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3225",
+   "monster": 1001,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3225",
+   "monster": 12022,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3225",
+   "monster": 12003,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3225",
+   "monster": 12031,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3225",
+   "monster": 12021,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3225",
+   "monster": 12005,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3225",
+   "monster": 12011,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3225",
+   "monster": 12019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3225",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3225",
+   "monster": 12030,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3225",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3325",
+   "monster": 1001,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3325",
+   "monster": 12022,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3325",
+   "monster": 12003,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3325",
+   "monster": 12029,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3325",
+   "monster": 12021,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3325",
+   "monster": 12005,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3325",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3325",
+   "monster": 12019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3325",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3325",
+   "monster": 11072,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3325",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3425",
+   "monster": 1001,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3425",
+   "monster": 12022,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3425",
+   "monster": 12003,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3425",
+   "monster": 12029,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3425",
+   "monster": 12021,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3425",
+   "monster": 12005,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3425",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3425",
+   "monster": 12019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3425",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3425",
+   "monster": 11072,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3425",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3525",
+   "monster": 1001,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3525",
+   "monster": 12022,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3525",
+   "monster": 12003,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3525",
+   "monster": 12029,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3525",
+   "monster": 12021,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3525",
+   "monster": 12005,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3525",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3525",
+   "monster": 12019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3525",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3525",
+   "monster": 11072,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3525",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3625",
+   "monster": 1001,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3625",
+   "monster": 12022,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3625",
+   "monster": 12003,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3625",
+   "monster": 12029,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3625",
+   "monster": 12021,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3625",
+   "monster": 12005,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3625",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3625",
+   "monster": 12019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3625",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3625",
+   "monster": 11072,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3625",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3725",
+   "monster": 1001,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3725",
+   "monster": 12022,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3725",
+   "monster": 12003,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3725",
+   "monster": 12029,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3725",
+   "monster": 12021,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3725",
+   "monster": 12005,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3725",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3725",
+   "monster": 12019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3725",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3725",
+   "monster": 11072,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3725",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3825",
+   "monster": 1001,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3825",
+   "monster": 12022,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3825",
+   "monster": 12003,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3825",
+   "monster": 12029,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3825",
+   "monster": 12021,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3825",
+   "monster": 12005,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3825",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3825",
+   "monster": 12019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3825",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3825",
+   "monster": 11072,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3825",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3925",
+   "monster": 1001,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3925",
+   "monster": 12022,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3925",
+   "monster": 12003,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3925",
+   "monster": 12029,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3925",
+   "monster": 12021,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3925",
+   "monster": 12005,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3925",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3925",
+   "monster": 12019,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3925",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3925",
+   "monster": 11072,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
+  },
+  {
+   "zone": "xc3925",
+   "monster": 11068,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true
   }
  ]
 }

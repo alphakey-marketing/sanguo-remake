@@ -1,7 +1,7 @@
 """生成 docs/plan/ORIG_MONSTERS.md: 各洞穴層怪名單 + 等級 + 缺 sprite 清單 (讀 monsters.json / asset_index.json / spawn_maps.tsv)"""
 import csv, json, os, sys
 sys.path.insert(0, os.path.dirname(__file__))
-from import_orig_monsters import CAVE_BAND, cave_level
+from import_orig_monsters import CAVE_BAND, cave_level, WILD, REGION
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ML = 'D:/Download/sanguo/extracted/map_list/'
 mons = json.load(open(ROOT + '/client/data/monsters.json', encoding='utf8'))['monsters']
@@ -32,7 +32,9 @@ for city in CAVE_BAND:
             parts.append('%s%s' % ('✅' if ok else '⚠️', m['name']))
         o.append('- 第%d層 (map %d) Lv%d：%s' % (fl, mid, cave_level(city, fl), '、'.join(parts) or '（無怪）'))
     o.append('')
-o += ['## 外圍 (xx25) 野外怪', '', '尚未做。下一步按各城所屬區域、用原版怪替換自創怪後補入此表。', '',
+o += ['## 外圍 (xx25) 野外怪', '', '來源：用家 Drive 攻略截圖（荊/豫/并司 適合 Lv1~10、兗徐 Lv10~20）。每城外圍每種 1 隻，重生 300 tick。實際怪等級仍用 monsters.json 現值（部分高過攻略帶，待平衡）。', '',
+      *['- %s：%s' % ({'荊': '荊州', '豫': '豫州', '并司': '并州-司隸', '兗徐': '兗州-徐州(其餘城用)'}[k], v.replace(' ', '、')) for k, v in WILD.items()],
+      '- 城→區：' + '；'.join('%s=%s' % (k, ','.join(CITY.get(c, str(c)) if c in CITY else str(c) for c in v)) for k, v in REGION.items()), '',
       '## 缺 sprite 清單 (%d 隻)' % len(missing), '', '| id | 名 | 原 sprite 編號 | 現時顯示 |', '|---|---|---|---|']
 for m in sorted(missing.values(), key=lambda m: m['id']):
     o.append('| %d | %s | %s | 舊色塊 (未借用武將圖) |' % (m['id'], m['name'], m.get('sprite', '—')))

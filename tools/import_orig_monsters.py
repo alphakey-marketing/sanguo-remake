@@ -24,11 +24,12 @@ def main(check=False):
         t = ln.split(None, 1)
         if len(t) == 2 and t[0].isdigit() and int(t[0]) not in tab[t[1].strip()]: tab[t[1].strip()].append(int(t[0]))
     drops = {int(r[0]): int(r[3]) for r in csv.reader(open(TX + 'npc_drops.csv', encoding='utf-8-sig')) if r and r[0].isdigit()}
-    lv = collections.defaultdict(list)
+    lv = collections.defaultdict(list); rows_cave = []
     for r in list(csv.reader(open(ML + 'spawn_maps.tsv', encoding='utf8'), delimiter='\t'))[1:]:
         if r[4] != '洞穴/營地': continue
         mid = int(r[0]); city, floor = mid // 100, mid % 100 - 50
         if city not in CAVE_BAND or not 1 <= floor <= 5: continue
+        rows_cave.append((mid, [n for col in (5, 6) for n in r[col].split('、') if n]))
         for col in (5, 6):
             for n in r[col].split('、'):
                 if n: lv[n].append(cave_level(city, floor))
@@ -54,5 +55,31 @@ def main(check=False):
     print('新增怪', len(new), [m['name'] for m in new][:80])
     if check: return
     mons.extend(new)
+    d['spawns'] = [x for x in d['spawns'] if not x.get('orig')] + gen_spawns(mons, rows_cave)
     json.dump(d, open(MP, 'w', encoding='utf8', newline='\n'), ensure_ascii=False, indent=1)
+# 外圍野怪名單: 官方攻略 (docs/plan/ORIG_MONSTERS.md 來源 = 用家 Drive 攻略截圖) 按州分；各州適合等級 荊/豫/并司 1-10、兗徐 10-20
+WILD = {'荊': '田鼠 水鴨 野兔 蜻蜓 野貂 母雞 猴子 瘋貓 野豬 飛蛾怪 流氓', '豫': '田鼠 水鴨 野兔 野貂 母雞 公雞 山羊 瘋貓 野豬 流氓',
+        '并司': '田鼠 水鴨 野兔 蝴蝶精 野貂 母雞 山羊 瘋貓 野豬 盜賊 流氓', '兗徐': '野狗 狐貍 花鹿 大蟒 黃蜂 野狼 野牛 花豹 老虎 大熊 流氓 地痞'}
+REGION = {'荊': (29, 27, 28, 30, 21, 22, 31, 32, 23), '豫': (19, 18, 20, 17), '并司': (26, 24, 25, 34, 33, 35, 36, 37, 38, 39)}   # 其餘城用兗徐 (近似【自訂】)
+def gen_spawns(mons, rows):
+    import re
+    by = {}
+    for m in mons: by.setdefault(m['name'].rstrip('0123456789'), m['id'])
+    mj = json.load(open(os.path.join(ROOT, 'client/data/maps.json'), encoding='utf8'))['maps']
+    ids = {m['id'] for m in mj}; out = []
+    def dims(mid):
+        g = open(os.path.join(ROOT, 'client/data/maps/%s.txt' % mid), encoding='utf8').readline().rstrip(); return len(g)
+    for mid, names in rows:
+        z = 'xc%d' % mid
+        if z not in ids: continue
+        n = 4 if dims(z) >= 300 else 3
+        for nm in names:
+            if nm in by: out.append({'zone': z, 'monster': by[nm], 'count': n, 'respawnTicks': 300, 'orig': True})
+    for c in range(1, 40):
+        z = 'xc%d25' % c
+        if z not in ids: continue
+        reg = next((k for k, v in REGION.items() if c in v), '兗徐')
+        for nm in WILD[reg].split():
+            if nm in by: out.append({'zone': z, 'monster': by[nm], 'count': 1, 'respawnTicks': 300, 'orig': True})
+    return out
 if __name__ == '__main__': main('--check' in sys.argv)
