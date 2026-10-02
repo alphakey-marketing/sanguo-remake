@@ -274,6 +274,32 @@ QUESTS += [
 ]
 
 
+# ---- 批次 8: 替天行道討伐張角 (取代自訂) + 三顧茅廬 原版取代自訂 ----
+REPLACED += ['hist_zhangjiao']
+QUESTS += [
+    {"id": "orig_zhangjiao", "src": "orig", "name": "替天行道討伐張角", "type": "history", "giver": "zhangjiao",
+     "pre": {"minLevel": 20, "attr": {"cha": 10, "pol": 10}, "workLv": {"herbalism": 10}},
+     "preHint": "武功 20 級、魅力/政治/採藥 10 級以上，去洛陽私塾黃巾道場搵張角",
+     "stages": [
+         {"type": "talk", "npc": "zhangjiao", "conv": [2704, 2705], "sp": {2: '張角'},
+          "hint": "去洛陽城外南華竹林（左下方）搵南華老仙"},
+         {"type": "ask", "npc": "nanhua_child", "conv": [2713, 2714], "sp": {2: '南華小童'},
+          "options": ["元稹", "張祐", "賈島", "李頻"], "answer": 2, "resp": 2715, "wrongc": 2716,
+          "hint": "答啱南華小童嘅問題（『松下問童子』嘅作者）"},
+         {"type": "talk", "npc": "nanhua_old", "conv": [2719], "sp": {2: '南華老仙'}, "getItem": {"id": 56502, "n": 1},
+          "hint": "入屋搵南華老仙，攞太平要術"},
+         {"type": "talk", "npc": "zhangjiao", "conv": [2708, 2709], "sp": {2: '張角'}, "takeItems": [[56502, 1]],
+          "hint": "將太平要術交畀張角"},
+         {"type": "talk", "npc": "nanhua_child", "conv": [2722, 2724], "sp": {2: '南華小童'},
+          "hint": "張角要造反，返南華竹林聽小童交代"},
+         {"type": "fight", "npc": "zhangjiao", "monster": 1092, "conv": [2710], "sp": {3: '張角'}, "win": 2711,
+          "getItem": {"id": 56502, "n": 1}, "hint": "擊敗張角，奪返太平要術"},
+         {"type": "talk", "npc": "nanhua_old", "conv": [2725, 2749], "sp": {2: '南華老仙'}, "takeItems": [[56502, 1]], "done": True,
+          "hint": "帶太平要術返去搵南華老仙"}],
+     "reward": {"fame": 50, "items": [[56027, 1]]}},
+]
+
+
 def snap(g, x, y, others):
     for r in range(0, 20):
         for dy in range(-r, r + 1):
@@ -323,6 +349,9 @@ def main():
             for cid in st['conv']:
                 ls += lines(convs[cid], names[st['npc']], st.get('sp'))
             st['dialog'] = ls
+            for k, tgt in (('resp', 'response'), ('wrongc', 'wrong')):
+                if k in st:
+                    st[tgt] = lines(convs[st.pop(k)], names[st['npc']], st.get('sp'))
             oc = list(st.pop('conv'))
             if 'win' in st:      # 打贏後敗將對白
                 w = st.pop('win')
