@@ -57,7 +57,7 @@ INN_IN = 'xc1702'
 shops = jl('shops.json'); fac = jl('facilities.json')
 # 清走舊複製
 shops['shops'] = [s for s in shops['shops'] if not s['id'].endswith(SFX)]
-shops['inns'] = [i for i in shops['inns'] if not i['id'].endswith(SFX)]
+shops['inns'] = [i for i in shops['inns'] if not i['id'].endswith(SFX) and i['id'] != 'chenliu_o']
 for k in [k for k in fac if k.endswith(SFX)]: del fac[k]
 
 todo = []   # (列表種類, 新條目)

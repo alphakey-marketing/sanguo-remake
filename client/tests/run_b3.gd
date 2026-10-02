@@ -168,7 +168,7 @@ func t_station_pure(data: GameData) -> void:
 	var p := int(cfg["perHop"])
 	check(RulesStation.fare(0, cfg) == b and RulesStation.fare(8, cfg) == b + 8 * p and RulesStation.fare(-3, cfg) == b, "車費 = base + perHop × 過圖")
 	var keys := RulesStation.keys(data.facilities)
-	check(keys == ["station_xc", "station_xy", "station_rn", "station_wc", "station_xyc", "station_xc_cl"], "6 個驛站 (含陳留) (檔案順序) %s" % [keys])
+	check(keys == ["station_xc", "station_xy", "station_rn", "station_wc", "station_xyc", "station_xc_cl", "station_xc_cl26", "station_xc_cl28"], "8 個驛站 (含陳留/洛陽/宛) (檔案順序) %s" % [keys])
 	var f := data.facilities
 	check(RulesStation.check("", "station_xy", f, 3, 999, cfg) == "要去驛站先得", "check: 唔喺驛站")
 	check(RulesStation.check("station_xc", "training", f, 3, 999, cfg) == "冇呢個驛站", "check: 目的地唔係驛站")
@@ -181,7 +181,7 @@ func t_station_pure(data: GameData) -> void:
 	for k in keys:
 		var d: Dictionary = f[k]
 		var md := sim.map_at(int(d["x"]), int(d["y"]))
-		check((String(md.get("kind", "")) == "city" or String(k).ends_with("_cl")) and String(md["id"]) == String(d["map"]), "%s 喺城入面" % k)
+		check((String(md.get("kind", "")) == "city" or String(k).contains("_cl")) and String(md["id"]) == String(d["map"]), "%s 喺城入面" % k)
 		check(sim.is_free(int(d["x"]), int(d["y"])), "%s 企喺行得嘅格" % k)
 		for k2 in keys:
 			if k2 != k:
@@ -208,7 +208,7 @@ func t_station(data: GameData) -> void:
 	# 喺許昌驛站: 視圖
 	_at_fac(sim, id, "station_xc")
 	var v := sim.station_view(id)
-	check(String(v["from"]) == "station_xc" and (v["list"] as Array).size() == 5, "視圖: 許昌驛站列 5 個目的地")
+	check(String(v["from"]) == "station_xc" and (v["list"] as Array).size() == 7, "視圖: 許昌驛站列 7 個目的地")
 	var row: Array = (v["list"] as Array).filter(func(x): return String(x["key"]) == "station_xyc")
 	check(row.size() == 1 and int(row[0]["fare"]) == fare and String(row[0]["why"]) == "", "視圖: 襄陽車費 %d、可以搭" % fare)
 	# 唔夠錢

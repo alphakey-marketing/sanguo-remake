@@ -19,16 +19,16 @@ func _station_hops(from_key: String, to_key: String) -> int:
 	var mb := map_id_at(int(b["x"]), int(b["y"]))
 	if _is_orig_map(ma) and _is_orig_map(mb):    # 兩站都喺原版世界: 外圍 25 連線已通，用真實過圖數
 		return map_hops(ma, mb)
-	var extra := 0                                # 一邊係原版、本城冇舊圖 (如陳留) = 經許昌: 真實過圖去許昌 + 舊圖由許昌起計
+	var extra := 0                                # 一邊係原版、另一邊係舊圖 = 原版嗰邊經許昌: 真實過圖去許昌 + 舊圖由許昌起計
 	var xa := _hop_map(int(a["x"]), int(a["y"]))
 	var xb := _hop_map(int(b["x"]), int(b["y"]))
-	if _is_orig_map(ma) and _city_map(String(data.map_by_id[ma].get("cityOf", ""))).is_empty():
+	if _is_orig_map(ma):
 		var h := map_hops(ma, "xuchang_o")
 		if h < 0:
 			return -1
 		extra = h
 		xa = "xuchang"
-	elif _is_orig_map(mb) and _city_map(String(data.map_by_id[mb].get("cityOf", ""))).is_empty():
+	elif _is_orig_map(mb):
 		var h2 := map_hops(mb, "xuchang_o")
 		if h2 < 0:
 			return -1

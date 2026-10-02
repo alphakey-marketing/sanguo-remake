@@ -15,7 +15,7 @@ func office_keys() -> Array:
 		var f = data.facilities[k]
 		if f is Dictionary and bool(f.get("office", false)):
 			out.append(String(k))
-	out.sort_custom(func(a, b): return [String(a).ends_with("_cl"), a] < [String(b).ends_with("_cl"), b])   # 複製城 (陳留 _cl) 排後，遞送軍函預設仍去新野
+	out.sort_custom(func(a, b): return [String(a).contains("_cl"), a] < [String(b).contains("_cl"), b])   # 複製城 (陳留 _cl) 排後，遞送軍函預設仍去新野
 	return out
 
 
