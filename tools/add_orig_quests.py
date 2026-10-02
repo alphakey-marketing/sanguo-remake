@@ -153,6 +153,52 @@ QUESTS += [
 ]
 
 
+# ---- 批次 4: 三顧茅廬 (原版: 鐵樹精華 / 天山樹鬚 要打怪收集) ----
+# 【自訂】掉落怪: 原版冇可收嘅來源，加兩種洞穴怪 (id 唔喺 npc_drops.csv，import_drops 唔會郁)
+DROP_MONS = [  # (id, name, lv, sprite, 掉落 item, 出場 zone)
+    (1117, '鐵樹精', 36, 31016, 52040, 'xc1753'),
+    (1118, '樹鬚妖', 40, 54051, 52045, 'xc1754'),
+]
+NEW_NPCS_EXTRA += [
+    _npc("xushu", "徐庶", 38, 30, "xuchang", "唉……老母被曹操所困……", "被曹操騙回許昌嘅徐元直"),
+]
+QUESTS += [
+    {"id": "orig_longzhong", "src": "orig", "name": "三顧茅廬·原版", "type": "history", "giver": "guanyu",
+     "pre": {"minLevel": 36},
+     "preHint": "武功 36 級以上，去陳留搵關羽",
+     "stages": [
+         {"type": "talk", "npc": "guanyu", "conv": [1348], "sp": {2: '關羽'},
+          "hint": "關羽要你去許昌城搵徐庶，問點樣救劉備"},
+         {"type": "talk", "npc": "xushu", "conv": [1354], "sp": {2: '徐庶'},
+          "hint": "去許昌城搵徐庶，問復原之法"},
+         {"type": "talk", "npc": "caolu_boy", "conv": [1369], "sp": {2: '書童'},
+          "hint": "去隆中草廬問書童臥龍先生喺邊"},
+         {"type": "collect", "npc": "caolu_boy", "item": {"id": 52040, "n": 10}, "conv": [1366], "sp": {2: '書童'},
+          "hint": "去陳留·洞穴3 打鐵樹精（Lv36），收集鐵樹精華 %v/%n，交畀書童"},
+         {"type": "collect", "npc": "zhugeliang", "item": {"id": 52045, "n": 10}, "conv": [1384], "sp": {2: '諸葛亮'},
+          "hint": "去陳留·洞穴4 打樹鬚妖（Lv40），收集天山樹鬚 %v/%n，交畀諸葛亮"},
+         {"type": "talk", "npc": "zhugeliang", "conv": [1381], "sp": {2: '諸葛亮'}, "done": True,
+          "hint": "孔明願意出山輔佐，聽佢分析天下大勢"}],
+     "reward": {"fame": 80, "exp": 12000, "gold": 2000}},
+]
+
+
+def add_drop_mons():
+    p = 'client/data/monsters.json'
+    md = json.load(open(p, encoding='utf8'))
+    ms = md['monsters']
+    ids = {m[0] for m in DROP_MONS}
+    ms[:] = [m for m in ms if m['id'] not in ids]
+    md['spawns'] = [x for x in md['spawns'] if x['monster'] not in ids]
+    for mid, name, lv, spr, item, zone in DROP_MONS:
+        ms.append({'id': mid, 'name': name, 'level': lv, 'hp': 10 * lv * lv + 20, 'atk': 3 * lv + 4, 'def': max(0, lv // 4),
+                   'atkInterval': 20, 'moveSpeed': 1, 'exp': 6 + 3 * lv, 'gold': [0, 3 * lv], 'alignment': -30,
+                   'aggroRange': 5, 'leash': 10, 'element': 'none', 'sprite': spr,
+                   'drops': [{'item': item, 'p': 0.5}], 'rareDrops': [], 'suppDrops': []})
+        md['spawns'].append({'zone': zone, 'monster': mid, 'count': 6, 'respawnTicks': 200, 'lv': lv})
+    json.dump(md, open(p, 'w', encoding='utf8', newline=chr(10)), ensure_ascii=False, indent=1)
+
+
 def snap(g, x, y, others):
     for r in range(0, 20):
         for dy in range(-r, r + 1):
@@ -181,6 +227,7 @@ def add_bosses():
 def main():
     ALL_NPCS = NEW_NPCS + [n for n in NEW_NPCS_EXTRA if n not in NEW_NPCS]
     add_bosses()
+    add_drop_mons()
     convs = load_convs()
 
     for n in ALL_NPCS:      # 位置係估嘅: 唔行得就搵最近行得嘅格 (同圖其他 NPC ≥2 格)
