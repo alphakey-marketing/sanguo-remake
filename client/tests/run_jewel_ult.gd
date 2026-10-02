@@ -275,11 +275,11 @@ func t_ultimate_framework(data: GameData) -> void:
 	sim.cmd_use_ultimate(id, "wanli")
 	check(int(ch["mp"]) == mp1, "冷卻中: 唔扣 MP")
 	# 怪死嘅 check (dmg 至少 1)
-	var died := 0
+	var untouched := 0                                   # spec 14: 田鼠 Lv1 hp 87，一發未必死 → 要求兩隻都受傷或已死
 	for e in sim.ents.values():
-		if e["kind"] == "mob":
-			died += 1
-	check(died == 0, "絕招後兩隻怪死晒 (lv1 都有傷害)"); 
+		if e["kind"] == "mob" and int(e["hp"]) >= int(data.mob_def(int(e["mob"]["def"]))["hp"]):
+			untouched += 1
+	check(untouched == 0, "絕招後兩隻怪都受傷或死晒 (lv1 都有傷害)"); 
 	# 公式層面確認絕招傷害
 	var calc := RulesCombat.calc_damage(12.0, 10.0, 0.0, Callable(func() -> float: return 1.0)) * 2.0
 	check(calc >= 2, "絕招傷害公式: (武力×1.5+武器強度)×2.0 起碼 2")

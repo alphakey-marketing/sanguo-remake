@@ -60,7 +60,7 @@ def main(check=False):
     if check: return
     mons.extend(new)
     d['spawns'] = [x for x in d['spawns'] if not x.get('orig')] + gen_spawns(mons, rows_cave)
-    hid = {m['id'] for m in mons if m['name'] in NO_SPRITE_HIDE}      # 冇圖又冇相似圖可借 -> 唔出場 (搵到圖包後清空 NO_SPRITE_HIDE 重跑)
+    hid = {m['id'] for m in mons if m.get('orig') and m['name'] in NO_SPRITE_HIDE}      # 冇圖又冇相似圖可借 -> 唔出場 (搵到圖包後清空 NO_SPRITE_HIDE 重跑)
     d['spawns'] = [x for x in d['spawns'] if x['monster'] not in hid]
     json.dump(d, open(MP, 'w', encoding='utf8', newline='\n'), ensure_ascii=False, indent=1)
 # 外圍野怪名單: 官方攻略 (docs/plan/ORIG_MONSTERS.md 來源 = 用家 Drive 攻略截圖) 按州分；各州適合等級 荊/豫/并司 1-10、兗徐 10-20

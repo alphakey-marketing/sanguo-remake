@@ -1,4 +1,4 @@
-"""怪物數值平衡 (docs/spec/14_怪物數值.md)：orig 怪 hp/atk/def/exp/gold 按等級曲線 + 原版怪表強弱系數重算。
+"""怪物數值平衡 (docs/spec/14_怪物數值.md)：全部怪 (orig + 舊手寫) hp/atk/def/exp/gold 按等級曲線 + 原版怪表強弱系數重算。
 曲線/kills = client/data/mob_curve.json；升級表 = client/rules/exp_table.gd；同引擎 rules/mob_scale.gd 同一公式。
 冪等，要喺 import_orig_monsters.py / import_drops.py 之後跑 (importer 會重置 orig 怪數值)。
 用法: python tools/balance_monsters.py [--check] [--report]"""
@@ -23,18 +23,24 @@ def kills(lv):
         if lv <= lim: return n
     return CV['kills'][-1][1]
 def exp_at(lv): return max(1, round(need(lv) / kills(lv)))
+BOSS_HP = 4.0
 def strength(tbl_hp):          # 原版怪表 hp 欄 = 強弱指標 (中位 ~80)；無表 (合成 id) = 1.0
     return 1.0 if not tbl_hp else min(1.8, max(0.7, (tbl_hp / 80) ** 0.5))
 def balanced(m, tbl_hp):
     L = m['level']; f = strength(tbl_hp)
-    return {'hp': max(1, round(curve(L, 0) * f)), 'atk': max(1, round(curve(L, 1) * f ** 0.5)), 'def': round(curve(L, 2)),
-            'exp': exp_at(L), 'gold': [0, 3 * L]}
+    bm = BOSS_HP if m.get('boss') else 1.0                  # boss: hp ×4、atk ×1.5
+    b = {'hp': max(1, round(curve(L, 0) * f * bm)), 'atk': max(1, round(curve(L, 1) * f ** 0.5 * (1.5 if m.get('boss') else 1.0))),
+         'def': round(curve(L, 2)), 'exp': exp_at(L) * (3 if m.get('boss') else 1)}
+    if not m.get('orig'):                                   # 手寫舊怪：gold 保留；exp 原本 0 (任務 boss/歷史怪) 保持 0
+        b['gold'] = m.get('gold', [0, 0])
+        if m.get('exp', 1) == 0: b['exp'] = 0
+    else: b['gold'] = [0, 3 * L]
+    return b
 def main(check, report):
     d = json.load(open(MP, encoding='utf8'))
     tbl = {int(r[0]): int(r[3]) for r in list(csv.reader(open(TBL, encoding='utf8'), delimiter='\t'))[1:] if r[0].isdigit()}
     bad = 0; rows = []
     for m in d['monsters']:
-        if not m.get('orig'): continue
         b = balanced(m, tbl.get(m['id']))
         if any(m[k] != v for k, v in b.items()): bad += 1
         rows.append((m['level'], m['id'], b))

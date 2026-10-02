@@ -213,7 +213,9 @@ func t_drop_rules(data: GameData) -> void:
 	var bad_split: Array = []
 	for d in data.monsters.values():
 		var src := int(d.get("dropSrc", d["id"]))
-		if not csv_ids.has(src) and not CUSTOM_DROPS.has(int(d["id"])) and not CUSTOM_BATTLE.has(int(d["id"])) and not CUSTOM_SCENE.has(int(d["id"])):
+		if bool(d.get("orig", false)):       # 原版匯入怪 (import_orig_monsters.py): 掉落由 import_drops 對 npc_drops.csv，唔使白名單
+			pass
+		elif not csv_ids.has(src) and not CUSTOM_DROPS.has(int(d["id"])) and not CUSTOM_BATTLE.has(int(d["id"])) and not CUSTOM_SCENE.has(int(d["id"])):
 			no_src.append(int(d["id"]))
 		for x in d.get("drops", []):
 			if float(x["p"]) < 0.05 or float(x["p"]) > 1.0:

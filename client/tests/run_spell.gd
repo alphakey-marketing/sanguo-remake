@@ -602,8 +602,11 @@ func t_daoshi_flow(data: GameData) -> void:
 	sim.event_emitted.connect(func(ev: Dictionary) -> void:
 		if ev["k"] == "kill" and int(ev["src"]) == pid:
 			kills.append(ev))
-	for i in 60:
+	for i in 400:                                       # 田鼠按 spec 14 曲線 Lv1 hp 87，一發葉之術殺唔死 → 補咒
 		sim.step()
 		if not kills.is_empty():
 			break
+		if i % 15 == 14:
+			ch["mp"] = 999
+			sim.cmd_cast_spell(pid, 0, mob_id)
 	check(kills.size() == 1, "新手流程: 術法殺到田鼠 (kills=%d)" % kills.size())

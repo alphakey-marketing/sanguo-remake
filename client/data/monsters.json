@@ -5,12 +5,12 @@
    "id": 1001,
    "name": "田鼠",
    "level": 1,
-   "hp": 20,
-   "atk": 4,
+   "hp": 87,
+   "atk": 6,
    "def": 0,
    "atkInterval": 20,
    "moveSpeed": 1,
-   "exp": 6,
+   "exp": 2,
    "gold": [
     0,
     3
@@ -79,12 +79,12 @@
    "id": 1002,
    "name": "野狗",
    "level": 2,
-   "hp": 35,
-   "atk": 7,
+   "hp": 109,
+   "atk": 8,
    "def": 1,
    "atkInterval": 18,
    "moveSpeed": 1,
-   "exp": 10,
+   "exp": 4,
    "gold": [
     0,
     5
@@ -170,12 +170,12 @@
    "id": 1003,
    "name": "山賊",
    "level": 4,
-   "hp": 70,
-   "atk": 12,
-   "def": 3,
+   "hp": 162,
+   "atk": 13,
+   "def": 2,
    "atkInterval": 15,
    "moveSpeed": 1,
-   "exp": 24,
+   "exp": 8,
    "gold": [
     5,
     25
@@ -282,12 +282,12 @@
    "id": 1004,
    "name": "野豬",
    "level": 6,
-   "hp": 120,
-   "atk": 16,
-   "def": 5,
+   "hp": 230,
+   "atk": 18,
+   "def": 3,
    "atkInterval": 16,
    "moveSpeed": 1,
-   "exp": 45,
+   "exp": 15,
    "gold": [
     0,
     8
@@ -398,12 +398,12 @@
    "id": 1005,
    "name": "惡虎",
    "level": 9,
-   "hp": 260,
-   "atk": 26,
-   "def": 8,
+   "hp": 362,
+   "atk": 29,
+   "def": 5,
    "atkInterval": 14,
    "moveSpeed": 1,
-   "exp": 110,
+   "exp": 30,
    "gold": [
     0,
     15
@@ -480,12 +480,12 @@
    "id": 1006,
    "name": "夜狼",
    "level": 3,
-   "hp": 55,
-   "atk": 10,
+   "hp": 136,
+   "atk": 11,
    "def": 2,
    "atkInterval": 17,
    "moveSpeed": 1,
-   "exp": 18,
+   "exp": 6,
    "gold": [
     0,
     6
@@ -559,13 +559,13 @@
    "id": 1007,
    "name": "妖法師",
    "level": 11,
-   "hp": 320,
-   "atk": 20,
-   "def": 8,
+   "hp": 447,
+   "atk": 35,
+   "def": 6,
    "spellDef": 14,
    "atkInterval": 16,
    "moveSpeed": 1,
-   "exp": 150,
+   "exp": 29,
    "gold": [
     0,
     20
@@ -621,13 +621,13 @@
    "id": 1008,
    "name": "妖道士",
    "level": 15,
-   "hp": 520,
-   "atk": 28,
-   "def": 12,
+   "hp": 682,
+   "atk": 53,
+   "def": 9,
    "spellDef": 26,
    "atkInterval": 15,
    "moveSpeed": 1,
-   "exp": 260,
+   "exp": 56,
    "gold": [
     10,
     40
@@ -668,13 +668,13 @@
    "id": 1009,
    "name": "妖僧侶",
    "level": 24,
-   "hp": 1100,
-   "atk": 45,
-   "def": 20,
+   "hp": 1224,
+   "atk": 96,
+   "def": 14,
    "spellDef": 60,
    "atkInterval": 14,
    "moveSpeed": 1,
-   "exp": 800,
+   "exp": 157,
    "gold": [
     20,
     80
@@ -730,13 +730,13 @@
    "id": 1010,
    "name": "霸盜賊",
    "level": 20,
-   "hp": 800,
-   "atk": 42,
-   "def": 14,
+   "hp": 944,
+   "atk": 74,
+   "def": 11,
    "spellDef": 30,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 420,
+   "exp": 125,
    "gold": [
     20,
     60
@@ -780,9 +780,9 @@
    "id": 1011,
    "name": "瀧銘",
    "level": 32,
-   "hp": 1800,
-   "atk": 55,
-   "def": 22,
+   "hp": 1885,
+   "atk": 137,
+   "def": 19,
    "spellDef": 40,
    "atkInterval": 12,
    "moveSpeed": 1,
@@ -840,9 +840,9 @@
    "id": 1012,
    "name": "胡玉",
    "level": 13,
-   "hp": 900,
-   "atk": 34,
-   "def": 11,
+   "hp": 552,
+   "atk": 43,
+   "def": 8,
    "spellDef": 20,
    "atkInterval": 13,
    "moveSpeed": 1,
@@ -875,9 +875,9 @@
    "id": 1013,
    "name": "于毒",
    "level": 15,
-   "hp": 1100,
-   "atk": 38,
-   "def": 12,
+   "hp": 682,
+   "atk": 53,
+   "def": 9,
    "spellDef": 24,
    "atkInterval": 13,
    "moveSpeed": 1,
@@ -910,9 +910,9 @@
    "id": 1014,
    "name": "丁原",
    "level": 18,
-   "hp": 1400,
-   "atk": 44,
-   "def": 14,
+   "hp": 829,
+   "atk": 65,
+   "def": 10,
    "spellDef": 28,
    "atkInterval": 13,
    "moveSpeed": 1,
@@ -950,12 +950,12 @@
    "id": 11091,
    "name": "山賊",
    "level": 11,
-   "hp": 279,
-   "atk": 28,
-   "def": 10,
+   "hp": 313,
+   "atk": 30,
+   "def": 6,
    "atkInterval": 18,
    "moveSpeed": 1,
-   "exp": 250,
+   "exp": 29,
    "gold": [
     0,
     33
@@ -1022,12 +1022,12 @@
    "id": 11068,
    "name": "流氓1",
    "level": 14,
-   "hp": 330,
-   "atk": 33,
-   "def": 10,
+   "hp": 614,
+   "atk": 48,
+   "def": 8,
    "atkInterval": 18,
    "moveSpeed": 1,
-   "exp": 385,
+   "exp": 49,
    "gold": [
     0,
     42
@@ -1089,12 +1089,12 @@
    "id": 11070,
    "name": "地痞1",
    "level": 30,
-   "hp": 720,
-   "atk": 48,
+   "hp": 1730,
+   "atk": 131,
    "def": 18,
    "atkInterval": 14,
    "moveSpeed": 1,
-   "exp": 1520,
+   "exp": 367,
    "gold": [
     0,
     90
@@ -1185,12 +1185,12 @@
    "id": 12022,
    "name": "水鴨",
    "level": 5,
-   "hp": 22,
-   "atk": 4,
-   "def": 0,
+   "hp": 135,
+   "atk": 13,
+   "def": 3,
    "atkInterval": 19,
    "moveSpeed": 1,
-   "exp": 60,
+   "exp": 10,
    "gold": [
     0,
     15
@@ -1260,12 +1260,12 @@
    "id": 12044,
    "name": "兔兒",
    "level": 5,
-   "hp": 21,
-   "atk": 4,
-   "def": 0,
+   "hp": 135,
+   "atk": 13,
+   "def": 3,
    "atkInterval": 19,
    "moveSpeed": 1,
-   "exp": 60,
+   "exp": 10,
    "gold": [
     0,
     15
@@ -1330,12 +1330,12 @@
    "id": 12003,
    "name": "野兔",
    "level": 7,
-   "hp": 128,
-   "atk": 17,
-   "def": 5,
+   "hp": 192,
+   "atk": 18,
+   "def": 4,
    "atkInterval": 19,
    "moveSpeed": 1,
-   "exp": 111,
+   "exp": 20,
    "gold": [
     0,
     21
@@ -1442,12 +1442,12 @@
    "id": 12046,
    "name": "草貂",
    "level": 7,
-   "hp": 142,
-   "atk": 19,
-   "def": 5,
+   "hp": 192,
+   "atk": 18,
+   "def": 4,
    "atkInterval": 19,
    "moveSpeed": 1,
-   "exp": 111,
+   "exp": 20,
    "gold": [
     0,
     21
@@ -1507,12 +1507,12 @@
    "id": 12021,
    "name": "野貂",
    "level": 9,
-   "hp": 100,
-   "atk": 13,
+   "hp": 254,
+   "atk": 24,
    "def": 5,
    "atkInterval": 19,
    "moveSpeed": 1,
-   "exp": 174,
+   "exp": 30,
    "gold": [
     0,
     27
@@ -1589,12 +1589,12 @@
    "id": 12029,
    "name": "蝴蝶精",
    "level": 9,
-   "hp": 103,
-   "atk": 14,
+   "hp": 362,
+   "atk": 29,
    "def": 5,
    "atkInterval": 19,
    "moveSpeed": 1,
-   "exp": 174,
+   "exp": 30,
    "gold": [
     0,
     27
@@ -1671,12 +1671,12 @@
    "id": 12031,
    "name": "蜻蜓",
    "level": 9,
-   "hp": 116,
-   "atk": 16,
+   "hp": 254,
+   "atk": 24,
    "def": 5,
    "atkInterval": 19,
    "moveSpeed": 1,
-   "exp": 174,
+   "exp": 30,
    "gold": [
     0,
     27
@@ -1748,12 +1748,12 @@
    "id": 12011,
    "name": "猴子",
    "level": 11,
-   "hp": 330,
-   "atk": 33,
-   "def": 10,
+   "hp": 313,
+   "atk": 30,
+   "def": 6,
    "atkInterval": 18,
    "moveSpeed": 1,
-   "exp": 250,
+   "exp": 29,
    "gold": [
     0,
     33
@@ -1820,12 +1820,12 @@
    "id": 12005,
    "name": "母雞",
    "level": 11,
-   "hp": 354,
-   "atk": 35,
-   "def": 10,
+   "hp": 313,
+   "atk": 30,
+   "def": 6,
    "atkInterval": 18,
    "moveSpeed": 1,
-   "exp": 250,
+   "exp": 29,
    "gold": [
     0,
     33
@@ -1896,12 +1896,12 @@
    "id": 12018,
    "name": "山羊",
    "level": 14,
-   "hp": 261,
-   "atk": 26,
-   "def": 10,
+   "hp": 430,
+   "atk": 40,
+   "def": 8,
    "atkInterval": 18,
    "moveSpeed": 1,
-   "exp": 385,
+   "exp": 49,
    "gold": [
     0,
     42
@@ -1938,12 +1938,12 @@
    "id": 12030,
    "name": "飛蛾怪",
    "level": 14,
-   "hp": 336,
-   "atk": 34,
-   "def": 10,
+   "hp": 614,
+   "atk": 48,
+   "def": 8,
    "atkInterval": 18,
    "moveSpeed": 1,
-   "exp": 385,
+   "exp": 49,
    "gold": [
     0,
     42
@@ -1998,12 +1998,12 @@
    "id": 12013,
    "name": "野豬",
    "level": 14,
-   "hp": 240,
-   "atk": 24,
-   "def": 10,
+   "hp": 430,
+   "atk": 40,
+   "def": 8,
    "atkInterval": 18,
    "moveSpeed": 1,
-   "exp": 385,
+   "exp": 49,
    "gold": [
     0,
     42
@@ -2069,12 +2069,12 @@
    "id": 12019,
    "name": "瘋貓",
    "level": 14,
-   "hp": 339,
-   "atk": 34,
-   "def": 10,
+   "hp": 430,
+   "atk": 40,
+   "def": 8,
    "atkInterval": 18,
    "moveSpeed": 1,
-   "exp": 385,
+   "exp": 49,
    "gold": [
     0,
     42
@@ -2133,12 +2133,12 @@
    "id": 12012,
    "name": "野狗",
    "level": 16,
-   "hp": 285,
-   "atk": 28,
-   "def": 10,
+   "hp": 509,
+   "atk": 47,
+   "def": 9,
    "atkInterval": 17,
    "moveSpeed": 1,
-   "exp": 490,
+   "exp": 70,
    "gold": [
     0,
     48
@@ -2209,12 +2209,12 @@
    "id": 12006,
    "name": "狐貍",
    "level": 18,
-   "hp": 309,
-   "atk": 31,
+   "hp": 580,
+   "atk": 54,
    "def": 10,
    "atkInterval": 17,
    "moveSpeed": 1,
-   "exp": 606,
+   "exp": 98,
    "gold": [
     0,
     54
@@ -2290,12 +2290,12 @@
    "id": 12014,
    "name": "花鹿",
    "level": 20,
-   "hp": 318,
-   "atk": 32,
-   "def": 10,
+   "hp": 661,
+   "atk": 62,
+   "def": 11,
    "atkInterval": 16,
    "moveSpeed": 1,
-   "exp": 732,
+   "exp": 125,
    "gold": [
     0,
     60
@@ -2342,12 +2342,12 @@
    "id": 12028,
    "name": "黃蜂",
    "level": 20,
-   "hp": 303,
-   "atk": 30,
-   "def": 10,
+   "hp": 661,
+   "atk": 62,
+   "def": 11,
    "atkInterval": 16,
    "moveSpeed": 1,
-   "exp": 732,
+   "exp": 125,
    "gold": [
     0,
     60
@@ -2402,12 +2402,12 @@
    "id": 12017,
    "name": "大蟒",
    "level": 20,
-   "hp": 306,
-   "atk": 31,
-   "def": 10,
+   "hp": 661,
+   "atk": 62,
+   "def": 11,
    "atkInterval": 16,
    "moveSpeed": 1,
-   "exp": 732,
+   "exp": 125,
    "gold": [
     0,
     60
@@ -2466,12 +2466,12 @@
    "id": 12034,
    "name": "蝙蝠",
    "level": 20,
-   "hp": 279,
-   "atk": 28,
-   "def": 10,
+   "hp": 661,
+   "atk": 62,
+   "def": 11,
    "atkInterval": 16,
    "moveSpeed": 1,
-   "exp": 732,
+   "exp": 125,
    "gold": [
     0,
     60
@@ -2488,12 +2488,12 @@
    "id": 19001,
    "name": "洞窟獸王",
    "level": 22,
-   "hp": 2619,
-   "atk": 93,
-   "def": 27,
+   "hp": 4299,
+   "atk": 126,
+   "def": 13,
    "atkInterval": 16,
    "moveSpeed": 1,
-   "exp": 1304,
+   "exp": 360,
    "gold": [
     0,
     66
@@ -2564,12 +2564,12 @@
    "id": 11072,
    "name": "盜賊",
    "level": 9,
-   "hp": 230,
-   "atk": 24,
-   "def": 8,
+   "hp": 362,
+   "atk": 29,
+   "def": 5,
    "atkInterval": 18,
    "moveSpeed": 1,
-   "exp": 174,
+   "exp": 30,
    "gold": [
     0,
     27
@@ -2646,12 +2646,12 @@
    "id": 11069,
    "name": "流氓2",
    "level": 20,
-   "hp": 700,
-   "atk": 50,
-   "def": 14,
+   "hp": 944,
+   "atk": 74,
+   "def": 11,
    "atkInterval": 18,
    "moveSpeed": 1,
-   "exp": 732,
+   "exp": 125,
    "gold": [
     0,
     60
@@ -2727,12 +2727,12 @@
    "id": 27248,
    "name": "瘋狂小兵",
    "level": 12,
-   "hp": 300,
-   "atk": 30,
-   "def": 10,
+   "hp": 348,
+   "atk": 33,
+   "def": 7,
    "atkInterval": 18,
    "moveSpeed": 1,
-   "exp": 290,
+   "exp": 36,
    "gold": [
     0,
     36
@@ -2795,12 +2795,12 @@
    "id": 27005,
    "name": "海盜賊",
    "level": 15,
-   "hp": 380,
-   "atk": 37,
-   "def": 11,
+   "hp": 835,
+   "atk": 59,
+   "def": 9,
    "atkInterval": 18,
    "moveSpeed": 1,
-   "exp": 435,
+   "exp": 56,
    "gold": [
     0,
     45
@@ -2856,12 +2856,12 @@
    "id": 27008,
    "name": "山寨山賊",
    "level": 14,
-   "hp": 340,
-   "atk": 34,
-   "def": 10,
+   "hp": 868,
+   "atk": 57,
+   "def": 8,
    "atkInterval": 18,
    "moveSpeed": 1,
-   "exp": 385,
+   "exp": 49,
    "gold": [
     0,
     42
@@ -2917,13 +2917,13 @@
    "id": 1015,
    "name": "殺人狂",
    "level": 10,
-   "hp": 700,
+   "hp": 403,
    "atk": 32,
-   "def": 11,
+   "def": 6,
    "spellDef": 16,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 400,
+   "exp": 35,
    "gold": [
     20,
     60
@@ -2971,13 +2971,13 @@
    "id": 1016,
    "name": "殺人狂",
    "level": 14,
-   "hp": 1100,
-   "atk": 40,
-   "def": 14,
+   "hp": 614,
+   "atk": 48,
+   "def": 8,
    "spellDef": 20,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 700,
+   "exp": 49,
    "gold": [
     30,
     90
@@ -3015,13 +3015,13 @@
    "id": 1017,
    "name": "殺人狂",
    "level": 18,
-   "hp": 1600,
-   "atk": 48,
-   "def": 17,
+   "hp": 829,
+   "atk": 65,
+   "def": 10,
    "spellDef": 24,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 1100,
+   "exp": 98,
    "gold": [
     40,
     120
@@ -3064,13 +3064,13 @@
    "id": 1018,
    "name": "張牛角",
    "level": 20,
-   "hp": 2400,
-   "atk": 56,
-   "def": 20,
+   "hp": 944,
+   "atk": 74,
+   "def": 11,
    "spellDef": 28,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 1800,
+   "exp": 125,
    "gold": [
     60,
     150
@@ -3113,13 +3113,13 @@
    "id": 19002,
    "name": "試煉守衛",
    "level": 45,
-   "hp": 2000,
-   "atk": 48,
-   "def": 22,
+   "hp": 3224,
+   "atk": 182,
+   "def": 27,
    "spellDef": 60,
    "atkInterval": 22,
    "moveSpeed": 1,
-   "exp": 1200,
+   "exp": 1210,
    "gold": [
     40,
     80
@@ -3173,13 +3173,13 @@
    "id": 19003,
    "name": "試煉武師",
    "level": 50,
-   "hp": 2800,
-   "atk": 56,
-   "def": 27,
+   "hp": 3773,
+   "atk": 198,
+   "def": 30,
    "spellDef": 60,
    "atkInterval": 22,
    "moveSpeed": 1,
-   "exp": 1800,
+   "exp": 1842,
    "gold": [
     60,
     120
@@ -3228,13 +3228,13 @@
    "id": 19004,
    "name": "試煉魔將",
    "level": 55,
-   "hp": 4000,
-   "atk": 65,
+   "hp": 4417,
+   "atk": 215,
    "def": 33,
    "spellDef": 60,
    "atkInterval": 22,
    "moveSpeed": 1,
-   "exp": 2600,
+   "exp": 2338,
    "gold": [
     90,
     180
@@ -3278,12 +3278,12 @@
    "id": 1019,
    "name": "野狼",
    "level": 21,
-   "hp": 5031,
-   "atk": 77,
-   "def": 5,
+   "hp": 1007,
+   "atk": 79,
+   "def": 12,
    "atkInterval": 20,
    "moveSpeed": 1,
-   "exp": 202,
+   "exp": 102,
    "gold": [
     0,
     63
@@ -3359,12 +3359,12 @@
    "id": 1020,
    "name": "花豹",
    "level": 25,
-   "hp": 7221,
-   "atk": 92,
-   "def": 6,
+   "hp": 1306,
+   "atk": 103,
+   "def": 15,
    "atkInterval": 20,
    "moveSpeed": 1,
-   "exp": 240,
+   "exp": 183,
    "gold": [
     0,
     75
@@ -3450,12 +3450,12 @@
    "id": 1021,
    "name": "公雞",
    "level": 9,
-   "hp": 969,
-   "atk": 37,
-   "def": 2,
+   "hp": 362,
+   "atk": 29,
+   "def": 5,
    "atkInterval": 20,
    "moveSpeed": 1,
-   "exp": 86,
+   "exp": 30,
    "gold": [
     0,
     27
@@ -3536,12 +3536,12 @@
    "id": 1022,
    "name": "地痞2",
    "level": 10,
-   "hp": 1207,
-   "atk": 41,
-   "def": 3,
+   "hp": 403,
+   "atk": 32,
+   "def": 6,
    "atkInterval": 20,
    "moveSpeed": 1,
-   "exp": 96,
+   "exp": 35,
    "gold": [
     0,
     30
@@ -3593,12 +3593,12 @@
    "id": 1023,
    "name": "盜賊2",
    "level": 12,
-   "hp": 1751,
-   "atk": 33,
-   "def": 3,
+   "hp": 497,
+   "atk": 39,
+   "def": 7,
    "atkInterval": 20,
    "moveSpeed": 1,
-   "exp": 115,
+   "exp": 36,
    "gold": [
     0,
     36
@@ -3660,12 +3660,12 @@
    "id": 1024,
    "name": "土匪1",
    "level": 15,
-   "hp": 1851,
-   "atk": 41,
-   "def": 4,
+   "hp": 682,
+   "atk": 53,
+   "def": 9,
    "atkInterval": 20,
    "moveSpeed": 1,
-   "exp": 144,
+   "exp": 56,
    "gold": [
     0,
     45
@@ -3731,12 +3731,12 @@
    "id": 1025,
    "name": "土匪2",
    "level": 18,
-   "hp": 2711,
-   "atk": 49,
-   "def": 5,
+   "hp": 829,
+   "atk": 65,
+   "def": 10,
    "atkInterval": 20,
    "moveSpeed": 1,
-   "exp": 173,
+   "exp": 98,
    "gold": [
     0,
     54
@@ -3783,12 +3783,12 @@
    "id": 1026,
    "name": "小兵1",
    "level": 15,
-   "hp": 1924,
-   "atk": 42,
-   "def": 4,
+   "hp": 682,
+   "atk": 53,
+   "def": 9,
    "atkInterval": 20,
    "moveSpeed": 1,
-   "exp": 144,
+   "exp": 56,
    "gold": [
     0,
     45
@@ -3825,12 +3825,12 @@
    "id": 1027,
    "name": "彎刀兵",
    "level": 14,
-   "hp": 1709,
-   "atk": 40,
-   "def": 4,
+   "hp": 614,
+   "atk": 48,
+   "def": 8,
    "atkInterval": 20,
    "moveSpeed": 1,
-   "exp": 134,
+   "exp": 49,
    "gold": [
     0,
     42
@@ -3897,12 +3897,12 @@
    "id": 1028,
    "name": "長刀兵",
    "level": 13,
-   "hp": 1504,
-   "atk": 38,
-   "def": 3,
+   "hp": 552,
+   "atk": 43,
+   "def": 8,
    "atkInterval": 20,
    "moveSpeed": 1,
-   "exp": 125,
+   "exp": 42,
    "gold": [
     0,
     39
@@ -3969,12 +3969,12 @@
    "id": 1029,
    "name": "長槍兵",
    "level": 13,
-   "hp": 1531,
-   "atk": 39,
-   "def": 3,
+   "hp": 552,
+   "atk": 43,
+   "def": 8,
    "atkInterval": 20,
    "moveSpeed": 1,
-   "exp": 125,
+   "exp": 42,
    "gold": [
     0,
     39
@@ -4011,12 +4011,12 @@
    "id": 1030,
    "name": "斧兵",
    "level": 15,
-   "hp": 2068,
-   "atk": 45,
-   "def": 4,
+   "hp": 682,
+   "atk": 53,
+   "def": 9,
    "atkInterval": 20,
    "moveSpeed": 1,
-   "exp": 144,
+   "exp": 56,
    "gold": [
     0,
     45
@@ -4053,12 +4053,12 @@
    "id": 1031,
    "name": "隨護衛",
    "level": 10,
-   "hp": 946,
+   "hp": 403,
    "atk": 32,
-   "def": 3,
+   "def": 6,
    "atkInterval": 20,
    "moveSpeed": 1,
-   "exp": 96,
+   "exp": 35,
    "gold": [
     0,
     30
@@ -4114,12 +4114,12 @@
    "id": 1032,
    "name": "簡護衛",
    "level": 11,
-   "hp": 1160,
+   "hp": 447,
    "atk": 35,
-   "def": 3,
+   "def": 6,
    "atkInterval": 20,
    "moveSpeed": 1,
-   "exp": 106,
+   "exp": 29,
    "gold": [
     0,
     33
@@ -4189,12 +4189,12 @@
    "id": 1033,
    "name": "老虎",
    "level": 12,
-   "hp": 1400,
+   "hp": 497,
    "atk": 39,
-   "def": 3,
+   "def": 7,
    "atkInterval": 20,
    "moveSpeed": 1,
-   "exp": 115,
+   "exp": 36,
    "gold": [
     0,
     36
@@ -4259,12 +4259,12 @@
    "id": 1034,
    "name": "大熊",
    "level": 17,
-   "hp": 2837,
-   "atk": 55,
-   "def": 4,
+   "hp": 777,
+   "atk": 60,
+   "def": 10,
    "atkInterval": 20,
    "moveSpeed": 1,
-   "exp": 163,
+   "exp": 84,
    "gold": [
     0,
     51
@@ -4334,12 +4334,12 @@
    "id": 1035,
    "name": "野牛",
    "level": 13,
-   "hp": 1694,
+   "hp": 552,
    "atk": 43,
-   "def": 3,
+   "def": 8,
    "atkInterval": 20,
    "moveSpeed": 1,
-   "exp": 125,
+   "exp": 42,
    "gold": [
     0,
     39
@@ -4405,12 +4405,12 @@
    "id": 1036,
    "name": "巨斧兵",
    "level": 19,
-   "hp": 3655,
-   "atk": 62,
-   "def": 5,
+   "hp": 884,
+   "atk": 69,
+   "def": 11,
    "atkInterval": 20,
    "moveSpeed": 1,
-   "exp": 182,
+   "exp": 111,
    "gold": [
     0,
     57
@@ -4482,12 +4482,12 @@
    "id": 1037,
    "name": "狐蝠精",
    "level": 15,
-   "hp": 2322,
-   "atk": 51,
-   "def": 4,
+   "hp": 682,
+   "atk": 53,
+   "def": 9,
    "atkInterval": 20,
    "moveSpeed": 1,
-   "exp": 144,
+   "exp": 56,
    "gold": [
     0,
     45
@@ -4553,12 +4553,12 @@
    "id": 1038,
    "name": "蜥蜴王",
    "level": 17,
-   "hp": 3023,
-   "atk": 58,
-   "def": 4,
+   "hp": 777,
+   "atk": 60,
+   "def": 10,
    "atkInterval": 20,
    "moveSpeed": 1,
-   "exp": 163,
+   "exp": 84,
    "gold": [
     0,
     51
@@ -4629,13 +4629,13 @@
    "id": 1039,
    "name": "百夫長",
    "level": 24,
-   "hp": 4144,
-   "atk": 78,
-   "def": 23,
+   "hp": 4895,
+   "atk": 144,
+   "def": 14,
    "spellDef": 33,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 2280,
+   "exp": 471,
    "gold": [
     72,
     168
@@ -4686,13 +4686,13 @@
    "id": 1040,
    "name": "千夫長",
    "level": 27,
-   "hp": 5138,
-   "atk": 88,
-   "def": 26,
+   "hp": 5949,
+   "atk": 176,
+   "def": 16,
    "spellDef": 36,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 2565,
+   "exp": 771,
    "gold": [
     81,
     189
@@ -4748,13 +4748,13 @@
    "id": 1041,
    "name": "萬夫長",
    "level": 29,
-   "hp": 5866,
-   "atk": 94,
-   "def": 28,
+   "hp": 6627,
+   "atk": 192,
+   "def": 17,
    "spellDef": 38,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 2755,
+   "exp": 990,
    "gold": [
     87,
     203
@@ -4820,13 +4820,13 @@
    "id": 1042,
    "name": "褚飛燕",
    "level": 30,
-   "hp": 6250,
-   "atk": 98,
-   "def": 29,
+   "hp": 6919,
+   "atk": 196,
+   "def": 18,
    "spellDef": 39,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 2850,
+   "exp": 1101,
    "gold": [
     90,
     210
@@ -4898,13 +4898,13 @@
    "id": 1043,
    "name": "極惡之虎/神射手",
    "level": 33,
-   "hp": 7478,
-   "atk": 107,
-   "def": 31,
+   "hp": 7873,
+   "atk": 210,
+   "def": 19,
    "spellDef": 41,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 3135,
+   "exp": 1761,
    "gold": [
     99,
     231
@@ -4976,13 +4976,13 @@
    "id": 1044,
    "name": "神射手",
    "level": 35,
-   "hp": 8362,
-   "atk": 114,
-   "def": 33,
+   "hp": 8580,
+   "atk": 220,
+   "def": 21,
    "spellDef": 43,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 3325,
+   "exp": 2199,
    "gold": [
     105,
     245
@@ -5051,13 +5051,13 @@
    "id": 1045,
    "name": "神射手",
    "level": 37,
-   "hp": 9298,
-   "atk": 120,
-   "def": 35,
+   "hp": 9352,
+   "atk": 230,
+   "def": 22,
    "spellDef": 45,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 3515,
+   "exp": 2970,
    "gold": [
     111,
     259
@@ -5116,13 +5116,13 @@
    "id": 1046,
    "name": "神射手",
    "level": 39,
-   "hp": 10286,
-   "atk": 126,
-   "def": 37,
+   "hp": 10193,
+   "atk": 241,
+   "def": 23,
    "spellDef": 47,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 3705,
+   "exp": 3741,
    "gold": [
     117,
     273
@@ -5191,13 +5191,13 @@
    "id": 1047,
    "name": "李大目",
    "level": 40,
-   "hp": 10800,
-   "atk": 130,
-   "def": 38,
+   "hp": 10641,
+   "atk": 247,
+   "def": 24,
    "spellDef": 48,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 3800,
+   "exp": 4125,
    "gold": [
     120,
     280
@@ -5264,13 +5264,13 @@
    "id": 1048,
    "name": "嗜血狂魔",
    "level": 42,
-   "hp": 11866,
-   "atk": 136,
-   "def": 39,
+   "hp": 11598,
+   "atk": 258,
+   "def": 25,
    "spellDef": 49,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 3990,
+   "exp": 2937,
    "gold": [
     126,
     294
@@ -5339,13 +5339,13 @@
    "id": 1049,
    "name": "嗜血狂魔",
    "level": 44,
-   "hp": 12984,
-   "atk": 142,
-   "def": 41,
+   "hp": 12495,
+   "atk": 268,
+   "def": 26,
    "spellDef": 51,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 4180,
+   "exp": 3399,
    "gold": [
     132,
     308
@@ -5414,13 +5414,13 @@
    "id": 1050,
    "name": "浮雲",
    "level": 46,
-   "hp": 14154,
-   "atk": 149,
-   "def": 43,
+   "hp": 13308,
+   "atk": 277,
+   "def": 27,
    "spellDef": 53,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 4370,
+   "exp": 4008,
    "gold": [
     138,
     322
@@ -5476,13 +5476,13 @@
    "id": 1051,
    "name": "劉石",
    "level": 48,
-   "hp": 15376,
-   "atk": 155,
-   "def": 45,
+   "hp": 14173,
+   "atk": 287,
+   "def": 28,
    "spellDef": 55,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 4560,
+   "exp": 4770,
    "gold": [
     144,
     336
@@ -5533,13 +5533,13 @@
    "id": 1052,
    "name": "五鹿/白鳳",
    "level": 49,
-   "hp": 16006,
-   "atk": 158,
-   "def": 46,
+   "hp": 14626,
+   "atk": 291,
+   "def": 29,
    "spellDef": 56,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 4655,
+   "exp": 5148,
    "gold": [
     147,
     343
@@ -5603,13 +5603,13 @@
    "id": 1053,
    "name": "張白騎",
    "level": 50,
-   "hp": 16650,
-   "atk": 162,
-   "def": 47,
+   "hp": 15094,
+   "atk": 296,
+   "def": 30,
    "spellDef": 57,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 4750,
+   "exp": 5526,
    "gold": [
     150,
     350
@@ -5671,13 +5671,13 @@
    "id": 1054,
    "name": "戰狂",
    "level": 52,
-   "hp": 17976,
-   "atk": 168,
-   "def": 48,
+   "hp": 16075,
+   "atk": 306,
+   "def": 31,
    "spellDef": 58,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 4940,
+   "exp": 6120,
    "gold": [
     156,
     364
@@ -5718,13 +5718,13 @@
    "id": 1055,
    "name": "戰狂",
    "level": 54,
-   "hp": 19354,
-   "atk": 174,
-   "def": 50,
+   "hp": 17120,
+   "atk": 317,
+   "def": 32,
    "spellDef": 60,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 5130,
+   "exp": 6714,
    "gold": [
     162,
     378
@@ -5774,13 +5774,13 @@
    "id": 1056,
    "name": "戰狂",
    "level": 56,
-   "hp": 20784,
-   "atk": 181,
-   "def": 52,
+   "hp": 18233,
+   "atk": 327,
+   "def": 33,
    "spellDef": 62,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 5320,
+   "exp": 8136,
    "gold": [
     168,
     392
@@ -5840,13 +5840,13 @@
    "id": 1057,
    "name": "苦蝤/于氐根",
    "level": 58,
-   "hp": 22266,
-   "atk": 187,
-   "def": 54,
+   "hp": 19418,
+   "atk": 338,
+   "def": 35,
    "spellDef": 64,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 5510,
+   "exp": 10380,
    "gold": [
     174,
     406
@@ -5900,13 +5900,13 @@
    "id": 1058,
    "name": "楊鳳/雷公/左校/白繞",
    "level": 59,
-   "hp": 23026,
-   "atk": 190,
-   "def": 55,
+   "hp": 20039,
+   "atk": 344,
+   "def": 35,
    "spellDef": 65,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 5605,
+   "exp": 11502,
    "gold": [
     177,
     413
@@ -5976,13 +5976,13 @@
    "id": 1059,
    "name": "黃龍",
    "level": 60,
-   "hp": 23800,
-   "atk": 194,
-   "def": 56,
+   "hp": 20680,
+   "atk": 349,
+   "def": 36,
    "spellDef": 66,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 5700,
+   "exp": 12624,
    "gold": [
     180,
     420
@@ -6044,13 +6044,13 @@
    "id": 1060,
    "name": "蹇碩/程曠/夏惲/孫璋/韓梩",
    "level": 62,
-   "hp": 25386,
-   "atk": 200,
-   "def": 57,
+   "hp": 21705,
+   "atk": 353,
+   "def": 37,
    "spellDef": 67,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 5890,
+   "exp": 10800,
    "gold": [
     186,
     434
@@ -6112,13 +6112,13 @@
    "id": 1061,
    "name": "曹節/侯覽/高望/張恭",
    "level": 64,
-   "hp": 27024,
-   "atk": 206,
-   "def": 59,
+   "hp": 22782,
+   "atk": 357,
+   "def": 38,
    "spellDef": 69,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 6080,
+   "exp": 13188,
    "gold": [
     192,
     448
@@ -6196,13 +6196,13 @@
    "id": 1062,
    "name": "封諝/段珪/栗嵩/宋典",
    "level": 66,
-   "hp": 28714,
-   "atk": 213,
-   "def": 61,
+   "hp": 23911,
+   "atk": 361,
+   "def": 39,
    "spellDef": 71,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 6270,
+   "exp": 16239,
    "gold": [
     198,
     462
@@ -6290,13 +6290,13 @@
    "id": 1063,
    "name": "張讓/趙忠/郭勝/畢嵐",
    "level": 68,
-   "hp": 30456,
-   "atk": 219,
-   "def": 63,
+   "hp": 25097,
+   "atk": 365,
+   "def": 40,
    "spellDef": 73,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 6460,
+   "exp": 19959,
    "gold": [
     204,
     476
@@ -6384,13 +6384,13 @@
    "id": 1064,
    "name": "張讓/趙忠/郭勝/封諝/段珪/曹節/侯覽/蹇碩/程曠/夏惲",
    "level": 70,
-   "hp": 32250,
-   "atk": 226,
-   "def": 65,
+   "hp": 26341,
+   "atk": 368,
+   "def": 42,
    "spellDef": 75,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 6650,
+   "exp": 23679,
    "gold": [
     210,
     490
@@ -6512,13 +6512,13 @@
    "id": 1065,
    "name": "雍州刀護衛",
    "level": 81,
-   "hp": 4599,
-   "atk": 52,
-   "def": 8,
+   "hp": 8556,
+   "atk": 260,
+   "def": 49,
    "spellDef": 14,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 900,
+   "exp": 12587,
    "gold": [
     120,
     200
@@ -6615,13 +6615,13 @@
    "id": 1066,
    "name": "雍州鬼判官",
    "level": 82,
-   "hp": 4685,
-   "atk": 53,
-   "def": 8,
+   "hp": 8727,
+   "atk": 261,
+   "def": 49,
    "spellDef": 14,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 920,
+   "exp": 13556,
    "gold": [
     130,
     210
@@ -6713,13 +6713,13 @@
    "id": 1067,
    "name": "雍州生死官",
    "level": 83,
-   "hp": 4772,
-   "atk": 54,
-   "def": 8,
+   "hp": 35609,
+   "atk": 393,
+   "def": 50,
    "spellDef": 14,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 950,
+   "exp": 43572,
    "gold": [
     140,
     220
@@ -6801,13 +6801,13 @@
    "id": 1068,
    "name": "雍州劍俠客",
    "level": 84,
-   "hp": 4858,
-   "atk": 55,
-   "def": 9,
+   "hp": 9080,
+   "atk": 263,
+   "def": 50,
    "spellDef": 14,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 980,
+   "exp": 15493,
    "gold": [
     150,
     230
@@ -6889,13 +6889,13 @@
    "id": 1069,
    "name": "雍州長刀軍",
    "level": 85,
-   "hp": 4944,
-   "atk": 56,
-   "def": 9,
+   "hp": 9262,
+   "atk": 264,
+   "def": 51,
    "spellDef": 15,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 1010,
+   "exp": 16462,
    "gold": [
     160,
     240
@@ -6977,13 +6977,13 @@
    "id": 1070,
    "name": "雍州陰陽師",
    "level": 86,
-   "hp": 5031,
-   "atk": 57,
-   "def": 9,
+   "hp": 37792,
+   "atk": 398,
+   "def": 51,
    "spellDef": 15,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 1040,
+   "exp": 53793,
    "gold": [
     170,
     250
@@ -7065,13 +7065,13 @@
    "id": 1071,
    "name": "雍州鬼矛軍",
    "level": 87,
-   "hp": 5117,
-   "atk": 58,
-   "def": 10,
+   "hp": 9637,
+   "atk": 266,
+   "def": 52,
    "spellDef": 15,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 1070,
+   "exp": 19400,
    "gold": [
     180,
     260
@@ -7153,13 +7153,13 @@
    "id": 1072,
    "name": "雍州刀衛士",
    "level": 88,
-   "hp": 5204,
-   "atk": 59,
-   "def": 10,
+   "hp": 9830,
+   "atk": 267,
+   "def": 53,
    "spellDef": 15,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 1100,
+   "exp": 20869,
    "gold": [
     190,
     270
@@ -7256,13 +7256,13 @@
    "id": 1073,
    "name": "雍州刀刺客",
    "level": 89,
-   "hp": 5290,
-   "atk": 60,
-   "def": 10,
+   "hp": 40108,
+   "atk": 403,
+   "def": 53,
    "spellDef": 16,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 1130,
+   "exp": 67014,
    "gold": [
     200,
     280
@@ -7354,13 +7354,13 @@
    "id": 1074,
    "name": "雍州長槍手",
    "level": 90,
-   "hp": 5379,
-   "atk": 61,
-   "def": 11,
+   "hp": 10228,
+   "atk": 270,
+   "def": 54,
    "spellDef": 16,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 1160,
+   "exp": 23807,
    "gold": [
     210,
     290
@@ -7452,13 +7452,13 @@
    "id": 1075,
    "name": "益州刀捕校",
    "level": 91,
-   "hp": 5463,
-   "atk": 62,
-   "def": 11,
+   "hp": 10433,
+   "atk": 271,
+   "def": 54,
    "spellDef": 16,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 1190,
+   "exp": 26024,
    "gold": [
     220,
     300
@@ -7550,13 +7550,13 @@
    "id": 1076,
    "name": "益州魔使者",
    "level": 92,
-   "hp": 5549,
-   "atk": 63,
-   "def": 11,
+   "hp": 42567,
+   "atk": 408,
+   "def": 55,
    "spellDef": 16,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 1220,
+   "exp": 84726,
    "gold": [
     230,
     310
@@ -7743,13 +7743,13 @@
    "id": 1077,
    "name": "益州隱影者",
    "level": 93,
-   "hp": 5636,
-   "atk": 64,
-   "def": 12,
+   "hp": 10855,
+   "atk": 273,
+   "def": 56,
    "spellDef": 16,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 1250,
+   "exp": 30460,
    "gold": [
     240,
     320
@@ -7936,13 +7936,13 @@
    "id": 1078,
    "name": "益州獵首者",
    "level": 94,
-   "hp": 5722,
-   "atk": 65,
-   "def": 12,
+   "hp": 11072,
+   "atk": 274,
+   "def": 56,
    "spellDef": 17,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 1280,
+   "exp": 32678,
    "gold": [
     250,
     330
@@ -8129,13 +8129,13 @@
    "id": 1079,
    "name": "益州突擊兵",
    "level": 95,
-   "hp": 5808,
-   "atk": 66,
-   "def": 12,
+   "hp": 45176,
+   "atk": 413,
+   "def": 57,
    "spellDef": 17,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 1310,
+   "exp": 104688,
    "gold": [
     260,
     340
@@ -8322,13 +8322,13 @@
    "id": 1080,
    "name": "紫魔孟獲",
    "level": 82,
-   "hp": 72000,
-   "atk": 140,
-   "def": 40,
+   "hp": 34910,
+   "atk": 392,
+   "def": 49,
    "spellDef": 60,
    "atkInterval": 12,
    "moveSpeed": 2,
-   "exp": 5200,
+   "exp": 40668,
    "gold": [
     800,
     1500
@@ -8392,13 +8392,13 @@
    "id": 1081,
    "name": "靛魔孟獲",
    "level": 84,
-   "hp": 76000,
-   "atk": 146,
-   "def": 42,
+   "hp": 36322,
+   "atk": 395,
+   "def": 50,
    "spellDef": 62,
    "atkInterval": 12,
    "moveSpeed": 2,
-   "exp": 5400,
+   "exp": 46479,
    "gold": [
     850,
     1600
@@ -8457,13 +8457,13 @@
    "id": 1082,
    "name": "藍魔孟獲",
    "level": 86,
-   "hp": 80000,
-   "atk": 152,
-   "def": 44,
+   "hp": 37792,
+   "atk": 398,
+   "def": 51,
    "spellDef": 64,
    "atkInterval": 12,
    "moveSpeed": 2,
-   "exp": 5600,
+   "exp": 53793,
    "gold": [
     900,
     1700
@@ -8522,13 +8522,13 @@
    "id": 1083,
    "name": "綠魔孟獲",
    "level": 88,
-   "hp": 84000,
-   "atk": 158,
-   "def": 46,
+   "hp": 39321,
+   "atk": 401,
+   "def": 53,
    "spellDef": 66,
    "atkInterval": 12,
    "moveSpeed": 2,
-   "exp": 5800,
+   "exp": 62607,
    "gold": [
     950,
     1800
@@ -8582,13 +8582,13 @@
    "id": 1084,
    "name": "黃魔孟獲",
    "level": 90,
-   "hp": 88000,
-   "atk": 164,
-   "def": 48,
+   "hp": 40911,
+   "atk": 404,
+   "def": 54,
    "spellDef": 68,
    "atkInterval": 12,
    "moveSpeed": 2,
-   "exp": 6000,
+   "exp": 71421,
    "gold": [
     1000,
     1900
@@ -8662,13 +8662,13 @@
    "id": 1085,
    "name": "橙魔孟獲",
    "level": 92,
-   "hp": 92000,
-   "atk": 170,
-   "def": 50,
+   "hp": 42567,
+   "atk": 408,
+   "def": 55,
    "spellDef": 70,
    "atkInterval": 12,
    "moveSpeed": 2,
-   "exp": 6200,
+   "exp": 84726,
    "gold": [
     1050,
     2000
@@ -8837,13 +8837,13 @@
    "id": 1086,
    "name": "紅魔孟獲",
    "level": 95,
-   "hp": 96000,
-   "atk": 176,
-   "def": 52,
+   "hp": 45176,
+   "atk": 413,
+   "def": 57,
    "spellDef": 72,
    "atkInterval": 12,
    "moveSpeed": 2,
-   "exp": 6600,
+   "exp": 104688,
    "gold": [
     1100,
     2100
@@ -9016,12 +9016,12 @@
    "id": 1087,
    "name": "木乃伊",
    "level": 22,
-   "hp": 900,
-   "atk": 30,
-   "def": 10,
+   "hp": 1075,
+   "atk": 84,
+   "def": 13,
    "atkInterval": 15,
    "moveSpeed": 1,
-   "exp": 40,
+   "exp": 120,
    "gold": [
     0,
     20
@@ -9090,12 +9090,12 @@
    "id": 1088,
    "name": "殭屍",
    "level": 23,
-   "hp": 950,
-   "atk": 32,
-   "def": 11,
+   "hp": 1147,
+   "atk": 90,
+   "def": 13,
    "atkInterval": 15,
    "moveSpeed": 1,
-   "exp": 42,
+   "exp": 138,
    "gold": [
     0,
     20
@@ -9134,9 +9134,9 @@
    "id": 1089,
    "name": "程普",
    "level": 20,
-   "hp": 1600,
-   "atk": 48,
-   "def": 16,
+   "hp": 944,
+   "atk": 74,
+   "def": 11,
    "spellDef": 30,
    "atkInterval": 13,
    "moveSpeed": 1,
@@ -9174,9 +9174,9 @@
    "id": 1090,
    "name": "何進",
    "level": 22,
-   "hp": 1800,
-   "atk": 50,
-   "def": 18,
+   "hp": 1075,
+   "atk": 84,
+   "def": 13,
    "spellDef": 32,
    "atkInterval": 13,
    "moveSpeed": 1,
@@ -9214,9 +9214,9 @@
    "id": 1091,
    "name": "黃蓋",
    "level": 25,
-   "hp": 2000,
-   "atk": 54,
-   "def": 20,
+   "hp": 1306,
+   "atk": 103,
+   "def": 15,
    "spellDef": 34,
    "atkInterval": 13,
    "moveSpeed": 1,
@@ -9259,9 +9259,9 @@
    "id": 1092,
    "name": "張角",
    "level": 30,
-   "hp": 2600,
-   "atk": 60,
-   "def": 22,
+   "hp": 1730,
+   "atk": 131,
+   "def": 18,
    "spellDef": 40,
    "atkInterval": 13,
    "moveSpeed": 1,
@@ -9319,9 +9319,9 @@
    "id": 1093,
    "name": "猛獸王",
    "level": 24,
-   "hp": 2100,
-   "atk": 52,
-   "def": 19,
+   "hp": 1224,
+   "atk": 96,
+   "def": 14,
    "spellDef": 33,
    "atkInterval": 13,
    "moveSpeed": 1,
@@ -9364,9 +9364,9 @@
    "id": 1094,
    "name": "食人惡虎",
    "level": 22,
-   "hp": 1900,
-   "atk": 50,
-   "def": 17,
+   "hp": 1075,
+   "atk": 84,
+   "def": 13,
    "spellDef": 30,
    "atkInterval": 13,
    "moveSpeed": 1,
@@ -9404,9 +9404,9 @@
    "id": 1095,
    "name": "賊寇",
    "level": 18,
-   "hp": 1500,
-   "atk": 44,
-   "def": 15,
+   "hp": 829,
+   "atk": 65,
+   "def": 10,
    "spellDef": 26,
    "atkInterval": 13,
    "moveSpeed": 1,
@@ -9444,9 +9444,9 @@
    "id": 1096,
    "name": "山大王",
    "level": 20,
-   "hp": 1700,
-   "atk": 47,
-   "def": 16,
+   "hp": 944,
+   "atk": 74,
+   "def": 11,
    "spellDef": 28,
    "atkInterval": 13,
    "moveSpeed": 1,
@@ -9484,9 +9484,9 @@
    "id": 1097,
    "name": "惡頭",
    "level": 26,
-   "hp": 2300,
-   "atk": 55,
-   "def": 20,
+   "hp": 1394,
+   "atk": 110,
+   "def": 15,
    "spellDef": 36,
    "atkInterval": 13,
    "moveSpeed": 1,
@@ -9524,9 +9524,9 @@
    "id": 1098,
    "name": "鬼域巨魎",
    "level": 28,
-   "hp": 2500,
-   "atk": 58,
-   "def": 21,
+   "hp": 1587,
+   "atk": 125,
+   "def": 17,
    "spellDef": 38,
    "atkInterval": 13,
    "moveSpeed": 1,
@@ -9574,9 +9574,9 @@
    "id": 1099,
    "name": "前朝寶藏守衛",
    "level": 27,
-   "hp": 2400,
-   "atk": 57,
-   "def": 21,
+   "hp": 1487,
+   "atk": 117,
+   "def": 16,
    "spellDef": 37,
    "atkInterval": 13,
    "moveSpeed": 1,
@@ -9619,9 +9619,9 @@
    "id": 1100,
    "name": "骷髏王",
    "level": 34,
-   "hp": 2600,
-   "atk": 60,
-   "def": 24,
+   "hp": 2055,
+   "atk": 143,
+   "def": 20,
    "spellDef": 44,
    "atkInterval": 13,
    "moveSpeed": 1,
@@ -9682,9 +9682,9 @@
    "id": 1101,
    "name": "張得",
    "level": 40,
-   "hp": 3000,
-   "atk": 66,
-   "def": 26,
+   "hp": 2660,
+   "atk": 164,
+   "def": 24,
    "spellDef": 48,
    "atkInterval": 13,
    "moveSpeed": 1,
@@ -9737,9 +9737,9 @@
    "id": 1102,
    "name": "狼懿",
    "level": 35,
-   "hp": 2700,
-   "atk": 61,
-   "def": 24,
+   "hp": 2145,
+   "atk": 147,
+   "def": 21,
    "spellDef": 45,
    "atkInterval": 13,
    "moveSpeed": 1,
@@ -9792,9 +9792,9 @@
    "id": 1103,
    "name": "紅菁",
    "level": 40,
-   "hp": 3000,
-   "atk": 66,
-   "def": 26,
+   "hp": 2660,
+   "atk": 164,
+   "def": 24,
    "spellDef": 48,
    "atkInterval": 13,
    "moveSpeed": 1,
@@ -9847,9 +9847,9 @@
    "id": 1104,
    "name": "雙風黑殺手",
    "level": 33,
-   "hp": 2500,
-   "atk": 58,
-   "def": 23,
+   "hp": 1968,
+   "atk": 140,
+   "def": 19,
    "spellDef": 42,
    "atkInterval": 13,
    "moveSpeed": 1,
@@ -9892,9 +9892,9 @@
    "id": 1105,
    "name": "地理圖守護者",
    "level": 28,
-   "hp": 1600,
-   "atk": 46,
-   "def": 18,
+   "hp": 1587,
+   "atk": 125,
+   "def": 17,
    "spellDef": 30,
    "atkInterval": 16,
    "moveSpeed": 1,
@@ -17822,6 +17822,14 @@
   },
   {
    "zone": "xc2052",
+   "monster": 12018,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 9
+  },
+  {
+   "zone": "xc2052",
    "monster": 11072,
    "count": 4,
    "respawnTicks": 300,
@@ -17861,8 +17869,24 @@
    "lv": 16
   },
   {
+   "zone": "xc2054",
+   "monster": 1004,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 16
+  },
+  {
    "zone": "xc2055",
    "monster": 70024,
+   "count": 4,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 20
+  },
+  {
+   "zone": "xc2055",
+   "monster": 12014,
    "count": 4,
    "respawnTicks": 300,
    "orig": true,
@@ -18646,6 +18670,14 @@
   },
   {
    "zone": "xc125",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 20
+  },
+  {
+   "zone": "xc125",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -18667,6 +18699,14 @@
    "respawnTicks": 300,
    "orig": true,
    "lv": 20
+  },
+  {
+   "zone": "xc125",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 13
   },
   {
    "zone": "xc125",
@@ -18726,6 +18766,14 @@
   },
   {
    "zone": "xc225",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 20
+  },
+  {
+   "zone": "xc225",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -18747,6 +18795,14 @@
    "respawnTicks": 300,
    "orig": true,
    "lv": 20
+  },
+  {
+   "zone": "xc225",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 13
   },
   {
    "zone": "xc225",
@@ -18806,6 +18862,14 @@
   },
   {
    "zone": "xc325",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 20
+  },
+  {
+   "zone": "xc325",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -18827,6 +18891,14 @@
    "respawnTicks": 300,
    "orig": true,
    "lv": 20
+  },
+  {
+   "zone": "xc325",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 13
   },
   {
    "zone": "xc325",
@@ -18886,6 +18958,14 @@
   },
   {
    "zone": "xc425",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 20
+  },
+  {
+   "zone": "xc425",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -18907,6 +18987,14 @@
    "respawnTicks": 300,
    "orig": true,
    "lv": 20
+  },
+  {
+   "zone": "xc425",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 13
   },
   {
    "zone": "xc425",
@@ -18966,6 +19054,14 @@
   },
   {
    "zone": "xc525",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 20
+  },
+  {
+   "zone": "xc525",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -18987,6 +19083,14 @@
    "respawnTicks": 300,
    "orig": true,
    "lv": 20
+  },
+  {
+   "zone": "xc525",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 13
   },
   {
    "zone": "xc525",
@@ -19046,6 +19150,14 @@
   },
   {
    "zone": "xc625",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 20
+  },
+  {
+   "zone": "xc625",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -19067,6 +19179,14 @@
    "respawnTicks": 300,
    "orig": true,
    "lv": 20
+  },
+  {
+   "zone": "xc625",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 13
   },
   {
    "zone": "xc625",
@@ -19126,6 +19246,14 @@
   },
   {
    "zone": "xc725",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 20
+  },
+  {
+   "zone": "xc725",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -19147,6 +19275,14 @@
    "respawnTicks": 300,
    "orig": true,
    "lv": 20
+  },
+  {
+   "zone": "xc725",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 13
   },
   {
    "zone": "xc725",
@@ -19206,6 +19342,14 @@
   },
   {
    "zone": "xc825",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 20
+  },
+  {
+   "zone": "xc825",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -19227,6 +19371,14 @@
    "respawnTicks": 300,
    "orig": true,
    "lv": 20
+  },
+  {
+   "zone": "xc825",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 13
   },
   {
    "zone": "xc825",
@@ -19286,6 +19438,14 @@
   },
   {
    "zone": "xc925",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 20
+  },
+  {
+   "zone": "xc925",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -19307,6 +19467,14 @@
    "respawnTicks": 300,
    "orig": true,
    "lv": 20
+  },
+  {
+   "zone": "xc925",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 13
   },
   {
    "zone": "xc925",
@@ -19366,6 +19534,14 @@
   },
   {
    "zone": "xc1025",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 20
+  },
+  {
+   "zone": "xc1025",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -19387,6 +19563,14 @@
    "respawnTicks": 300,
    "orig": true,
    "lv": 20
+  },
+  {
+   "zone": "xc1025",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 13
   },
   {
    "zone": "xc1025",
@@ -19446,6 +19630,14 @@
   },
   {
    "zone": "xc1125",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 20
+  },
+  {
+   "zone": "xc1125",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -19467,6 +19659,14 @@
    "respawnTicks": 300,
    "orig": true,
    "lv": 20
+  },
+  {
+   "zone": "xc1125",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 13
   },
   {
    "zone": "xc1125",
@@ -19526,6 +19726,14 @@
   },
   {
    "zone": "xc1225",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 20
+  },
+  {
+   "zone": "xc1225",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -19547,6 +19755,14 @@
    "respawnTicks": 300,
    "orig": true,
    "lv": 20
+  },
+  {
+   "zone": "xc1225",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 13
   },
   {
    "zone": "xc1225",
@@ -19606,6 +19822,14 @@
   },
   {
    "zone": "xc1325",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 20
+  },
+  {
+   "zone": "xc1325",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -19627,6 +19851,14 @@
    "respawnTicks": 300,
    "orig": true,
    "lv": 20
+  },
+  {
+   "zone": "xc1325",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 13
   },
   {
    "zone": "xc1325",
@@ -19686,6 +19918,14 @@
   },
   {
    "zone": "xc1425",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 20
+  },
+  {
+   "zone": "xc1425",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -19707,6 +19947,14 @@
    "respawnTicks": 300,
    "orig": true,
    "lv": 20
+  },
+  {
+   "zone": "xc1425",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 13
   },
   {
    "zone": "xc1425",
@@ -19766,6 +20014,14 @@
   },
   {
    "zone": "xc1525",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 20
+  },
+  {
+   "zone": "xc1525",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -19787,6 +20043,14 @@
    "respawnTicks": 300,
    "orig": true,
    "lv": 20
+  },
+  {
+   "zone": "xc1525",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 13
   },
   {
    "zone": "xc1525",
@@ -19846,6 +20110,14 @@
   },
   {
    "zone": "xc1625",
+   "monster": 12014,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 20
+  },
+  {
+   "zone": "xc1625",
    "monster": 12017,
    "count": 1,
    "respawnTicks": 300,
@@ -19867,6 +20139,14 @@
    "respawnTicks": 300,
    "orig": true,
    "lv": 20
+  },
+  {
+   "zone": "xc1625",
+   "monster": 1035,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 13
   },
   {
    "zone": "xc1625",
@@ -19958,11 +20238,27 @@
   },
   {
    "zone": "xc1725",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 10
+  },
+  {
+   "zone": "xc1725",
    "monster": 12019,
    "count": 1,
    "respawnTicks": 300,
    "orig": true,
    "lv": 10
+  },
+  {
+   "zone": "xc1725",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 6
   },
   {
    "zone": "xc1725",
@@ -20022,11 +20318,27 @@
   },
   {
    "zone": "xc1825",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 10
+  },
+  {
+   "zone": "xc1825",
    "monster": 12019,
    "count": 1,
    "respawnTicks": 300,
    "orig": true,
    "lv": 10
+  },
+  {
+   "zone": "xc1825",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 6
   },
   {
    "zone": "xc1825",
@@ -20086,11 +20398,27 @@
   },
   {
    "zone": "xc1925",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 10
+  },
+  {
+   "zone": "xc1925",
    "monster": 12019,
    "count": 1,
    "respawnTicks": 300,
    "orig": true,
    "lv": 10
+  },
+  {
+   "zone": "xc1925",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 6
   },
   {
    "zone": "xc1925",
@@ -20150,11 +20478,27 @@
   },
   {
    "zone": "xc2025",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 10
+  },
+  {
+   "zone": "xc2025",
    "monster": 12019,
    "count": 1,
    "respawnTicks": 300,
    "orig": true,
    "lv": 10
+  },
+  {
+   "zone": "xc2025",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 6
   },
   {
    "zone": "xc2025",
@@ -20230,6 +20574,14 @@
   },
   {
    "zone": "xc2125",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 6
+  },
+  {
+   "zone": "xc2125",
    "monster": 12030,
    "count": 1,
    "respawnTicks": 300,
@@ -20310,6 +20662,14 @@
   },
   {
    "zone": "xc2225",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 6
+  },
+  {
+   "zone": "xc2225",
    "monster": 12030,
    "count": 1,
    "respawnTicks": 300,
@@ -20390,6 +20750,14 @@
   },
   {
    "zone": "xc2325",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 6
+  },
+  {
+   "zone": "xc2325",
    "monster": 12030,
    "count": 1,
    "respawnTicks": 300,
@@ -20454,11 +20822,27 @@
   },
   {
    "zone": "xc2425",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 10
+  },
+  {
+   "zone": "xc2425",
    "monster": 12019,
    "count": 1,
    "respawnTicks": 300,
    "orig": true,
    "lv": 10
+  },
+  {
+   "zone": "xc2425",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 6
   },
   {
    "zone": "xc2425",
@@ -20526,11 +20910,27 @@
   },
   {
    "zone": "xc2525",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 10
+  },
+  {
+   "zone": "xc2525",
    "monster": 12019,
    "count": 1,
    "respawnTicks": 300,
    "orig": true,
    "lv": 10
+  },
+  {
+   "zone": "xc2525",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 6
   },
   {
    "zone": "xc2525",
@@ -20598,11 +20998,27 @@
   },
   {
    "zone": "xc2625",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 10
+  },
+  {
+   "zone": "xc2625",
    "monster": 12019,
    "count": 1,
    "respawnTicks": 300,
    "orig": true,
    "lv": 10
+  },
+  {
+   "zone": "xc2625",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 6
   },
   {
    "zone": "xc2625",
@@ -20686,6 +21102,14 @@
   },
   {
    "zone": "xc2725",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 6
+  },
+  {
+   "zone": "xc2725",
    "monster": 12030,
    "count": 1,
    "respawnTicks": 300,
@@ -20766,6 +21190,14 @@
   },
   {
    "zone": "xc2825",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 6
+  },
+  {
+   "zone": "xc2825",
    "monster": 12030,
    "count": 1,
    "respawnTicks": 300,
@@ -20846,6 +21278,14 @@
   },
   {
    "zone": "xc2925",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 6
+  },
+  {
+   "zone": "xc2925",
    "monster": 12030,
    "count": 1,
    "respawnTicks": 300,
@@ -20926,6 +21366,14 @@
   },
   {
    "zone": "xc3025",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 6
+  },
+  {
+   "zone": "xc3025",
    "monster": 12030,
    "count": 1,
    "respawnTicks": 300,
@@ -21006,6 +21454,14 @@
   },
   {
    "zone": "xc3125",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 6
+  },
+  {
+   "zone": "xc3125",
    "monster": 12030,
    "count": 1,
    "respawnTicks": 300,
@@ -21086,6 +21542,14 @@
   },
   {
    "zone": "xc3225",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 6
+  },
+  {
+   "zone": "xc3225",
    "monster": 12030,
    "count": 1,
    "respawnTicks": 300,
@@ -21150,11 +21614,27 @@
   },
   {
    "zone": "xc3325",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 10
+  },
+  {
+   "zone": "xc3325",
    "monster": 12019,
    "count": 1,
    "respawnTicks": 300,
    "orig": true,
    "lv": 10
+  },
+  {
+   "zone": "xc3325",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 6
   },
   {
    "zone": "xc3325",
@@ -21222,11 +21702,27 @@
   },
   {
    "zone": "xc3425",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 10
+  },
+  {
+   "zone": "xc3425",
    "monster": 12019,
    "count": 1,
    "respawnTicks": 300,
    "orig": true,
    "lv": 10
+  },
+  {
+   "zone": "xc3425",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 6
   },
   {
    "zone": "xc3425",
@@ -21294,11 +21790,27 @@
   },
   {
    "zone": "xc3525",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 10
+  },
+  {
+   "zone": "xc3525",
    "monster": 12019,
    "count": 1,
    "respawnTicks": 300,
    "orig": true,
    "lv": 10
+  },
+  {
+   "zone": "xc3525",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 6
   },
   {
    "zone": "xc3525",
@@ -21366,11 +21878,27 @@
   },
   {
    "zone": "xc3625",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 10
+  },
+  {
+   "zone": "xc3625",
    "monster": 12019,
    "count": 1,
    "respawnTicks": 300,
    "orig": true,
    "lv": 10
+  },
+  {
+   "zone": "xc3625",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 6
   },
   {
    "zone": "xc3625",
@@ -21438,11 +21966,27 @@
   },
   {
    "zone": "xc3725",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 10
+  },
+  {
+   "zone": "xc3725",
    "monster": 12019,
    "count": 1,
    "respawnTicks": 300,
    "orig": true,
    "lv": 10
+  },
+  {
+   "zone": "xc3725",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 6
   },
   {
    "zone": "xc3725",
@@ -21510,11 +22054,27 @@
   },
   {
    "zone": "xc3825",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 10
+  },
+  {
+   "zone": "xc3825",
    "monster": 12019,
    "count": 1,
    "respawnTicks": 300,
    "orig": true,
    "lv": 10
+  },
+  {
+   "zone": "xc3825",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 6
   },
   {
    "zone": "xc3825",
@@ -21582,11 +22142,27 @@
   },
   {
    "zone": "xc3925",
+   "monster": 12018,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 10
+  },
+  {
+   "zone": "xc3925",
    "monster": 12019,
    "count": 1,
    "respawnTicks": 300,
    "orig": true,
    "lv": 10
+  },
+  {
+   "zone": "xc3925",
+   "monster": 1004,
+   "count": 1,
+   "respawnTicks": 300,
+   "orig": true,
+   "lv": 6
   },
   {
    "zone": "xc3925",
@@ -21603,6 +22179,162 @@
    "respawnTicks": 300,
    "orig": true,
    "lv": 10
+  },
+  {
+   "zone": "field_1",
+   "monster": 1004,
+   "count": 3,
+   "respawnTicks": 250,
+   "area": [
+    10,
+    26,
+    50,
+    56
+   ]
+  },
+  {
+   "zone": "runan_f5",
+   "monster": 12018,
+   "count": 3,
+   "respawnTicks": 280
+  },
+  {
+   "zone": "runan_f6",
+   "monster": 12013,
+   "count": 3,
+   "respawnTicks": 300
+  },
+  {
+   "zone": "runan_f8",
+   "monster": 12014,
+   "count": 2,
+   "respawnTicks": 300
+  },
+  {
+   "zone": "runan_f10",
+   "monster": 19001,
+   "count": 1,
+   "respawnTicks": 0
+  },
+  {
+   "zone": "runan_road",
+   "monster": 12014,
+   "count": 2,
+   "respawnTicks": 300,
+   "area": [
+    4,
+    4,
+    36,
+    36
+   ]
+  },
+  {
+   "zone": "kunyang",
+   "monster": 12018,
+   "count": 3,
+   "respawnTicks": 280,
+   "area": [
+    4,
+    2,
+    88,
+    30
+   ]
+  },
+  {
+   "zone": "kunyang",
+   "monster": 12013,
+   "count": 3,
+   "respawnTicks": 300,
+   "area": [
+    62,
+    36,
+    88,
+    62
+   ]
+  },
+  {
+   "zone": "bowang",
+   "monster": 1004,
+   "count": 3,
+   "respawnTicks": 250,
+   "area": [
+    2,
+    2,
+    93,
+    16
+   ]
+  },
+  {
+   "zone": "fancheng",
+   "monster": 12018,
+   "count": 3,
+   "respawnTicks": 280,
+   "area": [
+    4,
+    22,
+    36,
+    38
+   ]
+  },
+  {
+   "zone": "fancheng",
+   "monster": 12013,
+   "count": 3,
+   "respawnTicks": 300,
+   "area": [
+    8,
+    40,
+    30,
+    52
+   ]
+  },
+  {
+   "zone": "hanshui",
+   "monster": 12014,
+   "count": 2,
+   "respawnTicks": 300,
+   "area": [
+    4,
+    28,
+    36,
+    40
+   ]
+  },
+  {
+   "zone": "longzhong",
+   "monster": 12018,
+   "count": 4,
+   "respawnTicks": 260,
+   "area": [
+    26,
+    3,
+    38,
+    22
+   ]
+  },
+  {
+   "zone": "longzhong",
+   "monster": 12013,
+   "count": 4,
+   "respawnTicks": 260,
+   "area": [
+    4,
+    34,
+    26,
+    46
+   ]
+  },
+  {
+   "zone": "fancheng",
+   "monster": 1035,
+   "count": 3,
+   "respawnTicks": 260,
+   "area": [
+    8,
+    40,
+    30,
+    52
+   ]
   }
  ]
 }
