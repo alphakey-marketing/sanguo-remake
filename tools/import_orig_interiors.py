@@ -124,8 +124,28 @@ def slot_rects(runs, conns, gw, gh):
     for m, lst in conns.items():
         place_slots(lst, lambda sd: runs[m % 100][sd], gw, gh)
 
-ROAD_GATES = {600089: 1923, 600865: 1922, 600857: 1722}      # 600857 = 陳留南邊整條寬觸發區 (同許昌 600865 類似)，暫定去道路B；道路A(1723) 未知入口
-TILESET = {1907: 'grd02', 1923: 'grd00', 1700: 'grd00'}   # 其餘 grd03
+# 新增完整城 (用家 2026-10 指定: 譙/汝南/洛陽/宛)：室內 = locations.tsv 該城「城內設施」+ 該城 k2 門指向嘅其他室內；道路 xx22/xx23
+NEWCITIES = {18: '譙', 20: '汝南', 26: '洛陽', 28: '宛'}
+FULLCITIES = [19, 17] + sorted(NEWCITIES)
+_FAC_KW = [('官宅', '地方功曹'), ('客棧', '客棧掌櫃'), ('藥房', '藥房掌櫃'), ('藥房', '煉丹師傅'), ('武器店', '武器商'), ('私塾', '夫子'), ('廟', '廟公'), ('練兵場', '練兵將'),
+           ('木工廠', '木匠師傅'), ('打鐵鋪', '火爐師傅'), ('錢莊', '錢莊掌櫃'), ('拍賣屋', '拍賣屋掌櫃'), ('馬廄', '馬廄老闆'), ('驛站', '驛站長'), ('賭場', '賭場'),
+           ('監牢', '獄卒'), ('廚房', '大廚')]
+def _load_new_interiors():
+    rows = [r.rstrip(chr(10)).split(chr(9)) for r in open(os.path.join(SRC, 'extracted', 'map_list', 'locations.tsv'), encoding='utf8')][1:]
+    info = {int(r[0]): r for r in rows}
+    rc = k2_rects(); out = {}; tsets = {}
+    for c in NEWCITIES:
+        cn = NEWCITIES[c]; extra = {k for k, *_ in rc[c * 100] if c * 100 < k < c * 100 + 100}
+        for mid in sorted({m for m in info if m // 100 == c and m % 100 and info[m][5] == '城內設施'} | extra):
+            if mid not in info or not rc[mid]: continue      # 冇任何 k2 觸發 (無出口) = 原版未用空房，跳過
+            names = info[mid][7]; fx = next((k for k, w in _FAC_KW if w in names), None)
+            out[mid] = '%s%s' % (cn, fx) if fx else '%s室內%02d' % (cn, mid % 100)
+            tsets[mid] = info[mid][4]
+        for m, n in ((c * 100 + 22, '道路B'), (c * 100 + 23, '道路A')):
+            out[m] = cn + n; tsets[m] = info[m][4]
+    return out, tsets
+ROAD_GATES = {600089: 1923, 600865: 1922, 600857: 1722, 600861: 1822, 600868: 2022, 600872: 2622, 600820: 2822}      # 600857 = 陳留南邊整條寬觸發區 (同許昌 600865 類似)，暫定去道路B；道路A(1723) 未知入口
+TILESET = {1907: 'grd02', 1923: 'grd00', 1700: 'grd00'}   # 其餘 grd03 (新城 tileset 見 NEW_TS)
 
 def sprite_index():
     idx = {}
@@ -145,6 +165,11 @@ def k2_rects():
             x1, y1, x2, y2 = map(int, r[4:8])
             if x2 > x1 and y2 > y1: out[int(r[3])].add((int(r[0]), int(r[2]), x1, y1, x2, y2))
     return out
+
+NEW_INT, NEW_TS = _load_new_interiors()
+ROADS |= {m: n for m, n in NEW_INT.items() if m % 100 in (22, 23)}
+INTERIORS |= {m: n for m, n in NEW_INT.items() if m % 100 not in (22, 23)}
+TILESET.update(NEW_TS)
 
 _GRIDS = None
 def build_walk(d):
@@ -288,7 +313,7 @@ def run(check):
     # 城內門 / 工作區門 -> 城內 portal；室內出口 -> 返城
     portals = []; nodoor = []
     door_of = {}
-    for cr in (rects[1900], rects[1700]):
+    for cr in [rects[c * 100] for c in FULLCITIES]:
         for k, sub, x1, y1, x2, y2 in sorted(cr):
             if k in INTERIORS: door_of.setdefault(k, (x1, y1, x2, y2))
             elif k in ROAD_GATES: door_of[ROAD_GATES[k]] = (x1, y1, x2, y2)

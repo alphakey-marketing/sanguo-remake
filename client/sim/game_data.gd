@@ -4,7 +4,7 @@ extends RefCounted
 
 const NEWBIE_LEVEL := 5
 const WORLD_W := 512              # 全域格仔 (所有地圖拼埋一張，spec 12 §2)
-const WORLD_H := 11700             # 640 + 原版許昌 + 室內/道路 + 洞穴 + 各城外圍實例 (shelf 排，import_orig_interiors 報最低值)
+const WORLD_H := 13000             # 640 + 原版許昌 + 室內/道路 + 洞穴 + 各城外圍實例 (shelf 排，import_orig_interiors 報最低值)
 
 var classes: Dictionary = {}     # id(String) -> def
 var monsters: Dictionary = {}    # id(int) -> def
@@ -32,7 +32,7 @@ var legend: Dictionary = {}       # 地形字元 -> {name, walk}
 var tiles := PackedByteArray()    # 全域地形字元 (ASCII)，0 = 虛空 (唔喺任何地圖)
 var walk := PackedByteArray()     # 全域行得表 1/0
 var portal_at: Dictionary = {}    # cell (y*W+x) -> auto 傳送點 id (踩上去就過圖)
-var map_idx := PackedByteArray()  # cell -> maps index + 1 (0 = 虛空)；map_at/zone 查表用 (地圖唔重疊)
+var map_idx := PackedInt32Array()  # cell -> maps index + 1 (0 = 虛空)；map_at/zone 查表用 (地圖唔重疊)
 var tp_by_id: Dictionary = {}     # 傳送點 id -> def
 var zone_by_id: Dictionary = {}   # zone (= 地圖) id -> zone
 var landmarks: Array = []         # 史蹟地標 (已轉全域座標)
@@ -293,7 +293,7 @@ func _load_maps(mj: Dictionary) -> void:
 	tiles.resize(WORLD_W * WORLD_H)
 	walk.resize(WORLD_W * WORLD_H)
 	map_idx.resize(WORLD_W * WORLD_H)
-	assert(mj["maps"].size() < 255, "map_idx 用 byte，地圖太多")
+	assert(mj["maps"].size() < 32000, "map_idx 用 int32")
 	for md in mj["maps"]:
 		var id := String(md["id"])
 		var rows := FileAccess.get_file_as_string("res://data/maps/%s.txt" % id).replace("\r", "").split("\n", false)

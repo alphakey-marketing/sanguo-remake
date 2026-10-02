@@ -1273,7 +1273,7 @@
    "id": "xc100",
    "name": "襄平（原版）",
    "ox": 271,
-   "oy": 6565,
+   "oy": 8233,
    "safe": true,
    "kind": "field",
    "orig": "xc100",
@@ -1289,7 +1289,7 @@
    "id": "xc200",
    "name": "北平（原版）",
    "ox": 0,
-   "oy": 6773,
+   "oy": 8441,
    "safe": true,
    "kind": "field",
    "orig": "xc200",
@@ -1305,7 +1305,7 @@
    "id": "xc300",
    "name": "薊（原版）",
    "ox": 221,
-   "oy": 6773,
+   "oy": 8441,
    "safe": true,
    "kind": "field",
    "orig": "xc300",
@@ -1321,7 +1321,7 @@
    "id": "xc400",
    "name": "北海（原版）",
    "ox": 0,
-   "oy": 6944,
+   "oy": 8612,
    "safe": true,
    "kind": "field",
    "orig": "xc400",
@@ -1337,7 +1337,7 @@
    "id": "xc500",
    "name": "平原（原版）",
    "ox": 0,
-   "oy": 1781,
+   "oy": 3449,
    "safe": true,
    "kind": "field",
    "orig": "xc500",
@@ -1353,7 +1353,7 @@
    "id": "xc600",
    "name": "南皮（原版）",
    "ox": 0,
-   "oy": 1989,
+   "oy": 3657,
    "safe": true,
    "kind": "field",
    "orig": "xc600",
@@ -1369,7 +1369,7 @@
    "id": "xc700",
    "name": "鄴（原版）",
    "ox": 0,
-   "oy": 2197,
+   "oy": 3865,
    "safe": true,
    "kind": "field",
    "orig": "xc700",
@@ -1385,7 +1385,7 @@
    "id": "xc800",
    "name": "盧江（原版）",
    "ox": 0,
-   "oy": 2405,
+   "oy": 4073,
    "safe": true,
    "kind": "field",
    "orig": "xc800",
@@ -1401,7 +1401,7 @@
    "id": "xc900",
    "name": "壽春（原版）",
    "ox": 0,
-   "oy": 2613,
+   "oy": 4281,
    "safe": true,
    "kind": "field",
    "orig": "xc900",
@@ -1417,7 +1417,7 @@
    "id": "xc1000",
    "name": "柴桑（原版）",
    "ox": 0,
-   "oy": 2821,
+   "oy": 4489,
    "safe": true,
    "kind": "field",
    "orig": "xc1000",
@@ -1433,7 +1433,7 @@
    "id": "xc1100",
    "name": "吳（原版）",
    "ox": 0,
-   "oy": 3029,
+   "oy": 4697,
    "safe": true,
    "kind": "field",
    "orig": "xc1100",
@@ -1449,7 +1449,7 @@
    "id": "xc1200",
    "name": "會稽（原版）",
    "ox": 221,
-   "oy": 6944,
+   "oy": 8612,
    "safe": true,
    "kind": "field",
    "orig": "xc1200",
@@ -1465,7 +1465,7 @@
    "id": "xc1300",
    "name": "建業（原版）",
    "ox": 0,
-   "oy": 3237,
+   "oy": 4905,
    "safe": true,
    "kind": "field",
    "orig": "xc1300",
@@ -1481,7 +1481,7 @@
    "id": "xc1400",
    "name": "小沛（原版）",
    "ox": 0,
-   "oy": 7115,
+   "oy": 8783,
    "safe": true,
    "kind": "field",
    "orig": "xc1400",
@@ -1497,7 +1497,7 @@
    "id": "xc1500",
    "name": "下邳（原版）",
    "ox": 0,
-   "oy": 3445,
+   "oy": 5113,
    "safe": true,
    "kind": "field",
    "orig": "xc1500",
@@ -1513,7 +1513,7 @@
    "id": "xc1600",
    "name": "濮陽（原版）",
    "ox": 221,
-   "oy": 7115,
+   "oy": 8783,
    "safe": true,
    "kind": "field",
    "orig": "xc1600",
@@ -1529,7 +1529,7 @@
    "id": "xc1700",
    "name": "陳留（原版）",
    "ox": 0,
-   "oy": 3653,
+   "oy": 5321,
    "safe": true,
    "kind": "field",
    "orig": "xc1700",
@@ -1545,7 +1545,7 @@
    "id": "xc1701",
    "name": "陳留·陳留官宅",
    "ox": 242,
-   "oy": 1202,
+   "oy": 1982,
    "safe": true,
    "kind": "house",
    "orig": "xc1701",
@@ -1561,7 +1561,7 @@
    "id": "xc1702",
    "name": "陳留·陳留客棧",
    "ox": 338,
-   "oy": 1202,
+   "oy": 1982,
    "safe": true,
    "kind": "house",
    "orig": "xc1702",
@@ -1576,8 +1576,8 @@
   {
    "id": "xc1703",
    "name": "陳留·陳留藥房",
-   "ox": 0,
-   "oy": 1375,
+   "ox": 96,
+   "oy": 2386,
    "safe": true,
    "kind": "house",
    "orig": "xc1703",
@@ -1592,8 +1592,8 @@
   {
    "id": "xc1704",
    "name": "陳留·陳留武器店",
-   "ox": 71,
-   "oy": 1375,
+   "ox": 167,
+   "oy": 2386,
    "safe": true,
    "kind": "house",
    "orig": "xc1704",
@@ -1608,8 +1608,8 @@
   {
    "id": "xc1705",
    "name": "陳留·陳留私塾",
-   "ox": 142,
-   "oy": 1375,
+   "ox": 238,
+   "oy": 2386,
    "safe": true,
    "kind": "house",
    "orig": "xc1705",
@@ -1625,7 +1625,7 @@
    "id": "xc1707",
    "name": "陳留·陳留室內07",
    "ox": 434,
-   "oy": 1202,
+   "oy": 1982,
    "safe": true,
    "kind": "house",
    "orig": "xc1707",
@@ -1640,8 +1640,8 @@
   {
    "id": "xc1708",
    "name": "陳留·陳留室內08",
-   "ox": 213,
-   "oy": 1375,
+   "ox": 309,
+   "oy": 2386,
    "safe": true,
    "kind": "house",
    "orig": "xc1708",
@@ -1656,8 +1656,8 @@
   {
    "id": "xc1709",
    "name": "陳留·陳留室內09",
-   "ox": 284,
-   "oy": 1375,
+   "ox": 380,
+   "oy": 2386,
    "safe": true,
    "kind": "house",
    "orig": "xc1709",
@@ -1673,8 +1673,8 @@
   {
    "id": "xc1710",
    "name": "陳留·陳留木工廠",
-   "ox": 355,
-   "oy": 1375,
+   "ox": 451,
+   "oy": 2386,
    "safe": true,
    "kind": "house",
    "orig": "xc1710",
@@ -1689,8 +1689,8 @@
   {
    "id": "xc1711",
    "name": "陳留·陳留打鐵鋪",
-   "ox": 426,
-   "oy": 1375,
+   "ox": 0,
+   "oy": 2463,
    "safe": true,
    "kind": "house",
    "orig": "xc1711",
@@ -1705,8 +1705,8 @@
   {
    "id": "xc1712",
    "name": "陳留·陳留錢莊",
-   "ox": 0,
-   "oy": 1433,
+   "ox": 71,
+   "oy": 2463,
    "safe": true,
    "kind": "house",
    "orig": "xc1712",
@@ -1722,7 +1722,7 @@
    "id": "xc1713",
    "name": "陳留·陳留拍賣屋",
    "ox": 0,
-   "oy": 1298,
+   "oy": 2078,
    "safe": true,
    "kind": "house",
    "orig": "xc1713",
@@ -1737,8 +1737,8 @@
   {
    "id": "xc1714",
    "name": "陳留·陳留馬廄",
-   "ox": 71,
-   "oy": 1433,
+   "ox": 142,
+   "oy": 2463,
    "safe": true,
    "kind": "house",
    "orig": "xc1714",
@@ -1753,8 +1753,8 @@
   {
    "id": "xc1715",
    "name": "陳留·陳留驛站",
-   "ox": 142,
-   "oy": 1433,
+   "ox": 213,
+   "oy": 2463,
    "safe": true,
    "kind": "house",
    "orig": "xc1715",
@@ -1769,8 +1769,8 @@
   {
    "id": "xc1716",
    "name": "陳留·陳留室內16",
-   "ox": 213,
-   "oy": 1433,
+   "ox": 284,
+   "oy": 2463,
    "safe": true,
    "kind": "house",
    "orig": "xc1716",
@@ -1786,7 +1786,7 @@
    "id": "xc1717",
    "name": "陳留·陳留監牢",
    "ox": 0,
-   "oy": 1202,
+   "oy": 1886,
    "safe": true,
    "kind": "house",
    "orig": "xc1717",
@@ -1802,8 +1802,8 @@
   {
    "id": "xc1718",
    "name": "陳留·陳留廚房",
-   "ox": 284,
-   "oy": 1433,
+   "ox": 355,
+   "oy": 2463,
    "safe": true,
    "kind": "house",
    "orig": "xc1718",
@@ -1818,8 +1818,8 @@
   {
    "id": "xc1719",
    "name": "陳留·衛富豪家",
-   "ox": 355,
-   "oy": 1433,
+   "ox": 426,
+   "oy": 2463,
    "safe": true,
    "kind": "house",
    "orig": "xc1719",
@@ -1834,8 +1834,8 @@
   {
    "id": "xc1720",
    "name": "陳留·漁夫家",
-   "ox": 426,
-   "oy": 1433,
+   "ox": 0,
+   "oy": 2521,
    "safe": true,
    "kind": "house",
    "orig": "xc1720",
@@ -1850,8 +1850,8 @@
   {
    "id": "xc1721",
    "name": "陳留·陳留朝廷官署",
-   "ox": 0,
-   "oy": 1491,
+   "ox": 71,
+   "oy": 2521,
    "safe": true,
    "kind": "house",
    "orig": "xc1721",
@@ -1900,8 +1900,8 @@
   {
    "id": "xc1724",
    "name": "陳留·陳留大廚房",
-   "ox": 71,
-   "oy": 1491,
+   "ox": 142,
+   "oy": 2521,
    "safe": true,
    "kind": "house",
    "orig": "xc1724",
@@ -1916,8 +1916,8 @@
   {
    "id": "xc1733",
    "name": "陳留·陳留室內33",
-   "ox": 142,
-   "oy": 1491,
+   "ox": 213,
+   "oy": 2521,
    "safe": true,
    "kind": "house",
    "orig": "xc1733",
@@ -1932,8 +1932,8 @@
   {
    "id": "xc1741",
    "name": "陳留·陳留室內41",
-   "ox": 213,
-   "oy": 1491,
+   "ox": 284,
+   "oy": 2521,
    "safe": true,
    "kind": "house",
    "orig": "xc1741",
@@ -1948,8 +1948,8 @@
   {
    "id": "xc1742",
    "name": "陳留·衛茲家",
-   "ox": 284,
-   "oy": 1491,
+   "ox": 355,
+   "oy": 2521,
    "safe": true,
    "kind": "house",
    "orig": "xc1742",
@@ -1964,8 +1964,8 @@
   {
    "id": "xc1743",
    "name": "陳留·小童家",
-   "ox": 355,
-   "oy": 1491,
+   "ox": 426,
+   "oy": 2521,
    "safe": true,
    "kind": "house",
    "orig": "xc1743",
@@ -1980,8 +1980,8 @@
   {
    "id": "xc1744",
    "name": "陳留·陳留室內44",
-   "ox": 426,
-   "oy": 1491,
+   "ox": 0,
+   "oy": 2579,
    "safe": true,
    "kind": "house",
    "orig": "xc1744",
@@ -1996,8 +1996,8 @@
   {
    "id": "xc1745",
    "name": "陳留·陳留室內45",
-   "ox": 0,
-   "oy": 1549,
+   "ox": 71,
+   "oy": 2579,
    "safe": true,
    "kind": "house",
    "orig": "xc1745",
@@ -2012,8 +2012,8 @@
   {
    "id": "xc1746",
    "name": "陳留·陳留室內46",
-   "ox": 71,
-   "oy": 1549,
+   "ox": 142,
+   "oy": 2579,
    "safe": true,
    "kind": "house",
    "orig": "xc1746",
@@ -2028,8 +2028,8 @@
   {
    "id": "xc1747",
    "name": "陳留·書生家",
-   "ox": 142,
-   "oy": 1549,
+   "ox": 213,
+   "oy": 2579,
    "safe": true,
    "kind": "house",
    "orig": "xc1747",
@@ -2045,7 +2045,7 @@
    "id": "xc1800",
    "name": "譙（原版）",
    "ox": 0,
-   "oy": 3861,
+   "oy": 5529,
    "safe": true,
    "kind": "field",
    "orig": "xc1800",
@@ -2058,10 +2058,462 @@
    ]
   },
   {
+   "id": "xc1801",
+   "name": "譙·譙官宅",
+   "ox": 96,
+   "oy": 2078,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc1801",
+   "cityOf": "qiao",
+   "spawn": [
+    69,
+    36,
+    69,
+    36
+   ]
+  },
+  {
+   "id": "xc1802",
+   "name": "譙·譙客棧",
+   "ox": 192,
+   "oy": 2078,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc1802",
+   "cityOf": "qiao",
+   "spawn": [
+    69,
+    39,
+    69,
+    39
+   ]
+  },
+  {
+   "id": "xc1803",
+   "name": "譙·譙藥房",
+   "ox": 284,
+   "oy": 2579,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc1803",
+   "cityOf": "qiao",
+   "spawn": [
+    35,
+    32,
+    35,
+    32
+   ]
+  },
+  {
+   "id": "xc1804",
+   "name": "譙·譙武器店",
+   "ox": 355,
+   "oy": 2579,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc1804",
+   "cityOf": "qiao",
+   "spawn": [
+    25,
+    32,
+    25,
+    32
+   ]
+  },
+  {
+   "id": "xc1806",
+   "name": "譙·譙室內06",
+   "ox": 426,
+   "oy": 2579,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc1806",
+   "cityOf": "qiao",
+   "spawn": [
+    25,
+    32,
+    25,
+    32
+   ]
+  },
+  {
+   "id": "xc1807",
+   "name": "譙·譙室內07",
+   "ox": 288,
+   "oy": 2078,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc1807",
+   "cityOf": "qiao",
+   "spawn": [
+    5,
+    40,
+    5,
+    40
+   ]
+  },
+  {
+   "id": "xc1808",
+   "name": "譙·譙室內08",
+   "ox": 0,
+   "oy": 2637,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc1808",
+   "cityOf": "qiao",
+   "spawn": [
+    34,
+    4,
+    34,
+    4
+   ]
+  },
+  {
+   "id": "xc1809",
+   "name": "譙·譙室內09",
+   "ox": 71,
+   "oy": 2637,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc1809",
+   "cityOf": "qiao",
+   "spawn": [
+    25,
+    7,
+    25,
+    7
+   ],
+   "orphan": true
+  },
+  {
+   "id": "xc1810",
+   "name": "譙·譙木工廠",
+   "ox": 142,
+   "oy": 2637,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc1810",
+   "cityOf": "qiao",
+   "spawn": [
+    5,
+    29,
+    5,
+    29
+   ]
+  },
+  {
+   "id": "xc1811",
+   "name": "譙·譙打鐵鋪",
+   "ox": 213,
+   "oy": 2637,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc1811",
+   "cityOf": "qiao",
+   "spawn": [
+    25,
+    34,
+    25,
+    34
+   ]
+  },
+  {
+   "id": "xc1812",
+   "name": "譙·譙錢莊",
+   "ox": 284,
+   "oy": 2637,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc1812",
+   "cityOf": "qiao",
+   "spawn": [
+    47,
+    34,
+    47,
+    34
+   ]
+  },
+  {
+   "id": "xc1813",
+   "name": "譙·譙拍賣屋",
+   "ox": 384,
+   "oy": 2078,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc1813",
+   "cityOf": "qiao",
+   "spawn": [
+    3,
+    51,
+    3,
+    51
+   ]
+  },
+  {
+   "id": "xc1814",
+   "name": "譙·譙馬廄",
+   "ox": 355,
+   "oy": 2637,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc1814",
+   "cityOf": "qiao",
+   "spawn": [
+    48,
+    33,
+    48,
+    33
+   ]
+  },
+  {
+   "id": "xc1816",
+   "name": "譙·譙賭場",
+   "ox": 426,
+   "oy": 2637,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc1816",
+   "cityOf": "qiao",
+   "spawn": [
+    46,
+    26,
+    46,
+    26
+   ]
+  },
+  {
+   "id": "xc1817",
+   "name": "譙·譙監牢",
+   "ox": 121,
+   "oy": 1886,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc1817",
+   "cityOf": "qiao",
+   "spawn": [
+    2,
+    9,
+    2,
+    9
+   ],
+   "orphan": true
+  },
+  {
+   "id": "xc1818",
+   "name": "譙·譙室內18",
+   "ox": 0,
+   "oy": 2695,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc1818",
+   "cityOf": "qiao",
+   "spawn": [
+    3,
+    27,
+    3,
+    27
+   ]
+  },
+  {
+   "id": "xc1819",
+   "name": "譙·譙室內19",
+   "ox": 71,
+   "oy": 2695,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc1819",
+   "cityOf": "qiao",
+   "spawn": [
+    2,
+    27,
+    2,
+    27
+   ]
+  },
+  {
+   "id": "xc1820",
+   "name": "譙·譙室內20",
+   "ox": 142,
+   "oy": 2695,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc1820",
+   "cityOf": "qiao",
+   "spawn": [
+    43,
+    35,
+    43,
+    35
+   ],
+   "orphan": true
+  },
+  {
+   "id": "xc1821",
+   "name": "譙·譙室內21",
+   "ox": 213,
+   "oy": 2695,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc1821",
+   "cityOf": "qiao",
+   "spawn": [
+    41,
+    34,
+    41,
+    34
+   ]
+  },
+  {
+   "id": "xc1822",
+   "name": "譙·譙道路B",
+   "ox": 0,
+   "oy": 1031,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc1822",
+   "cityOf": "qiao",
+   "spawn": [
+    100,
+    7,
+    100,
+    7
+   ]
+  },
+  {
+   "id": "xc1823",
+   "name": "譙·譙道路A",
+   "ox": 221,
+   "oy": 1031,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc1823",
+   "cityOf": "qiao",
+   "spawn": [
+    98,
+    5,
+    98,
+    5
+   ],
+   "orphan": true
+  },
+  {
+   "id": "xc1824",
+   "name": "譙·譙廚房",
+   "ox": 284,
+   "oy": 2695,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc1824",
+   "cityOf": "qiao",
+   "spawn": [
+    25,
+    33,
+    25,
+    33
+   ]
+  },
+  {
+   "id": "xc1834",
+   "name": "譙·譙室內34",
+   "ox": 355,
+   "oy": 2695,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc1834",
+   "cityOf": "qiao",
+   "spawn": [
+    4,
+    32,
+    4,
+    32
+   ]
+  },
+  {
+   "id": "xc1841",
+   "name": "譙·譙室內41",
+   "ox": 426,
+   "oy": 2695,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc1841",
+   "cityOf": "qiao",
+   "spawn": [
+    44,
+    35,
+    44,
+    35
+   ]
+  },
+  {
+   "id": "xc1842",
+   "name": "譙·譙室內42",
+   "ox": 0,
+   "oy": 2753,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc1842",
+   "cityOf": "qiao",
+   "spawn": [
+    24,
+    29,
+    24,
+    29
+   ]
+  },
+  {
+   "id": "xc1843",
+   "name": "譙·譙室內43",
+   "ox": 71,
+   "oy": 2753,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc1843",
+   "cityOf": "qiao",
+   "spawn": [
+    44,
+    35,
+    44,
+    35
+   ]
+  },
+  {
+   "id": "xc1844",
+   "name": "譙·譙室內44",
+   "ox": 142,
+   "oy": 2753,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc1844",
+   "cityOf": "qiao",
+   "spawn": [
+    45,
+    31,
+    45,
+    31
+   ]
+  },
+  {
+   "id": "xc1845",
+   "name": "譙·譙室內45",
+   "ox": 213,
+   "oy": 2753,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc1845",
+   "cityOf": "qiao",
+   "spawn": [
+    3,
+    27,
+    3,
+    27
+   ]
+  },
+  {
    "id": "xc1851",
    "name": "譙·許昌洞穴一",
    "ox": 221,
-   "oy": 10877,
+   "oy": 12545,
    "safe": false,
    "kind": "field",
    "orig": "xc1851",
@@ -2078,7 +2530,7 @@
    "id": "xc1852",
    "name": "譙·許昌洞穴二",
    "ox": 0,
-   "oy": 11048,
+   "oy": 12716,
    "safe": false,
    "kind": "field",
    "orig": "xc1852",
@@ -2095,7 +2547,7 @@
    "id": "xc1853",
    "name": "譙·許昌洞穴三",
    "ox": 171,
-   "oy": 11048,
+   "oy": 12716,
    "safe": false,
    "kind": "field",
    "orig": "xc1853",
@@ -2112,7 +2564,7 @@
    "id": "xc1854",
    "name": "譙·許昌洞穴四",
    "ox": 342,
-   "oy": 11048,
+   "oy": 12716,
    "safe": false,
    "kind": "field",
    "orig": "xc1854",
@@ -2129,7 +2581,7 @@
    "id": "xc1855",
    "name": "譙·許昌洞穴五",
    "ox": 0,
-   "oy": 11181,
+   "oy": 12849,
    "safe": false,
    "kind": "field",
    "orig": "xc1855",
@@ -2145,8 +2597,8 @@
   {
    "id": "xc1901",
    "name": "許昌·官宅",
-   "ox": 96,
-   "oy": 1298,
+   "ox": 0,
+   "oy": 2155,
    "safe": true,
    "kind": "house",
    "orig": "xc1901",
@@ -2161,8 +2613,8 @@
   {
    "id": "xc1902",
    "name": "許昌·客棧",
-   "ox": 192,
-   "oy": 1298,
+   "ox": 96,
+   "oy": 2155,
    "safe": true,
    "kind": "house",
    "orig": "xc1902",
@@ -2177,8 +2629,8 @@
   {
    "id": "xc1903",
    "name": "許昌·藥房",
-   "ox": 213,
-   "oy": 1549,
+   "ox": 284,
+   "oy": 2753,
    "safe": true,
    "kind": "house",
    "orig": "xc1903",
@@ -2193,8 +2645,8 @@
   {
    "id": "xc1904",
    "name": "許昌·武器店",
-   "ox": 284,
-   "oy": 1549,
+   "ox": 355,
+   "oy": 2753,
    "safe": true,
    "kind": "house",
    "orig": "xc1904",
@@ -2209,8 +2661,8 @@
   {
    "id": "xc1905",
    "name": "許昌·私塾",
-   "ox": 355,
-   "oy": 1549,
+   "ox": 426,
+   "oy": 2753,
    "safe": true,
    "kind": "house",
    "orig": "xc1905",
@@ -2225,8 +2677,8 @@
   {
    "id": "xc1906",
    "name": "許昌·廟",
-   "ox": 426,
-   "oy": 1549,
+   "ox": 0,
+   "oy": 2811,
    "safe": true,
    "kind": "house",
    "orig": "xc1906",
@@ -2241,8 +2693,8 @@
   {
    "id": "xc1907",
    "name": "許昌·練兵場",
-   "ox": 288,
-   "oy": 1298,
+   "ox": 192,
+   "oy": 2155,
    "safe": true,
    "kind": "house",
    "orig": "xc1907",
@@ -2257,8 +2709,8 @@
   {
    "id": "xc1908",
    "name": "許昌·虎威府",
-   "ox": 0,
-   "oy": 1607,
+   "ox": 71,
+   "oy": 2811,
    "safe": true,
    "kind": "house",
    "orig": "xc1908",
@@ -2273,8 +2725,8 @@
   {
    "id": "xc1909",
    "name": "許昌·禁衛府",
-   "ox": 71,
-   "oy": 1607,
+   "ox": 142,
+   "oy": 2811,
    "safe": true,
    "kind": "house",
    "orig": "xc1909",
@@ -2290,8 +2742,8 @@
   {
    "id": "xc1910",
    "name": "許昌·木工廠",
-   "ox": 142,
-   "oy": 1607,
+   "ox": 213,
+   "oy": 2811,
    "safe": true,
    "kind": "house",
    "orig": "xc1910",
@@ -2306,8 +2758,8 @@
   {
    "id": "xc1911",
    "name": "許昌·打鐵鋪",
-   "ox": 213,
-   "oy": 1607,
+   "ox": 284,
+   "oy": 2811,
    "safe": true,
    "kind": "house",
    "orig": "xc1911",
@@ -2322,8 +2774,8 @@
   {
    "id": "xc1912",
    "name": "許昌·錢莊",
-   "ox": 284,
-   "oy": 1607,
+   "ox": 355,
+   "oy": 2811,
    "safe": true,
    "kind": "house",
    "orig": "xc1912",
@@ -2339,8 +2791,8 @@
   {
    "id": "xc1913",
    "name": "許昌·拍賣屋",
-   "ox": 384,
-   "oy": 1298,
+   "ox": 288,
+   "oy": 2155,
    "safe": true,
    "kind": "house",
    "orig": "xc1913",
@@ -2355,8 +2807,8 @@
   {
    "id": "xc1914",
    "name": "許昌·馬廄",
-   "ox": 355,
-   "oy": 1607,
+   "ox": 426,
+   "oy": 2811,
    "safe": true,
    "kind": "house",
    "orig": "xc1914",
@@ -2371,8 +2823,8 @@
   {
    "id": "xc1916",
    "name": "許昌·賭場",
-   "ox": 426,
-   "oy": 1607,
+   "ox": 0,
+   "oy": 2869,
    "safe": true,
    "kind": "house",
    "orig": "xc1916",
@@ -2387,8 +2839,8 @@
   {
    "id": "xc1917",
    "name": "許昌·大廳",
-   "ox": 121,
-   "oy": 1202,
+   "ox": 242,
+   "oy": 1886,
    "safe": true,
    "kind": "house",
    "orig": "xc1917",
@@ -2404,8 +2856,8 @@
   {
    "id": "xc1918",
    "name": "許昌·民宅",
-   "ox": 0,
-   "oy": 1665,
+   "ox": 71,
+   "oy": 2869,
    "safe": true,
    "kind": "house",
    "orig": "xc1918",
@@ -2420,8 +2872,8 @@
   {
    "id": "xc1919",
    "name": "許昌·老年人家",
-   "ox": 71,
-   "oy": 1665,
+   "ox": 142,
+   "oy": 2869,
    "safe": true,
    "kind": "house",
    "orig": "xc1919",
@@ -2436,8 +2888,8 @@
   {
    "id": "xc1920",
    "name": "許昌·民宅20",
-   "ox": 142,
-   "oy": 1665,
+   "ox": 213,
+   "oy": 2869,
    "safe": true,
    "kind": "house",
    "orig": "xc1920",
@@ -2453,8 +2905,8 @@
   {
    "id": "xc1921",
    "name": "許昌·鳳嫂家",
-   "ox": 213,
-   "oy": 1665,
+   "ox": 284,
+   "oy": 2869,
    "safe": true,
    "kind": "house",
    "orig": "xc1921",
@@ -2471,7 +2923,7 @@
    "id": "xc1922",
    "name": "許昌·許昌道路（農漁獵）",
    "ox": 0,
-   "oy": 1031,
+   "oy": 1202,
    "safe": true,
    "kind": "field",
    "orig": "xc1922",
@@ -2487,7 +2939,7 @@
    "id": "xc1923",
    "name": "許昌·許昌道路（木礦藥）",
    "ox": 221,
-   "oy": 1031,
+   "oy": 1202,
    "safe": true,
    "kind": "field",
    "orig": "xc1923",
@@ -2502,8 +2954,8 @@
   {
    "id": "xc1924",
    "name": "許昌·廚房",
-   "ox": 284,
-   "oy": 1665,
+   "ox": 355,
+   "oy": 2869,
    "safe": true,
    "kind": "house",
    "orig": "xc1924",
@@ -2519,7 +2971,7 @@
    "id": "xc1925",
    "name": "許昌·外圍25",
    "ox": 0,
-   "oy": 7286,
+   "oy": 8954,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2534,8 +2986,8 @@
   {
    "id": "xc1942",
    "name": "許昌·室內42",
-   "ox": 355,
-   "oy": 1665,
+   "ox": 426,
+   "oy": 2869,
    "safe": true,
    "kind": "house",
    "orig": "xc1942",
@@ -2550,8 +3002,8 @@
   {
    "id": "xc1943",
    "name": "許昌·室內43",
-   "ox": 426,
-   "oy": 1665,
+   "ox": 0,
+   "oy": 2927,
    "safe": true,
    "kind": "house",
    "orig": "xc1943",
@@ -2566,8 +3018,8 @@
   {
    "id": "xc1944",
    "name": "許昌·珠寶店",
-   "ox": 0,
-   "oy": 1723,
+   "ox": 71,
+   "oy": 2927,
    "safe": true,
    "kind": "house",
    "orig": "xc1944",
@@ -2582,8 +3034,8 @@
   {
    "id": "xc1945",
    "name": "許昌·室內45",
-   "ox": 71,
-   "oy": 1723,
+   "ox": 142,
+   "oy": 2927,
    "safe": true,
    "kind": "house",
    "orig": "xc1945",
@@ -2598,8 +3050,8 @@
   {
    "id": "xc1946",
    "name": "許昌·王允府",
-   "ox": 142,
-   "oy": 1723,
+   "ox": 213,
+   "oy": 2927,
    "safe": true,
    "kind": "house",
    "orig": "xc1946",
@@ -2614,8 +3066,8 @@
   {
    "id": "xc1947",
    "name": "許昌·劉備家",
-   "ox": 213,
-   "oy": 1723,
+   "ox": 284,
+   "oy": 2927,
    "safe": true,
    "kind": "house",
    "orig": "xc1947",
@@ -2631,7 +3083,7 @@
    "id": "xc2000",
    "name": "汝南（原版）",
    "ox": 0,
-   "oy": 4069,
+   "oy": 5737,
    "safe": true,
    "kind": "field",
    "orig": "xc2000",
@@ -2644,10 +3096,396 @@
    ]
   },
   {
+   "id": "xc2001",
+   "name": "汝南·汝南官宅",
+   "ox": 384,
+   "oy": 2155,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2001",
+   "cityOf": "runan",
+   "spawn": [
+    71,
+    38,
+    71,
+    38
+   ]
+  },
+  {
+   "id": "xc2002",
+   "name": "汝南·汝南客棧",
+   "ox": 0,
+   "oy": 2232,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2002",
+   "cityOf": "runan",
+   "spawn": [
+    69,
+    43,
+    69,
+    43
+   ]
+  },
+  {
+   "id": "xc2003",
+   "name": "汝南·汝南藥房",
+   "ox": 355,
+   "oy": 2927,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2003",
+   "cityOf": "runan",
+   "spawn": [
+    36,
+    34,
+    36,
+    34
+   ]
+  },
+  {
+   "id": "xc2004",
+   "name": "汝南·汝南武器店",
+   "ox": 426,
+   "oy": 2927,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2004",
+   "cityOf": "runan",
+   "spawn": [
+    25,
+    33,
+    25,
+    33
+   ]
+  },
+  {
+   "id": "xc2005",
+   "name": "汝南·汝南私塾",
+   "ox": 0,
+   "oy": 2985,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2005",
+   "cityOf": "runan",
+   "spawn": [
+    4,
+    27,
+    4,
+    27
+   ]
+  },
+  {
+   "id": "xc2006",
+   "name": "汝南·汝南室內06",
+   "ox": 71,
+   "oy": 2985,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2006",
+   "cityOf": "runan",
+   "spawn": [
+    4,
+    24,
+    4,
+    24
+   ]
+  },
+  {
+   "id": "xc2007",
+   "name": "汝南·汝南室內07",
+   "ox": 96,
+   "oy": 2232,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2007",
+   "cityOf": "runan",
+   "spawn": [
+    4,
+    39,
+    4,
+    39
+   ]
+  },
+  {
+   "id": "xc2008",
+   "name": "汝南·汝南室內08",
+   "ox": 142,
+   "oy": 2985,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2008",
+   "cityOf": "runan",
+   "spawn": [
+    34,
+    3,
+    34,
+    3
+   ]
+  },
+  {
+   "id": "xc2009",
+   "name": "汝南·汝南室內09",
+   "ox": 213,
+   "oy": 2985,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2009",
+   "cityOf": "runan",
+   "spawn": [
+    25,
+    7,
+    25,
+    7
+   ],
+   "orphan": true
+  },
+  {
+   "id": "xc2010",
+   "name": "汝南·汝南木工廠",
+   "ox": 284,
+   "oy": 2985,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2010",
+   "cityOf": "runan",
+   "spawn": [
+    4,
+    29,
+    4,
+    29
+   ]
+  },
+  {
+   "id": "xc2011",
+   "name": "汝南·汝南打鐵鋪",
+   "ox": 355,
+   "oy": 2985,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2011",
+   "cityOf": "runan",
+   "spawn": [
+    25,
+    34,
+    25,
+    34
+   ]
+  },
+  {
+   "id": "xc2012",
+   "name": "汝南·汝南錢莊",
+   "ox": 426,
+   "oy": 2985,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2012",
+   "cityOf": "runan",
+   "spawn": [
+    29,
+    34,
+    29,
+    34
+   ]
+  },
+  {
+   "id": "xc2013",
+   "name": "汝南·汝南拍賣屋",
+   "ox": 192,
+   "oy": 2232,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2013",
+   "cityOf": "runan",
+   "spawn": [
+    37,
+    52,
+    37,
+    52
+   ]
+  },
+  {
+   "id": "xc2014",
+   "name": "汝南·汝南馬廄",
+   "ox": 0,
+   "oy": 3043,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2014",
+   "cityOf": "runan",
+   "spawn": [
+    45,
+    29,
+    45,
+    29
+   ]
+  },
+  {
+   "id": "xc2016",
+   "name": "汝南·汝南賭場",
+   "ox": 71,
+   "oy": 3043,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2016",
+   "cityOf": "runan",
+   "spawn": [
+    46,
+    26,
+    46,
+    26
+   ]
+  },
+  {
+   "id": "xc2017",
+   "name": "汝南·汝南監牢",
+   "ox": 363,
+   "oy": 1886,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2017",
+   "cityOf": "runan",
+   "spawn": [
+    4,
+    27,
+    4,
+    27
+   ]
+  },
+  {
+   "id": "xc2018",
+   "name": "汝南·汝南室內18",
+   "ox": 142,
+   "oy": 3043,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2018",
+   "cityOf": "runan",
+   "spawn": [
+    4,
+    27,
+    4,
+    27
+   ]
+  },
+  {
+   "id": "xc2019",
+   "name": "汝南·汝南室內19",
+   "ox": 213,
+   "oy": 3043,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2019",
+   "cityOf": "runan",
+   "spawn": [
+    45,
+    27,
+    45,
+    27
+   ]
+  },
+  {
+   "id": "xc2020",
+   "name": "汝南·汝南室內20",
+   "ox": 284,
+   "oy": 3043,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2020",
+   "cityOf": "runan",
+   "spawn": [
+    25,
+    34,
+    25,
+    34
+   ]
+  },
+  {
+   "id": "xc2021",
+   "name": "汝南·汝南室內21",
+   "ox": 355,
+   "oy": 3043,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2021",
+   "cityOf": "runan",
+   "spawn": [
+    4,
+    29,
+    4,
+    29
+   ]
+  },
+  {
+   "id": "xc2022",
+   "name": "汝南·汝南道路B",
+   "ox": 0,
+   "oy": 1373,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc2022",
+   "cityOf": "runan",
+   "spawn": [
+    100,
+    7,
+    100,
+    7
+   ]
+  },
+  {
+   "id": "xc2023",
+   "name": "汝南·汝南道路A",
+   "ox": 221,
+   "oy": 1373,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc2023",
+   "cityOf": "runan",
+   "spawn": [
+    98,
+    5,
+    98,
+    5
+   ],
+   "orphan": true
+  },
+  {
+   "id": "xc2024",
+   "name": "汝南·汝南廚房",
+   "ox": 426,
+   "oy": 3043,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2024",
+   "cityOf": "runan",
+   "spawn": [
+    25,
+    31,
+    25,
+    31
+   ]
+  },
+  {
+   "id": "xc2030",
+   "name": "汝南·汝南室內30",
+   "ox": 0,
+   "oy": 3101,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2030",
+   "cityOf": "runan",
+   "spawn": [
+    4,
+    32,
+    4,
+    32
+   ]
+  },
+  {
    "id": "xc2100",
    "name": "江夏（原版）",
    "ox": 0,
-   "oy": 4277,
+   "oy": 5945,
    "safe": true,
    "kind": "field",
    "orig": "xc2100",
@@ -2663,7 +3501,7 @@
    "id": "xc2200",
    "name": "長沙（原版）",
    "ox": 0,
-   "oy": 4485,
+   "oy": 6153,
    "safe": true,
    "kind": "field",
    "orig": "xc2200",
@@ -2679,7 +3517,7 @@
    "id": "xc2300",
    "name": "桂陽（原版）",
    "ox": 0,
-   "oy": 4693,
+   "oy": 6361,
    "safe": true,
    "kind": "field",
    "orig": "xc2300",
@@ -2695,7 +3533,7 @@
    "id": "xc2400",
    "name": "河內（原版）",
    "ox": 0,
-   "oy": 4901,
+   "oy": 6569,
    "safe": true,
    "kind": "field",
    "orig": "xc2400",
@@ -2711,7 +3549,7 @@
    "id": "xc2500",
    "name": "晉陽（原版）",
    "ox": 0,
-   "oy": 5109,
+   "oy": 6777,
    "safe": true,
    "kind": "field",
    "orig": "xc2500",
@@ -2727,7 +3565,7 @@
    "id": "xc2600",
    "name": "洛陽（原版）",
    "ox": 0,
-   "oy": 5317,
+   "oy": 6985,
    "safe": true,
    "kind": "field",
    "orig": "xc2600",
@@ -2740,10 +3578,397 @@
    ]
   },
   {
+   "id": "xc2601",
+   "name": "洛陽·洛陽官宅",
+   "ox": 288,
+   "oy": 2232,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2601",
+   "cityOf": "luoyang",
+   "spawn": [
+    71,
+    40,
+    71,
+    40
+   ]
+  },
+  {
+   "id": "xc2602",
+   "name": "洛陽·洛陽客棧",
+   "ox": 384,
+   "oy": 2232,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2602",
+   "cityOf": "luoyang",
+   "spawn": [
+    71,
+    36,
+    71,
+    36
+   ]
+  },
+  {
+   "id": "xc2603",
+   "name": "洛陽·洛陽藥房",
+   "ox": 71,
+   "oy": 3101,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2603",
+   "cityOf": "luoyang",
+   "spawn": [
+    3,
+    29,
+    3,
+    29
+   ]
+  },
+  {
+   "id": "xc2604",
+   "name": "洛陽·洛陽武器店",
+   "ox": 142,
+   "oy": 3101,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2604",
+   "cityOf": "luoyang",
+   "spawn": [
+    45,
+    33,
+    45,
+    33
+   ]
+  },
+  {
+   "id": "xc2605",
+   "name": "洛陽·洛陽私塾",
+   "ox": 213,
+   "oy": 3101,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2605",
+   "cityOf": "luoyang",
+   "spawn": [
+    2,
+    31,
+    2,
+    31
+   ]
+  },
+  {
+   "id": "xc2606",
+   "name": "洛陽·洛陽廟",
+   "ox": 284,
+   "oy": 3101,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2606",
+   "cityOf": "luoyang",
+   "spawn": [
+    2,
+    28,
+    2,
+    28
+   ]
+  },
+  {
+   "id": "xc2607",
+   "name": "洛陽·洛陽練兵場",
+   "ox": 0,
+   "oy": 2309,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2607",
+   "cityOf": "luoyang",
+   "spawn": [
+    20,
+    52,
+    20,
+    52
+   ]
+  },
+  {
+   "id": "xc2608",
+   "name": "洛陽·洛陽室內08",
+   "ox": 355,
+   "oy": 3101,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2608",
+   "cityOf": "luoyang",
+   "spawn": [
+    34,
+    4,
+    34,
+    4
+   ]
+  },
+  {
+   "id": "xc2609",
+   "name": "洛陽·洛陽室內09",
+   "ox": 426,
+   "oy": 3101,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2609",
+   "cityOf": "luoyang",
+   "spawn": [
+    26,
+    8,
+    26,
+    8
+   ],
+   "orphan": true
+  },
+  {
+   "id": "xc2610",
+   "name": "洛陽·洛陽木工廠",
+   "ox": 0,
+   "oy": 3159,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2610",
+   "cityOf": "luoyang",
+   "spawn": [
+    2,
+    29,
+    2,
+    29
+   ]
+  },
+  {
+   "id": "xc2611",
+   "name": "洛陽·洛陽打鐵鋪",
+   "ox": 71,
+   "oy": 3159,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2611",
+   "cityOf": "luoyang",
+   "spawn": [
+    3,
+    34,
+    3,
+    34
+   ]
+  },
+  {
+   "id": "xc2612",
+   "name": "洛陽·洛陽錢莊",
+   "ox": 142,
+   "oy": 3159,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2612",
+   "cityOf": "luoyang",
+   "spawn": [
+    2,
+    23,
+    2,
+    23
+   ]
+  },
+  {
+   "id": "xc2613",
+   "name": "洛陽·洛陽拍賣屋",
+   "ox": 96,
+   "oy": 2309,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2613",
+   "cityOf": "luoyang",
+   "spawn": [
+    37,
+    52,
+    37,
+    52
+   ]
+  },
+  {
+   "id": "xc2614",
+   "name": "洛陽·洛陽室內14",
+   "ox": 213,
+   "oy": 3159,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2614",
+   "cityOf": "luoyang",
+   "spawn": [
+    44,
+    30,
+    44,
+    30
+   ]
+  },
+  {
+   "id": "xc2615",
+   "name": "洛陽·洛陽驛站",
+   "ox": 284,
+   "oy": 3159,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2615",
+   "cityOf": "luoyang",
+   "spawn": [
+    45,
+    32,
+    45,
+    32
+   ]
+  },
+  {
+   "id": "xc2616",
+   "name": "洛陽·洛陽賭場",
+   "ox": 355,
+   "oy": 3159,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2616",
+   "cityOf": "luoyang",
+   "spawn": [
+    47,
+    26,
+    47,
+    26
+   ]
+  },
+  {
+   "id": "xc2617",
+   "name": "洛陽·洛陽室內17",
+   "ox": 0,
+   "oy": 1982,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2617",
+   "cityOf": "luoyang",
+   "spawn": [
+    2,
+    26,
+    2,
+    26
+   ],
+   "orphan": true
+  },
+  {
+   "id": "xc2618",
+   "name": "洛陽·洛陽室內18",
+   "ox": 426,
+   "oy": 3159,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2618",
+   "cityOf": "luoyang",
+   "spawn": [
+    44,
+    27,
+    44,
+    27
+   ]
+  },
+  {
+   "id": "xc2619",
+   "name": "洛陽·洛陽室內19",
+   "ox": 0,
+   "oy": 3217,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2619",
+   "cityOf": "luoyang",
+   "spawn": [
+    46,
+    33,
+    46,
+    33
+   ]
+  },
+  {
+   "id": "xc2620",
+   "name": "洛陽·洛陽室內20",
+   "ox": 71,
+   "oy": 3217,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2620",
+   "cityOf": "luoyang",
+   "spawn": [
+    46,
+    33,
+    46,
+    33
+   ]
+  },
+  {
+   "id": "xc2621",
+   "name": "洛陽·洛陽室內21",
+   "ox": 142,
+   "oy": 3217,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2621",
+   "cityOf": "luoyang",
+   "spawn": [
+    46,
+    33,
+    46,
+    33
+   ]
+  },
+  {
+   "id": "xc2622",
+   "name": "洛陽·洛陽道路B",
+   "ox": 0,
+   "oy": 1544,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc2622",
+   "cityOf": "luoyang",
+   "spawn": [
+    100,
+    7,
+    100,
+    7
+   ]
+  },
+  {
+   "id": "xc2623",
+   "name": "洛陽·洛陽道路A",
+   "ox": 221,
+   "oy": 1544,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc2623",
+   "cityOf": "luoyang",
+   "spawn": [
+    100,
+    9,
+    100,
+    9
+   ],
+   "orphan": true
+  },
+  {
+   "id": "xc2624",
+   "name": "洛陽·洛陽廚房",
+   "ox": 213,
+   "oy": 3217,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2624",
+   "cityOf": "luoyang",
+   "spawn": [
+    47,
+    27,
+    47,
+    27
+   ]
+  },
+  {
    "id": "xc2700",
    "name": "新野（原版）",
    "ox": 221,
-   "oy": 7286,
+   "oy": 8954,
    "safe": true,
    "kind": "field",
    "orig": "xc2700",
@@ -2759,7 +3984,7 @@
    "id": "xc2800",
    "name": "宛（原版）",
    "ox": 0,
-   "oy": 5525,
+   "oy": 7193,
    "safe": true,
    "kind": "field",
    "orig": "xc2800",
@@ -2772,10 +3997,412 @@
    ]
   },
   {
+   "id": "xc2801",
+   "name": "宛·宛官宅",
+   "ox": 192,
+   "oy": 2309,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2801",
+   "cityOf": "wancheng",
+   "spawn": [
+    70,
+    37,
+    70,
+    37
+   ]
+  },
+  {
+   "id": "xc2802",
+   "name": "宛·宛客棧",
+   "ox": 288,
+   "oy": 2309,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2802",
+   "cityOf": "wancheng",
+   "spawn": [
+    37,
+    52,
+    37,
+    52
+   ]
+  },
+  {
+   "id": "xc2803",
+   "name": "宛·宛藥房",
+   "ox": 284,
+   "oy": 3217,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2803",
+   "cityOf": "wancheng",
+   "spawn": [
+    4,
+    23,
+    4,
+    23
+   ]
+  },
+  {
+   "id": "xc2804",
+   "name": "宛·宛武器店",
+   "ox": 355,
+   "oy": 3217,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2804",
+   "cityOf": "wancheng",
+   "spawn": [
+    4,
+    30,
+    4,
+    30
+   ]
+  },
+  {
+   "id": "xc2806",
+   "name": "宛·宛室內06",
+   "ox": 426,
+   "oy": 3217,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2806",
+   "cityOf": "wancheng",
+   "spawn": [
+    25,
+    34,
+    25,
+    34
+   ]
+  },
+  {
+   "id": "xc2807",
+   "name": "宛·宛室內07",
+   "ox": 384,
+   "oy": 2309,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2807",
+   "cityOf": "wancheng",
+   "spawn": [
+    4,
+    39,
+    4,
+    39
+   ]
+  },
+  {
+   "id": "xc2808",
+   "name": "宛·宛室內08",
+   "ox": 0,
+   "oy": 3275,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2808",
+   "cityOf": "wancheng",
+   "spawn": [
+    18,
+    1,
+    18,
+    1
+   ]
+  },
+  {
+   "id": "xc2809",
+   "name": "宛·宛室內09",
+   "ox": 71,
+   "oy": 3275,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2809",
+   "cityOf": "wancheng",
+   "spawn": [
+    19,
+    9,
+    19,
+    9
+   ],
+   "orphan": true
+  },
+  {
+   "id": "xc2810",
+   "name": "宛·宛木工廠",
+   "ox": 142,
+   "oy": 3275,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2810",
+   "cityOf": "wancheng",
+   "spawn": [
+    5,
+    28,
+    5,
+    28
+   ]
+  },
+  {
+   "id": "xc2811",
+   "name": "宛·宛打鐵鋪",
+   "ox": 213,
+   "oy": 3275,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2811",
+   "cityOf": "wancheng",
+   "spawn": [
+    25,
+    31,
+    25,
+    31
+   ]
+  },
+  {
+   "id": "xc2812",
+   "name": "宛·宛錢莊",
+   "ox": 284,
+   "oy": 3275,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2812",
+   "cityOf": "wancheng",
+   "spawn": [
+    45,
+    29,
+    45,
+    29
+   ]
+  },
+  {
+   "id": "xc2813",
+   "name": "宛·宛拍賣屋",
+   "ox": 0,
+   "oy": 2386,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2813",
+   "cityOf": "wancheng",
+   "spawn": [
+    4,
+    41,
+    4,
+    41
+   ]
+  },
+  {
+   "id": "xc2814",
+   "name": "宛·宛馬廄",
+   "ox": 355,
+   "oy": 3275,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2814",
+   "cityOf": "wancheng",
+   "spawn": [
+    44,
+    29,
+    44,
+    29
+   ]
+  },
+  {
+   "id": "xc2815",
+   "name": "宛·宛驛站",
+   "ox": 426,
+   "oy": 3275,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2815",
+   "cityOf": "wancheng",
+   "spawn": [
+    45,
+    32,
+    45,
+    32
+   ]
+  },
+  {
+   "id": "xc2816",
+   "name": "宛·宛賭場",
+   "ox": 0,
+   "oy": 3333,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2816",
+   "cityOf": "wancheng",
+   "spawn": [
+    45,
+    26,
+    45,
+    26
+   ]
+  },
+  {
+   "id": "xc2817",
+   "name": "宛·宛監牢",
+   "ox": 121,
+   "oy": 1982,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2817",
+   "cityOf": "wancheng",
+   "spawn": [
+    65,
+    66,
+    65,
+    66
+   ]
+  },
+  {
+   "id": "xc2818",
+   "name": "宛·宛室內18",
+   "ox": 71,
+   "oy": 3333,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2818",
+   "cityOf": "wancheng",
+   "spawn": [
+    4,
+    26,
+    4,
+    26
+   ]
+  },
+  {
+   "id": "xc2819",
+   "name": "宛·宛室內19",
+   "ox": 142,
+   "oy": 3333,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2819",
+   "cityOf": "wancheng",
+   "spawn": [
+    4,
+    27,
+    4,
+    27
+   ]
+  },
+  {
+   "id": "xc2820",
+   "name": "宛·宛室內20",
+   "ox": 213,
+   "oy": 3333,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2820",
+   "cityOf": "wancheng",
+   "spawn": [
+    4,
+    26,
+    4,
+    26
+   ]
+  },
+  {
+   "id": "xc2821",
+   "name": "宛·宛室內21",
+   "ox": 284,
+   "oy": 3333,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2821",
+   "cityOf": "wancheng",
+   "spawn": [
+    3,
+    26,
+    3,
+    26
+   ]
+  },
+  {
+   "id": "xc2822",
+   "name": "宛·宛道路B",
+   "ox": 0,
+   "oy": 1715,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc2822",
+   "cityOf": "wancheng",
+   "spawn": [
+    100,
+    7,
+    100,
+    7
+   ]
+  },
+  {
+   "id": "xc2823",
+   "name": "宛·宛道路A",
+   "ox": 221,
+   "oy": 1715,
+   "safe": true,
+   "kind": "field",
+   "orig": "xc2823",
+   "cityOf": "wancheng",
+   "spawn": [
+    100,
+    7,
+    100,
+    7
+   ],
+   "orphan": true
+  },
+  {
+   "id": "xc2824",
+   "name": "宛·宛廚房",
+   "ox": 355,
+   "oy": 3333,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2824",
+   "cityOf": "wancheng",
+   "spawn": [
+    46,
+    27,
+    46,
+    27
+   ]
+  },
+  {
+   "id": "xc2842",
+   "name": "宛·宛室內42",
+   "ox": 426,
+   "oy": 3333,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2842",
+   "cityOf": "wancheng",
+   "spawn": [
+    39,
+    29,
+    39,
+    29
+   ]
+  },
+  {
+   "id": "xc2843",
+   "name": "宛·宛室內43",
+   "ox": 0,
+   "oy": 3391,
+   "safe": true,
+   "kind": "house",
+   "orig": "xc2843",
+   "cityOf": "wancheng",
+   "spawn": [
+    39,
+    29,
+    39,
+    29
+   ]
+  },
+  {
    "id": "xc2900",
    "name": "襄陽（原版）",
    "ox": 0,
-   "oy": 5733,
+   "oy": 7401,
    "safe": true,
    "kind": "field",
    "orig": "xc2900",
@@ -2791,7 +4418,7 @@
    "id": "xc3000",
    "name": "江陵（原版）",
    "ox": 0,
-   "oy": 5941,
+   "oy": 7609,
    "safe": true,
    "kind": "field",
    "orig": "xc3000",
@@ -2807,7 +4434,7 @@
    "id": "xc3100",
    "name": "武陵（原版）",
    "ox": 0,
-   "oy": 7457,
+   "oy": 9125,
    "safe": true,
    "kind": "field",
    "orig": "xc3100",
@@ -2823,7 +4450,7 @@
    "id": "xc3200",
    "name": "零陵（原版）",
    "ox": 221,
-   "oy": 7457,
+   "oy": 9125,
    "safe": true,
    "kind": "field",
    "orig": "xc3200",
@@ -2839,7 +4466,7 @@
    "id": "xc3300",
    "name": "安定（原版）",
    "ox": 0,
-   "oy": 7628,
+   "oy": 9296,
    "safe": true,
    "kind": "field",
    "orig": "xc3300",
@@ -2855,7 +4482,7 @@
    "id": "xc3400",
    "name": "長安（原版）",
    "ox": 0,
-   "oy": 6149,
+   "oy": 7817,
    "safe": true,
    "kind": "field",
    "orig": "xc3400",
@@ -2871,7 +4498,7 @@
    "id": "xc3500",
    "name": "西涼（原版）",
    "ox": 0,
-   "oy": 6357,
+   "oy": 8025,
    "safe": true,
    "kind": "field",
    "orig": "xc3500",
@@ -2887,7 +4514,7 @@
    "id": "xc3600",
    "name": "天水（原版）",
    "ox": 0,
-   "oy": 6565,
+   "oy": 8233,
    "safe": true,
    "kind": "field",
    "orig": "xc3600",
@@ -2903,7 +4530,7 @@
    "id": "xc125",
    "name": "襄平·外圍25",
    "ox": 221,
-   "oy": 7628,
+   "oy": 9296,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2918,7 +4545,7 @@
    "id": "xc225",
    "name": "北平·外圍25",
    "ox": 0,
-   "oy": 7799,
+   "oy": 9467,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2933,7 +4560,7 @@
    "id": "xc325",
    "name": "薊·外圍25",
    "ox": 221,
-   "oy": 7799,
+   "oy": 9467,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2948,7 +4575,7 @@
    "id": "xc425",
    "name": "北海·外圍25",
    "ox": 0,
-   "oy": 7970,
+   "oy": 9638,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2963,7 +4590,7 @@
    "id": "xc525",
    "name": "平原·外圍25",
    "ox": 221,
-   "oy": 7970,
+   "oy": 9638,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2978,7 +4605,7 @@
    "id": "xc625",
    "name": "南皮·外圍25",
    "ox": 0,
-   "oy": 8141,
+   "oy": 9809,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -2993,7 +4620,7 @@
    "id": "xc725",
    "name": "鄴·外圍25",
    "ox": 221,
-   "oy": 8141,
+   "oy": 9809,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3008,7 +4635,7 @@
    "id": "xc825",
    "name": "盧江·外圍25",
    "ox": 0,
-   "oy": 8312,
+   "oy": 9980,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3023,7 +4650,7 @@
    "id": "xc925",
    "name": "壽春·外圍25",
    "ox": 221,
-   "oy": 8312,
+   "oy": 9980,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3038,7 +4665,7 @@
    "id": "xc1025",
    "name": "柴桑·外圍25",
    "ox": 0,
-   "oy": 8483,
+   "oy": 10151,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3053,7 +4680,7 @@
    "id": "xc1125",
    "name": "吳·外圍25",
    "ox": 221,
-   "oy": 8483,
+   "oy": 10151,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3068,7 +4695,7 @@
    "id": "xc1225",
    "name": "會稽·外圍25",
    "ox": 0,
-   "oy": 8654,
+   "oy": 10322,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3083,7 +4710,7 @@
    "id": "xc1325",
    "name": "建業·外圍25",
    "ox": 221,
-   "oy": 8654,
+   "oy": 10322,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3098,7 +4725,7 @@
    "id": "xc1425",
    "name": "小沛·外圍25",
    "ox": 0,
-   "oy": 8825,
+   "oy": 10493,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3113,7 +4740,7 @@
    "id": "xc1525",
    "name": "下邳·外圍25",
    "ox": 221,
-   "oy": 8825,
+   "oy": 10493,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3128,7 +4755,7 @@
    "id": "xc1625",
    "name": "濮陽·外圍25",
    "ox": 0,
-   "oy": 8996,
+   "oy": 10664,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3143,7 +4770,7 @@
    "id": "xc1725",
    "name": "陳留·外圍25",
    "ox": 221,
-   "oy": 8996,
+   "oy": 10664,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3158,7 +4785,7 @@
    "id": "xc1825",
    "name": "譙·外圍25",
    "ox": 0,
-   "oy": 9167,
+   "oy": 10835,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3173,7 +4800,7 @@
    "id": "xc2025",
    "name": "汝南·外圍25",
    "ox": 221,
-   "oy": 9167,
+   "oy": 10835,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3188,7 +4815,7 @@
    "id": "xc2125",
    "name": "江夏·外圍25",
    "ox": 0,
-   "oy": 9338,
+   "oy": 11006,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3203,7 +4830,7 @@
    "id": "xc2225",
    "name": "長沙·外圍25",
    "ox": 221,
-   "oy": 9338,
+   "oy": 11006,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3218,7 +4845,7 @@
    "id": "xc2325",
    "name": "桂陽·外圍25",
    "ox": 0,
-   "oy": 9509,
+   "oy": 11177,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3233,7 +4860,7 @@
    "id": "xc2425",
    "name": "河內·外圍25",
    "ox": 221,
-   "oy": 9509,
+   "oy": 11177,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3248,7 +4875,7 @@
    "id": "xc2525",
    "name": "晉陽·外圍25",
    "ox": 0,
-   "oy": 9680,
+   "oy": 11348,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3263,7 +4890,7 @@
    "id": "xc2625",
    "name": "洛陽·外圍25",
    "ox": 221,
-   "oy": 9680,
+   "oy": 11348,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3278,7 +4905,7 @@
    "id": "xc2725",
    "name": "新野·外圍25",
    "ox": 0,
-   "oy": 9851,
+   "oy": 11519,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3293,7 +4920,7 @@
    "id": "xc2825",
    "name": "宛·外圍25",
    "ox": 221,
-   "oy": 9851,
+   "oy": 11519,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3308,7 +4935,7 @@
    "id": "xc2925",
    "name": "襄陽·外圍25",
    "ox": 0,
-   "oy": 10022,
+   "oy": 11690,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3323,7 +4950,7 @@
    "id": "xc3025",
    "name": "江陵·外圍25",
    "ox": 221,
-   "oy": 10022,
+   "oy": 11690,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3338,7 +4965,7 @@
    "id": "xc3125",
    "name": "武陵·外圍25",
    "ox": 0,
-   "oy": 10193,
+   "oy": 11861,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3353,7 +4980,7 @@
    "id": "xc3225",
    "name": "零陵·外圍25",
    "ox": 221,
-   "oy": 10193,
+   "oy": 11861,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3368,7 +4995,7 @@
    "id": "xc3325",
    "name": "安定·外圍25",
    "ox": 0,
-   "oy": 10364,
+   "oy": 12032,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3383,7 +5010,7 @@
    "id": "xc3425",
    "name": "長安·外圍25",
    "ox": 221,
-   "oy": 10364,
+   "oy": 12032,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3398,7 +5025,7 @@
    "id": "xc3525",
    "name": "西涼·外圍25",
    "ox": 0,
-   "oy": 10535,
+   "oy": 12203,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3413,7 +5040,7 @@
    "id": "xc3625",
    "name": "天水·外圍25",
    "ox": 221,
-   "oy": 10535,
+   "oy": 12203,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3428,7 +5055,7 @@
    "id": "xc3725",
    "name": "漢中·外圍25",
    "ox": 0,
-   "oy": 10706,
+   "oy": 12374,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3443,7 +5070,7 @@
    "id": "xc3825",
    "name": "武都·外圍25",
    "ox": 221,
-   "oy": 10706,
+   "oy": 12374,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -3458,7 +5085,7 @@
    "id": "xc3925",
    "name": "梓潼·外圍25",
    "ox": 0,
-   "oy": 10877,
+   "oy": 12545,
    "safe": false,
    "kind": "field",
    "orig": "xc1925",
@@ -5722,6 +7349,918 @@
    "auto": true
   },
   {
+   "id": "xc_in_1801",
+   "name": "入 譙官宅",
+   "map": "xc1800",
+   "x": 230,
+   "y": 66,
+   "rect": [
+    223,
+    60,
+    231,
+    70
+   ],
+   "land": [
+    227,
+    72
+   ],
+   "to": "xc_out_1801",
+   "auto": true
+  },
+  {
+   "id": "xc_out_1801",
+   "name": "出 譙官宅",
+   "map": "xc1801",
+   "x": 73,
+   "y": 37,
+   "rect": [
+    70,
+    20,
+    75,
+    52
+   ],
+   "land": [
+    69,
+    36
+   ],
+   "to": "xc_in_1801",
+   "auto": true
+  },
+  {
+   "id": "xc_in_1802",
+   "name": "入 譙客棧",
+   "map": "xc1800",
+   "x": 111,
+   "y": 161,
+   "rect": [
+    110,
+    154,
+    118,
+    164
+   ],
+   "land": [
+    114,
+    166
+   ],
+   "to": "xc_out_1802",
+   "auto": true
+  },
+  {
+   "id": "xc_out_1802",
+   "name": "出 譙客棧",
+   "map": "xc1802",
+   "x": 71,
+   "y": 41,
+   "rect": [
+    70,
+    23,
+    75,
+    56
+   ],
+   "land": [
+    69,
+    39
+   ],
+   "to": "xc_in_1802",
+   "auto": true
+  },
+  {
+   "id": "xc_in_1803",
+   "name": "入 譙藥房",
+   "map": "xc1800",
+   "x": 148,
+   "y": 127,
+   "rect": [
+    146,
+    122,
+    152,
+    130
+   ],
+   "land": [
+    149,
+    132
+   ],
+   "to": "xc_out_1803",
+   "auto": true
+  },
+  {
+   "id": "xc_out_1803",
+   "name": "出 譙藥房",
+   "map": "xc1803",
+   "x": 33,
+   "y": 35,
+   "rect": [
+    20,
+    33,
+    50,
+    37
+   ],
+   "land": [
+    35,
+    32
+   ],
+   "to": "xc_in_1803",
+   "auto": true
+  },
+  {
+   "id": "xc_in_1804",
+   "name": "入 譙武器店",
+   "map": "xc1800",
+   "x": 181,
+   "y": 127,
+   "rect": [
+    180,
+    122,
+    187,
+    129
+   ],
+   "land": [
+    183,
+    133
+   ],
+   "to": "xc_out_1804",
+   "auto": true
+  },
+  {
+   "id": "xc_out_1804",
+   "name": "出 譙武器店",
+   "map": "xc1804",
+   "x": 46,
+   "y": 35,
+   "rect": [
+    0,
+    33,
+    50,
+    37
+   ],
+   "land": [
+    25,
+    32
+   ],
+   "to": "xc_in_1804",
+   "auto": true
+  },
+  {
+   "id": "xc_in_1806",
+   "name": "入 譙室內06",
+   "map": "xc1800",
+   "x": 90,
+   "y": 33,
+   "rect": [
+    84,
+    30,
+    94,
+    36
+   ],
+   "land": [
+    89,
+    38
+   ],
+   "to": "xc_out_1806",
+   "auto": true
+  },
+  {
+   "id": "xc_out_1806",
+   "name": "出 譙室內06",
+   "map": "xc1806",
+   "x": 33,
+   "y": 35,
+   "rect": [
+    0,
+    33,
+    50,
+    37
+   ],
+   "land": [
+    25,
+    32
+   ],
+   "to": "xc_in_1806",
+   "auto": true
+  },
+  {
+   "id": "xc_in_1807",
+   "name": "入 譙室內07",
+   "map": "xc1800",
+   "x": 189,
+   "y": 24,
+   "rect": [
+    183,
+    16,
+    191,
+    25
+   ],
+   "land": [
+    187,
+    26
+   ],
+   "to": "xc_out_1807",
+   "auto": true
+  },
+  {
+   "id": "xc_out_1807",
+   "name": "出 譙室內07",
+   "map": "xc1807",
+   "x": 4,
+   "y": 40,
+   "rect": [
+    0,
+    24,
+    4,
+    56
+   ],
+   "land": [
+    5,
+    40
+   ],
+   "to": "xc_in_1807",
+   "auto": true
+  },
+  {
+   "id": "xc_in_1808",
+   "name": "入 譙室內08",
+   "map": "xc1800",
+   "x": 29,
+   "y": 26,
+   "rect": [
+    25,
+    20,
+    31,
+    28
+   ],
+   "land": [
+    28,
+    29
+   ],
+   "to": "xc_out_1808",
+   "auto": true
+  },
+  {
+   "id": "xc_out_1808",
+   "name": "出 譙室內08",
+   "map": "xc1808",
+   "x": 34,
+   "y": 1,
+   "rect": [
+    31,
+    0,
+    36,
+    3
+   ],
+   "land": [
+    34,
+    4
+   ],
+   "to": "xc_in_1808",
+   "auto": true
+  },
+  {
+   "id": "xc_in_1810",
+   "name": "入 譙木工廠",
+   "map": "xc1800",
+   "x": 56,
+   "y": 70,
+   "rect": [
+    52,
+    65,
+    58,
+    72
+   ],
+   "land": [
+    55,
+    74
+   ],
+   "to": "xc_out_1810",
+   "auto": true
+  },
+  {
+   "id": "xc_out_1810",
+   "name": "出 譙木工廠",
+   "map": "xc1810",
+   "x": 4,
+   "y": 30,
+   "rect": [
+    0,
+    21,
+    4,
+    37
+   ],
+   "land": [
+    5,
+    29
+   ],
+   "to": "xc_in_1810",
+   "auto": true
+  },
+  {
+   "id": "xc_in_1811",
+   "name": "入 譙打鐵鋪",
+   "map": "xc1800",
+   "x": 16,
+   "y": 117,
+   "rect": [
+    9,
+    114,
+    18,
+    119
+   ],
+   "land": [
+    13,
+    123
+   ],
+   "to": "xc_out_1811",
+   "auto": true
+  },
+  {
+   "id": "xc_out_1811",
+   "name": "出 譙打鐵鋪",
+   "map": "xc1811",
+   "x": 26,
+   "y": 36,
+   "rect": [
+    0,
+    35,
+    50,
+    37
+   ],
+   "land": [
+    25,
+    34
+   ],
+   "to": "xc_in_1811",
+   "auto": true
+  },
+  {
+   "id": "xc_in_1812",
+   "name": "入 譙錢莊",
+   "map": "xc1800",
+   "x": 144,
+   "y": 101,
+   "rect": [
+    139,
+    94,
+    152,
+    103
+   ],
+   "land": [
+    145,
+    105
+   ],
+   "to": "xc_out_1812",
+   "auto": true
+  },
+  {
+   "id": "xc_out_1812",
+   "name": "出 譙錢莊",
+   "map": "xc1812",
+   "x": 47,
+   "y": 36,
+   "rect": [
+    44,
+    35,
+    50,
+    37
+   ],
+   "land": [
+    47,
+    34
+   ],
+   "to": "xc_in_1812",
+   "auto": true
+  },
+  {
+   "id": "xc_in_1813",
+   "name": "入 譙拍賣屋",
+   "map": "xc1800",
+   "x": 72,
+   "y": 132,
+   "rect": [
+    70,
+    127,
+    77,
+    134
+   ],
+   "land": [
+    73,
+    135
+   ],
+   "to": "xc_out_1813",
+   "auto": true
+  },
+  {
+   "id": "xc_out_1813",
+   "name": "出 譙拍賣屋",
+   "map": "xc1813",
+   "x": 0,
+   "y": 53,
+   "rect": [
+    0,
+    47,
+    2,
+    56
+   ],
+   "land": [
+    3,
+    51
+   ],
+   "to": "xc_in_1813",
+   "auto": true
+  },
+  {
+   "id": "xc_in_1814",
+   "name": "入 譙馬廄",
+   "map": "xc1800",
+   "x": 69,
+   "y": 106,
+   "rect": [
+    64,
+    100,
+    72,
+    109
+   ],
+   "land": [
+    68,
+    112
+   ],
+   "to": "xc_out_1814",
+   "auto": true
+  },
+  {
+   "id": "xc_out_1814",
+   "name": "出 譙馬廄",
+   "map": "xc1814",
+   "x": 46,
+   "y": 36,
+   "rect": [
+    46,
+    34,
+    50,
+    37
+   ],
+   "land": [
+    48,
+    33
+   ],
+   "to": "xc_in_1814",
+   "auto": true
+  },
+  {
+   "id": "xc_in_1816",
+   "name": "入 譙賭場",
+   "map": "xc1800",
+   "x": 179,
+   "y": 151,
+   "rect": [
+    179,
+    147,
+    186,
+    153
+   ],
+   "land": [
+    182,
+    156
+   ],
+   "to": "xc_out_1816",
+   "auto": true
+  },
+  {
+   "id": "xc_out_1816",
+   "name": "出 譙賭場",
+   "map": "xc1816",
+   "x": 50,
+   "y": 27,
+   "rect": [
+    47,
+    16,
+    50,
+    37
+   ],
+   "land": [
+    46,
+    26
+   ],
+   "to": "xc_in_1816",
+   "auto": true
+  },
+  {
+   "id": "xc_in_1818",
+   "name": "入 譙室內18",
+   "map": "xc1800",
+   "x": 47,
+   "y": 112,
+   "rect": [
+    42,
+    107,
+    48,
+    115
+   ],
+   "land": [
+    45,
+    117
+   ],
+   "to": "xc_out_1818",
+   "auto": true
+  },
+  {
+   "id": "xc_out_1818",
+   "name": "出 譙室內18",
+   "map": "xc1818",
+   "x": 0,
+   "y": 29,
+   "rect": [
+    0,
+    18,
+    2,
+    37
+   ],
+   "land": [
+    3,
+    27
+   ],
+   "to": "xc_in_1818",
+   "auto": true
+  },
+  {
+   "id": "xc_in_1819",
+   "name": "入 譙室內19",
+   "map": "xc1800",
+   "x": 97,
+   "y": 93,
+   "rect": [
+    92,
+    88,
+    98,
+    96
+   ],
+   "land": [
+    95,
+    98
+   ],
+   "to": "xc_out_1819",
+   "auto": true
+  },
+  {
+   "id": "xc_out_1819",
+   "name": "出 譙室內19",
+   "map": "xc1819",
+   "x": 0,
+   "y": 29,
+   "rect": [
+    0,
+    18,
+    1,
+    37
+   ],
+   "land": [
+    2,
+    27
+   ],
+   "to": "xc_in_1819",
+   "auto": true
+  },
+  {
+   "id": "xc_in_1821",
+   "name": "入 譙室內21",
+   "map": "xc1800",
+   "x": 224,
+   "y": 132,
+   "rect": [
+    220,
+    127,
+    226,
+    135
+   ],
+   "land": [
+    223,
+    137
+   ],
+   "to": "xc_out_1821",
+   "auto": true
+  },
+  {
+   "id": "xc_out_1821",
+   "name": "出 譙室內21",
+   "map": "xc1821",
+   "x": 44,
+   "y": 37,
+   "rect": [
+    43,
+    32,
+    50,
+    37
+   ],
+   "land": [
+    41,
+    34
+   ],
+   "to": "xc_in_1821",
+   "auto": true
+  },
+  {
+   "id": "xc_in_1822",
+   "name": "入 譙道路B",
+   "map": "xc1800",
+   "x": 46,
+   "y": 185,
+   "rect": [
+    10,
+    184,
+    50,
+    187
+   ],
+   "land": [
+    30,
+    183
+   ],
+   "to": "xc_out_1822",
+   "auto": true
+  },
+  {
+   "id": "xc_out_1822",
+   "name": "出 譙道路B",
+   "map": "xc1822",
+   "x": 190,
+   "y": 1,
+   "rect": [
+    0,
+    0,
+    200,
+    3
+   ],
+   "land": [
+    100,
+    7
+   ],
+   "to": "xc_in_1822",
+   "auto": true
+  },
+  {
+   "id": "xc_in_1824",
+   "name": "入 譙廚房",
+   "map": "xc1800",
+   "x": 34,
+   "y": 64,
+   "rect": [
+    29,
+    61,
+    35,
+    66
+   ],
+   "land": [
+    33,
+    67
+   ],
+   "to": "xc_out_1824",
+   "auto": true
+  },
+  {
+   "id": "xc_out_1824",
+   "name": "出 譙廚房",
+   "map": "xc1824",
+   "x": 0,
+   "y": 36,
+   "rect": [
+    0,
+    34,
+    50,
+    37
+   ],
+   "land": [
+    25,
+    33
+   ],
+   "to": "xc_in_1824",
+   "auto": true
+  },
+  {
+   "id": "xc_in_1834",
+   "name": "入 譙室內34",
+   "map": "xc1800",
+   "x": 145,
+   "y": 101,
+   "rect": [
+    141,
+    96,
+    147,
+    105
+   ],
+   "land": [
+    145,
+    107
+   ],
+   "to": "xc_out_1834",
+   "auto": true
+  },
+  {
+   "id": "xc_out_1834",
+   "name": "出 譙室內34",
+   "map": "xc1834",
+   "x": 3,
+   "y": 34,
+   "rect": [
+    0,
+    25,
+    3,
+    37
+   ],
+   "land": [
+    4,
+    32
+   ],
+   "to": "xc_in_1834",
+   "auto": true
+  },
+  {
+   "id": "xc_in_1841",
+   "name": "入 譙室內41",
+   "map": "xc1800",
+   "x": 202,
+   "y": 117,
+   "rect": [
+    201,
+    112,
+    206,
+    119
+   ],
+   "land": [
+    203,
+    121
+   ],
+   "to": "xc_out_1841",
+   "auto": true
+  },
+  {
+   "id": "xc_out_1841",
+   "name": "出 譙室內41",
+   "map": "xc1841",
+   "x": 46,
+   "y": 37,
+   "rect": [
+    45,
+    33,
+    50,
+    37
+   ],
+   "land": [
+    44,
+    35
+   ],
+   "to": "xc_in_1841",
+   "auto": true
+  },
+  {
+   "id": "xc_in_1842",
+   "name": "入 譙室內42",
+   "map": "xc1800",
+   "x": 214,
+   "y": 111,
+   "rect": [
+    213,
+    106,
+    219,
+    113
+   ],
+   "land": [
+    216,
+    115
+   ],
+   "to": "xc_out_1842",
+   "auto": true
+  },
+  {
+   "id": "xc_out_1842",
+   "name": "出 譙室內42",
+   "map": "xc1842",
+   "x": 6,
+   "y": 35,
+   "rect": [
+    0,
+    33,
+    49,
+    36
+   ],
+   "land": [
+    24,
+    29
+   ],
+   "to": "xc_in_1842",
+   "auto": true
+  },
+  {
+   "id": "xc_in_1843",
+   "name": "入 譙室內43",
+   "map": "xc1800",
+   "x": 82,
+   "y": 75,
+   "rect": [
+    81,
+    70,
+    87,
+    77
+   ],
+   "land": [
+    84,
+    79
+   ],
+   "to": "xc_out_1843",
+   "auto": true
+  },
+  {
+   "id": "xc_out_1843",
+   "name": "出 譙室內43",
+   "map": "xc1843",
+   "x": 46,
+   "y": 37,
+   "rect": [
+    45,
+    33,
+    50,
+    37
+   ],
+   "land": [
+    44,
+    35
+   ],
+   "to": "xc_in_1843",
+   "auto": true
+  },
+  {
+   "id": "xc_in_1844",
+   "name": "入 譙室內44",
+   "map": "xc1800",
+   "x": 92,
+   "y": 64,
+   "rect": [
+    89,
+    59,
+    95,
+    67
+   ],
+   "land": [
+    92,
+    69
+   ],
+   "to": "xc_out_1844",
+   "auto": true
+  },
+  {
+   "id": "xc_out_1844",
+   "name": "出 譙室內44",
+   "map": "xc1844",
+   "x": 46,
+   "y": 33,
+   "rect": [
+    46,
+    26,
+    49,
+    37
+   ],
+   "land": [
+    45,
+    31
+   ],
+   "to": "xc_in_1844",
+   "auto": true
+  },
+  {
+   "id": "xc_in_1845",
+   "name": "入 譙室內45",
+   "map": "xc1800",
+   "x": 130,
+   "y": 73,
+   "rect": [
+    126,
+    70,
+    132,
+    77
+   ],
+   "land": [
+    127,
+    78
+   ],
+   "to": "xc_out_1845",
+   "auto": true
+  },
+  {
+   "id": "xc_out_1845",
+   "name": "出 譙室內45",
+   "map": "xc1845",
+   "x": 0,
+   "y": 29,
+   "rect": [
+    0,
+    18,
+    2,
+    37
+   ],
+   "land": [
+    3,
+    27
+   ],
+   "to": "xc_in_1845",
+   "auto": true
+  },
+  {
    "id": "xc_in_1901",
    "name": "入 官宅",
    "map": "xuchang_o",
@@ -6631,6 +9170,2514 @@
     27
    ],
    "to": "xc_in_1947",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2001",
+   "name": "入 汝南官宅",
+   "map": "xc2000",
+   "x": 33,
+   "y": 33,
+   "rect": [
+    32,
+    29,
+    42,
+    37
+   ],
+   "land": [
+    37,
+    38
+   ],
+   "to": "xc_out_2001",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2001",
+   "name": "出 汝南官宅",
+   "map": "xc2001",
+   "x": 75,
+   "y": 39,
+   "rect": [
+    72,
+    20,
+    75,
+    56
+   ],
+   "land": [
+    71,
+    38
+   ],
+   "to": "xc_in_2001",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2002",
+   "name": "入 汝南客棧",
+   "map": "xc2000",
+   "x": 68,
+   "y": 77,
+   "rect": [
+    63,
+    73,
+    74,
+    78
+   ],
+   "land": [
+    68,
+    79
+   ],
+   "to": "xc_out_2002",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2002",
+   "name": "出 汝南客棧",
+   "map": "xc2002",
+   "x": 75,
+   "y": 44,
+   "rect": [
+    70,
+    28,
+    75,
+    56
+   ],
+   "land": [
+    69,
+    43
+   ],
+   "to": "xc_in_2002",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2003",
+   "name": "入 汝南藥房",
+   "map": "xc2000",
+   "x": 20,
+   "y": 105,
+   "rect": [
+    16,
+    102,
+    23,
+    107
+   ],
+   "land": [
+    19,
+    108
+   ],
+   "to": "xc_out_2003",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2003",
+   "name": "出 汝南藥房",
+   "map": "xc2003",
+   "x": 37,
+   "y": 36,
+   "rect": [
+    22,
+    35,
+    50,
+    37
+   ],
+   "land": [
+    36,
+    34
+   ],
+   "to": "xc_in_2003",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2004",
+   "name": "入 汝南武器店",
+   "map": "xc2000",
+   "x": 163,
+   "y": 39,
+   "rect": [
+    160,
+    33,
+    170,
+    41
+   ],
+   "land": [
+    165,
+    45
+   ],
+   "to": "xc_out_2004",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2004",
+   "name": "出 汝南武器店",
+   "map": "xc2004",
+   "x": 14,
+   "y": 36,
+   "rect": [
+    0,
+    34,
+    50,
+    37
+   ],
+   "land": [
+    25,
+    33
+   ],
+   "to": "xc_in_2004",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2005",
+   "name": "入 汝南私塾",
+   "map": "xc2000",
+   "x": 104,
+   "y": 55,
+   "rect": [
+    97,
+    48,
+    105,
+    58
+   ],
+   "land": [
+    100,
+    60
+   ],
+   "to": "xc_out_2005",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2005",
+   "name": "出 汝南私塾",
+   "map": "xc2005",
+   "x": 0,
+   "y": 30,
+   "rect": [
+    0,
+    14,
+    3,
+    37
+   ],
+   "land": [
+    4,
+    27
+   ],
+   "to": "xc_in_2005",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2006",
+   "name": "入 汝南室內06",
+   "map": "xc2000",
+   "x": 159,
+   "y": 133,
+   "rect": [
+    156,
+    131,
+    161,
+    135
+   ],
+   "land": [
+    159,
+    137
+   ],
+   "to": "xc_out_2006",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2006",
+   "name": "出 汝南室內06",
+   "map": "xc2006",
+   "x": 2,
+   "y": 27,
+   "rect": [
+    0,
+    11,
+    3,
+    37
+   ],
+   "land": [
+    4,
+    24
+   ],
+   "to": "xc_in_2006",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2007",
+   "name": "入 汝南室內07",
+   "map": "xc2000",
+   "x": 90,
+   "y": 177,
+   "rect": [
+    80,
+    174,
+    93,
+    179
+   ],
+   "land": [
+    86,
+    185
+   ],
+   "to": "xc_out_2007",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2007",
+   "name": "出 汝南室內07",
+   "map": "xc2007",
+   "x": 3,
+   "y": 40,
+   "rect": [
+    0,
+    23,
+    3,
+    56
+   ],
+   "land": [
+    4,
+    39
+   ],
+   "to": "xc_in_2007",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2008",
+   "name": "入 汝南室內08",
+   "map": "xc2000",
+   "x": 215,
+   "y": 106,
+   "rect": [
+    213,
+    101,
+    220,
+    108
+   ],
+   "land": [
+    216,
+    109
+   ],
+   "to": "xc_out_2008",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2008",
+   "name": "出 汝南室內08",
+   "map": "xc2008",
+   "x": 33,
+   "y": 1,
+   "rect": [
+    30,
+    0,
+    36,
+    2
+   ],
+   "land": [
+    34,
+    3
+   ],
+   "to": "xc_in_2008",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2010",
+   "name": "入 汝南木工廠",
+   "map": "xc2000",
+   "x": 97,
+   "y": 143,
+   "rect": [
+    96,
+    138,
+    103,
+    143
+   ],
+   "land": [
+    99,
+    145
+   ],
+   "to": "xc_out_2010",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2010",
+   "name": "出 汝南木工廠",
+   "map": "xc2010",
+   "x": 3,
+   "y": 30,
+   "rect": [
+    0,
+    22,
+    3,
+    37
+   ],
+   "land": [
+    4,
+    29
+   ],
+   "to": "xc_in_2010",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2011",
+   "name": "入 汝南打鐵鋪",
+   "map": "xc2000",
+   "x": 159,
+   "y": 82,
+   "rect": [
+    154,
+    80,
+    161,
+    84
+   ],
+   "land": [
+    157,
+    85
+   ],
+   "to": "xc_out_2011",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2011",
+   "name": "出 汝南打鐵鋪",
+   "map": "xc2011",
+   "x": 26,
+   "y": 36,
+   "rect": [
+    0,
+    35,
+    50,
+    37
+   ],
+   "land": [
+    25,
+    34
+   ],
+   "to": "xc_in_2011",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2012",
+   "name": "入 汝南錢莊",
+   "map": "xc2000",
+   "x": 35,
+   "y": 147,
+   "rect": [
+    27,
+    143,
+    39,
+    149
+   ],
+   "land": [
+    33,
+    151
+   ],
+   "to": "xc_out_2012",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2012",
+   "name": "出 汝南錢莊",
+   "map": "xc2012",
+   "x": 29,
+   "y": 36,
+   "rect": [
+    9,
+    35,
+    50,
+    37
+   ],
+   "land": [
+    29,
+    34
+   ],
+   "to": "xc_in_2012",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2013",
+   "name": "入 汝南拍賣屋",
+   "map": "xc2000",
+   "x": 139,
+   "y": 142,
+   "rect": [
+    135,
+    135,
+    143,
+    144
+   ],
+   "land": [
+    140,
+    145
+   ],
+   "to": "xc_out_2013",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2013",
+   "name": "出 汝南拍賣屋",
+   "map": "xc2013",
+   "x": 0,
+   "y": 55,
+   "rect": [
+    0,
+    53,
+    75,
+    56
+   ],
+   "land": [
+    37,
+    52
+   ],
+   "to": "xc_in_2013",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2014",
+   "name": "入 汝南馬廄",
+   "map": "xc2000",
+   "x": 18,
+   "y": 80,
+   "rect": [
+    17,
+    77,
+    22,
+    82
+   ],
+   "land": [
+    19,
+    85
+   ],
+   "to": "xc_out_2014",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2014",
+   "name": "出 汝南馬廄",
+   "map": "xc2014",
+   "x": 47,
+   "y": 31,
+   "rect": [
+    46,
+    22,
+    50,
+    37
+   ],
+   "land": [
+    45,
+    29
+   ],
+   "to": "xc_in_2014",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2016",
+   "name": "入 汝南賭場",
+   "map": "xc2000",
+   "x": 191,
+   "y": 72,
+   "rect": [
+    186,
+    69,
+    194,
+    74
+   ],
+   "land": [
+    190,
+    76
+   ],
+   "to": "xc_out_2016",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2016",
+   "name": "出 汝南賭場",
+   "map": "xc2016",
+   "x": 50,
+   "y": 27,
+   "rect": [
+    47,
+    16,
+    50,
+    37
+   ],
+   "land": [
+    46,
+    26
+   ],
+   "to": "xc_in_2016",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2017",
+   "name": "入 汝南監牢",
+   "map": "xc2000",
+   "x": 123,
+   "y": 17,
+   "rect": [
+    120,
+    10,
+    128,
+    21
+   ],
+   "land": [
+    124,
+    23
+   ],
+   "to": "xc_out_2017",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2017",
+   "name": "出 汝南監牢",
+   "map": "xc2017",
+   "x": 0,
+   "y": 28,
+   "rect": [
+    0,
+    3,
+    3,
+    51
+   ],
+   "land": [
+    4,
+    27
+   ],
+   "to": "xc_in_2017",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2018",
+   "name": "入 汝南室內18",
+   "map": "xc2000",
+   "x": 143,
+   "y": 76,
+   "rect": [
+    138,
+    71,
+    143,
+    79
+   ],
+   "land": [
+    140,
+    81
+   ],
+   "to": "xc_out_2018",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2018",
+   "name": "出 汝南室內18",
+   "map": "xc2018",
+   "x": 0,
+   "y": 29,
+   "rect": [
+    0,
+    18,
+    3,
+    37
+   ],
+   "land": [
+    4,
+    27
+   ],
+   "to": "xc_in_2018",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2019",
+   "name": "入 汝南室內19",
+   "map": "xc2000",
+   "x": 178,
+   "y": 32,
+   "rect": [
+    176,
+    28,
+    182,
+    34
+   ],
+   "land": [
+    179,
+    35
+   ],
+   "to": "xc_out_2019",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2019",
+   "name": "出 汝南室內19",
+   "map": "xc2019",
+   "x": 48,
+   "y": 28,
+   "rect": [
+    46,
+    17,
+    50,
+    37
+   ],
+   "land": [
+    45,
+    27
+   ],
+   "to": "xc_in_2019",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2020",
+   "name": "入 汝南室內20",
+   "map": "xc2000",
+   "x": 135,
+   "y": 48,
+   "rect": [
+    131,
+    43,
+    137,
+    51
+   ],
+   "land": [
+    134,
+    53
+   ],
+   "to": "xc_out_2020",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2020",
+   "name": "出 汝南室內20",
+   "map": "xc2020",
+   "x": 25,
+   "y": 36,
+   "rect": [
+    0,
+    35,
+    50,
+    37
+   ],
+   "land": [
+    25,
+    34
+   ],
+   "to": "xc_in_2020",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2021",
+   "name": "入 汝南室內21",
+   "map": "xc2000",
+   "x": 245,
+   "y": 100,
+   "rect": [
+    240,
+    96,
+    246,
+    102
+   ],
+   "land": [
+    243,
+    104
+   ],
+   "to": "xc_out_2021",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2021",
+   "name": "出 汝南室內21",
+   "map": "xc2021",
+   "x": 2,
+   "y": 32,
+   "rect": [
+    0,
+    21,
+    3,
+    37
+   ],
+   "land": [
+    4,
+    29
+   ],
+   "to": "xc_in_2021",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2022",
+   "name": "入 汝南道路B",
+   "map": "xc2000",
+   "x": 224,
+   "y": 179,
+   "rect": [
+    202,
+    176,
+    243,
+    186
+   ],
+   "land": [
+    222,
+    175
+   ],
+   "to": "xc_out_2022",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2022",
+   "name": "出 汝南道路B",
+   "map": "xc2022",
+   "x": 190,
+   "y": 1,
+   "rect": [
+    0,
+    0,
+    200,
+    3
+   ],
+   "land": [
+    100,
+    7
+   ],
+   "to": "xc_in_2022",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2024",
+   "name": "入 汝南廚房",
+   "map": "xc2000",
+   "x": 110,
+   "y": 148,
+   "rect": [
+    108,
+    145,
+    113,
+    148
+   ],
+   "land": [
+    110,
+    150
+   ],
+   "to": "xc_out_2024",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2024",
+   "name": "出 汝南廚房",
+   "map": "xc2024",
+   "x": 0,
+   "y": 35,
+   "rect": [
+    0,
+    32,
+    50,
+    37
+   ],
+   "land": [
+    25,
+    31
+   ],
+   "to": "xc_in_2024",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2030",
+   "name": "入 汝南室內30",
+   "map": "xc2000",
+   "x": 167,
+   "y": 130,
+   "rect": [
+    166,
+    128,
+    170,
+    131
+   ],
+   "land": [
+    168,
+    133
+   ],
+   "to": "xc_out_2030",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2030",
+   "name": "出 汝南室內30",
+   "map": "xc2030",
+   "x": 0,
+   "y": 33,
+   "rect": [
+    0,
+    28,
+    3,
+    37
+   ],
+   "land": [
+    4,
+    32
+   ],
+   "to": "xc_in_2030",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2601",
+   "name": "入 洛陽官宅",
+   "map": "xc2600",
+   "x": 17,
+   "y": 53,
+   "rect": [
+    15,
+    47,
+    23,
+    56
+   ],
+   "land": [
+    19,
+    58
+   ],
+   "to": "xc_out_2601",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2601",
+   "name": "出 洛陽官宅",
+   "map": "xc2601",
+   "x": 72,
+   "y": 41,
+   "rect": [
+    72,
+    29,
+    74,
+    52
+   ],
+   "land": [
+    71,
+    40
+   ],
+   "to": "xc_in_2601",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2602",
+   "name": "入 洛陽客棧",
+   "map": "xc2600",
+   "x": 174,
+   "y": 21,
+   "rect": [
+    168,
+    17,
+    177,
+    23
+   ],
+   "land": [
+    173,
+    27
+   ],
+   "to": "xc_out_2602",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2602",
+   "name": "出 洛陽客棧",
+   "map": "xc2602",
+   "x": 74,
+   "y": 37,
+   "rect": [
+    72,
+    25,
+    74,
+    48
+   ],
+   "land": [
+    71,
+    36
+   ],
+   "to": "xc_in_2602",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2603",
+   "name": "入 洛陽藥房",
+   "map": "xc2600",
+   "x": 111,
+   "y": 169,
+   "rect": [
+    108,
+    164,
+    114,
+    172
+   ],
+   "land": [
+    111,
+    174
+   ],
+   "to": "xc_out_2603",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2603",
+   "name": "出 洛陽藥房",
+   "map": "xc2603",
+   "x": 1,
+   "y": 30,
+   "rect": [
+    0,
+    22,
+    2,
+    37
+   ],
+   "land": [
+    3,
+    29
+   ],
+   "to": "xc_in_2603",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2604",
+   "name": "入 洛陽武器店",
+   "map": "xc2600",
+   "x": 13,
+   "y": 152,
+   "rect": [
+    9,
+    148,
+    16,
+    154
+   ],
+   "land": [
+    13,
+    155
+   ],
+   "to": "xc_out_2604",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2604",
+   "name": "出 洛陽武器店",
+   "map": "xc2604",
+   "x": 47,
+   "y": 34,
+   "rect": [
+    46,
+    30,
+    50,
+    37
+   ],
+   "land": [
+    45,
+    33
+   ],
+   "to": "xc_in_2604",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2605",
+   "name": "入 洛陽私塾",
+   "map": "xc2600",
+   "x": 48,
+   "y": 135,
+   "rect": [
+    42,
+    129,
+    49,
+    138
+   ],
+   "land": [
+    44,
+    140
+   ],
+   "to": "xc_out_2605",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2605",
+   "name": "出 洛陽私塾",
+   "map": "xc2605",
+   "x": 1,
+   "y": 32,
+   "rect": [
+    0,
+    25,
+    1,
+    37
+   ],
+   "land": [
+    2,
+    31
+   ],
+   "to": "xc_in_2605",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2606",
+   "name": "入 洛陽廟",
+   "map": "xc2600",
+   "x": 244,
+   "y": 42,
+   "rect": [
+    236,
+    35,
+    245,
+    46
+   ],
+   "land": [
+    240,
+    47
+   ],
+   "to": "xc_out_2606",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2606",
+   "name": "出 洛陽廟",
+   "map": "xc2606",
+   "x": 0,
+   "y": 29,
+   "rect": [
+    0,
+    19,
+    1,
+    37
+   ],
+   "land": [
+    2,
+    28
+   ],
+   "to": "xc_in_2606",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2607",
+   "name": "入 洛陽練兵場",
+   "map": "xc2600",
+   "x": 128,
+   "y": 44,
+   "rect": [
+    120,
+    41,
+    133,
+    45
+   ],
+   "land": [
+    129,
+    46
+   ],
+   "to": "xc_out_2607",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2607",
+   "name": "出 洛陽練兵場",
+   "map": "xc2607",
+   "x": 40,
+   "y": 54,
+   "rect": [
+    0,
+    53,
+    41,
+    56
+   ],
+   "land": [
+    20,
+    52
+   ],
+   "to": "xc_in_2607",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2608",
+   "name": "入 洛陽室內08",
+   "map": "xc2600",
+   "x": 30,
+   "y": 87,
+   "rect": [
+    26,
+    82,
+    33,
+    90
+   ],
+   "land": [
+    30,
+    92
+   ],
+   "to": "xc_out_2608",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2608",
+   "name": "出 洛陽室內08",
+   "map": "xc2608",
+   "x": 34,
+   "y": 1,
+   "rect": [
+    31,
+    0,
+    36,
+    3
+   ],
+   "land": [
+    34,
+    4
+   ],
+   "to": "xc_in_2608",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2610",
+   "name": "入 洛陽木工廠",
+   "map": "xc2600",
+   "x": 207,
+   "y": 11,
+   "rect": [
+    207,
+    8,
+    212,
+    12
+   ],
+   "land": [
+    209,
+    14
+   ],
+   "to": "xc_out_2610",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2610",
+   "name": "出 洛陽木工廠",
+   "map": "xc2610",
+   "x": 0,
+   "y": 31,
+   "rect": [
+    0,
+    22,
+    1,
+    37
+   ],
+   "land": [
+    2,
+    29
+   ],
+   "to": "xc_in_2610",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2611",
+   "name": "入 洛陽打鐵鋪",
+   "map": "xc2600",
+   "x": 92,
+   "y": 162,
+   "rect": [
+    92,
+    159,
+    99,
+    164
+   ],
+   "land": [
+    94,
+    166
+   ],
+   "to": "xc_out_2611",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2611",
+   "name": "出 洛陽打鐵鋪",
+   "map": "xc2611",
+   "x": 0,
+   "y": 36,
+   "rect": [
+    0,
+    32,
+    2,
+    37
+   ],
+   "land": [
+    3,
+    34
+   ],
+   "to": "xc_in_2611",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2612",
+   "name": "入 洛陽錢莊",
+   "map": "xc2600",
+   "x": 180,
+   "y": 124,
+   "rect": [
+    180,
+    117,
+    190,
+    127
+   ],
+   "land": [
+    185,
+    129
+   ],
+   "to": "xc_out_2612",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2612",
+   "name": "出 洛陽錢莊",
+   "map": "xc2612",
+   "x": 1,
+   "y": 24,
+   "rect": [
+    0,
+    17,
+    1,
+    30
+   ],
+   "land": [
+    2,
+    23
+   ],
+   "to": "xc_in_2612",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2613",
+   "name": "入 洛陽拍賣屋",
+   "map": "xc2600",
+   "x": 91,
+   "y": 111,
+   "rect": [
+    90,
+    107,
+    98,
+    113
+   ],
+   "land": [
+    94,
+    115
+   ],
+   "to": "xc_out_2613",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2613",
+   "name": "出 洛陽拍賣屋",
+   "map": "xc2613",
+   "x": 0,
+   "y": 55,
+   "rect": [
+    0,
+    53,
+    75,
+    56
+   ],
+   "land": [
+    37,
+    52
+   ],
+   "to": "xc_in_2613",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2614",
+   "name": "入 洛陽室內14",
+   "map": "xc2600",
+   "x": 11,
+   "y": 95,
+   "rect": [
+    6,
+    90,
+    15,
+    98
+   ],
+   "land": [
+    10,
+    101
+   ],
+   "to": "xc_out_2614",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2614",
+   "name": "出 洛陽室內14",
+   "map": "xc2614",
+   "x": 48,
+   "y": 30,
+   "rect": [
+    45,
+    23,
+    50,
+    37
+   ],
+   "land": [
+    44,
+    30
+   ],
+   "to": "xc_in_2614",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2615",
+   "name": "入 洛陽驛站",
+   "map": "xc2600",
+   "x": 99,
+   "y": 58,
+   "rect": [
+    94,
+    53,
+    100,
+    61
+   ],
+   "land": [
+    97,
+    63
+   ],
+   "to": "xc_out_2615",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2615",
+   "name": "出 洛陽驛站",
+   "map": "xc2615",
+   "x": 46,
+   "y": 34,
+   "rect": [
+    46,
+    28,
+    50,
+    37
+   ],
+   "land": [
+    45,
+    32
+   ],
+   "to": "xc_in_2615",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2616",
+   "name": "入 洛陽賭場",
+   "map": "xc2600",
+   "x": 237,
+   "y": 115,
+   "rect": [
+    232,
+    112,
+    240,
+    117
+   ],
+   "land": [
+    236,
+    119
+   ],
+   "to": "xc_out_2616",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2616",
+   "name": "出 洛陽賭場",
+   "map": "xc2616",
+   "x": 50,
+   "y": 27,
+   "rect": [
+    48,
+    16,
+    50,
+    37
+   ],
+   "land": [
+    47,
+    26
+   ],
+   "to": "xc_in_2616",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2618",
+   "name": "入 洛陽室內18",
+   "map": "xc2600",
+   "x": 78,
+   "y": 118,
+   "rect": [
+    74,
+    116,
+    79,
+    119
+   ],
+   "land": [
+    79,
+    121
+   ],
+   "to": "xc_out_2618",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2618",
+   "name": "出 洛陽室內18",
+   "map": "xc2618",
+   "x": 48,
+   "y": 28,
+   "rect": [
+    45,
+    17,
+    50,
+    37
+   ],
+   "land": [
+    44,
+    27
+   ],
+   "to": "xc_in_2618",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2619",
+   "name": "入 洛陽室內19",
+   "map": "xc2600",
+   "x": 130,
+   "y": 131,
+   "rect": [
+    128,
+    126,
+    134,
+    134
+   ],
+   "land": [
+    131,
+    136
+   ],
+   "to": "xc_out_2619",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2619",
+   "name": "出 洛陽室內19",
+   "map": "xc2619",
+   "x": 47,
+   "y": 35,
+   "rect": [
+    47,
+    30,
+    50,
+    37
+   ],
+   "land": [
+    46,
+    33
+   ],
+   "to": "xc_in_2619",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2620",
+   "name": "入 洛陽室內20",
+   "map": "xc2600",
+   "x": 158,
+   "y": 148,
+   "rect": [
+    154,
+    143,
+    160,
+    151
+   ],
+   "land": [
+    157,
+    153
+   ],
+   "to": "xc_out_2620",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2620",
+   "name": "出 洛陽室內20",
+   "map": "xc2620",
+   "x": 47,
+   "y": 35,
+   "rect": [
+    47,
+    30,
+    50,
+    37
+   ],
+   "land": [
+    46,
+    33
+   ],
+   "to": "xc_in_2620",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2621",
+   "name": "入 洛陽室內21",
+   "map": "xc2600",
+   "x": 197,
+   "y": 7,
+   "rect": [
+    195,
+    3,
+    201,
+    9
+   ],
+   "land": [
+    198,
+    10
+   ],
+   "to": "xc_out_2621",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2621",
+   "name": "出 洛陽室內21",
+   "map": "xc2621",
+   "x": 47,
+   "y": 35,
+   "rect": [
+    47,
+    30,
+    50,
+    37
+   ],
+   "land": [
+    46,
+    33
+   ],
+   "to": "xc_in_2621",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2622",
+   "name": "入 洛陽道路B",
+   "map": "xc2600",
+   "x": 205,
+   "y": 185,
+   "rect": [
+    181,
+    184,
+    229,
+    186
+   ],
+   "land": [
+    205,
+    187
+   ],
+   "to": "xc_out_2622",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2622",
+   "name": "出 洛陽道路B",
+   "map": "xc2622",
+   "x": 190,
+   "y": 1,
+   "rect": [
+    0,
+    0,
+    200,
+    3
+   ],
+   "land": [
+    100,
+    7
+   ],
+   "to": "xc_in_2622",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2624",
+   "name": "入 洛陽廚房",
+   "map": "xc2600",
+   "x": 198,
+   "y": 63,
+   "rect": [
+    193,
+    60,
+    199,
+    65
+   ],
+   "land": [
+    197,
+    66
+   ],
+   "to": "xc_out_2624",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2624",
+   "name": "出 洛陽廚房",
+   "map": "xc2624",
+   "x": 48,
+   "y": 28,
+   "rect": [
+    48,
+    17,
+    50,
+    37
+   ],
+   "land": [
+    47,
+    27
+   ],
+   "to": "xc_in_2624",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2801",
+   "name": "入 宛官宅",
+   "map": "xc2800",
+   "x": 219,
+   "y": 30,
+   "rect": [
+    213,
+    27,
+    220,
+    33
+   ],
+   "land": [
+    216,
+    35
+   ],
+   "to": "xc_out_2801",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2801",
+   "name": "出 宛官宅",
+   "map": "xc2801",
+   "x": 74,
+   "y": 39,
+   "rect": [
+    71,
+    19,
+    75,
+    56
+   ],
+   "land": [
+    70,
+    37
+   ],
+   "to": "xc_in_2801",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2802",
+   "name": "入 宛客棧",
+   "map": "xc2800",
+   "x": 177,
+   "y": 105,
+   "rect": [
+    173,
+    102,
+    183,
+    107
+   ],
+   "land": [
+    178,
+    109
+   ],
+   "to": "xc_out_2802",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2802",
+   "name": "出 宛客棧",
+   "map": "xc2802",
+   "x": 71,
+   "y": 54,
+   "rect": [
+    0,
+    53,
+    75,
+    56
+   ],
+   "land": [
+    37,
+    52
+   ],
+   "to": "xc_in_2802",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2803",
+   "name": "入 宛藥房",
+   "map": "xc2800",
+   "x": 103,
+   "y": 184,
+   "rect": [
+    101,
+    181,
+    109,
+    186
+   ],
+   "land": [
+    105,
+    187
+   ],
+   "to": "xc_out_2803",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2803",
+   "name": "出 宛藥房",
+   "map": "xc2803",
+   "x": 1,
+   "y": 29,
+   "rect": [
+    0,
+    13,
+    3,
+    37
+   ],
+   "land": [
+    4,
+    23
+   ],
+   "to": "xc_in_2803",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2804",
+   "name": "入 宛武器店",
+   "map": "xc2800",
+   "x": 143,
+   "y": 55,
+   "rect": [
+    138,
+    54,
+    143,
+    57
+   ],
+   "land": [
+    140,
+    59
+   ],
+   "to": "xc_out_2804",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2804",
+   "name": "出 宛武器店",
+   "map": "xc2804",
+   "x": 1,
+   "y": 32,
+   "rect": [
+    0,
+    23,
+    3,
+    37
+   ],
+   "land": [
+    4,
+    30
+   ],
+   "to": "xc_in_2804",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2806",
+   "name": "入 宛室內06",
+   "map": "xc2800",
+   "x": 71,
+   "y": 163,
+   "rect": [
+    69,
+    161,
+    75,
+    166
+   ],
+   "land": [
+    72,
+    168
+   ],
+   "to": "xc_out_2806",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2806",
+   "name": "出 宛室內06",
+   "map": "xc2806",
+   "x": 30,
+   "y": 36,
+   "rect": [
+    0,
+    35,
+    50,
+    37
+   ],
+   "land": [
+    25,
+    34
+   ],
+   "to": "xc_in_2806",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2807",
+   "name": "入 宛室內07",
+   "map": "xc2800",
+   "x": 36,
+   "y": 141,
+   "rect": [
+    33,
+    136,
+    41,
+    142
+   ],
+   "land": [
+    38,
+    144
+   ],
+   "to": "xc_out_2807",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2807",
+   "name": "出 宛室內07",
+   "map": "xc2807",
+   "x": 3,
+   "y": 40,
+   "rect": [
+    0,
+    23,
+    3,
+    56
+   ],
+   "land": [
+    4,
+    39
+   ],
+   "to": "xc_in_2807",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2808",
+   "name": "入 宛室內08",
+   "map": "xc2800",
+   "x": 99,
+   "y": 52,
+   "rect": [
+    98,
+    49,
+    104,
+    54
+   ],
+   "land": [
+    101,
+    56
+   ],
+   "to": "xc_out_2808",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2808",
+   "name": "出 宛室內08",
+   "map": "xc2808",
+   "x": 16,
+   "y": 2,
+   "rect": [
+    14,
+    0,
+    17,
+    3
+   ],
+   "land": [
+    18,
+    1
+   ],
+   "to": "xc_in_2808",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2810",
+   "name": "入 宛木工廠",
+   "map": "xc2800",
+   "x": 95,
+   "y": 86,
+   "rect": [
+    90,
+    84,
+    98,
+    87
+   ],
+   "land": [
+    94,
+    89
+   ],
+   "to": "xc_out_2810",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2810",
+   "name": "出 宛木工廠",
+   "map": "xc2810",
+   "x": 4,
+   "y": 30,
+   "rect": [
+    0,
+    20,
+    4,
+    37
+   ],
+   "land": [
+    5,
+    28
+   ],
+   "to": "xc_in_2810",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2811",
+   "name": "入 宛打鐵鋪",
+   "map": "xc2800",
+   "x": 200,
+   "y": 141,
+   "rect": [
+    199,
+    139,
+    203,
+    142
+   ],
+   "land": [
+    201,
+    144
+   ],
+   "to": "xc_out_2811",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2811",
+   "name": "出 宛打鐵鋪",
+   "map": "xc2811",
+   "x": 17,
+   "y": 35,
+   "rect": [
+    0,
+    32,
+    50,
+    37
+   ],
+   "land": [
+    25,
+    31
+   ],
+   "to": "xc_in_2811",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2812",
+   "name": "入 宛錢莊",
+   "map": "xc2800",
+   "x": 127,
+   "y": 144,
+   "rect": [
+    127,
+    141,
+    133,
+    146
+   ],
+   "land": [
+    130,
+    148
+   ],
+   "to": "xc_out_2812",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2812",
+   "name": "出 宛錢莊",
+   "map": "xc2812",
+   "x": 49,
+   "y": 30,
+   "rect": [
+    46,
+    21,
+    50,
+    37
+   ],
+   "land": [
+    45,
+    29
+   ],
+   "to": "xc_in_2812",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2813",
+   "name": "入 宛拍賣屋",
+   "map": "xc2800",
+   "x": 232,
+   "y": 64,
+   "rect": [
+    231,
+    62,
+    236,
+    66
+   ],
+   "land": [
+    233,
+    68
+   ],
+   "to": "xc_out_2813",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2813",
+   "name": "出 宛拍賣屋",
+   "map": "xc2813",
+   "x": 1,
+   "y": 42,
+   "rect": [
+    0,
+    26,
+    3,
+    56
+   ],
+   "land": [
+    4,
+    41
+   ],
+   "to": "xc_in_2813",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2814",
+   "name": "入 宛馬廄",
+   "map": "xc2800",
+   "x": 24,
+   "y": 18,
+   "rect": [
+    23,
+    16,
+    31,
+    19
+   ],
+   "land": [
+    27,
+    20
+   ],
+   "to": "xc_out_2814",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2814",
+   "name": "出 宛馬廄",
+   "map": "xc2814",
+   "x": 47,
+   "y": 30,
+   "rect": [
+    45,
+    22,
+    50,
+    37
+   ],
+   "land": [
+    44,
+    29
+   ],
+   "to": "xc_in_2814",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2815",
+   "name": "入 宛驛站",
+   "map": "xc2800",
+   "x": 172,
+   "y": 157,
+   "rect": [
+    169,
+    155,
+    173,
+    159
+   ],
+   "land": [
+    171,
+    161
+   ],
+   "to": "xc_out_2815",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2815",
+   "name": "出 宛驛站",
+   "map": "xc2815",
+   "x": 46,
+   "y": 34,
+   "rect": [
+    46,
+    28,
+    50,
+    37
+   ],
+   "land": [
+    45,
+    32
+   ],
+   "to": "xc_in_2815",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2816",
+   "name": "入 宛賭場",
+   "map": "xc2800",
+   "x": 188,
+   "y": 130,
+   "rect": [
+    186,
+    128,
+    190,
+    132
+   ],
+   "land": [
+    188,
+    134
+   ],
+   "to": "xc_out_2816",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2816",
+   "name": "出 宛賭場",
+   "map": "xc2816",
+   "x": 49,
+   "y": 27,
+   "rect": [
+    46,
+    15,
+    50,
+    37
+   ],
+   "land": [
+    45,
+    26
+   ],
+   "to": "xc_in_2816",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2817",
+   "name": "入 宛監牢",
+   "map": "xc2800",
+   "x": 83,
+   "y": 11,
+   "rect": [
+    73,
+    11,
+    84,
+    21
+   ],
+   "land": [
+    88,
+    23
+   ],
+   "to": "xc_out_2817",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2817",
+   "name": "出 宛監牢",
+   "map": "xc2817",
+   "x": 50,
+   "y": 71,
+   "rect": [
+    43,
+    67,
+    87,
+    74
+   ],
+   "land": [
+    65,
+    66
+   ],
+   "to": "xc_in_2817",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2818",
+   "name": "入 宛室內18",
+   "map": "xc2800",
+   "x": 131,
+   "y": 76,
+   "rect": [
+    127,
+    74,
+    133,
+    78
+   ],
+   "land": [
+    130,
+    80
+   ],
+   "to": "xc_out_2818",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2818",
+   "name": "出 宛室內18",
+   "map": "xc2818",
+   "x": 2,
+   "y": 28,
+   "rect": [
+    0,
+    16,
+    3,
+    37
+   ],
+   "land": [
+    4,
+    26
+   ],
+   "to": "xc_in_2818",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2819",
+   "name": "入 宛室內19",
+   "map": "xc2800",
+   "x": 88,
+   "y": 139,
+   "rect": [
+    84,
+    137,
+    89,
+    141
+   ],
+   "land": [
+    86,
+    143
+   ],
+   "to": "xc_out_2819",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2819",
+   "name": "出 宛室內19",
+   "map": "xc2819",
+   "x": 0,
+   "y": 29,
+   "rect": [
+    0,
+    18,
+    3,
+    37
+   ],
+   "land": [
+    4,
+    27
+   ],
+   "to": "xc_in_2819",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2820",
+   "name": "入 宛室內20",
+   "map": "xc2800",
+   "x": 76,
+   "y": 70,
+   "rect": [
+    75,
+    68,
+    80,
+    71
+   ],
+   "land": [
+    77,
+    72
+   ],
+   "to": "xc_out_2820",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2820",
+   "name": "出 宛室內20",
+   "map": "xc2820",
+   "x": 2,
+   "y": 28,
+   "rect": [
+    0,
+    16,
+    3,
+    37
+   ],
+   "land": [
+    4,
+    26
+   ],
+   "to": "xc_in_2820",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2821",
+   "name": "入 宛室內21",
+   "map": "xc2800",
+   "x": 146,
+   "y": 30,
+   "rect": [
+    145,
+    27,
+    149,
+    31
+   ],
+   "land": [
+    147,
+    32
+   ],
+   "to": "xc_out_2821",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2821",
+   "name": "出 宛室內21",
+   "map": "xc2821",
+   "x": 1,
+   "y": 28,
+   "rect": [
+    0,
+    16,
+    2,
+    37
+   ],
+   "land": [
+    3,
+    26
+   ],
+   "to": "xc_in_2821",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2822",
+   "name": "入 宛道路B",
+   "map": "xc2800",
+   "x": 226,
+   "y": 185,
+   "rect": [
+    221,
+    182,
+    242,
+    187
+   ],
+   "land": [
+    231,
+    181
+   ],
+   "to": "xc_out_2822",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2822",
+   "name": "出 宛道路B",
+   "map": "xc2822",
+   "x": 197,
+   "y": 1,
+   "rect": [
+    0,
+    0,
+    200,
+    3
+   ],
+   "land": [
+    100,
+    7
+   ],
+   "to": "xc_in_2822",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2824",
+   "name": "入 宛廚房",
+   "map": "xc2800",
+   "x": 76,
+   "y": 103,
+   "rect": [
+    72,
+    102,
+    76,
+    105
+   ],
+   "land": [
+    74,
+    107
+   ],
+   "to": "xc_out_2824",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2824",
+   "name": "出 宛廚房",
+   "map": "xc2824",
+   "x": 48,
+   "y": 28,
+   "rect": [
+    47,
+    17,
+    50,
+    37
+   ],
+   "land": [
+    46,
+    27
+   ],
+   "to": "xc_in_2824",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2842",
+   "name": "入 宛室內42",
+   "map": "xc2800",
+   "x": 225,
+   "y": 108,
+   "rect": [
+    224,
+    106,
+    228,
+    109
+   ],
+   "land": [
+    226,
+    111
+   ],
+   "to": "xc_out_2842",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2842",
+   "name": "出 宛室內42",
+   "map": "xc2842",
+   "x": 43,
+   "y": 34,
+   "rect": [
+    40,
+    21,
+    50,
+    37
+   ],
+   "land": [
+    39,
+    29
+   ],
+   "to": "xc_in_2842",
+   "auto": true
+  },
+  {
+   "id": "xc_in_2843",
+   "name": "入 宛室內43",
+   "map": "xc2800",
+   "x": 178,
+   "y": 37,
+   "rect": [
+    173,
+    35,
+    179,
+    39
+   ],
+   "land": [
+    176,
+    41
+   ],
+   "to": "xc_out_2843",
+   "auto": true
+  },
+  {
+   "id": "xc_out_2843",
+   "name": "出 宛室內43",
+   "map": "xc2843",
+   "x": 43,
+   "y": 34,
+   "rect": [
+    40,
+    21,
+    50,
+    37
+   ],
+   "land": [
+    39,
+    29
+   ],
+   "to": "xc_in_2843",
    "auto": true
   },
   {
