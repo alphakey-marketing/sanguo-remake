@@ -1204,7 +1204,7 @@ func _office_ap_cost(ch: Dictionary) -> int:
 # ================= 官員護衛/流落官員 NPC (S06a spec 06 §3): 借用同伴 (gen kind) 嘅過圖/HP/倒下機制 =================
 # 生成官員 NPC：escort = 主公隔籬跟隨；rescue = field_1 打怪區隨機一角，等玩家救
 func _spawn_office_npc(pe: Dictionary, role: String) -> Dictionary:
-	var zone := "field_1"
+	var zone := "xc1925"
 	for od2 in data.office["orders"]:
 		if String(od2["kind"]) == role:
 			zone = String(od2["zone"])

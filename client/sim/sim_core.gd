@@ -10,7 +10,7 @@ const H := GameData.WORLD_H
 const NEAR := 3                                        # 設施互動距離(格)
 const WITNESS_RANGE := 8                               # NPC 目擊範圍(格) (Step 5.2)
 const GROUP_RANGE := 5                                 # 群居怪同類仇恨範圍(格) (Step 11, spec 04 §3)
-const DEFAULT_ZONE := "field_1"
+const DEFAULT_ZONE := "xc1925"
 const PATH_CAP := 30000                                # cmd_move A* 節點上限 (spec 12 §3；原版大圖 251x188 對角要 ~2 萬)
 const CHASE_CAP := 800                                 # 追擊 A* 節點上限
 const FACE_COUNT := 12                                 # 頭像款數 (UI 佔位頭像 face_0..11)
@@ -646,7 +646,7 @@ func _spawn_actor(ename: String, kind: String, class_id: String = "yishi", spawn
 # 新手城地圖 (world.homeCity / ch.homeCity；建角揀城 UAT-feedback)
 func _city_map(city: String) -> Dictionary:
 	for md in data.maps:
-		if String(md.get("city", "")) == city:
+		if String(md.get("cityOf", "")) == city and String(md.get("kind", "")) == "city":
 			return md
 	return {}
 

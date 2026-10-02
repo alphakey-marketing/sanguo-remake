@@ -29,16 +29,16 @@
     {"id": "official", "name": "朝廷官員", "weight": 1, "work": "office", "align": "good"}
   ],
   "cities": {
-    "xuchang": {"homeZone": "field_1"},
-    "xinye": {"homeZone": "bowang"},
-    "xiangyang": {"homeZone": "hanshui"},
-    "changsha": {"homeZone": "hanshui"},
-    "xiaopei": {"homeZone": "chenliu"},
-    "wancheng": {"homeZone": "wancheng_road"},
-    "runan": {"homeZone": "runan_road"},
-    "luoyang": {"homeZone": "chenliu"},
-    "xiapi": {"homeZone": "chenliu"},
-    "lingling": {"homeZone": "hanshui"}
+    "xuchang": {"homeZone": "xc1925"},
+    "xinye": {"homeZone": "xc2725"},
+    "xiangyang": {"homeZone": "xc2925"},
+    "changsha": {"homeZone": "xc2225"},
+    "xiaopei": {"homeZone": "xc1425"},
+    "wancheng": {"homeZone": "xc2825"},
+    "runan": {"homeZone": "xc2025"},
+    "luoyang": {"homeZone": "xc2625"},
+    "xiapi": {"homeZone": "xc1525"},
+    "lingling": {"homeZone": "xc3225"}
   },
   "names": {
     "surnames": ["陳", "林", "黃", "張", "李", "王", "吳", "劉", "蔡", "楊", "許", "鄭", "謝", "郭", "洪", "邱", "曾", "廖", "賴", "徐", "周", "葉", "蘇", "莊", "江", "呂", "何", "羅", "高", "蕭"],

@@ -1,0 +1,2424 @@
+{
+ "maps": [
+  {
+   "id": "field_1",
+   "name": "潁川郊外",
+   "ox": 0,
+   "oy": 0,
+   "safe": false,
+   "kind": "field",
+   "areas": [
+    {
+     "name": "許下屯田",
+     "x0": 52,
+     "y0": 5,
+     "x1": 96,
+     "y1": 22,
+     "work": [
+      "farming"
+     ]
+    },
+    {
+     "name": "許昌北郊",
+     "x0": 2,
+     "y0": 0,
+     "x1": 110,
+     "y1": 25
+    },
+    {
+     "name": "許田圍場",
+     "x0": 2,
+     "y0": 26,
+     "x1": 56,
+     "y1": 62,
+     "work": [
+      "hunting"
+     ]
+    },
+    {
+     "name": "東山丘林",
+     "x0": 57,
+     "y0": 26,
+     "x1": 110,
+     "y1": 50,
+     "work": [
+      "woodcutting",
+      "mining"
+     ]
+    },
+    {
+     "name": "潁水南岸",
+     "x0": 57,
+     "y0": 51,
+     "x1": 110,
+     "y1": 82,
+     "work": [
+      "fishing",
+      "herbalism"
+     ]
+    },
+    {
+     "name": "潁水渡口",
+     "x0": 2,
+     "y0": 63,
+     "x1": 56,
+     "y1": 82,
+     "work": [
+      "fishing"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "xuchang",
+   "name": "許昌城",
+   "ox": 132,
+   "oy": 0,
+   "safe": true,
+   "kind": "city",
+   "city": "xuchang",
+   "spawn": [
+    30,
+    40,
+    41,
+    45
+   ],
+   "areas": [
+    {
+     "name": "許都皇城",
+     "x0": 24,
+     "y0": 6,
+     "x1": 47,
+     "y1": 18
+    },
+    {
+     "name": "練兵場",
+     "x0": 5,
+     "y0": 17,
+     "x1": 16,
+     "y1": 26
+    },
+    {
+     "name": "南市",
+     "x0": 28,
+     "y0": 34,
+     "x1": 43,
+     "y1": 46
+    }
+   ]
+  },
+  {
+   "id": "runan_f1",
+   "name": "汝南洞窟 1F",
+   "ox": 0,
+   "oy": 104,
+   "safe": false,
+   "kind": "cave"
+  },
+  {
+   "id": "runan_f2",
+   "name": "汝南洞窟 2F",
+   "ox": 64,
+   "oy": 104,
+   "safe": false,
+   "kind": "cave"
+  },
+  {
+   "id": "runan_f3",
+   "name": "汝南洞窟 3F",
+   "ox": 128,
+   "oy": 104,
+   "safe": false,
+   "kind": "cave"
+  },
+  {
+   "id": "runan_f4",
+   "name": "汝南洞窟 4F",
+   "ox": 192,
+   "oy": 104,
+   "safe": false,
+   "kind": "cave"
+  },
+  {
+   "id": "runan_f5",
+   "name": "汝南洞窟 5F",
+   "ox": 256,
+   "oy": 104,
+   "safe": false,
+   "kind": "cave"
+  },
+  {
+   "id": "runan_f6",
+   "name": "汝南洞窟 6F",
+   "ox": 0,
+   "oy": 150,
+   "safe": false,
+   "kind": "cave"
+  },
+  {
+   "id": "runan_f7",
+   "name": "汝南洞窟 7F",
+   "ox": 64,
+   "oy": 150,
+   "safe": false,
+   "kind": "cave"
+  },
+  {
+   "id": "runan_f8",
+   "name": "汝南洞窟 8F",
+   "ox": 128,
+   "oy": 150,
+   "safe": false,
+   "kind": "cave"
+  },
+  {
+   "id": "runan_f9",
+   "name": "汝南洞窟 9F",
+   "ox": 192,
+   "oy": 150,
+   "safe": false,
+   "kind": "cave"
+  },
+  {
+   "id": "runan_f10",
+   "name": "汝南洞窟 10F",
+   "ox": 256,
+   "oy": 150,
+   "safe": false,
+   "kind": "cave"
+  },
+  {
+   "id": "runan_road",
+   "name": "汝南道",
+   "ox": 224,
+   "oy": 0,
+   "safe": false,
+   "kind": "field",
+   "areas": [
+    {
+     "name": "汝南賊寨",
+     "x0": 74,
+     "y0": 24,
+     "x1": 88,
+     "y1": 34
+    },
+    {
+     "name": "汝南山口",
+     "x0": 76,
+     "y0": 2,
+     "x1": 94,
+     "y1": 16,
+     "work": [
+      "mining"
+     ]
+    },
+    {
+     "name": "汝水渡",
+     "x0": 36,
+     "y0": 2,
+     "x1": 50,
+     "y1": 37,
+     "work": [
+      "fishing"
+     ]
+    },
+    {
+     "name": "汝南道",
+     "x0": 0,
+     "y0": 0,
+     "x1": 95,
+     "y1": 39
+    }
+   ]
+  },
+  {
+   "id": "kunyang",
+   "name": "昆陽",
+   "ox": 340,
+   "oy": 0,
+   "safe": false,
+   "kind": "field",
+   "areas": [
+    {
+     "name": "昆陽故城",
+     "x0": 34,
+     "y0": 43,
+     "x1": 60,
+     "y1": 61
+    },
+    {
+     "name": "滍水北岸",
+     "x0": 0,
+     "y0": 0,
+     "x1": 89,
+     "y1": 30
+    },
+    {
+     "name": "昆陽南郊",
+     "x0": 0,
+     "y0": 31,
+     "x1": 89,
+     "y1": 63
+    }
+   ]
+  },
+  {
+   "id": "wancheng_road",
+   "name": "宛城道",
+   "ox": 0,
+   "oy": 196,
+   "safe": false,
+   "kind": "field",
+   "areas": [
+    {
+     "name": "宛城東郊",
+     "x0": 0,
+     "y0": 0,
+     "x1": 28,
+     "y1": 49,
+     "work": [
+      "woodcutting",
+      "mining"
+     ]
+    },
+    {
+     "name": "淯水",
+     "x0": 29,
+     "y0": 0,
+     "x1": 38,
+     "y1": 49,
+     "work": [
+      "fishing"
+     ]
+    },
+    {
+     "name": "淯水田莊",
+     "x0": 62,
+     "y0": 20,
+     "x1": 92,
+     "y1": 40,
+     "work": [
+      "farming",
+      "herbalism"
+     ]
+    },
+    {
+     "name": "宛城道",
+     "x0": 39,
+     "y0": 0,
+     "x1": 95,
+     "y1": 49
+    }
+   ]
+  },
+  {
+   "id": "bowang",
+   "name": "博望坡",
+   "ox": 116,
+   "oy": 196,
+   "safe": false,
+   "kind": "field",
+   "areas": [
+    {
+     "name": "博望北林",
+     "x0": 0,
+     "y0": 0,
+     "x1": 95,
+     "y1": 16,
+     "work": [
+      "woodcutting",
+      "hunting"
+     ]
+    },
+    {
+     "name": "博望坡",
+     "x0": 0,
+     "y0": 17,
+     "x1": 95,
+     "y1": 44,
+     "work": [
+      "mining"
+     ]
+    },
+    {
+     "name": "新野北郊",
+     "x0": 0,
+     "y0": 45,
+     "x1": 95,
+     "y1": 69,
+     "work": [
+      "farming",
+      "herbalism"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "xinye",
+   "name": "新野城",
+   "ox": 232,
+   "oy": 196,
+   "safe": true,
+   "kind": "city",
+   "city": "xinye",
+   "areas": [
+    {
+     "name": "新野縣衙",
+     "x0": 22,
+     "y0": 8,
+     "x1": 41,
+     "y1": 17
+    },
+    {
+     "name": "城南校場",
+     "x0": 27,
+     "y0": 33,
+     "x1": 36,
+     "y1": 40
+    },
+    {
+     "name": "新野市集",
+     "x0": 5,
+     "y0": 24,
+     "x1": 58,
+     "y1": 30
+    }
+   ]
+  },
+  {
+   "id": "jingzhou",
+   "name": "荊州地界",
+   "ox": 0,
+   "oy": 290,
+   "safe": false,
+   "kind": "field",
+   "areas": [
+    {
+     "name": "白河",
+     "x0": 54,
+     "y0": 0,
+     "x1": 66,
+     "y1": 49,
+     "work": [
+      "fishing"
+     ]
+    },
+    {
+     "name": "白河田莊",
+     "x0": 66,
+     "y0": 30,
+     "x1": 88,
+     "y1": 44,
+     "work": [
+      "farming",
+      "herbalism"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "gangkou",
+   "name": "港口",
+   "ox": 116,
+   "oy": 290,
+   "safe": false,
+   "kind": "field",
+   "areas": [
+    {
+     "name": "渡船處",
+     "x0": 41,
+     "y0": 40,
+     "x1": 49,
+     "y1": 45
+    },
+    {
+     "name": "港口碼頭",
+     "x0": 14,
+     "y0": 26,
+     "x1": 76,
+     "y1": 33
+    }
+   ]
+  },
+  {
+   "id": "fancheng",
+   "name": "樊城",
+   "ox": 216,
+   "oy": 290,
+   "safe": false,
+   "kind": "field",
+   "areas": [
+    {
+     "name": "樊城城下",
+     "x0": 60,
+     "y0": 10,
+     "x1": 90,
+     "y1": 46
+    },
+    {
+     "name": "樊北田",
+     "x0": 8,
+     "y0": 40,
+     "x1": 30,
+     "y1": 52,
+     "work": [
+      "farming"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hanshui",
+   "name": "漢水渡口",
+   "ox": 332,
+   "oy": 290,
+   "safe": false,
+   "kind": "field",
+   "areas": [
+    {
+     "name": "北岸碼頭",
+     "x0": 34,
+     "y0": 8,
+     "x1": 47,
+     "y1": 14
+    },
+    {
+     "name": "南岸碼頭",
+     "x0": 34,
+     "y0": 28,
+     "x1": 47,
+     "y1": 34
+    },
+    {
+     "name": "漢水",
+     "x0": 0,
+     "y0": 15,
+     "x1": 79,
+     "y1": 27
+    }
+   ]
+  },
+  {
+   "id": "ding_fu",
+   "name": "丁刺史府",
+   "ox": 432,
+   "oy": 290,
+   "safe": true,
+   "kind": "house",
+   "parent": "runan_city",
+   "areas": []
+  },
+  {
+   "id": "xiangyang",
+   "name": "襄陽城",
+   "ox": 0,
+   "oy": 370,
+   "safe": true,
+   "kind": "city",
+   "city": "xiangyang",
+   "areas": [
+    {
+     "name": "襄陽宮宅",
+     "x0": 26,
+     "y0": 8,
+     "x1": 49,
+     "y1": 19
+    },
+    {
+     "name": "襄陽監獄",
+     "x0": 6,
+     "y0": 40,
+     "x1": 22,
+     "y1": 53
+    },
+    {
+     "name": "襄陽市集",
+     "x0": 5,
+     "y0": 24,
+     "x1": 70,
+     "y1": 33
+    }
+   ]
+  },
+  {
+   "id": "xy_prison",
+   "name": "襄陽監獄",
+   "ox": 96,
+   "oy": 370,
+   "safe": true,
+   "kind": "house",
+   "parent": "xiangyang",
+   "areas": []
+  },
+  {
+   "id": "changsha",
+   "name": "長沙城",
+   "ox": 152,
+   "oy": 370,
+   "safe": true,
+   "kind": "city",
+   "city": "changsha",
+   "areas": [
+    {
+     "name": "長沙賭場",
+     "x0": 6,
+     "y0": 8,
+     "x1": 17,
+     "y1": 15
+    }
+   ]
+  },
+  {
+   "id": "xiaopei",
+   "name": "小沛城",
+   "ox": 220,
+   "oy": 370,
+   "safe": true,
+   "kind": "city",
+   "city": "xiaopei",
+   "areas": [
+    {
+     "name": "轅門",
+     "x0": 34,
+     "y0": 14,
+     "x1": 40,
+     "y1": 18
+    }
+   ]
+  },
+  {
+   "id": "wancheng",
+   "name": "宛城",
+   "ox": 288,
+   "oy": 370,
+   "safe": true,
+   "kind": "city",
+   "city": "wancheng",
+   "areas": [
+    {
+     "name": "宛城牌樓",
+     "x0": 31,
+     "y0": 23,
+     "x1": 40,
+     "y1": 30
+    },
+    {
+     "name": "宛城市集",
+     "x0": 5,
+     "y0": 31,
+     "x1": 66,
+     "y1": 38
+    }
+   ]
+  },
+  {
+   "id": "runan_city",
+   "name": "汝南城",
+   "ox": 380,
+   "oy": 370,
+   "safe": true,
+   "kind": "city",
+   "city": "runan",
+   "areas": [
+    {
+     "name": "丁刺史府",
+     "x0": 40,
+     "y0": 6,
+     "x1": 57,
+     "y1": 18
+    },
+    {
+     "name": "李府",
+     "x0": 8,
+     "y0": 6,
+     "x1": 18,
+     "y1": 12
+    },
+    {
+     "name": "汝南市集",
+     "x0": 5,
+     "y0": 26,
+     "x1": 58,
+     "y1": 36
+    }
+   ]
+  },
+  {
+   "id": "chenliu",
+   "name": "陳留郊外",
+   "ox": 0,
+   "oy": 452,
+   "safe": false,
+   "kind": "field",
+   "areas": [
+    {
+     "name": "陳留城門口",
+     "x0": 38,
+     "y0": 9,
+     "x1": 57,
+     "y1": 13
+    },
+    {
+     "name": "汴水",
+     "x0": 62,
+     "y0": 9,
+     "x1": 76,
+     "y1": 55
+    }
+   ]
+  },
+  {
+   "id": "yudu",
+   "name": "于毒山寨",
+   "ox": 116,
+   "oy": 452,
+   "safe": false,
+   "kind": "field",
+   "areas": [
+    {
+     "name": "山寨",
+     "x0": 4,
+     "y0": 12,
+     "x1": 26,
+     "y1": 38
+    }
+   ]
+  },
+  {
+   "id": "longzhong",
+   "name": "隆中",
+   "ox": 208,
+   "oy": 452,
+   "safe": false,
+   "kind": "field",
+   "areas": [
+    {
+     "name": "臥龍岡",
+     "x0": 5,
+     "y0": 3,
+     "x1": 27,
+     "y1": 24
+    },
+    {
+     "name": "竹林",
+     "x0": 38,
+     "y0": 3,
+     "x1": 60,
+     "y1": 20,
+     "work": [
+      "woodcutting",
+      "herbalism"
+     ]
+    },
+    {
+     "name": "隴畝",
+     "x0": 8,
+     "y0": 34,
+     "x1": 42,
+     "y1": 46,
+     "work": [
+      "farming",
+      "herbalism"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "caolu",
+   "name": "草廬",
+   "ox": 300,
+   "oy": 452,
+   "safe": true,
+   "kind": "house",
+   "parent": "longzhong",
+   "areas": []
+  },
+  {
+   "id": "zhangniujiao_f1",
+   "name": "張牛角戰役 1F",
+   "ox": 320,
+   "oy": 196,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "zhangniujiao_f2",
+   "name": "張牛角戰役 2F",
+   "ox": 364,
+   "oy": 196,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "zhangniujiao_f3",
+   "name": "張牛角戰役 3F",
+   "ox": 408,
+   "oy": 196,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "zhangniujiao_f4",
+   "name": "張牛角戰役 4F",
+   "ox": 452,
+   "oy": 196,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "chufeiyan_f1",
+   "name": "褚飛燕戰役 1F",
+   "ox": 450,
+   "oy": 0,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "chufeiyan_f2",
+   "name": "褚飛燕戰役 2F",
+   "ox": 486,
+   "oy": 0,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "chufeiyan_f3",
+   "name": "褚飛燕戰役 3F",
+   "ox": 450,
+   "oy": 36,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "chufeiyan_f4",
+   "name": "褚飛燕戰役 4F",
+   "ox": 486,
+   "oy": 36,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "lidamu_f1",
+   "name": "李大目戰役 1F",
+   "ox": 224,
+   "oy": 60,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "lidamu_f2",
+   "name": "李大目戰役 2F",
+   "ox": 260,
+   "oy": 60,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "lidamu_f3",
+   "name": "李大目戰役 3F",
+   "ox": 296,
+   "oy": 60,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "lidamu_f4",
+   "name": "李大目戰役 4F",
+   "ox": 450,
+   "oy": 72,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "lidamu_f5",
+   "name": "李大目戰役 5F",
+   "ox": 486,
+   "oy": 72,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "zhangbaiqi_f1",
+   "name": "張白騎戰役 1F",
+   "ox": 332,
+   "oy": 84,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "zhangbaiqi_f2",
+   "name": "張白騎戰役 2F",
+   "ox": 368,
+   "oy": 84,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "zhangbaiqi_f3",
+   "name": "張白騎戰役 3F",
+   "ox": 404,
+   "oy": 84,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "zhangbaiqi_f4",
+   "name": "張白騎戰役 4F",
+   "ox": 440,
+   "oy": 108,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "zhangbaiqi_f5",
+   "name": "張白騎戰役 5F",
+   "ox": 476,
+   "oy": 108,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "zhangbaiqi_f6",
+   "name": "張白騎戰役 6F",
+   "ox": 320,
+   "oy": 120,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "huanglong_f1",
+   "name": "黃龍戰役 1F",
+   "ox": 356,
+   "oy": 120,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "huanglong_f2",
+   "name": "黃龍戰役 2F",
+   "ox": 392,
+   "oy": 120,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "huanglong_f3",
+   "name": "黃龍戰役 3F",
+   "ox": 428,
+   "oy": 144,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "huanglong_f4",
+   "name": "黃龍戰役 4F",
+   "ox": 464,
+   "oy": 144,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "huanglong_f5",
+   "name": "黃龍戰役 5F",
+   "ox": 320,
+   "oy": 156,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "huanglong_f6",
+   "name": "黃龍戰役 6F",
+   "ox": 356,
+   "oy": 156,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "shichangshi_f1",
+   "name": "十常侍戰役 1F",
+   "ox": 392,
+   "oy": 156,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "shichangshi_f2",
+   "name": "十常侍戰役 2F",
+   "ox": 316,
+   "oy": 232,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "shichangshi_f3",
+   "name": "十常侍戰役 3F",
+   "ox": 352,
+   "oy": 232,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "shichangshi_f4",
+   "name": "十常侍戰役 4F",
+   "ox": 388,
+   "oy": 232,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "shichangshi_f5",
+   "name": "十常侍戰役 5F",
+   "ox": 424,
+   "oy": 232,
+   "safe": false,
+   "kind": "field",
+   "instance": true
+  },
+  {
+   "id": "taohuadu_f1",
+   "name": "桃花渡 1F",
+   "ox": 460,
+   "oy": 232,
+   "safe": false,
+   "kind": "cave",
+   "instance": true
+  },
+  {
+   "id": "taohuadu_f2",
+   "name": "桃花渡 2F",
+   "ox": 484,
+   "oy": 268,
+   "safe": false,
+   "kind": "cave",
+   "instance": true
+  },
+  {
+   "id": "taohuadu_f3",
+   "name": "桃花渡 3F",
+   "ox": 484,
+   "oy": 304,
+   "safe": false,
+   "kind": "cave",
+   "instance": true
+  },
+  {
+   "id": "taohuadu_f4",
+   "name": "桃花渡 4F",
+   "ox": 432,
+   "oy": 330,
+   "safe": false,
+   "kind": "cave",
+   "instance": true
+  },
+  {
+   "id": "taohuadu_f5",
+   "name": "桃花渡 5F",
+   "ox": 468,
+   "oy": 340,
+   "safe": false,
+   "kind": "cave",
+   "instance": true
+  },
+  {
+   "id": "qicai_f1",
+   "name": "七彩奪寶陣 1F",
+   "ox": 464,
+   "oy": 376,
+   "safe": false,
+   "kind": "cave",
+   "instance": true
+  },
+  {
+   "id": "qicai_f2",
+   "name": "七彩奪寶陣 2F",
+   "ox": 96,
+   "oy": 412,
+   "safe": false,
+   "kind": "cave",
+   "instance": true
+  },
+  {
+   "id": "qicai_f3",
+   "name": "七彩奪寶陣 3F",
+   "ox": 464,
+   "oy": 412,
+   "safe": false,
+   "kind": "cave",
+   "instance": true
+  },
+  {
+   "id": "qicai_f4",
+   "name": "七彩奪寶陣 4F",
+   "ox": 380,
+   "oy": 442,
+   "safe": false,
+   "kind": "cave",
+   "instance": true
+  },
+  {
+   "id": "qicai_f5",
+   "name": "七彩奪寶陣 5F",
+   "ox": 416,
+   "oy": 442,
+   "safe": false,
+   "kind": "cave",
+   "instance": true
+  },
+  {
+   "id": "qicai_f6",
+   "name": "七彩奪寶陣 6F",
+   "ox": 452,
+   "oy": 448,
+   "safe": false,
+   "kind": "cave",
+   "instance": true
+  },
+  {
+   "id": "qicai_f7",
+   "name": "七彩奪寶陣 7F",
+   "ox": 488,
+   "oy": 448,
+   "safe": false,
+   "kind": "cave",
+   "instance": true
+  },
+  {
+   "id": "luoyang",
+   "name": "洛陽城",
+   "ox": 0,
+   "oy": 530,
+   "safe": true,
+   "kind": "city",
+   "city": "luoyang",
+   "areas": [
+    {
+     "name": "黃巾道場",
+     "x0": 6,
+     "y0": 12,
+     "x1": 18,
+     "y1": 20
+    },
+    {
+     "name": "南華竹林",
+     "x0": 6,
+     "y0": 30,
+     "x1": 16,
+     "y1": 33
+    }
+   ]
+  },
+  {
+   "id": "luoyang_well",
+   "name": "皇城井底",
+   "ox": 68,
+   "oy": 530,
+   "safe": false,
+   "kind": "house",
+   "parent": "luoyang",
+   "areas": []
+  },
+  {
+   "id": "chengfu",
+   "name": "程府民房",
+   "ox": 128,
+   "oy": 530,
+   "safe": true,
+   "kind": "house",
+   "parent": "luoyang",
+   "areas": []
+  },
+  {
+   "id": "xiapi",
+   "name": "下邳城",
+   "ox": 176,
+   "oy": 530,
+   "safe": true,
+   "kind": "city",
+   "city": "xiapi",
+   "areas": []
+  },
+  {
+   "id": "hefu",
+   "name": "何府",
+   "ox": 252,
+   "oy": 530,
+   "safe": true,
+   "kind": "house",
+   "parent": "xiapi",
+   "areas": []
+  },
+  {
+   "id": "lingling",
+   "name": "零陵城",
+   "ox": 296,
+   "oy": 530,
+   "safe": true,
+   "kind": "city",
+   "city": "lingling",
+   "areas": [
+    {
+     "name": "練兵場",
+     "x0": 6,
+     "y0": 6,
+     "x1": 16,
+     "y1": 13
+    }
+   ]
+  }
+ ],
+ "portals": [
+  {
+   "id": "gate_out",
+   "name": "南門 → 潁川郊外",
+   "map": "xuchang",
+   "x": 35,
+   "y": 75,
+   "to": "gate_in",
+   "auto": true
+  },
+  {
+   "id": "gate_in",
+   "name": "北 → 許昌城",
+   "map": "field_1",
+   "x": 40,
+   "y": 0,
+   "to": "gate_out",
+   "auto": true
+  },
+  {
+   "id": "cave_enter",
+   "name": "汝南山洞",
+   "map": "field_1",
+   "x": 101,
+   "y": 61,
+   "to": "cave_f1",
+   "auto": true
+  },
+  {
+   "id": "cave_f1",
+   "name": "洞口 → 潁川郊外",
+   "map": "runan_f1",
+   "x": 3,
+   "y": 3,
+   "to": "cave_enter",
+   "auto": true
+  },
+  {
+   "id": "f1_down",
+   "name": "落二層",
+   "map": "runan_f1",
+   "x": 40,
+   "y": 22,
+   "to": "f2_up",
+   "auto": true
+  },
+  {
+   "id": "f2_up",
+   "name": "上一層",
+   "map": "runan_f2",
+   "x": 3,
+   "y": 3,
+   "to": "f1_down",
+   "auto": true
+  },
+  {
+   "id": "f2_down",
+   "name": "落三層",
+   "map": "runan_f2",
+   "x": 40,
+   "y": 22,
+   "to": "f3_up",
+   "auto": true
+  },
+  {
+   "id": "f3_up",
+   "name": "上二層",
+   "map": "runan_f3",
+   "x": 3,
+   "y": 3,
+   "to": "f2_down",
+   "auto": true
+  },
+  {
+   "id": "f3_down",
+   "name": "落四層",
+   "map": "runan_f3",
+   "x": 40,
+   "y": 22,
+   "to": "f4_up",
+   "auto": true
+  },
+  {
+   "id": "f4_up",
+   "name": "上三層",
+   "map": "runan_f4",
+   "x": 3,
+   "y": 3,
+   "to": "f3_down",
+   "auto": true
+  },
+  {
+   "id": "f4_down",
+   "name": "落五層",
+   "map": "runan_f4",
+   "x": 40,
+   "y": 22,
+   "to": "f5_up",
+   "auto": true
+  },
+  {
+   "id": "f5_up",
+   "name": "上四層",
+   "map": "runan_f5",
+   "x": 3,
+   "y": 3,
+   "to": "f4_down",
+   "auto": true
+  },
+  {
+   "id": "f5_down",
+   "name": "落六層",
+   "map": "runan_f5",
+   "x": 40,
+   "y": 22,
+   "to": "f6_up",
+   "auto": true
+  },
+  {
+   "id": "f6_up",
+   "name": "上五層",
+   "map": "runan_f6",
+   "x": 3,
+   "y": 3,
+   "to": "f5_down",
+   "auto": true
+  },
+  {
+   "id": "f6_down",
+   "name": "落七層",
+   "map": "runan_f6",
+   "x": 40,
+   "y": 22,
+   "to": "f7_up",
+   "auto": true
+  },
+  {
+   "id": "f7_up",
+   "name": "上六層",
+   "map": "runan_f7",
+   "x": 3,
+   "y": 3,
+   "to": "f6_down",
+   "auto": true
+  },
+  {
+   "id": "f7_down",
+   "name": "落八層",
+   "map": "runan_f7",
+   "x": 40,
+   "y": 22,
+   "to": "f8_up",
+   "auto": true
+  },
+  {
+   "id": "f8_up",
+   "name": "上七層",
+   "map": "runan_f8",
+   "x": 3,
+   "y": 3,
+   "to": "f7_down",
+   "auto": true
+  },
+  {
+   "id": "f8_down",
+   "name": "落九層",
+   "map": "runan_f8",
+   "x": 40,
+   "y": 22,
+   "to": "f9_up",
+   "auto": true
+  },
+  {
+   "id": "f9_up",
+   "name": "上八層",
+   "map": "runan_f9",
+   "x": 3,
+   "y": 3,
+   "to": "f8_down",
+   "auto": true
+  },
+  {
+   "id": "f9_down",
+   "name": "落十層",
+   "map": "runan_f9",
+   "x": 40,
+   "y": 22,
+   "to": "f10_up",
+   "auto": true
+  },
+  {
+   "id": "f10_up",
+   "name": "上九層",
+   "map": "runan_f10",
+   "x": 3,
+   "y": 3,
+   "to": "f9_down",
+   "auto": true
+  },
+  {
+   "id": "east_out",
+   "name": "東 → 汝南道",
+   "map": "field_1",
+   "x": 111,
+   "y": 24,
+   "to": "rr_west",
+   "auto": true
+  },
+  {
+   "id": "south_out",
+   "name": "南 → 昆陽",
+   "map": "field_1",
+   "x": 40,
+   "y": 83,
+   "to": "ky_north",
+   "auto": true
+  },
+  {
+   "id": "rr_west",
+   "name": "西 → 潁川郊外",
+   "map": "runan_road",
+   "x": 0,
+   "y": 20,
+   "to": "east_out",
+   "auto": true
+  },
+  {
+   "id": "rr_cave",
+   "name": "汝南山洞（後洞）",
+   "map": "runan_road",
+   "x": 87,
+   "y": 10,
+   "to": "cave_back",
+   "auto": true
+  },
+  {
+   "id": "cave_back",
+   "name": "後洞 → 汝南道",
+   "map": "runan_f1",
+   "x": 42,
+   "y": 13,
+   "to": "rr_cave",
+   "auto": true
+  },
+  {
+   "id": "ky_north",
+   "name": "北 → 潁川郊外",
+   "map": "kunyang",
+   "x": 45,
+   "y": 0,
+   "to": "south_out",
+   "auto": true
+  },
+  {
+   "id": "ky_west",
+   "name": "西 → 宛城道",
+   "map": "kunyang",
+   "x": 0,
+   "y": 40,
+   "to": "wc_east",
+   "auto": true
+  },
+  {
+   "id": "wc_east",
+   "name": "東 → 昆陽",
+   "map": "wancheng_road",
+   "x": 95,
+   "y": 14,
+   "to": "ky_west",
+   "auto": true
+  },
+  {
+   "id": "wc_south",
+   "name": "南 → 博望坡",
+   "map": "wancheng_road",
+   "x": 60,
+   "y": 49,
+   "to": "bw_north",
+   "auto": true
+  },
+  {
+   "id": "bw_north",
+   "name": "北 → 宛城道",
+   "map": "bowang",
+   "x": 48,
+   "y": 0,
+   "to": "wc_south",
+   "auto": true
+  },
+  {
+   "id": "bw_south",
+   "name": "南 → 新野城",
+   "map": "bowang",
+   "x": 48,
+   "y": 69,
+   "to": "xy_north",
+   "auto": true
+  },
+  {
+   "id": "xy_north",
+   "name": "北門 → 博望坡",
+   "map": "xinye",
+   "x": 31,
+   "y": 0,
+   "to": "bw_south",
+   "auto": true
+  },
+  {
+   "id": "gate_north",
+   "name": "北門 → 陳留郊外",
+   "map": "xuchang",
+   "x": 35,
+   "y": 0,
+   "to": "cl_south",
+   "auto": true
+  },
+  {
+   "id": "cl_south",
+   "name": "南 → 許昌城",
+   "map": "chenliu",
+   "x": 48,
+   "y": 55,
+   "to": "gate_north",
+   "auto": true
+  },
+  {
+   "id": "cl_west",
+   "name": "西 → 于毒山寨",
+   "map": "chenliu",
+   "x": 0,
+   "y": 30,
+   "to": "yd_east",
+   "auto": true
+  },
+  {
+   "id": "yd_east",
+   "name": "東 → 陳留郊外",
+   "map": "yudu",
+   "x": 71,
+   "y": 25,
+   "to": "cl_west",
+   "auto": true
+  },
+  {
+   "id": "cl_east",
+   "name": "東 → 小沛城",
+   "map": "chenliu",
+   "x": 95,
+   "y": 30,
+   "to": "xp_west",
+   "auto": true
+  },
+  {
+   "id": "xp_west",
+   "name": "西門 → 陳留郊外",
+   "map": "xiaopei",
+   "x": 0,
+   "y": 17,
+   "to": "cl_east",
+   "auto": true
+  },
+  {
+   "id": "rr_east",
+   "name": "東 → 汝南城",
+   "map": "runan_road",
+   "x": 95,
+   "y": 20,
+   "to": "rn_west",
+   "auto": true
+  },
+  {
+   "id": "rn_west",
+   "name": "西門 → 汝南道",
+   "map": "runan_city",
+   "x": 0,
+   "y": 24,
+   "to": "rr_east",
+   "auto": true
+  },
+  {
+   "id": "rn_ding",
+   "name": "丁刺史府",
+   "map": "runan_city",
+   "x": 48,
+   "y": 13,
+   "to": "df_door",
+   "auto": true,
+   "gate": {
+    "item": 56018,
+    "msg": "丁府大門深鎖，要有丁原家鑰匙先入得"
+   }
+  },
+  {
+   "id": "df_door",
+   "name": "府門 → 汝南城",
+   "map": "ding_fu",
+   "x": 16,
+   "y": 19,
+   "to": "rn_ding",
+   "auto": true
+  },
+  {
+   "id": "wc_west",
+   "name": "西 → 宛城",
+   "map": "wancheng_road",
+   "x": 2,
+   "y": 14,
+   "to": "wch_east",
+   "auto": true
+  },
+  {
+   "id": "wch_east",
+   "name": "東門 → 宛城道",
+   "map": "wancheng",
+   "x": 71,
+   "y": 26,
+   "to": "wc_west",
+   "auto": true
+  },
+  {
+   "id": "xy_west",
+   "name": "西門 → 荊州地界",
+   "map": "xinye",
+   "x": 0,
+   "y": 22,
+   "to": "jz_east",
+   "auto": true
+  },
+  {
+   "id": "jz_east",
+   "name": "東 → 新野城",
+   "map": "jingzhou",
+   "x": 95,
+   "y": 20,
+   "to": "xy_west",
+   "auto": true
+  },
+  {
+   "id": "jz_port",
+   "name": "西南 → 港口",
+   "map": "jingzhou",
+   "x": 0,
+   "y": 44,
+   "to": "gk_ne",
+   "auto": true
+  },
+  {
+   "id": "gk_ne",
+   "name": "東北 → 荊州地界",
+   "map": "gangkou",
+   "x": 79,
+   "y": 6,
+   "to": "jz_port",
+   "auto": true
+  },
+  {
+   "id": "xy_south",
+   "name": "南門 → 樊城",
+   "map": "xinye",
+   "x": 31,
+   "y": 47,
+   "to": "fc_north",
+   "auto": true
+  },
+  {
+   "id": "fc_north",
+   "name": "北 → 新野城",
+   "map": "fancheng",
+   "x": 48,
+   "y": 0,
+   "to": "xy_south",
+   "auto": true
+  },
+  {
+   "id": "fc_south",
+   "name": "南 → 漢水渡口",
+   "map": "fancheng",
+   "x": 48,
+   "y": 59,
+   "to": "hs_north",
+   "auto": true
+  },
+  {
+   "id": "hs_north",
+   "name": "北 → 樊城",
+   "map": "hanshui",
+   "x": 40,
+   "y": 0,
+   "to": "fc_south",
+   "auto": true
+  },
+  {
+   "id": "hs_south",
+   "name": "南 → 襄陽城",
+   "map": "hanshui",
+   "x": 40,
+   "y": 43,
+   "to": "xyc_north",
+   "auto": true
+  },
+  {
+   "id": "xyc_north",
+   "name": "北門 → 漢水渡口",
+   "map": "xiangyang",
+   "x": 37,
+   "y": 0,
+   "to": "hs_south",
+   "auto": true
+  },
+  {
+   "id": "xyc_prison",
+   "name": "襄陽監獄",
+   "map": "xiangyang",
+   "x": 14,
+   "y": 48,
+   "to": "pr_door",
+   "auto": true,
+   "gate": {
+    "window": {
+     "startKe": 0,
+     "endKe": 16
+    },
+    "msg": "獄卒把守森嚴，要等子時~丑時夜靜先潛得入去"
+   }
+  },
+  {
+   "id": "pr_door",
+   "name": "獄門 → 襄陽城",
+   "map": "xy_prison",
+   "x": 18,
+   "y": 0,
+   "to": "xyc_prison",
+   "auto": true
+  },
+  {
+   "id": "xyc_south",
+   "name": "南門 → 長沙城",
+   "map": "xiangyang",
+   "x": 37,
+   "y": 59,
+   "to": "cs_north",
+   "auto": true
+  },
+  {
+   "id": "cs_north",
+   "name": "北門 → 襄陽城",
+   "map": "changsha",
+   "x": 23,
+   "y": 0,
+   "to": "xyc_south",
+   "auto": true
+  },
+  {
+   "id": "xyc_west",
+   "name": "西門 → 隆中",
+   "map": "xiangyang",
+   "x": 0,
+   "y": 24,
+   "to": "lz_east",
+   "auto": true
+  },
+  {
+   "id": "lz_east",
+   "name": "東口 → 襄陽城",
+   "map": "longzhong",
+   "x": 71,
+   "y": 25,
+   "to": "xyc_west",
+   "auto": true
+  },
+  {
+   "id": "lz_caolu",
+   "name": "草廬",
+   "map": "longzhong",
+   "x": 15,
+   "y": 13,
+   "to": "cl_door",
+   "auto": true
+  },
+  {
+   "id": "cl_door",
+   "name": "門口 → 臥龍岡",
+   "map": "caolu",
+   "x": 14,
+   "y": 17,
+   "to": "lz_caolu",
+   "auto": true
+  },
+  {
+   "id": "cln_luoyang",
+   "name": "西北口 → 洛陽城",
+   "map": "chenliu",
+   "x": 0,
+   "y": 12,
+   "to": "ly_south",
+   "auto": true
+  },
+  {
+   "id": "ly_south",
+   "name": "南門 → 陳留郊外",
+   "map": "luoyang",
+   "x": 23,
+   "y": 35,
+   "to": "cln_luoyang",
+   "auto": true
+  },
+  {
+   "id": "ly_well",
+   "name": "皇城井",
+   "map": "luoyang",
+   "x": 24,
+   "y": 15,
+   "to": "lyw_door",
+   "auto": true
+  },
+  {
+   "id": "lyw_door",
+   "name": "井口 → 洛陽城",
+   "map": "luoyang_well",
+   "x": 20,
+   "y": 0,
+   "to": "ly_well",
+   "auto": true
+  },
+  {
+   "id": "ly_chengfu",
+   "name": "程府",
+   "map": "luoyang",
+   "x": 34,
+   "y": 28,
+   "to": "cf_door",
+   "auto": true
+  },
+  {
+   "id": "cf_door",
+   "name": "府門 → 洛陽城",
+   "map": "chengfu",
+   "x": 14,
+   "y": 15,
+   "to": "ly_chengfu",
+   "auto": true
+  },
+  {
+   "id": "xps_xiapi",
+   "name": "南口 → 下邳城",
+   "map": "xiaopei",
+   "x": 21,
+   "y": 35,
+   "to": "xiapi_west",
+   "auto": true
+  },
+  {
+   "id": "xiapi_west",
+   "name": "西門 → 小沛城",
+   "map": "xiapi",
+   "x": 0,
+   "y": 18,
+   "to": "xps_xiapi",
+   "auto": true
+  },
+  {
+   "id": "xiapi_hefu",
+   "name": "何府",
+   "map": "xiapi",
+   "x": 44,
+   "y": 17,
+   "to": "hf_door",
+   "auto": true
+  },
+  {
+   "id": "hf_door",
+   "name": "府門 → 下邳城",
+   "map": "hefu",
+   "x": 11,
+   "y": 13,
+   "to": "xiapi_hefu",
+   "auto": true
+  },
+  {
+   "id": "css_lingling",
+   "name": "南門 → 零陵城",
+   "map": "changsha",
+   "x": 23,
+   "y": 35,
+   "to": "ll_north",
+   "auto": true
+  },
+  {
+   "id": "ll_north",
+   "name": "北門 → 長沙城",
+   "map": "lingling",
+   "x": 23,
+   "y": 0,
+   "to": "css_lingling",
+   "auto": true
+  }
+ ],
+ "landmarks": [
+  {
+   "id": "xudu_palace",
+   "map": "xuchang",
+   "x": 35,
+   "y": 19,
+   "r": 3,
+   "name": "許都皇城",
+   "text": "建安元年（196），曹操迎漢獻帝，遷都於許，改稱許都。自此「奉天子以令不臣」，天下諸侯側目。"
+  },
+  {
+   "id": "xutian",
+   "map": "field_1",
+   "x": 32,
+   "y": 38,
+   "r": 5,
+   "name": "許田圍場",
+   "text": "演義第二十回：曹操請天子許田射鹿，借天子寶雕弓金鈚箭一發中鹿，群臣望見金箭，以為天子射中，齊呼萬歲。操縱馬直出，遮於天子之前受之。關公大怒，提刀欲斬，玄德急搖手送目止之。"
+  },
+  {
+   "id": "tuntian",
+   "map": "field_1",
+   "x": 74,
+   "y": 12,
+   "r": 5,
+   "name": "許下屯田",
+   "text": "建安元年，曹操用棗祗、韓浩之議，募民屯田許下，一年得穀百萬斛。自此州郡例置田官，征伐四方而無運糧之勞。"
+  },
+  {
+   "id": "yingshui",
+   "map": "field_1",
+   "x": 40,
+   "y": 67,
+   "r": 3,
+   "name": "潁水渡",
+   "text": "潁水出嵩山，東南流經許昌之南，潁川郡因此得名。潁川多名士：荀彧、荀攸、郭嘉、陳群、徐庶，皆出此郡。"
+  },
+  {
+   "id": "yiting",
+   "map": "field_1",
+   "x": 40,
+   "y": 23,
+   "r": 2,
+   "name": "許昌驛亭",
+   "text": "驛路分岔：東行通汝南道，南過潁水往昆陽、宛城、新野。"
+  },
+  {
+   "id": "runan_mouth",
+   "map": "field_1",
+   "x": 101,
+   "y": 61,
+   "r": 3,
+   "name": "汝南山洞",
+   "text": "山洞往東南深入汝南郡界。鄉人話洞中聚咗山賊猛獸，最深處更有妖物作祟，唔好一個人去。"
+  },
+  {
+   "id": "runan_bandits",
+   "map": "runan_road",
+   "x": 80,
+   "y": 27,
+   "r": 3,
+   "name": "汝南賊寨",
+   "text": "建安五年（200），汝南黃巾劉辟等叛曹應袁紹，袁紹遣劉備引兵與劉辟會合，攻略許下。寨中至今仍聚住一班亡命之徒。"
+  },
+  {
+   "id": "kunyang_ruins",
+   "map": "kunyang",
+   "x": 45,
+   "y": 46,
+   "r": 4,
+   "name": "昆陽故城",
+   "text": "更始元年（23），劉秀以數千之眾守昆陽，大破王莽號稱百萬之軍。時雷電大風，屋瓦皆飛，莽軍赴滍水死者以萬數，滍水為之不流。"
+  },
+  {
+   "id": "yushui",
+   "map": "wancheng_road",
+   "x": 31,
+   "y": 14,
+   "r": 3,
+   "name": "淯水",
+   "text": "演義第十六回：曹操征張繡，繡降而復叛，夜襲曹營。典韋獨擋寨門，身被數十槍而死；長子曹昂、侄曹安民皆歿。操敗走淯水，後祭典韋而哭。"
+  },
+  {
+   "id": "wancheng_gate",
+   "map": "wancheng_road",
+   "x": 12,
+   "y": 14,
+   "r": 2,
+   "name": "宛城東門",
+   "text": "宛城，南陽郡治，荊北重鎮。城門緊閉，守軍喊話：「城中戒嚴，閒人免進！」（宛城尚未開放）"
+  },
+  {
+   "id": "bowang_po",
+   "map": "bowang",
+   "x": 45,
+   "y": 30,
+   "r": 4,
+   "name": "博望坡",
+   "text": "演義第三十九回：諸葛亮初出茅廬，於博望坡伏兵，「左有山名豫山，右有林名安林」。夏侯惇追入狹谷，蘆葦中火起，曹軍大敗。此乃孔明用兵第一功。"
+  },
+  {
+   "id": "xinye_yamen",
+   "map": "xinye",
+   "x": 31,
+   "y": 16,
+   "r": 3,
+   "name": "新野縣衙",
+   "text": "劉備依劉表，屯兵新野。徐庶化名單福投效，教破曹仁八門金鎖陣；後徐庶走馬薦諸葛，玄德三顧茅廬於隆中。"
+  },
+  {
+   "id": "chenliu_gate",
+   "map": "chenliu",
+   "x": 47,
+   "y": 12,
+   "r": 4,
+   "name": "陳留城",
+   "text": "中平六年，曹操逃出洛陽，至陳留散家財、合義兵，衛茲資助，「首倡義兵」討董卓。"
+  },
+  {
+   "id": "yudu_camp",
+   "map": "yudu",
+   "x": 20,
+   "y": 25,
+   "r": 4,
+   "name": "于毒山寨",
+   "text": "初平二年，黑山賊于毒、白繞、眭固等十餘萬眾寇東郡，曹操引兵入東郡，破白繞於濮陽，後攻于毒本屯。"
+  },
+  {
+   "id": "xiaopei_yuanmen",
+   "map": "xiaopei",
+   "x": 37,
+   "y": 16,
+   "r": 3,
+   "name": "轅門",
+   "text": "建安元年，袁術遣紀靈攻劉備於小沛，呂布於轅門植戟，一箭正中小支，兩家罷兵 —— 轅門射戟。"
+  },
+  {
+   "id": "runan_ding",
+   "map": "runan_city",
+   "x": 48,
+   "y": 17,
+   "r": 3,
+   "name": "丁刺史府",
+   "text": "丁原，字建陽，任并州刺史，以呂布為主簿，甚見親待。董卓遣李肅以赤兔馬、金珠說布，布遂殺原投卓。"
+  },
+  {
+   "id": "wancheng_pailou",
+   "map": "wancheng",
+   "x": 35,
+   "y": 26,
+   "r": 3,
+   "name": "宛城牌樓",
+   "text": "建安二年，曹操征張繡於宛，繡降而復叛，典韋死戰門中，長子曹昂、侄曹安民皆歿。"
+  },
+  {
+   "id": "gangkou_pier",
+   "map": "gangkou",
+   "x": 45,
+   "y": 42,
+   "r": 3,
+   "name": "渡船處",
+   "text": "孫堅年十七，與父乘船至錢唐，遇海賊胡玉等於匏里上岸劫掠。堅獨提刀上岸，揮手東西若分部人兵，賊以為官兵至，棄財散走。"
+  },
+  {
+   "id": "fancheng_wall",
+   "map": "fancheng",
+   "x": 64,
+   "y": 28,
+   "r": 3,
+   "name": "樊城",
+   "text": "建安二十四年，關羽圍曹仁於樊城，秋雨漢水暴溢，于禁七軍皆沒 —— 水淹七軍，威震華夏。"
+  },
+  {
+   "id": "hanshui_ferry",
+   "map": "hanshui",
+   "x": 40,
+   "y": 13,
+   "r": 3,
+   "name": "漢水渡口",
+   "text": "建安十三年，劉表卒，曹操南下。劉備自樊城南渡漢水，荊州士民十餘萬相隨，日行十餘里。"
+  },
+  {
+   "id": "xiangyang_palace",
+   "map": "xiangyang",
+   "x": 37,
+   "y": 20,
+   "r": 3,
+   "name": "襄陽宮宅",
+   "text": "初平元年，劉表單騎入宜城，用蒯良、蒯越之謀平定荊州，徙治襄陽，開立學官，荊州一時安定。"
+  },
+  {
+   "id": "changsha_town",
+   "map": "changsha",
+   "x": 23,
+   "y": 6,
+   "r": 3,
+   "name": "長沙",
+   "text": "中平四年，區星作亂，孫堅為長沙太守，旬月破之，封烏程侯。後關羽戰黃忠於長沙，黃忠、魏延歸劉備。"
+  },
+  {
+   "id": "wolong_gang",
+   "map": "longzhong",
+   "x": 16,
+   "y": 20,
+   "r": 3,
+   "name": "臥龍岡",
+   "text": "諸葛亮躬耕隴畝，好為梁父吟，每自比於管仲、樂毅。時人莫之許也，惟博陵崔州平、潁川徐庶與亮友善，謂為信然。"
+  },
+  {
+   "id": "longzhong_dui",
+   "map": "caolu",
+   "x": 14,
+   "y": 10,
+   "r": 3,
+   "name": "隆中對",
+   "text": "建安十二年，劉備三顧茅廬。亮為之畫策：跨有荊、益，保其巖阻，西和諸戎，南撫夷越，外結好孫權，內修政理——天下三分之勢，定於草廬之中。"
+  },
+  {
+   "id": "luoyang_seal",
+   "map": "luoyang",
+   "x": 24,
+   "y": 15,
+   "r": 3,
+   "name": "皇城井",
+   "text": "初平元年，董卓焚洛陽宮室，驅民西遷。孫堅入洛陽，於城南甄官井中得傳國玉璽，遂萌代漢自立之志。"
+  },
+  {
+   "id": "xiapi_lubu",
+   "map": "xiapi",
+   "x": 20,
+   "y": 18,
+   "r": 3,
+   "name": "下邳",
+   "text": "建安元年，呂布襲奪徐州，據下邳自守；建安三年，曹操決泗、沂水灌城，布眾潰，縊殺於白門樓。"
+  }
+ ],
+ "world": {
+  "_note": "大地圖 (天下) 座標 0~1 (面板內相對位置)；map = 撳入去對應地圖 (null = 未開放)",
+  "nodes": [
+   {
+    "id": "xuchang",
+    "name": "許昌",
+    "province": "豫州",
+    "x": 0.62,
+    "y": 0.16,
+    "map": "xuchang",
+    "city": true
+   },
+   {
+    "id": "yingchuan",
+    "name": "潁川郊外",
+    "province": "豫州",
+    "x": 0.62,
+    "y": 0.32,
+    "map": "field_1"
+   },
+   {
+    "id": "runan_road",
+    "name": "汝南道",
+    "province": "豫州",
+    "x": 0.76,
+    "y": 0.24,
+    "map": "runan_road"
+   },
+   {
+    "id": "runan",
+    "name": "汝南山洞",
+    "province": "豫州",
+    "x": 0.86,
+    "y": 0.46,
+    "map": "runan_f1"
+   },
+   {
+    "id": "kunyang",
+    "name": "昆陽",
+    "province": "豫州",
+    "x": 0.48,
+    "y": 0.4,
+    "map": "kunyang"
+   },
+   {
+    "id": "wancheng_road",
+    "name": "宛城道",
+    "province": "荊州",
+    "x": 0.38,
+    "y": 0.48,
+    "map": "wancheng_road"
+   },
+   {
+    "id": "wancheng",
+    "name": "宛城",
+    "province": "荊州",
+    "x": 0.2,
+    "y": 0.46,
+    "map": "wancheng",
+    "city": true
+   },
+   {
+    "id": "bowang",
+    "name": "博望坡",
+    "province": "荊州",
+    "x": 0.36,
+    "y": 0.58,
+    "map": "bowang"
+   },
+   {
+    "id": "xinye",
+    "name": "新野",
+    "province": "荊州",
+    "x": 0.3,
+    "y": 0.7,
+    "map": "xinye",
+    "city": true
+   },
+   {
+    "id": "fancheng",
+    "name": "樊城",
+    "province": "荊州",
+    "x": 0.34,
+    "y": 0.82,
+    "map": "fancheng"
+   },
+   {
+    "id": "xiangyang",
+    "name": "襄陽",
+    "province": "荊州",
+    "x": 0.3,
+    "y": 0.95,
+    "map": "xiangyang",
+    "city": true
+   },
+   {
+    "id": "longzhong",
+    "name": "隆中",
+    "province": "荊州",
+    "x": 0.16,
+    "y": 0.9,
+    "map": "longzhong"
+   },
+   {
+    "id": "chenliu",
+    "name": "陳留",
+    "province": "兗州",
+    "x": 0.68,
+    "y": 0.04,
+    "map": "chenliu"
+   },
+   {
+    "id": "yudu",
+    "name": "于毒山寨",
+    "province": "兗州",
+    "x": 0.52,
+    "y": 0.05,
+    "map": "yudu"
+   },
+   {
+    "id": "xiaopei",
+    "name": "小沛",
+    "province": "徐州",
+    "x": 0.93,
+    "y": 0.06,
+    "map": "xiaopei",
+    "city": true
+   },
+   {
+    "id": "runan_city",
+    "name": "汝南",
+    "province": "豫州",
+    "x": 0.93,
+    "y": 0.3,
+    "map": "runan_city",
+    "city": true
+   },
+   {
+    "id": "jingzhou",
+    "name": "荊州地界",
+    "province": "荊州",
+    "x": 0.16,
+    "y": 0.66,
+    "map": "jingzhou"
+   },
+   {
+    "id": "gangkou",
+    "name": "港口",
+    "province": "荊州",
+    "x": 0.05,
+    "y": 0.78,
+    "map": "gangkou"
+   },
+   {
+    "id": "hanshui",
+    "name": "漢水渡口",
+    "province": "荊州",
+    "x": 0.42,
+    "y": 0.88,
+    "map": "hanshui"
+   },
+   {
+    "id": "changsha",
+    "name": "長沙",
+    "province": "荊州",
+    "x": 0.52,
+    "y": 0.98,
+    "map": "changsha",
+    "city": true
+   },
+   {
+    "id": "luoyang",
+    "name": "洛陽",
+    "province": "司隸",
+    "x": 0.8,
+    "y": 0.02,
+    "map": "luoyang",
+    "city": true
+   },
+   {
+    "id": "xiapi",
+    "name": "下邳",
+    "province": "徐州",
+    "x": 0.98,
+    "y": 0.02,
+    "map": "xiapi",
+    "city": true
+   },
+   {
+    "id": "lingling",
+    "name": "零陵",
+    "province": "荊州",
+    "x": 0.65,
+    "y": 0.98,
+    "map": "lingling",
+    "city": true
+   }
+  ],
+  "edges": [
+   [
+    "xuchang",
+    "yingchuan"
+   ],
+   [
+    "yingchuan",
+    "runan"
+   ],
+   [
+    "yingchuan",
+    "runan_road"
+   ],
+   [
+    "runan_road",
+    "runan"
+   ],
+   [
+    "yingchuan",
+    "kunyang"
+   ],
+   [
+    "kunyang",
+    "wancheng_road"
+   ],
+   [
+    "wancheng_road",
+    "wancheng"
+   ],
+   [
+    "wancheng_road",
+    "bowang"
+   ],
+   [
+    "bowang",
+    "xinye"
+   ],
+   [
+    "xinye",
+    "fancheng"
+   ],
+   [
+    "xiangyang",
+    "longzhong"
+   ],
+   [
+    "xuchang",
+    "chenliu"
+   ],
+   [
+    "chenliu",
+    "yudu"
+   ],
+   [
+    "chenliu",
+    "xiaopei"
+   ],
+   [
+    "runan_road",
+    "runan_city"
+   ],
+   [
+    "xinye",
+    "jingzhou"
+   ],
+   [
+    "jingzhou",
+    "gangkou"
+   ],
+   [
+    "fancheng",
+    "hanshui"
+   ],
+   [
+    "hanshui",
+    "xiangyang"
+   ],
+   [
+    "xiangyang",
+    "changsha"
+   ],
+   [
+    "chenliu",
+    "luoyang"
+   ],
+   [
+    "xiaopei",
+    "xiapi"
+   ],
+   [
+    "changsha",
+    "lingling"
+   ]
+  ]
+ }
+}

@@ -97,19 +97,6 @@
    "sprite": 52131
   }
  },
- "smithy_xy": {
-  "name": "新野打鐵鋪",
-  "map": "xinye",
-  "x": 26,
-  "y": 41,
-  "color": [
-   0.55,
-   0.5,
-   0.65
-  ],
-  "repair": true,
-  "desc": "修理服務【原】: 俾錢修武器/防具 (費用 = 價錢 × 損耗% × 0.3)"
- },
  "kitchen": {
   "name": "廚房",
   "map": "xc1924",
@@ -188,21 +175,6 @@
    "sprite": 52183
   }
  },
- "donate_xy": {
-  "name": "新野縣衙",
-  "map": "xinye",
-  "x": 27,
-  "y": 18,
-  "color": [
-   0.85,
-   0.3,
-   0.3
-  ],
-  "donation": true,
-  "office": true,
-  "city": "新野",
-  "desc": "官宅【原】: 討取頭銜 / 官令 / 捐贈官令 / 貢獻換行動丹 (任何城池官宅都得, Step 13~14)"
- },
  "station_xc": {
   "name": "許昌驛站",
   "map": "xuchang_o",
@@ -219,58 +191,6 @@
    "name": "驛站長",
    "sprite": 52071
   }
- },
- "station_xy": {
-  "name": "新野驛站",
-  "map": "xinye",
-  "x": 6,
-  "y": 20,
-  "color": [
-   0.75,
-   0.55,
-   0.25
-  ],
-  "station": true,
-  "desc": "驛站【自訂】(B3): 收費快速傳送去其他城池驛站，車費 = 基本費 + 每過一張圖加價 (一開始全部開放)"
- },
- "station_rn": {
-  "name": "汝南驛站",
-  "map": "runan_city",
-  "x": 6,
-  "y": 19,
-  "color": [
-   0.75,
-   0.55,
-   0.25
-  ],
-  "station": true,
-  "desc": "驛站【自訂】(B3): 收費快速傳送去其他城池驛站，車費 = 基本費 + 每過一張圖加價 (一開始全部開放)"
- },
- "station_wc": {
-  "name": "宛城驛站",
-  "map": "wancheng",
-  "x": 65,
-  "y": 24,
-  "color": [
-   0.75,
-   0.55,
-   0.25
-  ],
-  "station": true,
-  "desc": "驛站【自訂】(B3): 收費快速傳送去其他城池驛站，車費 = 基本費 + 每過一張圖加價 (一開始全部開放)"
- },
- "station_xyc": {
-  "name": "襄陽驛站",
-  "map": "xiangyang",
-  "x": 31,
-  "y": 53,
-  "color": [
-   0.75,
-   0.55,
-   0.25
-  ],
-  "station": true,
-  "desc": "驛站【自訂】(B3): 收費快速傳送去其他城池驛站，車費 = 基本費 + 每過一張圖加價 (一開始全部開放)"
  },
  "stable_xc": {
   "name": "許昌馬廄",
@@ -290,20 +210,6 @@
    "sprite": 52131
   }
  },
- "stable_xy": {
-  "name": "新野馬廄",
-  "map": "xinye",
-  "x": 54,
-  "y": 20,
-  "color": [
-   0.6,
-   0.42,
-   0.25
-  ],
-  "stable": true,
-  "city": "xinye",
-  "desc": "馬廄 (Step 17a, spec 07)【原】: 買馬 / 寄養領馬 / 馬用品 (飼料、玩具、寵物藥、馴馬專用哨)。寄喺馬廄過子時 = 疲勞清零、頭暈好返"
- },
  "bulletin_xc": {
   "name": "許昌公佈欄",
   "map": "xuchang_o",
@@ -316,74 +222,6 @@
   ],
   "bulletin": true,
   "desc": "公佈欄【原 sy2_8_12】: 城門口查看各城池正發生嘅天災同種類"
- },
- "bulletin_xy": {
-  "name": "新野公佈欄",
-  "map": "xinye",
-  "x": 33,
-  "y": 45,
-  "color": [
-   0.7,
-   0.62,
-   0.4
-  ],
-  "bulletin": true,
-  "desc": "公佈欄【原 sy2_8_12】: 城門口查看各城池正發生嘅天災同種類"
- },
- "bulletin_xyc": {
-  "name": "襄陽公佈欄",
-  "map": "xiangyang",
-  "x": 39,
-  "y": 57,
-  "color": [
-   0.7,
-   0.62,
-   0.4
-  ],
-  "bulletin": true,
-  "desc": "公佈欄【原 sy2_8_12】: 城門口查看各城池正發生嘅天災同種類"
- },
- "relief_xc": {
-  "name": "許昌救災區",
-  "map": "field_1",
-  "x": 104,
-  "y": 10,
-  "color": [
-   0.9,
-   0.45,
-   0.3
-  ],
-  "relief": true,
-  "cityId": "xuchang",
-  "desc": "救災區【原 sy2_8_12】: 領咗救災官令 + 帶對應救災物品，喺呢度執行救災工作（每次扣 SP + 用 1 份物品）"
- },
- "relief_xy": {
-  "name": "新野救災區",
-  "map": "bowang",
-  "x": 62,
-  "y": 10,
-  "color": [
-   0.9,
-   0.45,
-   0.3
-  ],
-  "relief": true,
-  "cityId": "xinye",
-  "desc": "救災區【原 sy2_8_12】: 領咗救災官令 + 帶對應救災物品，喺呢度執行救災工作（每次扣 SP + 用 1 份物品）"
- },
- "relief_xyc": {
-  "name": "襄陽救災區",
-  "map": "longzhong",
-  "x": 38,
-  "y": 10,
-  "color": [
-   0.9,
-   0.45,
-   0.3
-  ],
-  "relief": true,
-  "cityId": "xiangyang",
-  "desc": "救災區【原 sy2_8_12】: 領咗救災官令 + 帶對應救災物品，喺呢度執行救災工作（每次扣 SP + 用 1 份物品）"
  },
  "pharmacy_cl": {
   "name": "陳留藥房",

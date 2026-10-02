@@ -31,6 +31,13 @@ def snap(g, x, y, others):
                     return x + dx, y + dy
     raise SystemExit('搵唔到位 %s %d,%d' % ('?', x, y))
 
+def place_near(tm, i, others):
+    g = grid(tm)
+    maps = {m['id']: m for m in jl('maps.json')['maps']}
+    sp = maps[tm].get('spawn') or [len(g[0]) // 2, len(g) // 2]
+    return snap(g, sp[0] + 6 * (i % 5) - 12, sp[1] - 4 * (i // 5) - 8, others)
+
+
 def main():
     maps = {m['id']: m for m in jl('maps.json')['maps']}
     old = {i for i, m in maps.items() if not m.get('orig')}

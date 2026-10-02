@@ -21,10 +21,10 @@
   {"id": "recruit", "name": "朝廷求才", "rank": 20, "kind": "recruit",
    "fame": 60, "contrib": 30,
    "desc": "登用返 1 位文官，帶佢返嚟見官。"},
-  {"id": "escort", "name": "官員護衛", "rank": 25, "kind": "escort", "zone": "field_1",
+  {"id": "escort", "name": "官員護衛", "rank": 25, "kind": "escort", "zone": "xc1925",
    "fame": 50, "contrib": 25, "salaryMult": 1,
    "desc": "護送官員出城去%s，保住佢唔死，再返官宅覆命。"},
-  {"id": "rescue", "name": "流落官員", "rank": 25, "kind": "rescue", "zone": "field_1",
+  {"id": "rescue", "name": "流落官員", "rank": 25, "kind": "rescue", "zone": "xc1925",
    "fame": 50, "contrib": 25,
    "desc": "去%s打怪區搵返流落嘅官員，帶佢生還返官宅覆命。"}
  ],

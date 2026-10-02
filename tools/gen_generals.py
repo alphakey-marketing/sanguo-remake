@@ -109,6 +109,19 @@ def gen_ideo(gid):
     return IDEOLOGIES[(h >> 8) % 5]
 
 
+_placed = {}
+
+
+def _orig_place(old_map):
+    import migrate_to_orig as M
+    from collections import defaultdict
+    tm = M.REMAP[old_map]
+    n = _placed.setdefault(tm, [])
+    x, y = M.place_near(tm, len(n), n)
+    n.append((x, y))
+    return tm, x, y
+
+
 def build():
     rows = list(csv.DictReader(open(SRC, encoding="utf-8-sig")))
     t1 = {x[0]: x for x in TIER1}
@@ -127,6 +140,7 @@ def build():
              "sub": gen_sub(t, lv, f116), "ideo": gen_ideo(gid), "tier": 0}
         if r["name"] in t1:
             _, mp, x, y, ideo, typ, win, idle = t1.pop(r["name"])
+            mp, x, y = _orig_place(mp)       # 舊 ASCII 圖已封存：Tier1 常駐搬去原版城街
             g.update({"type": typ, "sub": gen_sub(typ, lv, f116), "ideo": ideo, "tier": 1, "map": mp, "x": x, "y": y,
                       "idle": [idle]})
             if win:

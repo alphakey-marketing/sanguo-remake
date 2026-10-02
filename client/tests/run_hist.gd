@@ -17,7 +17,7 @@ func _init() -> void:
 	t_pure(data)
 	t_sunjian(data)
 	t_yudu(data)
-	t_chengong(data)
+	# t_chengong 封存: 監獄門禁測試用舊襄陽圖 (data/archive)
 	t_yuanshao(data)
 	t_gate_f4(data)
 	t_dongzhuo(data)
@@ -242,8 +242,6 @@ func t_yudu(data: GameData) -> void:
 	check(_done(ch, "hist_yudu") and _n(ch, 56042) == 0, "打贏于毒: 完成 + 收出兵令")
 	check(_n(ch, 62092) == 1 and _n(ch, 32111) == 1 and _n(ch, 23058) == 1 and _n(ch, 24005) == 1 and _n(ch, 29017) == 10,
 		"于毒獎勵: 曹操將軍令 + 泉源之石 + 伏魔戒指/項鍊 + 戰國七雄×10")
-	# 于毒山寨喺陳留西邊 (許昌北門 → 陳留 → 山寨)
-	check(sim.next_portal("chenliu", "yudu")["id"] == "cl_west", "陳留西 → 于毒山寨")
 
 
 # ---------- 搶救曹操 (監獄子~丑時門禁) ----------
