@@ -21,8 +21,12 @@ QUESTS = [
           "sp": {3: '阿武', 4: '呂布'}, "hint": "去汝南路口，董卓護衛阿武擋路，打低佢"},
          {"type": "talk", "npc": "dongzhuo", "conv": [1224, 1226], "sp": WY,
           "hint": "董卓肯赴宴，返去回報王允"},
-         {"type": "talk", "npc": "wangyun", "conv": [1228, 1236], "sp": WY, "done": True,
-          "hint": "貂蟬獻畀董卓，連環計種子已經埋低"},
+         {"type": "talk", "npc": "wangyun", "conv": [1228, 1229], "sp": WY,
+          "hint": "返王允處，宴席上貂蟬獻畀董卓，王允要你護送貂蟬去太師府"},
+         {"type": "escort", "npc": "dz_guard", "escortName": "貂蟬", "conv": [1235], "sp": {2: '衛兵', 3: '貂蟬'},
+          "hint": "帶貂蟬（跟住你走）去汝南路口太師府衛兵處，唔好行太遠"},
+         {"type": "talk", "npc": "wangyun", "conv": [1236], "sp": WY, "done": True,
+          "hint": "返去回報王允，連環計種子已經埋低"},
      ],
      "reward": {"fame": 40, "exp": 4000, "gold": 800}},
     {"id": "orig_liubei", "src": "orig", "name": "煮酒論英雄", "type": "history", "giver": "zuoci",
@@ -54,8 +58,12 @@ QUESTS.append({"id": "orig_xiapi", "src": "orig", "name": "水淹下邳", "type"
           "hint": "返去陳留搵曹操領賞"},
      ],
      "reward": {"fame": 50, "exp": 6000, "gold": 1200}})
+NEW_NPCS_EXTRA = [
+    {"id": "dz_guard", "name": "太師府衛兵", "x": 92, "y": 19, "map": "runan_road", "questOnly": True,
+     "idle": ["衛兵：「太師府重地，閒人免進！」"], "desc": "董卓府衛兵【原版】"},
+]
 BOSSES = [(1106, '阿武', 22), (1107, '臧霸', 28), (1108, '呂布', 35)]
-NEW_NPCS = [
+NEW_NPCS = NEW_NPCS_EXTRA + [
     {"id": "awu", "name": "阿武", "x": 88, "y": 19, "map": "runan_road", "questOnly": True,
      "idle": ["阿武：「太師出巡，閒人迴避！」"], "desc": "董卓護衛【原版】"},
     {"id": "zangba", "name": "臧霸", "x": 34, "y": 14, "map": "xiapi", "questOnly": True,

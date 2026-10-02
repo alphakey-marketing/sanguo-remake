@@ -1261,6 +1261,47 @@ func _think_office_npc(c: Dictionary) -> void:
 		_set_dest(c, int(o["x"]), int(o["y"]), CHASE_CAP)
 
 
+# ================= 護送任務 (escort stage): 借用官員 NPC 跟隨機制，唔佔同伴格/冇服務期 =================
+func _escort_ents(qid: String) -> Array:
+	var out := []
+	for c in ents.values():
+		if c["kind"] == "gen" and String(c.get("gen", {}).get("questEscort", "")) == qid:
+			out.append(c)
+	return out
+
+
+func _escort_sync(e: Dictionary) -> void:
+	if e.is_empty() or not e.has("ch"):
+		return
+	for q in data.quests:
+		var stage := RulesQuest.stage_of(e["ch"], q)
+		var qid := String(q["id"])
+		var cs := _escort_ents(qid)
+		if stage.is_empty() or String(stage.get("type", "")) != "escort":
+			for c in cs:                      # stage 完咗/放棄 → 跟隨 NPC 散走
+				_remove_ent(int(c["id"]))
+			continue
+		for c in cs:
+			if bool(c.get("down", false)):
+				_remove_ent(int(c["id"]))
+		if _escort_ents(qid).is_empty():
+			var c := _spawn_office_npc(e, "escort")
+			c["name"] = String(stage.get("escortName", "護送對象"))
+			c["gen"]["questEscort"] = qid
+			_msg(int(e["id"]), "%s跟住你喇，帶佢去目的地" % c["name"])
+
+
+func _escort_gate(e: Dictionary, npc_id: String) -> String:
+	for q in data.quests:
+		var stage := RulesQuest.stage_of(e["ch"], q)
+		if stage.is_empty() or String(stage.get("type", "")) != "escort" or String(stage.get("npc", "")) != npc_id:
+			continue
+		var cs := _escort_ents(String(q["id"]))
+		if cs.is_empty() or _cheb(cs[0], e) > 6 or map_id_at(int(cs[0]["x"]), int(cs[0]["y"])) != map_id_at(int(e["x"]), int(e["y"])):
+			return "%s仲未跟到嚟，等埋佢先" % String(stage.get("escortName", "護送對象"))
+	return ""
+
+
 # UI 用: 護衛/救援官員 NPC 現況一句講
 func _office_npc_status(od: Dictionary) -> String:
 	var npc := ent(int(od.get("npc", 0)))

@@ -1036,6 +1036,15 @@ func _office_on_talk(_e: Dictionary, _key: String, _x: int, _y: int) -> void:
 	pass
 
 
+# 護送任務 hook (escort stage): sim_recruit 覆寫。sync = 確保當前 escort stage 有跟隨 NPC；gate = 對話前檢查 (非空 = 擋住)
+func _escort_sync(_e: Dictionary) -> void:
+	pass
+
+
+func _escort_gate(_e: Dictionary, _npc_id: String) -> String:
+	return ""
+
+
 # 居民委託 / 收集冊 hook (Step 16)：sim_comm 覆寫
 func _comm_on_talk(_e: Dictionary, _npc_id: String) -> bool:
 	return false

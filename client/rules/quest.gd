@@ -5,7 +5,7 @@ extends RefCounted
 # 數值/對話全部喺 data/quests.json + data/quest_npcs.json，呢度只做邏輯。
 
 const QUEST_TYPES := ["newbie", "general", "official", "history", "ultimate", "group", "battle", "expert", "marry", "service"]
-const STAGE_TYPES := ["talk", "talk_n", "repeat", "collect", "ask", "facility", "fight", "chest"]
+const STAGE_TYPES := ["talk", "talk_n", "repeat", "collect", "ask", "facility", "fight", "chest", "escort"]   # escort = 護送 NPC 跟住去 stage.npc (目的地) 對話，sim 負責生成/檢查跟隨
 const QUEST_ITEM_CATS := [44, 52]          # 任務雜物 / 任務物品 (spec 06 §1.2: 61501 田鼠碎骨等)
 const HINT_VARS := ["%v", "%n"]            # hint 內 %v=目前進度 %n=需要數量
 const ATTR_KEYS := ["str", "agi", "int", "spi", "pol", "cha"]
@@ -35,7 +35,7 @@ static func validate(data: GameData) -> Array:
 			if not STAGE_TYPES.has(t):
 				errs.append("%s.s%d: stage type 唔啱 (%s)" % [id, si, t])
 				continue
-			if t == "talk" or t == "repeat" or t == "fight" or t == "chest":
+			if t == "talk" or t == "repeat" or t == "fight" or t == "chest" or t == "escort":
 				if not data.quest_npcs.has(String(st.get("npc", ""))):
 					errs.append("%s.s%d: npc 唔存在 (%s)" % [id, si, st.get("npc", "")])
 			if t == "talk_n":
@@ -349,7 +349,7 @@ static func on_npc_talk(data: GameData, ch: Dictionary, q: Dictionary, npc_id: S
 	if not hit:
 		return out
 	match t:
-		"talk", "fight":
+		"talk", "fight", "escort":
 			if t == "fight":
 				return out                            # PK 由 cmd_quest_battle 處理 (Step 10+)，talk 唔推進
 			var take: Array = stage.get("takeItems", [])

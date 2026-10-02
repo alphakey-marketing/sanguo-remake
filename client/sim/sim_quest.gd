@@ -73,6 +73,7 @@ func _quest_emit(e: Dictionary, q: Dictionary, res: Dictionary, speaker: String 
 		payload["stage"] = int(res.get("stage", 0))
 		_emit(dict_merge({"k": "quest"}, payload))
 	_sync_quest_npcs()          # 開始/推進/完成都可能改 NPC 常駐 (questOnly boss/內應, Step 16)
+	_escort_sync(e)
 	if not str(res.get("msg", "")).is_empty():
 		_msg(id, str(res["msg"]))
 
@@ -90,6 +91,10 @@ func cmd_quest_talk(id: int, npc_id: String) -> void:
 	if not bool(state["quest_npcs"].get(npc_id, {}).get("visible", false)):
 		return _msg(id, "呢度搵唔到%s" % npc["name"])
 	var ch: Dictionary = e["ch"]
+	_escort_sync(e)                                  # 死咗/讀檔後跟隨 NPC 唔見 → 補返
+	var eg := _escort_gate(e, npc_id)                # 護送未到埗 / 跟隨 NPC 唔喺附近
+	if eg != "":
+		return _msg(id, eg)
 	_office_on_talk(e, "q:" + npc_id, int(npc["x"]), int(npc["y"]))
 	# 服務 NPC（密醫免費醫療）
 	var sv: Dictionary = npc.get("service", {})

@@ -21,6 +21,7 @@ func _init() -> void:
 	t_turnin_answer(data)
 	t_roundtrip(data)
 	t_xinye_quests(data)
+	t_escort(data)
 	print("[TEST] quest: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -368,3 +369,30 @@ func t_xinye_quests(data: GameData) -> void:
 	sim.cmd_quest_turnin(id, "xinye_inn")
 	check(bool(ch["questDone"].get("xinye_inn", false)) and _bag_n(sim, id, 29038) == 0, "客棧缺貨: 交齊完成 + 扣仙楂")
 	check(_bag_n(sim, id, 29043) >= 5, "客棧缺貨: 獎勵回血草 ×5")
+
+
+# 護送 stage (orig_lianhuan 貂蟬): 入 stage 生成跟隨 NPC → 唔跟埋唔得交 → 跟埋到埗推進 + NPC 散走
+func t_escort(data: GameData) -> void:
+	var sim := Sim.new(data, 7)
+	var id := sim.spawn_player("護送測試", "yishi")
+	var ch: Dictionary = sim.ent(id)["ch"]
+	var q := sim._quest_by_id("orig_lianhuan")
+	var si := -1
+	for i in (q["stages"] as Array).size():
+		if String(q["stages"][i]["type"]) == "escort":
+			si = i
+	check(si > 0, "escort: orig_lianhuan 有 escort stage")
+	ch["quests"] = {"orig_lianhuan": {"stage": si, "startDay": 0, "flags": {}}}
+	sim._sync_quest_npcs()
+	sim._escort_sync(sim.ent(id))
+	var cs := sim._escort_ents("orig_lianhuan")
+	check(cs.size() == 1 and String(cs[0]["name"]) == "貂蟬", "escort: 入 stage 生成貂蟬跟隨")
+	var dg: Dictionary = data.quest_npcs["dz_guard"]
+	_put(sim, int(cs[0]["id"]), int(dg["x"]) + 30, int(dg["y"]))
+	_talk(sim, id, "dz_guard")
+	check(int(ch["quests"]["orig_lianhuan"]["stage"]) == si, "escort: 貂蟬未跟埋唔推進")
+	_put(sim, int(cs[0]["id"]), int(dg["x"]) + 2, int(dg["y"]))
+	_talk(sim, id, "dz_guard")
+	check(int(ch["quests"]["orig_lianhuan"]["stage"]) == si + 1, "escort: 跟埋到埗推進")
+	check(sim._escort_ents("orig_lianhuan").is_empty(), "escort: 完 stage 貂蟬散走")
+
