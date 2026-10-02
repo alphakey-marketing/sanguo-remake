@@ -57,3 +57,16 @@
 - 功能 NPC 掛原版名 + okm sprite 編號 (`tools/set_orig_npc_names.py` → shops/facilities 嘅 `npc`)；
   原版 52xxx 人形圖包 (hsnpc01/editnpc01.mrg) 原 rar 冇 (dnpc01 嘅 52001–52007 係武器) → 暫用通用人形 (`AssetLib.npc_sid`)，搵到圖包後補圖，毋須改資料。
 - 未做: 任務 NPC 換原版、文官武將搬入、野外圖 1851–1855 接口。
+
+## 進度 (2026-10-01 後段)：全城匯入
+- **城圖**：TOWNS 34 城全部匯入（許昌除外）；漢中/武都/梓潼 map22 係空殼 → 用家決定跳過。天水 xc3600 已匯。
+- **設計**：每城只有一個邊緣出口 → 傳送去該城外圍 `<城id>25`（xc1925 模板實例），外圍有完整城堡模型 + 城門傳送；25 四邊連鄰城 25 (`client/data/city_links.json`)。
+- **完整室內 (18 城)**：陳留、譙、汝南、洛陽、宛、小沛、下邳、平原、濮陽、河內、晉陽、新野、襄陽、長沙、桂陽、武陵、零陵、江陵、江夏（城門用標準編號 = 城id*100+NN）。
+  室內名/設施由 `locations.tsv` NPC 名表自動分配 (`_FAC_KW`)；設施總表 `docs/plan/city_facilities.md`。
+  商店/設施/客棧自動放置：`place_chenliu_npcs.py` → `place_city_npcs.py` → `set_orig_npc_names.py`（複製條目後綴 `_cl<城id>`）。
+- **部分城 (16 城)**：北平/北海/南皮/吳/壽春/天水/安定/建業/會稽/柴桑/盧江/薊/襄平/西涼/鄴/長安 用 `6xxxxx`/`13xxxxx` 另一套門編號，data 內搵唔到房↔門對應（傳送目標喺 server 側）。
+  → 只匯功曹(01)+客棧(02)，門 = 城圖最長連號 k2 門串頭兩個 (`PARTIAL`)，**門位係估，要手測**；只放官宅+客棧。其餘房暫缺。
+- **world.json**：cities 由 4 增至 36（+32 原版城，pop 600/defense 40 預設值，省份人手填）。公佈欄/救災點只有許昌系舊城有，新城暫冇（災害資料照有）。
+- **引擎/資料**：WORLD_H=19100、`map_idx` 改 int32（地圖 >255）、驛站車費 = base + perHop × hops（原版圖用真實 map_hops）、importer 重跑會清走舊匯入殘留 (`gone`)。
+- **測試**：只跑相關 leg (maps/b3/tiandi/title/world/militia) 全 `fail 0`；冇跑全套 `run_tests.sh`。
+- **未做**：錢莊/拍賣屋/賭場/監牢 模板；16 城其餘房；各城公佈欄/救災；~80 間無城門孤兒房；陳留廟/練兵場；25 外圍嘅怪物/洞穴入口；新城人口/防禦/屬性實數。
