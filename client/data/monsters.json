@@ -15961,6 +15961,75 @@
     30559,
     32234
    ]
+  },
+  {
+   "id": 1106,
+   "name": "阿武",
+   "level": 22,
+   "hp": 1075,
+   "atk": 84,
+   "def": 13,
+   "spellDef": 33,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 0,
+   "gold": [
+    0,
+    0
+   ],
+   "alignment": -200,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "drops": [],
+   "rareDrops": [],
+   "suppDrops": []
+  },
+  {
+   "id": 1107,
+   "name": "臧霸",
+   "level": 28,
+   "hp": 1587,
+   "atk": 125,
+   "def": 17,
+   "spellDef": 42,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 0,
+   "gold": [
+    0,
+    0
+   ],
+   "alignment": -200,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "drops": [],
+   "rareDrops": [],
+   "suppDrops": []
+  },
+  {
+   "id": 1108,
+   "name": "呂布",
+   "level": 35,
+   "hp": 2145,
+   "atk": 147,
+   "def": 21,
+   "spellDef": 52,
+   "atkInterval": 13,
+   "moveSpeed": 1,
+   "exp": 0,
+   "gold": [
+    0,
+    0
+   ],
+   "alignment": -200,
+   "aggroRange": 8,
+   "leash": 16,
+   "element": "none",
+   "drops": [],
+   "rareDrops": [],
+   "suppDrops": []
   }
  ],
  "spawns": [

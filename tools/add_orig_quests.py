@@ -17,6 +17,8 @@ QUESTS = [
           "hint": "呂布收咗金冠，返去回報王允"},
          {"type": "talk", "npc": "wangyun", "conv": [1207, 1211], "sp": WY,
           "hint": "王允要你將邀請函送去汝南路口畀董卓"},
+         {"type": "fight", "npc": "awu", "monster": 1106, "conv": [1248],
+          "sp": {3: '阿武', 4: '呂布'}, "hint": "去汝南路口，董卓護衛阿武擋路，打低佢"},
          {"type": "talk", "npc": "dongzhuo", "conv": [1224, 1226], "sp": WY,
           "hint": "董卓肯赴宴，返去回報王允"},
          {"type": "talk", "npc": "wangyun", "conv": [1228, 1236], "sp": WY, "done": True,
@@ -44,13 +46,20 @@ QUESTS.append({"id": "orig_xiapi", "src": "orig", "name": "水淹下邳", "type"
      "stages": [
          {"type": "talk", "npc": "xunyou", "conv": [1281], "sp": {2: '荀攸'},
           "hint": "荀攸獻水淹下邳之計，要你去下邳搵呂布探路"},
-         {"type": "talk", "npc": "lvbu_xp", "conv": [1290], "sp": {2: '曹操', 3: '呂布', 4: '劉備'},
-          "hint": "白門樓下見到被擒嘅呂布，返去回報曹操"},
+         {"type": "fight", "npc": "zangba", "monster": 1107, "conv": [1283], "sp": {0: '你'},
+          "hint": "去下邳城外打低守河道嘅臧霸"},
+         {"type": "fight", "npc": "lvbu_xp", "monster": 1108, "conv": [1290], "sp": {2: '曹操', 3: '呂布', 4: '劉備'},
+          "hint": "白門樓下同呂布比武，贏咗曹操就放佢一條生路"},
          {"type": "talk", "npc": "caocao_cl", "conv": [1286, 1291], "sp": {2: '曹操'}, "done": True,
           "hint": "返去陳留搵曹操領賞"},
      ],
      "reward": {"fame": 50, "exp": 6000, "gold": 1200}})
+BOSSES = [(1106, '阿武', 22), (1107, '臧霸', 28), (1108, '呂布', 35)]
 NEW_NPCS = [
+    {"id": "awu", "name": "阿武", "x": 88, "y": 19, "map": "runan_road", "questOnly": True,
+     "idle": ["阿武：「太師出巡，閒人迴避！」"], "desc": "董卓護衛【原版】"},
+    {"id": "zangba", "name": "臧霸", "x": 34, "y": 14, "map": "xiapi", "questOnly": True,
+     "idle": ["臧霸：「想破我河道？先過我呢關！」"], "desc": "下邳守將【原版】"},
     {"id": "xunyou", "name": "荀攸", "x": 45, "y": 13, "map": "chenliu", "questOnly": True,
      "idle": ["荀攸：「下邳久攻不下，需要一位勇士相助……」"], "desc": "曹操軍師【原版】"},
     {"id": "lvbu_xp", "name": "呂布", "x": 20, "y": 14, "map": "xiapi", "questOnly": True,
@@ -59,7 +68,21 @@ NEW_NPCS = [
      "idle": ["劉備：「曹操相請，此去兇多吉少……」"], "desc": "小沛城內劉玄德【原版】"},
 ]
 
+def add_bosses():
+    p = 'client/data/monsters.json'
+    md = json.load(open(p, encoding='utf8'))
+    ms = md['monsters'] if isinstance(md, dict) else md
+    ms[:] = [m for m in ms if m['id'] not in {b[0] for b in BOSSES}]
+    for mid, name, lv in BOSSES:   # 【自訂】數值按 lv 線性，唔掉落
+        ms.append({'id': mid, 'name': name, 'level': lv, 'hp': 46 * lv, 'atk': round(3.6 * lv), 'def': round(0.55 * lv),
+                   'spellDef': round(1.5 * lv), 'atkInterval': 13, 'moveSpeed': 1, 'exp': 0, 'gold': [0, 0],
+                   'alignment': -200, 'aggroRange': 8, 'leash': 16, 'element': 'none', 'drops': [], 'rareDrops': [],
+                   'suppDrops': []})
+    json.dump(md, open(p, 'w', encoding='utf8', newline='\n'), ensure_ascii=False, indent=1)
+
+
 def main():
+    add_bosses()
     convs = load_convs()
     qd = json.load(open(QJ, encoding='utf8'))
     nd = json.load(open(NJ, encoding='utf8'))
