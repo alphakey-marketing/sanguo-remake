@@ -47,7 +47,9 @@ def pick(mid, n, near_spawn=False):
 
 
 # 設施表 (docs/plan/city_facilities.md 同 importer 嘅室內命名)：按室內名關鍵字決定放咩。cityOf 無 world.json 城，故唔放公佈欄/救災區
-CITIES = {18: ('譙', 'qiao'), 20: ('汝南', 'runan'), 26: ('洛陽', 'luoyang'), 28: ('宛', 'wancheng')}
+import sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import import_orig_interiors as _I
+CITIES = {c: (n, _I.CITY_SLUG[c]) for c, n in _I.NEWCITIES.items()}      # importer 匯入咗室內嘅城
 ROOM_FAC = {'官宅': 'donate_xc', '藥房': 'pharmacy', '私塾': 'school', '廟': 'temple', '練兵場': 'training', '木工廠': 'workshop', '打鐵鋪': 'forge',
             '馬廄': 'stable_xc', '驛站': 'station_xc', '廚房': 'kitchen'}
 ROOM_SHOP = {'藥房': 'herbalist', '武器店': 'weapon'}

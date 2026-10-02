@@ -125,7 +125,8 @@ def slot_rects(runs, conns, gw, gh):
         place_slots(lst, lambda sd: runs[m % 100][sd], gw, gh)
 
 # 新增完整城 (用家 2026-10 指定: 譙/汝南/洛陽/宛)：室內 = locations.tsv 該城「城內設施」+ 該城 k2 門指向嘅其他室內；道路 xx22/xx23
-NEWCITIES = {18: '譙', 20: '汝南', 26: '洛陽', 28: '宛'}
+NEWCITIES = {t // 100: CITY_NAME[t // 100] for t in TOWNS if t // 100 not in (17, 19)}     # 全部有城圖嘅城
+_ALL_NEW = dict(NEWCITIES)
 FULLCITIES = [19, 17] + sorted(NEWCITIES)
 _FAC_KW = [('官宅', '地方功曹'), ('客棧', '客棧掌櫃'), ('藥房', '藥房掌櫃'), ('藥房', '煉丹師傅'), ('武器店', '武器商'), ('私塾', '夫子'), ('廟', '廟公'), ('練兵場', '練兵將'),
            ('木工廠', '木匠師傅'), ('打鐵鋪', '火爐師傅'), ('錢莊', '錢莊掌櫃'), ('拍賣屋', '拍賣屋掌櫃'), ('馬廄', '馬廄老闆'), ('驛站', '驛站長'), ('賭場', '賭場'),
@@ -142,9 +143,19 @@ def _load_new_interiors():
             out[mid] = '%s%s' % (cn, fx) if fx else '%s室內%02d' % (cn, mid % 100)
             tsets[mid] = info[mid][4]
         for m, n in ((c * 100 + 22, '道路B'), (c * 100 + 23, '道路A')):
+            if m not in info: continue
             out[m] = cn + n; tsets[m] = info[m][4]
     return out, tsets
-ROAD_GATES = {600089: 1923, 600865: 1922, 600857: 1722, 600861: 1822, 600868: 2022, 600872: 2622, 600820: 2822}      # 600857 = 陳留南邊整條寬觸發區 (同許昌 600865 類似)，暫定去道路B；道路A(1723) 未知入口
+ROAD_GATES = {600089: 1923, 600865: 1922, 600857: 1722}
+def _auto_road_gates():
+    # 各城城圖南邊 (y>=170 格) 嘅 6008xx 觸發 = 道路B 入口 (譙 600861/汝南 600868/洛陽 600872/宛 600820 同型)
+    rc = k2_rects(); out = {}
+    for c in NEWCITIES:
+        if c * 100 + 22 not in ROADS: continue
+        cand = [(k, y1) for k, sub, x1, y1, x2, y2 in rc[c * 100] if 600800 <= k < 600900 and sub == 1 and y1 // 16 >= 170]
+        if cand: out[min(cand)[0]] = c * 100 + 22
+    return out
+# (ROAD_GATES 自動補全喺 k2_rects 定義之後)      # 600857 = 陳留南邊整條寬觸發區 (同許昌 600865 類似)，暫定去道路B；道路A(1723) 未知入口
 TILESET = {1907: 'grd02', 1923: 'grd00', 1700: 'grd00'}   # 其餘 grd03 (新城 tileset 見 NEW_TS)
 
 def sprite_index():
@@ -166,10 +177,15 @@ def k2_rects():
             if x2 > x1 and y2 > y1: out[int(r[3])].add((int(r[0]), int(r[2]), x1, y1, x2, y2))
     return out
 
+# 只匯入城內 k2 觸發用標準編號 (城id*100+NN 直指室內) 嘅城；襄平/北平/柴桑等用另一套 6xxxxx 門編號，門位對唔上 -> 室內只會變孤兒，暫時唔匯 (只留城圖)
+_rc0 = k2_rects()
+NEWCITIES = {c: n for c, n in NEWCITIES.items() if any(c * 100 < k < c * 100 + 100 for k, *_ in _rc0[c * 100])}
+print('匯入室內嘅城:', sorted(n for n in NEWCITIES.values()), '| 只有城圖:', sorted(n for c, n in _ALL_NEW.items() if c not in NEWCITIES))
 NEW_INT, NEW_TS = _load_new_interiors()
 ROADS |= {m: n for m, n in NEW_INT.items() if m % 100 in (22, 23)}
 INTERIORS |= {m: n for m, n in NEW_INT.items() if m % 100 not in (22, 23)}
 TILESET.update(NEW_TS)
+ROAD_GATES |= _auto_road_gates()
 
 _GRIDS = None
 def build_walk(d):
@@ -346,7 +362,7 @@ def run(check):
             while not dcells and grow < 4:
                 grow += 1
                 dcells = [c for c in rect_cells([drc[0] - grow, drc[1] - grow, drc[2] + grow, drc[3] + grow], cgw, cgh) if walkable(cgrid, cgw, cgh, *c)]
-            if not dcells: print('警告: %d 城門口冇行得格' % mid); continue
+            if not dcells: print('警告: %d 城門口冇行得格' % mid); nodoor.append(mid); b['spawn'] = in_land; continue
             if grow: drc = [drc[0] - grow, drc[1] - grow, drc[2] + grow, drc[3] + grow]
             dc = dcells[len(dcells) // 2]
             city_land = nearest_outside(cgrid, cgw, cgh, drc, ((drc[0] + drc[2]) // 2, drc[3] + 2))
@@ -405,7 +421,14 @@ def run(check):
             f.write('\n'.join(''.join('H' if g[y * gw + x] else '.' for x in range(gw)) for y in range(gh)) + '\n')
     mj = json.load(open(MAPS, encoding='utf8'))
     keep = {'xc%d' % m for m in built}
-    mj['maps'] = [m for m in mj['maps'] if m['id'] not in keep]
+    gone = {m['id'] for m in mj['maps'] if m['id'].startswith('xc') and m['id'][2:].isdigit() and m.get('orig') == m['id'] and m['id'] not in keep}   # 上次匯過、今次唔再匯嘅 (如改過城名單)
+    for sid in gone:
+        for fp in (os.path.join(ROOT, 'client', 'data', 'maps', sid + '.txt'), os.path.join(DATA, sid + '.json')):
+            try: os.remove(fp)
+            except OSError: pass
+        shutil.rmtree(os.path.join(ASSET, sid), ignore_errors=True)
+    mj['portals'] = [q for q in mj['portals'] if q['map'] not in gone]
+    mj['maps'] = [m for m in mj['maps'] if m['id'] not in keep and m['id'] not in gone]
     for mid, b in sorted(built.items()):
         ox, oy = pos[mid]; sp = b.get('spawn') or (b['gw'] // 2, b['gh'] // 2)
         if mid in TOWNS:
