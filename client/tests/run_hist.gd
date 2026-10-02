@@ -121,11 +121,12 @@ func t_validate(data: GameData) -> void:
 	var e2 := RulesCommission.validate(data)
 	check(e2.is_empty(), "commissions 驗證 (errors: %s)" % str(e2))
 	var hist := data.quests.filter(func(q): return String(q["type"]) == "history" and String(q.get("src", "")) != "orig")
-	check(hist.size() == 12, "歷史任務 12 條 (不計 src=orig 原版導入；S06b 加齊 5 條：孫堅匿璽/張公公謀害何進/黃蓋/曹阿瞞/討伐張角) (而家 %d)" % hist.size())
+	check(hist.size() == 11, "歷史任務 11 條 (不計 src=orig 原版導入；S06b 加齊 5 條：孫堅匿璽/張公公謀害何進/黃蓋/曹阿瞞/討伐張角) (而家 %d)" % hist.size())
 	for q in hist:
-		var items: Array = (q["reward"]["items"] as Array).map(func(x): return int(x[0]))
-		check(items.has(int(ORDERS[String(q["id"])])), "%s 獎勵有將軍令" % q["id"])
-		check(String(data.names.get(int(ORDERS[String(q["id"])]), "")).ends_with("將軍令"), "%s 將軍令 item 名啱" % q["id"])
+		if ORDERS.has(String(q["id"])):      # 只有首批 7 條有將軍令獎勵
+			var items: Array = (q["reward"]["items"] as Array).map(func(x): return int(x[0]))
+			check(items.has(int(ORDERS[String(q["id"])])), "%s 獎勵有將軍令" % q["id"])
+			check(String(data.names.get(int(ORDERS[String(q["id"])]), "")).ends_with("將軍令"), "%s 將軍令 item 名啱" % q["id"])
 		var n: Dictionary = data.quest_npcs[String(q["giver"])]
 		check(data.map_by_id.has(String(n["map"])), "%s giver 喺已有地圖" % q["id"])
 	for nid in ["huyu", "yudu", "dingyuan", "prison_clerk", "caocao_pr"]:

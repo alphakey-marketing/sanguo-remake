@@ -6,6 +6,7 @@ from apply_orig_dialog import load_convs, lines, QJ, NJ
 
 # 王允連環計: conv 1201~1250 | 劉備煮酒論英雄(左慈相助): conv 1254~1272
 WY = {2: '王允', 3: '董卓', 4: '貂蟬'}
+REPLACED = []   # 被原版取代嘅自訂任務 id (會喺 quests.json 刪走)
 QUESTS = [
     {"id": "orig_lianhuan", "src": "orig", "name": "王允連環計", "type": "history", "giver": "wangyun",
      "pre": {"minLevel": 15, "attr": {"cha": 8}},
@@ -223,6 +224,32 @@ QUESTS += [
 ]
 
 
+# ---- 批次 6: 孫堅匿璽 (取代自訂 hist_sunjian_seal) ----
+REPLACED += ['hist_sunjian_seal']
+NEW_NPCS_EXTRA += [
+    _npc("well_guard", "守井小兵", 26, 14, "luoyang", "真是一口詭異的井呀！", "守著皇城古井嘅小兵"),
+]
+QUESTS += [
+    {"id": "orig_sunjian_seal", "src": "orig", "name": "孫堅匿璽", "type": "history", "giver": "well_guard",
+     "pre": {"minLevel": 10, "attr": {"pol": 10, "cha": 10}},
+     "preHint": "武功 10 級以上，去洛陽城搵守井小兵",
+     "stages": [
+         {"type": "talk", "npc": "well_guard", "conv": [3198], "sp": {2: '守井小兵'},
+          "hint": "守井小兵請你去稟告孫文臺（洛陽城內宮宅旁）"},
+         {"type": "talk", "npc": "sunwentai", "conv": [3205], "sp": {2: '孫文臺'}, "getItem": {"id": 56491, "n": 1},
+          "hint": "帶特亮蠟燭，落皇城井底打撈"},
+         {"type": "collect", "npc": "well_guard", "item": {"id": 56494, "n": 1}, "conv": [3210], "sp": {2: '守井小兵'},
+          "hint": "皇城井底打木乃伊/殭屍，撈玉璽錦囊 %v/%n，交畀守井小兵"},
+         {"type": "talk", "npc": "sunwentai", "conv": [3211, 3213], "sp": {2: '孫文臺'},
+          "takeItems": [[56491, 1]], "getItem": {"id": 56495, "n": 1},
+          "hint": "將玉璽錦囊呈畀孫文臺，攞佢嘅委託函"},
+         {"type": "fight", "npc": "chengpu", "monster": 1089, "conv": [3217], "sp": {2: '程普'},
+          "takeItems": [[56495, 1]], "done": True,
+          "hint": "去程府（洛陽城內）同程普 PK，行近程普對話開打"}],
+     "reward": {"fame": 40, "polExp": 30, "items": [[31902, 1]]}},
+]
+
+
 def snap(g, x, y, others):
     for r in range(0, 20):
         for dy in range(-r, r + 1):
@@ -263,7 +290,7 @@ def main():
     for n in ALL_NPCS:
         names[n['id']] = n['name']
         nd['npcs'] = [x for x in nd['npcs'] if x['id'] != n['id']] + [n]
-    ids = {q['id'] for q in QUESTS}
+    ids = {q['id'] for q in QUESTS} | set(REPLACED)
     qd['quests'] = [q for q in qd['quests'] if q['id'] not in ids]
     for q in QUESTS:
         q = json.loads(json.dumps(q))
