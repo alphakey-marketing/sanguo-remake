@@ -6,6 +6,7 @@ from apply_orig_dialog import load_convs, lines, QJ, NJ
 
 # 王允連環計: conv 1201~1250 | 劉備煮酒論英雄(左慈相助): conv 1254~1272
 WY = {2: '王允', 3: '董卓', 4: '貂蟬'}
+PATCH_STAGES = []   # (quest id, stage idx, convs, sp): 舊任務某 stage 補原版對白
 REPLACED = []   # 被原版取代嘅自訂任務 id (會喺 quests.json 刪走)
 QUESTS = [
     {"id": "orig_lianhuan", "src": "orig", "name": "王允連環計", "type": "history", "giver": "wangyun",
@@ -250,6 +251,29 @@ QUESTS += [
 ]
 
 
+# ---- 批次 7: 張公公謀害何進 (取代自訂) + 代呂布斬丁原 (補原版對白) ----
+REPLACED += ['hist_zhanggong']
+PATCH_STAGES += [('hist_dingyuan', 3, [3189], {2: '丁原'})]
+QUESTS += [
+    {"id": "orig_zhanggong", "src": "orig", "name": "張公公謀害何進", "type": "history", "giver": "zhanggong",
+     "pre": {"karmaMax": 0, "minLevel": 10, "attr": {"pol": 10, "cha": 10}},
+     "preHint": "PK 值為 0（未曾濫殺），去下邳城內搵張公公",
+     "stages": [
+         {"type": "talk", "npc": "zhanggong", "conv": [3176, 3177], "sp": {2: '張公公'}, "getItem": {"id": 56497, "n": 1},
+          "hint": "帶何府通行牌去下邳何府，傳何太后懿旨"},
+         {"type": "talk", "npc": "hefu_guard", "conv": [3179], "sp": {2: '何府守衛'},
+          "hint": "守衛唔放行，返去搵張公公取太后手諭"},
+         {"type": "talk", "npc": "zhanggong", "conv": [3180], "sp": {2: '張公公'}, "getItem": {"id": 56498, "n": 1},
+          "hint": "帶太后手諭返何府畀守衛睇"},
+         {"type": "talk", "npc": "hefu_guard", "conv": [3181], "sp": {2: '何府守衛'}, "takeItems": [[56498, 1]],
+          "hint": "守衛放行，入何府搵何進"},
+         {"type": "fight", "npc": "hejin", "monster": 1090, "conv": [], "win": 3182, "hint": "喺何府同何進 PK（行近何進對話開打）"},
+         {"type": "talk", "npc": "zhanggong", "conv": [3183], "sp": {2: '張公公'}, "takeItems": [[56497, 1]], "done": True,
+          "hint": "返下邳向張公公覆命"}],
+     "reward": {"fame": 40, "polExp": 30, "items": [[32203, 1]]}},
+]
+
+
 def snap(g, x, y, others):
     for r in range(0, 20):
         for dy in range(-r, r + 1):
@@ -308,6 +332,13 @@ def main():
             st['origConv'] = oc
             st.pop('sp', None)
         qd['quests'].append(q)
+    for qid, si, cv, sp in PATCH_STAGES:
+        st = next(q for q in qd['quests'] if q['id'] == qid)['stages'][si]
+        ls = []
+        for cid in cv:
+            ls += lines(convs[cid], st['npc'], sp)
+        st['dialog'] = ls
+        st['origConv'] = cv
     json.dump(qd, open(QJ, 'w', encoding='utf8', newline='\n'), ensure_ascii=False, indent=1)
     json.dump(nd, open(NJ, 'w', encoding='utf8', newline='\n'), ensure_ascii=False, indent=1)
     print('ok', len(QUESTS), 'quests', len(ALL_NPCS), 'npcs')

@@ -121,7 +121,7 @@ func t_validate(data: GameData) -> void:
 	var e2 := RulesCommission.validate(data)
 	check(e2.is_empty(), "commissions 驗證 (errors: %s)" % str(e2))
 	var hist := data.quests.filter(func(q): return String(q["type"]) == "history" and String(q.get("src", "")) != "orig")
-	check(hist.size() == 11, "歷史任務 11 條 (不計 src=orig 原版導入；S06b 加齊 5 條：孫堅匿璽/張公公謀害何進/黃蓋/曹阿瞞/討伐張角) (而家 %d)" % hist.size())
+	check(hist.size() == 10, "歷史任務 10 條 (不計 src=orig 原版導入；S06b 加齊 5 條：孫堅匿璽/張公公謀害何進/黃蓋/曹阿瞞/討伐張角) (而家 %d)" % hist.size())
 	for q in hist:
 		if ORDERS.has(String(q["id"])):      # 只有首批 7 條有將軍令獎勵
 			var items: Array = (q["reward"]["items"] as Array).map(func(x): return int(x[0]))
