@@ -42,13 +42,13 @@ LINKS = json.load(open(os.path.join(ROOT, 'client', 'data', 'city_links.json'), 
 CITY_NAME = {c['id'] // 100: n for n, c in LINKS['cities'].items()}
 TPLS = (25,)                              # v2: 每城只有一張外圍 xx25 (所有城共用)
 # 城圖 (3200x2400 / 4000x3000，type=城市)：除許昌 (import_orig_maps 負責 xuchang_o) 外全部城池；(漢中/梓潼 係 map22 大圖，天水/武都 冇城圖 -> 跳過)
-SKIP_TOWNS = {1900, 3600, 3700, 3800, 3900}
+SKIP_TOWNS = {1900, 3700, 3800, 3900}     # 漢中/武都/梓潼 = map22 空殼圖 (全平地、無物件、tile 0)，原版未做完
 TOWNS = {c['id']: n for n, c in LINKS['cities'].items() if c['id'] not in SKIP_TOWNS}
 CITY_MAPID = {19: CITY} | {t // 100: 'xc%d' % t for t in TOWNS}     # 城 id(//100) -> 城圖 map id
 # cityOf slug: 有舊圖嘅城沿用舊 city id (驛站/市場借舊圖)，其餘拼音
 SLUG = {'許昌': 'xuchang', '陳留': 'chenliu', '洛陽': 'luoyang', '汝南': 'runan', '宛': 'wancheng', '襄陽': 'xiangyang', '新野': 'xinye', '長沙': 'changsha',
         '小沛': 'xiaopei', '下邳': 'xiapi', '零陵': 'lingling', '襄平': 'xiangping', '北平': 'beiping', '薊': 'ji', '北海': 'beihai', '平原': 'pingyuan',
-        '南皮': 'nanpi', '鄴': 'ye', '盧江': 'lujiang', '壽春': 'shouchun', '柴桑': 'chaisang', '吳': 'wu', '會稽': 'kuaiji', '建業': 'jianye', '濮陽': 'puyang',
+        '南皮': 'nanpi', '鄴': 'ye', '盧江': 'lujiang', '壽春': 'shouchun', '柴桑': 'chaisang', '吳': 'wu', '天水': 'tianshui', '漢中': 'hanzhong', '武都': 'wudu', '梓潼': 'zitong', '會稽': 'kuaiji', '建業': 'jianye', '濮陽': 'puyang',
         '譙': 'qiao', '江夏': 'jiangxia', '桂陽': 'guiyang', '河內': 'henei', '晉陽': 'jinyang', '江陵': 'jiangling', '武陵': 'wuling', '安定': 'anding',
         '長安': 'changan', '西涼': 'xiliang'}
 CITY_SLUG = {c['id'] // 100: SLUG[n] for n, c in LINKS['cities'].items() if n in SLUG}
@@ -183,7 +183,7 @@ def build_walk(d):
     return gw, gh, g.tobytes()
 
 def open_mrg(name):
-    for f in ('Map', 'map21'):
+    for f in ('Map', 'map21', 'map22'):
         m = Mrg(MAPD + f + '.mrg')
         if name in m.names and parse(m.blob(m.names.index(name))) is not None: return f, m
     return None, None
