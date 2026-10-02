@@ -10,6 +10,8 @@ MAP = {
     'hist_sunjian': {0: [2771, 2772], 2: [2775]},
     'hist_yudu': {0: [2806, 2808], 1: [2811, 2812]},
     'hist_chengong': {0: [2824, 2826, 2827], 2: [2831]},
+    'hist_dingyuan': {0: [3184, 3186], 1: [3187], 2: [3188]},
+    'hist_huanggai': {0: [2779, 2780], 1: [2791], 2: [2782]},
 }
 
 def load_convs():
@@ -25,7 +27,7 @@ def lines(conv, npc_name):
     for slot, t in conv:
         if slot == 1:
             continue                                    # 選項行
-        t = t.replace('~^', '').strip()
+        t = re.sub(r'ok_\d+', '你', t.replace('~^', '').strip())      # ok_NNN = 玩家名佔位
         if not re.search(r'[\u4e00-\u9fff]', t) or len(t) <= 4 and not re.search(r'[。！？]', t):
             continue                                    # 純表情/音效
         out.append('%s：「%s」' % ('你' if slot == 0 else npc_name, t))
