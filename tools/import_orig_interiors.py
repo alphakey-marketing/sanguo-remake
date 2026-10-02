@@ -27,7 +27,10 @@ INTERIORS = {
     1914: '馬廄', 1915: '室內15', 1916: '賭場', 1917: '大廳', 1918: '民宅', 1919: '老年人家', 1920: '民宅20',
     1921: '鳳嫂家', 1924: '廚房', 1942: '室內42', 1943: '室內43', 1944: '珠寶店', 1945: '室內45',
     1946: '王允府', 1947: '劉備家'}
-ROADS = {1923: '許昌道路（木礦藥）', 1922: '許昌道路（農漁獵）'}
+ROADS = {1923: '許昌道路（木礦藥）', 1922: '許昌道路（農漁獵）', 1723: '陳留道路A', 1722: '陳留道路B'}
+# 陳留室內 (名暫按許昌同號推；1724/1733/1741-47 係 1700 k2 觸發區指向嘅額外室內)；1706/1709/1717/1721 冇 k2 城內門 -> orphan
+INTERIORS |= {1700 + n: '陳留' + INTERIORS[1900 + n] for n in (1, 2, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14, 15, 16, 18, 19, 20)}
+INTERIORS |= {1709: '陳留室內09', 1717: '陳留大廳', 1721: '陳留室內21', 1724: '陳留室內24', 1733: '陳留室內33'} | {1740 + n: '陳留室內%d' % (40 + n) for n in range(1, 8)}
 # 工作區入口: 城內 k2 觸發區 -> 道路圖 (用家 2026-09-30 指定: 600089 -> A=1923, 600865 -> B=1922)
 FIELDS = {1851: '許昌洞穴一', 1852: '許昌洞穴二', 1853: '許昌洞穴三', 1854: '許昌洞穴四', 1855: '許昌洞穴五',     # N51-55 = 洞穴 (用家睇圖確認)
           1925: '外圍25'}
@@ -109,7 +112,7 @@ def slot_rects(runs, conns, gw, gh):
     for m, lst in conns.items():
         place_slots(lst, lambda sd: runs[m % 100][sd], gw, gh)
 
-ROAD_GATES = {600089: 1923, 600865: 1922}
+ROAD_GATES = {600089: 1923, 600865: 1922, 600857: 1722}      # 600857 = 陳留南邊整條寬觸發區 (同許昌 600865 類似)，暫定去道路B；道路A(1723) 未知入口
 TILESET = {1907: 'grd02', 1923: 'grd00', 1700: 'grd00'}   # 其餘 grd03
 
 def sprite_index():
@@ -272,11 +275,12 @@ def run(check):
     if check: return
     # 城內門 / 工作區門 -> 城內 portal；室內出口 -> 返城
     portals = []; nodoor = []
-    city_rects = rects[1900]
     door_of = {}
-    for k, sub, x1, y1, x2, y2 in sorted(city_rects):
-        if k in INTERIORS: door_of.setdefault(k, (x1, y1, x2, y2))
-        elif k in ROAD_GATES: door_of[ROAD_GATES[k]] = (x1, y1, x2, y2)
+    for cr in (rects[1900], rects[1700]):
+        for k, sub, x1, y1, x2, y2 in sorted(cr):
+            if k in INTERIORS: door_of.setdefault(k, (x1, y1, x2, y2))
+            elif k in ROAD_GATES: door_of[ROAD_GATES[k]] = (x1, y1, x2, y2)
+    cityg = {19: (cg, cgw, cgh)} | {t // 100: (built[t]['g'], built[t]['gw'], built[t]['gh']) for t in TOWNS if t in built}
     for mid, b in sorted(built.items()):
         key = 'xc%d' % mid; g = b['g']; gw, gh = b['gw'], b['gh']
         if mid in FIELDS or mid in TOWNS:
@@ -297,25 +301,25 @@ def run(check):
         if mid not in door_of:
             nodoor.append(mid)
         else:
+            cgrid, cgw, cgh = cityg[mid // 100]
             dx1, dy1, dx2, dy2 = door_of[mid]
             drc = [dx1 // 16, dy1 // 16, dx2 // 16, dy2 // 16]
-            dcells = [c for c in rect_cells(drc, cgw, cgh) if walkable(cg, cgw, cgh, *c)]
+            dcells = [c for c in rect_cells(drc, cgw, cgh) if walkable(cgrid, cgw, cgh, *c)]
             grow = 0
             while not dcells and grow < 4:
                 grow += 1
-                dcells = [c for c in rect_cells([drc[0] - grow, drc[1] - grow, drc[2] + grow, drc[3] + grow], cgw, cgh) if walkable(cg, cgw, cgh, *c)]
+                dcells = [c for c in rect_cells([drc[0] - grow, drc[1] - grow, drc[2] + grow, drc[3] + grow], cgw, cgh) if walkable(cgrid, cgw, cgh, *c)]
             if not dcells: print('警告: %d 城門口冇行得格' % mid); continue
             if grow: drc = [drc[0] - grow, drc[1] - grow, drc[2] + grow, drc[3] + grow]
             dc = dcells[len(dcells) // 2]
-            city_land = nearest_outside(cg, cgw, cgh, drc, ((drc[0] + drc[2]) // 2, drc[3] + 2))
-            portals.append({'id': 'xc_in_%d' % mid, 'name': '入 ' + b['cn'], 'map': CITY, 'x': dc[0], 'y': dc[1],
+            city_land = nearest_outside(cgrid, cgw, cgh, drc, ((drc[0] + drc[2]) // 2, drc[3] + 2))
+            portals.append({'id': 'xc_in_%d' % mid, 'name': '入 ' + b['cn'], 'map': CITY_MAPID[mid // 100], 'x': dc[0], 'y': dc[1],
                             'rect': drc, 'land': list(city_land), 'to': 'xc_out_%d' % mid, 'auto': True})
             portals.append({'id': 'xc_out_%d' % mid, 'name': '出 ' + b['cn'], 'map': key, 'x': ec[0], 'y': ec[1],
                             'rect': erc, 'land': list(in_land), 'to': 'xc_in_%d' % mid, 'auto': True})
         b['spawn'] = in_land
     # 外圍線 (外圍 <-> 對方外圍，地圖邊緣傳送) + 城圖邊緣口 <-> 本城外圍
     runs = {t: tpl_runs(built[1900 + t]['g'], built[1900 + t]['gw'], built[1900 + t]['gh']) for t in TPLS}
-    cityg = {19: (cg, cgw, cgh)} | {t // 100: (built[t]['g'], built[t]['gw'], built[t]['gh']) for t in TOWNS if t in built}
     cruns = {k: tpl_runs(*v) for k, v in cityg.items()}
     conns = plan_links(runs, cruns)
     for m, lst in conns.items(): place_slots(lst, lambda sd: runs[25][sd], built[1925]['gw'], built[1925]['gh'])
@@ -346,6 +350,7 @@ def run(check):
         ch = False
         for l in LINKS['links']:
             if (l['a_out'] in reach) != (l['b_out'] in reach): reach |= {l['a_out'], l['b_out']}; ch = True
+    reach |= {t for t in TOWNS if t // 100 * 100 + 25 in reach}      # 城圖經本城外圍 25 嘅入城口到得
     for t in TOWNS:
         if t in built: built[t]['spawn'] = gates[t // 100]
     # 寫資產 / 資料 / txt
@@ -370,8 +375,8 @@ def run(check):
             mj['maps'].append({'id': 'xc%d' % mid, 'name': b['cn'] + '（原版）', 'ox': ox, 'oy': oy, 'safe': True, 'kind': 'field', 'orig': 'xc%d' % mid,
                                'cityOf': 'chenliu', 'spawn': [sp[0], sp[1], sp[0], sp[1]]} | ({} if mid in reach else {'orphan': True}))
             continue
-        mj['maps'].append({'id': 'xc%d' % mid, 'name': '許昌·' + b['cn'], 'ox': ox, 'oy': oy, 'safe': mid not in FIELDS,
-                           'kind': 'field' if (mid in ROADS or mid in FIELDS) else 'house', 'orig': 'xc%d' % mid, 'cityOf': 'xuchang',
+        mj['maps'].append({'id': 'xc%d' % mid, 'name': ('許昌·' if mid // 100 == 19 else '陳留·') + b['cn'], 'ox': ox, 'oy': oy, 'safe': mid not in FIELDS,
+                           'kind': 'field' if (mid in ROADS or mid in FIELDS) else 'house', 'orig': 'xc%d' % mid, 'cityOf': 'xuchang' if mid // 100 == 19 else 'chenliu',
                            'spawn': [sp[0], sp[1], sp[0], sp[1]]}
                   | ({'orphan': True} if (mid in nodoor or mid in FIELDS) else {}))     # orphan = 未知城內門，暫時去唔到
     tplids = ('xc1925', 'xc1929', 'xc1949')            # 1929/1949 係 v1 舊模板，一併清走

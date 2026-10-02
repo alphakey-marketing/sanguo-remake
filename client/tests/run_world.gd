@@ -411,7 +411,10 @@ func _orig_interiors(data: GameData, city_seen: Dictionary) -> void:
 		var land: Array = back["land"]
 		check(data.walk[int(land[1]) * W + int(land[0])] == 1 and not data.portal_at.has(int(land[1]) * W + int(land[0])), "原版室內: %s 落地點行得且唔係觸發格" % pid)
 		var cl: Array = p["land"]
-		check(city_seen.has(int(cl[1]) * W + int(cl[0])), "原版室內: %s 返城落地點喺城內連通區" % pid)
+		if String(p["map"]) == "xuchang_o":
+			check(city_seen.has(int(cl[1]) * W + int(cl[0])), "原版室內: %s 返城落地點喺城內連通區" % pid)
+		else:   # 陳留等其他城: 只驗落腳點行得 (連通區 BFS 淨係許昌)
+			check(data.walk[int(cl[1]) * W + int(cl[0])] == 1, "原版室內: %s 返城落地點行得" % pid)
 	check(n_pair >= 20, "原版室內: 入屋門 >= 20 (%d)" % n_pair)
 	var inn_o: Dictionary = {}
 	for iv in data.inns:
