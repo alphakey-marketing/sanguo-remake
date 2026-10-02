@@ -17,6 +17,7 @@ func _init() -> void:
 	t_save_file(data)
 	t_zones_travel(data)
 	t_set_home(data)
+	t_chenliu_npcs(data)
 	t_trade_cities(data)
 	t_orig_map(data)
 	print("[TEST] world: %d, fail %d" % [total, fails])
@@ -290,6 +291,44 @@ func t_set_home(data: GameData) -> void:
 	ch["level"] = 2
 	sim.cmd_set_home(id, "xuchang")
 	check(String(ch.get("homeCity", "")) == "xuchang", "揀城: 出發後 (Lv>1) 仍然係許昌")
+
+
+# 陳留(原版)商店/設施複製 (_cl): 位置行得、喺 xc17 圖、可買、私塾沿用 school 邏輯
+func t_chenliu_npcs(data: GameData) -> void:
+	var W := GameData.WORLD_W
+	var sim := Sim.new(data, 63)
+	var id := sim.spawn_player("t")
+	var e := sim.ent(id)
+	var n := 0
+	for s in data.shops:
+		if not String(s["id"]).ends_with("_cl"):
+			continue
+		n += 1
+		check(String(s["map"]).begins_with("xc17") and data.walk[int(s["y"]) * W + int(s["x"])] == 1, "陳留商店 %s 喺 xc17 行得格" % s["id"])
+	check(n >= 4, "陳留商店 >= 4 (%d)" % n)
+	var wp: Dictionary = {}
+	for s in data.shops:
+		if s["id"] == "weapon_cl":
+			wp = s
+	e["x"] = int(wp["x"]); e["y"] = int(wp["y"])
+	check(not sim._shop_for(e).is_empty() and String(sim._shop_for(e)["id"]) == "weapon_cl", "陳留武器店: 企喺度搵到 weapon_cl")
+	var inn: Dictionary = {}
+	for x in data.inns:
+		if x["id"] == "chenliu_o":
+			inn = x
+	check(not inn.is_empty() and data.walk[int(inn["y"]) * W + int(inn["x"])] == 1, "陳留客棧: 喺行得格")
+	var sc: Dictionary = data.facilities.get("school_cl", {})
+	check(not sc.is_empty() and String(sc["map"]) == "xc1705" and data.walk[int(sc["y"]) * W + int(sc["x"])] == 1, "陳留私塾: 喺 xc1705 行得格")
+	e["x"] = int(sc["x"]); e["y"] = int(sc["y"])
+	var ch: Dictionary = e["ch"]
+	var pol0 := int(ch["attrs"]["pol"])
+	ch["gold"] = 100; ch["sp"] = int(ch["sp"]); ch["mp"] = int(ch["mp"])
+	sim.cmd_facility(id, "school_cl")
+	check(int(ch["gold"]) < 100 or int(ch["attrs"]["pol"]) != pol0, "陳留私塾: school_cl 行私塾邏輯 (扣金或加政治)")
+	for k in data.facilities:
+		if String(k).ends_with("_cl"):
+			var f: Dictionary = data.facilities[k]
+			check(String(f["map"]).begins_with("xc17") and data.walk[int(f["y"]) * W + int(f["x"])] == 1, "陳留設施 %s 喺 xc17 行得格" % k)
 
 
 # 城際貿易 (spec 05 §6): 平城買、貴城賣，買賣價跟所屬城市場 pf，賺差價

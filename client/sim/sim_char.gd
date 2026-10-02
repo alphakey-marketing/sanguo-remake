@@ -14,7 +14,7 @@ func cmd_facility(id: int, key: String) -> void:
 	if not _near(e, int(f["x"]), int(f["y"])):
 		return _msg(id, "要行近%s先得" % f["name"])
 	var ch: Dictionary = e["ch"]
-	match key:
+	match String(f.get("type", key)):    # type = 複製設施 (如 school_cl) 沿用原邏輯
 		"training": _fac_training(e, ch, f)
 		"trainer": _fac_restsp(e, ch, f)
 		"school":
