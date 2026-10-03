@@ -1092,8 +1092,8 @@
   {
    "id": "dz_guard",
    "name": "太師府衛兵",
-   "x": 72,
-   "y": 141,
+   "x": 52,
+   "y": 139,
    "map": "xc2025",
    "questOnly": true,
    "idle": [
@@ -1104,8 +1104,8 @@
   {
    "id": "awu",
    "name": "阿武",
-   "x": 54,
-   "y": 137,
+   "x": 58,
+   "y": 139,
    "map": "xc2025",
    "questOnly": true,
    "idle": [
@@ -1116,8 +1116,8 @@
   {
    "id": "zangba",
    "name": "臧霸",
-   "x": 2,
-   "y": 150,
+   "x": 0,
+   "y": 149,
    "map": "xc1500",
    "questOnly": true,
    "idle": [
@@ -1129,7 +1129,7 @@
    "id": "xunyou",
    "name": "荀攸",
    "x": 0,
-   "y": 148,
+   "y": 157,
    "map": "xc1700",
    "questOnly": true,
    "idle": [
@@ -1140,7 +1140,7 @@
   {
    "id": "lvbu_xp",
    "name": "呂布",
-   "x": 7,
+   "x": 2,
    "y": 150,
    "map": "xc1500",
    "questOnly": true,
@@ -1152,8 +1152,8 @@
   {
    "id": "liubei",
    "name": "劉備",
-   "x": 2,
-   "y": 137,
+   "x": 0,
+   "y": 135,
    "map": "xc1400",
    "questOnly": true,
    "idle": [
@@ -1164,8 +1164,8 @@
   {
    "id": "xs_merchant",
    "name": "行腳商人",
-   "x": 2,
-   "y": 103,
+   "x": 0,
+   "y": 107,
    "map": "xc2200",
    "questOnly": true,
    "idle": [
@@ -1176,8 +1176,8 @@
   {
    "id": "xugong_ke",
    "name": "許貢家客",
-   "x": 54,
-   "y": 137,
+   "x": 52,
+   "y": 139,
    "map": "xc2925",
    "questOnly": true,
    "idle": [
@@ -1188,8 +1188,8 @@
   {
    "id": "sunce",
    "name": "孫策",
-   "x": 60,
-   "y": 137,
+   "x": 58,
+   "y": 139,
    "map": "xc2925",
    "questOnly": true,
    "idle": [
@@ -1200,8 +1200,8 @@
   {
    "id": "ys_guard",
    "name": "祭壇守衛",
-   "x": 8,
-   "y": 103,
+   "x": 2,
+   "y": 105,
    "map": "xc2200",
    "questOnly": true,
    "idle": [
@@ -1212,8 +1212,8 @@
   {
    "id": "sunce_guard",
    "name": "孫策護衛",
-   "x": 14,
-   "y": 103,
+   "x": 6,
+   "y": 105,
    "map": "xc2200",
    "questOnly": true,
    "idle": [
@@ -1225,7 +1225,7 @@
    "id": "guanyu",
    "name": "關羽",
    "x": 2,
-   "y": 148,
+   "y": 158,
    "map": "xc1700",
    "questOnly": true,
    "idle": [
@@ -1236,8 +1236,8 @@
   {
    "id": "qinqi",
    "name": "秦琪",
-   "x": 66,
-   "y": 137,
+   "x": 64,
+   "y": 139,
    "map": "xc2925",
    "questOnly": true,
    "idle": [
@@ -1260,8 +1260,8 @@
   {
    "id": "bianxi",
    "name": "卞喜",
-   "x": 60,
-   "y": 137,
+   "x": 64,
+   "y": 139,
    "map": "xc2025",
    "questOnly": true,
    "idle": [
@@ -1272,8 +1272,8 @@
   {
    "id": "mengtan",
    "name": "孟坦",
-   "x": 14,
-   "y": 99,
+   "x": 0,
+   "y": 107,
    "map": "xc2600",
    "questOnly": true,
    "idle": [
@@ -1284,8 +1284,8 @@
   {
    "id": "kongxiu",
    "name": "孔秀",
-   "x": 4,
-   "y": 147,
+   "x": 7,
+   "y": 158,
    "map": "xc1700",
    "questOnly": true,
    "idle": [
@@ -1296,7 +1296,7 @@
   {
    "id": "caiyang",
    "name": "蔡陽",
-   "x": 8,
+   "x": 2,
    "y": 137,
    "map": "xc1400",
    "questOnly": true,
@@ -1320,8 +1320,8 @@
   {
    "id": "ganning",
    "name": "甘寧",
-   "x": 200,
-   "y": 48,
+   "x": 183,
+   "y": 49,
    "map": "xc2125",
    "questOnly": true,
    "idle": [
@@ -1332,7 +1332,7 @@
   {
    "id": "huangzu",
    "name": "黃祖",
-   "x": 2,
+   "x": 12,
    "y": 105,
    "map": "xc2200",
    "questOnly": true,
@@ -1344,8 +1344,8 @@
   {
    "id": "zhouyu_gk",
    "name": "周瑜",
-   "x": 185,
-   "y": 47,
+   "x": 189,
+   "y": 49,
    "map": "xc2125",
    "questOnly": true,
    "idle": [
@@ -1356,8 +1356,8 @@
   {
    "id": "well_guard",
    "name": "守井小兵",
-   "x": 0,
-   "y": 88,
+   "x": 4,
+   "y": 103,
    "map": "xc2600",
    "questOnly": true,
    "idle": [

@@ -40,7 +40,7 @@ def place_near(tm, i, others):
 
 def main():
     maps = {m['id']: m for m in jl('maps.json')['maps']}
-    old = {i for i, m in maps.items() if not m.get('orig')}
+    old = set(REMAP)           # 舊圖已封存 (maps.json 冇晒)，靠 REMAP 表認
     nd = jl('quest_npcs.json')
     placed = {}
     for n in nd['npcs']:

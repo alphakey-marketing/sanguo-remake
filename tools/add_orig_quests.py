@@ -335,7 +335,11 @@ def main():
     convs = load_convs()
 
     for n in ALL_NPCS:      # 位置係估嘅: 唔行得就搵最近行得嘅格 (同圖其他 NPC ≥2 格)
-        g = open('client/data/maps/%s.txt' % n['map'], encoding='utf8').read().split(chr(10))
+        import os
+        fp = 'client/data/maps/%s.txt' % n['map']
+        if not os.path.exists(fp):
+            fp = 'client/data/archive/maps/%s.txt' % n['map']       # 舊圖已封存
+        g = open(fp, encoding='utf8').read().split(chr(10))
         n['x'], n['y'] = snap(g, n['x'], n['y'], [(o['x'], o['y']) for o in ALL_NPCS if o['map'] == n['map'] and o is not n])
     qd = json.load(open(QJ, encoding='utf8'))
     nd = json.load(open(NJ, encoding='utf8'))

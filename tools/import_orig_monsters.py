@@ -62,6 +62,10 @@ def main(check=False):
     d['spawns'] = [x for x in d['spawns'] if not x.get('orig')] + gen_spawns(mons, rows_cave)
     hid = {m['id'] for m in mons if m.get('orig') and m['name'] in NO_SPRITE_HIDE}      # 冇圖又冇相似圖可借 -> 唔出場 (搵到圖包後清空 NO_SPRITE_HIDE 重跑)
     d['spawns'] = [x for x in d['spawns'] if x['monster'] not in hid]
+    ix = os.path.join(ROOT, 'client/data/asset_index.json')
+    if os.path.exists(ix):       # 野外怪冇 sprite (亦冇 BORROW 借圖) = 唔出場；任務怪/boss 唔受影響 (非 orig spawn)
+        have = json.load(open(ix, encoding='utf8')).get('mon_S', {})
+        d['spawns'] = [x for x in d['spawns'] if not x.get('orig') or str(x['monster']) in have]
     json.dump(d, open(MP, 'w', encoding='utf8', newline='\n'), ensure_ascii=False, indent=1)
 # 外圍野怪名單: 官方攻略 (docs/plan/ORIG_MONSTERS.md 來源 = 用家 Drive 攻略截圖) 按州分；各州適合等級 荊/豫/并司 1-10、兗徐 10-20
 WILD = {'荊': '田鼠 水鴨 野兔 蜻蜓 野貂 母雞 猴子 瘋貓 野豬 飛蛾怪 流氓', '豫': '田鼠 水鴨 野兔 野貂 母雞 公雞 山羊 瘋貓 野豬 流氓',
@@ -69,6 +73,7 @@ WILD = {'荊': '田鼠 水鴨 野兔 蜻蜓 野貂 母雞 猴子 瘋貓 野豬 �
 REGION = {'荊': (29, 27, 28, 30, 21, 22, 31, 32, 23), '豫': (19, 18, 20, 17), '并司': (26, 24, 25, 34, 33, 35, 36, 37, 38, 39)}   # 其餘城用兗徐 (近似【自訂】)
 # 缺 sprite 又冇相似圖可借，暫時隱藏嘅怪 (見 import_orig_assets.BORROW 借圖表)
 NO_SPRITE_HIDE = {'野豬', '野牛', '山羊', '花鹿', '洞窟獸王'}
+NEWBIE_WILD = '田鼠 水鴨 野兔 野豬'     # 許昌外圍 = 新手區【自訂】: 只留 Lv<=7，每種 4 隻；高級怪 (Lv9~14) 去鄰近外圍 (洛陽/譙/陳留/宛)
 def gen_spawns(mons, rows):
     import re
     by = {}
@@ -89,7 +94,8 @@ def gen_spawns(mons, rows):
         if z not in ids: continue
         reg = next((k for k, v in REGION.items() if c in v), '兗徐')
         lo, hi = (10, 20) if reg == '兗徐' else (1, 10)                    # 攻略外圍等級帶
-        for nm in WILD[reg].split():
-            if nm in by: out.append({'zone': z, 'monster': by[nm], 'count': 1, 'respawnTicks': 300, 'orig': True, 'lv': min(hi, max(lo, lvl[by[nm]]))})
+        names, cnt = (WILD[reg].split(), 1) if c != 19 else (NEWBIE_WILD.split(), 5)
+        for nm in names:
+            if nm in by: out.append({'zone': z, 'monster': by[nm], 'count': cnt, 'respawnTicks': 300, 'orig': True, 'lv': min(hi, max(lo, lvl[by[nm]]))})
     return out
 if __name__ == '__main__': main('--check' in sys.argv)
