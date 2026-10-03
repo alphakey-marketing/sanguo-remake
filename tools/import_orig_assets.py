@@ -322,6 +322,16 @@ def imp_mount(src, idx):
     idx["mount_S"] = out
     print(f"座騎 sprite: {len(out)} 馬種")
 
+# 特別服裝: (名, role mrg, 甲 E 位, 甲 FG, 髮 FG 或 "")；E=4 夢幻/特殊套，E=1 FG08~12 = 變身吉祥物 (只部分職業有)
+COSTUMES = [
+    ("神話一", "role9902", "4", "04", "04"), ("神話二", "role9902", "4", "05", "05"), ("神話三", "role9902", "4", "06", "06"),
+    ("夢幻一", "role9", "4", "01", "01"), ("夢幻二", "role9", "4", "02", "02"), ("夢幻三", "role9", "4", "03", "03"), ("夢幻四", "role9", "4", "07", "07"),
+    ("節慶", "role9904", "4", "07", "07"), ("聖誕", "role9904", "4", "15", ""), ("華服", "role9905", "4", "14", ""),
+    ("變身一", "role9", "1", "08", ""), ("變身二", "role9", "1", "09", ""), ("變身三", "role9", "1", "10", ""),
+    ("變身四", "role9", "1", "11", ""), ("變身五", "role9", "1", "12", ""),
+]
+
+
 def imp_player_layers(src, idx):
     """玩家分層 (運行時按裝備疊): player_layers key = "B/C/kind/style"
     kind: b 身 / w 武 (1~9) / a 甲 (0~6) / h 髮 (0~6)；B=職業 1~6, C=動作 1 走 2 攻。同 cell/原點，直接疊。"""
@@ -347,6 +357,31 @@ def imp_player_layers(src, idx):
                 rel = f"player/{b}_{c}_{kind}0.png"
                 sh.save(os.path.join(OUT, rel))
                 out[f"{b}/{c}/{kind}/0"] = rel
+    # 特別服裝 (外觀頁): kind t = 甲、th = 髮，style = 服裝 id (見 COSTUMES)；冇髮件就用裝備髮
+    cls_of = {1: "yishi", 2: "shinu", 3: "daoshi", 4: "wunu", 5: "bianshi", 6: "meinu"}
+    meta = []
+    for cid, (name, mrg, ae, afg, hfg) in enumerate(COSTUMES, 1):
+        have = []
+        for b in range(1, 7):
+            ok = False
+            for c in (1, 2):
+                sh = cp.single(f"1{b}{c}4{ae}{afg}", cp.mrg_layer(mrg))
+                if sh is None:
+                    continue
+                ok = True
+                sh.save(os.path.join(OUT, f"player/{b}_{c}_t{cid}.png"))
+                out[f"{b}/{c}/t/{cid}"] = f"player/{b}_{c}_t{cid}.png"
+                if hfg:
+                    hh = cp.single(f"1{b}{c}34{hfg}", cp.mrg_layer(mrg))
+                    if hh is not None:
+                        hh.save(os.path.join(OUT, f"player/{b}_{c}_th{cid}.png"))
+                        out[f"{b}/{c}/th/{cid}"] = f"player/{b}_{c}_th{cid}.png"
+            if ok:
+                have.append(cls_of[b])
+        meta.append({"id": cid, "name": name, "classes": have})
+    with open(os.path.join(ROOT, "client", "data", "costumes.json"), "w", encoding="utf-8", newline="\n") as fh:
+        json.dump({"_note": "特別服裝 (角色面板外觀頁)，由 tools/import_orig_assets.py 生成，唔好手改。classes = 邊啲職業有呢款", "costumes": meta}, fh, ensure_ascii=False, indent=1)
+        fh.write("\n")
     idx["player_layers"] = out
     print(f"玩家分層: {len(out)} 張")
 

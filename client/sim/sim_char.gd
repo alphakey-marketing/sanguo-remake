@@ -136,6 +136,23 @@ func cmd_auto_assign(id: int) -> void:
 	_msg(id, "自動分配合成 (剩 %d 點)" % int(ch["attrPoints"]))
 
 
+# 特別服裝 (外觀頁)【自訂】: ch.costume = 服裝 id，0 = 唔著 (照裝備/三轉造型)；每職有邊啲款睇 costumes.json
+func cmd_set_costume(id: int, n: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return
+	var ch: Dictionary = e["ch"]
+	if n != 0:
+		var ok := false
+		for c in data.costumes:
+			if int(c["id"]) == n and (c["classes"] as Array).has(str(ch.get("classId", ""))):
+				ok = true
+		if not ok:
+			_msg(id, "呢款服裝你個職業著唔到。")
+			return
+	ch["costume"] = n
+
+
 # 升級自動派點開關【自訂，無 UI】: 預設關 (ch.autoPoints)，升級時按職業建議比例派晒
 func cmd_auto_points(id: int, on: bool) -> void:
 	var e := ent(id)

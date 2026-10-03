@@ -236,6 +236,26 @@ static func player_preview(b: int, face: Dictionary) -> Array:
 	return out
 
 
+# 服裝預覽: 身 → 服裝甲 → 服裝髮 (冇就臉譜髮) → 武 1；面向鏡頭站立第一幀
+static func costume_preview(b: int, face: Dictionary, cs: int) -> Array:
+	var body := player_layer(b, 1, "b", 0)
+	if body == null:
+		return []
+	var cw := body.get_width() / 8
+	var chh := body.get_height() / 8
+	var hair := player_layer(b, 1, "th", cs)
+	if hair == null:
+		hair = player_layer(b, 1, "h", hair_style(face))
+	var out: Array = []
+	for t in [body, player_layer(b, 1, "t", cs), hair, player_layer(b, 1, "w", 1)]:
+		if t != null:
+			var at := AtlasTexture.new()
+			at.atlas = t
+			at.region = Rect2(0, 4 * chh, cw, chh)
+			out.append(at)
+	return out
+
+
 # 音效檔路徑；冇索引回 ""
 static func audio_path(name: String) -> String:
 	_ensure()

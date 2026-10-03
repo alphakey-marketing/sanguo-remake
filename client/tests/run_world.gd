@@ -20,6 +20,7 @@ func _init() -> void:
 	t_auto_stay(data)
 	t_landmarks(data)
 	t_growth(data)
+	t_costume(data)
 	t_path_fallback(data)
 	t_chenliu_npcs(data)
 	t_trade_cities(data)
@@ -594,3 +595,28 @@ func t_growth(data: GameData) -> void:
 	ap["autoPoints"] = true
 	RulesStats.gain_exp(data, ap, RulesStats.exp_to_next(2))
 	check(int(ap["attrPoints"]) == 0 and int(ap["level"]) == 3, "自動派點: 開咗升級即派晒所有點")
+
+
+func t_costume(data: GameData) -> void:
+	check(data.costumes.size() >= 10, "服裝: costumes.json 有 10+ 款")
+	var sim := Sim.new(data, 71)
+	var id := sim.spawn_player("t")
+	var ch: Dictionary = sim.player_ch()
+	sim.cmd_set_costume(id, 1)
+	check(int(ch.get("costume", 0)) == 1, "服裝: 穿神話一")
+	sim.cmd_set_costume(id, 0)
+	check(int(ch.get("costume", 0)) == 0, "服裝: 脫下")
+	sim.cmd_set_costume(id, 999)
+	check(int(ch.get("costume", 0)) == 0, "服裝: 唔存在嘅款拒絕")
+	var only_y := 0
+	for c in data.costumes:
+		if (c["classes"] as Array).size() == 1:
+			only_y = int(c["id"])
+	if only_y > 0:
+		var cls := str(ch.get("classId", ""))
+		var mine := false
+		for c in data.costumes:
+			if int(c["id"]) == only_y:
+				mine = (c["classes"] as Array).has(cls)
+		sim.cmd_set_costume(id, only_y)
+		check((int(ch.get("costume", 0)) == only_y) == mine, "服裝: 職業限定款只畀啱嘅職業穿")

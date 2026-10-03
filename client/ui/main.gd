@@ -287,7 +287,7 @@ func _look_styles() -> Dictionary:
 	if hid > 0:
 		h = 2 + mini(4, int(data.info.get(hid, {}).get("req_lv", 0)) / 33)
 	# 三轉 (tier 2) 基本造型【用家 2026-10-03 揀 role9902 第 1 款】: 冇著身甲/頭盔先顯示，有裝備照裝備
-	return {"b": b, "w": w, "a": a, "h": h, "t3a": int(ch.get("tier", 0)) >= 2 and bid <= 0, "t3h": int(ch.get("tier", 0)) >= 2 and hid <= 0}
+	return {"b": b, "w": w, "a": a, "h": h, "cs": int(ch.get("costume", 0)), "t3a": int(ch.get("tier", 0)) >= 2 and bid <= 0, "t3h": int(ch.get("tier", 0)) >= 2 and hid <= 0}
 
 func _draw_my_layers(a: Dictionary, act: String, p: Vector2) -> bool:
 	var k := _look_styles()
@@ -300,10 +300,11 @@ func _draw_my_layers(a: Dictionary, act: String, p: Vector2) -> bool:
 		return false
 	var dir := int(a.get("dir", 4))
 	var wtex := AssetLib.player_layer(b, c, "w", int(k["w"]))
-	var atex := AssetLib.player_layer(b, c, "t", 0) if bool(k["t3a"]) else null
+	var cs := int(k["cs"])                                            # 特別服裝優先 (甲+髮)，冇髮件用裝備髮
+	var atex := AssetLib.player_layer(b, c, "t", cs) if cs > 0 else (AssetLib.player_layer(b, c, "t", 0) if bool(k["t3a"]) else null)
 	if atex == null:
 		atex = AssetLib.player_layer(b, c, "a", int(k["a"]))
-	var htex := AssetLib.player_layer(b, c, "th", 0) if bool(k["t3h"]) else null
+	var htex := AssetLib.player_layer(b, c, "th", cs) if cs > 0 else (AssetLib.player_layer(b, c, "th", 0) if bool(k["t3h"]) else null)
 	if htex == null:
 		htex = AssetLib.player_layer(b, c, "h", int(k["h"]))
 	var order: Array = [wtex, body, atex, htex]
@@ -556,6 +557,7 @@ func _send(d: Dictionary) -> void:
 		"auto_assign": sim.cmd_auto_assign(my_id)
 		"set_name": sim.cmd_set_name(my_id, str(d.name))
 		"set_title": sim.cmd_set_title(my_id, str(d.title))
+		"set_costume": sim.cmd_set_costume(my_id, int(d.n))
 		"set_face": sim.cmd_set_face(my_id, str(d.part), int(d.value))
 		"submit_quiz": sim.cmd_submit_quiz(my_id, d.answers)
 		"quest_talk": sim.cmd_quest_talk(my_id, str(d.npc))

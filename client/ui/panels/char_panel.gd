@@ -12,7 +12,7 @@ var sel_slot := ""            # 裝備頁揀中格: head/body/boots/ring/necklac
 func _init(m: Node) -> void:
 	super(m)
 	title_lbl.text = "角色"
-	set_tabs(["屬性", "裝備", "技能", "專長"])
+	set_tabs(["屬性", "裝備", "技能", "專長", "外觀"])
 
 
 func open() -> void:
@@ -25,7 +25,7 @@ func sig() -> String:
 	return JSON.stringify([tab, sel_slot, ch.get("equip", {}), ch.get("workLv", {}), ch.get("tools", {}), pending, ch.get("attrs", {}), ch.get("attrPoints", 0), ch.get("level", 1), ch.get("hp", 0),
 		ch.get("mp", 0), ch.get("sp", 0), ch.get("gold", 0), ch.get("karma", 0), ch.get("title", ""), ch.get("titles", []), ch.get("fame", 0), ch.get("ap", 0), ch.get("chaExp", 0),
 		ch.get("titleRank", 0), ch.get("thirst", 0), ch.get("contrib", 0), ch.get("polExp", 0), ch.get("expert", {}),
-		ch.get("tier", 0), ch.get("quests", {}), ch.get("questDone", {})])
+		ch.get("tier", 0), ch.get("quests", {}), ch.get("questDone", {}), ch.get("costume", 0)])
 
 
 func _left() -> int:
@@ -47,6 +47,9 @@ func _build_body() -> void:
 		return
 	if tab == 3:
 		_build_expert(ch)
+		return
+	if tab == 4:
+		_build_look(ch)
 		return
 	var row := HBoxContainer.new()
 	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -314,6 +317,49 @@ func _armor_pick_list(parent: Control, ch: Dictionary, slot: String, exclude_id 
 
 # 專長頁 (S01c, spec 01 §8): 12 項專長，等級 1~4 = 藍/綠/紅/紫，顯示上限；天文 lv≥1 + 帶渾天儀顯示各城天氣
 const EXPERT_LV_COLOR := [Color(0.6, 0.6, 0.6), Color(0.4, 0.6, 1.0), Color(0.4, 0.85, 0.4), Color(0.95, 0.35, 0.3), Color(0.75, 0.4, 0.95)]
+
+# 外觀頁: 特別服裝 (純外觀，唔加數值)；撳「穿上」/「脫下」，0 = 照裝備/三轉造型
+func _build_look(ch: Dictionary) -> void:
+	var cid := str(ch.get("classId", ""))
+	var b := int(main._CLASS_B.get(cid, 0))
+	var cur := int(ch.get("costume", 0))
+	body.add_child(wrap_lbl("特別服裝只改外型，唔影響數值。現時：%s" % ("照裝備" if cur == 0 else _costume_name(cur)), 13, UiTheme.DIM))
+	if cur != 0:
+		body.add_child(btn("脫下服裝", func() -> void: main._send({"t": "set_costume", "n": 0}), 120))
+	var sc := scroll()
+	body.add_child(sc)
+	var grid := GridContainer.new()
+	grid.columns = 4
+	grid.add_theme_constant_override("h_separation", 12)
+	grid.add_theme_constant_override("v_separation", 10)
+	sc.add_child(grid)
+	for c in main.data.costumes:
+		if not (c["classes"] as Array).has(cid):
+			continue
+		var n := int(c["id"])
+		var card := VBoxContainer.new()
+		var box := Control.new()
+		box.custom_minimum_size = Vector2(72, 96)
+		for t in AssetLib.costume_preview(b, ch.get("face", {}), n):
+			var tr := TextureRect.new()
+			tr.texture = t
+			tr.set_anchors_preset(Control.PRESET_FULL_RECT)
+			tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			box.add_child(tr)
+		card.add_child(box)
+		card.add_child(lbl(str(c["name"]), 12, UiTheme.GOLD if n == cur else UiTheme.TEXT))
+		if n != cur:
+			card.add_child(btn("穿上", func() -> void: main._send({"t": "set_costume", "n": n}), 72))
+		grid.add_child(card)
+
+
+func _costume_name(n: int) -> String:
+	for c in main.data.costumes:
+		if int(c["id"]) == n:
+			return str(c["name"])
+	return "?"
+
 
 func _build_expert(ch: Dictionary) -> void:
 	var d = main.data

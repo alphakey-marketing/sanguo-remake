@@ -7,6 +7,7 @@ const WORLD_W := 512              # 全域格仔 (所有地圖拼埋一張，spe
 const WORLD_H := 34000             # 640 + 原版許昌 + 室內/道路 + 洞穴 + 各城外圍實例 (shelf 排，import_orig_interiors 報最低值)
 
 var classes: Dictionary = {}     # id(String) -> def
+var costumes: Array = []         # 特別服裝 [{id,name,classes}] (costumes.json，角色面板外觀頁)
 var monsters: Dictionary = {}    # id(int) -> def
 var spawns: Array = []
 var starter: Dictionary = {}
@@ -111,6 +112,7 @@ static func load_all() -> GameData:
 		return _cache
 	var g := GameData.new()
 	var c: Dictionary = _read("res://data/classes.json")
+	g.costumes = _read("res://data/costumes.json").get("costumes", [])
 	var m: Dictionary = _read("res://data/monsters.json")
 	var sh: Dictionary = _read("res://data/shops.json")
 	var items: Array = _read("res://data/items.json")

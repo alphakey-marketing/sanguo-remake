@@ -1,0 +1,163 @@
+{
+ "_note": "特別服裝 (角色面板外觀頁)，由 tools/import_orig_assets.py 生成，唔好手改。classes = 邊啲職業有呢款",
+ "costumes": [
+  {
+   "id": 1,
+   "name": "神話一",
+   "classes": [
+    "yishi",
+    "shinu",
+    "daoshi",
+    "wunu",
+    "bianshi",
+    "meinu"
+   ]
+  },
+  {
+   "id": 2,
+   "name": "神話二",
+   "classes": [
+    "yishi",
+    "shinu",
+    "daoshi",
+    "wunu",
+    "bianshi",
+    "meinu"
+   ]
+  },
+  {
+   "id": 3,
+   "name": "神話三",
+   "classes": [
+    "yishi",
+    "shinu",
+    "daoshi",
+    "wunu",
+    "bianshi",
+    "meinu"
+   ]
+  },
+  {
+   "id": 4,
+   "name": "夢幻一",
+   "classes": [
+    "yishi",
+    "shinu",
+    "daoshi",
+    "wunu",
+    "bianshi",
+    "meinu"
+   ]
+  },
+  {
+   "id": 5,
+   "name": "夢幻二",
+   "classes": [
+    "yishi",
+    "shinu",
+    "daoshi",
+    "wunu",
+    "bianshi",
+    "meinu"
+   ]
+  },
+  {
+   "id": 6,
+   "name": "夢幻三",
+   "classes": [
+    "yishi",
+    "shinu",
+    "daoshi",
+    "wunu",
+    "bianshi",
+    "meinu"
+   ]
+  },
+  {
+   "id": 7,
+   "name": "夢幻四",
+   "classes": [
+    "yishi",
+    "shinu",
+    "daoshi",
+    "wunu",
+    "bianshi",
+    "meinu"
+   ]
+  },
+  {
+   "id": 8,
+   "name": "節慶",
+   "classes": [
+    "yishi",
+    "shinu",
+    "daoshi",
+    "wunu",
+    "bianshi",
+    "meinu"
+   ]
+  },
+  {
+   "id": 9,
+   "name": "聖誕",
+   "classes": [
+    "yishi",
+    "shinu",
+    "daoshi",
+    "wunu",
+    "bianshi",
+    "meinu"
+   ]
+  },
+  {
+   "id": 10,
+   "name": "華服",
+   "classes": [
+    "yishi",
+    "shinu",
+    "daoshi",
+    "wunu",
+    "bianshi",
+    "meinu"
+   ]
+  },
+  {
+   "id": 11,
+   "name": "變身一",
+   "classes": [
+    "yishi"
+   ]
+  },
+  {
+   "id": 12,
+   "name": "變身二",
+   "classes": [
+    "wunu",
+    "meinu"
+   ]
+  },
+  {
+   "id": 13,
+   "name": "變身三",
+   "classes": [
+    "yishi"
+   ]
+  },
+  {
+   "id": 14,
+   "name": "變身四",
+   "classes": [
+    "yishi"
+   ]
+  },
+  {
+   "id": 15,
+   "name": "變身五",
+   "classes": [
+    "yishi",
+    "wunu",
+    "meinu"
+   ]
+  }
+ ]
+}

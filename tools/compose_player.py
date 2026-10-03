@@ -38,6 +38,18 @@ def layer9902(code):
     return CP(_m9902.blob(_ix9902[code])) if code in _ix9902 else None
 
 
+_mm = {}
+
+
+def mrg_layer(name):
+    """role<name>.mrg 嘅 layer 取件函數 (給 single(code, src) 用)；冇就 None"""
+    if name not in _mm:
+        m = Mrg(r"D:/Download/zyxy_client/Sanguo_Client/role/%s.mrg" % name)
+        _mm[name] = (m, {n.split(chr(92))[-1][:7]: i for i, n in enumerate(m.names)})
+    m, ix = _mm[name]
+    return lambda code: CP(m.blob(ix[code])) if code in ix else None
+
+
 def single(code, src=None):
     """單層 → 8x8 sheet (同 compose 一樣 cell/原點，可直接疊)"""
     c = (src or layer)(code)
