@@ -59,6 +59,9 @@ func _set_move_mode(mode: String) -> void:
 	move_mode = mode
 	_save_settings()
 var potion_auto: Array = [0, 0, 0]    # 每格自動用藥門檻 % (0 = 關): HP 藥低於 x% HP / MP 藥低於 x% MP 就自動用
+var auto_skill := {}                # 自動掛機放邊啲術法/絕招: key ("s0" 術書格 / "u:<id>" 絕招) -> true
+var _auto_skill_next := 0
+var _stay_sent := false             # 已通知 sim「掛機唔過圖」
 const POTION_AUTO_CD := 10          # 自動用藥最短間隔 (tick)
 var _potion_next := 0
 var potion_slots: Array = [0, 0, 0]   # U-fix: 快捷補品欄 3 格，存 item id（0 = 空），純 UI 偏好唔入 sim 存檔
@@ -479,6 +482,7 @@ func _send(d: Dictionary) -> void:
 	match d.t:
 		"move": sim.cmd_move(my_id, int(d.x), int(d.y))
 		"attack": sim.cmd_attack(my_id, int(d.target))
+		"auto_stay": sim.cmd_auto_stay(my_id, bool(d.on))
 		"chat": sim.cmd_chat(my_id, str(d.text))
 		"rest": sim.cmd_rest(my_id)
 		"buy": sim.cmd_buy(my_id, int(d.item), int(d.get("n", 1)))
@@ -1388,12 +1392,18 @@ func _steer_tick() -> void:
 
 # 自動掛機: 打最近唔高太多級嘅怪；冇怪就間中行去野區
 func _auto_tick() -> void:
+	var stay := auto and not auto_roam
+	if stay != _stay_sent:                      # 掛機 + 唔跨場景: sim 唔會因追怪踩傳送點過圖
+		_stay_sent = stay
+		_send({"t": "auto_stay", "on": stay})
 	if not auto:
 		return
 	var me = _me()
 	if me == null:
 		return
 	var t = target_ent()
+	if t != null and _is_targetable(t) and t.get("mob", false):
+		_auto_skill_tick(me, t)
 	var near = _pick_mob(me, true)
 	if t != null and _is_targetable(t):
 		# 貼身 / 打緊我 → 繼續打；否則有更近嘅就轉 (例如目標逃走咗)
@@ -1407,6 +1417,32 @@ func _auto_tick() -> void:
 		return
 	if auto_roam and int(sim.tick) % FIELD_RETRY_TICKS == 0:
 		_go_field()
+
+# 掛機自動放術法/絕招: 只放有剔嘅攻擊術 / 絕招，目標入射程、MP/SP/冷卻夠先放；一次一招
+func _auto_skill_tick(me: Dictionary, t: Dictionary) -> void:
+	if auto_skill.is_empty() or sim.tick < _auto_skill_next or hud == null:
+		return
+	var slots: Array = hud.skill_slots()
+	for sl in slots:
+		if bool(sl.get("casting", false)):
+			return
+	var dist := _mob_dist(me, t)
+	for sl in slots:
+		var key := ""
+		var rng_ok := false
+		if String(sl["kind"]) == "spell" and int(sl["item"]) > 0:
+			key = "s%d" % int(sl["slot"])
+			var def: Dictionary = data.spell_by_item.get(int(sl["item"]), {})
+			rng_ok = String(def.get("kind", "")) == "attack" and dist <= int(def.get("range", 1))
+		elif String(sl["kind"]) == "ult" and String(sl["ult"]) != "":
+			key = "u:%s" % String(sl["ult"])
+			rng_ok = dist <= int(data.ult_by_id.get(String(sl["ult"]), {}).get("range", 1))
+		if key == "" or not bool(auto_skill.get(key, false)) or not bool(sl["ready"]) or not rng_ok:
+			continue
+		_on_skill(sl)
+		_auto_skill_next = sim.tick + 6
+		return
+
 
 # 揀怪: 只揀同自己同一 zone (洞窟各層座標同野外相鄰，唔可以隔層鎖)；
 # 打緊我嘅怪優先 (唔理等級)；其次最近 (Chebyshev = 實際步數，同距離再比 Manhattan)

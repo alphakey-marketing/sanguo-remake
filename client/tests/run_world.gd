@@ -17,6 +17,7 @@ func _init() -> void:
 	t_save_file(data)
 	t_zones_travel(data)
 	t_set_home(data)
+	t_auto_stay(data)
 	t_path_fallback(data)
 	t_chenliu_npcs(data)
 	t_trade_cities(data)
@@ -318,6 +319,31 @@ func t_set_home(data: GameData) -> void:
 	ch["level"] = 2
 	sim.cmd_set_home(id, "xuchang")
 	check(String(ch.get("homeCity", "")) == "xuchang", "揀城: 出發後 (Lv>1) 仍然係許昌")
+
+
+# 掛機唔跨場景: auto_stay 開咗，追怪踩傳送點唔過圖；閂咗就過
+func t_auto_stay(data: GameData) -> void:
+	var sim := Sim.new(data, 62)
+	var id := sim.spawn_player_orig("s")
+	var e := sim.ent(id)
+	var cell := -1
+	for k in data.portal_at.keys():
+		if int(k) / sim.W >= 0 and sim.map_id_at(int(k) % sim.W, int(k) / sim.W) == "xuchang_o":
+			cell = int(k)
+			break
+	if cell < 0:
+		return
+	var here := sim.map_id_at(int(e["x"]), int(e["y"]))
+	sim.cmd_auto_stay(id, true)
+	e["x"] = cell % sim.W
+	e["y"] = cell / sim.W
+	e["tx"] = int(e["x"]) + 5
+	e["ty"] = int(e["y"])
+	sim._on_moved(e)
+	check(sim.map_id_at(int(e["x"]), int(e["y"])) == here, "掛機唔跨場景: 踩傳送點唔過圖")
+	sim.cmd_auto_stay(id, false)
+	sim._on_moved(e)
+	check(sim.map_id_at(int(e["x"]), int(e["y"])) != here, "掛機跨場景(關 stay): 踩傳送點照過圖")
 
 
 # 陳留(原版)商店/設施複製 (_cl): 位置行得、喺 xc17 圖、可買、私塾沿用 school 邏輯

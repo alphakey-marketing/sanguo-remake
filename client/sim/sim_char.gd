@@ -313,6 +313,13 @@ func _move(id: int, x: int, y: int, cap: int = 0) -> void:
 	e["atk_target"] = 0      # 手動行路取消攻擊
 
 
+# 自動掛機「唔跨場景」: 開咗之後，玩家追怪踩中傳送點都唔會過圖
+func cmd_auto_stay(id: int, on: bool) -> void:
+	var e := ent(id)
+	if not e.is_empty():
+		e["auto_stay"] = on
+
+
 func cmd_attack(id: int, target: int) -> void:
 	var e := ent(id)
 	var t := ent(target)
@@ -372,6 +379,8 @@ func _on_moved(e: Dictionary) -> void:
 	if not e.has("ch"):
 		return
 	var pid: String = data.portal_at.get(int(e["y"]) * W + int(e["x"]), "")
+	if pid != "" and bool(e.get("auto_stay", false)) and not (int(e["tx"]) == int(e["x"]) and int(e["ty"]) == int(e["y"]) and e.get("atk_target", 0) == 0):
+		pid = ""              # 掛機唔跨場景: 追怪/行路經過傳送點都唔過圖
 	if pid != "":
 		cmd_travel(int(e["id"]), pid)
 		return

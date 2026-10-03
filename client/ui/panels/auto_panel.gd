@@ -10,7 +10,7 @@ func _init(m: Node) -> void:
 
 
 func sig() -> String:
-	return JSON.stringify([main.auto, main.auto_whitelist, main.auto_roam, main.pk_mode, main.ents.size()])
+	return JSON.stringify([main.auto, main.auto_whitelist, main.auto_roam, main.auto_skill, main.pk_mode, main.ents.size()])
 
 
 const NEARBY_RANGE := 14   # 揀怪表只顯示呢個 Chebyshev 距離之內嘅怪（同 zone），唔好成張圖咁多
@@ -44,6 +44,26 @@ func _build_body() -> void:
 	body.add_child(btn("跨場景搵怪：%s" % ("開" if main.auto_roam else "關（留喺呢個場景）"), func() -> void:
 		main.auto_roam = not main.auto_roam
 		refresh(true)))
+	body.add_child(hsep())
+	body.add_child(lbl("自動放招（剔咗先放；攻擊術同絕招，入射程 + MP/SP/冷卻夠）：", 13, UiTheme.DIM))
+	for sl in main.hud.skill_slots():
+		var key := ""
+		var nm := ""
+		if String(sl["kind"]) == "spell" and int(sl["item"]) > 0:
+			var def: Dictionary = main.data.spell_by_item.get(int(sl["item"]), {})
+			if String(def.get("kind", "")) != "attack":
+				continue
+			key = "s%d" % int(sl["slot"])
+			nm = "術 " + String(def.get("name", "?"))
+		elif String(sl["kind"]) == "ult" and String(sl["ult"]) != "":
+			key = "u:%s" % String(sl["ult"])
+			nm = "絕 " + String(sl["label"])
+		if key == "":
+			continue
+		var k: String = key
+		body.add_child(btn("%s %s" % ["✓" if bool(main.auto_skill.get(k, false)) else "☆", nm], func() -> void:
+			main.auto_skill[k] = not bool(main.auto_skill.get(k, false))
+			refresh(true)))
 	body.add_child(hsep())
 	var sc := scroll()
 	body.add_child(sc)
