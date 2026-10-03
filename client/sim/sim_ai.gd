@@ -229,6 +229,9 @@ func _think_player(p: Dictionary) -> void:
 	if crit:
 		dmg = MathX.js_round(float(dmg) * RulesCombat.CRIT_MULT)
 	_emit({"k": "hit", "src": p["id"], "dst": t["id"], "dmg": dmg, "crit": crit})
+	var steal := float(jb.get("lifeSteal", 0.0))      # 輔助石吸取 (type 64)
+	if steal > 0.0 and dmg > 0:
+		p["hp"] = mini(_eff_max_hp(ch), int(p["hp"]) + maxi(1, MathX.js_round(float(dmg) * steal)))
 	if not mounted_combat:
 		_wear_weapon_hit(p)                     # 武器出手磨損 (Step 12)
 	damage(t, dmg, p, crit)

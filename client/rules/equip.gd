@@ -7,7 +7,7 @@ const SLOTS := ["head", "body", "boots", "ring", "necklace"]
 const WEAPON_SLOTS := 3                  # 【原】武器 3 槽 Alt+A/S/D 切換
 const ATTR_EFFECT := {1: "str", 2: "agi", 4: "spi", 5: "int"}     # effect type -> attrs key
 # 迴避異常狀態 34~37 -> status id (中邪/封咒 = RulesSpell；媚惑/蠱毒未有術法，先記住)
-const RESIST_EFFECT := {34: "hex", 35: "sealed", 36: "charm", 37: "poison"}
+const RESIST_EFFECT := {34: "hex", 35: "sealed", 36: "charm", 37: "poison", 38: "slow"}
 const RESIST_ALL := 39                   # 迴避異常狀態 (全部)
 
 

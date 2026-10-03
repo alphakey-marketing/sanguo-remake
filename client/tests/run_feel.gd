@@ -39,5 +39,25 @@ func _init() -> void:
 	ch["level"] = lv0 + 5
 	sim._levelup_notice(sim.ent(id), lv0)
 	check(sim.ent(id) != null, "levelup_notice 唔 crash")
+	# 輔助石: 全部 support 石可以裝上玩家 + 效果進 bonus (含 34~38 迴避 / 64 吸取)
+	var sim2 := Sim.new(data, 9)
+	var id2 := sim2.spawn_player("j", "yishi")
+	var ch2: Dictionary = sim2.player_ch()
+	var n_eq := 0
+	var n_sup := 0
+	for jd in data.jewel_by_item.values():
+		if str(jd.get("kind", "")) != "support":
+			continue
+		n_sup += 1
+		ch2["bag"].append({"id": int(jd["item"] if jd.has("item") else jd["id"]), "n": 1})
+		sim2.cmd_equip_jewel(id2, int(jd["item"] if jd.has("item") else jd["id"]), 0)
+		if int(ch2["equip"]["jewels"][0]) == int(jd["item"] if jd.has("item") else jd["id"]):
+			n_eq += 1
+	check(n_sup > 100 and n_eq == n_sup, "輔助石全部裝得上玩家 (%d/%d)" % [n_eq, n_sup])
+	sim2.cmd_equip_jewel(id2, 32307, 0)
+	sim2.cmd_equip_jewel(id2, 32056, 1)
+	var jbn: Dictionary = sim2._jewel_bonus(ch2)
+	check(int(jbn["resist"].get("hex", 0)) == 25, "防邪之石 迴避中邪 25 (%s)" % str(jbn["resist"]))
+	check(is_equal_approx(float(jbn["lifeSteal"]), 0.02), "吸魂之石 吸取 2%")
 	print("[TEST] feel: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)

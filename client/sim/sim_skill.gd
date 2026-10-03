@@ -785,7 +785,7 @@ func _resolve_mob_cast(m: Dictionary, s: Dictionary, d: Dictionary, tgt: Diction
 			if sid != "" and not tgt.is_empty() and tgt.has("ch"):
 				var pch2: Dictionary = tgt["ch"]
 				# 防具迴避異常狀態 34~37/39 (Step 11.6)
-				var res := int(_armor_bonus(pch2)["resist"].get(sid, 0))
+				var res := int(_armor_bonus(pch2)["resist"].get(sid, 0)) + int(_jewel_bonus(pch2)["resist"].get(sid, 0))   # 防具 + 輔助石
 				if res > 0 and rng.next() < minf(res, int(data.equip_cfg["caps"]["resistPct"])) / 100.0:
 					_emit({"k": "status", "dst": tgt["id"], "id": sid, "until": 0, "applied": false, "resisted": true})
 					_mobcast_cd(s, d, cs)

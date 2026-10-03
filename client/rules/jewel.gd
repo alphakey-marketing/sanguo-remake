@@ -38,7 +38,7 @@ static func support_bonus(effects: Array) -> Dictionary:
 		"defPct": 0.0, "spellDefPct": 0.0, "defFlat": 0, "spellDefFlat": 0,
 		"evadePct": 0.0, "spellEvadePct": 0.0, "hitPct": 0.0, "spellHitPct": 0.0,
 		"strFlat": 0, "agiFlat": 0, "spiFlat": 0, "intFlat": 0,
-		"mpCostMul": 1.0, "spCostMul": 1.0}
+		"mpCostMul": 1.0, "spCostMul": 1.0, "resist": {}, "lifeSteal": 0.0}
 	for e in effects:
 		var t := int(e["type"])
 		var v := int(e.get("value", 0))
@@ -63,6 +63,10 @@ static func support_bonus(effects: Array) -> Dictionary:
 			5: b["intFlat"] = int(b["intFlat"]) + v
 			63: b["mpCostMul"] = float(b["mpCostMul"]) * (1.0 - p)  # MP 耗損 -%
 			65: b["spCostMul"] = float(b["spCostMul"]) * (1.0 - p)  # SP 耗損 -%
+			64: b["lifeSteal"] = float(b["lifeSteal"]) + p          # 吸取: 普攻傷害 % 回 HP【自訂，原意未明】
+			34, 35, 36, 37, 38:                                      # 迴避 中邪/封咒/媚惑/蠱毒/遲緩 %
+				var rk: String = RulesEquip.RESIST_EFFECT[t]
+				b["resist"][rk] = int(b["resist"].get(rk, 0)) + v
 	return b
 
 
@@ -77,7 +81,7 @@ static func sum_bonus(bonus_list: Array) -> Dictionary:
 		"defPct": 0.0, "spellDefPct": 0.0, "defFlat": 0, "spellDefFlat": 0,
 		"evadePct": 0.0, "spellEvadePct": 0.0, "hitPct": 0.0, "spellHitPct": 0.0,
 		"strFlat": 0, "agiFlat": 0, "spiFlat": 0, "intFlat": 0,
-		"mpCostMul": 1.0, "spCostMul": 1.0}
+		"mpCostMul": 1.0, "spCostMul": 1.0, "resist": {}, "lifeSteal": 0.0}
 	for b in bonus_list:
 		out["hpPct"] = float(out["hpPct"]) + float(b.get("hpPct", 0.0))
 		out["mpPct"] = float(out["mpPct"]) + float(b.get("mpPct", 0.0))
@@ -98,6 +102,9 @@ static func sum_bonus(bonus_list: Array) -> Dictionary:
 		out["intFlat"] = int(out["intFlat"]) + int(b.get("intFlat", 0))
 		out["mpCostMul"] = float(out["mpCostMul"]) * float(b.get("mpCostMul", 1.0))
 		out["spCostMul"] = float(out["spCostMul"]) * float(b.get("spCostMul", 1.0))
+		out["lifeSteal"] = float(out["lifeSteal"]) + float(b.get("lifeSteal", 0.0))
+		for rk in b.get("resist", {}):
+			out["resist"][rk] = int(out["resist"].get(rk, 0)) + int(b["resist"][rk])
 	return out
 
 
