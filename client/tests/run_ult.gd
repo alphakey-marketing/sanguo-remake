@@ -24,6 +24,19 @@ const QUESTS := [
 	["meinu", "xiaobo", "ult_meinu_xiaobo", "meinu_master", 20],
 	["meinu", "songzhu", "ult_meinu_songzhu", "meinu_master", 30],
 	["meinu", "feihua", "ult_meinu_feihua", "meinu_master", 44],
+	["shinu", "tianhuo", "ult_shinu_tianhuo", "shinu_master", 50],
+	["shinu", "liehuo", "ult_shinu_liehuo", "shinu_master", 60],
+	["shinu", "hengsao", "ult_shinu_hengsao", "shinu_master", 70],
+	["daoshi", "wolong", "ult_daoshi_wolong", "daoshi_master", 50],
+	["daoshi", "leizhen", "ult_daoshi_leizhen", "daoshi_master", 60],
+	["daoshi", "qimen", "ult_daoshi_qimen", "daoshi_master", 70],
+	["wunu", "shehun", "ult_wunu_shehun", "wunu_master", 50],
+	["wunu", "suohun", "ult_wunu_suohun", "wunu_master", 60],
+	["wunu", "qunmo", "ult_wunu_qunmo", "wunu_master", 70],
+	["bianshi", "wanjian", "ult_bianshi_wanjian", "bianshi_master", 50],
+	["bianshi", "zhuiyun", "ult_bianshi_zhuiyun", "bianshi_master", 60],
+	["meinu", "huangying", "ult_meinu_huangying", "meinu_master", 50],
+	["meinu", "luoshen", "ult_meinu_luoshen", "meinu_master", 60],
 ]
 
 
@@ -159,7 +172,7 @@ func t_data(data: GameData) -> void:
 	for x in data.quests:
 		if ids.has(String(x["id"])):
 			n += 1
-	check(n == 15, "S06d 絕招任務 15 條齊 (而家 %d)" % n)
+	check(n == 28, "S06d 絕招任務 28 條齊 (而家 %d)" % n)
 
 
 # ---------- 15 條端到端 ----------

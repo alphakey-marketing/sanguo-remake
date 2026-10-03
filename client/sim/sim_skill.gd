@@ -102,6 +102,8 @@ func _resolve_cast(p: Dictionary) -> void:
 		return _msg(int(p["id"]), "靈力唔夠，術法取消")
 	ch["mp"] = int(ch["mp"]) - mp_cost
 	_emit({"k": "cast", "src": p["id"], "book": int(cs["book"]), "kind": str(def["kind"])})
+	var cast_target := int(cs.get("target", 0))
+	_spell_prof_bump(p, def)
 	match str(def["kind"]):
 		"attack":
 			var t := ent(int(cs["target"]))
@@ -120,12 +122,11 @@ func _resolve_cast(p: Dictionary) -> void:
 		"buff":
 			_spell_buff(p, def)
 		"heal":
-			_spell_heal(p, def)
+			_spell_heal(p, def, cast_target)
 
 
 # 恢復術 (美女系, S02c, spec 02 §3.1): 單體補 HP。目標 = 自己 (target 0) 或 同伴/玩家 (要有 ch)。
-func _spell_heal(p: Dictionary, def: Dictionary) -> void:
-	var ct := int((p.get("casting", {}) as Dictionary).get("target", 0))
+func _spell_heal(p: Dictionary, def: Dictionary, ct: int = 0) -> void:
 	if ct == 0:
 		ct = int(p["id"])
 	var t := ent(ct)
@@ -134,7 +135,7 @@ func _spell_heal(p: Dictionary, def: Dictionary) -> void:
 	if not RulesCombat.in_range(p["x"], p["y"], t["x"], t["y"], 8):
 		return _msg(int(p["id"]), "目標行遠咗，術法落空")
 	var ch2: Dictionary = t["ch"]
-	var heal := maxi(1, MathX.js_round(float(def["power"]) * (1.0 + float(_jewel_bonus(ch2).get("healPct", 0.0)))))
+	var heal := maxi(1, MathX.js_round(float(def["power"]) * _spell_prof_mult(p, def) * (1.0 + float(_jewel_bonus(ch2).get("healPct", 0.0)))))
 	var before := int(ch2["hp"])
 	var max_hp := int(t.get("max_hp", 1))
 	ch2["hp"] = mini(max_hp, before + heal)
@@ -169,6 +170,27 @@ func _sp_cost(ch: Dictionary, base: int) -> int:
 	return maxi(1, MathX.js_round(float(base) * float(_jewel_bonus(ch).get("spCostMul", 1.0))))
 
 
+# 術法熟練度 (P5): 每次施放記一次，升級有訊息；威力乘 RulesSpell.prof_mult
+func _spell_prof_bump(p: Dictionary, def: Dictionary) -> void:
+	if str(def["kind"]) != "attack" and str(def["kind"]) != "heal":
+		return
+	var ch: Dictionary = p["ch"]
+	var use: Dictionary = ch.get("spellUse", {})
+	var k := str(int(def["item"]))
+	var before := int(use.get(k, 0))
+	use[k] = before + 1
+	ch["spellUse"] = use
+	var lv0 := RulesSpell.prof_level(before)
+	var lv1 := RulesSpell.prof_level(before + 1)
+	if lv1 > lv0:
+		_emit({"k": "spell_prof", "dst": int(p["id"]), "book": int(def["item"]), "lv": lv1})
+		_msg(int(p["id"]), "「%s」熟練度升至 %d 級（威力 +%d%%）" % [str(def["name"]), lv1, int(round(RulesSpell.PROF_PCT * 100.0 * lv1))])
+
+
+func _spell_prof_mult(p: Dictionary, def: Dictionary) -> float:
+	return RulesSpell.prof_mult(int((p["ch"].get("spellUse", {}) as Dictionary).get(str(int(def["item"])), 0)))
+
+
 # 傷害術: 大範圍 (aoe>0) = 以目標格為圓心打晒所有怪物；隊友唔受【原】
 func _spell_hit(p: Dictionary, def: Dictionary, t: Dictionary) -> void:
 	var ch: Dictionary = p["ch"]
@@ -177,7 +199,7 @@ func _spell_hit(p: Dictionary, def: Dictionary, t: Dictionary) -> void:
 	var stone := _equip_stone(ch)
 	var jewel_pct := RulesJewel.spell_jewel_bonus(str(stone.get("elem", "")), str(def.get("elem", "")),
 		float(stone.get("pct", 0.0))) - 1.0
-	var spell_atk_mult := 1.0 + float(_jewel_bonus(ch).get("spellAtkPct", 0.0))
+	var spell_atk_mult := (1.0 + float(_jewel_bonus(ch).get("spellAtkPct", 0.0))) * _spell_prof_mult(p, def)
 	var aoe := int(def.get("aoe", 0))
 	var targets: Array = []
 	if aoe > 0:
@@ -197,6 +219,14 @@ func _spell_hit(p: Dictionary, def: Dictionary, t: Dictionary) -> void:
 
 # ================= 絕招 (Step 10, spec 02 §5) =================
 # 大範圍即時傷害 (冇吟唱): 耗 MP+SP、冷卻、需要對應武器 (ultimates.json weaponCat)
+# 武器 cat 對應嘅類名 (items.json cat_label)，錯誤訊息用
+func _cat_label(cat: int) -> String:
+	for item in data.cats:
+		if int(data.cats[item]) == cat:
+			return str(data.info.get(item, {}).get("cat_label", "對應武器"))
+	return "對應武器"
+
+
 func cmd_use_ultimate(id: int, ult_id: String) -> void:
 	var e := ent(id)
 	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
@@ -214,7 +244,7 @@ func cmd_use_ultimate(id: int, ult_id: String) -> void:
 		return _msg(id, str(climit["why"]))
 	var w := int(ch["equip"].get("weapon", 0))
 	if w == 0 or int(data.cats.get(w, 0)) != int(ult["weaponCat"]):
-		return _msg(id, "要用矛類武器先用得「%s」" % ult["name"])
+		return _msg(id, "要裝備%s先用得「%s」" % [_cat_label(int(ult["weaponCat"])), ult["name"]])
 	var cd: Dictionary = ch.get("ultCd", {})
 	if tick < int(cd.get(ult_id, 0)):
 		return _msg(id, "「%s」冷卻中 (%d tick)" % [ult["name"], int(cd.get(ult_id, 0)) - tick])
@@ -240,7 +270,8 @@ func cmd_use_ultimate(id: int, ult_id: String) -> void:
 	ch["ultCd"] = cd
 	var wdef: Dictionary = _weapon_def(ch)     # 耐久 0 = 威力減半 (Step 12)
 	var atk_mult := RulesSpell.atk_mult(ch.get("status", {}), tick) * (1.0 + float(_jewel_bonus(ch).get("atkPct", 0.0)))
-	var eff_str := _eff_attr(ch, "str") + float(_jewel_bonus(ch).get("strFlat", 0))
+	var ult_stat := str(ult.get("stat", "str"))     # 術法職絕招跟智力/靈力 (P1)；武職跟武力
+	var eff_str := _eff_attr(ch, ult_stat) + (float(_jewel_bonus(ch).get("strFlat", 0)) if ult_stat == "str" else 0.0)
 	_emit({"k": "ult", "src": id, "ult": ult_id, "name": str(ult["name"]), "mp": mp_cost, "sp": sp_cost})
 	_msg(id, "「%s」！" % ult["name"])
 	for o in targets:

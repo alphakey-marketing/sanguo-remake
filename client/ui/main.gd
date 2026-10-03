@@ -659,8 +659,10 @@ func _on_event(e: Dictionary) -> void:
 			var d = _ent(int(e.dst))
 			if d != null:
 				var dmg: int = int(e.dmg)
-				floats.append({"pos": Vector2(d.x, d.y) * TILE, "text": "miss" if dmg == 0 else str(dmg),
-					"color": Color.YELLOW if int(e.dst) == my_id else Color.WHITE, "age": 0.0})
+				var is_crit: bool = bool(e.get("crit", false))
+				var txt := ("閃避" if bool(e.get("dodge", false)) else "miss") if dmg == 0 else (("暴擊 %d" % dmg) if is_crit else str(dmg))
+				floats.append({"pos": Vector2(d.x, d.y) * TILE, "text": txt,
+					"color": Color(1.0, 0.55, 0.1) if is_crit else (Color.YELLOW if int(e.dst) == my_id else Color.WHITE), "age": 0.0})
 				if dmg > 0:
 					_fx_add("hit", Vector2(d.x, d.y), 0.4)
 		"spell_hit":

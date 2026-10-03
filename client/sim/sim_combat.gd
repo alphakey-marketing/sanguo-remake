@@ -2,7 +2,7 @@ extends "res://sim/sim_scene.gd"
 # Sim 繼承鏈 第 6 層: 傷害 / 死亡 / 掉落 / 重生排期
 
 # ================= 戰鬥 =================
-func damage(t: Dictionary, dmg: int, by: Dictionary) -> void:
+func damage(t: Dictionary, dmg: int, by: Dictionary, crit: bool = false) -> void:
 	var cc: Dictionary = data.world["combat"]
 	# 吟唱中受擊: castInterruptPct 機率中斷【自訂】(spec 02 §3.1)
 	if t.has("casting") and MathX.roll(rng_fn) < float(cc["castInterruptPct"]):
@@ -20,6 +20,9 @@ func damage(t: Dictionary, dmg: int, by: Dictionary) -> void:
 	if t["kind"] == "mob" and by.has("ch"):
 		t["mob"]["state"] = "chase"
 		t["mob"]["target"] = by["id"]
+		if dmg > 0 and int(t["hp"]) > 0:          # 受擊硬直 (P3): 怪下次出手遲啲，暴擊更耐
+			var stun := RulesCombat.CRIT_STUN if crit else RulesCombat.HIT_STUN
+			t["mob"]["next_atk"] = maxi(int(t["mob"].get("next_atk", 0)), tick + stun)
 		var md: Dictionary = data.mob_def(int(t["mob"]["def"]), int(t["mob"].get("lv", 0)))
 		# 群居怪【自訂】(spec 04 §3): 打 1 隻，附近 GROUP_RANGE 格內同類一齊仇恨
 		if dmg > 0 and bool(md.get("groups", false)):

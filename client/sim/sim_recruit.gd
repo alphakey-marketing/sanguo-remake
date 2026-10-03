@@ -272,7 +272,7 @@ func _arena_end(pe: Dictionary, win: bool) -> void:
 
 
 # 擂台只可以挑戰者打；武將 HP 到 0 = 制服；玩家 HP 到 0 = 輸 (留 1 HP，唔算死)
-func damage(t: Dictionary, dmg: int, by: Dictionary) -> void:
+func damage(t: Dictionary, dmg: int, by: Dictionary, crit: bool = false) -> void:
 	var tm: Dictionary = t.get("mob", {})
 	if tm.has("arena"):
 		if int(by.get("id", 0)) != int(tm["owner"]):
@@ -287,7 +287,7 @@ func damage(t: Dictionary, dmg: int, by: Dictionary) -> void:
 		t["ch"]["hp"] = 1
 		_arena_end(t, false)
 		return
-	super(t, dmg, by)
+	super(t, dmg, by, crit)
 
 
 # 每 tick: 擂台走甩 (距離 > maxDist) / 武將脫戰 = 輸

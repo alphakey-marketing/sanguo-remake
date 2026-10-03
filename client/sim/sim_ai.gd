@@ -100,8 +100,8 @@ func _think_mob(m: Dictionary) -> void:
 					_emit({"k": "hit", "src": m["id"], "dst": tgt["id"], "dmg": 0})     # 馬戰「抵擋」擋咗 (Step 17b)
 				elif RulesSpell.has(pch.get("status", {}), "mshield", tick):
 					_emit({"k": "hit", "src": m["id"], "dst": tgt["id"], "dmg": 0})     # 馬戰「護盾」全防禦 (Step 17b)
-				elif rng.next() < RulesEquip.evade_chance(int(ab["evade"]), float(jb.get("evadePct", 0.0)), int(caps["evadePct"])):
-					_emit({"k": "hit", "src": m["id"], "dst": tgt["id"], "dmg": 0})     # 迴避咗
+				elif rng.next() < minf(0.6, RulesEquip.evade_chance(int(ab["evade"]), float(jb.get("evadePct", 0.0)), int(caps["evadePct"])) + RulesCombat.base_dodge(_eff_attr(pch, "agi", ab))):
+					_emit({"k": "hit", "src": m["id"], "dst": tgt["id"], "dmg": 0, "dodge": true})     # 迴避咗 (裝備 + 敏捷底閃避, P3)
 				else:
 					var dmg := RulesEquip.reduce_dmg(RulesCombat.calc_mob_damage(RulesCombat.debuffed(d["atk"], m.get("beastDebuff", {}), "atk", tick), pd, rng_fn), int(ab["dmgRed"]), int(caps["dmgRedPct"]))
 					_emit({"k": "hit", "src": m["id"], "dst": tgt["id"], "dmg": dmg})
@@ -225,7 +225,10 @@ func _think_player(p: Dictionary) -> void:
 	var elem_mult := _phys_elem_mult(ch, t_elem)
 	var dmg0 := RulesCombat.calc_damage(eff_str, w_power, t_def, rng_fn, atk_mult, 1.0)
 	var dmg := MathX.js_round(dmg0 * elem_mult)
-	_emit({"k": "hit", "src": p["id"], "dst": t["id"], "dmg": dmg})
+	var crit := rng.next() < RulesCombat.crit_chance(_eff_attr(ch, "agi", ab))      # 暴擊 (P3)
+	if crit:
+		dmg = MathX.js_round(float(dmg) * RulesCombat.CRIT_MULT)
+	_emit({"k": "hit", "src": p["id"], "dst": t["id"], "dmg": dmg, "crit": crit})
 	if not mounted_combat:
 		_wear_weapon_hit(p)                     # 武器出手磨損 (Step 12)
-	damage(t, dmg, p)
+	damage(t, dmg, p, crit)

@@ -43,6 +43,25 @@ static func hit_chance(weapon_hit: float, atk_lv: float, def_lv: float) -> float
 	return minf(0.98, maxf(0.3, 0.8 + (weapon_hit - 45.0) / 200.0 + (atk_lv - def_lv) * 0.02))
 
 
+# ---- 暴擊 / 閃避 / 受擊硬直 (P3, 用家 2026-10-02 approve)【自訂】 ----
+const CRIT_BASE := 0.05
+const CRIT_PER_AGI := 0.002
+const CRIT_CAP := 0.40
+const CRIT_MULT := 1.5
+const DODGE_PER_AGI := 0.0015
+const DODGE_CAP := 0.20
+const HIT_STUN := 2          # 怪受擊: 下次出手最少遲 2 tick
+const CRIT_STUN := 5         # 暴擊: 遲 5 tick
+
+
+static func crit_chance(agi: float) -> float:
+	return clampf(CRIT_BASE + agi * CRIT_PER_AGI, 0.0, CRIT_CAP)
+
+
+static func base_dodge(agi: float) -> float:
+	return clampf(agi * DODGE_PER_AGI, 0.0, DODGE_CAP)
+
+
 static func in_range(ax: float, ay: float, bx: float, by: float, rng_cells: float = MELEE_RANGE) -> bool:
 	return maxf(absf(ax - bx), absf(ay - by)) <= rng_cells
 

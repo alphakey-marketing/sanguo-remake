@@ -30,6 +30,24 @@ static func calc_spell_damage(power: float, attr: float, spell_def: float, att_e
 		* element_factor(att_elem, def_elem) * (1.0 + jewel_pct)))
 
 
+# ================= 術法熟練度 (P5, 用家 2026-10-02 approve)【自訂】 =================
+# 每本術書記施放次數 ch.spellUse[item]；熟練等級 0~10，每級威力 +3%（上限 +30%），只加傷害術/恢復術威力
+const PROF_NEED := [10, 25, 45, 70, 100, 135, 175, 220, 270, 330]   # 累計施放次數 → 升 1~10 級
+const PROF_PCT := 0.03
+
+
+static func prof_level(uses: int) -> int:
+	var lv := 0
+	for n in PROF_NEED:
+		if uses >= int(n):
+			lv += 1
+	return lv
+
+
+static func prof_mult(uses: int) -> float:
+	return 1.0 + PROF_PCT * float(prof_level(uses))
+
+
 # ================= 狀態 (spec 02 §7) =================
 # 持續(tick): 封咒 600 / 中邪 300 / buff 全部 900
 const STATUS_TICKS := {"sealed": 600, "hex": 300, "freeze": 300,

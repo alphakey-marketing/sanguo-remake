@@ -239,3 +239,9 @@
 - **UAT-011**（🟠）撳「拾取」**冇落袋、實體冇消失**（`cmd_pick` 邏輯喺 sim 已通，壞喺 UI 掣偵測/接駁）
 
 > 其餘 4 個 ui_smoke fail（建角 3 + 卸除 1）係 stale test（面板已改 2 頁/結構），**唔係真 bug**。帶技測試（rules/combat/spell/jewel/class）全 PASS，**冇直接 combat 邏輯 fail**。
+## 2026-10-02 戰鬥完善（用家 approve P1/P2/P3/P5，待手測）
+- P1 絕招錯誤訊息顯示正確武器類；術法職絕招改跟智力/靈力（ultimates.json `stat`）
+- P2 補 tier4–6 絕招 13 招 +（義士 fengyi/qingtian/xuanbing）任務鏈，共 28 條【自訂】，minLevel 50/60/70
+- P3 暴擊（5%+敏捷0.2%，上限40%，×1.5）/ 敏捷底閃避 / 怪受擊硬直 / 飄字「暴擊」「閃避」
+- P5 術法熟練度：施放次數 10..330 升 1~10 級，每級威力 +3%（上限 +30%）；UI 未顯示
+- 測試：tests/run_feel.gd、run_ult.gd（28 條）
