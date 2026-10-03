@@ -35,7 +35,7 @@ def place_near(tm, i, others):
     g = grid(tm)
     maps = {m['id']: m for m in jl('maps.json')['maps']}
     sp = maps[tm].get('spawn') or [len(g[0]) // 2, len(g) // 2]
-    return snap(g, sp[0] + 6 * (i % 5) - 12, sp[1] - 4 * (i // 5) - 8, others)
+    return snap(g, sp[0] + 8 + 5 * (i % 5), sp[1] + 4 * (i // 5) + 3, others)
 
 
 def main():
@@ -80,11 +80,44 @@ AT = {'廟': ['神秘老人', '算命先生', '玄真道人'], '藥房': ['密�
       '劉備家': ['劉老', '徐庶', '劉備', '關羽', '張飛', '趙雲', '孫乾', '簡雍', '糜竺', '伊籍']}
 
 
+INTERIOR = {'官宅': 'xc1901', '客棧': 'xc1902', '藥房': 'xc1903', '虎威府': 'xc1908', '練兵場': 'xc1907', '私塾': 'xc1905',
+            '廟': 'xc1906', '打鐵鋪': 'xc1911', '拍賣屋': 'xc1913', '賭場': 'xc1916', '老年人家': 'xc1919', '廚房': 'xc1924',
+            '王允府': 'xc1946', '劉備家': 'xc1947'}      # 街頭角色 (民宅/出城) 唔入屋
+
+
+def _inside(mid, taken):
+    """室內圖: 由出生點 (門口) BFS，揀行 7~16 步遠、離其他人 >=2 格嘅位"""
+    g = grid(mid)
+    md = next(m for m in jl('maps.json')['maps'] if m['id'] == mid)
+    sx, sy = md['spawn'][0], md['spawn'][1]
+    dist = {(sx, sy): 0}
+    q = [(sx, sy)]
+    for cx, cy in q:
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            n = (cx + dx, cy + dy)
+            if n not in dist and ok(g, *n):
+                dist[n] = dist[(cx, cy)] + 1
+                q.append(n)
+    for lo, w in ((7, 2), (4, 2), (1, 2), (4, 0), (1, 0)):
+        c = [p for p, d in dist.items() if lo <= d <= 16 and all(ok(g, p[0] + a, p[1] + b) for a in range(-w, w + 1) for b in (-1, 0, 1))
+             and all(max(abs(p[0] - a), abs(p[1] - b)) >= 2 for a, b in taken)]
+        if c:
+            c.sort(key=lambda p: (abs(dist[p] - 10), p[1], p[0]))
+            return c[0]
+    return None
+
+
 def at_building(name, taken):
-    """回傳 (x, y) 喺許昌 xuchang_o 嘅建築入口隔籬；冇對照 = None"""
+    """回傳 (map, x, y)：功能建築 → 室內圖；街頭角色 → 許昌街；冇對照 = None。taken 係 {map: [(x,y)]}"""
     b = next((k for k, v in AT.items() if name in v), None)
     if b is None:
         return None
+    if b in INTERIOR:
+        t = taken.setdefault(INTERIOR[b], [])
+        r = _inside(INTERIOR[b], t)
+        if r:
+            t.append(r)
+            return INTERIOR[b], r[0], r[1]
     ps = [p for p in jl('maps.json')['portals'] if p['map'] == 'xuchang_o' and b in (p.get('name') or '')]
     if not ps:
         return None
@@ -96,9 +129,9 @@ def at_building(name, taken):
         for dy in range(-r, r + 1):
             for dx in range(-r, r + 1):
                 cx, cy = p['x'] + dx, p['y'] + 4 + dy
-                if max(abs(dx), abs(dy)) == r and ok(g, cx, cy) and ok(g, cx + 1, cy) and ok(g, cx - 1, cy) and x is None                         and all(max(abs(cx - a), abs(cy - b)) >= 3 for a, b in allp)                         and all(max(abs(cx - a), abs(cy - b)) >= 2 for a, b in taken):
+                if max(abs(dx), abs(dy)) == r and ok(g, cx, cy) and ok(g, cx + 1, cy) and ok(g, cx - 1, cy) and x is None                         and all(max(abs(cx - a), abs(cy - b)) >= 3 for a, b in allp)                         and all(max(abs(cx - a), abs(cy - b)) >= 2 for a, b in taken.setdefault('xuchang_o', [])):
                     x, y = cx, cy
     if x is None:
         return None
-    taken.append((x, y))
-    return x, y
+    taken['xuchang_o'].append((x, y))
+    return 'xuchang_o', x, y

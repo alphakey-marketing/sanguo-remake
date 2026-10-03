@@ -115,12 +115,18 @@ _cur = {'n': ''}
 
 def _orig_place(old_map):
     import migrate_to_orig as M
-    from collections import defaultdict
     tm = M.REMAP[old_map]
-    n = _placed.setdefault(tm, [])
-    r = M.at_building(_cur['n'], n) if tm == 'xuchang_o' else None
+    if not _placed.get('_seeded'):
+        _placed['_seeded'] = True
+        for q in M.jl('quest_npcs.json')['npcs']:
+            _placed.setdefault(q['map'], []).append((q['x'], q['y']))
+    r = M.at_building(_cur['n'], _placed) if tm == 'xuchang_o' else None
     if r:
-        return tm, r[0], r[1]
+        return r
+    n = _placed.setdefault(tm, [])
+    for q in M.jl('quest_npcs.json')['npcs']:
+        if q['map'] == tm and (q['x'], q['y']) not in n:
+            n.append((q['x'], q['y']))
     x, y = M.place_near(tm, len(n), n)
     n.append((x, y))
     return tm, x, y

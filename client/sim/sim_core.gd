@@ -646,7 +646,7 @@ func _spawn_actor(ename: String, kind: String, class_id: String = "yishi", spawn
 # 新手城地圖 (world.homeCity / ch.homeCity；建角揀城 UAT-feedback)
 func _city_map(city: String) -> Dictionary:
 	for md in data.maps:
-		if String(md.get("cityOf", "")) == city and String(md.get("kind", "")) == "city":
+		if String(md.get("cityOf", "")) == city and String(md.get("name", "")).ends_with("（原版）"):
 			return md
 	return {}
 
