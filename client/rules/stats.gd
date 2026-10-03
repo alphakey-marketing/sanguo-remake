@@ -4,11 +4,12 @@ extends RefCounted
 # attrs = {str, agi, int, spi, pol, cha}；character = Dictionary（可直接序列化）
 
 const NEWBIE_LEVEL := 5    # 【原】5 級脫離新手
-const MAX_LEVEL := 100     # 【原】三轉 100 級
+const MAX_LEVEL := 180     # 【用家 2026-10-03】滿級 180 (升級表 exp_table.gd 本來就有 180 級)
 const ATTR_KEYS := ["str", "agi", "int", "spi", "pol", "cha"]
 const RAIDABLE := ["str", "agi", "int", "spi"]   # 升級點數分配嘅四屬性 (spec 01 §5)
 const UPGRADE_POINTS := 3  # 【自訂】每升 1 級發幾多點
-const ATTR_CAP := 99       # 【原】修練/點數上限 99
+const ATTR_CAP := 500      # 【用家 2026-10-03】屬性上限 500 (原 99)
+const MAXLV_EXP_TO_GOLD := 20   # 【自訂】滿級後多出嘅經驗 20 點換 1 金
 
 
 static func max_hp(lv: int, a: Dictionary) -> int:
@@ -86,7 +87,8 @@ static func gain_exp(data: GameData, ch: Dictionary, amount: int) -> int:
 		ch["level"] = int(ch["level"]) + 1
 		ups += 1
 		ch["attrPoints"] = int(ch.get("attrPoints", 0)) + UPGRADE_POINTS
-	if int(ch["level"]) >= MAX_LEVEL:
+	if int(ch["level"]) >= MAX_LEVEL:                # 滿級: 多出嘅經驗換金，唔白白浪費
+		ch["gold"] = int(ch.get("gold", 0)) + int(ch["exp"]) / MAXLV_EXP_TO_GOLD
 		ch["exp"] = 0
 	if ups > 0:
 		var lv := int(ch["level"])
@@ -95,6 +97,16 @@ static func gain_exp(data: GameData, ch: Dictionary, amount: int) -> int:
 		ch["mp"] = max_mp(lv, attrs)
 		ch["sp"] = max_sp(lv, attrs)
 	return ups
+
+
+# 擊殺經驗等級差倍率【自訂】: 玩家高過怪 >4 級每級 -10% (最低 10%)；低過怪每級 +5% (最高 +50%)
+static func exp_level_mult(player_lv: int, mob_lv: int) -> float:
+	var diff := player_lv - mob_lv
+	if diff > 4:
+		return maxf(0.1, 1.0 - 0.1 * float(diff - 4))
+	if diff < 0:
+		return minf(1.5, 1.0 + 0.05 * float(-diff))
+	return 1.0
 
 
 # 升級提示 (P4): lv_from → lv_to 之間新解鎖嘅術法 / 絕招（只列本職）
@@ -137,6 +149,18 @@ static func raise_attr(ch: Dictionary, attr: String) -> int:
 # 自動分配: 按 classes.json.growth 建議比例 (純 UI 提示) 派晒所有點。確定性、唔用 RNG。
 # 分配落 RAIDABLE；派到 99 上限就唔再派嗰隻，餘點留低。
 static func auto_assign_points(ch: Dictionary, cls: Dictionary) -> void:
+	var spent := plan_auto_assign(ch, cls)
+	for k in RAIDABLE:
+		if int(spent[k]) > 0:
+			ch["attrs"][k] = int(ch["attrs"][k]) + int(spent[k])
+			var raised: Dictionary = ch.get("raised", {})
+			ch["raised"] = raised
+			raised[k] = int(raised.get(k, 0)) + int(spent[k])
+	ch["attrPoints"] = int(ch["attrPoints"]) - spent_total(spent)
+
+
+# 建議分配預覽 (唔改 ch): 回 {str,agi,int,spi: 點數}
+static func plan_auto_assign(ch: Dictionary, cls: Dictionary) -> Dictionary:
 	var w := {}
 	var total := 0
 	for k in RAIDABLE:
@@ -147,9 +171,8 @@ static func auto_assign_points(ch: Dictionary, cls: Dictionary) -> void:
 		for k in RAIDABLE:
 			w[k] = 1
 		total = RAIDABLE.size()
-	var pts := int(ch["attrPoints"])
-	if pts <= 0:
-		return
+	var pts := int(ch.get("attrPoints", 0))
+	var all := pts
 	var spent := {}
 	for k in RAIDABLE:
 		spent[k] = 0
@@ -159,23 +182,17 @@ static func auto_assign_points(ch: Dictionary, cls: Dictionary) -> void:
 		var best := ""
 		var best_deficit := -1.0
 		for k in RAIDABLE:
-			if int(ch["attrs"][k]) >= ATTR_CAP:
+			if int(ch["attrs"][k]) + int(spent[k]) >= ATTR_CAP:
 				continue
-			var deficit := float(w[k]) - float(spent[k]) * float(total) / float(pts + spent_total(spent))
+			var deficit := float(w[k]) - float(spent[k]) * float(total) / float(all)
 			if deficit > best_deficit:
 				best_deficit = deficit
 				best = k
-		if best == "":                  # 四屬全部到 99
+		if best == "":                  # 四屬全部到上限
 			break
 		spent[best] = int(spent[best]) + 1
 		pts -= 1
-	for k in RAIDABLE:
-		if int(spent[k]) > 0:
-			ch["attrs"][k] = int(ch["attrs"][k]) + int(spent[k])
-			var raised: Dictionary = ch.get("raised", {})
-			ch["raised"] = raised
-			raised[k] = int(raised.get(k, 0)) + int(spent[k])
-	ch["attrPoints"] = pts
+	return spent
 
 
 static func spent_total(spent: Dictionary) -> int:

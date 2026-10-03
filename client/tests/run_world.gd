@@ -19,6 +19,7 @@ func _init() -> void:
 	t_set_home(data)
 	t_auto_stay(data)
 	t_landmarks(data)
+	t_growth(data)
 	t_path_fallback(data)
 	t_chenliu_npcs(data)
 	t_trade_cities(data)
@@ -560,3 +561,23 @@ func _orig_interiors(data: GameData, city_seen: Dictionary) -> void:
 				sim._on_moved(e)
 				check(String(data.map_at(int(e["x"]), int(e["y"])).get("id", "")) == "xc1902", "原版室內: 落地後唔會即刻彈返")
 				return
+
+
+# 成長系統 (用家 2026-10-03): 滿級 180 / 屬性上限 500 / 滿級經驗換金 / 等級差經驗 / 建議分配預覽
+func t_growth(data: GameData) -> void:
+	check(RulesStats.MAX_LEVEL == 180 and RulesStats.ATTR_CAP == 500, "成長: 滿級 180 / 屬性上限 500")
+	check(RulesStats.exp_level_mult(50, 50) == 1.0 and RulesStats.exp_level_mult(54, 50) == 1.0, "成長: 差 ≤4 級全額")
+	check(absf(RulesStats.exp_level_mult(60, 50) - 0.4) < 0.001 and RulesStats.exp_level_mult(100, 50) == 0.1, "成長: 高級遞減、最低 10%")
+	check(absf(RulesStats.exp_level_mult(40, 50) - 1.5) < 0.001 and absf(RulesStats.exp_level_mult(48, 50) - 1.1) < 0.001, "成長: 越級有加成、封頂 +50%")
+	var ch := RulesStats.create_character(data, "測試", "yishi")
+	ch["level"] = 179
+	ch["gold"] = 0
+	RulesStats.gain_exp(data, ch, RulesStats.exp_to_next(179) + 400)
+	check(int(ch["level"]) == 180 and int(ch["exp"]) == 0 and int(ch["gold"]) == 20, "成長: 滿級多出 400 exp 換 20 金")
+	var c2 := RulesStats.create_character(data, "測試", "yishi")
+	c2["attrPoints"] = 12
+	var before: Dictionary = c2["attrs"].duplicate()
+	var plan := RulesStats.plan_auto_assign(c2, data.classes["yishi"])
+	check(RulesStats.spent_total(plan) == 12 and c2["attrs"] == before and int(c2["attrPoints"]) == 12, "成長: 建議分配只預覽、唔改角色")
+	RulesStats.auto_assign_points(c2, data.classes["yishi"])
+	check(int(c2["attrPoints"]) == 0 and int(c2["attrs"]["str"]) == int(before["str"]) + int(plan["str"]), "成長: 確認後同預覽一致")

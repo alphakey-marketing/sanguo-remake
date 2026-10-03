@@ -98,8 +98,8 @@ func _build_body() -> void:
 	h.add_child(rs)
 	if int(ch.get("attrPoints", 0)) > 0:
 		h.add_child(btn("建議分配", func() -> void:
-			pending = {}
-			main._send({"t": "auto_assign"}), 96))
+			pending = RulesStats.plan_auto_assign(ch, main.data.classes[str(ch.get("classId", ""))])   # 只預覽，撳「確認分配」先落
+			refresh(true), 96))
 	left.add_child(h)
 	# 右: 資料
 	var lv := int(ch["level"])
