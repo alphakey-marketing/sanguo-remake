@@ -60,7 +60,28 @@ static func face_by_name(npc_name: String) -> Texture2D:
 
 # 怪物動畫 sheet: act = "A" 攻擊 / "S" 站立 / "W" 行走；8 列(方向 N,NE,E,SE,S,SW,W,NW 順時針) x 8 欄(幀)。冇圖 = null
 static func mon_sheet(mob_def: int, act: String) -> Texture2D:
-	return _tex("mon_" + act, mob_def)
+	var t := _tex("mon_" + act, mob_def)
+	if t == null:
+		var al: Dictionary = _alias(mob_def)
+		if al.has("actor"):
+			return _tex("actor_" + act, int(al["actor"]))
+		if al.has("mon"):
+			return _tex("mon_" + act, int(al["mon"]))
+	return t
+
+
+# 冇原版圖嘅任務怪借圖 (data/mon_alias.json)
+static var _alias_tab: Dictionary = {}
+static var _alias_loaded := false
+static func _alias(mob_def: int) -> Dictionary:
+	if not _alias_loaded:
+		_alias_loaded = true
+		var f := FileAccess.open("res://data/mon_alias.json", FileAccess.READ)
+		if f != null:
+			var v: Variant = JSON.parse_string(f.get_as_text())
+			if v is Dictionary:
+				_alias_tab = (v as Dictionary).get("alias", {})
+	return _alias_tab.get(str(mob_def), {})
 
 
 # 借圖怪染色 (importer BORROW 表)；原版圖或冇登記 = 白色 (唔染)
@@ -69,6 +90,9 @@ static func mon_tint(mob_def: int) -> Color:
 	var t: Variant = _index.get("_mon_tint", {})
 	if t is Dictionary and (t as Dictionary).has(str(mob_def)):
 		return Color.html(str((t as Dictionary)[str(mob_def)]))
+	var al := _alias(mob_def)
+	if al.has("tint"):
+		return Color.html(str(al["tint"]))
 	return Color.WHITE
 
 
