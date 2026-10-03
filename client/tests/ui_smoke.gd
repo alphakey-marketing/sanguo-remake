@@ -803,9 +803,9 @@ func _run() -> void:
 	m.sim.state["clock"]["ke"] = 90         # 窗與窗之間 → view_battles open 空
 	check(String(m.sim.view_battles(int(m.my_id))["open"]).is_empty(), "戰役: 冇窗口時 open 空")
 	# S04d 特殊場景：記事「場景」tab + 入口對話 + 入場/離場煙霧
-	m.sim.state["clock"]["day"] = 0          # 初一 = 桃花渡/七彩奪寶陣開門
+	m.sim.state["clock"]["day"] = 0          # 初一 = 七彩奪寶陣/七彩奪寶陣開門
 	var vs: Dictionary = m.sim.view_scenes(int(m.my_id))
-	check((vs["list"] as Array).size() == 2, "場景: view_scenes 回 2 個特殊場景")
+	check((vs["list"] as Array).size() == 3, "場景: view_scenes 回 3 個特殊場景")
 	hud.open_panel("quest")
 	var qpb2: GamePanel = hud.panels["quest"]
 	qpb2.set_tab(3)                           # 記事「場景」頁
@@ -813,17 +813,17 @@ func _run() -> void:
 	await frames(2)
 	check(qpb2.tab == 3, "場景: 記事切到場景 tab")
 	hud.close_panels()
-	var gate: Dictionary = m.sim._scene_gate("taohuadu")
+	var gate: Dictionary = m.sim._scene_gate("qicai")
 	var scene_ent: Dictionary = m.sim.ent(int(m.my_id))
 	scene_ent["x"] = int(gate["x"]); scene_ent["tx"] = int(scene_ent["x"])
 	scene_ent["y"] = int(gate["y"]) + 1; scene_ent["ty"] = int(scene_ent["y"])
 	scene_ent.erase("path")
 	scene_ent["ch"]["level"] = 80
 	m.sim._sync_quest_npcs()
-	var sd := ContextActions.scene_dialog(m, "taohuadu")
+	var sd := ContextActions.scene_dialog(m, "qicai")
 	check(not (sd["options"] as Array).is_empty(), "場景: 入口對話有選項")
-	m._send({"t": "scene_enter", "sid": "taohuadu"})
-	check(m.sim.ent(int(m.my_id)).has("scene"), "場景: 撳「進入場景」入到桃花渡")
+	m._send({"t": "scene_enter", "sid": "qicai"})
+	check(m.sim.ent(int(m.my_id)).has("scene"), "場景: 撳「進入場景」入到七彩奪寶陣")
 	m._send({"t": "scene_leave"})
 	check(not m.sim.ent(int(m.my_id)).has("scene"), "場景: 撳「離開場景」返到出面")
 	print("[TEST] ui_smoke: %d, fail %d" % [total, fails])

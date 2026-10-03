@@ -89,8 +89,9 @@ func _scene_goto_layer(e: Dictionary, s: Dictionary, layer_idx: int) -> void:
 	var layer := RulesScene.layer_of(s, layer_idx)
 	var mid := String(layer["map"])
 	var md := _map_def(mid)
-	var px := int(md.get("ox", 0)) + 2
-	var py := int(md.get("oy", 0)) + 2
+	var sp: Array = md.get("spawn", [])
+	var px := int(sp[0]) if sp.size() >= 2 else int(md.get("ox", 0)) + 2
+	var py := int(sp[1]) if sp.size() >= 2 else int(md.get("oy", 0)) + 2
 	e["x"] = px; e["tx"] = px; e["y"] = py; e["ty"] = py
 	e.erase("path"); e.erase("goto")
 	e["atk_target"] = 0

@@ -16,6 +16,11 @@ func _init(m: Node) -> void:
 
 
 func sig() -> String:
+	if tab >= 4:               # 地標/指引頁靜態: 只認進行中/完成狀態，唔好因 tick 變動拆頁（拖緊會卡）
+		var st: Array = []
+		for q in main.sim.view_quests():
+			st.append([q["id"], q.get("active", false), q.get("done", false)])
+		return JSON.stringify([tab, st, main.ch.get("landmarks", [])])
 	return JSON.stringify([tab, main.sim.view_quests(), main.sim.view_commissions(),
 		main.sim.view_battles(main.my_id), main.sim.view_scenes(main.my_id)])
 
@@ -117,16 +122,15 @@ func _landmark_section(list: Node) -> void:
 func _lm_row(s: Dictionary) -> Node:
 	var lid := String(s["id"])
 	var open := bool(_lm_open.get(lid, false))
-	var col := UiTheme.TEXT
 	var mark := "☆"
 	if bool(s["seen"]):
 		mark = "●"
-		col = UiTheme.GOLD
 	var head := btn("%s %s %s" % [mark, str(s["name"]), "▾" if open else "▸"], func() -> void:
 		_lm_open[lid] = not open
 		refresh(true))
-	head.add_theme_color_override("font_color", col)
-	head.add_theme_color_override("font_hover_color", col)
+	if bool(s["seen"]):                     # 掣底係米色: 字用深色，唔好用淺色 TEXT/GOLD
+		_btn_ink(head, Color(0.45, 0.05, 0.02))
+	head.mouse_filter = Control.MOUSE_FILTER_PASS   # 拖動可以由掣上面開始捲
 	head.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	var box := VBoxContainer.new()
 	box.add_child(head)
@@ -175,6 +179,7 @@ func _guide_battles(list: Node) -> void:
 		var head := btn("☆ %s %s" % [str(b["name"]), "▾" if open else "▸"], func() -> void:
 			_guide_open[bid] = not open
 			refresh(true))
+		head.mouse_filter = Control.MOUSE_FILTER_PASS
 		head.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		list.add_child(head)
 		if not open:
@@ -203,20 +208,20 @@ func _guide_scenes(list: Node) -> void:
 
 func _guide_row(list: Node, q: Dictionary, st: Dictionary) -> void:
 	var mark := "☆"
-	var color := UiTheme.TEXT
+	var color := Color(0.2, 0.1, 0.03)      # 掣底係米色，字要深色
 	if bool(st.get("done", false)):
 		mark = "✓"
-		color = UiTheme.GOOD
+		color = Color(0.1, 0.4, 0.1)
 	elif bool(st.get("active", false)):
 		mark = "●"
-		color = UiTheme.GOLD
+		color = Color(0.45, 0.05, 0.02)
 	var qid := String(q["id"])
 	var open := bool(_guide_open.get(qid, false))
 	var head := btn("%s %s %s %s" % [mark, str(q["name"]), "" , "▾" if open else "▸"], func() -> void:
 		_guide_open[qid] = not open
 		refresh(true))
-	head.add_theme_color_override("font_color", color)
-	head.add_theme_color_override("font_hover_color", color)
+	_btn_ink(head, color)
+	head.mouse_filter = Control.MOUSE_FILTER_PASS
 	head.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	list.add_child(head)
 	if not open:
@@ -239,6 +244,11 @@ func _guide_row(list: Node, q: Dictionary, st: Dictionary) -> void:
 	var reward := _reward_summary(q.get("reward", {}))
 	if reward != "":
 		list.add_child(lbl("　獎勵：%s" % reward, 13, UiTheme.DIM))
+
+
+func _btn_ink(b: Button, c: Color) -> void:
+	for k in ["font_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color"]:
+		b.add_theme_color_override(k, c)
 
 
 func _map_name(map_id: String) -> String:

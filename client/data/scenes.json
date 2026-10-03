@@ -1,4 +1,1450 @@
 {
- "_note": "特殊場景 (S04d, spec 04 §4)【原 sy3_10_1~7】: 桃花渡 + 七彩奪寶陣首批。data/scenes.json = 權威來源（攻略掉寶全表 + 怪物 def + 層地圖），tools/gen_scenes.py 將怪物/地圖分發落 monsters.json + maps.json + maps/*.txt（idempotent，--check 核對）。單機化: 原版限真實時間（七彩奪寶陣週六晚）→ 改 game 日曆開門（每月初一~初三、十五~十七），公告提示。日期窗口 schedule.days = 每月第幾日（1 起，共 monthDays 日）。entryMap/entryX/entryY = 場景入口囗 NPC 企位地圖格。monsters 每隻可以自帶 drops（攻略全表）；boss:true 嗰隻 = 該層大頭目（打完過層，尾層 = 完成傳返入口）。density = 每層每款普通怪同時出幾多隻（boss 理論上 1 隻）。",
- "scenes": []
+ "_note": "特殊場景 (spec 04 §4)【原 sy3_10_*】，由 tools/gen_scenes.py 生成 (原版模板圖 instance)。七），公告提示。日期窗口 schedule.days = 每月第幾日（1 起，共 monthDays 日）。entryMap/entryX/entryY = 場景入口囗 NPC 企位地圖格。monsters 每隻可以自帶 drops（攻略全表）；boss:true 嗰隻 = 該層大頭目（打完過層，尾層 = 完成傳返入口）。density = 每層每款普通怪同時出幾多隻（boss 理論上 1 隻）。",
+ "scenes": [
+  {
+   "id": "tongtian",
+   "name": "通天關",
+   "minLevel": 71,
+   "entryMap": "xc2125",
+   "entryX": 185,
+   "entryY": 51,
+   "schedule": {
+    "days": [
+     1,
+     2,
+     3,
+     15,
+     16,
+     17
+    ]
+   },
+   "droplore": "8 擂台 24 魔神【原 sy3_10_4】: 守關魔神必掉夢幻收集品 (換夢幻裝備)；原版 24 魔神能力不詳，數值【自訂】。單機化: 擂台改按序闖，每擂台打晒 3 魔神過下一擂。",
+   "monsters": [
+    {
+     "id": 1200,
+     "name": "劉備",
+     "level": 100,
+     "hp": 40000,
+     "atk": 360,
+     "def": 60,
+     "spellDef": 70,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 45000,
+     "gold": [
+      800,
+      1600
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": false,
+     "drops": [
+      [
+       53008,
+       1.0
+      ]
+     ]
+    },
+    {
+     "id": 1201,
+     "name": "呂布",
+     "level": 100,
+     "hp": 40000,
+     "atk": 360,
+     "def": 60,
+     "spellDef": 70,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 45000,
+     "gold": [
+      800,
+      1600
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": false,
+     "drops": [
+      [
+       53008,
+       1.0
+      ]
+     ]
+    },
+    {
+     "id": 1202,
+     "name": "蓋普洛",
+     "level": 100,
+     "hp": 60000,
+     "atk": 360,
+     "def": 60,
+     "spellDef": 70,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 45000,
+     "gold": [
+      800,
+      1600
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": true,
+     "drops": [
+      [
+       53008,
+       1.0
+      ]
+     ]
+    },
+    {
+     "id": 1203,
+     "name": "董卓",
+     "level": 101,
+     "hp": 52000,
+     "atk": 363,
+     "def": 60,
+     "spellDef": 70,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 45450,
+     "gold": [
+      808,
+      1616
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": false,
+     "drops": [
+      [
+       53008,
+       1.0
+      ]
+     ]
+    },
+    {
+     "id": 1204,
+     "name": "關羽",
+     "level": 101,
+     "hp": 52000,
+     "atk": 363,
+     "def": 60,
+     "spellDef": 70,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 45450,
+     "gold": [
+      808,
+      1616
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": false,
+     "drops": [
+      [
+       53008,
+       1.0
+      ]
+     ]
+    },
+    {
+     "id": 1205,
+     "name": "風魔",
+     "level": 101,
+     "hp": 78000,
+     "atk": 363,
+     "def": 60,
+     "spellDef": 70,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 45450,
+     "gold": [
+      808,
+      1616
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": true,
+     "drops": [
+      [
+       53008,
+       1.0
+      ]
+     ]
+    },
+    {
+     "id": 1206,
+     "name": "火魔",
+     "level": 102,
+     "hp": 64000,
+     "atk": 367,
+     "def": 61,
+     "spellDef": 71,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 45900,
+     "gold": [
+      816,
+      1632
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": false,
+     "drops": [
+      [
+       53008,
+       1.0
+      ]
+     ]
+    },
+    {
+     "id": 1207,
+     "name": "水魔",
+     "level": 102,
+     "hp": 64000,
+     "atk": 367,
+     "def": 61,
+     "spellDef": 71,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 45900,
+     "gold": [
+      816,
+      1632
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": false,
+     "drops": [
+      [
+       53008,
+       1.0
+      ]
+     ]
+    },
+    {
+     "id": 1208,
+     "name": "地魔",
+     "level": 102,
+     "hp": 96000,
+     "atk": 367,
+     "def": 61,
+     "spellDef": 71,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 45900,
+     "gold": [
+      816,
+      1632
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": true,
+     "drops": [
+      [
+       53008,
+       1.0
+      ]
+     ]
+    },
+    {
+     "id": 1209,
+     "name": "心魔",
+     "level": 103,
+     "hp": 76000,
+     "atk": 370,
+     "def": 61,
+     "spellDef": 72,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 46350,
+     "gold": [
+      824,
+      1648
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": false,
+     "drops": [
+      [
+       53008,
+       1.0
+      ]
+     ]
+    },
+    {
+     "id": 1210,
+     "name": "地煞",
+     "level": 103,
+     "hp": 76000,
+     "atk": 370,
+     "def": 61,
+     "spellDef": 72,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 46350,
+     "gold": [
+      824,
+      1648
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": false,
+     "drops": [
+      [
+       53008,
+       1.0
+      ]
+     ]
+    },
+    {
+     "id": 1211,
+     "name": "天煞",
+     "level": 103,
+     "hp": 114000,
+     "atk": 370,
+     "def": 61,
+     "spellDef": 72,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 46350,
+     "gold": [
+      824,
+      1648
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": true,
+     "drops": [
+      [
+       53008,
+       1.0
+      ]
+     ]
+    },
+    {
+     "id": 1212,
+     "name": "火云邪神",
+     "level": 104,
+     "hp": 88000,
+     "atk": 374,
+     "def": 62,
+     "spellDef": 72,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 46800,
+     "gold": [
+      832,
+      1664
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": false,
+     "drops": [
+      [
+       53008,
+       1.0
+      ]
+     ]
+    },
+    {
+     "id": 1213,
+     "name": "水云邪神",
+     "level": 104,
+     "hp": 88000,
+     "atk": 374,
+     "def": 62,
+     "spellDef": 72,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 46800,
+     "gold": [
+      832,
+      1664
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": false,
+     "drops": [
+      [
+       53008,
+       1.0
+      ]
+     ]
+    },
+    {
+     "id": 1214,
+     "name": "風云邪神",
+     "level": 104,
+     "hp": 132000,
+     "atk": 374,
+     "def": 62,
+     "spellDef": 72,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 46800,
+     "gold": [
+      832,
+      1664
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": true,
+     "drops": [
+      [
+       53008,
+       1.0
+      ]
+     ]
+    },
+    {
+     "id": 1215,
+     "name": "地云邪神",
+     "level": 105,
+     "hp": 100000,
+     "atk": 378,
+     "def": 63,
+     "spellDef": 73,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 47250,
+     "gold": [
+      840,
+      1680
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": false,
+     "drops": [
+      [
+       53008,
+       1.0
+      ]
+     ]
+    },
+    {
+     "id": 1216,
+     "name": "無云邪神",
+     "level": 105,
+     "hp": 100000,
+     "atk": 378,
+     "def": 63,
+     "spellDef": 73,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 47250,
+     "gold": [
+      840,
+      1680
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": false,
+     "drops": [
+      [
+       53008,
+       1.0
+      ]
+     ]
+    },
+    {
+     "id": 1217,
+     "name": "弓奴",
+     "level": 105,
+     "hp": 150000,
+     "atk": 378,
+     "def": 63,
+     "spellDef": 73,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 47250,
+     "gold": [
+      840,
+      1680
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": true,
+     "drops": [
+      [
+       53008,
+       1.0
+      ]
+     ]
+    },
+    {
+     "id": 1218,
+     "name": "玄德公",
+     "level": 106,
+     "hp": 112000,
+     "atk": 381,
+     "def": 63,
+     "spellDef": 74,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 47700,
+     "gold": [
+      848,
+      1696
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": false,
+     "drops": [
+      [
+       53008,
+       1.0
+      ]
+     ]
+    },
+    {
+     "id": 1219,
+     "name": "玉皇",
+     "level": 106,
+     "hp": 112000,
+     "atk": 381,
+     "def": 63,
+     "spellDef": 74,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 47700,
+     "gold": [
+      848,
+      1696
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": false,
+     "drops": [
+      [
+       53008,
+       1.0
+      ]
+     ]
+    },
+    {
+     "id": 1220,
+     "name": "豆腐屍",
+     "level": 106,
+     "hp": 168000,
+     "atk": 381,
+     "def": 63,
+     "spellDef": 74,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 47700,
+     "gold": [
+      848,
+      1696
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": true,
+     "drops": [
+      [
+       53008,
+       1.0
+      ]
+     ]
+    },
+    {
+     "id": 1221,
+     "name": "阿煞力",
+     "level": 107,
+     "hp": 124000,
+     "atk": 385,
+     "def": 64,
+     "spellDef": 74,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 48150,
+     "gold": [
+      856,
+      1712
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": false,
+     "drops": [
+      [
+       53008,
+       1.0
+      ]
+     ]
+    },
+    {
+     "id": 1222,
+     "name": "血魄",
+     "level": 107,
+     "hp": 124000,
+     "atk": 385,
+     "def": 64,
+     "spellDef": 74,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 48150,
+     "gold": [
+      856,
+      1712
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": false,
+     "drops": [
+      [
+       53008,
+       1.0
+      ]
+     ]
+    },
+    {
+     "id": 1223,
+     "name": "闇之神",
+     "level": 107,
+     "hp": 186000,
+     "atk": 385,
+     "def": 64,
+     "spellDef": 74,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 48150,
+     "gold": [
+      856,
+      1712
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": true,
+     "drops": [
+      [
+       53008,
+       1.0
+      ]
+     ]
+    }
+   ],
+   "layers": [
+    {
+     "monsters": [
+      1200,
+      1201,
+      1202
+     ],
+     "density": 1,
+     "map": "sc_tongtian_f1"
+    },
+    {
+     "monsters": [
+      1203,
+      1204,
+      1205
+     ],
+     "density": 1,
+     "map": "sc_tongtian_f2"
+    },
+    {
+     "monsters": [
+      1206,
+      1207,
+      1208
+     ],
+     "density": 1,
+     "map": "sc_tongtian_f3"
+    },
+    {
+     "monsters": [
+      1209,
+      1210,
+      1211
+     ],
+     "density": 1,
+     "map": "sc_tongtian_f4"
+    },
+    {
+     "monsters": [
+      1212,
+      1213,
+      1214
+     ],
+     "density": 1,
+     "map": "sc_tongtian_f5"
+    },
+    {
+     "monsters": [
+      1215,
+      1216,
+      1217
+     ],
+     "density": 1,
+     "map": "sc_tongtian_f6"
+    },
+    {
+     "monsters": [
+      1218,
+      1219,
+      1220
+     ],
+     "density": 1,
+     "map": "sc_tongtian_f7"
+    },
+    {
+     "monsters": [
+      1221,
+      1222,
+      1223
+     ],
+     "density": 1,
+     "map": "sc_tongtian_f8"
+    }
+   ]
+  },
+  {
+   "id": "yizu",
+   "name": "異族禁地",
+   "minLevel": 70,
+   "entryMap": "xc2125",
+   "entryX": 191,
+   "entryY": 53,
+   "schedule": {
+    "days": [
+     1,
+     8,
+     15,
+     22
+    ]
+   },
+   "droplore": "7 關魔王【原 sy3_10_7】: 羌奴/烏丸/南蠻 + 孟獲殿；原版血量 70萬~500萬×回血，單機化縮細【自訂】。",
+   "monsters": [
+    {
+     "id": 1224,
+     "name": "羌奴勇士",
+     "level": 80,
+     "hp": 70000,
+     "atk": 288,
+     "def": 48,
+     "spellDef": 56,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 36000,
+     "gold": [
+      640,
+      1280
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": true,
+     "drops": [
+      [
+       65029,
+       0.7
+      ],
+      [
+       32225,
+       0.7
+      ],
+      [
+       28067,
+       0.7
+      ]
+     ]
+    },
+    {
+     "id": 1225,
+     "name": "羌奴戰士",
+     "level": 82,
+     "hp": 80000,
+     "atk": 295,
+     "def": 49,
+     "spellDef": 57,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 36900,
+     "gold": [
+      656,
+      1312
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": true,
+     "drops": [
+      [
+       65055,
+       0.7
+      ],
+      [
+       65082,
+       0.7
+      ],
+      [
+       28065,
+       0.7
+      ]
+     ]
+    },
+    {
+     "id": 1226,
+     "name": "烏丸戰士",
+     "level": 84,
+     "hp": 85000,
+     "atk": 302,
+     "def": 50,
+     "spellDef": 58,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 37800,
+     "gold": [
+      672,
+      1344
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": true,
+     "drops": [
+      [
+       63018,
+       0.7
+      ],
+      [
+       65084,
+       0.7
+      ]
+     ]
+    },
+    {
+     "id": 1227,
+     "name": "烏丸勇士",
+     "level": 86,
+     "hp": 110000,
+     "atk": 309,
+     "def": 51,
+     "spellDef": 60,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 38700,
+     "gold": [
+      688,
+      1376
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": true,
+     "drops": [
+      [
+       65083,
+       0.7
+      ],
+      [
+       63019,
+       0.7
+      ]
+     ]
+    },
+    {
+     "id": 1228,
+     "name": "南蠻勇士",
+     "level": 88,
+     "hp": 130000,
+     "atk": 316,
+     "def": 52,
+     "spellDef": 61,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 39600,
+     "gold": [
+      704,
+      1408
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": true,
+     "drops": [
+      [
+       65049,
+       0.7
+      ],
+      [
+       65144,
+       0.7
+      ],
+      [
+       32204,
+       0.7
+      ]
+     ]
+    },
+    {
+     "id": 1229,
+     "name": "南蠻法師",
+     "level": 90,
+     "hp": 140000,
+     "atk": 324,
+     "def": 54,
+     "spellDef": 62,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 40500,
+     "gold": [
+      720,
+      1440
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": true,
+     "drops": [
+      [
+       65008,
+       0.7
+      ],
+      [
+       28066,
+       0.7
+      ],
+      [
+       63018,
+       0.7
+      ]
+     ]
+    },
+    {
+     "id": 1230,
+     "name": "孟獲",
+     "level": 92,
+     "hp": 170000,
+     "atk": 331,
+     "def": 55,
+     "spellDef": 64,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 41400,
+     "gold": [
+      736,
+      1472
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": true,
+     "drops": [
+      [
+       32053,
+       0.7
+      ],
+      [
+       65145,
+       0.7
+      ],
+      [
+       65030,
+       0.7
+      ],
+      [
+       65016,
+       0.7
+      ]
+     ]
+    }
+   ],
+   "layers": [
+    {
+     "monsters": [
+      1224
+     ],
+     "density": 1,
+     "map": "sc_yizu_f1"
+    },
+    {
+     "monsters": [
+      1225
+     ],
+     "density": 1,
+     "map": "sc_yizu_f2"
+    },
+    {
+     "monsters": [
+      1226
+     ],
+     "density": 1,
+     "map": "sc_yizu_f3"
+    },
+    {
+     "monsters": [
+      1227
+     ],
+     "density": 1,
+     "map": "sc_yizu_f4"
+    },
+    {
+     "monsters": [
+      1228
+     ],
+     "density": 1,
+     "map": "sc_yizu_f5"
+    },
+    {
+     "monsters": [
+      1229
+     ],
+     "density": 1,
+     "map": "sc_yizu_f6"
+    },
+    {
+     "monsters": [
+      1230
+     ],
+     "density": 1,
+     "map": "sc_yizu_f7"
+    }
+   ]
+  },
+  {
+   "id": "qicai",
+   "name": "七彩奪寶陣",
+   "minLevel": 70,
+   "entryMap": "gangkou",
+   "entryX": 44,
+   "entryY": 34,
+   "schedule": {
+    "days": [
+     1,
+     2,
+     3,
+     15,
+     16,
+     17
+    ]
+   },
+   "droplore": "7 色孟獲大頭目【原 sy3_10_6】: 每款跌對應顏色寶石 + 萬法之石 + 珍藏櫃鑰匙；七彩真晶（三轉七彩項鍊材料，接 S01d）",
+   "monsters": [
+    {
+     "id": 1080,
+     "name": "紫魔孟獲",
+     "level": 82,
+     "hp": 72000,
+     "atk": 140,
+     "def": 40,
+     "spellDef": 60,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 5200,
+     "gold": [
+      800,
+      1500
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": true,
+     "skills": [
+      {
+       "spell": "yun_m",
+       "cd": 380
+      }
+     ],
+     "drops": [
+      [
+       25081,
+       0.8
+      ],
+      [
+       32052,
+       0.5
+      ],
+      [
+       63004,
+       0.2
+      ],
+      [
+       63013,
+       0.5
+      ]
+     ]
+    },
+    {
+     "id": 1081,
+     "name": "靛魔孟獲",
+     "level": 84,
+     "hp": 76000,
+     "atk": 146,
+     "def": 42,
+     "spellDef": 62,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 5400,
+     "gold": [
+      850,
+      1600
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": true,
+     "skills": [
+      {
+       "spell": "shui_m",
+       "cd": 380
+      }
+     ],
+     "drops": [
+      [
+       25080,
+       0.8
+      ],
+      [
+       32052,
+       0.5
+      ],
+      [
+       63004,
+       0.2
+      ],
+      [
+       63013,
+       0.5
+      ]
+     ]
+    },
+    {
+     "id": 1082,
+     "name": "藍魔孟獲",
+     "level": 86,
+     "hp": 80000,
+     "atk": 152,
+     "def": 44,
+     "spellDef": 64,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 5600,
+     "gold": [
+      900,
+      1700
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": true,
+     "skills": [
+      {
+       "spell": "shui_m",
+       "cd": 380
+      }
+     ],
+     "drops": [
+      [
+       25079,
+       0.8
+      ],
+      [
+       32052,
+       0.5
+      ],
+      [
+       63004,
+       0.2
+      ],
+      [
+       63013,
+       0.5
+      ]
+     ]
+    },
+    {
+     "id": 1083,
+     "name": "綠魔孟獲",
+     "level": 88,
+     "hp": 84000,
+     "atk": 158,
+     "def": 46,
+     "spellDef": 66,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 5800,
+     "gold": [
+      950,
+      1800
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": true,
+     "skills": [
+      {
+       "spell": "feng_m",
+       "cd": 380
+      }
+     ],
+     "drops": [
+      [
+       25078,
+       0.8
+      ],
+      [
+       32052,
+       0.5
+      ],
+      [
+       63004,
+       0.2
+      ],
+      [
+       63014,
+       0.5
+      ]
+     ]
+    },
+    {
+     "id": 1084,
+     "name": "黃魔孟獲",
+     "level": 90,
+     "hp": 88000,
+     "atk": 164,
+     "def": 48,
+     "spellDef": 68,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 6000,
+     "gold": [
+      1000,
+      1900
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": true,
+     "skills": [
+      {
+       "spell": "huo_m",
+       "cd": 380
+      }
+     ],
+     "drops": [
+      [
+       25077,
+       0.8
+      ],
+      [
+       32052,
+       0.5
+      ],
+      [
+       63004,
+       0.2
+      ],
+      [
+       63014,
+       0.5
+      ]
+     ]
+    },
+    {
+     "id": 1085,
+     "name": "橙魔孟獲",
+     "level": 92,
+     "hp": 92000,
+     "atk": 170,
+     "def": 50,
+     "spellDef": 70,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 6200,
+     "gold": [
+      1050,
+      2000
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": true,
+     "skills": [
+      {
+       "spell": "huo_m",
+       "cd": 380
+      }
+     ],
+     "drops": [
+      [
+       25076,
+       0.8
+      ],
+      [
+       32052,
+       0.5
+      ],
+      [
+       63004,
+       0.2
+      ],
+      [
+       63014,
+       0.5
+      ]
+     ]
+    },
+    {
+     "id": 1086,
+     "name": "紅魔孟獲",
+     "level": 95,
+     "hp": 96000,
+     "atk": 176,
+     "def": 52,
+     "spellDef": 72,
+     "atkInterval": 12,
+     "moveSpeed": 2,
+     "exp": 6600,
+     "gold": [
+      1100,
+      2100
+     ],
+     "alignment": -900,
+     "aggroRange": 10,
+     "leash": 18,
+     "element": "none",
+     "boss": true,
+     "skills": [
+      {
+       "spell": "huo_l",
+       "cd": 420
+      },
+      {
+       "spell": "shui_l",
+       "cd": 420
+      }
+     ],
+     "drops": [
+      [
+       25075,
+       0.8
+      ],
+      [
+       32052,
+       0.5
+      ],
+      [
+       63004,
+       0.2
+      ],
+      [
+       63014,
+       0.5
+      ]
+     ]
+    }
+   ],
+   "layers": [
+    {
+     "monsters": [
+      1080
+     ],
+     "density": 1,
+     "map": "sc_qicai_f1"
+    },
+    {
+     "monsters": [
+      1081
+     ],
+     "density": 1,
+     "map": "sc_qicai_f2"
+    },
+    {
+     "monsters": [
+      1082
+     ],
+     "density": 1,
+     "map": "sc_qicai_f3"
+    },
+    {
+     "monsters": [
+      1083
+     ],
+     "density": 1,
+     "map": "sc_qicai_f4"
+    },
+    {
+     "monsters": [
+      1084
+     ],
+     "density": 1,
+     "map": "sc_qicai_f5"
+    },
+    {
+     "monsters": [
+      1085
+     ],
+     "density": 1,
+     "map": "sc_qicai_f6"
+    },
+    {
+     "monsters": [
+      1086
+     ],
+     "density": 1,
+     "map": "sc_qicai_f7"
+    }
+   ]
+  }
+ ]
 }

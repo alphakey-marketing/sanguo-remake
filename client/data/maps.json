@@ -11211,6 +11211,358 @@
     75,
     50
    ]
+  },
+  {
+   "id": "sc_tongtian_f1",
+   "name": "通天關 1F",
+   "ox": 0,
+   "oy": 33750,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc5061",
+   "instance": true,
+   "spawn": [
+    25,
+    33,
+    25,
+    33
+   ]
+  },
+  {
+   "id": "sc_tongtian_f2",
+   "name": "通天關 2F",
+   "ox": 64,
+   "oy": 33750,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc5062",
+   "instance": true,
+   "spawn": [
+    25,
+    33,
+    25,
+    33
+   ]
+  },
+  {
+   "id": "sc_tongtian_f3",
+   "name": "通天關 3F",
+   "ox": 128,
+   "oy": 33750,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc5063",
+   "instance": true,
+   "spawn": [
+    25,
+    33,
+    25,
+    33
+   ]
+  },
+  {
+   "id": "sc_tongtian_f4",
+   "name": "通天關 4F",
+   "ox": 192,
+   "oy": 33750,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc5064",
+   "instance": true,
+   "spawn": [
+    25,
+    33,
+    25,
+    33
+   ]
+  },
+  {
+   "id": "sc_tongtian_f5",
+   "name": "通天關 5F",
+   "ox": 256,
+   "oy": 33750,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc5065",
+   "instance": true,
+   "spawn": [
+    25,
+    33,
+    25,
+    33
+   ]
+  },
+  {
+   "id": "sc_tongtian_f6",
+   "name": "通天關 6F",
+   "ox": 320,
+   "oy": 33750,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc5066",
+   "instance": true,
+   "spawn": [
+    25,
+    33,
+    25,
+    33
+   ]
+  },
+  {
+   "id": "sc_tongtian_f7",
+   "name": "通天關 7F",
+   "ox": 384,
+   "oy": 33750,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc5067",
+   "instance": true,
+   "spawn": [
+    25,
+    33,
+    25,
+    33
+   ]
+  },
+  {
+   "id": "sc_tongtian_f8",
+   "name": "通天關 8F",
+   "ox": 448,
+   "oy": 33750,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc5068",
+   "instance": true,
+   "spawn": [
+    25,
+    33,
+    25,
+    33
+   ]
+  },
+  {
+   "id": "sc_yizu_f1",
+   "name": "異族禁地 1F",
+   "ox": 0,
+   "oy": 33817,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc5283",
+   "instance": true,
+   "spawn": [
+    25,
+    33,
+    25,
+    33
+   ]
+  },
+  {
+   "id": "sc_yizu_f2",
+   "name": "異族禁地 2F",
+   "ox": 64,
+   "oy": 33817,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc5284",
+   "instance": true,
+   "spawn": [
+    25,
+    33,
+    25,
+    33
+   ]
+  },
+  {
+   "id": "sc_yizu_f3",
+   "name": "異族禁地 3F",
+   "ox": 128,
+   "oy": 33817,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc5285",
+   "instance": true,
+   "spawn": [
+    25,
+    33,
+    25,
+    33
+   ]
+  },
+  {
+   "id": "sc_yizu_f4",
+   "name": "異族禁地 4F",
+   "ox": 192,
+   "oy": 33817,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc5286",
+   "instance": true,
+   "spawn": [
+    25,
+    33,
+    25,
+    33
+   ]
+  },
+  {
+   "id": "sc_yizu_f5",
+   "name": "異族禁地 5F",
+   "ox": 256,
+   "oy": 33817,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc5287",
+   "instance": true,
+   "spawn": [
+    25,
+    33,
+    25,
+    33
+   ]
+  },
+  {
+   "id": "sc_yizu_f6",
+   "name": "異族禁地 6F",
+   "ox": 320,
+   "oy": 33817,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc5288",
+   "instance": true,
+   "spawn": [
+    25,
+    33,
+    25,
+    33
+   ]
+  },
+  {
+   "id": "sc_yizu_f7",
+   "name": "異族禁地 7F",
+   "ox": 384,
+   "oy": 33817,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc5289",
+   "instance": true,
+   "spawn": [
+    25,
+    33,
+    25,
+    33
+   ]
+  },
+  {
+   "id": "sc_qicai_f1",
+   "name": "七彩奪寶陣 1F",
+   "ox": 448,
+   "oy": 33817,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc5260",
+   "instance": true,
+   "spawn": [
+    27,
+    39,
+    27,
+    39
+   ]
+  },
+  {
+   "id": "sc_qicai_f2",
+   "name": "七彩奪寶陣 2F",
+   "ox": 0,
+   "oy": 33884,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc5258",
+   "instance": true,
+   "spawn": [
+    25,
+    42,
+    25,
+    42
+   ]
+  },
+  {
+   "id": "sc_qicai_f3",
+   "name": "七彩奪寶陣 3F",
+   "ox": 64,
+   "oy": 33884,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc5255",
+   "instance": true,
+   "spawn": [
+    27,
+    39,
+    27,
+    39
+   ]
+  },
+  {
+   "id": "sc_qicai_f4",
+   "name": "七彩奪寶陣 4F",
+   "ox": 128,
+   "oy": 33884,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc5259",
+   "instance": true,
+   "spawn": [
+    28,
+    37,
+    28,
+    37
+   ]
+  },
+  {
+   "id": "sc_qicai_f5",
+   "name": "七彩奪寶陣 5F",
+   "ox": 192,
+   "oy": 33884,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc5256",
+   "instance": true,
+   "spawn": [
+    25,
+    42,
+    25,
+    42
+   ]
+  },
+  {
+   "id": "sc_qicai_f6",
+   "name": "七彩奪寶陣 6F",
+   "ox": 256,
+   "oy": 33884,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc5261",
+   "instance": true,
+   "spawn": [
+    28,
+    41,
+    28,
+    41
+   ]
+  },
+  {
+   "id": "sc_qicai_f7",
+   "name": "七彩奪寶陣 7F",
+   "ox": 320,
+   "oy": 33884,
+   "safe": false,
+   "kind": "field",
+   "orig": "xc5257",
+   "instance": true,
+   "spawn": [
+    25,
+    33,
+    25,
+    33
+   ]
   }
  ],
  "landmarks": [
@@ -11303,6 +11655,78 @@
    "r": 4,
    "name": "下邳",
    "text": "建安元年，呂布襲奪徐州，據下邳自守；建安三年，曹操決泗、沂水灌城，布眾潰，縊殺於白門樓。"
+  },
+  {
+   "id": "xudu_temple",
+   "map": "xuchang_o",
+   "x": 118,
+   "y": 31,
+   "r": 4,
+   "name": "許昌廟",
+   "text": "許昌城內古廟，香火不絕。建安年間曹操遷都於此，百姓常來祈求戰亂早息。"
+  },
+  {
+   "id": "xudu_hufu",
+   "map": "xuchang_o",
+   "x": 227,
+   "y": 58,
+   "r": 4,
+   "name": "虎威府",
+   "text": "許昌武將官署，出征前諸將在此聽令。"
+  },
+  {
+   "id": "xudu_wangyun",
+   "map": "xuchang_o",
+   "x": 162,
+   "y": 152,
+   "r": 4,
+   "name": "王允府",
+   "text": "司徒王允舊邸。獻連環計，使董卓、呂布反目，是漢室少有的一次反擊。"
+  },
+  {
+   "id": "xudu_liubei",
+   "map": "xuchang_o",
+   "x": 63,
+   "y": 75,
+   "r": 4,
+   "name": "劉備家",
+   "text": "劉備客居許昌時的住所。後園種菜，以避曹操之疑，才有青梅煮酒論英雄。"
+  },
+  {
+   "id": "luoyang_temple",
+   "map": "xc2600",
+   "x": 240,
+   "y": 47,
+   "r": 4,
+   "name": "洛陽廟",
+   "text": "東漢故都洛陽古廟。董卓焚城遷都後，滿目瓦礫，此廟猶存。"
+  },
+  {
+   "id": "luoyang_drill",
+   "map": "xc2600",
+   "x": 129,
+   "y": 46,
+   "r": 4,
+   "name": "洛陽練兵場",
+   "text": "洛陽練兵場，昔日北軍五校操練之地，今多為各路豪傑練武處。"
+  },
+  {
+   "id": "xiangyang_temple",
+   "map": "xc2900",
+   "x": 22,
+   "y": 85,
+   "r": 4,
+   "name": "襄陽廟",
+   "text": "襄陽古廟，劉表治荊州十餘年，境內安寧，士人多來避亂。"
+  },
+  {
+   "id": "xiangyang_drill",
+   "map": "xc2900",
+   "x": 213,
+   "y": 57,
+   "r": 4,
+   "name": "襄陽練兵場",
+   "text": "襄陽練兵場，劉表水陸之兵在此操演，蔡瑁統領水軍。"
   }
  ],
  "world": {
