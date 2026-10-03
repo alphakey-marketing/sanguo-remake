@@ -1404,6 +1404,7 @@ func _steer_tick() -> void:
 		if sim.is_free(t.x, t.y):
 			_send({"t": "move", "x": t.x, "y": t.y})
 			return
+	_send({"t": "move", "x": p.x, "y": p.y})       # 前面係牆: 都要停低 + 取消自動尋路
 
 # 自動掛機: 打最近唔高太多級嘅怪；冇怪就間中行去野區
 func _auto_tick() -> void:

@@ -188,8 +188,11 @@ func cmd_recruit_survey(id: int, kind: String) -> void:
 	rec["surveyDay"] = day
 	var medal := _has_medal(ch)
 	var vis := {}
+	var city_id := GameData.map_city_of(md)
 	for g in data.generals_t1:        # 御賜金牌【原】: 子午時 (時辰外) 嘅人才都搵到
-		if String(g["map"]) == String(md["id"]) and (general_visible(g) or (medal and not _general_away(int(g["id"])))):
+		var gm: Dictionary = data.map_by_id.get(String(g["map"]), {})
+		var same_city: bool = String(g["map"]) == String(md["id"]) or (not city_id.is_empty() and GameData.map_city_of(gm) == city_id)   # 武將喺城內室內都算
+		if same_city and (general_visible(g) or (medal and not _general_away(int(g["id"])))):
 			vis[int(g["id"])] = true
 	var gone := _gone_ids()
 	var cands := RulesRecruit.candidates(data.generals, ch, kind, day, vis, gone, data.recruit_cfg, medal)

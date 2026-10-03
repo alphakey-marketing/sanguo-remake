@@ -418,7 +418,7 @@ func _run() -> void:
 	hud.close_panels()
 	# 13. 許昌官宅 (Step 13/14): 互動掣 → 官宅對話框 →「捐獻…」→ 捐 3000 金 → 名聲 +3、扣行動力
 	var df: Dictionary = m.data.facilities["donate_xc"]
-	put(int(df["x"]), int(df["y"]) + 1)
+	put(int(df["x"]), int(df["y"]))        # 企正上面 dist 0 (旁邊有滅鼠官同距離會搶)
 	check(await until(func() -> bool: return String(hud.ctx.get("kind", "")) == "fac" and String(hud.ctx.get("ref", {}).get("fac", "")) == "donate_xc"),
 		"近官宅互動掣應該係官宅 (%s)" % hud.ctx)
 	await click(center("context"))
@@ -487,6 +487,11 @@ func _run() -> void:
 	var rp: GamePanel = hud.panels.get("recruit")
 	check(rp != null and rp.visible, "撳登用應該開登用面板")
 	if rp != null:
+		var st: Dictionary = m.data.map_by_id["xuchang_o"]
+		var xsp: Array = st["spawn"]
+		put(int(xsp[0]), int(xsp[1]))                 # 調查要企城池街道 (典韋喺室內，同城都搵到)
+		rp.refresh(true)                            # 掣喺室內時 disabled，要重畫
+		await frames(1)
 		press(rp, "調查文官")
 		await frames(1)
 		rp.refresh(true)
@@ -573,17 +578,20 @@ func _run() -> void:
 	hud.close_panels()
 	# 19. 驛站 (Step 16.5 B3): 行近許昌驛站 → 互動掣「驛站」→ 揀襄陽 → 扣車費去到襄陽
 	var stn: Dictionary = m.data.facilities["station_xc"]
-	put(int(stn["x"]), int(stn["y"]) + 1)
+	put(int(stn["x"]), int(stn["y"]))
 	check(await until(func() -> bool: return String(hud.ctx.get("label", "")) == "驛站"), "近驛站互動掣 = 驛站 (%s)" % hud.ctx)
 	ch["gold"] = 1000
 	await click(center("context"))
 	var dp6: GamePanel = hud.panels.get("dialog")
-	var fare := RulesStation.fare(m.sim.map_hops("xuchang", "xiangyang"), m.data.world["station"])
+	var fare := 0
+	for r_ in m.sim.station_view(m.my_id)["list"]:       # 襄陽驛站車費照 sim 嘅
+		if str(r_["key"]) == "station_xc_cl29":
+			fare = int(r_["fare"])
 	check(dp6 != null and dp6.visible and find_btn(dp6, "襄陽驛站 (%d 金)" % fare) != null, "驛站對話框列出襄陽 (%d 金)" % fare)
 	check(dp6 != null and press(dp6, "襄陽驛站"), "撳襄陽驛站")
 	await frames(2)
 	var me6: Dictionary = m.sim.ent(m.my_id)
-	check(m.sim.map_id_at(int(me6["x"]), int(me6["y"])) == "xiangyang" and int(ch["gold"]) == 1000 - fare, "搭驛站: 去到襄陽、扣 %d 金" % fare)
+	check(m.sim.map_id_at(int(me6["x"]), int(me6["y"])) == "xc2915" and int(ch["gold"]) == 1000 - fare, "搭驛站: 去到襄陽、扣 %d 金" % fare)
 	check(not dp6.visible, "搭完車對話框閂咗")
 	hud.close_panels()
 	# 20. 馬廄 (Step 17a): 行近許昌馬廄 → 互動掣「馬廄」→ 座騎面板馬廄頁 → 買成年馬 → HUD 騎馬掣 → 座騎頁飼養
@@ -729,7 +737,7 @@ func _run() -> void:
 			break
 	m.sim.data.monsters[999998] = {"id": 999998, "name": "測怪", "level": 5, "hp": 50, "exp": 10,
 		"gold": [0, 0], "drops": [{"item": 29042, "p": 1.0}], "rareDrops": [], "alignment": 0}
-	var mm2 = m.sim._spawn_mob(999998, "field_1")
+	var mm2 = m.sim._spawn_mob(999998, Sim.DEFAULT_ZONE)
 	mm2["x"] = spot.x
 	mm2["y"] = spot.y
 	mm2["tx"] = spot.x
@@ -772,7 +780,7 @@ func _run() -> void:
 		if c2_ok: break
 	check(c2_ok, "吟唱線索: 揾到術法怪站位 (術距內)")
 	if c2_ok:
-		var csp_: Variant = m.sim._spawn_mob(1007, "field_1")   # 火之術(小) range5
+		var csp_: Variant = m.sim._spawn_mob(1007, Sim.DEFAULT_ZONE)   # 火之術(小) range5
 		csp_["x"] = c2x; csp_["y"] = c2y; csp_["tx"] = c2x; csp_["ty"] = c2y
 		var mmob: Dictionary = csp_["mob"]
 		mmob["home_x"] = c2x; mmob["home_y"] = c2y
