@@ -82,7 +82,7 @@ func t_spawn(data: GameData) -> void:
 	var per_city := int(G.get("perCity", 2))
 	var maps := []
 	for md in data.maps:
-		if String(md.get("kind", "")) == "city" and not md.has("orig"):      # 原版圖 (步驟 4 先放 NPC/捕快) 暫唔計
+		if String(md.get("kind", "")) == "city":
 			maps.append(md)
 	var by_city := {}
 	var n := 0
@@ -100,7 +100,7 @@ func t_spawn(data: GameData) -> void:
 	check(n == per_city * maps.size(), "spawn: 全部城捕快總數 = %d (got %d)" % [per_city * maps.size(), n])
 	check(by_city.size() == maps.size(), "spawn: 每張 city 地圖都有捕快")
 	for md in maps:
-		var cid := String(md.get("city", ""))
+		var cid := GameData.map_city_of(md)
 		check(int(by_city.get(cid, 0)) == per_city, "spawn: %s 捕快數 = %d" % [cid, per_city])
 
 

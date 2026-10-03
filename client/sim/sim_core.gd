@@ -705,7 +705,7 @@ func add_residents() -> void:
 	for md in data.maps:
 		if String(md.get("kind", "")) != "city":
 			continue
-		var city_id := String(md.get("city", ""))
+		var city_id := GameData.map_city_of(md)
 		if city_id == "":
 			continue
 		var cdef: Dictionary = data.cities.get(city_id, {})
@@ -736,15 +736,19 @@ func add_guards() -> void:
 	for md in data.maps:
 		if String(md.get("kind", "")) != "city":
 			continue
-		var city_id := String(md.get("city", ""))
+		var city_id := GameData.map_city_of(md)
 		if city_id == "":
 			continue
 		var inn_here := Vector2i(-1, -1)
 		for x in data.inns:
 			var m: Dictionary = data.map_by_id.get(String(x.get("map", "")), {})
-			if String(m.get("city", "")) == city_id:
+			if GameData.map_city_of(m) == city_id:
 				inn_here = Vector2i(int(x["x"]), int(x["y"]))
 				break
+		if inn_here.x >= 0 and map_id_at(inn_here.x, inn_here.y) != String(md["id"]):      # 客棧喺室內圖 (原版): 改企客棧門口外 (傳送點 land)
+			var door: Dictionary = data.tp_by_id.get("xc_in_" + map_id_at(inn_here.x, inn_here.y).substr(2), {})
+			var land: Array = door.get("land", [])
+			inn_here = Vector2i(int(land[0]), int(land[1])) if land.size() >= 2 else Vector2i(-1, -1)
 		if inn_here.x < 0:      # 冇客棧嘅城: 用城圖中心做企定位基準 (UAT-001~003)
 			var z: Dictionary = zone_by_id(String(md.get("id", "")))
 			if z.is_empty():
@@ -779,7 +783,7 @@ func resident_city_map_id(city_id: String) -> String:
 	if city_id == "":
 		return ""
 	for md in data.maps:
-		if String(md.get("kind", "")) == "city" and String(md.get("city", "")) == city_id:
+		if String(md.get("kind", "")) == "city" and GameData.map_city_of(md) == city_id:
 			return String(md.get("id", ""))
 	return ""
 
@@ -794,7 +798,7 @@ func resident_inn_pos(e: Dictionary) -> Vector2i:
 		return inn_pos
 	for x in data.inns:
 		var m: Dictionary = data.map_by_id.get(String(x.get("map", "")), {})
-		if String(m.get("city", "")) == city:
+		if GameData.map_city_of(m) == city:
 			return Vector2i(int(x["x"]), int(x["y"]))
 	return Vector2i(-1, -1)
 
