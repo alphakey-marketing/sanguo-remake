@@ -6628,6 +6628,59 @@
       "reward": {
         "fame": 10
       }
+    },
+    {
+      "id": "newbie_guide",
+      "src": "custom",
+      "name": "新手嚮導：跑城熟路",
+      "type": "newbie",
+      "giver": "newbie_guide",
+      "pre": {
+        "maxLevel": 4
+      },
+      "stages": [
+        {
+          "type": "talk",
+          "npc": "newbie_guide",
+          "dialog": [
+            "新手嚮導：「初到許昌？跟我一套：①搵賣菜嬸、算命先生、茶館老闆傾偈 ②去私塾同廟修練 ③練兵場對練 ④城西神秘老人有考驗。做晒就升到 5 級。」"
+          ],
+          "hint": "同新手嚮導傾偈"
+        },
+        {
+          "type": "talk_n",
+          "npcs": [
+            "citizen_1",
+            "citizen_2",
+            "citizen_3"
+          ],
+          "n": 3,
+          "hint": "搵賣菜嬸、算命先生、茶館老闆傾偈 (%v/%n)"
+        },
+        {
+          "type": "facility",
+          "fac": "school",
+          "hint": "去私塾修練 1 次"
+        },
+        {
+          "type": "facility",
+          "fac": "temple",
+          "hint": "去廟修練 1 次"
+        },
+        {
+          "type": "talk",
+          "npc": "newbie_guide",
+          "dialog": [
+            "新手嚮導：「好！街你識晒喇。另外練兵場對練、神秘老人嘅考驗都記得做，仲有公佈欄喺城門旁。」"
+          ],
+          "hint": "返去同新手嚮導報告",
+          "done": true
+        }
+      ],
+      "reward": {
+        "exp": 40,
+        "gold": 30
+      }
     }
   ]
 }
