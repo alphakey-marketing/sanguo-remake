@@ -297,6 +297,52 @@ func _lm_map_name(map_id: String) -> String:
 	return map_id
 
 
+# 任務提示尾加「在哪裡」: 地圖名 + 地圖內座標 (新手易搵)。未開始 = 接任務 NPC；進行中 = 當前 stage 嘅 NPC / 設施
+func _where_text(q: Dictionary, ch: Dictionary) -> String:
+	var st: Dictionary = ch.get("quests", {}).get(String(q["id"]), {})
+	if bool(st.get("done", false)) or bool(ch.get("questDone", {}).get(String(q["id"]), false)):
+		return ""
+	var spots: Array = []
+	if st.is_empty():
+		spots.append(_spot_of_npc(String(q.get("giver", ""))))
+	else:
+		var stages: Array = q.get("stages", [])
+		var si := int(st.get("stage", 0))
+		if si < 0 or si >= stages.size():
+			return ""
+		var stage: Dictionary = stages[si]
+		match String(stage.get("type", "")):
+			"talk", "collect", "ask", "repeat", "escort", "chest":
+				spots.append(_spot_of_npc(String(stage.get("npc", q.get("giver", "")))))
+			"talk_n":
+				var vis: Array = st.get("flags", {}).get("visited", [])
+				for nid in stage.get("npcs", []):
+					if not vis.has(nid):
+						spots.append(_spot_of_npc(String(nid)))
+			"facility":
+				var f: Dictionary = data.facilities.get(String(stage.get("fac", "")), {})
+				if not f.is_empty():
+					spots.append(_spot_text(String(f.get("name", "")), f))
+	spots = spots.filter(func(t) -> bool: return t != "")
+	return "　【%s】" % "、".join(spots) if not spots.is_empty() else ""
+
+
+func _spot_of_npc(npc_id: String) -> String:
+	var n: Dictionary = data.quest_npcs.get(npc_id, {})
+	return _spot_text(String(n.get("name", "")), n) if not n.is_empty() else ""
+
+
+func _spot_text(nm: String, o: Dictionary) -> String:
+	if not o.has("map"):
+		return ""
+	var mid := String(o["map"])
+	var door: Dictionary = data.tp_by_id.get("xc_in_" + mid.substr(2), {}) if mid.begins_with("xc") else {}
+	var at := "%s (%d,%d)" % [_lm_map_name(mid).replace("（原版）", "街上"), int(o.get("lx", o.get("x", 0))), int(o.get("ly", o.get("y", 0)))]
+	if not door.is_empty():     # 室內: 加街上入口座標
+		at += "，入口在%s (%d,%d)" % [_lm_map_name(String(door.get("map", ""))).replace("（原版）", "街上"), int(door.get("lx", door.get("x", 0))), int(door.get("ly", door.get("y", 0)))]
+	return "%s：%s" % [nm, at]
+
+
 func view_quests() -> Array:
 	var ch := player_ch()
 	var out: Array = []
@@ -310,9 +356,9 @@ func view_quests() -> Array:
 		elif not (ch.get("quests", {}) as Dictionary).is_empty() and (ch["quests"] as Dictionary).has(qid):
 			entry["active"] = true
 			entry["stage"] = int(ch["quests"][qid].get("stage", 0))
-			entry["hint"] = RulesQuest.hint(q, ch)
+			entry["hint"] = RulesQuest.hint(q, ch) + _where_text(q, ch)
 		else:
-			entry["hint"] = RulesQuest.hint(q, ch)   # 未開始: preHint
+			entry["hint"] = RulesQuest.hint(q, ch) + _where_text(q, ch)   # 未開始: preHint (+ 邊度接)
 		out.append(entry)
 	return out
 
