@@ -7,23 +7,26 @@ extends RefCounted
 # 每個元件: {"kind": "circle", "c": Vector2, "r": float} 或 {"kind": "rect", "rect": Rect2}
 # 測試: tests/run_hud.gd（冇重疊、夠大、喺安全區內、唔入搖桿區）
 
-const MIN_TOUCH := 44.0        # 手指最細目標 ≈ 9mm
+const MIN_TOUCH := 30.0        # 手指最細目標 (用家 UAT: HUD 要細啲，由 44 降到 30)
 const ATK_R := 46.0            # 普攻大圓
 const SKILL_R := 22.0          # 技能圓
 const SKILL_DIST := 104.0      # 技能圓心距普攻圓心 (前 4 格)
 const SKILL_DIST2 := 150.0     # 額外 2 格 (S01a: 5 級後) 用大半徑，避免同前 4 格重疊
 const SKILL_ANGLES := [180.0, 210.0, 240.0, 270.0, 218.0, 248.0]   # 左 → 上 扇形（Godot y 向下）；前 4 個 = 5 級前；S01a: 5 級後開埋後 2 個 (用 SKILL_DIST2)
 const SMALL_R := 22.0          # 切換目標 / 自動
-const MENU := ["menu_bag", "menu_char", "menu_quest", "menu_pk", "menu_more"]
-const MENU_LABELS := {"menu_bag": "背包", "menu_char": "角色", "menu_quest": "任務", "menu_pk": "打人", "menu_more": "更多"}
-const MENU_SZ := 48.0
-const MENU_GAP := 4.0
-const MINI_SZ := Vector2(112, 50)   # 小地圖 (spec 12 §6)
+const MENU := ["menu_bag", "menu_char", "menu_quest", "menu_more"]      # 打人掣收入「更多」
+const MENU_LABELS := {"menu_bag": "背包", "menu_char": "角色", "menu_quest": "任務", "menu_more": "更多"}
+const MENU_SZ := 30.0
+const MENU_GAP := 3.0
+const MINI_R := 32.0           # 小地圖半徑 (圓形, spec 12 §6)
 const COMP_SZ := Vector2(120, 54)   # 同伴框 (Step 13.5；S02b 加多一行 exp 條)
-const STATUS_ROW_H := 18.0     # 角色框底部狀態 icon 列高度 (S02a)
-const POTION_R := 26.0         # 快捷補品欄 (U-fix): 窄窄一條，喺搖桿區上面，3 格 HP/MP 補品
+const STATUS_ROW_H := 12.0     # 角色框底部狀態 icon 列高度 (S02a)
+const POTION_R := 16.0         # 快捷補品欄 (U-fix): 窄窄一條，喺搖桿區上面，3 格 HP/MP 補品
 const POTION_SLOTS := 3
-const POTION_GAP := 6.0
+const POTION_GAP := 5.0
+const PORTRAIT_SZ := Vector2(150, 46)   # 角色框 (縮細; 底下另加 STATUS_ROW_H)
+const LOG_W := 200.0
+const LOG_H := 34.0
 
 
 # 系統介面鍵數 (S01a, spec 01 §5): 5 級前 4 鍵，5 級後 6 鍵
@@ -40,15 +43,15 @@ static func build(size: Vector2, safe: Rect2 = Rect2()) -> Dictionary:
 	var B := safe.end.y
 	var out := {}
 	# 左上角色框（整塊撳得，底部一行 = 狀態 icon 列 S02a）
-	out["portrait"] = {"kind": "rect", "rect": Rect2(L + 6, T + 6, 210, 84 + STATUS_ROW_H)}
+	out["portrait"] = {"kind": "rect", "rect": Rect2(L + 4, T + 4, PORTRAIT_SZ.x, PORTRAIT_SZ.y + STATUS_ROW_H)}
 	# 同伴框 (Step 13.5): 日誌右邊，搖桿區上面
-	out["companion"] = {"kind": "rect", "rect": Rect2(L + 312, T + 108, COMP_SZ.x, COMP_SZ.y)}
+	out["companion"] = {"kind": "rect", "rect": Rect2(L + 160, T + 4, COMP_SZ.x, COMP_SZ.y)}
 	# 右上選單列（由右向左排）
 	for i in MENU.size():
 		var x := R - 6 - MENU_SZ * (i + 1) - MENU_GAP * i
 		out[MENU[MENU.size() - 1 - i]] = {"kind": "rect", "rect": Rect2(x, T + 6, MENU_SZ, MENU_SZ)}
 	# 小地圖: 選單列下面靠右（區名/時辰寫喺入面）
-	out["minimap"] = {"kind": "rect", "rect": Rect2(R - 6 - MINI_SZ.x, T + 6 + MENU_SZ + 4, MINI_SZ.x, MINI_SZ.y)}
+	out["minimap"] = {"kind": "circle", "c": Vector2(R - 6 - MINI_R, T + 6 + MENU_SZ + 4 + MINI_R), "r": MINI_R}
 	# 右下戰鬥群
 	var ac := Vector2(R - 74, B - 72)
 	out["attack"] = {"kind": "circle", "c": ac, "r": ATK_R}
@@ -87,14 +90,14 @@ static func joy_zone(size: Vector2, safe: Rect2 = Rect2()) -> Rect2:
 	if safe.size == Vector2.ZERO:
 		safe = Rect2(Vector2.ZERO, size)
 	var ctx: Rect2 = build(size, safe)["context"]["rect"]
-	var top := safe.position.y + 156.0 + STATUS_ROW_H + POTION_R * 2 + 16.0   # 角色框 + 日誌 + 補品欄下面
+	var top := log_rect(safe).end.y + POTION_R * 2 + 12.0   # 角色框 + 日誌 + 補品欄下面
 	var right := minf(safe.position.x + size.x * 0.5, ctx.position.x - 8.0)
 	return Rect2(safe.position.x, top, right - safe.position.x, safe.end.y - top)
 
 
 # 日誌預覽（角色框下面，撳到開完整日誌面板）
 static func log_rect(safe: Rect2) -> Rect2:
-	return Rect2(safe.position.x + 6, safe.position.y + 108 + STATUS_ROW_H, 300, 44)
+	return Rect2(safe.position.x + 4, safe.position.y + 4 + PORTRAIT_SZ.y + STATUS_ROW_H + 3, LOG_W, LOG_H)
 
 
 static func contains(el: Dictionary, p: Vector2) -> bool:

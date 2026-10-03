@@ -336,9 +336,6 @@ func _fire(id: String) -> void:
 			bag_panel().open_filter("")
 		"menu_char", "portrait": open_panel("char")
 		"menu_quest": open_panel("quest")
-		"menu_pk":
-			main.pk_mode = not main.pk_mode
-			main._log("打人模式 %s" % ("開" if main.pk_mode else "關"))
 		"menu_more": open_panel("more")
 		"minimap": open_panel("map")
 		"log": log_panel().open()
@@ -453,7 +450,7 @@ func _draw_potions() -> void:
 		_circle_btn(id, Color(0.12, 0.28, 0.14, 0.8) if filled else Color(0.12, 0.12, 0.12, 0.55),
 			Color(0.55, 0.95, 0.55) if filled else Color(1, 1, 1, 0.4))
 		var label: String = main.item_name_for_potion(item_id).substr(0, 3) if filled else "空"
-		_txt_center(c.y + 4, label, Color.WHITE if filled else Color(0.7, 0.7, 0.7), 11, r * 2, c.x - r)
+		_txt_center(c.y + 3, label, Color.WHITE if filled else Color(0.7, 0.7, 0.7), 8, r * 2, c.x - r)
 
 # 左上角色框
 func _draw_status() -> void:
@@ -470,12 +467,12 @@ func _draw_status() -> void:
 	draw_rect(fr, Color(0, 0, 0, 0.7 if _is_down("portrait") else 0.55))
 	draw_rect(fr, Color(1, 1, 1, 0.3), false, 1.0)
 	# 頭像（UAT-feedback: 角色框縮細）
-	var pr := Rect2(o + Vector2(5, 5), Vector2(46, 46))
+	var pr := Rect2(o + Vector2(3, 3), Vector2(34, 38))
 	draw_rect(pr, Color(0, 0, 0, 0.4))
 	var me = main._me()
 	var cf := AssetLib.face_image(main.ch.get("face", {}))
 	if cf != null:
-		draw_texture_rect(cf, Rect2(pr.position + Vector2(2.3, 0), Vector2(41.4, 46)), false)
+		draw_texture_rect(cf, Rect2(pr.position + Vector2(1.9, 0), Vector2(30.2, 38)), false)
 	elif me != null:
 		var faces: Array = main.faces
 		if faces.size() > 0:
@@ -483,18 +480,17 @@ func _draw_status() -> void:
 			if f != null:
 				draw_texture_rect(f, pr, true)
 	draw_rect(pr, Color(1, 1, 1, 0.35), false, 1.0)
-	_txt(o + Vector2(57, 15), "%s  Lv%d" % [main.ch.name, lv], Color.WHITE, 13)
-	_txt(o + Vector2(57, 28), "%s" % RulesKarma.tier_name(int(ch.karma)), Color(1, 0.85, 0.4), 10)
+	_txt(o + Vector2(41, 10), "%s Lv%d" % [main.ch.name, lv], Color.WHITE, 10)
 	var rows := [["HP", float(ch.hp) / mhp, Color(0.85, 0.2, 0.2), "%d" % int(ch.hp)], ["MP", float(ch.mp) / mmp, Color(0.25, 0.45, 0.95), "%d" % int(ch.mp)],
 		["SP", float(ch.sp) / msp, Color(0.9, 0.8, 0.2), "%d" % int(ch.sp)], ["EXP", float(ch.exp) / maxi(1, need), Color(0.7, 0.4, 0.95), "%d/%d" % [int(ch.exp), need]]]
 	for i in rows.size():
-		var y := o.y + 32 + 11 * i
-		_txt(Vector2(o.x + 57, y + 8), rows[i][0], Color(0.95, 0.95, 0.95), 10)
-		_bar(o.x + 84, y - 1, 88, 6, rows[i][1], rows[i][2])
-		_txt(Vector2(o.x + 176, y + 8), rows[i][3], Color(0.9, 0.9, 0.9), 9)    # 數字 (手機：睇到實際 exp)
+		var y := o.y + 14 + 7 * i
+		_txt(Vector2(o.x + 41, y + 5), rows[i][0], Color(0.95, 0.95, 0.95), 7)
+		_bar(o.x + 58, y, 50, 4, rows[i][1], rows[i][2])
+		_txt(Vector2(o.x + 111, y + 5), rows[i][3], Color(0.9, 0.9, 0.9), 7)    # 數字 (手機：睇到實際 exp)
 	# 金（右上角細字）
-	var gold_s := "金 %d" % int(ch.gold)
-	_txt(Vector2(o.x + fr.end.x - 6 - gold_s.length() * 6.0, o.y + 10), gold_s, Color(1, 0.9, 0.5), 11)
+	var gold_s := "金%d" % int(ch.gold)
+	_txt_right(Vector2(fr.end.x - 3, o.y + 10), gold_s, Color(1, 0.9, 0.5), 8)
 	_draw_status_icons(o, fr, main.sim.tick)
 
 # 狀態 icon 列 (S02a, spec 02 §7): 角色框底部一行，短名 + 剩餘秒數
@@ -509,9 +505,9 @@ func _draw_status_icons(o: Vector2, fr: Rect2, tick: int) -> void:
 		if left <= 0:
 			continue
 		var label: String = main.STATUS_NAMES.get(str(sid), str(sid))
-		var w := 8.0 * label.length() + 20.0
-		draw_rect(Rect2(x, y + 2, w, 14), Color(0.5, 0.15, 0.55, 0.75))
-		_txt(Vector2(x + 3, y + 13), "%s %ds" % [label, int(left / 10.0)], Color(1, 0.9, 1), 10)
+		var w := 6.0 * label.length() + 16.0
+		draw_rect(Rect2(x, y + 1, w, 10), Color(0.5, 0.15, 0.55, 0.75))
+		_txt(Vector2(x + 2, y + 9), "%s %ds" % [label, int(left / 10.0)], Color(1, 0.9, 1), 7)
 		x += w + 4
 
 # 同伴框 (Step 13.5): 頭像 + 名 + HP 條 + 忠誠/剩日/指令
@@ -549,73 +545,91 @@ func _draw_target(s: Vector2) -> void:
 	_txt(Vector2(r.position.x + 8, r.position.y + 15), "%s  Lv%d" % [t.name, int(t.level)], Color(1, 0.8, 0.7), 12)
 	_bar(r.position.x + 8, r.position.y + 25, w - 16, 6, float(t.hp) / max_hp, Color(0.9, 0.25, 0.15))
 
-# 右上小地圖: 當前地圖縮圖 (以自己為中心) + 怪/NPC/自己點 + 區名/時辰 (spec 12 §6)
+# 右上小地圖 (圓形): 當前地圖縮圖 (以自己為中心，範圍闊 ~3 倍) + 怪/NPC/自己點；區名/時辰喺圓下面 (spec 12 §6)
 func _draw_info() -> void:
-	var r: Rect2 = layout["minimap"]["rect"]
-	draw_rect(r, Color(0, 0, 0, 0.75 if _is_down("minimap") else 0.6))
+	var el: Dictionary = layout["minimap"]
+	var C: Vector2 = el["c"]
+	var R := float(el["r"])
+	draw_circle(C, R, Color(0, 0, 0, 0.75 if _is_down("minimap") else 0.6))
 	var me = main._me()
 	var md: Dictionary = main.cur_map
+	var nm := ""
+	var fx: Dictionary = main.sim.beast_effects_view(main.my_id)   # U13 戰騎導航/天眼/嗅血 友好技
 	if me != null and not md.is_empty():
-		const K := 2.0                              # 每格 2px
-		var inner := r.grow(-2)
-		var view := inner.size / K                  # 睇到幾多格
+		var K := clampf(2.0 * R * 0.95 / maxf(float(md.w), float(md.h)), 1.0, 3.0)     # 大圖 1px/格 (睇 ~76 格)；細圖放大
+		var inner := Rect2(C - Vector2(R, R), Vector2(R, R) * 2.0)
+		var view := inner.size / K
 		var mx := float(me.x) - float(md.ox)
 		var my := float(me.y) - float(md.oy)
 		var src := Rect2(Vector2(clampf(mx - view.x / 2, 0, maxf(0, float(md.w) - view.x)), clampf(my - view.y / 2, 0, maxf(0, float(md.h) - view.y))), view)
 		src.size = src.size.min(Vector2(float(md.w), float(md.h)) - src.position)
-		var dst := Rect2(inner.position, src.size * K)
-		draw_texture_rect_region(MapArt.minimap(main.data, md), dst, src, Color(1, 1, 1, 0.9))
-		var org := inner.position - src.position * K
-		var fx: Dictionary = main.sim.beast_effects_view(main.my_id)   # U13 戰騎導航/天眼/嗅血 友好技
+		var dst := Rect2(C - src.size * K / 2.0, src.size * K)
+		if view.x < float(md.w):
+			dst.position.x = inner.position.x
+		if view.y < float(md.h):
+			dst.position.y = inner.position.y
+		var tex := MapArt.minimap(main.data, md)
+		var tsz := Vector2(tex.get_width(), tex.get_height())
+		var pts := PackedVector2Array()
+		var uvs := PackedVector2Array()
+		for k in 40:
+			var a := TAU * float(k) / 40.0
+			var pt := C + Vector2(cos(a), sin(a)) * (R - 1.5)
+			pt = Vector2(clampf(pt.x, dst.position.x, dst.end.x), clampf(pt.y, dst.position.y, dst.end.y))
+			pts.append(pt)
+			uvs.append((src.position + (pt - dst.position) / K) / tsz)
+		draw_colored_polygon(pts, Color(1, 1, 1, 0.92), uvs, tex)
+		var org := dst.position - src.position * K
 		var tianyan: bool = bool(fx.get("show_npc", false))
 		var xiuxue: bool = bool(fx.get("show_low_hp", false))
 		for e in main.ents:
 			var p := org + (Vector2(float(e.x) - float(md.ox), float(e.y) - float(md.oy)) + Vector2(0.5, 0.5)) * K
-			if not dst.has_point(p) or int(e.id) == main.my_id:
+			if p.distance_to(C) > R - 3.0 or int(e.id) == main.my_id:
 				continue
 			var is_low := xiuxue and bool(e.get("mob", false)) and float(e.maxHp) > 0 and float(e.hp) / float(e.maxHp) < 0.3
 			draw_rect(Rect2(p - Vector2(1, 1), Vector2(2, 2)), Color(1.0, 0.85, 0.1) if is_low else (Color(0.95, 0.25, 0.2) if e.get("mob", false) else Color(0.9, 0.9, 0.9)))
 			if tianyan and not e.get("mob", false) and (bool(e.get("bot", false)) or bool(e.get("gen", false))):
-				_txt(p + Vector2(3, 3), str(e.name), Color(0.6, 0.95, 1.0), 9)
+				_txt(p + Vector2(3, 3), str(e.name), Color(0.6, 0.95, 1.0), 8)
 		for qn in main.quest_npcs:
 			var q := org + (Vector2(float(qn.x) - float(md.ox), float(qn.y) - float(md.oy)) + Vector2(0.5, 0.5)) * K
-			if dst.has_point(q):
+			if q.distance_to(C) < R - 3.0:
 				draw_rect(Rect2(q - Vector2(1.5, 1.5), Vector2(3, 3)), Color(0.4, 0.75, 1.0))
 		for gn in main.generals:
 			var gq := org + (Vector2(float(gn.x) - float(md.ox), float(gn.y) - float(md.oy)) + Vector2(0.5, 0.5)) * K
-			if dst.has_point(gq):
+			if gq.distance_to(C) < R - 3.0:
 				draw_rect(Rect2(gq - Vector2(1.5, 1.5), Vector2(3, 3)), Color(1.0, 0.8, 0.3))
 		var geo: bool = main.sim.geo_unlocked()      # 地理專長 lv≥1: 全部設施顯示，唔止傳送點 (S01c, spec 01 §8)
 		for f in main.facilities:
 			if String(f.kind) == "travel" or geo:
 				var tp := org + (Vector2(float(f.x) - float(md.ox), float(f.y) - float(md.oy)) + Vector2(0.5, 0.5)) * K
-				if dst.has_point(tp):
-					draw_circle(tp, 2.5, Color(0.5, 1.0, 0.4) if String(f.kind) == "travel" else Color(0.6, 0.8, 1.0))
+				if tp.distance_to(C) < R - 3.0:
+					draw_circle(tp, 2.0, Color(0.5, 1.0, 0.4) if String(f.kind) == "travel" else Color(0.6, 0.8, 1.0))
 		draw_circle(org + (Vector2(mx, my) + Vector2(0.5, 0.5)) * K, 2.5, Color(1, 0.9, 0.2))
 		var zv: Dictionary = main.sim.zone_view(int(me.x), int(me.y))
-		var nm := str(zv.get("area", "")) if str(zv.get("area", "")) != "" else str(zv.get("name", ""))
-		if bool(fx.get("map_city", false)):     # U13 戰騎「導航」友好技: 加返最近城池名 + 方向指示
+		nm = str(zv.get("area", "")) if str(zv.get("area", "")) != "" else str(zv.get("name", ""))
+		if bool(fx.get("map_city", false)):     # U13 戰騎「導航」友好技: 加返最近城池名
 			var nc: Dictionary = main.sim.nearest_city_view(int(me.x), int(me.y))
 			if not nc.is_empty():
 				nm += "  →%s" % str(nc.get("name", ""))
-		draw_rect(Rect2(r.position, Vector2(r.size.x, 14)), Color(0, 0, 0, 0.55))
-		_txt_right(Vector2(r.end.x - 4, r.position.y + 11), nm, Color(0.95, 0.88, 0.7), 11)
-	draw_rect(Rect2(Vector2(r.position.x, r.end.y - 13), Vector2(r.size.x, 13)), Color(0, 0, 0, 0.55))
-	_txt_right(Vector2(r.end.x - 4, r.end.y - 3), ("夜 " if main.night_on else "") + str(main.clock_str), Color(1, 0.95, 0.65), 10)
-	draw_rect(r, UiTheme.GOLD if _is_down("minimap") else Color(1, 1, 1, 0.35), false, 1.0)
+	draw_arc(C, R, 0, TAU, 48, UiTheme.GOLD if _is_down("minimap") else Color(1, 1, 1, 0.45), 1.5)
+	# 區名 + 時辰: 圓下面兩行小字
+	var ty := C.y + R + 10.0
+	draw_rect(Rect2(Vector2(C.x - R - 14, ty - 8), Vector2(R * 2 + 14, 20)), Color(0, 0, 0, 0.45))
+	_txt_right(Vector2(C.x + R - 2, ty), nm, Color(0.95, 0.88, 0.7), 8)
+	_txt_right(Vector2(C.x + R - 2, ty + 9), ("夜 " if main.night_on else "") + str(main.clock_str), Color(1, 0.95, 0.65), 8)
 
 func _draw_menu() -> void:
 	for id in HudLayout.MENU:
 		var r: Rect2 = layout[id]["rect"]
 		var down := _is_down(id)
-		var pk_on: bool = id == "menu_pk" and bool(main.pk_mode)
+		var pk_on: bool = id == "menu_more" and bool(main.pk_mode)      # 打人開住 → 更多掣變紅
 		draw_rect(r, Color(0.55, 0.12, 0.12, 0.95) if pk_on else (Color(0.3, 0.22, 0.12, 0.95) if down else Color(0.12, 0.1, 0.08, 0.85)))
-		draw_rect(r, Color(1, 0.3, 0.25) if pk_on else UiTheme.GOLD, false, 1.5)
-		_txt_center(r.position.y + r.size.y / 2 + 5, String(HudLayout.MENU_LABELS[id]), Color.WHITE, 14, r.size.x, r.position.x)
+		draw_rect(r, Color(1, 0.3, 0.25) if pk_on else UiTheme.GOLD, false, 1.0)
+		_txt_center(r.position.y + r.size.y / 2 + 4, String(HudLayout.MENU_LABELS[id]), Color.WHITE, 11, r.size.x, r.position.x)
 	# 有未分配點數: 角色掣紅點
 	if int(main.ch.get("attrPoints", 0)) > 0:
 		var cr: Rect2 = layout["menu_char"]["rect"]
-		draw_circle(cr.position + Vector2(cr.size.x - 4, 4), 6, Color(0.95, 0.2, 0.15))
+		draw_circle(cr.position + Vector2(cr.size.x - 3, 3), 4, Color(0.95, 0.2, 0.15))
 
 func _circle_btn(id: String, fill: Color, ring: Color, ring_w := 2.5) -> void:
 	var el: Dictionary = layout[id]
@@ -688,12 +702,12 @@ func _draw_log(sr: Rect2) -> void:
 		return
 	var show: Array = lines.slice(maxi(0, n - 3))
 	var r := HudLayout.log_rect(sr)
-	draw_rect(Rect2(r.position, Vector2(r.size.x, 14 * show.size() + 4)), Color(0, 0, 0, 0.35))
+	draw_rect(Rect2(r.position, Vector2(r.size.x, 10 * show.size() + 3)), Color(0, 0, 0, 0.35))
 	for i in show.size():
 		var t := str(show[i])
-		if t.length() > 26:
-			t = t.substr(0, 25) + "…"
-		_txt(r.position + Vector2(4, 13 + 14 * i), t, Color(1, 1, 0.75), 11)
+		if t.length() > 32:
+			t = t.substr(0, 31) + "…"
+		_txt(r.position + Vector2(3, 9 + 10 * i), t, Color(1, 1, 0.75), 8)
 
 # ================= 小工具 (同 main.gd 一致) =================
 func _bar(x: float, y: float, w: float, h: float, ratio: float, col: Color) -> void:

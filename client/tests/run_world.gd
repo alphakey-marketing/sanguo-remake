@@ -17,6 +17,7 @@ func _init() -> void:
 	t_save_file(data)
 	t_zones_travel(data)
 	t_set_home(data)
+	t_path_fallback(data)
 	t_chenliu_npcs(data)
 	t_trade_cities(data)
 	t_orig_map(data)
@@ -251,6 +252,52 @@ func t_zones_travel(data: GameData) -> void:
 
 
 # 建角揀新手城 (spec 12 §1): 3 城可揀、Lv1 先改得、搬去嗰城客棧
+# 自動尋路: 目的地圍封 (去唔到) → 行去最近行得到嘅格，唔會企喺度；一般目的地行得到
+func t_path_fallback(data: GameData) -> void:
+	var sim := Sim.new(data, 62)
+	var id := sim.spawn_player_orig("p")
+	var e := sim.ent(id)
+	var md: Dictionary = data.map_by_id["xuchang_o"]
+	var ox := int(md["spawn"][0])
+	var oy := int(md["spawn"][1])
+	var far := sim._free_near(ox + 25, oy)
+	sim.cmd_move(id, far.x, far.y)
+	for i in 3000:
+		sim.step()
+	check(int(e["x"]) == far.x and int(e["y"]) == far.y, "尋路: 一般目的地行得到")
+	# 搵一格有路但 4 面被圍嘅孤島 (全域 walk 入面 BFS 唔連到出生點)
+	var start := oy * sim.W + ox
+	var seen := {start: true}
+	var q: Array = [start]
+	var qi := 0
+	while qi < q.size() and qi < 60000:
+		var c: int = q[qi]
+		qi += 1
+		for n in [c + 1, c - 1, c + sim.W, c - sim.W]:
+			if n >= 0 and n < data.walk.size() and data.walk[n] == 1 and not seen.has(n):
+				seen[n] = true
+				q.append(n)
+	var isle := -1
+	for y in range(int(md["oy"]) + 2, int(md["oy"]) + int(md["h"]) - 2):
+		for x in range(int(md["ox"]) + 2, int(md["ox"]) + int(md["w"]) - 2):
+			if sim.is_free(x, y) and not seen.has(y * sim.W + x) and not data.portal_at.has(y * sim.W + x):
+				isle = y * sim.W + x
+				break
+		if isle >= 0:
+			break
+	if isle < 0:
+		return
+	e["x"] = ox
+	e["y"] = oy
+	e["tx"] = ox
+	e["ty"] = oy
+	sim.cmd_move(id, isle % sim.W, isle / sim.W)
+	for i in 3000:
+		sim.step()
+	check(int(e["tx"]) != isle % sim.W or int(e["ty"]) != isle / sim.W, "尋路: 孤島目的地改去最近嘅位")
+	check(not (int(e["x"]) == ox and int(e["y"]) == oy), "尋路: 去唔到都行去最近位，唔係原地企")
+
+
 func t_set_home(data: GameData) -> void:
 	var sim := Sim.new(data, 61)
 	var orig_ids: Array = sim.newbie_cities()

@@ -33,6 +33,7 @@ def snap(g, x, y, others):
 
 def spread(tm, others):
     """揀一格：喺某建築(傳送門)附近，離所有門 >=3、八鄰皆可行，並同 others 盡量遠 (目標 >=10 格，farthest-point)。"""
+    tm_vis = os.path.exists(os.path.join(C, 'orig_maps', tm + '.json'))
     g = grid(tm)
     ports = [(q['x'], q['y']) for q in jl('maps.json')['portals'] if q['map'] == tm]
     lands = [tuple(q['land']) if q.get('land') else (q['x'], q['y']) for q in jl('maps.json')['portals'] if q['map'] == tm]
@@ -44,6 +45,8 @@ def spread(tm, others):
             if any(max(abs(lx - a), abs(ly - b)) < 3 for a, b in ports):
                 continue
             if lands and min(max(abs(lx - a), abs(ly - b)) for a, b in lands) > 8:
+                continue
+            if tm_vis and not visible(tm, lx, ly):
                 continue
             cand.append((lx, ly))
     if not cand:
@@ -113,6 +116,60 @@ INTERIOR = {'官宅': 'xc1901', '客棧': 'xc1902', '藥房': 'xc1903', '虎威�
             '王允府': 'xc1946', '劉備家': 'xc1947'}      # 街頭角色 (民宅/出城) 唔入屋
 
 
+_OBJ = {}
+
+
+def _objs(mid):
+    """載入原版地圖物件 (非貼地) 嘅 alpha mask，用嚟判斷 NPC 會唔會畀物件遮住。回 (objs, walkable bytes, gw)"""
+    if mid in _OBJ:
+        return _OBJ[mid]
+    import base64, zlib
+    from PIL import Image
+    jp = os.path.join(C, 'orig_maps', mid + '.json')
+    if not os.path.exists(jp):
+        _OBJ[mid] = ([], None, 0)
+        return _OBJ[mid]
+    d = jl('orig_maps/' + mid + '.json')
+    wd = d.get('walk') or {}
+    walk = zlib.decompress(base64.b64decode(wd['z'])) if wd else None
+    gw = int(wd.get('w', 0)) if wd else 0
+    out = []
+    for o in d['objects']:
+        f = os.path.join(C, '..', 'assets_orig', 'maps', mid, 'obj', str(o['n']) + '.png')
+        if not os.path.exists(f):
+            continue
+        im = Image.open(f).convert('RGBA')
+        a = im.split()[3]
+        bb = a.getbbox()
+        if not bb:
+            continue
+        x, y, w, h = int(o['x']), int(o['y']), im.width, im.height
+        if bool(o.get('floor')) or str(o['n']).startswith('up6'):
+            continue
+        if walk is not None:                      # 貼地物件 (佔嘅格冇一格擋) 唔遮人
+            cells = [walk[r * gw + c] for r in range(max(0, y // 16), (y + h - 1) // 16 + 1) for c in range(max(0, x // 16), min(gw - 1, (x + w - 1) // 16) + 1) if r * gw + c < len(walk)]
+            if cells and not any(cells):
+                continue
+        out.append((x, y, w, h, y + bb[3], a))
+    _OBJ[mid] = (out, walk, gw)
+    return _OBJ[mid]
+
+
+def visible(mid, x, y):
+    """NPC 企 (x,y) 時，身體範圍 (約 50x72 px，腳底 = 格底) 有冇俾腳底更低嘅物件(牆/樓梯/屋簷)遮住"""
+    objs, _, _ = _objs(mid)
+    fx, fy = x * 16 + 8, y * 16 + 16
+    pts = [(fx + dx, fy - dy) for dx in range(-22, 23, 6) for dy in range(2, 72, 6)]
+    for ox, oy, w, h, bot, a in objs:
+        if bot <= fy:
+            continue
+        for px, py in pts:
+            lx, ly = px - ox, py - oy
+            if 0 <= lx < w and 0 <= ly < h and a.getpixel((lx, ly)) > 40:
+                return False
+    return True
+
+
 def _inside(mid, taken):
     """室內圖: 由出生點 (門口) BFS，揀行 7~16 步遠、離其他人 >=2 格嘅位"""
     g = grid(mid)
@@ -126,11 +183,12 @@ def _inside(mid, taken):
             if n not in dist and ok(g, *n):
                 dist[n] = dist[(cx, cy)] + 1
                 q.append(n)
-    for lo, w in ((7, 2), (4, 2), (1, 2), (4, 0), (1, 0)):
-        c = [p for p, d in dist.items() if lo <= d <= 16 and all(ok(g, p[0] + a, p[1] + b) for a in range(-w, w + 1) for b in (-1, 0, 1))
-             and all(max(abs(p[0] - a), abs(p[1] - b)) >= 2 for a, b in taken)]
+    # 新規則: 離門 >=6 步、5x5 全行得 (離牆 2 格)、唔畀物件遮住；同房人 >=10 格 (放唔晒逐級放寬)
+    for lo, w, sep in ((6, 2, 10), (6, 2, 6), (4, 2, 4), (4, 1, 3), (3, 1, 2), (1, 0, 2)):
+        c = [p for p, d in dist.items() if lo <= d <= 40 and all(ok(g, p[0] + a, p[1] + b) for a in range(-w, w + 1) for b in range(-w, w + 1))
+             and all(max(abs(p[0] - a), abs(p[1] - b)) >= sep for a, b in taken) and visible(mid, p[0], p[1])]
         if c:
-            c.sort(key=lambda p: (abs(dist[p] - 10), p[1], p[0]))
+            c.sort(key=lambda p: (-min([max(abs(p[0] - a), abs(p[1] - b)) for a, b in taken] or [99]) if sep >= 6 else 0, abs(dist[p] - 12), p[1], p[0]))
             return c[0]
     return None
 

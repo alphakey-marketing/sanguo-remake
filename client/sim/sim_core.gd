@@ -302,6 +302,18 @@ func _set_dest(e: Dictionary, x: int, y: int, cap: int = PATH_CAP) -> void:
 	if _greedy_reaches(int(e["x"]), int(e["y"]), x, y):
 		return
 	var p := RulesPath.find(data.walk, W, int(e["y"]) * W + int(e["x"]), y * W + x, cap, data.portal_at)
+	if p.is_empty() and is_free(x, y) and e["kind"] == "player":
+		# 去唔到 (圍封/太遠): 行去最近行得到嘅格，唔好對住牆企喺度
+		p = RulesPath.reach_nearest(data.walk, W, int(e["y"]) * W + int(e["x"]), y * W + x, cap * 2, data.portal_at)
+		if not p.is_empty():
+			var last := int(p[-1])
+			e["tx"] = last % W
+			e["ty"] = last / W
+			_msg(int(e["id"]), "去唔到嗰度，行去最近嘅位")
+		else:
+			e["tx"] = int(e["x"])
+			e["ty"] = int(e["y"])
+			_msg(int(e["id"]), "去唔到嗰度")
 	if not p.is_empty():
 		e["path"] = p
 

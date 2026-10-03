@@ -8,8 +8,8 @@ extends Control
 signal moved(dir: Vector2)
 signal released(dir: Vector2)
 
-const RADIUS := 44.0
-const KNOB := 19.0
+const RADIUS := 32.0
+const KNOB := 14.0
 const DEAD := 7.0
 
 var zone := Rect2()          # 搖桿區（screen 座標，每次事件前由 HUD 更新）

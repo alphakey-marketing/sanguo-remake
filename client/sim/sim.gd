@@ -245,8 +245,21 @@ func step() -> void:
 				moved = true
 				moved_n += 1
 		if moved:
+			e["stuck"] = 0
 			_ride_moved(e, moved_n)
 			_on_moved(e)
+		elif e["kind"] == "player" and (int(e["tx"]) != int(e["x"]) or int(e["ty"]) != int(e["y"])):
+			# 行唔郁 (被人/怪擋、路徑作廢): 連續 6 tick 唔郁就重新尋路一次，仲唔得就放棄
+			e["stuck"] = int(e.get("stuck", 0)) + 1
+			if int(e["stuck"]) >= 6:
+				e["stuck"] = 0
+				var gx := int(e["tx"])
+				var gy := int(e["ty"])
+				e["tx"] = -1
+				_set_dest(e, gx, gy)
+				if not e.has("path") and not _greedy_reaches(int(e["x"]), int(e["y"]), int(e["tx"]), int(e["ty"])):
+					e["tx"] = int(e["x"])
+					e["ty"] = int(e["y"])
 
 
 # 天文專長 lv≥1 + 帶渾天儀(26029): 各城池現時天氣/天災情報 (S01c, spec 01 §8)

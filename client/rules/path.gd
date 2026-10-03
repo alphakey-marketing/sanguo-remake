@@ -56,6 +56,38 @@ static func find(walk: PackedByteArray, w: int, from: int, to: int, max_nodes: i
 	return []
 
 
+# 目的地行唔到 (圍封/太遠超 cap) → BFS 搵最近嘅行得到格，回路徑 (唔包起點)；原地最近 = []
+# 用 max_nodes 限制擴展數；同樣 avoid 傳送點。決定性: 固定方向次序，同距先到先得。
+static func reach_nearest(walk: PackedByteArray, w: int, from: int, to: int, max_nodes: int, avoid: Dictionary = {}) -> Array:
+	var tx := to % w
+	var ty := to / w
+	var came := {from: -1}
+	var q: Array = [from]
+	var qi := 0
+	var best := from
+	var best_h := _h(from, w, tx, ty)
+	while qi < q.size() and qi < max_nodes:
+		var cur: int = q[qi]
+		qi += 1
+		var h := _h(cur, w, tx, ty)
+		if h < best_h and not avoid.has(cur):
+			best_h = h
+			best = cur
+		var cx := cur % w
+		for n in [cur + 1 if cx + 1 < w else -1, cur - 1 if cx > 0 else -1, cur + w, cur - w]:
+			if n < 0 or n >= walk.size() or walk[n] == 0 or came.has(n) or avoid.has(n):
+				continue
+			came[n] = cur
+			q.append(n)
+	var out: Array = []
+	var c := best
+	while c != from:
+		out.append(c)
+		c = int(came[c])
+	out.reverse()
+	return out
+
+
 static func _h(c: int, w: int, tx: int, ty: int) -> int:
 	return absi(c % w - tx) + absi(c / w - ty)
 
