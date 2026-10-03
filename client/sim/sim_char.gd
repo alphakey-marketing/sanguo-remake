@@ -32,8 +32,8 @@ func cmd_facility(id: int, key: String) -> void:
 # 練兵場【原】: 2 人對練, 扣 HP+SP, 直接加 EXP (F8: 取代歷練)
 func _fac_training(e: Dictionary, ch: Dictionary, f: Dictionary) -> void:
 	var lv := int(ch["level"])
-	var mhp := RulesStats.max_hp(lv, ch["attrs"])
-	var msp := RulesStats.max_sp(lv, ch["attrs"])
+	var mhp := RulesStats.max_hp(lv, ch["attrs"], ch)
+	var msp := RulesStats.max_sp(lv, ch["attrs"], ch)
 	var id := int(e["id"])
 	if tick < int(e.get("train_cd", 0)):
 		return _msg(id, "啱啱練完，抖陣先")
@@ -52,7 +52,7 @@ func _fac_training(e: Dictionary, ch: Dictionary, f: Dictionary) -> void:
 	ch["hp"] = maxi(1, int(ch["hp"]) - MathX.js_round(mhp * float(f["costHp"])))
 	ch["sp"] = maxi(1, int(ch["sp"]) - MathX.js_round(msp * float(f["costSp"])))
 	var pch: Dictionary = partner["ch"]
-	pch["hp"] = maxi(1, int(pch["hp"]) - MathX.js_round(RulesStats.max_hp(int(pch["level"]), pch["attrs"]) * float(f["costHp"])))
+	pch["hp"] = maxi(1, int(pch["hp"]) - MathX.js_round(RulesStats.max_hp(int(pch["level"]), pch["attrs"], pch) * float(f["costHp"])))
 	partner["hp"] = int(pch["hp"])
 	_sync_stats(e)
 	var gain := maxi(int(f["expMin"]), MathX.js_round(RulesStats.exp_to_next(lv) * float(f["expPct"])))
@@ -67,7 +67,7 @@ func _fac_restsp(e: Dictionary, ch: Dictionary, f: Dictionary) -> void:
 	var id := int(e["id"])
 	if tick < int(e.get("restsp_cd", 0)):
 		return _msg(id, "小兵啱啱幫你回復完，抖陣先")
-	var msp := RulesStats.max_sp(int(ch["level"]), ch["attrs"])
+	var msp := RulesStats.max_sp(int(ch["level"]), ch["attrs"], ch)
 	if int(ch["sp"]) >= msp:
 		return _msg(id, "體力已滿")
 	ch["sp"] = msp
@@ -82,8 +82,8 @@ func _fac_attr(e: Dictionary, ch: Dictionary, f: Dictionary, attr: String, free:
 	var id := int(e["id"])
 	var lv := int(ch["level"])
 	var cost_gold := 0 if free else int(f.get("gold", 0))
-	var cost_sp := MathX.js_round(RulesStats.max_sp(lv, ch["attrs"]) * float(f.get("costSp", 0.0)))
-	var cost_mp := MathX.js_round(RulesStats.max_mp(lv, ch["attrs"]) * float(f.get("costMp", 0.0)))
+	var cost_sp := MathX.js_round(RulesStats.max_sp(lv, ch["attrs"], ch) * float(f.get("costSp", 0.0)))
+	var cost_mp := MathX.js_round(RulesStats.max_mp(lv, ch["attrs"], ch) * float(f.get("costMp", 0.0)))
 	if int(ch["gold"]) < cost_gold:
 		_msg(id, "要 %d 金" % cost_gold)
 		return false
@@ -134,6 +134,14 @@ func cmd_auto_assign(id: int) -> void:
 	_sync_stats(e)
 	_emit({"k": "attr_auto", "src": id, "points": int(ch["attrPoints"])})
 	_msg(id, "自動分配合成 (剩 %d 點)" % int(ch["attrPoints"]))
+
+
+# 升級自動派點開關【自訂，無 UI】: 預設關 (ch.autoPoints)，升級時按職業建議比例派晒
+func cmd_auto_points(id: int, on: bool) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return
+	e["ch"]["autoPoints"] = on
 
 
 # 新手城建角揀城 (UAT-feedback, spec 12 §1)【自訂】: 未出發(Lv1)先可以揀；揀完搬去嗰城客棧

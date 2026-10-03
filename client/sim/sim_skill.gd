@@ -478,7 +478,7 @@ func _try_toushi(id: int) -> void:
 		var bch: Dictionary = best.get("ch", {})
 		if not bch.is_empty():
 			info["mp"] = int(bch.get("mp", 0))
-			info["maxMp"] = RulesStats.max_mp(int(bch.get("level", 0)), bch.get("attrs", {}))
+			info["maxMp"] = RulesStats.max_mp(int(bch.get("level", 0)), bch.get("attrs", {}), bch)
 	info["weakness"] = RulesToushi.weakness_of(String(info["elem"]))
 	ch["toushiCd"] = tick + MathX.js_round(RulesToushi.TOUSHI_CD_TICKS * float(_companion_class_skill_mul(e)["cd"]))    # 22 職業特技
 	if not ch.has("status"):
@@ -503,7 +503,7 @@ func _try_chaodu(id: int) -> void:
 	if target.is_empty():
 		return _msg(id, "附近冇倒下嘅人（同伴/主公倒下先可以超渡）")
 	var max_hp := maxi(1, int(e.get("max_hp", 1)))
-	var max_mp := maxi(1, RulesStats.max_mp(int(ch["level"]), ch["attrs"]))
+	var max_mp := maxi(1, RulesStats.max_mp(int(ch["level"]), ch["attrs"], ch))
 	var cmul := float(_companion_class_skill_mul(e)["cost"])    # 22 職業特技
 	var hp_cost := int(ceil(max_hp * 0.2 * cmul))
 	var mp_cost := int(ceil(max_mp * 0.3 * cmul))

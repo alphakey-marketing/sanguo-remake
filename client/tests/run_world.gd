@@ -581,3 +581,16 @@ func t_growth(data: GameData) -> void:
 	check(RulesStats.spent_total(plan) == 12 and c2["attrs"] == before and int(c2["attrPoints"]) == 12, "成長: 建議分配只預覽、唔改角色")
 	RulesStats.auto_assign_points(c2, data.classes["yishi"])
 	check(int(c2["attrPoints"]) == 0 and int(c2["attrs"]["str"]) == int(before["str"]) + int(plan["str"]), "成長: 確認後同預覽一致")
+
+	# 職業 HP/MP/SP 差異 + 升級自動派點
+	var ys := RulesStats.create_character(data, "甲", "yishi")
+	var ds := RulesStats.create_character(data, "乙", "daoshi")
+	check(RulesStats.max_hp(1, ys["attrs"], ys) > RulesStats.max_hp(1, ds["attrs"], ds), "職業: 義士 HP > 道士")
+	check(RulesStats.max_mp(1, ds["attrs"], ds) > RulesStats.max_mp(1, ys["attrs"], ys), "職業: 道士 MP > 義士")
+	check(RulesStats.max_hp(10, ys["attrs"]) == 60 + 150 + int(ys["attrs"]["str"]) * 4, "職業: 冇傳 ch = 舊公式")
+	var ap := RulesStats.create_character(data, "丙", "yishi")
+	RulesStats.gain_exp(data, ap, RulesStats.exp_to_next(1))
+	check(int(ap["attrPoints"]) == 3, "自動派點: 預設關，升級留 3 點")
+	ap["autoPoints"] = true
+	RulesStats.gain_exp(data, ap, RulesStats.exp_to_next(2))
+	check(int(ap["attrPoints"]) == 0 and int(ap["level"]) == 3, "自動派點: 開咗升級即派晒所有點")

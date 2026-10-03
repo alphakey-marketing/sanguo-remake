@@ -149,7 +149,7 @@ static func think(sim) -> void:
 			continue                                  # (atk_target 已鎖定, 下方 _think_player 出手)
 		if sim.rng.next() < float(bc["chatChance"]):
 			sim.cmd_chat(id, LINES[sim.rng.below(LINES.size())])
-		var low: bool = int(e["hp"]) < RulesStats.max_hp(int(ch["level"]), ch["attrs"]) * float(bc["lowHpPct"])
+		var low: bool = int(e["hp"]) < RulesStats.max_hp(int(ch["level"]), ch["attrs"], ch) * float(bc["lowHpPct"])
 		var zone_id := String(ch.get("homeZone", Sim.DEFAULT_ZONE))    # S09a: 居民屬自己城最近野區；legacy = 預設
 		var inn: Vector2i = sim.resident_inn_pos(e)      # S09a: 居民返自己城客棧 (冇 = 唔撤退)
 		if low and inn.x >= 0:                          # 血低: 撤退返客棧休息 (跨圖就經門口行, spec 12 §4)

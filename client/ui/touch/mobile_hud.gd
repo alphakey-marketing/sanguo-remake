@@ -458,9 +458,9 @@ func _draw_status() -> void:
 	if ch.is_empty():
 		return
 	var lv := int(ch.level)
-	var mhp := RulesStats.max_hp(lv, ch.attrs)
-	var mmp := RulesStats.max_mp(lv, ch.attrs)
-	var msp := RulesStats.max_sp(lv, ch.attrs)
+	var mhp := RulesStats.max_hp(lv, ch.attrs, ch)
+	var mmp := RulesStats.max_mp(lv, ch.attrs, ch)
+	var msp := RulesStats.max_sp(lv, ch.attrs, ch)
 	var need := RulesStats.exp_to_next(lv)
 	var fr: Rect2 = layout["portrait"]["rect"]
 	var o := fr.position

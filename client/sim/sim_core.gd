@@ -438,15 +438,15 @@ func _jewel_bonus(ch: Dictionary) -> Dictionary:
 
 
 func _eff_max_hp(ch: Dictionary) -> int:
-	return MathX.js_round(RulesStats.max_hp(int(ch["level"]), ch["attrs"]) * (1.0 + float(_jewel_bonus(ch).get("hpPct", 0.0))))
+	return MathX.js_round(RulesStats.max_hp(int(ch["level"]), ch["attrs"], ch) * (1.0 + float(_jewel_bonus(ch).get("hpPct", 0.0))))
 
 
 func _eff_max_mp(ch: Dictionary) -> int:
-	return MathX.js_round(RulesStats.max_mp(int(ch["level"]), ch["attrs"]) * (1.0 + float(_jewel_bonus(ch).get("mpPct", 0.0))))
+	return MathX.js_round(RulesStats.max_mp(int(ch["level"]), ch["attrs"], ch) * (1.0 + float(_jewel_bonus(ch).get("mpPct", 0.0))))
 
 
 func _eff_max_sp(ch: Dictionary) -> int:
-	return RulesStats.max_sp(int(ch["level"]), ch["attrs"]) + int(_jewel_bonus(ch).get("spFlat", 0))
+	return RulesStats.max_sp(int(ch["level"]), ch["attrs"], ch) + int(_jewel_bonus(ch).get("spFlat", 0))
 
 
 # ================= 裝備 (Step 11.6, spec 02 §9) =================
@@ -767,9 +767,9 @@ func _bump_level(e: Dictionary, lv: int) -> void:
 	var attrs := RulesStats.attrs_at(cls, lv)
 	ch["level"] = lv
 	ch["attrs"] = attrs
-	ch["hp"] = RulesStats.max_hp(lv, attrs)
-	ch["mp"] = RulesStats.max_mp(lv, attrs)
-	ch["sp"] = RulesStats.max_sp(lv, attrs)
+	ch["hp"] = RulesStats.max_hp(lv, attrs, ch)
+	ch["mp"] = RulesStats.max_mp(lv, attrs, ch)
+	ch["sp"] = RulesStats.max_sp(lv, attrs, ch)
 	_sync_stats(e)
 
 

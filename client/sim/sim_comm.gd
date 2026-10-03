@@ -85,7 +85,7 @@ func _comm_repair_check(e: Dictionary, o: Dictionary) -> String:
 		return "%s要 %d 級先修得" % [ad["name"], int(o["lv"])]
 	if not ch.get("tools", {}).has(sk):
 		return "要裝備%s工具" % ad["name"]
-	if int(ch["sp"]) < RulesWork.sp_cost(RulesStats.max_sp(int(ch["level"]), ch["attrs"])):
+	if int(ch["sp"]) < RulesWork.sp_cost(RulesStats.max_sp(int(ch["level"]), ch["attrs"], ch)):
 		return "SP 唔夠"
 	return ""
 

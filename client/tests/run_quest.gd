@@ -212,7 +212,7 @@ func t_miyi_service(data: GameData) -> void:
 	var sim := Sim.new(data, 4)
 	var id := sim.spawn_player("t")
 	var ch: Dictionary = sim.player_ch()
-	var mhp := RulesStats.max_hp(int(ch["level"]), ch["attrs"])
+	var mhp := RulesStats.max_hp(int(ch["level"]), ch["attrs"], ch)
 	ch["hp"] = mhp - 50
 	sim.ent(id)["hp"] = ch["hp"]
 	_talk(sim, id, "miyi")
@@ -272,7 +272,7 @@ func t_reward_use(data: GameData) -> void:
 	var sim := Sim.new(data, 8)
 	var id := sim.spawn_player("t")
 	var ch: Dictionary = sim.player_ch()
-	var mhp := RulesStats.max_hp(int(ch["level"]), ch["attrs"])
+	var mhp := RulesStats.max_hp(int(ch["level"]), ch["attrs"], ch)
 	ch["hp"] = mhp - 50
 	sim.ent(id)["hp"] = ch["hp"]
 	sim.cmd_use_item(id, 65210)
@@ -281,7 +281,7 @@ func t_reward_use(data: GameData) -> void:
 	# SP 藥水 (effect 75)
 	var sp_heal: Dictionary = data.heals.get(65158, {})
 	check(int(sp_heal.get("sp", 0)) == 100, "綠色藥丸回 100 SP")
-	var msp := RulesStats.max_sp(int(ch["level"]), ch["attrs"])
+	var msp := RulesStats.max_sp(int(ch["level"]), ch["attrs"], ch)
 	ch["hp"] = mhp
 	ch["sp"] = 1
 	sim.ent(id)["hp"] = ch["hp"]

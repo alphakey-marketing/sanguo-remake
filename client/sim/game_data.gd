@@ -219,6 +219,7 @@ static func load_all() -> GameData:
 	g.marry = _read("res://data/marry.json")
 	for x in c["classes"]:
 		g.classes[String(x["id"])] = x
+		RulesStats.class_defs = g.classes
 	var mon_elem: Dictionary = _read("res://data/mon_elem.json")     # 怪物屬性規則表 (tools/gen_mon_elem.py)
 	for x in m["monsters"]:
 		if str(x.get("element", "none")) in ["none", "null", ""] and mon_elem.has(str(int(x["id"]))):

@@ -2009,7 +2009,7 @@ func _potion_auto_tick() -> void:
 		if int(hl.get("hp", 0)) > 0 and int(me.get("maxHp", 0)) > 0:
 			low = float(me.hp) * 100.0 < float(th) * float(me.maxHp)
 		if not low and int(hl.get("mp", 0)) > 0:
-			low = float(ch.get("mp", 0)) * 100.0 < float(th) * float(RulesStats.max_mp(lv, ch.attrs))
+			low = float(ch.get("mp", 0)) * 100.0 < float(th) * float(RulesStats.max_mp(lv, ch.attrs, ch))
 		if not low:
 			continue
 		for b in ch.get("bag", []):

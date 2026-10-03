@@ -731,7 +731,7 @@ func cmd_companion_revive_owner(owner_id: int) -> void:
 	if not _aura_near(c, o):
 		return _msg(owner_id, "要同伴行近先超渡得到")
 	var max_hp := maxi(1, int(c.get("max_hp", 1)))
-	var max_mp := maxi(1, RulesStats.max_mp(int(cch["level"]), cch["attrs"]))
+	var max_mp := maxi(1, RulesStats.max_mp(int(cch["level"]), cch["attrs"], cch))
 	var cmul := float(_companion_class_skill_mul(c)["cost"])    # 22 職業特技
 	var hp_cost := int(ceil(max_hp * 0.2 * cmul))
 	var mp_cost := int(ceil(max_mp * 0.3 * cmul))

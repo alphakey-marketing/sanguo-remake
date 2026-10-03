@@ -42,9 +42,9 @@ func _safe_regen_tick() -> void:
 		var pct: float = base_pct * _friend_regen_mult(e)
 		var ch: Dictionary = e["ch"]
 		var lv := int(ch["level"])
-		ch["hp"] = mini(RulesStats.max_hp(lv, ch["attrs"]), int(ch["hp"]) + maxi(1, MathX.js_round(RulesStats.max_hp(lv, ch["attrs"]) * pct)))
-		ch["mp"] = mini(RulesStats.max_mp(lv, ch["attrs"]), int(ch["mp"]) + maxi(1, MathX.js_round(RulesStats.max_mp(lv, ch["attrs"]) * pct)))
-		ch["sp"] = mini(RulesStats.max_sp(lv, ch["attrs"]), int(ch["sp"]) + maxi(1, MathX.js_round(RulesStats.max_sp(lv, ch["attrs"]) * pct)))
+		ch["hp"] = mini(RulesStats.max_hp(lv, ch["attrs"], ch), int(ch["hp"]) + maxi(1, MathX.js_round(RulesStats.max_hp(lv, ch["attrs"], ch) * pct)))
+		ch["mp"] = mini(RulesStats.max_mp(lv, ch["attrs"], ch), int(ch["mp"]) + maxi(1, MathX.js_round(RulesStats.max_mp(lv, ch["attrs"], ch) * pct)))
+		ch["sp"] = mini(RulesStats.max_sp(lv, ch["attrs"], ch), int(ch["sp"]) + maxi(1, MathX.js_round(RulesStats.max_sp(lv, ch["attrs"], ch) * pct)))
 		_sync_stats(e)
 
 

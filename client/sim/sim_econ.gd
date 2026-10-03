@@ -922,7 +922,7 @@ func cmd_work(id: int, skill: String) -> void:
 	var tool: Dictionary = ch["tools"].get(skill, {})
 	if tool.is_empty() or int(tool["dur"]) <= 0:
 		return _msg(id, "要裝備%s工具先" % sk["name"])
-	var msp := RulesStats.max_sp(int(ch["level"]), ch["attrs"])
+	var msp := RulesStats.max_sp(int(ch["level"]), ch["attrs"], ch)
 	var cost := RulesWork.sp_cost(msp)
 	if int(ch["sp"]) < cost:
 		return _msg(id, "體力不足 (要 %d SP)" % cost)
@@ -999,14 +999,14 @@ func adv_check(e: Dictionary, skill: String, need_lv: int) -> String:
 	var tool: Dictionary = ch["tools"].get(skill, {})
 	if tool.is_empty() or int(tool["dur"]) <= 0:
 		return "要裝備%s先" % data.names.get(int(ad["tool"]), "工具")
-	if int(ch["sp"]) < RulesWork.sp_cost(RulesStats.max_sp(int(ch["level"]), ch["attrs"])):
+	if int(ch["sp"]) < RulesWork.sp_cost(RulesStats.max_sp(int(ch["level"]), ch["attrs"], ch)):
 		return "體力不足"
 	return ""
 
 
 # 用一次進階工具: 扣 SP + 工具耐久；回傳工具爛咗未
 func _adv_use(ch: Dictionary, skill: String) -> bool:
-	ch["sp"] = int(ch["sp"]) - RulesWork.sp_cost(RulesStats.max_sp(int(ch["level"]), ch["attrs"]))
+	ch["sp"] = int(ch["sp"]) - RulesWork.sp_cost(RulesStats.max_sp(int(ch["level"]), ch["attrs"], ch))
 	var tool: Dictionary = ch["tools"][skill]
 	tool["dur"] = RulesWork.durability_after_use(int(tool["dur"]))
 	if int(tool["dur"]) <= 0:
@@ -1393,8 +1393,8 @@ func cmd_equip_jewel(id: int, item: int, slot: int) -> void:
 func _unequip_jewel_sync(ch: Dictionary, item: int) -> void:
 	var lv := int(ch["level"])
 	var bonus_before := RulesJewel.support_bonus(data.jewel_by_item.get(item, {}).get("effects", []))
-	var extra_hp := MathX.js_round(RulesStats.max_hp(lv, ch["attrs"]) * float(bonus_before.get("hpPct", 0.0)))
-	var extra_mp := MathX.js_round(RulesStats.max_mp(lv, ch["attrs"]) * float(bonus_before.get("mpPct", 0.0)))
+	var extra_hp := MathX.js_round(RulesStats.max_hp(lv, ch["attrs"], ch) * float(bonus_before.get("hpPct", 0.0)))
+	var extra_mp := MathX.js_round(RulesStats.max_mp(lv, ch["attrs"], ch) * float(bonus_before.get("mpPct", 0.0)))
 	var extra_sp := int(bonus_before.get("spFlat", 0))
 	ch["hp"] = maxi(1, int(ch["hp"]) - extra_hp)
 	ch["mp"] = maxi(0, int(ch["mp"]) - extra_mp)

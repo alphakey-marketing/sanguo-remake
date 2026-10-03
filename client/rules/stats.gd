@@ -12,16 +12,28 @@ const ATTR_CAP := 500      # 【用家 2026-10-03】屬性上限 500 (原 99)
 const MAXLV_EXP_TO_GOLD := 20   # 【自訂】滿級後多出嘅經驗 20 點換 1 金
 
 
-static func max_hp(lv: int, a: Dictionary) -> int:
-	return int(60 + lv * 15 + a["str"] * 4)
+# 職業 vit 倍率表 (classes.json "vit")，GameData 載入時填。冇傳 ch / 冇表 = 舊公式 (倍率 1、武力 ×4)
+static var class_defs: Dictionary = {}
 
 
-static func max_mp(lv: int, a: Dictionary) -> int:
-	return int(20 + lv * 5 + a["spi"] * 3 + a["int"] * 2)
+static func _vit(ch: Dictionary) -> Dictionary:
+	return class_defs.get(String(ch.get("classId", "")), {}).get("vit", {})
 
 
-static func max_sp(lv: int, a: Dictionary) -> int:
-	return int(50 + lv * 3 + a["agi"] * 2)
+# 【用家 2026-10-03】HP 隨職業: (60 + 15×等級) × hpMult + 4 × 職業主屬性 (義士/仕女 武力、道士/巫女/美女 靈力、辯士 智力)
+static func max_hp(lv: int, a: Dictionary, ch: Dictionary = {}) -> int:
+	var v := _vit(ch)
+	return int((60 + lv * 15) * float(v.get("hpMult", 1.0)) + int(a[String(v.get("hpAttr", "str"))]) * 4)
+
+
+static func max_mp(lv: int, a: Dictionary, ch: Dictionary = {}) -> int:
+	var v := _vit(ch)
+	return int((20 + lv * 5) * float(v.get("mpMult", 1.0)) + a["spi"] * 3 + a["int"] * 2)
+
+
+static func max_sp(lv: int, a: Dictionary, ch: Dictionary = {}) -> int:
+	var v := _vit(ch)
+	return int((50 + lv * 3) * float(v.get("spMult", 1.0)) + a["agi"] * 2)
 
 
 # 玩家術防【自訂】(spec 02 §3): 隨等級+靈力；護鏡/光鏡/仙鏡 buff 喺 sim 再乘倍率
@@ -47,6 +59,7 @@ static func attrs_at(cls: Dictionary, lv: int) -> Dictionary:
 # 失敗回 {} 並 push_error
 static func create_character(data: GameData, char_name: String, class_id: String) -> Dictionary:
 	var cls: Dictionary = data.classes.get(class_id, {})
+	class_defs = data.classes
 	if cls.is_empty() or not cls["enabled"]:
 		push_error("職業未開放: " + class_id)
 		return {}
@@ -66,7 +79,7 @@ static func create_character(data: GameData, char_name: String, class_id: String
 		face[part] = 1
 	return {
 		"name": char_name, "classId": class_id, "level": 1, "exp": 0, "tier": 0, "attrs": attrs,
-		"hp": max_hp(1, attrs), "mp": max_mp(1, attrs), "sp": max_sp(1, attrs),
+		"hp": max_hp(1, attrs, {"classId": class_id}), "mp": max_mp(1, attrs, {"classId": class_id}), "sp": max_sp(1, attrs, {"classId": class_id}),
 		"gold": int(st.get("gold", 0)), "karma": 0, "bag": bag, "equip": equip, "status": {},
 		# Step 7.5 建角欄位 (spec 01 §1/§11)
 		"title": "", "face": face,
@@ -90,12 +103,14 @@ static func gain_exp(data: GameData, ch: Dictionary, amount: int) -> int:
 	if int(ch["level"]) >= MAX_LEVEL:                # 滿級: 多出嘅經驗換金，唔白白浪費
 		ch["gold"] = int(ch.get("gold", 0)) + int(ch["exp"]) / MAXLV_EXP_TO_GOLD
 		ch["exp"] = 0
+	if ups > 0 and bool(ch.get("autoPoints", false)) and data.classes.has(String(ch.get("classId", ""))):
+		auto_assign_points(ch, data.classes[String(ch["classId"])])     # 升級自動派點 (預設關，冇 UI，debug 指令開)
 	if ups > 0:
 		var lv := int(ch["level"])
 		var attrs: Dictionary = ch["attrs"]
-		ch["hp"] = max_hp(lv, attrs)
-		ch["mp"] = max_mp(lv, attrs)
-		ch["sp"] = max_sp(lv, attrs)
+		ch["hp"] = max_hp(lv, attrs, ch)
+		ch["mp"] = max_mp(lv, attrs, ch)
+		ch["sp"] = max_sp(lv, attrs, ch)
 	return ups
 
 
