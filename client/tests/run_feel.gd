@@ -75,5 +75,13 @@ func _init() -> void:
 	var wst := sim3._equip_stone(ch3, "fire") if sim3._equip_stone(ch3, "fire").is_empty() == false else sim3._equip_stone(ch3, "water")
 	check(not wst.is_empty(), "按術法屬性揀石")
 	check(sim3._phys_elem_mult(ch3, "wind") > 1.0 or sim3._phys_elem_mult(ch3, "fire") > 1.0, "兩格石物理相剋有加成")
+	# 怪物屬性規則表
+	var n_el := 0
+	for mid in data.monsters:
+		if str(data.monsters[mid].get("element", "none")) in ["wind", "earth", "water", "fire"]:
+			n_el += 1
+	check(n_el >= 60, "怪物有屬性 (%d)" % n_el)
+	check(str(data.mob_def(12022, 0).get("element", "")) == "water", "水鴨=水")
+	check(str(data.mob_def(1007, 0).get("element", "")) == "fire", "妖法師仍=火")
 	print("[TEST] feel: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
