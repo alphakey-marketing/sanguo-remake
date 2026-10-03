@@ -58,7 +58,7 @@ run world --script tests/run_world.gd
 # 封存(舊圖): run militia --script tests/run_militia.gd
 # 封存(舊圖): run civic --script tests/run_civic.gd
 # 封存(舊圖): run camp --script tests/run_camp.gd
-# 封存(舊圖): run battle --script tests/run_battle.gd
+run battle --script tests/run_battle.gd
 # 封存(舊圖): run scene --script tests/run_scene.gd
 # 封存(舊圖): run pk --script tests/run_pk.gd
 # 封存(舊圖): run karma --script tests/run_karma.gd

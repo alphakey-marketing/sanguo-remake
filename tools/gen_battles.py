@@ -1,83 +1,64 @@
-"""gen_battles.py —— S04c 其餘 5 場戰役實裝資料生成 (spec 04 §5 / spec 06 §7，【原 sy3_8】)
+"""gen_battles.py —— 戰役任務 6 場 (spec 04 §5 / spec 06 §7，【原 sy3_8】) 用原版戰役地圖重做
 
-將 `data/battles.json` 其餘 5 場 (褚飛燕/李大目/張白騎/黃龍/十常侍) 由「資料殼 (playable=false，層得 drops)」補齊：
-每層配 `monster` (boss id) + `map` (戰役地圖 id)，每場 `playable:true`；同步：
-  - `data/monsters.json` 加每層 boss 怪物 (數值【自訂】按 lv template 遞增，drops = 層掉寶表 p=1.0 全部落，尾層大頭目加 skills)
-  - `data/maps.json` + `data/maps/<bid>_f<n>.txt` 加每層戰役地圖 (16x16 arena，全自動打包揾 free 位，
-    地圖之間 ≥20 格分隔 (run_maps t_gaps grow(10) 唔相撞)，WORLD 512 內唔重疊)
-張牛角 (zhangniujiao) 已實作，唔郁。全部【自訂】boss 冇 npc_drops.csv 對應 → import_drops 唔會覆寫。
+原版有戰役地圖系列 (xc3251~4 張牛角 / xc1451~4 褚飛燕 / xc2451~5 李大目 / xc1751~5 張白騎 /
+xc3051~5 黃龍 / xc1551~5 十常侍)。每層開獨立 instance 地圖 `bt_<戰役>_f<n>` (複製 template txt，
+唔同練功洞穴共用)，放喺世界最底，地圖之間 ≥20 格。
+
+由 `data/archive/legacy_battles.json` (攻略 sy3_8 掉寶表) 生成 `data/battles.json`：
+  - 張白騎 / 黃龍 攻略 6 層、原版地圖得 5 張 → 攻略第 5+6 層併做原版第 5 層 (尾層 boss = 攻略第 6 層，掉寶兩層合併)
+  - 每層 `mobs` = [[怪 id, 數量], ...]，入層先生、離開清走 (battle_mob)；怪用原版近似怪借位 (原版缺嘅冇圖怪用相近怪)
+  - boss 怪 (monsters.json 1015~1064) drops 同層掉寶表對齊
 
 用法:
-  python tools/gen_battles.py          # 寫返三個 data 檔 + 地圖 txt
-  python tools/gen_battles.py --check  # 只核對 (data 一致) / 錯 exit 1
+  python tools/gen_battles.py          # 寫 battles.json / maps.json / monsters.json / maps/*.txt / mon_alias.json
+  python tools/gen_battles.py --check  # 只核對 / 錯 exit 1
 """
 import json
-import random
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-MONSTERS = ROOT / "client/data/monsters.json"
-MAPS = ROOT / "client/data/maps.json"
-BATTLES = ROOT / "client/data/battles.json"
-MAPS_DIR = ROOT / "client/data/maps"
+D = ROOT / "client/data"
+MONSTERS = D / "monsters.json"
+MAPS = D / "maps.json"
+BATTLES = D / "battles.json"
+LEGACY = D / "archive/legacy_battles.json"
+ALIAS = D / "mon_alias.json"
+ITEMS = D / "items.json"
+MAPS_DIR = D / "maps"
 
-NEW_ID_START = 1039          # 張牛角 1015~1018 之後開始編
-WORLD = 512
-GAP = 20                     # 地圖之間最少隔 20 格 (run_maps t_gaps: grow(10) 唔相撞)
-MAP_W = 16
-MAP_H = 16
-FINAL_SKILLS = {             # 尾層大頭目加 boss 技能表 (S04b 延續)，reuse 術書 spell id
-    "chufeiyan":   [{"spell": "yun_m", "cd": 360}],
-    "lidamu":      [{"spell": "shui_m", "cd": 360}],
-    "zhangbaiqi":  [{"spell": "feng_m", "cd": 360}],
-    "huanglong":   [{"spell": "huo_m", "cd": 360}],
-    "shichangshi": [{"spell": "feng_l", "cd": 420}, {"spell": "shui_l", "cd": 420}],
+BASE_OY = 30000              # instance 地圖由世界 y=30000 起，向下疊
+STEP = 113 + 20              # 地圖高 113 + 20 格間隔
+GAP_OK = 20
+
+# 戰役 → 原版 template 地圖 (層序)
+TPL = {
+    "zhangniujiao": ["xc3251", "xc3252", "xc3253", "xc3254"],
+    "chufeiyan":    ["xc1451", "xc1452", "xc1453", "xc1454"],
+    "lidamu":       ["xc2451", "xc2452", "xc2453", "xc2454", "xc2455"],
+    "zhangbaiqi":   ["xc1751", "xc1752", "xc1753", "xc1754", "xc1755"],
+    "huanglong":    ["xc3051", "xc3052", "xc3053", "xc3054", "xc3055"],
+    "shichangshi":  ["xc1551", "xc1552", "xc1553", "xc1554", "xc1555"],
 }
-# 每場各層 boss 等級 (尾層 = maxLevel；前面層喺之下遞增)【自訂】
-FLOOR_LEVELS = {
-    "chufeiyan":   [24, 27, 29, 30],
-    "lidamu":      [33, 35, 37, 39, 40],
-    "zhangbaiqi":  [42, 44, 46, 48, 49, 50],
-    "huanglong":   [52, 54, 56, 58, 59, 60],
-    "shichangshi": [62, 64, 66, 68, 70],
+MERGE_LAST = {"zhangbaiqi", "huanglong"}      # 攻略 6 層、原版 5 層 → 第 5+6 層併
+
+# 每層小怪 [[def, 數量], ...] (原版小怪；冇圖/冇資料嘅用近似怪)
+MOBS = {
+    "zhangniujiao": [[[70000, 4]], [[70000, 3], [70005, 2]], [[70005, 4]], [[70005, 3], [70000, 3]]],
+    "chufeiyan":    [[[27045, 5]], [[27045, 3], [70011, 3]], [[27061, 4], [70011, 2]], [[27061, 4], [70011, 3]]],
+    "lidamu":       [[[27047, 3], [27050, 1]], [[27046, 4]], [[27048, 4]], [[27049, 4]], [[1030, 3], [27045, 3], [27044, 2]]],
+    "zhangbaiqi":   [[[27057, 4]], [[27057, 3], [27061, 3]], [[27061, 4], [27059, 2]], [[27059, 4], [27057, 3]], [[27061, 4], [27059, 3], [27057, 2]]],
+    "huanglong":    [[[27076, 2], [27077, 2]], [[27078, 2], [27079, 2]], [[27074, 3], [27072, 3]], [[27080, 3], [27070, 3]], [[27076, 2], [27078, 2], [27080, 2]]],
+    "shichangshi":  [[[13026, 5]], [[13026, 4], [27061, 3]], [[27061, 4], [27059, 3]], [[27059, 4], [27061, 4]], [[27061, 5], [27059, 4], [13026, 3]]],
 }
 
-
-def boss_stats(lv):
-    # 數值【自訂】按 lynl template (spec 04 §1) 隨 lv 遞增，但 boss 較強 (「練功打寶戰役」頭目)
-    return {
-        "level": lv,
-        "hp": int(6.5 * lv * lv + 400),
-        "atk": int(3.2 * lv + 2),
-        "def": int(lv * 0.9 + 2),
-        "spellDef": int(lv * 0.9 + 2) + 10,
-        "atkInterval": 13,
-        "moveSpeed": 1,
-        "exp": int(95 * lv),
-        "gold": [lv * 3, lv * 7],
-        "alignment": -800,
-        "aggroRange": 8,
-        "leash": 16,
-        "element": "none",
-        "boss": True,
-    }
-
-
-def gen_map_txt(seed):
-    rnd = random.Random(seed)
-    g = [["^"] * MAP_W for _ in range(MAP_H)]
-    for y in range(1, MAP_H - 1):
-        for x in range(1, MAP_W - 1):
-            g[y][x] = "_"
-    rocks = 0
-    while rocks < 8:
-        x = rnd.randrange(1, MAP_W - 1)
-        y = rnd.randrange(1, MAP_H - 1)
-        if g[y][x] == "_":
-            g[y][x] = "^"
-            rocks += 1
-    return "\n".join("".join(row) for row in g) + "\n"
+# 冇原版 sprite 嘅 boss 借人形 sprite (soldier 池 id) + 染色，asset_lib.mon_sheet 搵唔到先用
+ALIAS_ACTORS = {
+    1018: (20150, "#ffd0b0"), 1039: (20142, "#ffe0c0"), 1040: (20142, "#ffc0a0"), 1041: (20142, "#ff9070"),
+    1042: (20150, "#c0c0ff"), 1043: (20218, "#ffe0a0"), 1047: (20150, "#a0ffa0"), 1052: (20218, "#d0ffd0"),
+    1053: (20150, "#e0e0ff"), 1057: (20142, "#c0ffc0"), 1058: (20218, "#ffd0ff"), 1060: (20018, "#d0b0ff"),
+    1061: (20018, "#ffb0b0"), 1062: (20018, "#b0ffb0"), 1063: (20018, "#b0b0ff"), 1064: (20018, "#ffd060"),
+}
 
 
 def load_json(p):
@@ -89,175 +70,131 @@ def save_json(p, data):
         json.dumps(data, ensure_ascii=False, indent=1) + "\n")
 
 
-# 自動打包 16x16 地圖位：喺 WORLD 512 入面揾 26 個 grow(GAP/2)=唔相撞 嘅格 (決定性 row-major)
-def pack_maps(existing_ids, existing_pos):
-    occ = [[0] * WORLD for _ in range(WORLD)]
-    for (ox, oy, w, h) in existing_pos:
-        p = GAP // 2
-        for yy in range(max(0, oy - p), min(WORLD, oy + h + p)):
-            for xx in range(max(0, ox - p), min(WORLD, ox + w + p)):
-                occ[yy][xx] = 1
-    out = {}
-    p = GAP // 2
-    step = 2
-    for oy in range(0, WORLD - MAP_H, step):
-        for ox in range(0, WORLD - MAP_W, step):
-            if len(out) >= len(existing_ids):
-                return out
-            ok = True
-            for yy in range(oy - p, oy + MAP_H + p):
-                if not ok:
-                    break
-                XXmin = max(0, ox - p); XXmax = min(WORLD, ox + MAP_W + p)
-                for xx in range(XXmin, XXmax):
-                    if occ[yy][xx]:
-                        ok = False
-                        break
-            if ok:
-                out[existing_ids[len(out)]] = (ox, oy)
-                for yy in range(oy - p, oy + MAP_H + p):
-                    for xx in range(max(0, ox - p), min(WORLD, ox + MAP_W + p)):
-                        occ[yy][xx] = 1
-    raise RuntimeError("WORLD 512 揾唔到 %d 個唔相撞嘅 16x16 地圖位" % len(existing_ids))
+def inst_id(bid, i):
+    return "bt_%s_f%d" % (bid, i + 1)
+
+
+def merged_floors(bid, floors):
+    fl = [dict(f) for f in floors]
+    if bid in MERGE_LAST and len(fl) == len(TPL[bid]) + 1:
+        a, b = fl[-2], fl[-1]
+        seen = set()
+        drops = []
+        for d in a["drops"] + b["drops"]:
+            if int(d[0]) not in seen:
+                seen.add(int(d[0]))
+                drops.append([int(d[0]), float(d[1])])
+        b["drops"] = drops
+        fl = fl[:-2] + [b]
+    return fl
 
 
 def build():
     mj = load_json(MONSTERS)
     ap = load_json(MAPS)
-    bj = load_json(BATTLES)
-
-    monsters = mj["monsters"]
-    maps = ap["maps"]
-    existing_ids = {int(m["id"]) for m in monsters}
-    next_id = max([i for i in existing_ids if i < NEW_ID_START] + [NEW_ID_START - 1]) + 1
-
-    by_tag = {}
-    for m in monsters:
-        if "_battle" in m:
-            by_tag[(str(m["_battle"]), int(m.get("_floor", 0)))] = m
-
-    map_ids = {m["id"] for m in maps}
-    # 新 map 要嘅位：僅計未存在嘅
-    new_mids = []
-    for bt in bj["battles"]:
+    lg = load_json(LEGACY)
+    monsters = {int(m["id"]): m for m in mj["monsters"]}
+    maps = [m for m in ap["maps"] if not str(m["id"]).startswith("bt_")]
+    by_id = {str(m["id"]): m for m in maps}
+    out = {"_note": "戰役任務 (spec 06 §7, spec 04 §5)【原 sy3_8】用原版戰役地圖 (instance)。窗口【自訂】落 game 日曆：96 刻/日，每 16 刻一個窗 (8 刻報名)。由 tools/gen_battles.py 生成。",
+           "battles": []}
+    n = 0
+    for bt in lg["battles"]:
         bid = str(bt["id"])
-        if bid == "zhangniujiao":
-            continue
-        for i in range(len(bt["floors"])):
-            mid = "%s_f%d" % (bid, i + 1)
-            if mid not in map_ids:
-                new_mids.append(mid)
-    # 已存在地圖 (純尺寸，唔含 instance 標記——按 id 揾 txt 睇 w/h)
-    existing_geom = []
-    for m in maps:
-        f = MAPS_DIR / (str(m["id"]) + ".txt")
-        if not f.exists():
-            continue
-        rows = [r for r in f.read_text(encoding="utf-8").split("\n") if r.strip() != ""]
-        existing_geom.append((int(m["ox"]), int(m["oy"]), max(len(r) for r in rows), len(rows)))
-    placements = pack_maps(new_mids, existing_geom) if new_mids else {}
-
-    for bt in bj["battles"]:
-        bid = str(bt["id"])
-        if bid == "zhangniujiao":
-            continue
-        floors = bt["floors"]
-        lvs = FLOOR_LEVELS[bid]
-        is_final = len(floors) - 1
+        floors = merged_floors(bid, bt["floors"])
+        tpls = TPL[bid]
+        assert len(floors) == len(tpls), bid
+        nb = {k: v for k, v in bt.items() if k != "floors"}
+        nb["playable"] = True
+        nb["floors"] = []
         for i, fl in enumerate(floors):
-            tag = by_tag.get((bid, i))
-            boss_name = str(fl["boss"])
-            # ---- monster ----
-            if tag is None:
-                st = boss_stats(lvs[i])
-                mob = {
-                    "id": next_id, "name": boss_name, **st,
-                    "drops": [{"item": int(d[0]), "p": float(d[1])} for d in fl["drops"]],
-                    "_battle": bid, "_floor": i,
-                }
-                if i == is_final and bid in FINAL_SKILLS:
-                    mob["skills"] = FINAL_SKILLS[bid]
-                monsters.append(mob)
-                next_id += 1
-                tag = mob
-            else:
-                tag["name"] = boss_name
-                tag["drops"] = [{"item": int(d[0]), "p": float(d[1])} for d in fl["drops"]]
-                if i == is_final and bid in FINAL_SKILLS:
-                    tag["skills"] = FINAL_SKILLS[bid]
-                elif "skills" in tag:
-                    del tag["skills"]
-            # ---- map ----
-            mid = "%s_f%d" % (bid, i + 1)
-            if mid not in map_ids:
-                ox, oy = placements[mid]
-                maps.append({
-                    "id": mid, "name": "%s %dF" % (str(bt["name"]), i + 1),
-                    "ox": ox, "oy": oy, "safe": False, "kind": "field",
-                    "instance": True,
-                })
-                map_ids.add(mid)
-            # ---- battle floor ----
-            fl["monster"] = int(tag["id"])
-            fl["map"] = mid
-        bt["playable"] = True
-
-    txt_seed = 0
-    for bt in bj["battles"]:
-        bid = str(bt["id"])
-        if bid == "zhangniujiao":
-            continue
-        for fl in bt["floors"]:
-            mid = str(fl["map"])
-            (MAPS_DIR / (mid + ".txt")).write_text(gen_map_txt(txt_seed), encoding="utf-8")
-            txt_seed += 1
-
+            mid = inst_id(bid, i)
+            tpl = by_id[tpls[i]]
+            boss = monsters[int(fl["monster"])]
+            boss["drops"] = [{"item": int(d[0]), "p": float(d[1])} for d in fl["drops"]]
+            boss["_battle"] = bid
+            boss["_floor"] = i
+            oy = BASE_OY + n * STEP
+            maps.append({"id": mid, "name": "%s %dF" % (str(bt["name"]), i + 1), "ox": 0, "oy": oy,
+                         "safe": False, "kind": "field", "orig": tpls[i], "instance": True,
+                         "spawn": list(tpl.get("spawn", [75, 56, 75, 56]))})
+            (MAPS_DIR / (mid + ".txt")).write_text((MAPS_DIR / (tpls[i] + ".txt")).read_text(encoding="utf-8"), encoding="utf-8")
+            n += 1
+            nf = {"boss": fl["boss"], "monster": int(fl["monster"]), "map": mid, "tpl": tpls[i],
+                  "drops": fl["drops"], "mobs": MOBS[bid][i]}
+            if i == len(floors) - 1:
+                nf["final"] = True
+            nb["floors"].append(nf)
+        out["battles"].append(nb)
+    # 唔再用嘅合併前 boss (1052/1058) 去掉 _battle 標記，免俾測試當戰役 boss
+    used = {int(f["monster"]) for b in out["battles"] for f in b["floors"]}
+    for m in monsters.values():
+        if "_battle" in m and int(m["id"]) not in used:
+            del m["_battle"]
+            m.pop("_floor", None)
+    ap["maps"] = maps
     save_json(MONSTERS, mj)
     save_json(MAPS, ap)
-    save_json(BATTLES, bj)
-    return txt_seed
+    save_json(BATTLES, out)
+    al = load_json(ALIAS)
+    for mid, (act, tint) in ALIAS_ACTORS.items():
+        al["alias"].setdefault(str(mid), {"actor": act, "tint": tint})
+    save_json(ALIAS, al)
+    return n
 
 
 def check():
     mj = load_json(MONSTERS)
     ap = load_json(MAPS)
     bj = load_json(BATTLES)
+    items = load_json(ITEMS)
+    item_ids = {int(i["id"]) for i in (items if isinstance(items, list) else items.get("items", []))}
     monsters = {int(m["id"]): m for m in mj["monsters"]}
-    map_ids = {m["id"] for m in ap["maps"]}
-    respect = 0
+    maps = {m["id"]: m for m in ap["maps"]}
     errs = []
+    ys = []
     for bt in bj["battles"]:
         bid = str(bt["id"])
-        if bid == "zhangniujiao":
-            continue
-        respect += 1
-        if not bool(bt.get("playable")):
+        if not bt.get("playable"):
             errs.append("%s 未 playable" % bid)
+        if len(bt["floors"]) != len(TPL.get(bid, [])):
+            errs.append("%s 層數唔對原版 template" % bid)
         for i, fl in enumerate(bt["floors"]):
-            if "monster" not in fl or "map" not in fl:
-                errs.append("%s 層 %d 冇 monster/map" % (bid, i + 1))
+            tag = "%s 層%d" % (bid, i + 1)
+            m = monsters.get(int(fl["monster"]))
+            if m is None:
+                errs.append("%s boss 唔存在" % tag)
                 continue
-            mid = int(fl["monster"])
-            if mid not in monsters:
-                errs.append("%s 層 %d monster %d 唔存在" % (bid, i + 1, mid))
-                continue
-            m = monsters[mid]
-            want = sorted((int(d[0]) for d in fl["drops"]))
-            got = sorted(int(d["item"]) for d in m["drops"])
-            if want != got:
-                errs.append("%s 層 %d drops 唔對齊怪物 %d" % (bid, i + 1, mid))
-            if str(fl["map"]) not in map_ids:
-                errs.append("%s 層 %d map 唔存在" % (bid, i + 1))
-    for mid in map_ids:
-        p = MAPS_DIR / (mid + ".txt")
-        if not p.exists():
-            errs.append("map txt 唔存在: " + mid)
+            if sorted(int(d[0]) for d in fl["drops"]) != sorted(int(d["item"]) for d in m["drops"]):
+                errs.append("%s drops 唔對齊 boss %d" % (tag, fl["monster"]))
+            for d in fl["drops"]:
+                if item_ids and int(d[0]) not in item_ids:
+                    errs.append("%s 掉落 item %d 唔喺 items.json" % (tag, int(d[0])))
+            mp = maps.get(str(fl["map"]))
+            if mp is None:
+                errs.append("%s map 唔存在" % tag)
+            else:
+                if mp.get("orig") != fl.get("tpl"):
+                    errs.append("%s map orig 唔係 template" % tag)
+                if not (MAPS_DIR / (str(fl["map"]) + ".txt")).exists():
+                    errs.append("%s map txt 冇" % tag)
+                ys.append(int(mp["oy"]))
+            for d, c in fl.get("mobs", []):
+                if int(d) not in monsters:
+                    errs.append("%s 小怪 %d 唔存在" % (tag, d))
+    ys.sort()
+    for a, b in zip(ys, ys[1:]):
+        if b - a < 113 + GAP_OK:
+            errs.append("instance 地圖間隔 <20: y %d/%d" % (a, b))
+    for mid, (act, _t) in ALIAS_ACTORS.items():
+        if str(mid) not in load_json(ALIAS)["alias"] and str(mid) not in load_json(D / "asset_index.json").get("mon_S", {}):
+            errs.append("boss %d 冇 sprite / alias" % mid)
     if errs:
         print("[battles] --check 錯:")
         for e in errs:
             print("  -", e)
         return 1
-    print("[battles] --check OK (%d 場非張牛角戰役全部 playable + monster/map/drops 齊)" % respect)
+    print("[battles] --check OK (%d 場戰役、%d 層 instance 地圖，boss/drops/小怪/sprite 齊)" % (len(bj["battles"]), len(ys)))
     return 0
 
 
@@ -265,7 +202,7 @@ def main():
     if "--check" in sys.argv:
         sys.exit(check())
     n = build()
-    print("[battles] 生成/確定 %d 層戰役 (5 場非張牛角全部 playable + monster/map/drops 齊)" % n)
+    print("[battles] 生成 %d 層戰役 instance 地圖" % n)
 
 
 if __name__ == "__main__":

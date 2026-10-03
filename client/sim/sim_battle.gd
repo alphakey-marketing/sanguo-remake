@@ -93,8 +93,10 @@ func _battle_goto_floor(e: Dictionary, b: Dictionary, floor_idx: int) -> void:
 	var fl := RulesBattle.floor_of(b, floor_idx)
 	var mid := String(fl["map"])
 	var md := _map_def(mid)
-	var px := int(md.get("ox", 0)) + 2
-	var py := int(md.get("oy", 0)) + 2
+	var sp: Array = md.get("spawn", [])
+	var px := int(sp[0]) if sp.size() >= 2 else int(md.get("ox", 0)) + 2
+	var py := int(sp[1]) if sp.size() >= 2 else int(md.get("oy", 0)) + 2
+	_battle_clear_mobs(String(b["id"]), true)
 	e["x"] = px
 	e["tx"] = px
 	e["y"] = py
@@ -103,6 +105,12 @@ func _battle_goto_floor(e: Dictionary, b: Dictionary, floor_idx: int) -> void:
 	e.erase("goto")
 	e["atk_target"] = 0
 	e["battle"]["floor"] = floor_idx
+	var blv := int(data.mob_def(int(fl["monster"]), 0).get("level", 1))
+	for pr in fl.get("mobs", []):                        # 層小怪 (離層/離場清走)
+		for _i in int(pr[1]):
+			var mb: Variant = _spawn_mob(int(pr[0]), mid, maxi(1, blv - 2))
+			if mb != null:
+				mb["mob"]["battle_mob"] = String(b["id"])
 	var boss: Variant = _spawn_mob(int(fl["monster"]), mid)
 	if boss != null:
 		boss["mob"]["battle_id"] = String(b["id"])
@@ -123,18 +131,26 @@ func _battle_on_boss_kill(by: Dictionary, bid: String, floor_idx: int) -> void:
 		_battle_goto_floor(by, b, floor_idx + 1)
 
 
+# 清戰役遺留怪: 小怪 (battle_mob) 一定清；boss (battle_id) 只喺離場先清
+func _battle_clear_mobs(bid: String, mobs_only: bool) -> void:
+	var to_erase: Array = []
+	for o in ents.values():
+		if o["kind"] != "mob":
+			continue
+		var mb: Dictionary = o.get("mob", {})
+		if String(mb.get("battle_mob", "")) == bid or (not mobs_only and String(mb.get("battle_id", "")) == bid):
+			to_erase.append(int(o["id"]))
+	for oid in to_erase:
+		ents.erase(oid)
+
+
 # 離開戰役 (完成/放棄/死亡都經呢度): 清晒呢場遺留嘅 boss + 傳送返報名點
 func _battle_exit(e: Dictionary, _reason: String) -> void:
 	var bt: Dictionary = e.get("battle", {})
 	if bt.is_empty():
 		return
 	var bid := String(bt["id"])
-	var to_erase: Array = []
-	for o in ents.values():
-		if o["kind"] == "mob" and String(o.get("mob", {}).get("battle_id", "")) == bid:
-			to_erase.append(int(o["id"]))
-	for oid in to_erase:
-		ents.erase(oid)
+	_battle_clear_mobs(bid, false)
 	var bx := int(bt.get("back_x", int(e["x"])))
 	var byy := int(bt.get("back_y", int(e["y"])))
 	e["x"] = bx

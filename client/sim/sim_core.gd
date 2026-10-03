@@ -872,11 +872,12 @@ func _expire_drops() -> void:
 	_remove_ents(gone)
 
 
-func _spawn_mob(def_id: int, zone_id: String = DEFAULT_ZONE) -> Variant:
-	var lv := 0                           # spawn 可選 lv = 呢個地圖嘅等級覆蓋
+func _spawn_mob(def_id: int, zone_id: String = DEFAULT_ZONE, lv_over: int = 0) -> Variant:
+	var lv := lv_over                           # spawn 可選 lv = 呢個地圖嘅等級覆蓋
 	for sp0 in data.spawns:
 		if int(sp0["monster"]) == def_id and String(sp0.get("zone", DEFAULT_ZONE)) == zone_id:
-			lv = int(sp0.get("lv", 0))
+			if lv_over == 0:
+				lv = int(sp0.get("lv", 0))
 			break
 	var d: Dictionary = data.mob_def(def_id, lv)
 	if d.get("night", false) and not _clock().is_night:

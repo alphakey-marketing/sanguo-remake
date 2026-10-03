@@ -96,7 +96,8 @@ func _kill_mob(m: Dictionary, by: Dictionary, exp_mult: float = 1.0) -> void:
 		var w := BotSys.W_SEE_KILL if RulesKarma.tier(int(by["ch"]["karma"])) < 5 else -BotSys.W_SEE_KILL
 		_witness_nearby(m, int(by["id"]), "see_kill", w)
 	_remove_ent(int(m["id"]))
-	if battle_id == "" and scene_id == "":
+	var bmob := str(m.get("mob", {}).get("battle_mob", "")) != ""   # 戰役層小怪: 唔重生、掉寶入袋
+	if battle_id == "" and scene_id == "" and not bmob:
 		_schedule_respawn(m, d)
 	if not by.has("ch"):
 		return
@@ -107,7 +108,7 @@ func _kill_mob(m: Dictionary, by: Dictionary, exp_mult: float = 1.0) -> void:
 	ch["gold"] = int(ch["gold"]) + gold
 	# S04a (spec 04 §6)【原=跌落地】: 野外地圖物品以「跌落地」實體出現，行埋邊拾取。
 	# 戰役/特殊場景落場 (battle_id/scene_id != "") 例外: 過層即傳走，唔返頭執 → 掉寶照直入袋 (保留獎勵)
-	if battle_id != "" or scene_id != "":
+	if battle_id != "" or scene_id != "" or bmob:
 		for it in items:
 			RulesShop.add_item(ch["bag"], int(it), 1)
 	elif not items.is_empty():
