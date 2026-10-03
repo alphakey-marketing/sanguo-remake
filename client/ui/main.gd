@@ -1894,6 +1894,7 @@ func switch_to_slot(n: int, is_new: bool) -> void:
 				pe["x"] = int(sp[0]); pe["y"] = int(sp[1])
 	if fresh:
 		if bool(data.world.get("origStart", false)):
+			sim.init_mobs()                                  # 原版野區 (xcN25) 嘅怪；居民/捕快仍然唔生
 			my_id = sim.spawn_player_orig("玩家")           # 原版世界: 淨係原版許昌，舊 ASCII 怪/居民/捕快抽起
 		else:
 			sim.init_mobs()

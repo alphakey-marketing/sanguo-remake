@@ -69,3 +69,36 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+# 許昌 NPC/武將 → 站喺邊座建築入口隔籬 (位置係估嘅)
+AT = {'廟': ['神秘老人', '算命先生', '玄真道人'], '藥房': ['密醫'], '廚房': ['賣菜嬸', '禮餅商', '開餅盒師傅'],
+      '客棧': ['茶館老闆', '郭嘉'], '官宅': ['禁衛大隊長', '朝廷官員', '曹操', '荀彧', '程昱', '滿寵', '鍾繇'],
+      '虎威府': ['呂布', '典韋', '許褚', '夏侯惇'], '出城': ['許昌驛丞'], '老年人家': ['老丈'],
+      '練兵場': ['轉職導師'], '私塾': ['黃師姐', '蔡邕'], '民宅': ['流浪狗', '巫姬婆', '斷情絕愛郎'],
+      '打鐵鋪': ['蔡師傅'], '賭場': ['夢韶華'], '拍賣屋': ['商會長'], '王允府': ['林員外'],
+      '劉備家': ['劉老', '徐庶', '劉備', '關羽', '張飛', '趙雲', '孫乾', '簡雍', '糜竺', '伊籍']}
+
+
+def at_building(name, taken):
+    """回傳 (x, y) 喺許昌 xuchang_o 嘅建築入口隔籬；冇對照 = None"""
+    b = next((k for k, v in AT.items() if name in v), None)
+    if b is None:
+        return None
+    ps = [p for p in jl('maps.json')['portals'] if p['map'] == 'xuchang_o' and b in (p.get('name') or '')]
+    if not ps:
+        return None
+    p = ps[0]
+    g = grid('xuchang_o')
+    allp = [(q['x'], q['y']) for q in jl('maps.json')['portals'] if q['map'] == 'xuchang_o']
+    x = y = None
+    for r in range(0, 14):
+        for dy in range(-r, r + 1):
+            for dx in range(-r, r + 1):
+                cx, cy = p['x'] + dx, p['y'] + 4 + dy
+                if max(abs(dx), abs(dy)) == r and ok(g, cx, cy) and ok(g, cx + 1, cy) and ok(g, cx - 1, cy) and x is None                         and all(max(abs(cx - a), abs(cy - b)) >= 3 for a, b in allp)                         and all(max(abs(cx - a), abs(cy - b)) >= 2 for a, b in taken):
+                    x, y = cx, cy
+    if x is None:
+        return None
+    taken.append((x, y))
+    return x, y

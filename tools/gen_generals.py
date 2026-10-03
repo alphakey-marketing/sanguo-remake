@@ -110,6 +110,7 @@ def gen_ideo(gid):
 
 
 _placed = {}
+_cur = {'n': ''}
 
 
 def _orig_place(old_map):
@@ -117,6 +118,9 @@ def _orig_place(old_map):
     from collections import defaultdict
     tm = M.REMAP[old_map]
     n = _placed.setdefault(tm, [])
+    r = M.at_building(_cur['n'], n) if tm == 'xuchang_o' else None
+    if r:
+        return tm, r[0], r[1]
     x, y = M.place_near(tm, len(n), n)
     n.append((x, y))
     return tm, x, y
@@ -140,6 +144,7 @@ def build():
              "sub": gen_sub(t, lv, f116), "ideo": gen_ideo(gid), "tier": 0}
         if r["name"] in t1:
             _, mp, x, y, ideo, typ, win, idle = t1.pop(r["name"])
+            _cur['n'] = r['name']
             mp, x, y = _orig_place(mp)       # 舊 ASCII 圖已封存：Tier1 常駐搬去原版城街
             g.update({"type": typ, "sub": gen_sub(typ, lv, f116), "ideo": ideo, "tier": 1, "map": mp, "x": x, "y": y,
                       "idle": [idle]})
