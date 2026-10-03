@@ -592,6 +592,7 @@ func _send(d: Dictionary) -> void:
 		"recruit_answer": sim.cmd_recruit_answer(my_id, int(d.answer))
 		"recruit_cancel": sim.cmd_recruit_cancel(my_id)
 		"companion_order": sim.cmd_companion_order(my_id, str(d.order))
+		"companion_select": sim.cmd_companion_select(my_id, int(d.cid))
 		"companion_skill_mode": sim.cmd_companion_skill_mode(my_id, str(d.mode))
 		"companion_gift": sim.cmd_companion_gift(my_id, int(d.item))
 		"companion_treasure": sim.cmd_companion_treasure(my_id, int(d.item))

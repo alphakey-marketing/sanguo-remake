@@ -34,6 +34,7 @@ func _init() -> void:
 	t_comp_gift_dismiss(data)
 	t_comp_cross_map(data)
 	t_comp_save(data)
+	t_party(data)
 	t_recruit_view(data)
 	print("[TEST] recruit scenarios: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
@@ -342,7 +343,7 @@ func t_arena_win(data: GameData) -> void:
 	check(int(cv.get("gid", 0)) == gid and int(cv["daysLeft"]) == int(data.recruit_cfg["serveDays"]) and int(cv["loyalty"]) >= int(data.recruit_cfg["loyalty"]["init"]),
 		"companion_view: gid / serveDays 日 / 忠誠")
 	sim.cmd_recruit_survey(pid, "wu")
-	check(_last(r[3]).contains("已經有人才"), "有同伴: 唔可以再調查")
+	check(_last(r[3]).contains("登用鎖緊"), "有同伴: 登用鎖內唔可以再調查")
 
 
 func t_arena_lose(data: GameData) -> void:
@@ -797,6 +798,38 @@ func t_comp_save(data: GameData) -> void:
 
 
 # ---------------- D: UI 讀取 ----------------
+# 多同伴: 隊伍上限 5 位同伴 (+ 主公 = 6)；揀人落指令；離隊後自動換揀
+func t_party(data: GameData) -> void:
+	var r := _comp_setup(data)
+	var sim: Sim = r[0]
+	var pid: int = r[1]
+	var ch: Dictionary = r[2]
+	var pe := sim.ent(pid)
+	var first := int(r[6]["id"])
+	var added: Array = [first]
+	for g in data.generals_t1:
+		if added.size() >= 5:
+			break
+		if int(g["id"]) == int(r[5]) or String(g["type"]) != "wu":
+			continue
+		sim._recruit_success(pe, g)
+		added.append(int(ch["recruit"]["comp"]))
+	check(sim.party_view().size() == 5 and sim.recruit_view()["partyMax"] == 5, "多同伴: 登用 5 位")
+	check(int(ch["recruit"]["comp"]) == added[4], "多同伴: 新登用 = 揀咗")
+	sim.cmd_companion_select(pid, first)
+	check(int(ch["recruit"]["comp"]) == first and sim.companion_view()["id"] == first, "多同伴: 揀人")
+	sim.cmd_companion_order(pid, "stop")
+	check(String(sim.ent(first)["gen"]["order"]) == "stop" and String(sim.ent(added[1])["gen"]["order"]) != "stop", "多同伴: 指令只落揀咗嗰位")
+	ch["recruit"]["recruitLockUntil"] = -1
+	ch["recruit"]["surveyDay"] = -1
+	var md := sim.map_at(int(pe["x"]), int(pe["y"]))
+	check(String(sim.recruit_view()["block"]).contains("隊伍已滿") or String(md.get("kind", "")) != "city", "多同伴: 滿 5 位封鎖調查")
+	sim.cmd_companion_dismiss(pid)
+	check(sim.party_view().size() == 4 and int(ch["recruit"]["comp"]) != first and not sim.companion_view().is_empty(), "多同伴: 解散後自動換揀")
+	ch["recruit"].erase("comps")
+	check(sim.party_view().size() == 1, "舊檔 (只有 comp): 當 1 位")
+
+
 func t_recruit_view(data: GameData) -> void:
 	var r := _setup(data, 5, "義理")
 	var sim: Sim = r[0]
@@ -816,7 +849,7 @@ func t_recruit_view(data: GameData) -> void:
 	check(String(r2[0].recruit_view()["block"]).contains("城池"), "recruit_view: 野外 = 要喺城池")
 	var r3 := _comp_setup(data, 4)
 	var v3: Dictionary = r3[0].recruit_view()
-	check(not (v3["comp"] as Dictionary).is_empty() and String(v3["block"]).contains("已經有人才"), "recruit_view: 有同伴")
+	check(not (v3["comp"] as Dictionary).is_empty() and String(v3["block"]).contains("今日"), "recruit_view: 有同伴 (調查今日封鎖，未滿隊唔擋)")
 	var ents: Array = r3[0].view_ents()
 	var has_gen := false
 	for e in ents:

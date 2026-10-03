@@ -41,7 +41,7 @@ GUIDE_LV = {"蔡邕": 6, "王允": 7, "劉琦": 8, "陳珪": 8, "蔣幹": 9, "�
 # 登用規則設定 (rules/recruit.gd 讀)【自訂】除註明【原】
 CFG = {
     "serveDays": 15,            # U16: 登用期由 30→15 game 日減半，到期子時 0 刻離開
-    "recruitLockDays": 15,      # U16: 登用成功後封鎖調查嘅日數 (由曆月鎖改做滾動 15 日，配合 serveDays 減半)
+    "recruitLockDays": 1,       # U16: 登用成功後封鎖調查嘅日數 (由曆月鎖改做滾動 15 日，配合 serveDays 減半)
     "levelGap": 10,             # 【原】唔可以登用比自己高 10 級以上
     "titleGap": 5,              # 【原】50 級以上人才: 頭銜差 ≤5 階 (Step 14；人才頭銜【自訂】= 戰等 - titleMinLv)
     "titleMinLv": 50,

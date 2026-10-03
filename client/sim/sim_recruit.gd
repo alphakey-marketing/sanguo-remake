@@ -179,8 +179,8 @@ func cmd_recruit_survey(id: int, kind: String) -> void:
 	var rec := _rec(ch)
 	if not (rec.get("pending", {}) as Dictionary).is_empty():
 		return _msg(id, "考驗緊人才，未得閒調查")
-	if int(rec.get("comp", 0)) != 0:
-		return _msg(id, "已經有人才跟緊你")
+	if _comp_ids(rec).size() >= PARTY_COMP_MAX:
+		return _msg(id, "隊伍已滿 (最多 %d 位同伴)" % PARTY_COMP_MAX)
 	var day := int(_clock()["day"])
 	var why := RulesRecruit.survey_block(rec, day, _month())
 	if not why.is_empty():
@@ -413,6 +413,10 @@ func _recruit_success(pe: Dictionary, g: Dictionary) -> void:
 	_consume_pass(pe, g)
 	var c := _spawn_companion(pe, g)
 	rec["comp"] = int(c["id"])
+	var ids := _comp_ids(rec)
+	if not ids.has(int(c["id"])):
+		ids.append(int(c["id"]))
+	rec["comps"] = ids
 	_gen_state(int(g["id"]))["serving"] = true
 	_emit({"k": "recruit_result", "dst": int(pe["id"]), "gid": int(g["id"]), "ok": true, "comp": int(c["id"])})
 	_msg(int(pe["id"]), "登用成功！%s會跟你 %d 日" % [g["name"], int(data.recruit_cfg["serveDays"])])
@@ -483,8 +487,8 @@ func recruit_view() -> Dictionary:
 	var block := RulesRecruit.survey_block(rec, int(_clock()["day"]), _month())
 	if not (rec.get("pending", {}) as Dictionary).is_empty():
 		block = "考驗緊人才"
-	elif int(rec.get("comp", 0)) != 0:
-		block = "已經有人才跟緊你"
+	elif _comp_ids(rec).size() >= PARTY_COMP_MAX:
+		block = "隊伍已滿 (最多 %d 位同伴)" % PARTY_COMP_MAX
 	elif block.is_empty() and not in_city:
 		block = "要喺城池街道先可以調查"
 	var cands: Array = []
@@ -497,9 +501,60 @@ func recruit_view() -> Dictionary:
 	var pend: Dictionary = rec.get("pending", {})
 	return {"inCity": in_city, "block": block, "kind": String(rec.get("kind", "")), "cands": cands,
 		"pending": String(pend.get("kind", "")), "pendingName": String(data.general_by_id.get(int(pend.get("gid", 0)), {}).get("name", "")),
-		"quiz": recruit_quiz_view(pe["ch"]), "comp": companion_view()}
+		"quiz": recruit_quiz_view(pe["ch"]), "comp": companion_view(), "party": party_view(), "partyMax": PARTY_COMP_MAX}
 
 
+# 隊伍 (spec 02 §8): 你 + 最多 PARTY_COMP_MAX 位同伴。rec.comps = 全部同伴 ent id；rec.comp = 而家揀咗嘅 (指令/面板/光環都跟呢個)
+const PARTY_COMP_MAX := 5
+
+
+# 存活嘅同伴 id (舊檔只有 comp → 當 1 人)；順手清走已唔存在嘅
+func _comp_ids(rec: Dictionary) -> Array:
+	var raw: Array = rec.get("comps", [])
+	if raw.is_empty() and int(rec.get("comp", 0)) != 0:
+		raw = [int(rec["comp"])]
+	var out: Array = []
+	for i in raw:
+		if ent(int(i)).has("gen") and not out.has(int(i)):
+			out.append(int(i))
+	return out
+
+
+func _comp_drop(rec: Dictionary, cid: int) -> void:
+	var ids := _comp_ids(rec)
+	ids.erase(cid)
+	rec["comps"] = ids
+	if int(rec.get("comp", 0)) == cid or not ids.has(int(rec.get("comp", 0))):
+		if ids.is_empty():
+			rec.erase("comp")
+		else:
+			rec["comp"] = int(ids[0])
+
+
+# 揀邊位同伴落指令
+func cmd_companion_select(id: int, cid: int) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return
+	var rec := _rec(e["ch"])
+	if not _comp_ids(rec).has(cid):
+		return
+	rec["comp"] = cid
+	_emit({"k": "companion", "dst": id, "comp": companion_view()})
+
+
+# 隊伍摘要 (UI 揀人用)
+func party_view() -> Array:
+	var rec: Dictionary = player_ch().get("recruit", {})
+	var out: Array = []
+	for i in _comp_ids(rec):
+		var c := ent(int(i))
+		out.append({"id": int(i), "name": String(c["name"]), "lv": int(c["level"]), "hp": int(c["hp"]), "maxHp": int(c["max_hp"]),
+			"sel": int(i) == int(rec.get("comp", 0))})
+	return out
+
+
+# 同伴視圖 (UI): {} = 冇同伴
 func _companion_of(owner: Dictionary) -> Dictionary:
 	if not owner.has("ch"):
 		return {}
@@ -892,7 +947,7 @@ func _companion_leave(c: Dictionary, why: String, sulk: bool) -> void:
 	var owner := int(gn["owner"])
 	var o := ent(owner)
 	if not o.is_empty():
-		_rec(o["ch"]).erase("comp")
+		_comp_drop(_rec(o["ch"]), int(c["id"]))
 	var cid := int(c["id"])
 	_remove_ent(cid)
 	_emit({"k": "companion_leave", "dst": owner, "gid": gid, "name": String(c["name"]), "reason": why})

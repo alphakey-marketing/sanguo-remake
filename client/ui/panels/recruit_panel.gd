@@ -18,6 +18,10 @@ func sig() -> String:
 		c["mp"] = int(c.get("mp", 0)) * 10 / maxi(1, int(c.get("maxMp", 1)))
 		c["sp"] = int(c.get("sp", 0)) * 10 / maxi(1, int(c.get("maxSp", 1)))
 		v["comp"] = c
+	var pt: Array = []
+	for pm in v.get("party", []):        # 隊伍列唔睇 HP，免每下重砌
+		pt.append([pm["id"], pm["lv"], pm["sel"]])
+	v["party"] = pt
 	return JSON.stringify([v, _gifts().size(), _treasures().size()])
 
 
@@ -38,14 +42,31 @@ func _build_body() -> void:
 		list.add_child(btn("返去打", func() -> void: main.hud.close_panels()))
 		list.add_child(btn("認輸", func() -> void: main._send({"t": "recruit_cancel"})))
 	elif not (v["comp"] as Dictionary).is_empty():
+		_build_party(list, v)
 		_build_comp(list, v["comp"])
+		if String(v["block"]) == "":
+			list.add_child(HSeparator.new())
+			_build_survey(list, v)
 	else:
 		_build_survey(list, v)
 
 
+# 隊伍列: 揀邊位同伴落指令 (上限 partyMax)
+func _build_party(list: VBoxContainer, v: Dictionary) -> void:
+	var party: Array = v.get("party", [])
+	list.add_child(lbl("隊伍 %d/%d 位同伴" % [party.size(), int(v.get("partyMax", 5))], 14, UiTheme.DIM))
+	var h := HFlowContainer.new()
+	h.add_theme_constant_override("h_separation", 6)
+	list.add_child(h)
+	for pm in party:
+		var cid: int = int(pm["id"])
+		h.add_child(btn("%s%s Lv%d" % ["● " if bool(pm["sel"]) else "", pm["name"], int(pm["lv"])],
+			func() -> void: main._send({"t": "companion_select", "cid": cid})))
+
+
 func _build_survey(list: VBoxContainer, v: Dictionary) -> void:
 	var ch: Dictionary = main.ch
-	list.add_child(wrap_lbl("理念「%s」　Lv%d\n喺城池街道「調查」搵人才：每日 1 次；成功登用嗰個月唔可以再調查。武將要擂台 PK，文官要答三國問答（10 題啱 8）。" %
+	list.add_child(wrap_lbl("理念「%s」　Lv%d\n喺城池街道「調查」搵人才：每日 1 次；登用後隔 1 日可再調查，隊伍最多 5 位同伴。武將要擂台 PK，文官要答三國問答（10 題啱 8）。" %
 		[str(ch.get("ideology", "")) if str(ch.get("ideology", "")) != "" else "未定（只登得出仕人才）", int(ch.get("level", 1))], 14, UiTheme.DIM))
 	var h := HBoxContainer.new()
 	h.add_theme_constant_override("separation", 6)
