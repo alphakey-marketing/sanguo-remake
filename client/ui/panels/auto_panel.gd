@@ -13,8 +13,6 @@ func sig() -> String:
 	return JSON.stringify([main.auto, main.auto_whitelist, main.auto_roam, main.auto_skill, main.pk_mode, main.ents.size()])
 
 
-const NEARBY_RANGE := 14   # 揀怪表只顯示呢個 Chebyshev 距離之內嘅怪（同 zone），唔好成張圖咁多
-
 func _nearby_names() -> Array:
 	var names := {}
 	var me = main._me()
@@ -23,8 +21,6 @@ func _nearby_names() -> Array:
 			continue
 		if me != null:
 			if str(main.sim.zone_view(int(e.x), int(e.y)).get("id", "")) != str(main.sim.zone_view(int(me.x), int(me.y)).get("id", "")):
-				continue
-			if main._mob_dist(me, e) > NEARBY_RANGE:
 				continue
 		names[str(e["name"])] = true
 	var out: Array = names.keys()
@@ -71,10 +67,10 @@ func _build_body() -> void:
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	list.add_theme_constant_override("separation", 6)
 	sc.add_child(list)
-	list.add_child(wrap_lbl("揀邊幾種怪先自動打（冇揀 = 打晒附近嘅怪；只顯示附近 %d 格內嘅怪）：" % NEARBY_RANGE, 13, UiTheme.DIM))
+	list.add_child(wrap_lbl("揀邊幾種怪先自動打（冇揀 = 打晒附近嘅怪；顯示當前場景所有怪）：", 13, UiTheme.DIM))
 	var names := _nearby_names()
 	if names.is_empty():
-		list.add_child(lbl("（附近見唔到怪，行埋去先揀）", 13, UiTheme.DIM))
+		list.add_child(lbl("（當前場景冇怪）", 13, UiTheme.DIM))
 	for nm in names:
 		var on := bool(main.auto_whitelist.has(nm))
 		var b := btn("%s %s" % ["✓" if on else "☆", nm], func() -> void:

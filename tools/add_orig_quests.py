@@ -322,7 +322,7 @@ def add_bosses():
     ms[:] = [m for m in ms if m['id'] not in {b[0] for b in BOSSES}]
     for mid, name, lv in BOSSES:   # 【自訂】數值按 lv 線性，唔掉落
         ms.append({'id': mid, 'name': name, 'level': lv, 'hp': 46 * lv, 'atk': round(3.6 * lv), 'def': round(0.55 * lv),
-                   'spellDef': round(1.5 * lv), 'atkInterval': 13, 'moveSpeed': 1, 'exp': 0, 'gold': [0, 0],
+                   'spellDef': round(1.5 * lv), 'atkInterval': 13, 'moveSpeed': 1, 'exp': 10 * lv + 20, 'gold': [0, 0],
                    'alignment': -200, 'aggroRange': 8, 'leash': 16, 'element': 'none', 'drops': [], 'rareDrops': [],
                    'suppDrops': []})
     json.dump(md, open(p, 'w', encoding='utf8', newline='\n'), ensure_ascii=False, indent=1)

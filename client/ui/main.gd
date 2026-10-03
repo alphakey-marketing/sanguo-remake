@@ -21,7 +21,7 @@ var w := Sim.W
 var h := Sim.H
 var ents := []
 var faces := []
-const ZOOM_OUT := 0.5                              # 全圖縮放 (0.5 = 拉遠一倍，手機睇得多啲)；world 座標 * zoom = 畫面
+const ZOOM_OUT := 1.0                              # 全圖縮放 (0.5 = 拉遠一倍，手機睇得多啲)；world 座標 * zoom = 畫面
 const ORIG_CHAR_SCALE := 2.0
 var cam := Vector2.ZERO
 var _vp := {}                       # 單位顯示位置 (格) 平滑跟 sim 位置，畫面唔再一格一格跳
@@ -1793,7 +1793,6 @@ func _draw() -> void:
 			if _draw_mon_sprite(e, p): pass
 			elif f != null: draw_texture_rect(f, Rect2(p - Vector2(4, 8), Vector2(24, 26)), false)
 			else: draw_rect(Rect2(p, Vector2(TILE, TILE)), Color.RED if isme else Color.ORANGE)
-			if isme: draw_rect(Rect2(p - Vector2(4, 8), Vector2(24, 26)), Color.YELLOW, false, 2.0)
 		var isgen: bool = e.get("gen", false)
 		if e.has("hp") and e.has("maxHp") and (ismob or isme or isgen):
 			_bar(p + Vector2(-2, -14), Vector2(20, 3), float(e.hp) / float(e.maxHp), Color(0.9, 0.2, 0.2) if ismob else Color(0.3, 0.8, 0.3))

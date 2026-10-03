@@ -18,7 +18,7 @@ for mid, name, ring, zone, tint in G:
     else:
         m = dict(base); m['id'] = mid; m['name'] = name; md['monsters'].append(m)
     m['drops'] = [{'item': ring, 'p': 1.0}]
-    m['exp'] = 0
+    m['exp'] = 10 * 50 + 20
     if tint: al['alias'][str(mid)] = {'mon': 70028, 'tint': tint}
     md['spawns'].append({'zone': zone, 'monster': mid, 'count': 1, 'respawnTicks': 300, 'lv': 50})
 json.dump(md, open(C + 'monsters.json', 'w', encoding='utf8', newline='\n'), ensure_ascii=False, indent=1)

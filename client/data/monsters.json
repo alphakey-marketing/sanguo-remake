@@ -786,7 +786,7 @@
    "spellDef": 40,
    "atkInterval": 12,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 340,
    "gold": [
     0,
     0
@@ -826,7 +826,7 @@
    "spellDef": 20,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 150,
    "gold": [
     0,
     0
@@ -861,7 +861,7 @@
    "spellDef": 24,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 170,
    "gold": [
     0,
     0
@@ -896,7 +896,7 @@
    "spellDef": 28,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 200,
    "gold": [
     0,
     0
@@ -9207,7 +9207,7 @@
    "spellDef": 30,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 220,
    "gold": [
     0,
     0
@@ -9247,7 +9247,7 @@
    "spellDef": 32,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 240,
    "gold": [
     0,
     0
@@ -9287,7 +9287,7 @@
    "spellDef": 34,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 270,
    "gold": [
     0,
     0
@@ -9332,7 +9332,7 @@
    "spellDef": 40,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 320,
    "gold": [
     0,
     0
@@ -9387,7 +9387,7 @@
    "spellDef": 33,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 260,
    "gold": [
     0,
     0
@@ -9432,7 +9432,7 @@
    "spellDef": 30,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 240,
    "gold": [
     0,
     0
@@ -9472,7 +9472,7 @@
    "spellDef": 26,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 200,
    "gold": [
     0,
     0
@@ -9512,7 +9512,7 @@
    "spellDef": 28,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 220,
    "gold": [
     0,
     0
@@ -9552,7 +9552,7 @@
    "spellDef": 36,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 280,
    "gold": [
     0,
     0
@@ -9592,7 +9592,7 @@
    "spellDef": 38,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 300,
    "gold": [
     0,
     0
@@ -9637,7 +9637,7 @@
    "spellDef": 37,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 290,
    "gold": [
     0,
     0
@@ -9682,7 +9682,7 @@
    "spellDef": 44,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 360,
    "gold": [
     0,
     0
@@ -9740,7 +9740,7 @@
    "spellDef": 48,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 420,
    "gold": [
     0,
     0
@@ -9790,7 +9790,7 @@
    "spellDef": 45,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 370,
    "gold": [
     0,
     0
@@ -9835,7 +9835,7 @@
    "spellDef": 48,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 420,
    "gold": [
     0,
     0
@@ -9880,7 +9880,7 @@
    "spellDef": 42,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 350,
    "gold": [
     0,
     0
@@ -9920,7 +9920,7 @@
    "spellDef": 30,
    "atkInterval": 16,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 300,
    "gold": [
     0,
     0
@@ -9960,7 +9960,7 @@
    "spellDef": 33,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 240,
    "gold": [
     0,
     0
@@ -10000,7 +10000,7 @@
    "spellDef": 42,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 300,
    "gold": [
     0,
     0
@@ -10040,7 +10040,7 @@
    "spellDef": 52,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 370,
    "gold": [
     0,
     0
@@ -10085,7 +10085,7 @@
    "spellDef": 45,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 320,
    "gold": [
     0,
     0
@@ -10140,7 +10140,7 @@
    "spellDef": 48,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 340,
    "gold": [
     0,
     0
@@ -10175,7 +10175,7 @@
    "spellDef": 45,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 320,
    "gold": [
     0,
     0
@@ -10230,7 +10230,7 @@
    "spellDef": 48,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 340,
    "gold": [
     0,
     0
@@ -10265,7 +10265,7 @@
    "spellDef": 51,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 360,
    "gold": [
     0,
     0
@@ -10305,7 +10305,7 @@
    "spellDef": 54,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 380,
    "gold": [
     0,
     0
@@ -10345,7 +10345,7 @@
    "spellDef": 57,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 400,
    "gold": [
     0,
     0
@@ -10390,7 +10390,7 @@
    "spellDef": 60,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 420,
    "gold": [
     0,
     0
@@ -10435,7 +10435,7 @@
    "spellDef": 66,
    "atkInterval": 13,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 460,
    "gold": [
     0,
     0
@@ -11798,7 +11798,7 @@
    "def": 12,
    "atkInterval": 20,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 520,
    "gold": [
     0,
     150
@@ -13437,7 +13437,7 @@
    "def": 12,
    "atkInterval": 20,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 520,
    "gold": [
     0,
     150
@@ -13465,7 +13465,7 @@
    "def": 12,
    "atkInterval": 20,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 520,
    "gold": [
     0,
     150
@@ -13493,7 +13493,7 @@
    "def": 12,
    "atkInterval": 20,
    "moveSpeed": 1,
-   "exp": 0,
+   "exp": 520,
    "gold": [
     0,
     150

@@ -83,6 +83,12 @@ func _kill_mob(m: Dictionary, by: Dictionary, exp_mult: float = 1.0) -> void:
 	var quest_boss := str(m.get("mob", {}).get("quest_boss", ""))
 	if quest_boss != "":
 		_emit({"k": "mob_died", "dst": int(by.get("id", 0)), "name": str(m["name"])})
+		if by.has("ch") and int(d["exp"]) > 0:    # 任務 boss 都有經驗
+			var bch: Dictionary = by["ch"]
+			var bl0 := int(bch["level"])
+			if RulesStats.gain_exp(data, bch, int(d["exp"])) > 0:
+				_levelup_notice(by, bl0)
+			_sync_stats(by)
 		var q := _quest_by_id(quest_boss)
 		if not q.is_empty() and by.has("ch"):
 			var res := RulesQuest.on_fight_win(data, by["ch"], q)
@@ -121,11 +127,14 @@ func _kill_mob(m: Dictionary, by: Dictionary, exp_mult: float = 1.0) -> void:
 		_drop_items(int(m["x"]), int(m["y"]), di)
 	ch["karma"] = RulesCombat.karma_after_kill(int(ch["karma"]), d["alignment"])
 	var base_exp := MathX.js_round(float(d["exp"]) * exp_mult)
+	if int(d["exp"]) > 0 and exp_mult > 0.0:
+		base_exp = maxi(1, base_exp)         # 有經驗嘅怪最少 +1，唔好見 +0
 	var dmg_log: Dictionary = m.get("dmg", {})
 	if dmg_log.is_empty():           # 冇打過就死 (即死/狀態致死等)：全歸擊殺者
 		dmg_log = {str(int(by["id"])): 1}
 	var shares := RulesGeneral.team_exp_split(base_exp, dmg_log)   # 隊伍經驗池 (S02b, spec 02 §8)
 	var ups := 0
+	var gained := 0
 	for id_str in shares.keys():
 		var member := ent(int(id_str))
 		if member.is_empty() or not member.has("ch"):
@@ -144,11 +153,12 @@ func _kill_mob(m: Dictionary, by: Dictionary, exp_mult: float = 1.0) -> void:
 		_sync_stats(member)
 		if int(member["id"]) == int(by["id"]):
 			ups = mups
+			gained = e
 	_comm_on_kill(by, int(m["mob"]["def"]))      # 居民委託打怪計數 (Step 16)
 	_beast_on_mob_kill(by, base_exp)              # S07b: 出戰戰騎吸 exp
 	if ups > 0:
 		_sync_quest_npcs()          # 升級可能改變任務 NPC 可見性 (神秘老人/流浪狗)
-	_emit({"k": "kill", "src": by["id"], "dst": m["id"], "exp": int(d["exp"]), "gold": gold, "items": items,
+	_emit({"k": "kill", "src": by["id"], "dst": m["id"], "exp": gained, "gold": gold, "items": items,
 		"lvUp": int(ch["level"]) if ups > 0 else 0})
 	if battle_id != "":
 		_battle_on_boss_kill(by, battle_id, int(m["mob"].get("battle_floor", 0)))
