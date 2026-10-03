@@ -155,5 +155,40 @@ func _init() -> void:
 	ms.cmd_use_skill(mid, "toushi")
 	check(not _has("toushi"), "透視冷卻中")
 
+	# 融合 (義士): 打鐵鋪 + 屬性石 → 集氣棒 → 早撳失敗唔扣石 / 準時成功嵌石 / 已嵌唔再融合 / 非義士唔得
+	var f := _new(data, "yishi", "")
+	var fs: Sim = f[0]
+	var fid: int = f[1]
+	var fch: Dictionary = f[2]
+	fs.cmd_fusion_start(fid)
+	check((fch.get("fusing", {}) as Dictionary).is_empty(), "唔喺打鐵鋪唔融合")
+	var fe := fs.ent(fid)
+	fe["x"] = int(data.facilities["forge"]["x"])
+	fe["y"] = int(data.facilities["forge"]["y"])
+	fs.cmd_fusion_start(fid)
+	check((fch.get("fusing", {}) as Dictionary).is_empty(), "冇屬性石唔融合")
+	fs.cmd_debug_give(fid, 32001, 2)
+	fs.cmd_fusion_start(fid)
+	check(not (fch.get("fusing", {}) as Dictionary).is_empty(), "開始融合集氣棒")
+	fs.cmd_fusion_hit(fid)
+	check(RulesShop.count_item(fch["bag"], 32001) == 2 and (fch.get("fusedJewels", {}) as Dictionary).is_empty(), "撳早失敗唔扣石")
+	fs.cmd_fusion_start(fid)
+	for i in 15:
+		fs.step()
+	fs.cmd_fusion_hit(fid)
+	check(RulesShop.count_item(fch["bag"], 32001) == 1, "成功扣 1 粒石")
+	var wp := int(fch["equip"]["weapon"])
+	check((fch["fusedJewels"] as Dictionary).has(wp) and str(fch["fusedJewels"][wp]["elem"]) == "wind", "武器嵌風石")
+	check(absf(fs._phys_elem_mult(fch, "earth") - 1.05) < 0.0001, "融合石物理剋地 ×1.05")
+	fs.cmd_fusion_start(fid)
+	check((fch.get("fusing", {}) as Dictionary).is_empty(), "已嵌武器唔再融合")
+	var nf := _new(data, "daoshi", "")
+	var nfe: Dictionary = nf[0].ent(nf[1])
+	nfe["x"] = int(data.facilities["forge"]["x"])
+	nfe["y"] = int(data.facilities["forge"]["y"])
+	nf[0].cmd_debug_give(nf[1], 32001, 1)
+	nf[0].cmd_fusion_start(nf[1])
+	check((nf[2].get("fusing", {}) as Dictionary).is_empty(), "非義士唔得融合")
+
 	print("[TEST] cskill: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)

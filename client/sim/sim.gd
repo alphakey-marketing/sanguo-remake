@@ -338,6 +338,9 @@ func view_ents() -> Array:
 		if e["kind"] == "dropped":
 			o["dropped"] = true
 			o["dropItems"] = e["drop"]["items"]
+		if e["kind"] == "chest":
+			o["chestBox"] = true                         # 隨機寶箱: 客戶端畫箱，唔好當人形
+			o["locked"] = bool(e.get("locked", true))
 		out.append(o)
 	return out
 

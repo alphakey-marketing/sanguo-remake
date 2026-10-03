@@ -103,7 +103,7 @@ func _ready() -> void:
 		audio.play_bgm("bgm_town")
 	UiTheme.install_font()   # embed CJK 字形，HUD/panel 中文先顯示到（Web/iOS 唔使睇 browser fallback）
 	autotest = "--autotest" in OS.get_cmdline_user_args()
-	uitest = "--uitest" in OS.get_cmdline_user_args() or "--uishot" in OS.get_cmdline_user_args() or "--origshot" in OS.get_cmdline_user_args()
+	uitest = "--uitest" in OS.get_cmdline_user_args() or "--uishot" in OS.get_cmdline_user_args() or "--origshot" in OS.get_cmdline_user_args() or "--skillshot" in OS.get_cmdline_user_args()
 	# 內建 watchdog: --uitest/--autotest 無論 test script 有冇 load 到 / 有冇 crash / 有冇死迴圈，
 	# 超過呢個時間都會強制 quit，唔會令 Godot 無限跑 → bash 永久等 → relay leg 掛死。
 	# 要喺 load test script 之前裝好，先至唔會因 smoke parse error 而失效。
@@ -188,6 +188,10 @@ func _ready() -> void:
 		var os_ := load("res://tests/ui_shot_orig.gd")
 		if os_ != null:
 			add_child(os_.new())
+	elif "--skillshot" in OS.get_cmdline_user_args():
+		var ks := load("res://tests/ui_shot_skill.gd")
+		if ks != null:
+			add_child(ks.new())
 	elif "--uishot" in OS.get_cmdline_user_args():
 		var sh := load("res://tests/ui_shot.gd")
 		if sh != null:
@@ -1570,6 +1574,18 @@ func _bar(pos: Vector2, size: Vector2, ratio: float, col: Color) -> void:
 func _txt(pos: Vector2, s: String, col := Color.WHITE, sz := FONT_SZ) -> void:
 	draw_string(ThemeDB.fallback_font, pos, s, HORIZONTAL_ALIGNMENT_LEFT, -1, sz, col)
 
+# 寶箱圖: 木箱身 + 較深箱蓋 + 金鎖 + 金屬帶 (鎖住 = 鎖頭；開咗 = 箱蓋掀起)
+func _draw_chest_box(p: Vector2, locked: bool) -> void:
+	var body := Rect2(p + Vector2(2, 10), Vector2(TILE - 4, 12))
+	var lid := Rect2(p + Vector2(2, 4 if locked else 0), Vector2(TILE - 4, 7))
+	draw_rect(body, Color(0.55, 0.34, 0.14))
+	draw_rect(lid, Color(0.42, 0.25, 0.1))
+	draw_rect(Rect2(body.position + Vector2(0, 3), Vector2(body.size.x, 2)), Color(0.75, 0.62, 0.25))
+	draw_rect(Rect2(p + Vector2(2, 4 if locked else 0), Vector2(TILE - 4, 18 if locked else 22)), Color(0.15, 0.08, 0.02), false, 1.0)
+	if locked:
+		draw_rect(Rect2(p + Vector2(TILE * 0.5 - 2, 8), Vector2(4, 5)), Color(1.0, 0.85, 0.25))
+
+
 func _draw() -> void:
 	var vs_screen := get_viewport_rect().size
 	var vs := vs_screen / zoom
@@ -1638,6 +1654,10 @@ func _draw() -> void:
 				draw_rect(Rect2(p + Vector2(7, 6), Vector2(10, 7)), Color(0.6, 0.5, 0.22))
 				draw_rect(Rect2(p + Vector2(4, 12), Vector2(16, 10)), Color(0.2, 0.15, 0.05), false, 1.0)
 			_txt(p + Vector2(-2, 4), "×%d" % n, Color(1, 0.95, 0.6), 11)
+			continue
+		if e.get("chestBox", false):                    # 隨機寶箱: 木箱 + 金鎖 (原版冇專用圖)
+			_draw_chest_box(p, bool(e.get("locked", true)))
+			_txt(p + Vector2(-4, -8), str(e.name), Color(1, 0.88, 0.4), 11)
 			continue
 		if ismob:
 			if not _draw_mon_sprite(e, p):
