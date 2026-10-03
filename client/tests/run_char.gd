@@ -238,10 +238,33 @@ func t_promote_flow(data: GameData) -> void:
 	sim.cmd_class_promote(id)
 	check(int(ch["tier"]) == 1, "完成考試 + Lv50 = 轉職成功")
 	check(RulesClass.title_of(cls, 1) == "武士", "二轉職名")
-	# 三轉框架: 唔存在任務 → 拒絕
+	# 三轉 (S01e): 冇完成七彩項鍊 → 拒絕；接任務 → 集晶 → 回報 → 轉職
 	ch["level"] = 100
 	sim.cmd_class_promote(id)
-	check(int(ch["tier"]) == 1, "冇三轉任務: 三轉拒絕 (S04d 接)")
+	check(int(ch["tier"]) == 1, "未完成七彩項鍊考驗: 三轉拒絕")
+	var t3: Dictionary = {}
+	for q in data.quests:
+		if String(q["id"]) == "promote_test2":
+			t3 = q
+	check(not t3.is_empty(), "三轉考驗任務 promote_test2 有資料")
+	check(RulesQuest.pre_ok(data, t3, ch), "Lv100 + 二轉: 三轉考驗 pre 過")
+	ch["tier"] = 0
+	check(not RulesQuest.pre_ok(data, t3, ch), "未二轉: 三轉考驗 pre 唔過")
+	ch["tier"] = 1
+	var zn: Dictionary = data.quest_npcs["promote_zhuge"]
+	sim._sync_quest_npcs()
+	_put(sim, id, int(zn["x"]) + 1, int(zn["y"]))
+	sim.cmd_quest_talk(id, "promote_zhuge")
+	check((ch.get("quests", {}) as Dictionary).has("promote_test2"), "同諸葛亮傾偈 = 接三轉考驗")
+	RulesShop.add_item(ch["bag"], 63013, 4)
+	sim.cmd_quest_turnin(id, "promote_test2")
+	RulesShop.add_item(ch["bag"], 63014, 3)
+	sim.cmd_quest_turnin(id, "promote_test2")
+	_put(sim, id, int(zn["x"]) + 1, int(zn["y"]))
+	sim.cmd_quest_talk(id, "promote_zhuge")
+	check(bool(ch.get("questDone", {}).get("promote_test2", false)), "集齊 7 晶 + 回報 = 三轉考驗完成")
+	sim.cmd_class_promote(id)
+	check(int(ch["tier"]) == 2, "完成考驗 + Lv100 = 三轉成功")
 
 
 

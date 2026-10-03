@@ -5,7 +5,7 @@ extends RefCounted
 # 轉職效果: 職名變化、進階武器解鎖、四招起絶招解鎖、專長等級上限提升。
 
 const PROMOTE_LEVEL := [50, 100]                          # 【原】50 二轉、100 三轉
-const PROMOTE_QUEST_T3 := "promote_test2"  # 三轉考試任務（S04d 接，暫未有）
+const PROMOTE_QUEST_T3 := "promote_test2"  # 三轉考試任務（S01e 已有，六職共用）
 
 
 # F6 轉職考試任務 id: 二轉 = 每職一份 promote_test_<classId>；三轉 = promote_test2

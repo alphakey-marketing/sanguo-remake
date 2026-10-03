@@ -14,6 +14,7 @@ func _init() -> void:
 	t_enter(data)
 	t_full_run_taohuadu(data)
 	t_qicai_bosses(data)
+	t_qicai_t3_open(data)
 	t_death_no_loss(data)
 	t_leave(data)
 	t_closed(data)
@@ -284,3 +285,20 @@ func t_determinism(data: GameData) -> void:
 	var nick1 := s1.save_string()
 	var nick2 := s2.save_string()
 	check(nick1 == nick2, "場景入場同 seed 決定性 (存取字串一致)")
+
+# S01e: 三轉考驗期間七彩奪寶陣長開；死亡扣經驗唔跌級
+func t_qicai_t3_open(data: GameData) -> void:
+	var r := _new(data, 5)
+	var sim: Sim = r[0]; var id: int = r[1]
+	_set_day(sim, 5)                         # 初六 = 唔係開門日
+	var ch: Dictionary = sim.player_ch()
+	ch["level"] = 100
+	_goto_gate(sim, id, "qicai")
+	sim.cmd_scene_enter(id, "qicai")
+	check(not sim.ent(id).has("scene"), "三轉: 冇任務 + 非開門日 入唔到七彩奪寶陣")
+	ch["quests"] = {"promote_test2": {"stage": 0}}
+	sim.cmd_scene_enter(id, "qicai")
+	check(sim.ent(id).has("scene"), "三轉: 考驗期間非開門日都入到")
+	ch["exp"] = 0
+	sim._die(sim.ent(id)) if sim.has_method("_die") else null
+	check(int(ch["level"]) == 100 and int(ch["exp"]) == 0, "三轉: 死亡只扣經驗，Lv100 + 0% 保持 (唔跌 99)")

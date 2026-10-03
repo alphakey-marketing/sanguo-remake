@@ -199,6 +199,8 @@ static func pre_ok(data: GameData, q: Dictionary, ch: Dictionary) -> bool:
 		return false
 	if pre.has("level") and lv < int(pre["level"]):
 		return false
+	if pre.has("tier") and int(ch.get("tier", 0)) != int(pre["tier"]):   # 轉職階 (三轉考驗要已二轉)
+		return false
 	if pre.has("classId") and String(ch.get("classId", "")) != String(pre["classId"]):
 		return false
 	if pre.has("karmaMin") and int(ch.get("karma", 0)) < int(pre["karmaMin"]):

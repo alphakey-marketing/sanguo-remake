@@ -69,7 +69,9 @@ func cmd_scene_enter(id: int, sid: String) -> void:
 			or not _near(e, int(gate["x"]), int(gate["y"])):
 		return _msg(id, "要行近%s入口先入得" % String(RulesScene.find(data.scenes, sid).get("name", "")))
 	var s := RulesScene.find(data.scenes, sid)
-	var err := RulesScene.can_enter(s, int(e["ch"]["level"]), int(_clock()["day"]), _month_days())
+	# 三轉考驗期間七彩奪寶陣長開 (S01e)
+	var t3_open := sid == "qicai" and (e["ch"].get("quests", {}) as Dictionary).has(RulesClass.PROMOTE_QUEST_T3)
+	var err := RulesScene.can_enter(s, int(e["ch"]["level"]), int(_clock()["day"]), _month_days(), t3_open)
 	if err != "":
 		return _msg(id, err)
 	e["scene"] = {"id": sid, "layer": 0, "back_x": int(gate["x"]), "back_y": int(gate["y"])}

@@ -53,10 +53,10 @@ static func open_days_text(scene: Dictionary) -> String:
 
 
 # 可以入? 得 = ""，唔得 = 提示字
-static func can_enter(scene: Dictionary, level: int, day: int, month_days: int) -> String:
+static func can_enter(scene: Dictionary, level: int, day: int, month_days: int, force_open := false) -> String:
 	if scene.is_empty():
 		return "而家冇特殊場景開放"
-	if not is_open(scene, day, month_days):
+	if not force_open and not is_open(scene, day, month_days):
 		return "今日唔係%s開門日（每月%s）" % [String(scene.get("name", "")), open_days_text(scene)]
 	if level < int(scene.get("minLevel", 1)):
 		return "武等 ≥ %d 先入得%s" % [int(scene["minLevel"]), String(scene.get("name", ""))]
