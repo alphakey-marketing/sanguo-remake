@@ -7,6 +7,8 @@ func _levelup_notice(p: Dictionary, lv0: int) -> void:
 	var ch: Dictionary = p["ch"]
 	var lv := int(ch["level"])
 	var txt := "升級！Lv%d，屬性點 +%d（共 %d），HP/MP/SP 回滿" % [lv, (lv - lv0) * RulesStats.UPGRADE_POINTS, int(ch.get("attrPoints", 0))]
+	if bool(ch.get("autoPoints", false)):
+		txt += "；已自動派點，剩 %d 點" % int(ch.get("attrPoints", 0))
 	var hints := RulesStats.unlock_hints(data, str(ch["classId"]), lv0, lv)
 	if not hints.is_empty():
 		txt += "；" + "、".join(hints)
