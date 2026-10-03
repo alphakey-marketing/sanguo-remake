@@ -339,6 +339,14 @@ def imp_player_layers(src, idx):
                 rel = f"player/{b}_{c}_{kind}{k}.png"
                 sh.save(os.path.join(OUT, rel))
                 out[f"{b}/{c}/{kind}/{k}"] = rel
+            # 三轉基本造型 (role9902 第 1 款 FG04): kind t = 甲(含翼)，th = 髮
+            for kind, code in (("t", f"1{b}{c}4404"), ("th", f"1{b}{c}3404")):
+                sh = cp.single(code, cp.layer9902)
+                if sh is None:
+                    continue
+                rel = f"player/{b}_{c}_{kind}0.png"
+                sh.save(os.path.join(OUT, rel))
+                out[f"{b}/{c}/{kind}/0"] = rel
     idx["player_layers"] = out
     print(f"玩家分層: {len(out)} 張")
 

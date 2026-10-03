@@ -24,9 +24,23 @@ def layer(code):
     _load()
     return CP(_m.blob(_ix[code])) if code in _ix else None
 
-def single(code):
+_m9902 = None
+_ix9902 = {}
+
+
+def layer9902(code):
+    """role9902.mrg = 三轉造型件 (第 5 位 4，FG 04~06 三款)；用家 2026-10-03 揀第 1 款 (04)"""
+    global _m9902
+    if _m9902 is None:
+        _m9902 = Mrg(r"D:/Download/zyxy_client/Sanguo_Client/role/role9902.mrg")
+        for i, n in enumerate(_m9902.names):
+            _ix9902[n.split(chr(92))[-1][:7]] = i
+    return CP(_m9902.blob(_ix9902[code])) if code in _ix9902 else None
+
+
+def single(code, src=None):
     """單層 → 8x8 sheet (同 compose 一樣 cell/原點，可直接疊)"""
-    c = layer(code)
+    c = (src or layer)(code)
     if c is None:
         return None
     sheet = Image.new("RGBA", (CW * 8, CH * 8), (0, 0, 0, 0))

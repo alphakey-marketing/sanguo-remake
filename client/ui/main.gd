@@ -286,7 +286,8 @@ func _look_styles() -> Dictionary:
 	var hid := int(eq.get("head", 0))
 	if hid > 0:
 		h = 2 + mini(4, int(data.info.get(hid, {}).get("req_lv", 0)) / 33)
-	return {"b": b, "w": w, "a": a, "h": h}
+	# 三轉 (tier 2) 基本造型【用家 2026-10-03 揀 role9902 第 1 款】: 冇著身甲/頭盔先顯示，有裝備照裝備
+	return {"b": b, "w": w, "a": a, "h": h, "t3a": int(ch.get("tier", 0)) >= 2 and bid <= 0, "t3h": int(ch.get("tier", 0)) >= 2 and hid <= 0}
 
 func _draw_my_layers(a: Dictionary, act: String, p: Vector2) -> bool:
 	var k := _look_styles()
@@ -299,7 +300,13 @@ func _draw_my_layers(a: Dictionary, act: String, p: Vector2) -> bool:
 		return false
 	var dir := int(a.get("dir", 4))
 	var wtex := AssetLib.player_layer(b, c, "w", int(k["w"]))
-	var order: Array = [wtex, body, AssetLib.player_layer(b, c, "a", int(k["a"])), AssetLib.player_layer(b, c, "h", int(k["h"]))]
+	var atex := AssetLib.player_layer(b, c, "t", 0) if bool(k["t3a"]) else null
+	if atex == null:
+		atex = AssetLib.player_layer(b, c, "a", int(k["a"]))
+	var htex := AssetLib.player_layer(b, c, "th", 0) if bool(k["t3h"]) else null
+	if htex == null:
+		htex = AssetLib.player_layer(b, c, "h", int(k["h"]))
+	var order: Array = [wtex, body, atex, htex]
 	if not (dir in [0, 1, 7]):
 		order = [body, order[2], order[3], wtex]
 	var cw := body.get_width() / 8

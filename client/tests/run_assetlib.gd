@@ -26,6 +26,7 @@ func _init() -> void:
 		check(AssetLib.face(20001) != null, "face 20001 有圖")
 		for b in range(1, 7):
 			check(AssetLib.player_layer(b, 1, "b", 0) != null, "職業 %d 有身體分層" % b)
+			check(AssetLib.player_layer(b, 1, "t", 0) != null and AssetLib.player_layer(b, 2, "th", 0) != null, "職業 %d 有三轉造型分層" % b)
 			check(AssetLib.player_preview(b, {"hair": 2}).size() >= 2, "職業 %d 預覽有圖層" % b)
 		for st in range(1, 12):
 			check(AssetLib.face_layers({"set": st, "hair": 3, "brow": 2, "shape": 1, "neck": 3, "bg": 12}).size() == 5, "臉型組 %d 五層齊" % st)
