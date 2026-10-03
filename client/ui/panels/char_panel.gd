@@ -283,10 +283,8 @@ func _build_expert(ch: Dictionary) -> void:
 	var cls_id := str(ch.get("classId", ""))
 	var sc := scroll()
 	body.add_child(sc)
-	var g := GridContainer.new()
-	g.columns = 3
-	g.add_theme_constant_override("h_separation", 18)
-	g.add_theme_constant_override("v_separation", 4)
+	var g := VBoxContainer.new()
+	g.add_theme_constant_override("separation", 6)
 	g.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	sc.add_child(g)
 	var exp: Dictionary = ch.get("expert", {})
@@ -295,13 +293,19 @@ func _build_expert(ch: Dictionary) -> void:
 		var def: Dictionary = d.experts["skills"][sk]
 		var cap: int = RulesExpert.cap_of(d.experts, cls_id, sk, tier)
 		var lv: int = main.sim.expert_lv(ch, sk) if main.sim != null else 0
-		g.add_child(lbl(String(def["name"]), 14))
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 18)
+		row.add_child(lbl(String(def["name"]), 14))
 		if cap <= 0:
-			g.add_child(lbl("未解鎖", 13, UiTheme.DIM))
-			g.add_child(lbl("", 13))
-		else:
-			g.add_child(lbl("Lv%d / 上限%d" % [lv, cap], 14, EXPERT_LV_COLOR[lv]))
-			g.add_child(lbl("%d/%d exp" % [int(exp.get(sk, 0)), int(d.experts["levelExp"][cap - 1])], 12, UiTheme.DIM))
+			row.add_child(lbl("未解鎖", 13, UiTheme.DIM))
+			g.add_child(row)
+			continue
+		row.add_child(lbl("Lv%d / 上限%d" % [lv, cap], 14, EXPERT_LV_COLOR[mini(lv, EXPERT_LV_COLOR.size() - 1)]))
+		row.add_child(lbl("%d/%d exp" % [int(exp.get(sk, 0)), int(d.experts["levelExp"][cap - 1])], 12, UiTheme.DIM))
+		g.add_child(row)
+		var fx := RulesExpert.effect_line(str(sk), lv, cap)
+		if fx != "":
+			g.add_child(wrap_lbl("　" + fx, 12, UiTheme.DIM))
 	body.add_child(hsep())
 	var weather: Array = main.sim.view_weather() if main.sim != null else []
 	if weather.is_empty():

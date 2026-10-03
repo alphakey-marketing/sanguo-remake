@@ -76,6 +76,13 @@ func _init() -> void:
 	RulesShop.add_item(c2["bag"], sim2.ITEM_SKILL_ELIXIR, 1)
 	sim2._use_skill_elixir(id2, sim2.ent(id2))
 	check(int(c2["expert"]["kaiken"]) > 10, "技能神丹加專長 exp")
+	# 效果說明文字
+	check(RulesExpert.effect_line("kaiken", 2, 4) == "內政工作收益 ×1.50　→ 下一級 ×1.75", "內政說明 " + RulesExpert.effect_line("kaiken", 2, 4))
+	check(RulesExpert.effect_line("kaiken", 4, 4).ends_with("（已達上限）"), "滿級標上限")
+	check(RulesExpert.effect_line("jiaoyi", 2, 4).begins_with("買入 -4%　賣出 +4%"), "交易說明")
+	check(RulesExpert.effect_line("tianwen", 0, 2).begins_with("Lv1 解鎖") and RulesExpert.effect_line("dili", 1, 2).begins_with("已解鎖"), "天文/地理說明")
+	for sid in ex["skills"].keys():
+		check(RulesExpert.effect_line(str(sid), 1, 3) != "", "專長 %s 有效果說明" % sid)
 	print("[TEST] expfx: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)
 

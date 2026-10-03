@@ -83,6 +83,28 @@ static func certify(ch: Dictionary, data: Dictionary, skill_id: String, level: i
 	return cur
 
 
+# 專長效果說明 (專長頁用): 現級效果；lv<cap 再加「下一級」。純文字，數值同上面倍率函數一致
+static func effect_line(skill_id: String, lv: int, cap: int) -> String:
+	var nxt := lv + 1 if lv < cap else 0
+	match skill_id:
+		"kaiken", "zhaolai", "siyu", "tankuang", "xiuzhu", "gongyi":
+			return "內政工作收益 ×%.2f" % domestic_mult(lv) + ("　→ 下一級 ×%.2f" % domestic_mult(nxt) if nxt > 0 else "（已達上限）")
+		"jiuzai":
+			return "救災完成度 ×%.2f" % relief_mult(lv) + ("　→ 下一級 ×%.2f" % relief_mult(nxt) if nxt > 0 else "（已達上限）")
+		"xunlian", "jingjie":
+			return "營地訓練度／治安 ×%.2f" % militia_mult(lv) + ("　→ 下一級 ×%.2f" % militia_mult(nxt) if nxt > 0 else "（已達上限）")
+		"jiaoyi":
+			var s := "買入 -%d%%　賣出 +%d%%" % [int(round(trade_buy_discount(lv) * 100.0)), int(round(trade_sell_bonus(lv) * 100.0))]
+			if nxt > 0:
+				s += "　→ 下一級 -%d%% / +%d%%" % [int(round(trade_buy_discount(nxt) * 100.0)), int(round(trade_sell_bonus(nxt) * 100.0))]
+			return s + ("（買賣各封頂 10%）" if nxt == 0 or trade_buy_discount(nxt) >= 0.10 else "")
+		"tianwen":
+			return "已解鎖：天氣道具、渾天儀天氣情報" if weather_unlocked(lv) else "Lv1 解鎖：天氣道具、渾天儀天氣情報"
+		"dili":
+			return "已解鎖：地理功能" if geo_unlocked(lv) else "Lv1 解鎖：地理功能"
+	return ""
+
+
 static func weather_unlocked(lv: int) -> bool:
 	return lv >= 1
 

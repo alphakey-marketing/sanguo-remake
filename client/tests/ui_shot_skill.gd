@@ -3,6 +3,7 @@ extends Node
 # Godot --path client -- --skillshot
 
 var m: Node
+const EXPERT_TAB := 3
 
 
 func _ready() -> void:
@@ -66,4 +67,14 @@ func _run() -> void:
 	RulesShop.add_item(ch["bag"], 32001, 1)
 	ContextActions.run(m, {"kind": "fac", "ref": {"fac": "forge", "x": int(fg["x"]), "y": int(fg["y"])}})
 	await shot("forge_dialog")
+	m.hud.close_panels()
+	ch["classId"] = "yishi"
+	RulesExpert.certify(ch, m.data.experts, "kaiken", 2)
+	RulesExpert.certify(ch, m.data.experts, "jiaoyi", 2)
+	RulesExpert.certify(ch, m.data.experts, "tianwen", 1)
+	m.hud.open_panel("char")
+	var cp: CharPanel = m.hud.panels["char"]
+	cp.set_tab(EXPERT_TAB)
+	cp.refresh(true)
+	await shot("expert_tab")
 	get_tree().quit(0)
