@@ -127,6 +127,7 @@ func _build_body() -> void:
 		"金 %d" % int(ch.get("gold", 0)),
 		"武器 %s" % (item_name(int(ch.get("equip", {}).get("weapon", 0))) if int(ch.get("equip", {}).get("weapon", 0)) > 0 else "（冇）"),
 		"寶石 %s" % _jewel_line(ch),
+		"專長 %s（詳情睇「專長」頁）" % _expert_line(ch),
 	]
 	lines.append_array(_jewel_effect_lines(ch))
 	for l in lines:
@@ -361,6 +362,15 @@ func _costume_name(n: int) -> String:
 	return "?"
 
 
+func _expert_line(ch: Dictionary) -> String:
+	var out: Array = []
+	for sk in main.data.experts.get("skills", {}):
+		var lv: int = main.sim.expert_lv(ch, sk)
+		if lv > 0:
+			out.append("%s Lv%d" % [str(main.data.experts["skills"][sk]["name"]), lv])
+	return "、".join(out) if not out.is_empty() else "未有（做官宅工作／任務可學）"
+
+
 func _build_expert(ch: Dictionary) -> void:
 	var d = main.data
 	var cls_id := str(ch.get("classId", ""))
@@ -389,6 +399,9 @@ func _build_expert(ch: Dictionary) -> void:
 		var fx := RulesExpert.effect_line(str(sk), lv, cap)
 		if fx != "":
 			g.add_child(wrap_lbl("　" + fx, 12, UiTheme.DIM))
+		var us := RulesExpert.usage_line(str(sk))
+		if us != "":
+			g.add_child(wrap_lbl("　" + us, 12, UiTheme.DIM))
 	body.add_child(hsep())
 	var weather: Array = main.sim.view_weather() if main.sim != null else []
 	if weather.is_empty():

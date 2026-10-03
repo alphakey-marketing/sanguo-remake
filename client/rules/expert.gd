@@ -105,6 +105,23 @@ static func effect_line(skill_id: String, lv: int, cap: int) -> String:
 	return ""
 
 
+# 專長使用方法 (專長頁用): 自動生效定要做乜
+static func usage_line(skill_id: String) -> String:
+	match skill_id:
+		"kaiken", "zhaolai", "siyu", "tankuang", "xiuzhu", "gongyi":
+			return "用法：去官宅做對應工作，自動加成；做得多就升級"
+		"jiuzai":
+			return "用法：官宅領「救災」官令，自動加成"
+		"xunlian", "jingjie":
+			return "用法：義勇軍營地訓練／治安，自動加成"
+		"jiaoyi":
+			return "用法：喺商店買賣，自動減價／加價"
+		"tianwen":
+			return "用法：背包帶渾天儀，專長頁睇各城天氣"
+		"dili":
+			return "用法：解鎖後小地圖顯示設施"
+	return ""
+
 static func weather_unlocked(lv: int) -> bool:
 	return lv >= 1
 
