@@ -125,6 +125,7 @@ func _build_body() -> void:
 		"武器 %s" % (item_name(int(ch.get("equip", {}).get("weapon", 0))) if int(ch.get("equip", {}).get("weapon", 0)) > 0 else "（冇）"),
 		"寶石 %s" % _jewel_line(ch),
 	]
+	lines.append_array(_jewel_effect_lines(ch))
 	for l in lines:
 		right.add_child(lbl(str(l), 14))
 	var titles: Array = ch.get("titles", [])
@@ -345,6 +346,31 @@ func _weapon_switch_btn(p: Control, eq: Dictionary, ws: int) -> void:
 	var b := btn("現用緊" if cur else "切換做現用", func() -> void: main._send({"t": "switch_weapon", "wslot": ws}))
 	b.disabled = cur
 	p.add_child(b)
+
+
+# 屬性欄: 屬性石術法/物理相剋加成 + 輔助石合計
+func _jewel_effect_lines(ch: Dictionary) -> Array:
+	var out: Array = []
+	var ELEM := {"wind": "風", "earth": "地", "water": "水", "fire": "火"}
+	for s in main.sim._equip_stones(ch):
+		var e := str(s["elem"])
+		var pct := int(round(float(s["pct"]) * 100.0))
+		var beats := str(RulesSpell.BEATS.get(e, ""))
+		var x := 1.0 + (RulesSpell.COUNTER_X - 1.0) * float(s["pct"])
+		out.append("%s石 +%d%%：%s系術法 ×%.2f；物理打%s屬性 ×%.2f" % [ELEM.get(e, e), pct, ELEM.get(e, e), 1.0 + float(s["pct"]), ELEM.get(beats, "?"), x])
+	var jb: Dictionary = main.sim._jewel_bonus(ch)
+	var parts: Array = []
+	for k in [["atkPct", "物攻"], ["spellAtkPct", "術攻"], ["defPct", "物防"], ["spellDefPct", "術防"], ["evadePct", "物迴避"], ["spellEvadePct", "術迴避"], ["hitPct", "命中"], ["spellHitPct", "術命中"], ["hpPct", "HP上限"], ["mpPct", "MP上限"], ["lifeSteal", "吸取"]]:
+		var v := float(jb.get(k[0], 0.0))
+		if v != 0.0:
+			parts.append("%s %+d%%" % [k[1], int(round(v * 100.0))])
+	if int(jb.get("defFlat", 0)) != 0:
+		parts.append("物防 %+d" % int(jb["defFlat"]))
+	if int(jb.get("spellDefFlat", 0)) != 0:
+		parts.append("術防 %+d" % int(jb["spellDefFlat"]))
+	if not parts.is_empty():
+		out.append("輔助加成：" + "　".join(parts))
+	return out
 
 
 # S2-13: 屬性欄顯示所裝寶石 + 合計加成

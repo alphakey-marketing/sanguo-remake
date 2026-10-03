@@ -59,5 +59,21 @@ func _init() -> void:
 	var jbn: Dictionary = sim2._jewel_bonus(ch2)
 	check(int(jbn["resist"].get("hex", 0)) == 25, "防邪之石 迴避中邪 25 (%s)" % str(jbn["resist"]))
 	check(is_equal_approx(float(jbn["lifeSteal"]), 0.02), "吸魂之石 吸取 2%")
+	# 屬性石兩格都認
+	var sim3 := Sim.new(data, 11)
+	var id3 := sim3.spawn_player("s", "yishi")
+	var ch3: Dictionary = sim3.player_ch()
+	var stones: Array = []
+	for jd in data.jewel_by_item.values():
+		if str(jd.get("kind", "")) == "stone" and (str(jd["elem"]) == "fire" or str(jd["elem"]) == "water") and int(jd["pct"]) == 50:
+			stones.append(int(jd["id"]))
+	for it in stones:
+		ch3["bag"].append({"id": it, "n": 1})
+	sim3.cmd_equip_jewel(id3, int(stones[0]), 0)
+	sim3.cmd_equip_jewel(id3, int(stones[1]), 1)
+	check(sim3._equip_stones(ch3).size() == 2, "兩格屬性石都認")
+	var wst := sim3._equip_stone(ch3, "fire") if sim3._equip_stone(ch3, "fire").is_empty() == false else sim3._equip_stone(ch3, "water")
+	check(not wst.is_empty(), "按術法屬性揀石")
+	check(sim3._phys_elem_mult(ch3, "wind") > 1.0 or sim3._phys_elem_mult(ch3, "fire") > 1.0, "兩格石物理相剋有加成")
 	print("[TEST] feel: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)

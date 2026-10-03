@@ -587,12 +587,25 @@ func _cleanup_dur(ch: Dictionary) -> void:
 
 
 # 裝備緊嘅屬性石 (slot 0, 攻擊用) → {elem, pct} / {}
-func _equip_stone(ch: Dictionary) -> Dictionary:
-	var it := int(ch["equip"].get("jewels", [0, 0])[0])
-	var jd: Dictionary = data.jewel_by_item.get(it, {})
-	if jd.is_empty() or str(jd.get("kind", "")) != "stone":
-		return {}
-	return {"elem": str(jd["elem"]), "pct": float(int(jd["pct"])) / 100.0}
+# 兩格都認屬性石 (用家 2026-10-02)：回傳所有裝咗嘅屬性石 [{elem, pct}]
+func _equip_stones(ch: Dictionary) -> Array:
+	var out: Array = []
+	for it in (ch["equip"].get("jewels", [0, 0]) as Array):
+		var jd: Dictionary = data.jewel_by_item.get(int(it), {})
+		if not jd.is_empty() and str(jd.get("kind", "")) == "stone":
+			out.append({"elem": str(jd["elem"]), "pct": float(int(jd["pct"])) / 100.0})
+	return out
+
+
+# 揀最強一粒 (pct 最高)；want_elem 非空 = 只揀同屬性
+func _equip_stone(ch: Dictionary, want_elem: String = "") -> Dictionary:
+	var best := {}
+	for s in _equip_stones(ch):
+		if want_elem != "" and str(s["elem"]) != want_elem:
+			continue
+		if best.is_empty() or float(s["pct"]) > float(best["pct"]):
+			best = s
+	return best
 
 
 # 裝備武器嘅融合屬性 (義士融合 → 武器嵌石, spec 02 §6) → {elem, pct} / {}
@@ -611,10 +624,11 @@ func _fused_stone(ch: Dictionary) -> Dictionary:
 # 物理攻擊屬性倍率: 融合石優先，否則裝備 slot 0 屬性石；冇石 = 1.0
 func _phys_elem_mult(ch: Dictionary, def_elem: String) -> float:
 	var f := _fused_stone(ch)
-	var stone := f if not f.is_empty() else _equip_stone(ch)
-	if stone.is_empty():
-		return 1.0
-	return RulesJewel.element_mult(str(stone["elem"]), float(stone["pct"]), def_elem)
+	var cands: Array = [f] if not f.is_empty() else _equip_stones(ch)
+	var best := 1.0
+	for stone in cands:        # 兩格石 → 揀對呢隻怪最有利嗰粒
+		best = maxf(best, RulesJewel.element_mult(str(stone["elem"]), float(stone["pct"]), def_elem))
+	return best
 
 
 # fusedJewels 清理: 背包已經冇嗰件武器就刪

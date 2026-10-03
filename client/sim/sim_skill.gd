@@ -195,8 +195,8 @@ func _spell_prof_mult(p: Dictionary, def: Dictionary) -> float:
 func _spell_hit(p: Dictionary, def: Dictionary, t: Dictionary) -> void:
 	var ch: Dictionary = p["ch"]
 	var attr := _eff_attr(ch, str(def["stat"]))
-	# 寶石加成 (Step 10, spec 02 §3.2): 裝備 slot 0 屬性石同術法元素相同 → 石 pct 加成；另加輔助術攻 %
-	var stone := _equip_stone(ch)
+	# 寶石加成 (Step 10, spec 02 §3.2): 兩格屬性石揀同術法元素最強嗰粒 → 石 pct 加成；另加輔助術攻 %
+	var stone := _equip_stone(ch, str(def.get("elem", "")))
 	var jewel_pct := RulesJewel.spell_jewel_bonus(str(stone.get("elem", "")), str(def.get("elem", "")),
 		float(stone.get("pct", 0.0))) - 1.0
 	var spell_atk_mult := (1.0 + float(_jewel_bonus(ch).get("spellAtkPct", 0.0))) * _spell_prof_mult(p, def)
