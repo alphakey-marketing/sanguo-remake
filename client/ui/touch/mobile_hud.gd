@@ -485,12 +485,13 @@ func _draw_status() -> void:
 	draw_rect(pr, Color(1, 1, 1, 0.35), false, 1.0)
 	_txt(o + Vector2(57, 15), "%s  Lv%d" % [main.ch.name, lv], Color.WHITE, 13)
 	_txt(o + Vector2(57, 28), "%s" % RulesKarma.tier_name(int(ch.karma)), Color(1, 0.85, 0.4), 10)
-	var rows := [["HP", float(ch.hp) / mhp, Color(0.85, 0.2, 0.2)], ["MP", float(ch.mp) / mmp, Color(0.25, 0.45, 0.95)],
-		["SP", float(ch.sp) / msp, Color(0.9, 0.8, 0.2)], ["EXP", float(ch.exp) / maxi(1, need), Color(0.7, 0.4, 0.95)]]
+	var rows := [["HP", float(ch.hp) / mhp, Color(0.85, 0.2, 0.2), "%d" % int(ch.hp)], ["MP", float(ch.mp) / mmp, Color(0.25, 0.45, 0.95), "%d" % int(ch.mp)],
+		["SP", float(ch.sp) / msp, Color(0.9, 0.8, 0.2), "%d" % int(ch.sp)], ["EXP", float(ch.exp) / maxi(1, need), Color(0.7, 0.4, 0.95), "%d/%d" % [int(ch.exp), need]]]
 	for i in rows.size():
 		var y := o.y + 32 + 11 * i
 		_txt(Vector2(o.x + 57, y + 8), rows[i][0], Color(0.95, 0.95, 0.95), 10)
-		_bar(o.x + 84, y - 1, 120, 6, rows[i][1], rows[i][2])
+		_bar(o.x + 84, y - 1, 88, 6, rows[i][1], rows[i][2])
+		_txt(Vector2(o.x + 176, y + 8), rows[i][3], Color(0.9, 0.9, 0.9), 9)    # 數字 (手機：睇到實際 exp)
 	# 金（右上角細字）
 	var gold_s := "金 %d" % int(ch.gold)
 	_txt(Vector2(o.x + fr.end.x - 6 - gold_s.length() * 6.0, o.y + 10), gold_s, Color(1, 0.9, 0.5), 11)

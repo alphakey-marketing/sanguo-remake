@@ -6,6 +6,11 @@ extends GamePanel
 
 var _info := ""                  # 天下頁: 撳咗邊個節點嘅說明
 var _sel_map := ""               # 天下頁: 撳咗嘅已開放節點對應地圖 ("" = 冇 / 而家喺度)
+var _wz := 2.0                   # 天下頁縮放 (1=塞滿畫面；預設 2 倍，節點唔擠)
+var _wpan := Vector2.ZERO        # 天下頁平移 (px)
+var _wdrag := false              # 拖動中
+var _wmoved := 0.0               # 今次按下後移動距離 (分 tap / 拖)
+var _wcentered := false          # 開頁後first次對準自己位置
 
 
 func _init(m: Node) -> void:
@@ -30,10 +35,15 @@ func _build_body() -> void:
 	body.add_child(view)
 	if tab == 0:
 		view.draw.connect(func() -> void: _draw_area(view))
+		view.gui_input.connect(func(ev: InputEvent) -> void: _area_input(view, ev))
 	else:
 		view.draw.connect(func() -> void: _draw_world(view))
-		view.gui_input.connect(func(ev: InputEvent) -> void: _world_tap(view, ev))
+		view.gui_input.connect(func(ev: InputEvent) -> void: _world_input(view, ev))
+		view.clip_contents = true
 		var row := HBoxContainer.new()
+		row.add_child(btn("＋", func() -> void: _zoom_world(view, 1.4), 56))
+		row.add_child(btn("－", func() -> void: _zoom_world(view, 1.0 / 1.4), 56))
+		row.add_child(btn("定位", func() -> void: _center_here(view), 72))
 		row.add_child(wrap_lbl(_info if _info != "" else "撳城池睇詳情。灰色 = 未開放（之後版本開通）", 13, UiTheme.DIM))
 		if _sel_map != "":
 			row.add_child(btn("自動前往", func() -> void: goto_sel(), 120))
@@ -104,19 +114,72 @@ func _draw_area(view: Control) -> void:
 		var mp: Vector2 = at.call(int(me.x), int(me.y))
 		view.draw_circle(mp, 5, Color(1, 0.9, 0.2))
 		view.draw_arc(mp, 8, 0, TAU, 20, Color(1, 0.9, 0.2, 0.7), 1.5)
-	view.draw_string(font, off + Vector2(4, 16), String(md.name), HORIZONTAL_ALIGNMENT_LEFT, -1, 16, UiTheme.GOLD)
+	view.draw_string(font, off + Vector2(4, 16), String(md.name) + "　（撳任何位置自動行過去）", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, UiTheme.GOLD)
+
+
+# 撳區域圖任何一格 → 自動尋路行過去 (A*, sim 處理)；撳中障礙行去最近可行格
+func _area_input(view: Control, ev: InputEvent) -> void:
+	if not (ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT):
+		return
+	var md: Dictionary = main.cur_map
+	if md.is_empty():
+		return
+	var f := _fit(view, md)
+	var k: float = f[0]
+	var rel: Vector2 = (ev.position - (f[1] as Vector2)) / k
+	if rel.x < 0 or rel.y < 0 or rel.x >= float(md.w) or rel.y >= float(md.h):
+		return
+	var tx := int(md.ox) + int(rel.x)
+	var ty := int(md.oy) + int(rel.y)
+	if not main.sim.is_free(tx, ty):
+		var fr: Vector2i = main._free_near(Vector2i(tx, ty), 4)
+		if fr.x < 0:
+			return
+		tx = fr.x
+		ty = fr.y
+	main._send({"t": "move", "x": tx, "y": ty})
+	main.marker = {"pos": Vector2(tx, ty), "t": 1.0}
+	main.hud.close_panels()
 
 
 # ---- 天下 ----
 func _node_pos(view: Control, n: Dictionary) -> Vector2:
 	var pad := Vector2(40, 16)
-	return pad + Vector2(float(n.x), float(n.y)) * (view.size - pad * 2)
+	return (pad + Vector2(float(n.x), float(n.y)) * (view.size - pad * 2)) * _wz + _wpan
+
+
+func _clamp_pan(view: Control) -> void:
+	var lo := view.size - view.size * _wz
+	_wpan = Vector2(clampf(_wpan.x, minf(lo.x, 0.0), 0.0), clampf(_wpan.y, minf(lo.y, 0.0), 0.0))
+
+
+func _zoom_world(view: Control, f: float, at := Vector2(-1, -1)) -> void:
+	var c := view.size / 2.0 if at.x < 0 else at
+	var nz := clampf(_wz * f, 1.0, 4.0)
+	_wpan = c - (c - _wpan) * (nz / _wz)
+	_wz = nz
+	_clamp_pan(view)
+	view.queue_redraw()
+
+
+func _center_here(view: Control) -> void:
+	var hn := _here_node()
+	for n in main.data.world_map.get("nodes", []):
+		if String(n.id) == hn:
+			_wpan = Vector2.ZERO
+			_wpan = view.size / 2.0 - _node_pos(view, n)
+			break
+	_clamp_pan(view)
+	view.queue_redraw()
 
 
 func _draw_world(view: Control) -> void:
 	var w: Dictionary = main.data.world_map
 	if w.is_empty():
 		return
+	if not _wcentered:
+		_wcentered = true
+		_center_here(view)
 	var font := ThemeDB.fallback_font
 	var nodes := {}
 	for n in w["nodes"]:
@@ -173,7 +236,7 @@ func _draw_world(view: Control) -> void:
 			view.draw_circle(p, 5, col)
 		if String(n.id) == here:
 			view.draw_arc(p, 12, 0, TAU, 24, Color(1, 0.95, 0.3), 2.0)
-		view.draw_string(font, p + Vector2(10, 5), String(n.name), HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color.WHITE if open else Color(0.65, 0.62, 0.58))
+		view.draw_string(font, p + Vector2(10, 5), String(n.name), HORIZONTAL_ALIGNMENT_LEFT, -1, 15, Color.WHITE if open else Color(0.65, 0.62, 0.58))
 
 
 # 自己所在節點: 洞窟各層都算汝南山洞；室內 (house) 算所屬城池 (parent)
@@ -186,14 +249,37 @@ func _here_node() -> String:
 	return ""
 
 
-func _world_tap(view: Control, ev: InputEvent) -> void:
-	if not (ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT):
-		return
+func _world_input(view: Control, ev: InputEvent) -> void:
+	if ev is InputEventMouseButton:
+		if ev.button_index == MOUSE_BUTTON_WHEEL_UP and ev.pressed:
+			_zoom_world(view, 1.2, ev.position)
+		elif ev.button_index == MOUSE_BUTTON_WHEEL_DOWN and ev.pressed:
+			_zoom_world(view, 1.0 / 1.2, ev.position)
+		elif ev.button_index == MOUSE_BUTTON_LEFT:
+			if ev.pressed:
+				_wdrag = true
+				_wmoved = 0.0
+			else:
+				_wdrag = false
+				if _wmoved < 10.0:
+					_world_tap(view, ev.position)
+	elif ev is InputEventMouseMotion and _wdrag:
+		_wmoved += ev.relative.length()
+		_wpan += ev.relative
+		_clamp_pan(view)
+		view.queue_redraw()
+
+
+func _world_tap(view: Control, pos: Vector2) -> void:
+	var best := ""
+	var bd := 28.0                      # 手指粗: 容差大啲，揀最近
 	for n in main.data.world_map.get("nodes", []):
-		if _node_pos(view, n).distance_to(ev.position) <= 18:
-			var open: bool = n.get("map") != null
-			select_node(String(n.id))
-			return
+		var d := _node_pos(view, n).distance_to(pos)
+		if d <= bd:
+			bd = d
+			best = String(n.id)
+	if best != "":
+		select_node(best)
 
 
 # 揀節點: 顯示說明；已開放又唔喺度 = 可以自動前往

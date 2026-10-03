@@ -364,9 +364,8 @@ func _run() -> void:
 	check(await until(func() -> bool: return hud.panels.has("shop") and hud.panels["shop"].visible, 15.0), "行到商店應該自動開商店面板")
 	hud.close_panels()
 	# 11. 地圖面板天下頁: 撳新野 →「自動前往」→ sim 記住目的地；搖桿郁 = 取消 (Step 11.7)
-	var oldxc: Dictionary = m.data.map_by_id["xuchang"]      # 原版許昌未連去新野 → 搬去舊許昌圖先試自動前往
-	var oldp: Vector2i = m.sim._free_near(int(oldxc["ox"]) + 20, int(oldxc["oy"]) + 20)
-	put(oldp.x, oldp.y)
+	var oldxc: Dictionary = m.data.map_by_id["xuchang_o"]    # 舊許昌圖已封存 → 用原版許昌
+	put(int(oldxc["spawn"][0]), int(oldxc["spawn"][1]))
 	await frames(2)
 	await click(center("minimap"))
 	var mp = hud.panels.get("map")
@@ -376,7 +375,7 @@ func _run() -> void:
 	await frames(1)
 	check(press(mp, "自動前往"), "天下頁揀新野應該有「自動前往」掣")
 	await frames(1)
-	check(String(m.sim.ent(m.my_id).get("goto", "")) == "xinye" and not hud.any_panel_open(), "自動前往: sim 記住去新野 + 關面板")
+	check(String(m.sim.ent(m.my_id).get("goto", "")) == "xc2700" and not hud.any_panel_open(), "自動前往: sim 記住去新野 + 關面板")
 	touch(p0, true, 2)
 	var dr2 := InputEventScreenDrag.new()
 	dr2.index = 2
@@ -476,6 +475,9 @@ func _run() -> void:
 	for g in m.data.generals_t1:
 		if String(g["name"]) == "典韋":
 			dw = g
+	for ge in m.sim.ents.values():                 # 典韋已搬入室內圖 → 用實體位置
+		if str(ge.get("name", "")) == "典韋":
+			dw = {"x": int(ge["x"]), "y": int(ge["y"])}
 	put(int(dw["x"]) + 1, int(dw["y"]))
 	check(await until(func() -> bool: return String(hud.ctx.get("kind", "")) == "general"), "近典韋互動掣應該係人才 (%s)" % hud.ctx)
 	await click(center("context"))

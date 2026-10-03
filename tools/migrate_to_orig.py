@@ -31,7 +31,34 @@ def snap(g, x, y, others):
                     return x + dx, y + dy
     raise SystemExit('搵唔到位 %s %d,%d' % ('?', x, y))
 
+def spread(tm, others):
+    """揀一格：喺某建築(傳送門)附近，離所有門 >=3、八鄰皆可行，並同 others 盡量遠 (目標 >=10 格，farthest-point)。"""
+    g = grid(tm)
+    ports = [(q['x'], q['y']) for q in jl('maps.json')['portals'] if q['map'] == tm]
+    lands = [tuple(q['land']) if q.get('land') else (q['x'], q['y']) for q in jl('maps.json')['portals'] if q['map'] == tm]
+    cand = []
+    for ly in range(len(g)):
+        for lx in range(len(g[ly])):
+            if not all(ok(g, lx + a, ly + b) for a in (-1, 0, 1) for b in (-1, 0, 1)):
+                continue
+            if any(max(abs(lx - a), abs(ly - b)) < 3 for a, b in ports):
+                continue
+            if lands and min(max(abs(lx - a), abs(ly - b)) for a, b in lands) > 8:
+                continue
+            cand.append((lx, ly))
+    if not cand:
+        return None
+    def score(c):
+        d = min([max(abs(c[0] - a), abs(c[1] - b)) for a, b in others] or [99])
+        return (min(d, 10), -min(max(abs(c[0] - a), abs(c[1] - b)) for a, b in lands) if lands else 0)
+    best = max(cand, key=score)
+    return best
+
+
 def place_near(tm, i, others):
+    r = spread(tm, others)
+    if r:
+        return r
     g = grid(tm)
     maps = {m['id']: m for m in jl('maps.json')['maps']}
     sp = maps[tm].get('spawn') or [len(g[0]) // 2, len(g) // 2]
@@ -55,7 +82,8 @@ def main():
         sp = maps[tm].get('spawn') or [len(g[0]) // 2, len(g) // 2]
         i = k.get(tm, 0); k[tm] = i + 1
         bx, by = sp[0] + 6 * (i % 4) - 9, sp[1] - 4 * (i // 4) - 3
-        x, y = snap(g, bx, by, placed.setdefault(tm, []))
+        r = spread(tm, placed.setdefault(tm, []))
+        x, y = r if r else snap(g, bx, by, placed[tm])
         placed[tm].append((x, y))
         n['map'], n['x'], n['y'] = tm, x, y
     # 汝南官宅 = 丁刺史府: 要丁原家鑰匙 (原 rn_ding 門鎖搬過嚟)
