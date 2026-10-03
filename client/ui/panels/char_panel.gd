@@ -231,6 +231,9 @@ func _build_equip(ch: Dictionary) -> void:
 		right.add_child(lbl("（空格）", 15, UiTheme.DIM))
 		if sel_slot.begins_with("w"):
 			_weapon_switch_btn(right, eq, int(sel_slot.substr(1)))
+			_weapon_pick_list(right, ch, int(sel_slot.substr(1)))
+		if sel_slot.begins_with("j"):
+			_jewel_pick_list(right, ch, int(sel_slot.substr(1)))
 		if RulesEquip.SLOTS.has(sel_slot):
 			_armor_pick_list(right, ch, sel_slot)
 		return
@@ -248,9 +251,43 @@ func _build_equip(ch: Dictionary) -> void:
 		right.add_child(lbl(armor_dur_text(ch, id), 13))
 		_weapon_switch_btn(right, eq, ws)
 		right.add_child(btn("卸下", func() -> void: main._send({"t": "unequip", "part": "weapon", "wslot": ws})))
+		right.add_child(hsep())
+		right.add_child(lbl("背包裡其他武器（換入呢格）：", 13, UiTheme.DIM))
+		_weapon_pick_list(right, ch, ws, id)
 	elif sel_slot.begins_with("j"):
 		var js := int(sel_slot.substr(1))
 		right.add_child(btn("卸下", func() -> void: main._send({"t": "equip_jewel", "item": 0, "slot": js})))
+		right.add_child(hsep())
+		right.add_child(lbl("背包裡其他寶石（換入呢格）：", 13, UiTheme.DIM))
+		_jewel_pick_list(right, ch, js, id)
+
+
+# 武器格: 列背包武器，撳一下裝入指定武器格 (cmd_equip wslot)
+func _weapon_pick_list(parent: Control, ch: Dictionary, wslot: int, exclude_id := 0) -> void:
+	var found := false
+	for b in ch.get("bag", []):
+		var it_id := int(b["id"])
+		if it_id == exclude_id or not main.data.weapons.has(it_id):
+			continue
+		found = true
+		parent.add_child(btn("裝備：%s x%d" % [item_name(it_id), int(b["n"])],
+			func() -> void: main._send({"t": "equip", "item": it_id, "wslot": wslot}), 0))
+	if not found:
+		parent.add_child(wrap_lbl("背包冇武器，去武器店睇下。", 12, UiTheme.DIM))
+
+
+# 寶石格: 列背包寶石，撳一下裝入指定寶石欄
+func _jewel_pick_list(parent: Control, ch: Dictionary, jslot: int, exclude_id := 0) -> void:
+	var found := false
+	for b in ch.get("bag", []):
+		var it_id := int(b["id"])
+		if it_id == exclude_id or not main.data.jewel_by_item.has(it_id):
+			continue
+		found = true
+		parent.add_child(btn("裝備：%s x%d" % [item_name(it_id), int(b["n"])],
+			func() -> void: main._send({"t": "equip_jewel", "item": it_id, "slot": jslot}), 0))
+	if not found:
+		parent.add_child(wrap_lbl("背包冇寶石。", 12, UiTheme.DIM))
 
 
 # 喺右邊直接列背包裡同 slot 嘅防具，撳一下就裝備，唔使再跳去背包 (U-fix)

@@ -77,4 +77,19 @@ func _run() -> void:
 	cp.set_tab(EXPERT_TAB)
 	cp.refresh(true)
 	await shot("expert_tab")
+	ch["classId"] = "yishi"
+	ch["equip"]["weapons"] = [0, 0, 0]
+	ch["equip"]["weapon"] = 0
+	for it in [10001, 10002, 32001, 32035]:
+		RulesShop.add_item(ch["bag"], it, 1)
+	cp.set_tab(1)
+	cp.sel_slot = "w0"
+	cp.refresh(true)
+	await shot("equip_weapon_empty")
+	m._send({"t": "equip", "item": 10001, "wslot": 0})
+	cp.refresh(true)
+	await shot("equip_weapon_filled")
+	cp.sel_slot = "j1"
+	cp.refresh(true)
+	await shot("equip_jewel_empty")
 	get_tree().quit(0)
