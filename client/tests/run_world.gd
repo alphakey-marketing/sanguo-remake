@@ -18,6 +18,7 @@ func _init() -> void:
 	t_zones_travel(data)
 	t_set_home(data)
 	t_auto_stay(data)
+	t_landmarks(data)
 	t_path_fallback(data)
 	t_chenliu_npcs(data)
 	t_trade_cities(data)
@@ -319,6 +320,29 @@ func t_set_home(data: GameData) -> void:
 	ch["level"] = 2
 	sim.cmd_set_home(id, "xuchang")
 	check(String(ch.get("homeCity", "")) == "xuchang", "揀城: 出發後 (Lv>1) 仍然係許昌")
+
+
+# 史蹟地標: 搬咗上原版城圖，座標行得、踩近觸發一次、記事頁睇得返
+func t_landmarks(data: GameData) -> void:
+	check(data.landmarks.size() >= 10, "地標: 原版城圖有 >=10 個")
+	var sim := Sim.new(data, 63)
+	var id := sim.spawn_player_orig("l")
+	var e := sim.ent(id)
+	var lm: Dictionary = {}
+	for x in data.landmarks:
+		check(sim.is_free(int(x["x"]), int(x["y"])) or not str(x["map"]).begins_with("xc"), "地標 %s 座標行得" % x["id"])
+		if String(x["id"]) == "xudu_palace":
+			lm = x
+	check(not lm.is_empty() and sim.map_id_at(int(lm["x"]), int(lm["y"])) == "xuchang_o", "地標: 許都皇城喺原版許昌")
+	if lm.is_empty():
+		return
+	e["x"] = int(lm["x"])
+	e["y"] = int(lm["y"])
+	sim._on_moved(e)
+	var seen: Array = sim.player_ch().get("landmarks", [])
+	check(seen.has("xudu_palace"), "地標: 行近 = 探到")
+	var vl := sim.view_landmarks()
+	check(vl.size() == data.landmarks.size(), "地標: 記事頁列晒")
 
 
 # 掛機唔跨場景: auto_stay 開咗，追怪踩傳送點唔過圖；閂咗就過

@@ -70,7 +70,7 @@ func _battle_section(list: Node) -> void:
 		list.add_child(wrap_lbl("%s 第 %d/%d 層，打完自動離場；內陣亡唔跌經驗/物品" % [vb["battleName"],
 			int(vb["floor"]), int(vb["totalFloors"])], 14, UiTheme.TEXT))
 	else:
-		list.add_child(wrap_lbl("去許昌城上方「義勇士兵」（開窗時出現）報名，打贏尾層大頭目即完成。", 14, UiTheme.DIM))
+		list.add_child(wrap_lbl("去「義勇士兵」（許昌練兵場）報名，打贏尾層大頭目即完成。", 14, UiTheme.DIM))
 
 
 # 特殊場景日程 (S04d, spec 04 §4): game 日曆窗口開門 + 玩家進度
@@ -156,6 +156,49 @@ func _guide_section(list: Node) -> void:
 		list.add_child(lbl(str(TYPE_LABEL.get(t, t)), 16, UiTheme.GOLD))
 		for q in by_type[t]:
 			_guide_row(list, q, status.get(String(q["id"]), {}))
+	_guide_battles(list)
+	_guide_scenes(list)
+
+
+# 指引: 戰役 (data/battles.json) 唔喺 quests.json，另外列: 邊度報名 / 武等上限 / 每層 boss + 掉寶
+func _guide_battles(list: Node) -> void:
+	if main.data.battles.is_empty():
+		return
+	list.add_child(lbl("戰役", 16, UiTheme.GOLD))
+	var npc: Dictionary = main.data.quest_npcs.get("battle_herald", {})
+	var where := _map_name(String(npc.get("map", "")))
+	for b in main.data.battles:
+		if not bool(b.get("playable", false)):
+			continue
+		var bid := "battle:" + String(b["id"])
+		var open := bool(_guide_open.get(bid, false))
+		var head := btn("☆ %s %s" % [str(b["name"]), "▾" if open else "▸"], func() -> void:
+			_guide_open[bid] = not open
+			refresh(true))
+		head.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		list.add_child(head)
+		if not open:
+			continue
+		list.add_child(lbl("　報名：%s（%s）　武等上限 %d　開窗 %s~%s" % [str(npc.get("name", "義勇士兵")), where,
+			int(b["maxLevel"]), RulesClock.format_ke(int(b["window"]["startKe"])), RulesClock.format_ke(int(b["window"]["endKe"]))],
+			13, UiTheme.DIM))
+		var i := 0
+		for f in b["floors"]:
+			i += 1
+			var drops: Array = []
+			for d in f["drops"]:
+				drops.append(str(main.data.names.get(int(d[0]), "?")))
+			list.add_child(wrap_lbl("　第%d層 %s　掉：%s" % [i, str(f["boss"]), "、".join(drops.slice(0, 4))], 13, UiTheme.DIM))
+
+
+# 指引: 特殊場景 (data/scenes.json)
+func _guide_scenes(list: Node) -> void:
+	if main.data.scenes.is_empty():
+		return
+	list.add_child(lbl("特殊場景", 16, UiTheme.GOLD))
+	for sc in main.data.scenes:
+		list.add_child(wrap_lbl("☆ %s　（武等 ≥%d，入口：%s）" % [str(sc["name"]), int(sc.get("minLevel", 1)),
+			_map_name(String(sc.get("entryMap", "")))], 13, UiTheme.TEXT))
 
 
 func _guide_row(list: Node, q: Dictionary, st: Dictionary) -> void:
