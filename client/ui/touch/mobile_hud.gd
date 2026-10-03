@@ -491,6 +491,10 @@ func _draw_status() -> void:
 	# 金（右上角細字）
 	var gold_s := "金%d" % int(ch.gold)
 	_txt_right(Vector2(fr.end.x - 3, o.y + 10), gold_s, Color(1, 0.9, 0.5), 8)
+	if me != null:      # 所在地圖 + 地圖內座標 (同任務提示嘅座標一致)
+		var md: Dictionary = main.sim.data.map_at(int(me.x), int(me.y))
+		if not md.is_empty():
+			_txt_right(Vector2(fr.end.x - 3, o.y + 21), "%s (%d,%d)" % [str(md.get("name", "")).replace("（原版）", ""), int(me.x) - int(md["ox"]), int(me.y) - int(md["oy"])], Color(0.8, 0.9, 1.0), 7)
 	_draw_status_icons(o, fr, main.sim.tick)
 
 # 狀態 icon 列 (S02a, spec 02 §7): 角色框底部一行，短名 + 剩餘秒數
