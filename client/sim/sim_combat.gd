@@ -2,6 +2,17 @@ extends "res://sim/sim_scene.gd"
 # Sim 繼承鏈 第 6 層: 傷害 / 死亡 / 掉落 / 重生排期
 
 # ================= 戰鬥 =================
+# 升級提示 (P4): 加咗幾多屬性點、HP/MP 回滿、新解鎖術法/絕招
+func _levelup_notice(p: Dictionary, lv0: int) -> void:
+	var ch: Dictionary = p["ch"]
+	var lv := int(ch["level"])
+	var txt := "升級！Lv%d，屬性點 +%d（共 %d），HP/MP/SP 回滿" % [lv, (lv - lv0) * RulesStats.UPGRADE_POINTS, int(ch.get("attrPoints", 0))]
+	var hints := RulesStats.unlock_hints(data, str(ch["classId"]), lv0, lv)
+	if not hints.is_empty():
+		txt += "；" + "、".join(hints)
+	_msg(int(p["id"]), txt)
+
+
 func damage(t: Dictionary, dmg: int, by: Dictionary, crit: bool = false) -> void:
 	var cc: Dictionary = data.world["combat"]
 	# 吟唱中受擊: castInterruptPct 機率中斷【自訂】(spec 02 §3.1)
@@ -122,7 +133,10 @@ func _kill_mob(m: Dictionary, by: Dictionary, exp_mult: float = 1.0) -> void:
 		var e := int(shares[id_str])
 		if member.get("kind", "") == "player":
 			e = MathX.js_round(float(e) * _friend_exp_mult(member))   # U13 戰騎「神獸/王者」加成友好技
+		var mlv0 := int(mch["level"])
 		var mups := RulesStats.gain_exp(data, mch, e)
+		if mups > 0 and member.get("kind", "") == "player":
+			_levelup_notice(member, mlv0)
 		if mups > 0 and member.get("kind", "") in ["bot", "gen"]:   # 機械人/同伴冇人幫手派點: 直接按建議比例自動派
 			RulesStats.auto_assign_points(mch, data.classes[mch["classId"]])
 		_sync_stats(member)

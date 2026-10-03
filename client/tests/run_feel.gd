@@ -31,6 +31,13 @@ func _init() -> void:
 		sim._spell_prof_bump(sim.ent(id), def)
 	check(int(ch["spellUse"][str(int(def["item"]))]) == 10, "施放記數 10")
 	check(sim._spell_prof_mult(sim.ent(id), def) > 1.0, "熟練 +%")
-	# 暴擊: 普攻事件有 crit 欄
+	# 升級提示 (P4)
+	var h := RulesStats.unlock_hints(data, "daoshi", 0, 100)
+	check(h.size() > 0 and h.any(func(x): return "絕招" in str(x)), "unlock_hints 有術法+絕招")
+	check(RulesStats.unlock_hints(data, "daoshi", 100, 100).is_empty(), "同級冇提示")
+	var lv0 := int(ch["level"])
+	ch["level"] = lv0 + 5
+	sim._levelup_notice(sim.ent(id), lv0)
+	check(sim.ent(id) != null, "levelup_notice 唔 crash")
 	print("[TEST] feel: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)

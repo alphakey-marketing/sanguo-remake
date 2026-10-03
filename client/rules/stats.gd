@@ -97,6 +97,18 @@ static func gain_exp(data: GameData, ch: Dictionary, amount: int) -> int:
 	return ups
 
 
+# 升級提示 (P4): lv_from → lv_to 之間新解鎖嘅術法 / 絕招（只列本職）
+static func unlock_hints(data: GameData, class_id: String, lv_from: int, lv_to: int) -> Array:
+	var out: Array = []
+	for sp in data.spells:
+		if int(sp["lv"]) > lv_from and int(sp["lv"]) <= lv_to and (sp["classes"] as Array).has(class_id):
+			out.append("可學術法「%s」" % str(sp["name"]))
+	for u in data.ultimates:
+		if str(u["class"]) == class_id and int(u.get("reqLevel", 0)) > lv_from and int(u.get("reqLevel", 0)) <= lv_to:
+			out.append("絕招「%s」等級夠用 (要先完成任務)" % str(u["name"]))
+	return out
+
+
 # 升級點數分配: 得 str/agi/int/spi 可以用; 政治/魅力唔用得分點 (spec 01 §5)。
 # 回 0=成功 / 1=冇點 / 2=唔係可分配屬性 / 3=屬性已到上限
 static func can_raise(ch: Dictionary, attr: String) -> int:

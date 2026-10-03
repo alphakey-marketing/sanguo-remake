@@ -221,6 +221,12 @@ func _build_detail(p: Control, ch: Dictionary) -> void:
 	if d.heals.has(id) or id == int(d.office["pillItem"]):      # 行動丹 = 回滿行動力 (Step 14)
 		p.add_child(btn("使用", func() -> void: main._send({"t": "use_item", "item": id})))
 	if d.spell_by_item.has(id):
+		var sdef: Dictionary = d.spell_by_item[id]
+		if str(sdef["kind"]) == "attack" or str(sdef["kind"]) == "heal":     # 熟練度 (P5)
+			var uses := int((ch.get("spellUse", {}) as Dictionary).get(str(id), 0))
+			var plv := RulesSpell.prof_level(uses)
+			var nxt := "已滿級" if plv >= RulesSpell.PROF_NEED.size() else "下級要 %d 次" % int(RulesSpell.PROF_NEED[plv])
+			p.add_child(lbl("熟練 Lv%d/%d  用 %d 次（%s）  威力 +%d%%" % [plv, RulesSpell.PROF_NEED.size(), uses, nxt, int(round(RulesSpell.PROF_PCT * 100.0 * plv))], 13, Color(0.85, 0.7, 1.0)))
 		var h := HBoxContainer.new()
 		for i in 3:
 			var b := btn("快%d" % (i + 1), func() -> void:
