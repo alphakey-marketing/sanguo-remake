@@ -1371,9 +1371,15 @@ func _toggle_auto() -> void:
 
 # 搖桿持續移動: 每 tick 將目標點推前 2~4 格（揀第一個空格），放手自然停
 func _steer_tick() -> void:
-	if hud == null or not hud.joy_active():
+	if hud == null:
 		return
-	var d := hud.joy_dir()
+	var d := Vector2.ZERO
+	if hud.joy_active():
+		d = hud.joy_dir()
+	elif not hud.any_panel_open():
+		d = _pad_dir()
+	if d == Vector2.ZERO:
+		return
 	var me = _me()
 	if me == null or d == Vector2.ZERO:
 		return
@@ -1572,7 +1578,48 @@ func _on_debug_pressed(action: String) -> void:
 					_send({"t": "debug_learn", "kind": "skill", "what": sid})
 
 
+# 手掣左搖桿 / 十字鍵方向 (冇接手掣 = ZERO)
+func _pad_dir() -> Vector2:
+	var v := Vector2(Input.get_joy_axis(0, JOY_AXIS_LEFT_X), Input.get_joy_axis(0, JOY_AXIS_LEFT_Y))
+	if v.length() < 0.35:
+		v = Vector2.ZERO
+		if Input.is_joy_button_pressed(0, JOY_BUTTON_DPAD_LEFT): v.x -= 1
+		if Input.is_joy_button_pressed(0, JOY_BUTTON_DPAD_RIGHT): v.x += 1
+		if Input.is_joy_button_pressed(0, JOY_BUTTON_DPAD_UP): v.y -= 1
+		if Input.is_joy_button_pressed(0, JOY_BUTTON_DPAD_DOWN): v.y += 1
+	return v.normalized() if v != Vector2.ZERO else v
+
+# 手掣掣: A 互動/攻擊, B 切目標(面板開住=關面板), X 放技能, Y 背包, LB 角色, RB 記事
+func _pad_button(btn: int) -> void:
+	if hud.any_panel_open():
+		if btn == JOY_BUTTON_B or btn == JOY_BUTTON_Y:
+			hud.close_panels()
+		return
+	match btn:
+		JOY_BUTTON_A:
+			var act := ContextActions.find(self)
+			if not act.is_empty():
+				ContextActions.run(self, act)
+				return
+			if target_id < 0:
+				_cycle_target()
+			if target_id >= 0:
+				_send({"t": "attack", "target": target_id})
+		JOY_BUTTON_B: _cycle_target()
+		JOY_BUTTON_X:
+			for sl in hud.skill_slots():
+				if bool(sl.get("ready", false)) and (String(sl["kind"]) != "spell" or int(sl["item"]) != 0):
+					_on_skill(sl)
+					return
+			_log("冇可用技能")
+		JOY_BUTTON_Y: hud.bag_panel().open_filter("")
+		JOY_BUTTON_LEFT_SHOULDER: hud.open_panel("char")
+		JOY_BUTTON_RIGHT_SHOULDER: hud.open_panel("quest")
+
 func _unhandled_input(ev: InputEvent) -> void:
+	if ev is InputEventJoypadButton and ev.pressed:
+		_pad_button(ev.button_index)
+		return
 	if hud != null and hud.any_panel_open():
 		return                                     # 面板開住: 唔做世界點擊/快捷鍵
 	# 逐個事件判斷: 觸控 = ScreenTouch；由觸控模擬出嚟嘅 mouse 事件忽略（避免雙重處理）
