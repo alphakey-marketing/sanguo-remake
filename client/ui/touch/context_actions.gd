@@ -51,7 +51,7 @@ static func find(main: Node) -> Dictionary:
 		return best
 	# 野外工作區 (spec 05): 要企喺可做嘅工作區 + 有工具先顯示「工作」
 	var skills_here: Array = main.sim.work_area_skills(int(me.x), int(me.y))
-	if not skills_here.is_empty() and has_work_tool_for(main, skills_here):
+	if not skills_here.is_empty():       # 冇工具都出掣，撳咗講邊度買
 		return {"kind": "work", "label": "工作"}
 	if String(main.cur_map.get("kind", "")) == "city":      # 城池街道【原】: 調查 (登用, Step 13.5)
 		return {"kind": "survey", "label": "調查"}
@@ -79,6 +79,13 @@ static func has_work_tool_for(main: Node, skills_here: Array) -> bool:
 	for b in main.ch.get("bag", []):
 		var sid := String(main.data.tool_skill.get(int(b["id"]), ""))
 		if main.data.work.has(sid) and skills_here.has(sid):
+			return true
+	return false
+
+
+static func _has_tool_in_bag(main: Node, skill: String) -> bool:
+	for b in main.ch.get("bag", []):
+		if String(main.data.tool_skill.get(int(b["id"]), "")) == skill:
 			return true
 	return false
 
@@ -276,6 +283,9 @@ static func work_dialog(main: Node) -> Dictionary:
 				var t: int = tid
 				opts.append({"label": "裝%s" % main.item_names.get(tid, "工具"), "cb": func() -> void: main._send({"t": "equip_tool", "skill": skill, "item": t})})
 				break
+	for sk in main.data.work:        # 冇工具: 指路去工具店
+		if skills_here.has(String(sk)) and not tools.has(sk) and not _has_tool_in_bag(main, String(sk)):
+			lines.append("%s：未有工具 — 去許昌工具店買「%s」" % [main.data.work[sk]["name"], main.item_names.get(int(main.data.work[sk]["starterTool"]), "工具")])
 	# 天地商行訂閱 -> 工作區小屋休息 (Step 13)：訂閱先見 (未訂閱 = 灰/提示)
 	var sub := bool(ch.get("storageSub", false))
 	var rest_cost := int((main.data.world.get("tiandi", {}) as Dictionary).get("restCost", 10))

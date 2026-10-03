@@ -429,6 +429,12 @@ func _check_place(me: Dictionary) -> void:
 	if first or autotest:
 		return
 	var nm := str(zv.get("area", "")) if str(zv.get("area", "")) != "" else str(zv.get("name", ""))
+	var ws: Array = sim.work_area_skills(int(me.x), int(me.y))
+	if not ws.is_empty():
+		var wn: Array = []
+		for sk in ws:
+			wn.append(str(data.work[sk]["name"]))
+		nm += "（工作區：%s）" % "／".join(wn)
 	if nm != "":
 		banner = {"text": "— %s —" % nm, "t": 3.0, "color": Color(0.95, 0.85, 0.55)}
 

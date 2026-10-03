@@ -92,6 +92,14 @@ func _draw_area(view: Control) -> void:
 	var font := ThemeDB.fallback_font
 	var at := func(x: int, y: int) -> Vector2:
 		return off + (Vector2(x - int(md.ox), y - int(md.oy)) + Vector2(0.5, 0.5)) * k
+	var me0 = main._me()
+	if me0 != null:                 # 工作區地圖: 標題寫明可做咩
+		var ws: Array = main.sim.work_area_skills(int(me0.x), int(me0.y))
+		if not ws.is_empty():
+			var wn: Array = []
+			for sk in ws:
+				wn.append(str(main.data.work[sk]["name"]))
+			view.draw_string(font, Vector2(8, 16), "工作區：" + "／".join(wn), HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color(0.7, 1, 0.6))
 	var seen: Array = main.ch.get("landmarks", [])
 	for lm in main.data.landmarks:
 		if String(lm["map"]) != String(md.id):

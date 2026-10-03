@@ -241,21 +241,20 @@ func area_name(x: int, y: int) -> String:
 # 野外工作區 (spec 05): 企喺呢格係唔係 &skill 可做嘅工作區 (a.work 含 skill)。
 # 唔喺任何工作區 = 否 → cmd_work 唔俾做。
 func work_ok_here(skill: String, x: int, y: int) -> bool:
-	var md := data.map_at(x, y)
-	if md.is_empty():
-		return false
-	for a in md.get("areas", []):
-		if x >= int(a["x0"]) and x <= int(a["x1"]) and y >= int(a["y0"]) and y <= int(a["y1"]):
-			if (a.get("work", []) as Array).has(skill):
-				return true
-	return false
+	return work_area_skills(x, y).has(skill)
 
 
 # 將一格嘅 工作區技能名 砌好 (read-model，畀 UI 顯示「而家係X地，可以做農耕」)
+# 原版工作區 = 整張地圖 (許昌道路 農漁獵 / 木礦藥)，按地圖 id
+const WORK_MAPS := {"xc1922": ["farming", "fishing", "hunting"], "xc1923": ["woodcutting", "mining", "herbalism"]}
+
+
 func work_area_skills(x: int, y: int) -> Array:
 	var md := data.map_at(x, y)
 	if md.is_empty():
 		return []
+	if WORK_MAPS.has(str(md.get("id", ""))):
+		return (WORK_MAPS[str(md["id"])] as Array).duplicate()
 	for a in md.get("areas", []):
 		if x >= int(a["x0"]) and x <= int(a["x1"]) and y >= int(a["y0"]) and y <= int(a["y1"]):
 			return (a.get("work", []) as Array).duplicate()
