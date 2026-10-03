@@ -11798,7 +11798,7 @@
    "def": 12,
    "atkInterval": 20,
    "moveSpeed": 1,
-   "exp": 156,
+   "exp": 0,
    "gold": [
     0,
     150
@@ -11809,7 +11809,13 @@
    "element": "none",
    "dropSrc": 26041,
    "orig": true,
-   "sprite": 53151
+   "sprite": 53151,
+   "drops": [
+    {
+     "item": 64006,
+     "p": 1.0
+    }
+   ]
   },
   {
    "id": 27046,
@@ -13421,6 +13427,90 @@
     }
    ],
    "_scene": "yizu"
+  },
+  {
+   "id": 70039,
+   "name": "藍晶守護者",
+   "level": 50,
+   "hp": 25020,
+   "atk": 154,
+   "def": 12,
+   "atkInterval": 20,
+   "moveSpeed": 1,
+   "exp": 0,
+   "gold": [
+    0,
+    150
+   ],
+   "alignment": -30,
+   "aggroRange": 5,
+   "leash": 10,
+   "element": "none",
+   "dropSrc": 26041,
+   "orig": true,
+   "sprite": 53151,
+   "drops": [
+    {
+     "item": 64004,
+     "p": 1.0
+    }
+   ]
+  },
+  {
+   "id": 70040,
+   "name": "紅晶守護者",
+   "level": 50,
+   "hp": 25020,
+   "atk": 154,
+   "def": 12,
+   "atkInterval": 20,
+   "moveSpeed": 1,
+   "exp": 0,
+   "gold": [
+    0,
+    150
+   ],
+   "alignment": -30,
+   "aggroRange": 5,
+   "leash": 10,
+   "element": "none",
+   "dropSrc": 26041,
+   "orig": true,
+   "sprite": 53151,
+   "drops": [
+    {
+     "item": 64005,
+     "p": 1.0
+    }
+   ]
+  },
+  {
+   "id": 70041,
+   "name": "綠晶守護者",
+   "level": 50,
+   "hp": 25020,
+   "atk": 154,
+   "def": 12,
+   "atkInterval": 20,
+   "moveSpeed": 1,
+   "exp": 0,
+   "gold": [
+    0,
+    150
+   ],
+   "alignment": -30,
+   "aggroRange": 5,
+   "leash": 10,
+   "element": "none",
+   "dropSrc": 26041,
+   "orig": true,
+   "sprite": 53151,
+   "drops": [
+    {
+     "item": 64003,
+     "p": 1.0
+    }
+   ]
   }
  ],
  "spawns": [
@@ -14813,14 +14903,6 @@
    "respawnTicks": 300,
    "orig": true,
    "lv": 49
-  },
-  {
-   "zone": "xc1855",
-   "monster": 70028,
-   "count": 6,
-   "respawnTicks": 300,
-   "orig": true,
-   "lv": 50
   },
   {
    "zone": "xc1855",
@@ -18045,6 +18127,34 @@
    "respawnTicks": 300,
    "orig": true,
    "lv": 10
+  },
+  {
+   "zone": "xc2555",
+   "monster": 70039,
+   "count": 1,
+   "respawnTicks": 300,
+   "lv": 50
+  },
+  {
+   "zone": "xc1655",
+   "monster": 70040,
+   "count": 1,
+   "respawnTicks": 300,
+   "lv": 50
+  },
+  {
+   "zone": "xc2055",
+   "monster": 70041,
+   "count": 1,
+   "respawnTicks": 300,
+   "lv": 50
+  },
+  {
+   "zone": "xc1855",
+   "monster": 70028,
+   "count": 1,
+   "respawnTicks": 300,
+   "lv": 50
   }
  ]
 }

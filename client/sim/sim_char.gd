@@ -239,6 +239,8 @@ func cmd_class_promote(id: int) -> void:
 		return _msg(id, str(ok["why"]))
 	var tier := int(ok["tier"])
 	ch["tier"] = tier
+	if tier == 1:    # 原版二轉：轉職後免費升一級
+		RulesStats.gain_exp(data, ch, RulesStats.exp_to_next(int(ch["level"])) - int(ch["exp"]))
 	var cls: Dictionary = data.classes.get(str(ch["classId"]), {})
 	var name := RulesClass.title_of(cls, tier)
 	_sync_stats(e)

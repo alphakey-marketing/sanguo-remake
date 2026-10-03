@@ -178,7 +178,7 @@ func t_class_rules(data: GameData) -> void:
 	check(RulesClass.promote_ok(data, ch)["ok"] == false, "Lv49 唔可以轉職")
 	ch["level"] = 50
 	check(RulesClass.promote_ok(data, ch)["ok"] == false, "Lv50 未考考試唔可以轉職")
-	ch["questDone"] = {"promote_test_yishi": true}
+	ch["questDone"] = {"promote_test": true}
 	check(bool(RulesClass.promote_ok(data, ch)["ok"]) and int(RulesClass.promote_ok(data, ch)["tier"]) == 1, "Lv50 + 考試完成 = 可以二轉")
 	ch["tier"] = 1
 	check(RulesClass.promote_ok(data, ch)["ok"] == false, "二轉後 Lv50 唔可以跳三轉")
@@ -191,20 +191,11 @@ func t_class_rules(data: GameData) -> void:
 	data.quests.remove_at(data.quests.size() - 1)
 	var ch3 := {"tier": 2, "level": 100, "classId": "yishi", "questDone": {}}
 	check(RulesClass.promote_ok(data, ch3)["ok"] == false, "已三轉: 冇得再轉")
-	# F6: 六職各有自己嘅二轉考試任務，完成自己嗰份先可以轉 (完成別職嗰份唔算)
+	# 二轉 = 原版貂蟬四晶戒任務 promote_test，六職共用
 	for cid in ["yishi", "shinu", "daoshi", "wunu", "bianshi", "meinu"]:
-		var pq := RulesClass.promote_quest_id(cid, 0)
-		check(pq == "promote_test_" + cid, "F6: %s 考試任務 id" % cid)
-		var found := false
-		for q in data.quests:
-			if String(q["id"]) == pq:
-				found = true
-				check(String((q["pre"] as Dictionary).get("classId", "")) == cid, "F6: %s 任務限本職" % cid)
-		check(found, "F6: %s 有二轉考試任務" % cid)
-		var pc := {"tier": 0, "level": 50, "classId": cid, "questDone": {pq: true}}
-		check(bool(RulesClass.promote_ok(data, pc)["ok"]), "F6: %s 完成自己考試 = 可轉" % cid)
-		var other := {"tier": 0, "level": 50, "classId": cid, "questDone": {"promote_test_" + ("shinu" if cid != "shinu" else "yishi"): true}}
-		check(not bool(RulesClass.promote_ok(data, other)["ok"]), "F6: %s 完成別職考試唔算" % cid)
+		check(RulesClass.promote_quest_id(cid, 0) == "promote_test", "%s 二轉考試 = promote_test" % cid)
+		var pc := {"tier": 0, "level": 50, "classId": cid, "questDone": {"promote_test": true}}
+		check(bool(RulesClass.promote_ok(data, pc)["ok"]), "%s 完成考試 = 可轉" % cid)
 
 
 func t_promote_flow(data: GameData) -> void:
@@ -216,27 +207,32 @@ func t_promote_flow(data: GameData) -> void:
 	# 未完成考試 → 轉職拒絕
 	sim.cmd_class_promote(id)
 	check(bool(ch.get("tier", 0)) == false, "冇考試任務: 轉職拒絕")
-	# 接任務 (導師 NPC minLevel 50)
-	var npc: Dictionary = data.quest_npcs["promote_master"]
-	sim._sync_quest_npcs()           # 導師 minLevel 50，spawn 嗰陣唔 visible，升 50 後要 re-sync
+	# 接任務 (貂蟬 minLevel 50)
+	var npc: Dictionary = data.quest_npcs["diaochan"]
+	sim._sync_quest_npcs()
 	_put(sim, id, int(npc["x"]) + 1, int(npc["y"]))
-	sim.cmd_quest_talk(id, "promote_master")
-	check((ch.get("quests", {}) as Dictionary).has("promote_test_yishi"), "同導師傾偈 = 接咗轉職考試")
-	# 收集 5 塊試煉之證 → 交
-	RulesShop.add_item(ch["bag"], 51100, 5)
+	sim.cmd_quest_talk(id, "diaochan")
+	check((ch.get("quests", {}) as Dictionary).has("promote_test"), "同貂蟬傾偈 = 接二轉考驗")
+	# 四晶戒逐隻交
+	for ring in [64004, 64005, 64003, 64006]:
+		RulesShop.add_item(ch["bag"], ring, 1)
+		_put(sim, id, int(npc["x"]) + 1, int(npc["y"]))
+		sim.cmd_quest_turnin(id, "promote_test")
+	check(int((ch.get("quests", {}) as Dictionary).get("promote_test", {}).get("stage", -1)) == 5, "交齊四戒 = 推進到回報階段")
 	_put(sim, id, int(npc["x"]) + 1, int(npc["y"]))
-	sim.cmd_quest_turnin(id, "promote_test_yishi")
-	check(int((ch.get("quests", {}) as Dictionary).get("promote_test_yishi", {}).get("stage", -1)) == 2, "交齊證 = 推進到回報階段")
-	# 最後回報導師先 done
-	_put(sim, id, int(npc["x"]) + 1, int(npc["y"]))
-	sim.cmd_quest_talk(id, "promote_master")
-	check(bool(ch.get("questDone", {}).get("promote_test_yishi", false)), "交齊證 + 回報 = 考試任務完成")
+	sim.cmd_quest_talk(id, "diaochan")
+	check(bool(ch.get("questDone", {}).get("promote_test", false)), "四戒 + 回報 = 考試任務完成")
 	check(int(ch.get("fame", 0)) == 10, "考試任務獎勵名聲 10")
+	# 守護者掉戒 100%
+	for pair in [[70039, 64004], [70040, 64005], [70041, 64003], [70028, 64006]]:
+		var dr: Array = data.monsters[pair[0]].get("drops", [])
+		check(dr.size() == 1 and int(dr[0]["item"]) == pair[1] and float(dr[0]["p"]) >= 1.0, "守護者 %d 必掉 %d" % [pair[0], pair[1]])
 	# 轉職
 	var cls: Dictionary = data.classes["yishi"]
 	check(RulesClass.title_of(cls, 0) == "義士", "轉職前職名")
 	sim.cmd_class_promote(id)
 	check(int(ch["tier"]) == 1, "完成考試 + Lv50 = 轉職成功")
+	check(int(ch["level"]) == 51, "二轉免費升一級 (Lv51)")
 	check(RulesClass.title_of(cls, 1) == "武士", "二轉職名")
 	# 三轉 (S01e): 冇完成七彩項鍊 → 拒絕；接任務 → 集晶 → 回報 → 轉職
 	ch["level"] = 100

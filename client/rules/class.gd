@@ -5,12 +5,13 @@ extends RefCounted
 # 轉職效果: 職名變化、進階武器解鎖、四招起絶招解鎖、專長等級上限提升。
 
 const PROMOTE_LEVEL := [50, 100]                          # 【原】50 二轉、100 三轉
+const PROMOTE_QUEST_T2 := "promote_test"   # 二轉考試任務（原版：貂蟬四晶戒，六職共用）
 const PROMOTE_QUEST_T3 := "promote_test2"  # 三轉考試任務（S01e 已有，六職共用）
 
 
-# F6 轉職考試任務 id: 二轉 = 每職一份 promote_test_<classId>；三轉 = promote_test2
+# F6 轉職考試任務 id: 二轉 = promote_test；三轉 = promote_test2
 static func promote_quest_id(class_id: String, tier: int) -> String:
-	return "promote_test_%s" % class_id if tier == 0 else PROMOTE_QUEST_T3
+	return PROMOTE_QUEST_T2 if tier == 0 else PROMOTE_QUEST_T3
 const TIER_NAMES := ["初階", "二轉", "三轉"]
 
 

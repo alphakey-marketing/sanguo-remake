@@ -991,270 +991,6 @@
       }
     },
     {
-      "id": "promote_test_yishi",
-      "src": "custom",
-      "name": "轉職考試（義士→武士）",
-      "type": "general",
-      "giver": "promote_master",
-      "pre": {
-        "level": 50,
-        "classId": "yishi"
-      },
-      "preHint": "Lv50 後去許昌城中心搵轉職導師。（義士二轉考驗）",
-      "stages": [
-        {
-          "type": "talk",
-          "npc": "promote_master",
-          "dialog": [
-            "轉職導師：「你一身正氣、拳腳夠硬。要成為『武士』，就要接受轉職考驗——去野外打敗試煉守衛、試煉武師同試煉魔將，集齊 5 塊『試煉之證』返嚟。」",
-            "轉職導師：「試煉怪出沒喺許昌東面高級野區，Lv45 起。小心行事！」"
-          ],
-          "hint": "同轉職導師傾偈，接受轉職考試"
-        },
-        {
-          "type": "collect",
-          "item": {
-            "id": 51100,
-            "n": 5
-          },
-          "hint": "去野外打試煉怪（許昌東面高級野區），收集試煉之證 (%v/%n)"
-        },
-        {
-          "type": "talk",
-          "npc": "promote_master",
-          "dialog": [
-            "轉職導師：「5 塊試煉之證，證明你實力已足。回報朝廷，你即成為武士！」",
-            "轉職導師：「返去角色面板，撳『轉職』完成儀式。」"
-          ],
-          "hint": "返去同轉職導師報告，完成考試",
-          "done": true
-        }
-      ],
-      "reward": {
-        "fame": 10
-      }
-    },
-    {
-      "id": "promote_test_shinu",
-      "src": "custom",
-      "name": "轉職考試（仕女→俠女）",
-      "type": "general",
-      "giver": "promote_master",
-      "pre": {
-        "level": 50,
-        "classId": "shinu"
-      },
-      "preHint": "Lv50 後去許昌城中心搵轉職導師。（仕女二轉考驗）",
-      "stages": [
-        {
-          "type": "talk",
-          "npc": "promote_master",
-          "dialog": [
-            "轉職導師：「你身手輕靈、劍法已見火候。要成為『俠女』，就要接受轉職考驗——去野外打敗試煉守衛、試煉武師同試煉魔將，集齊 5 塊『試煉之證』返嚟。」",
-            "轉職導師：「試煉怪出沒喺許昌東面高級野區，Lv45 起。小心行事！」"
-          ],
-          "hint": "同轉職導師傾偈，接受轉職考試"
-        },
-        {
-          "type": "collect",
-          "item": {
-            "id": 51100,
-            "n": 5
-          },
-          "hint": "去野外打試煉怪（許昌東面高級野區），收集試煉之證 (%v/%n)"
-        },
-        {
-          "type": "talk",
-          "npc": "promote_master",
-          "dialog": [
-            "轉職導師：「5 塊試煉之證，證明你實力已足。回報朝廷，你即成為俠女！」",
-            "轉職導師：「返去角色面板，撳『轉職』完成儀式。」"
-          ],
-          "hint": "返去同轉職導師報告，完成考試",
-          "done": true
-        }
-      ],
-      "reward": {
-        "fame": 10
-      }
-    },
-    {
-      "id": "promote_test_daoshi",
-      "src": "custom",
-      "name": "轉職考試（道士→仙君）",
-      "type": "general",
-      "giver": "promote_master",
-      "pre": {
-        "level": 50,
-        "classId": "daoshi"
-      },
-      "preHint": "Lv50 後去許昌城中心搵轉職導師。（道士二轉考驗）",
-      "stages": [
-        {
-          "type": "talk",
-          "npc": "promote_master",
-          "dialog": [
-            "轉職導師：「你道行漸深、術法已有根基。要成為『仙君』，就要接受轉職考驗——去野外打敗試煉守衛、試煉武師同試煉魔將，集齊 5 塊『試煉之證』返嚟。」",
-            "轉職導師：「試煉怪出沒喺許昌東面高級野區，Lv45 起。小心行事！」"
-          ],
-          "hint": "同轉職導師傾偈，接受轉職考試"
-        },
-        {
-          "type": "collect",
-          "item": {
-            "id": 51100,
-            "n": 5
-          },
-          "hint": "去野外打試煉怪（許昌東面高級野區），收集試煉之證 (%v/%n)"
-        },
-        {
-          "type": "talk",
-          "npc": "promote_master",
-          "dialog": [
-            "轉職導師：「5 塊試煉之證，證明你實力已足。回報朝廷，你即成為仙君！」",
-            "轉職導師：「返去角色面板，撳『轉職』完成儀式。」"
-          ],
-          "hint": "返去同轉職導師報告，完成考試",
-          "done": true
-        }
-      ],
-      "reward": {
-        "fame": 10
-      }
-    },
-    {
-      "id": "promote_test_wunu",
-      "src": "custom",
-      "name": "轉職考試（巫女→魔女）",
-      "type": "general",
-      "giver": "promote_master",
-      "pre": {
-        "level": 50,
-        "classId": "wunu"
-      },
-      "preHint": "Lv50 後去許昌城中心搵轉職導師。（巫女二轉考驗）",
-      "stages": [
-        {
-          "type": "talk",
-          "npc": "promote_master",
-          "dialog": [
-            "轉職導師：「你靈力充盈、咒術已見火候。要成為『魔女』，就要接受轉職考驗——去野外打敗試煉守衛、試煉武師同試煉魔將，集齊 5 塊『試煉之證』返嚟。」",
-            "轉職導師：「試煉怪出沒喺許昌東面高級野區，Lv45 起。小心行事！」"
-          ],
-          "hint": "同轉職導師傾偈，接受轉職考試"
-        },
-        {
-          "type": "collect",
-          "item": {
-            "id": 51100,
-            "n": 5
-          },
-          "hint": "去野外打試煉怪（許昌東面高級野區），收集試煉之證 (%v/%n)"
-        },
-        {
-          "type": "talk",
-          "npc": "promote_master",
-          "dialog": [
-            "轉職導師：「5 塊試煉之證，證明你實力已足。回報朝廷，你即成為魔女！」",
-            "轉職導師：「返去角色面板，撳『轉職』完成儀式。」"
-          ],
-          "hint": "返去同轉職導師報告，完成考試",
-          "done": true
-        }
-      ],
-      "reward": {
-        "fame": 10
-      }
-    },
-    {
-      "id": "promote_test_bianshi",
-      "src": "custom",
-      "name": "轉職考試（辯士→策士）",
-      "type": "general",
-      "giver": "promote_master",
-      "pre": {
-        "level": 50,
-        "classId": "bianshi"
-      },
-      "preHint": "Lv50 後去許昌城中心搵轉職導師。（辯士二轉考驗）",
-      "stages": [
-        {
-          "type": "talk",
-          "npc": "promote_master",
-          "dialog": [
-            "轉職導師：「你智謀出眾、言談機鋒已見火候。要成為『策士』，就要接受轉職考驗——去野外打敗試煉守衛、試煉武師同試煉魔將，集齊 5 塊『試煉之證』返嚟。」",
-            "轉職導師：「試煉怪出沒喺許昌東面高級野區，Lv45 起。小心行事！」"
-          ],
-          "hint": "同轉職導師傾偈，接受轉職考試"
-        },
-        {
-          "type": "collect",
-          "item": {
-            "id": 51100,
-            "n": 5
-          },
-          "hint": "去野外打試煉怪（許昌東面高級野區），收集試煉之證 (%v/%n)"
-        },
-        {
-          "type": "talk",
-          "npc": "promote_master",
-          "dialog": [
-            "轉職導師：「5 塊試煉之證，證明你實力已足。回報朝廷，你即成為策士！」",
-            "轉職導師：「返去角色面板，撳『轉職』完成儀式。」"
-          ],
-          "hint": "返去同轉職導師報告，完成考試",
-          "done": true
-        }
-      ],
-      "reward": {
-        "fame": 10
-      }
-    },
-    {
-      "id": "promote_test_meinu",
-      "src": "custom",
-      "name": "轉職考試（美女→仙女）",
-      "type": "general",
-      "giver": "promote_master",
-      "pre": {
-        "level": 50,
-        "classId": "meinu"
-      },
-      "preHint": "Lv50 後去許昌城中心搵轉職導師。（美女二轉考驗）",
-      "stages": [
-        {
-          "type": "talk",
-          "npc": "promote_master",
-          "dialog": [
-            "轉職導師：「你氣質出塵、琴音術法已見火候。要成為『仙女』，就要接受轉職考驗——去野外打敗試煉守衛、試煉武師同試煉魔將，集齊 5 塊『試煉之證』返嚟。」",
-            "轉職導師：「試煉怪出沒喺許昌東面高級野區，Lv45 起。小心行事！」"
-          ],
-          "hint": "同轉職導師傾偈，接受轉職考試"
-        },
-        {
-          "type": "collect",
-          "item": {
-            "id": 51100,
-            "n": 5
-          },
-          "hint": "去野外打試煉怪（許昌東面高級野區），收集試煉之證 (%v/%n)"
-        },
-        {
-          "type": "talk",
-          "npc": "promote_master",
-          "dialog": [
-            "轉職導師：「5 塊試煉之證，證明你實力已足。回報朝廷，你即成為仙女！」",
-            "轉職導師：「返去角色面板，撳『轉職』完成儀式。」"
-          ],
-          "hint": "返去同轉職導師報告，完成考試",
-          "done": true
-        }
-      ],
-      "reward": {
-        "fame": 10
-      }
-    },
-    {
       "id": "skill_unlock_shinu",
       "src": "custom",
       "name": "學特技：開鎖",
@@ -6819,6 +6555,78 @@
       ],
       "reward": {
         "fame": 30
+      }
+    },
+    {
+      "id": "promote_test",
+      "src": "orig",
+      "name": "轉職任務（二轉）",
+      "type": "general",
+      "giver": "diaochan",
+      "pre": {
+        "level": 50,
+        "tier": 0
+      },
+      "preHint": "Lv50 去長沙城門口搵貂蟬",
+      "stages": [
+        {
+          "type": "talk",
+          "npc": "diaochan",
+          "dialog": [
+            "貂蟬：想轉職？先集齊四枚晶戒。",
+            "貂蟬：晉陽、濮陽、汝南、譙城洞窟最深層，各有一隻晶守護者。"
+          ],
+          "hint": "同貂蟬傾偈接二轉任務"
+        },
+        {
+          "type": "collect",
+          "npc": "diaochan",
+          "item": {
+            "id": 64004,
+            "n": 1
+          },
+          "hint": "晉陽洞窟最深層殺藍晶守護者，得藍晶戒 (%v/%n)，交畀貂蟬"
+        },
+        {
+          "type": "collect",
+          "npc": "diaochan",
+          "item": {
+            "id": 64005,
+            "n": 1
+          },
+          "hint": "濮陽洞窟最深層殺紅晶守護者，得紅晶戒 (%v/%n)，交畀貂蟬"
+        },
+        {
+          "type": "collect",
+          "npc": "diaochan",
+          "item": {
+            "id": 64003,
+            "n": 1
+          },
+          "hint": "汝南洞窟最深層殺綠晶守護者，得綠晶戒 (%v/%n)，交畀貂蟬"
+        },
+        {
+          "type": "collect",
+          "npc": "diaochan",
+          "item": {
+            "id": 64006,
+            "n": 1
+          },
+          "hint": "譙城洞窟最深層殺紫晶守護者，得紫晶戒 (%v/%n)，交畀貂蟬"
+        },
+        {
+          "type": "talk",
+          "npc": "diaochan",
+          "dialog": [
+            "貂蟬：四晶戒齊晒，你通過考驗！",
+            "貂蟬：轉職後仲免費升一級。"
+          ],
+          "hint": "返去搵貂蟬完成考驗，即可轉職",
+          "done": true
+        }
+      ],
+      "reward": {
+        "fame": 10
       }
     }
   ]
