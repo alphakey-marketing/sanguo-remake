@@ -453,6 +453,14 @@ static func donate_dialog(main: Node, def: Dictionary) -> Dictionary:
 	return {"title": str(def["name"]), "text": text, "options": opts}
 
 
+# 融合 QTE 對話 (HUD 掣用，唔使喺打鐵鋪)；融合完 = 結果 + 離開
+static func fusion_dialog(main: Node) -> Dictionary:
+	var fs: Dictionary = main.ch.get("fusing", {})
+	if fs.is_empty():
+		return {"title": "融合", "text": "融合已結束（睇信息欄）", "options": [_leave(main)]}
+	return forge_dialog(main, {"name": "融合"})
+
+
 # 打鐵鋪（義士融合 QTE）: 未開始 = 「開始融合」；開始咗 = 集氣棒 + 「敲！」
 static func forge_dialog(main: Node, def: Dictionary) -> Dictionary:
 	var ch: Dictionary = main.ch

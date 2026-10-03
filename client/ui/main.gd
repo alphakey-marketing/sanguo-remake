@@ -1284,6 +1284,11 @@ func _on_skill(sl: Dictionary) -> void:
 		var tgt := int(t.id) if t != null and bool(t.get("mob", false)) else 0
 		_send({"t": "cast_spell", "slot": int(sl["slot"]), "target": tgt})
 		return
+	if String(sl["kind"]) == "fusion":          # 義士融合: 開 QTE 對話 (隨時隨地)
+		if (ch.get("fusing", {}) as Dictionary).is_empty():
+			_send({"t": "fusion_start"})
+		hud.open_dialog(func() -> Dictionary: return ContextActions.fusion_dialog(self))
+		return
 	if String(sl["kind"]) == "skill":           # S02c 職業特技掣: 而家得開鎖（sim 會檢查附近有冇鎖寶箱）
 		_send({"t": "use_skill", "skill": String(sl["skill"])})
 		return

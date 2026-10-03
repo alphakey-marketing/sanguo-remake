@@ -396,6 +396,9 @@ func _calc_skill_slots() -> Array:
 		var sd: Dictionary = d.class_skills.get(sk, {})
 		out.append({"kind": "skill", "skill": sk, "label": str(sd.get("name", "技")).substr(0, 2), "sub": "特技",
 			"ready": bool(RulesClassSkill.can_use(d, ch, sk).get("ok", false)), "cd": 0.0, "casting": false})
+	if str(ch.get("classId", "")) == "yishi":       # 義士融合: 隨時隨地 (唔使 classSkill)
+		out.append({"kind": "fusion", "label": "融合", "sub": "特技",
+			"ready": int(ch["level"]) >= 10, "cd": 0.0, "casting": false})
 	if bool(ch.get("riding", false)):            # U02: 馬戰特技掣（騎緊 + 已學）
 		var wtype := ""
 		var wid := str(ch.get("mountWeapon", ""))

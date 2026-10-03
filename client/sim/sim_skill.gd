@@ -396,7 +396,7 @@ func cmd_stealth_cross(id: int) -> void:
 			ch["stealthCd"] = tick + MathX.js_round(RulesStealth.STEALTH_CD_TICKS * float(_companion_class_skill_mul(e)["cd"]))    # 22 職業特技
 			_sync_stats(e)
 			_emit({"k": "stealth_done", "dst": id, "until": tick + RulesStealth.STEALTH_TICKS})
-			_msg(id, "潛行！10 分鐘內主動怪唔會仇恨你（CD 1 日）")
+			_msg(id, "潛行！%d tick 內主動怪睇唔到你，可以照打（CD 1 日）" % RulesStealth.STEALTH_TICKS + "")
 		else:
 			_emit({"k": "stealth_prog", "dst": id, "crossed": int(g["crossed"])})
 	else:
@@ -638,9 +638,7 @@ func cmd_fusion_start(id: int) -> void:
 	var e := ent(id)
 	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
 		return
-	if not _near_forge(e):
-		return _msg(id, "要喺打鐵鋪附近先融合得")
-	var ch: Dictionary = e["ch"]
+	var ch: Dictionary = e["ch"]       # 隨時隨地融合 (唔使去打鐵鋪)
 	if str(ch.get("classId", "")) != "yishi":
 		return _msg(id, "融合係義士特技")
 	if int(ch["level"]) < 10:

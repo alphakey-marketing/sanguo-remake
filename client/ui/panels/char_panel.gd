@@ -130,6 +130,7 @@ func _build_body() -> void:
 		"專長 %s（詳情睇「專長」頁）" % _expert_line(ch),
 	]
 	lines.append_array(_jewel_effect_lines(ch))
+	lines.append_array(_class_skill_lines(ch))
 	for l in lines:
 		right.add_child(lbl(str(l), 14))
 	var titles: Array = ch.get("titles", [])
@@ -369,6 +370,22 @@ func _expert_line(ch: Dictionary) -> String:
 		if lv > 0:
 			out.append("%s Lv%d" % [str(main.data.experts["skills"][sk]["name"]), lv])
 	return "、".join(out) if not out.is_empty() else "未有（做官宅工作／任務可學）"
+
+
+# 職業特技: 名 + 效果；用法 = HUD 特技掣
+func _class_skill_lines(ch: Dictionary) -> Array:
+	var cid := str(ch.get("classId", ""))
+	if cid == "yishi":
+		return ["職業特技「%s」（HUD 特技掣）：%s" % [RulesClassSkill.YISHI_FUSION["name"], RulesClassSkill.YISHI_FUSION["desc"]]]
+	for sid in RulesClassSkill.DESCS:
+		var def: Dictionary = main.data.class_skills.get(sid, {})
+		if str(def.get("class", "")) != cid:
+			continue
+		var nm := str(def.get("name", sid))
+		if RulesClassSkill.learned(ch, sid):
+			return ["職業特技「%s」（HUD 特技掣）：%s" % [nm, RulesClassSkill.DESCS[sid]]]
+		return ["職業特技「%s」（未學，Lv%d 後搵導師任務）：%s" % [nm, int(def.get("lv", 5)), RulesClassSkill.DESCS[sid]]]
+	return []
 
 
 func _build_expert(ch: Dictionary) -> void:

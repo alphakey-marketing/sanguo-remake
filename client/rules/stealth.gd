@@ -7,7 +7,7 @@ extends RefCounted
 # 純函數，無狀態；模式 (車空隙 offset) 由 sim 用 SimRng 生成，sim 權威判定，呢度提供查詢。
 
 
-const STEALTH_TICKS := 5         # 潛行持續 10 分鐘 => 5 tick (gameMinPerTick=2)
+const STEALTH_TICKS := 100       # 潛行持續 100 tick (可攻擊，主動怪/居民睇唔到)
 const STEALTH_CD_TICKS := 720    # CD 1 game 日 => 720 tick
 
 const GAP_COUNT := 3             # 要穿過幾多卡車之間
