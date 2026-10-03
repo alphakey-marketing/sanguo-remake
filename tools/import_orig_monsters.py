@@ -86,7 +86,7 @@ def gen_spawns(mons, rows):
     for mid, names in rows:
         z = 'xc%d' % mid
         if z not in ids: continue
-        n = 4 if dims(z) >= 300 else 3
+        n = 8 if dims(z) >= 300 else 6          # 2026-10-02 用家: 每圖怪加多 (原 4/3)
         for nm in names:
             if nm in by: out.append({'zone': z, 'monster': by[nm], 'count': n, 'respawnTicks': 300, 'orig': True, 'lv': cave_level(mid // 100, mid % 100 - 50)})   # 每層一個等級 (spawn 級別覆蓋)
     for c in range(1, 40):
@@ -94,7 +94,7 @@ def gen_spawns(mons, rows):
         if z not in ids: continue
         reg = next((k for k, v in REGION.items() if c in v), '兗徐')
         lo, hi = (10, 20) if reg == '兗徐' else (1, 10)                    # 攻略外圍等級帶
-        names, cnt = (WILD[reg].split(), 1) if c != 19 else (NEWBIE_WILD.split(), 5)
+        names, cnt = (WILD[reg].split(), 3) if c != 19 else (NEWBIE_WILD.split(), 8)
         for nm in names:
             if nm in by: out.append({'zone': z, 'monster': by[nm], 'count': cnt, 'respawnTicks': 300, 'orig': True, 'lv': min(hi, max(lo, lvl[by[nm]]))})
     return out

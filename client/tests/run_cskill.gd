@@ -190,5 +190,24 @@ func _init() -> void:
 	nf[0].cmd_fusion_start(nf[1])
 	check((nf[2].get("fusing", {}) as Dictionary).is_empty(), "非義士唔得融合")
 
+	# 冇開鎖技能: 狂打寶箱 12 下撬爛得賞
+	var pr := _new(data, "yishi", "")
+	var ps: Sim = pr[0]
+	var pid: int = pr[1]
+	var ppe := ps.ent(pid)
+	var pc := ps._new_ent("寶箱", "chest", Vector2i(int(ppe["x"]) + 1, int(ppe["y"])))
+	pc["hp"] = 1
+	pc["locked"] = true
+	pc["key"] = 1
+	pc["drop"] = {"gold": 40, "items": []}
+	var pg0 := int(pr[2]["gold"])
+	ps.cmd_attack(pid, int(pc["id"]))
+	for i in 40:
+		ps.step()
+	check(ps.ents.has(int(pc["id"])) and int(pc["pry"]) < 12, "狂打寶箱未爛 (撬緊)")
+	for i in 200:
+		ps.step()
+	check(not ps.ents.has(int(pc["id"])) and int(pr[2]["gold"]) >= pg0 + 40, "冇開鎖技能撬爛寶箱得賞")
+
 	print("[TEST] cskill: %d, fail %d" % [total, fails])
 	quit(1 if fails > 0 else 0)

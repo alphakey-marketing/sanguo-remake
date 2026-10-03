@@ -170,6 +170,10 @@ func _think_player(p: Dictionary) -> void:
 		return
 	p["tx"] = p["x"]
 	p["ty"] = p["y"]
+	if t.get("kind", "") == "chest":          # 寶箱安全區都撬得
+		if tick >= int(p["next_atk"]):
+			_pry_chest(p, t)
+		return
 	var tm: Dictionary = t.get("mob", {})
 	if (is_safe(int(p["x"]), int(p["y"])) or is_safe(int(t["x"]), int(t["y"]))) and not tm.has("arena") and not tm.has("quest_boss"):
 		if t.get("kind", "") != "mob":     # 城內唔准打人: 攻擊者或目標任何一方喺安全區都唔出手，放棄目標 (捕快/紅名都一樣，等出野外先打)

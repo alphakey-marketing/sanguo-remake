@@ -24,6 +24,8 @@ var faces := []
 const ZOOM_OUT := 0.5                              # 全圖縮放 (0.5 = 拉遠一倍，手機睇得多啲)；world 座標 * zoom = 畫面
 const ORIG_CHAR_SCALE := 2.0
 var cam := Vector2.ZERO
+var _vp := {}                       # 單位顯示位置 (格) 平滑跟 sim 位置，畫面唔再一格一格跳
+const SMOOTH_K := 16.0
 var zoom := ZOOM_OUT                            # 現時縮放：室內細圖會自動放大至成幅畫面剛好裝得落
 var autotest := false
 var uitest := false                # --uitest: 觸控 UI 煙霧測試 (tests/ui_smoke.gd)
@@ -56,6 +58,9 @@ func _set_move_mode(mode: String) -> void:
 		return
 	move_mode = mode
 	_save_settings()
+var potion_auto: Array = [0, 0, 0]    # 每格自動用藥門檻 % (0 = 關): HP 藥低於 x% HP / MP 藥低於 x% MP 就自動用
+const POTION_AUTO_CD := 10          # 自動用藥最短間隔 (tick)
+var _potion_next := 0
 var potion_slots: Array = [0, 0, 0]   # U-fix: 快捷補品欄 3 格，存 item id（0 = 空），純 UI 偏好唔入 sim 存檔
 var sshot_file := ""             # --sshot: 開場幾秒後截圖存 user:// 退出
 var ch := {}                      # 玩家角色狀態 (sim 內同一個 Dictionary)
@@ -365,6 +370,30 @@ func _map_zoom() -> float:
 	return clampf(fit, ZOOM_OUT, 1.0)
 
 # 鏡頭限喺當前地圖入面；地圖細過畫面就置中 (spec 12 §6)
+# 顯示位置 vp 以指數追 sim 格位 (sim 10Hz 跳格 → 畫面順滑)；遠跳 (傳送/過圖) 直接到位
+func _smooth_pos(delta: float) -> void:
+	if ents.is_empty():
+		return
+	var k := 1.0 - exp(-delta * SMOOTH_K)
+	var seen := {}
+	for e in ents:
+		var id := int(e.id)
+		var t := Vector2(e.x, e.y)
+		seen[id] = true
+		if not _vp.has(id) or (_vp[id] as Vector2).distance_to(t) > 4.0:
+			_vp[id] = t
+		else:
+			var v: Vector2 = _vp[id]
+			_vp[id] = v + (t - v) * k
+	for id in _vp.keys():
+		if not seen.has(id):
+			_vp.erase(id)
+	var me = _me()
+	if me != null and not cur_map.is_empty():
+		var mv: Vector2 = _vp.get(int(me.id), Vector2(me.x, me.y))
+		cam = _clamp_cam(mv * TILE + Vector2(TILE, TILE) * 0.5 - get_viewport_rect().size / zoom / 2)
+
+
 func _clamp_cam(c: Vector2) -> Vector2:
 	if cur_map.is_empty():
 		return c
@@ -406,6 +435,7 @@ func _process(delta: float) -> void:
 			for i in range(debug_speed - 1):    # debug 加速: 額外 sim tick
 				sim.step()
 			_steer_tick()
+			_potion_auto_tick()
 			_auto_tick()
 			_refresh()                  # 視圖跟 sim tick (10Hz) 更新，唔使每幀砌
 	if _dirty:
@@ -428,6 +458,7 @@ func _process(delta: float) -> void:
 	if autotest and me != null: _autotest_step(me)
 	if autotest and t0 > 60.0:
 		print("FAIL: timeout (moved=%s atk=%s kills=%d)" % [moved, atk_sent, kills]); get_tree().quit(1)
+	_smooth_pos(delta)
 	queue_redraw()
 	if sshot_file != "" and t0 > 2.5:
 		var img := get_viewport().get_texture().get_image()
@@ -1105,8 +1136,8 @@ func target_ent():
 func _is_targetable(e) -> bool:
 	if e == null:
 		return false
-	if e.get("mob", false):
-		return true
+	if e.get("mob", false) or e.get("chestBox", false):
+		return true                               # 寶箱: 冇開鎖技能都可以狂打撬開
 	if not e.get("bot", false):
 		return false
 	if pk_mode:
@@ -1620,7 +1651,7 @@ func _draw() -> void:
 	for e in ent_list:
 		if not mr.has_point(Vector2i(int(e.x), int(e.y))):
 			continue                                  # 其他地圖嘅單位唔畫
-		var p := Vector2(e.x, e.y) * TILE - cam
+		var p: Vector2 = (_vp.get(int(e.id), Vector2(e.x, e.y)) as Vector2) * TILE - cam
 		if om != null:
 			draw_set_transform(Vector2.ZERO, 0.0, Vector2(zoom, zoom))
 			om.flush_upto(self, om_org, p.y + TILE - om_org.y, om_mod)    # 腳底 y 以北嘅物件先畫，角色喺佢哋前面
@@ -1875,6 +1906,34 @@ func use_potion(slot: int) -> void:
 		_log("背包冇%s喇" % item_name_for_potion(id))
 		return
 	_send({"t": "use_item", "item": id})
+
+
+# 自動用藥: 逐格睇 (HP 藥睇 HP%、MP 藥睇 MP%)，低過門檻 + 冇冷卻 + 背包有貨就用
+func _potion_auto_tick() -> void:
+	if sim.tick < _potion_next or ch.is_empty():
+		return
+	var me = _me()
+	if me == null or int(me.get("hp", 0)) <= 0:
+		return
+	var lv := int(ch.get("level", 1))
+	for i in potion_slots.size():
+		var th := int(potion_auto[i])
+		var id := int(potion_slots[i])
+		if th <= 0 or id == 0 or not data.heals.has(id):
+			continue
+		var hl: Dictionary = data.heals[id]
+		var low := false
+		if int(hl.get("hp", 0)) > 0 and int(me.get("maxHp", 0)) > 0:
+			low = float(me.hp) * 100.0 < float(th) * float(me.maxHp)
+		if not low and int(hl.get("mp", 0)) > 0:
+			low = float(ch.get("mp", 0)) * 100.0 < float(th) * float(RulesStats.max_mp(lv, ch.attrs))
+		if not low:
+			continue
+		for b in ch.get("bag", []):
+			if int(b["id"]) == id and int(b["n"]) > 0:
+				_send({"t": "use_item", "item": id})
+				_potion_next = sim.tick + POTION_AUTO_CD
+				return
 
 
 func item_name_for_potion(id: int) -> String:

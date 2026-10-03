@@ -539,11 +539,16 @@ func cmd_skill_pick(id: int, chest_id: int, key_idx: int) -> void:
 		return _msg(id, "寶箱已經開咗")
 	if int(chest.get("key", 0)) != key_idx:
 		return _msg(id, "揀錯鑰匙，%s 紋紋唔肯郁…（再試）" % str(chest.get("name", "寶箱")))
-	# 開岩：鎖開 + 得賞 + 收箱
+	_chest_open(id, e, chest_id, chest, false)
+
+
+# 寶箱開 (開鎖揀啱鑰匙 / 硬撬打爛): 鎖開 + 得賞 + 收箱 + 任務推進
+func _chest_open(id: int, e: Dictionary, chest_id: int, chest: Dictionary, pried: bool) -> void:
+	var ch: Dictionary = e["ch"]
 	chest["locked"] = false
 	var name := str(chest.get("name", "寶箱"))
 	_emit({"k": "unlock_done", "dst": id, "chest": chest_id, "ok": true, "name": name})
-	_msg(id, "咔！%s 開咗！" % name)
+	_msg(id, ("砰！%s 俾你撬爛咗！" if pried else "咔！%s 開咗！") % name)
 	var dp: Dictionary = chest.get("drop", {})
 	var items: Array = []
 	for it in dp.get("items", []) as Array:
@@ -571,6 +576,19 @@ func cmd_skill_pick(id: int, chest_id: int, key_idx: int) -> void:
 
 
 # 附近鎖住嘅寶箱實體（開鎖特技喺寶箱旁先用得）
+# 冇開鎖技能都得: 狂打寶箱 (固定硬度 CHEST_PRY_HITS 下先爛，每下 CHEST_PRY_CD tick)；由 sim_ai 玩家攻擊迴圈叫
+const CHEST_PRY_HITS := 12
+const CHEST_PRY_CD := 8
+func _pry_chest(p: Dictionary, t: Dictionary) -> void:
+	p["next_atk"] = tick + CHEST_PRY_CD
+	t["pry"] = int(t.get("pry", CHEST_PRY_HITS)) - 1
+	_emit({"k": "hit", "src": p["id"], "dst": t["id"], "dmg": 1, "crit": false})
+	if int(t["pry"]) > 0:
+		return
+	p["atk_target"] = 0
+	_chest_open(int(p["id"]), p, int(t["id"]), t, true)
+
+
 func _near_locked_chest(e: Dictionary) -> Dictionary:
 	for o in ents.values():
 		if String(o.get("kind", "")) == "chest" and bool(o.get("locked", true)) \

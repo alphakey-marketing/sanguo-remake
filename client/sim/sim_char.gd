@@ -317,7 +317,7 @@ func cmd_attack(id: int, target: int) -> void:
 	var e := ent(id)
 	var t := ent(target)
 	# S03a: 開放居民 (bot) 做攻擊目標（含紅名殺人魔 NPC）；安全區照禁（_think_player 出手前擋）
-	if e.has("ch") and int(e["hp"]) > 0 and (t.get("kind", "") == "mob" or t.get("kind", "") == "bot"):
+	if e.has("ch") and int(e["hp"]) > 0 and (t.get("kind", "") in ["mob", "bot", "chest"]):
 		e["atk_target"] = target      # 安全區入面都可以追過去，行出安全區先真正出手 (見 _think_player)
 
 

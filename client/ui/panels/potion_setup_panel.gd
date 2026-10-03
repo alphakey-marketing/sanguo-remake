@@ -12,7 +12,7 @@ func _init(m: Node) -> void:
 
 
 func sig() -> String:
-	return JSON.stringify([main.potion_slots, editing_slot, main.ch.get("bag", [])])
+	return JSON.stringify([main.potion_slots, main.potion_auto, editing_slot, main.ch.get("bag", [])])
 
 
 func _heal_items() -> Array:
@@ -31,7 +31,7 @@ func _build_body() -> void:
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	list.add_theme_constant_override("separation", 8)
 	sc.add_child(list)
-	list.add_child(wrap_lbl("3 格快捷欄，裝住嘅補品移動手制上面撳一下即用。", 13, UiTheme.DIM))
+	list.add_child(wrap_lbl("3 格快捷欄，撳一下即用。每格可設「自動用」：HP 藥低於 x% HP、MP 藥低於 x% MP 自動飲（＋/－ 每次 10%，關 = 唔自動）。", 13, UiTheme.DIM))
 	for i in main.potion_slots.size():
 		var id := int(main.potion_slots[i])
 		var row := HBoxContainer.new()
@@ -46,7 +46,22 @@ func _build_body() -> void:
 		if id > 0:
 			row.add_child(btn("卸空", func() -> void:
 				main.potion_slots[i_] = 0
+				main.potion_auto[i_] = 0
 				refresh(true), 60))
+			var th := int(main.potion_auto[i_])
+			var arow := HBoxContainer.new()
+			arow.add_theme_constant_override("separation", 6)
+			list.add_child(arow)
+			arow.add_child(lbl("　自動用：%s" % ("關" if th <= 0 else "低於 %d%%" % th), 13, UiTheme.GOLD if th > 0 else UiTheme.DIM))
+			arow.add_child(btn("－", func() -> void:
+				main.potion_auto[i_] = maxi(0, int(main.potion_auto[i_]) - 10)
+				refresh(true), 44))
+			arow.add_child(btn("＋", func() -> void:
+				main.potion_auto[i_] = mini(90, int(main.potion_auto[i_]) + 10 if int(main.potion_auto[i_]) > 0 else 50)
+				refresh(true), 44))
+			arow.add_child(btn("關", func() -> void:
+				main.potion_auto[i_] = 0
+				refresh(true), 44))
 	if editing_slot >= 0:
 		list.add_child(hsep())
 		list.add_child(lbl("揀件回 HP/MP 嘅補品裝入格 %d：" % (editing_slot + 1), 14, UiTheme.GOLD))
