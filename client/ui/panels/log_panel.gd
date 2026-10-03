@@ -7,6 +7,7 @@ extends GamePanel
 func _init(m: Node) -> void:
 	super(m)
 	title_lbl.text = "完整日誌"
+	compact()
 
 
 func sig() -> String:
@@ -22,7 +23,7 @@ func _build_body() -> void:
 	sc.add_child(v)
 	var lines: Array = main.log_lines
 	if lines.is_empty():
-		v.add_child(lbl("（暫時冇記錄）", 14, UiTheme.TEXT))
+		v.add_child(lbl("（暫時冇記錄）", 11, UiTheme.TEXT))
 		return
 	for i in range(lines.size() - 1, -1, -1):    # 新到舊
-		v.add_child(lbl(str(lines[i]), 13, UiTheme.TEXT))
+		v.add_child(wrap_lbl(str(lines[i]), 11, UiTheme.TEXT))

@@ -6,6 +6,7 @@ extends GamePanel
 func _init(m: Node) -> void:
 	super(m)
 	title_lbl.text = "自動掛機設定"
+	compact()
 	set_tabs([])
 
 
@@ -33,7 +34,7 @@ func _build_body() -> void:
 	body.add_child(btn("開始自動掛機", func() -> void:
 		main.hud.set_auto(true)
 		main._hud_auto(true)
-		close(), 200))
+		close(), 160))
 	body.add_child(btn("清空白名單（打晒附近）", func() -> void:
 		main.auto_whitelist.clear()
 		refresh(true)))
@@ -41,7 +42,7 @@ func _build_body() -> void:
 		main.auto_roam = not main.auto_roam
 		refresh(true)))
 	body.add_child(hsep())
-	body.add_child(lbl("自動放招（剔咗先放；攻擊術同絕招，入射程 + MP/SP/冷卻夠）：", 13, UiTheme.DIM))
+	body.add_child(wrap_lbl("自動放招（剔咗先放；攻擊術同絕招，入射程 + MP/SP/冷卻夠）：", 11, UiTheme.DIM))
 	for sl in main.hud.skill_slots():
 		var key := ""
 		var nm := ""
@@ -67,10 +68,10 @@ func _build_body() -> void:
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	list.add_theme_constant_override("separation", 6)
 	sc.add_child(list)
-	list.add_child(wrap_lbl("揀邊幾種怪先自動打（冇揀 = 打晒附近嘅怪；顯示當前場景所有怪）：", 13, UiTheme.DIM))
+	list.add_child(wrap_lbl("揀邊幾種怪先自動打（冇揀 = 打晒附近嘅怪；顯示當前場景所有怪）：", 11, UiTheme.DIM))
 	var names := _nearby_names()
 	if names.is_empty():
-		list.add_child(lbl("（當前場景冇怪）", 13, UiTheme.DIM))
+		list.add_child(lbl("（當前場景冇怪）", 11, UiTheme.DIM))
 	for nm in names:
 		var on := bool(main.auto_whitelist.has(nm))
 		var b := btn("%s %s" % ["✓" if on else "☆", nm], func() -> void:

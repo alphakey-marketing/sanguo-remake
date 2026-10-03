@@ -15,6 +15,7 @@ var tab := 0
 var tab_names: Array = []
 var _last_sig := ""
 var _t := 0.0
+var btn_h := UiTheme.BTN_H     # 細字面板 (手機) 可縮細
 var margin := 10.0             # 視窗離屏幕邊（細視窗例如對話框會改）
 
 
@@ -55,6 +56,17 @@ func _init(m: Node) -> void:
 	body.add_theme_constant_override("separation", 6)
 	v.add_child(body)
 	hide()
+
+
+# 細字模式 (手機): 本面板 theme 字縮細，掣矮啲；喺 _init 入面叫（super 之後）
+func compact(font := 11, h := 34.0) -> void:
+	var t: Theme = UiTheme.get_theme().duplicate()
+	t.default_font_size = font
+	t.set_font_size("font_size", "Button", font)
+	t.set_font_size("font_size", "Label", font)
+	theme = t
+	btn_h = h
+	title_lbl.add_theme_font_size_override("font_size", font + 3)
 
 
 func open() -> void:
@@ -156,7 +168,7 @@ func _build_body() -> void:
 func btn(text: String, cb: Callable, min_w := 0.0) -> Button:
 	var b := Button.new()
 	b.text = text
-	b.custom_minimum_size = Vector2(min_w, UiTheme.BTN_H)
+	b.custom_minimum_size = Vector2(min_w, btn_h)
 	b.focus_mode = Control.FOCUS_NONE
 	b.pressed.connect(func() -> void:
 		if main != null and main.hud != null:
