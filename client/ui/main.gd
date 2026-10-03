@@ -775,9 +775,17 @@ func _on_event(e: Dictionary) -> void:
 		"kill":
 			if int(e.src) == my_id:
 				kills += 1
-				var names := []
-				for i in e.items: names.append(item_names.get(int(i), str(i)))
-				_log("殺怪 +%d 經驗 +%d 金 %s%s" % [e.exp, e.gold, ",".join(names), "  升級! Lv%d" % e.lvUp if int(e.lvUp) > 0 else ""])
+				var cnt := {}
+				for i in e.items: cnt[int(i)] = int(cnt.get(int(i), 0)) + 1
+				var kp: Array = [str(e.get("name", ""))]
+				if int(e.exp) > 0: kp.append("經驗 +%d" % int(e.exp))
+				if int(e.gold) > 0: kp.append("金 +%d" % int(e.gold))
+				if not cnt.is_empty():
+					var dn := []
+					for k in cnt: dn.append("%s×%d" % [item_names.get(k, str(k)), cnt[k]])
+					kp.append("掉落 " + " ".join(dn))
+				if int(e.lvUp) > 0: kp.append("升級！Lv%d" % int(e.lvUp))
+				_log("殺怪：" + ", ".join(kp))
 		"kill_npc":                # S03a: 殺居民/紅名 NPC -> 善惡變化
 			if int(e.dst) == my_id:
 				var km := str(e.get("kind", ""))
@@ -803,7 +811,7 @@ func _on_event(e: Dictionary) -> void:
 				for it in e.get("items", []):
 					pn.append("%s×%d" % [item_names.get(int(it["id"]), str(it["id"])), int(it["n"])])
 				if not pn.is_empty():
-					_log("拾取 %s" % ", ".join(pn))
+					_log("拾取：%s" % ", ".join(pn))
 				if bool(e.get("full", false)):
 					_log("背包滿，有啲裝唔落留落地")
 		"travel":
@@ -842,7 +850,7 @@ func _on_event(e: Dictionary) -> void:
 		"train":
 			if int(e.src) == my_id:
 				if e.has("partner"):
-					_log("同 %s 對練，經驗 +%d" % [e.partner, int(e.exp)])
+					_log("對練：%s, 經驗 +%d" % [e.partner, int(e.exp)])
 				else:
 					_log("%s: %s +1 (而家 %d)" % ["私塾" if e.attr == "政治" else "寺廟", e.attr, int(e.val)])
 		"quest":
@@ -858,8 +866,8 @@ func _on_event(e: Dictionary) -> void:
 				elif bool(e.get("done", false)):
 					var rw: Dictionary = e.get("reward", {})
 					var parts: Array = []
-					if int(rw.get("gold", 0)) > 0: parts.append("+%d 金" % int(rw["gold"]))
-					if int(rw.get("exp", 0)) > 0: parts.append("+%d 經驗" % int(rw["exp"]))
+					if int(rw.get("exp", 0)) > 0: parts.append("經驗 +%d" % int(rw["exp"]))
+					if int(rw.get("gold", 0)) > 0: parts.append("金 +%d" % int(rw["gold"]))
 					if rw.has("title"): parts.append("解鎖稱號「%s」！" % str(rw["title"]))
 					if rw.has("ultimate"): parts.append("學識絕招「%s」！" % str(rw["ultimate"]))
 					if rw.has("skill"):
@@ -868,7 +876,7 @@ func _on_event(e: Dictionary) -> void:
 					if rw.has("items"):
 						for it in rw["items"]:
 							parts.append("%s x%d" % [item_names.get(int(it.id), str(it.id)), int(it.n)])
-					_log("任務完成「%s」 %s" % [qname, " ".join(parts) if not parts.is_empty() else ""])
+					_log("任務：完成「%s」%s" % [qname, "".join(parts.map(func(x): return ", " + str(x)))])
 				else:
 					_log("「%s」有進展" % qname)
 		"heal":

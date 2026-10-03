@@ -158,7 +158,7 @@ func _kill_mob(m: Dictionary, by: Dictionary, exp_mult: float = 1.0) -> void:
 	_beast_on_mob_kill(by, base_exp)              # S07b: 出戰戰騎吸 exp
 	if ups > 0:
 		_sync_quest_npcs()          # 升級可能改變任務 NPC 可見性 (神秘老人/流浪狗)
-	_emit({"k": "kill", "src": by["id"], "dst": m["id"], "exp": gained, "gold": gold, "items": items,
+	_emit({"k": "kill", "src": by["id"], "dst": m["id"], "name": str(m["name"]), "exp": gained, "gold": gold, "items": items,
 		"lvUp": int(ch["level"]) if ups > 0 else 0})
 	if battle_id != "":
 		_battle_on_boss_kill(by, battle_id, int(m["mob"].get("battle_floor", 0)))
@@ -450,6 +450,6 @@ func cmd_pick(id: int, drop_id: int) -> void:
 	if full:
 		_msg(id, "背包滿，裝唔落，留返喺地下")
 	for it in picked:
-		_msg(id, "執到 %s ×%d" % [data.names.get(int(it["id"]), str(it["id"])), int(it["n"])])
+		_msg(id, "拾取：%s×%d" % [data.names.get(int(it["id"]), str(it["id"])), int(it["n"])])
 	_emit({"k": "picked", "dst": id, "drop": drop_id, "items": picked, "full": full,
 		"x": int(dxy[0]), "y": int(dxy[1])})
