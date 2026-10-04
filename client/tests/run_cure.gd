@@ -47,5 +47,30 @@ func _init() -> void:
 	check(sim._eff_max_hp(ch) == mhp0, "過期 HP 上限回復")
 	check(float(sim._jewel_bonus(ch).get("atkPct", 0.0)) == 0.0, "過期 atk 歸零")
 	check(RulesPill.exp_mult(ch, sim.tick) == 2.0, "三效 360 分鐘仲有效")
+	# 湯/水
+	ch["thirst"] = 10
+	RulesShop.add_item(ch["bag"], 29035, 1)           # 清水 +50
+	sim.cmd_use_item(pid, 29035)
+	check(int(ch["thirst"]) == 60, "清水 飲水度 +50")
+	# 光
+	RulesShop.add_item(ch["bag"], 26016, 1)
+	sim.cmd_use_item(pid, 26016)
+	check(RulesPill.light_on(ch, sim.tick), "火把 點燈")
+	# 丸/速度
+	RulesShop.add_item(ch["bag"], 28017, 1)           # 大力丸 物攻+20%
+	sim.cmd_use_item(pid, 28017)
+	check(float(sim._jewel_bonus(ch).get("atkPct", 0.0)) >= 0.2, "大力丸 atk")
+	RulesShop.add_item(ch["bag"], 65165, 1)           # 急速丹 +50%
+	sim.cmd_use_item(pid, 65165)
+	check(absf(RulesPill.speed_mult(ch, sim.tick) - 1.5) < 0.001, "急速丹 移速 x1.5")
+	var e: Dictionary = sim.ent(pid)
+	var s := 0
+	for _i in 10:
+		s += sim._walk_scale(e, 1)
+	check(s == 15, "10 tick 行 15 步 (%d)" % s)
+	# 行動之戒
+	var ap0: int = sim.ap_max(ch)
+	ch["equip"]["ring"] = 23089
+	check(sim.ap_max(ch) == ap0 + 5, "行動之戒 AP +5")
 	print("run_cure fails=", fails)
 	quit(1 if fails > 0 else 0)

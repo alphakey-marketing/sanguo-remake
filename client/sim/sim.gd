@@ -458,7 +458,9 @@ static func _intify(v: Variant) -> Variant:
 # 小數步數累積入 e.mvAcc (決定性，冇 RNG)。walkStepRate=1 = 唔縮放。
 func _walk_scale(e: Dictionary, mv: int) -> int:
 	var rate := float(data.world.get("walkStepRate", 1.0))
-	if rate >= 1.0 or mv <= 0:
+	if e.has("ch"):
+		rate *= RulesPill.speed_mult(e["ch"], tick)      # 速度丹
+	if (rate == 1.0 or (rate > 1.0 and not e.has("ch"))) or mv <= 0:
 		return mv
 	var acc := float(e.get("mvAcc", 0.0)) + float(mv) * rate
 	var n := int(floor(acc + 0.0001))

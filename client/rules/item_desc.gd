@@ -42,7 +42,7 @@ const SUPPORT := {
 }
 
 # 單機版真係有接嘅 effect type (其餘有 label 嘅照原標籤，無 label 嘅標未實裝)
-const IMPL_TYPES := [0, 1, 22, 28, 29, 30, 31, 32, 33, 2, 4, 5, 9, 10, 11, 12, 13, 14, 16, 19, 34, 35, 36, 37, 38, 39, 52, 53, 73, 74, 75, 99]
+const IMPL_TYPES := [0, 1, 22, 18, 59, 60, 61, 62, 68, 69, 70, 71, 72, 76, 28, 29, 30, 31, 32, 33, 2, 4, 5, 9, 10, 11, 12, 13, 14, 16, 19, 34, 35, 36, 37, 38, 39, 52, 53, 73, 74, 75, 99]
 const UNIMPL_LABELLED := [2, 3]     # 技能/戰騎經驗倍率丹 (限時版) 未接     # 「解除…」類單機版食藥唔會解狀態
 
 
@@ -143,6 +143,14 @@ static func _generic_lines(effs: Array) -> Array:
 		if t in [14, 16]:
 			continue                         # 回復行由 game_panel 顯示
 		var val := int(e["value"])
+		if t == 18 and not pill.is_empty():
+			continue
+		if t in [18, 59, 60, 61, 62, 68, 69, 70, 71, 72, 76] and lab == "":
+			out.append(_custom_line(t, val))
+			continue
+		if t in [56, 57, 58]:
+			out.append("煉化素材（單機版暫無用途）")
+			continue
 		if t in UNIMPL_LABELLED:
 			out.append("%s（單機版未實裝）" % lab)
 		elif lab == "":
@@ -153,3 +161,19 @@ static func _generic_lines(effs: Array) -> Array:
 	if unimpl:
 		out.append("（原版特殊效果，單機版未實裝）")
 	return out
+
+
+static func _custom_line(t: int, v: int) -> String:
+	match t:
+		18: return "飲用：飲水度 +%d" % v
+		59: return "點燈：夜間照明 %d 分鐘" % v
+		60: return "物防 +20%（限時 30 分鐘）"
+		61: return "術防 +20%（限時 30 分鐘）"
+		62: return "物攻 +20%（限時 30 分鐘）"
+		68: return "物防 +40%（限時 30 分鐘）"
+		69: return "術防 +40%（限時 30 分鐘）"
+		70: return "物攻 +40%（限時 30 分鐘）"
+		71: return "移動速度 +50%（限時 30 分鐘）"
+		76: return "移動速度 +%d%%（限時 30 分鐘）" % (25 * clampi(v, 1, 3))
+		72: return "著住：行動力上限 +%d" % v
+	return ""

@@ -369,7 +369,7 @@ func _refresh() -> void:
 	var cv: Variant = sim.clock_view()
 	clock_str = str(cv["text"])
 	night_on = bool(cv["is_night"])
-	beast_light = bool(sim.beast_effects_view(my_id).get("light", false))
+	beast_light = bool(sim.beast_effects_view(my_id).get("light", false)) or RulesPill.light_on(sim.ent(my_id).get("ch", {}), sim.tick)
 	ask_now = _calc_active_ask()
 	if hud != null:
 		hud.sim_refreshed()

@@ -287,6 +287,18 @@ func _use_buff_pill(id: int, e: Dictionary, item: int, pill: Dictionary) -> void
 	_msg(id, "%s：效果持續 %d 分鐘" % [str(data.names.get(item, "丹")), int(pill["minutes"])])
 
 
+# 水/飲品 (effect 18)：飲水度 +value
+func _use_drink(id: int, e: Dictionary, item: int, gain: int) -> void:
+	var ch: Dictionary = e["ch"]
+	var mx := int(data.world["thirst"]["max"])
+	if thirst_of(ch) >= mx:
+		return _msg(id, "唔渴，飲唔落")
+	if not RulesShop.remove_item(ch["bag"], item, 1):
+		return _msg(id, "背包冇呢件")
+	ch["thirst"] = mini(mx, thirst_of(ch) + gain)
+	_msg(id, "飲咗 %s，飲水度 %d/%d" % [str(data.names.get(item, "飲品")), int(ch["thirst"]), mx])
+
+
 func cmd_use_item(id: int, item: int) -> void:
 	var e := ent(id)
 	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
@@ -312,11 +324,16 @@ func cmd_use_item(id: int, item: int) -> void:
 	if not cure.is_empty() and data.heals.get(item, {}).is_empty():
 		return _use_cure(id, e, item, cure)
 	var heal: Dictionary = data.heals.get(item, {})
+	var drink := RulesPill.thirst_gain(data.info.get(item, {}))
+	if heal.is_empty() and drink > 0:
+		return _use_drink(id, e, item, drink)
 	if heal.is_empty():
 		return _msg(id, "呢件唔可以食用")
 	var ch: Dictionary = e["ch"]
 	if not RulesShop.remove_item(ch["bag"], item, 1):
 		return _msg(id, "背包冇呢件")
+	if drink > 0:
+		ch["thirst"] = mini(int(data.world["thirst"]["max"]), thirst_of(ch) + drink)
 	var mhp := _eff_max_hp(ch)
 	var mmp := _eff_max_mp(ch)
 	var msp := _eff_max_sp(ch)
@@ -751,7 +768,12 @@ func _tiandi_haul(id: int, ch: Dictionary) -> void:
 
 # 行動力上限【原】= 頭銜表 ap 欄 (Step 14)；白身 = world.ap.max
 func ap_max(ch: Dictionary) -> int:
-	return RulesTitle.ap_max(data.titles, int(ch.get("titleRank", 0)), int(data.world["ap"]["max"]))
+	var ring := 0       # 行動之戒 (effect 72) 著住 = 行動力上限 +value
+	for slot in ["ring", "necklace"]:
+		for ef in data.info.get(int(ch.get("equip", {}).get(slot, 0)), {}).get("effects", []):
+			if int(ef.get("type", -1)) == 72:
+				ring += int(ef.get("value", 0))
+	return RulesTitle.ap_max(data.titles, int(ch.get("titleRank", 0)), int(data.world["ap"]["max"])) + ring
 
 
 func ap_of(ch: Dictionary) -> int:
