@@ -11,3 +11,5 @@ build/
 *.apk
 *.aab
 /index.*
+docs/plan/**/*.png
+docs/uat/**/*.png
