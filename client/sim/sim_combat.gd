@@ -266,6 +266,7 @@ func _kill_player(p: Dictionary) -> void:
 	var cc: Dictionary = data.world["combat"]
 	var self_at := (tick + int(cc.get("playerDownSelfTicks", 50))) if down else 0
 	var down_until := (tick + int(cc.get("playerDownMaxTicks", 3000))) if down else 0
+	tip_once(int(p["id"]), "death")
 	_emit({"k": "die", "dst": p["id"], "exp_lost": exp_lost, "dropped": dropped,
 		"revived": revived, "lucky": lucky, "huhushen": huhushen,
 		"down": down, "selfAt": self_at, "downUntil": down_until})

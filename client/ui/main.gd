@@ -507,6 +507,7 @@ func _send(d: Dictionary) -> void:
 		"station": sim.cmd_station(my_id, str(d.to))
 		"goto_map": sim.cmd_goto_map(my_id, str(d.map))
 		"work": sim.cmd_work(my_id, str(d.skill))
+		"tip": sim.cmd_tip(my_id, str(d.key))
 		"equip_tool": sim.cmd_equip_tool(my_id, str(d.skill), int(d.item))
 		"pick": sim.cmd_pick(my_id, int(d.drop))
 		"storage_sub": sim.cmd_storage_sub(my_id, bool(d.on))
@@ -680,6 +681,9 @@ func _on_llm_request(e: Dictionary) -> void:
 			sim.cmd_llm_reply(req_id, "")
 
 
+const FAIL_KEYS := ["唔夠", "不足", "要裝備", "要喺", "未學", "未解鎖", "已滿", "冇工具", "要 ", "先做得", "先用得"]
+
+
 func _log(s: String) -> void:
 	log_lines.append(s)
 	if log_lines.size() > 200: log_lines.pop_front()
@@ -811,7 +815,16 @@ func _on_event(e: Dictionary) -> void:
 			if int(e.dst) == my_id:
 				_log(str(e.get("text", "城門衛兵攔住你：唔准入城！")))
 		"msg":
-			if int(e.dst) == my_id: _log(str(e.text))
+			if int(e.dst) == my_id:
+				_log(str(e.text))
+				for kw in FAIL_KEYS:                # 做唔到嘅原因: 螢幕中間 toast，唔使睇日誌
+					if str(e.text).contains(kw):
+						banner = {"text": str(e.text), "t": 2.5, "color": Color(1, 0.6, 0.5)}
+						break
+		"tip":                     # 新手一次性提示
+			if int(e.dst) == my_id:
+				banner = {"text": str(e.text), "t": 6.0, "color": Color(0.7, 0.95, 1.0)}
+				_log("【提示】" + str(e.text))
 		"picked":                 # S04a 拾取地面掉落物
 			if int(e.dst) == my_id:
 				var pn := []
@@ -1290,6 +1303,8 @@ func _on_skill(sl: Dictionary) -> void:
 		var tgt := int(t.id) if t != null and bool(t.get("mob", false)) else 0
 		_send({"t": "cast_spell", "slot": int(sl["slot"]), "target": tgt})
 		return
+	if String(sl["kind"]) in ["skill", "fusion"]:
+		_send({"t": "tip", "key": "hud_skill"})
 	if String(sl["kind"]) == "fusion":          # 義士融合: 開 QTE 對話 (隨時隨地)
 		if (ch.get("fusing", {}) as Dictionary).is_empty():
 			_send({"t": "fusion_start"})
@@ -1391,6 +1406,8 @@ func _hud_attack() -> void:
 
 func _hud_auto(v: bool) -> void:
 	auto = v
+	if v:
+		_send({"t": "tip", "key": "hud_auto"})
 	_log("自動掛機 %s" % ("開" if v else "關"))
 
 func _toggle_auto() -> void:

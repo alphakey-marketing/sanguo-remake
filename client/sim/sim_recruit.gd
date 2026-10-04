@@ -169,6 +169,7 @@ func _consume_pass(pe: Dictionary, g: Dictionary) -> void:
 
 # 調查【原】: 城池街道用；每日 1 次 (唔理成敗)；成功登用嗰個月封鎖。kind = "wu" 武將登用 / "wen" 文官登用
 func cmd_recruit_survey(id: int, kind: String) -> void:
+	tip_once(id, "recruit")
 	var e := ent(id)
 	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0 or not ["wu", "wen"].has(kind):
 		return

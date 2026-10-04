@@ -6681,6 +6681,48 @@
         "exp": 40,
         "gold": 30
       }
+    },
+    {
+      "id": "newbie_work",
+      "src": "custom",
+      "name": "新手工作：第一次採集",
+      "type": "newbie",
+      "giver": "work_master",
+      "pre": {
+        "minLevel": 10
+      },
+      "stages": [
+        {
+          "type": "talk",
+          "npc": "work_master",
+          "dialog": [
+            "工作師傅：「10 級就可以做工作喇。①去許昌工具店買把鋤頭，裝備佢 ②行去西城門附近 (17,178) 嗰個傳送點入「許昌道路（農漁獵）」③喺嗰度撳「工作」採集，每次扣 10% SP。帶 2 件農作物返嚟畀我。」"
+          ],
+          "hint": "同工作師傅傾偈"
+        },
+        {
+          "type": "collect",
+          "npc": "work_master",
+          "item": {
+            "id": 25064,
+            "n": 2
+          },
+          "hint": "去許昌道路（農漁獵）工作，帶 2 件農作物返嚟 (%v/%n)"
+        },
+        {
+          "type": "talk",
+          "npc": "work_master",
+          "dialog": [
+            "工作師傅：「做得好！木礦藥喺 (6,137) 嗰個傳送點，賣材料或者做生產都得。」"
+          ],
+          "hint": "返去同工作師傅報告",
+          "done": true
+        }
+      ],
+      "reward": {
+        "exp": 120,
+        "gold": 200
+      }
     }
   ]
 }

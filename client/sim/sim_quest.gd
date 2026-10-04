@@ -343,6 +343,93 @@ func _spot_text(nm: String, o: Dictionary) -> String:
 	return "%s：%s" % [nm, at]
 
 
+# ================= 新手一次性提示 (rules/tips.gd) =================
+func tip_once(id: int, key: String) -> void:
+	var e := ent(id)
+	if e.is_empty() or not e.has("ch"):
+		return
+	var txt := RulesTips.text_of(key)
+	if txt == "":
+		return
+	var seen: Dictionary = e["ch"].get("tipsSeen", {})
+	if seen.has(key):
+		return
+	seen[key] = true
+	e["ch"]["tipsSeen"] = seen
+	_emit({"k": "tip", "dst": id, "key": key, "text": txt})
+
+
+func cmd_tip(id: int, key: String) -> void:
+	tip_once(id, key)
+
+
+# 每 40 tick 查一次：按狀態彈提示
+func _tips_tick() -> void:
+	if tick % 40 != 0:
+		return
+	var e := ent(int(state["player_id"]))
+	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
+		return
+	var ch: Dictionary = e["ch"]
+	if int(ch.get("attrPoints", 0)) > 0:
+		tip_once(int(e["id"]), "attr")
+	if not work_area_skills(int(e["x"]), int(e["y"])).is_empty():
+		tip_once(int(e["id"]), "work_zone")
+	if int(ch.get("equip", {}).get("weapon", 0)) == 0:
+		for b in ch.get("bag", []):
+			if data.weapons.has(int(b["id"])):
+				tip_once(int(e["id"]), "equip")
+				break
+
+
+# 任務追蹤 (HUD 常駐): 第一個進行中任務 → {name, hint, tx, ty, tname}；冇 = {}
+func quest_track_view() -> Dictionary:
+	var ch := player_ch()
+	var best: Dictionary = {}
+	for q in data.quests:
+		var qid := String(q["id"])
+		if bool(q.get("hidden", false)) or not (ch.get("quests", {}) as Dictionary).has(qid) or bool(ch.get("questDone", {}).get(qid, false)):
+			continue
+		var out := {"name": String(q["name"]), "hint": RulesQuest.hint(q, ch)}
+		var tgt := _track_target(q, ch)
+		if not tgt.is_empty():
+			out.merge(tgt)
+		if String(q.get("type", "")) == "newbie" or best.is_empty():
+			best = out
+			if String(q.get("type", "")) == "newbie":
+				break
+	return best
+
+
+# 當前 stage 目標 (全局座標)；室內目標指去街上入口
+func _track_target(q: Dictionary, ch: Dictionary) -> Dictionary:
+	var st: Dictionary = ch["quests"][String(q["id"])]
+	var stages: Array = q.get("stages", [])
+	var si := int(st.get("stage", 0))
+	if si < 0 or si >= stages.size():
+		return {}
+	var stage: Dictionary = stages[si]
+	var o: Dictionary = {}
+	match String(stage.get("type", "")):
+		"talk", "collect", "ask", "repeat", "escort", "chest":
+			o = data.quest_npcs.get(String(stage.get("npc", q.get("giver", ""))), {})
+		"talk_n":
+			var vis: Array = st.get("flags", {}).get("visited", [])
+			for nid in stage.get("npcs", []):
+				if not vis.has(nid):
+					o = data.quest_npcs.get(String(nid), {})
+					break
+		"facility":
+			o = data.facilities.get(String(stage.get("fac", "")), {})
+	if o.is_empty() or not o.has("x"):
+		return {}
+	var mid := String(o.get("map", ""))
+	var door: Dictionary = data.tp_by_id.get("xc_in_" + mid.substr(2), {}) if mid.begins_with("xc") else {}
+	if not door.is_empty():
+		return {"tx": int(door["x"]), "ty": int(door["y"]), "tname": "入口"}
+	return {"tx": int(o["x"]), "ty": int(o["y"]), "tname": String(o.get("name", ""))}
+
+
 func view_quests() -> Array:
 	var ch := player_ch()
 	var out: Array = []

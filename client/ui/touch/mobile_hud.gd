@@ -187,6 +187,7 @@ func open_panel(name_: String) -> void:
 
 # 撳空快捷補品格：直接彈快捷欄設定面板，並揀定嗰一格等揀補品
 func open_potion_setup(slot: int) -> void:
+	main._send({"t": "tip", "key": "hud_potion"})
 	close_panels()
 	var p := _panel("potion_setup") as PotionSetupPanel
 	p.editing_slot = slot
@@ -428,6 +429,7 @@ func _draw() -> void:
 	_draw_companion()
 	_draw_log(sr)
 	_draw_target(s)
+	_draw_quest_track()
 	_draw_info()
 	_draw_menu()
 	_draw_combat()
@@ -547,6 +549,36 @@ func _draw_target(s: Vector2) -> void:
 	var max_hp := maxi(1, int(t.maxHp))
 	_txt(Vector2(r.position.x + 8, r.position.y + 15), "%s  Lv%d" % [t.name, int(t.level)], Color(1, 0.8, 0.7), 12)
 	_bar(r.position.x + 8, r.position.y + 25, w - 16, 6, float(t.hp) / max_hp, Color(0.9, 0.25, 0.15))
+
+# 任務追蹤 (角色框/日誌下面): 任務名 + 下一步 + 目標方向箭嘴/距離 (同地圖先有箭嘴)
+func _draw_quest_track() -> void:
+	var tv: Dictionary = main.sim.quest_track_view()
+	if tv.is_empty():
+		return
+	var lr: Rect2 = HudLayout.log_rect(safe_rect())
+	var r := Rect2(lr.position.x, lr.end.y + 3, lr.size.x, 26)
+	draw_rect(r, Color(0, 0, 0, 0.45))
+	var hint := str(tv.hint)
+	var cut := hint.find("　")
+	_txt(r.position + Vector2(4, 10), str(tv.name).substr(0, 14), Color(1, 0.9, 0.5), 8)
+	var me = main._me()
+	var tail := ""
+	if tv.has("tx") and me != null:
+		var md: Dictionary = main.sim.data.map_at(int(me.x), int(me.y))
+		var tmd: Dictionary = main.sim.data.map_at(int(tv.tx), int(tv.ty))
+		if not md.is_empty() and str(md.get("id", "")) == str(tmd.get("id", "")):
+			var dx := float(int(tv.tx) - int(me.x))
+			var dy := float(int(tv.ty) - int(me.y))
+			var ang := atan2(dy, dx)
+			var c := Vector2(r.end.x - 14, r.position.y + 13)
+			var tip := c + Vector2(cos(ang), sin(ang)) * 8.0
+			draw_line(c - Vector2(cos(ang), sin(ang)) * 8.0, tip, Color(0.5, 1, 0.6), 2.0)
+			draw_circle(tip, 3.0, Color(0.5, 1, 0.6))
+			tail = " %s %d格" % [str(tv.tname), int(maxf(absf(dx), absf(dy)))]
+		else:
+			tail = " →%s" % str(tv.tname)
+	_txt(r.position + Vector2(4, 21), (hint.substr(0, 16) if cut < 0 else hint.substr(0, mini(cut, 16))) + tail, Color(0.9, 0.95, 0.9), 8)
+
 
 # 右上小地圖 (圓形): 當前地圖縮圖 (以自己為中心，範圍闊 ~3 倍) + 怪/NPC/自己點；區名/時辰喺圓下面 (spec 12 §6)
 func _draw_info() -> void:
