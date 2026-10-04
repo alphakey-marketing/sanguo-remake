@@ -44,6 +44,9 @@ func _build_body() -> void:
 	list.add_child(btn("完整日誌", func() -> void: main.hud.log_panel().open()))
 	list.add_child(hsep())
 	list.add_child(lbl("角色 / 存檔", 16, UiTheme.GOLD))
+	list.add_child(btn("立即存檔（上次：%s）" % SaveSys.ts_text(main.last_save_ts), func() -> void:
+		main.save_now()
+		refresh(true)))
 	list.add_child(btn("切換角色 / 選擇存檔位", func() -> void: main.hud.open_panel("title")))
 	list.add_child(btn("設定快捷補品欄", func() -> void: main.hud.open_panel("potion_setup")))
 	list.add_child(hsep())

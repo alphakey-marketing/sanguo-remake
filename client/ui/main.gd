@@ -87,6 +87,9 @@ var beast_light := false          # 焰牙虎「火焰」友好技: 夜晚照明
 var last_season := -1
 var banner := {"text": "", "t": 0.0}   # 天災/季節橫幅
 var last_save_tick := 0
+var last_save_ts := 0          # 上次成功存檔 (unix 秒)；「更多」面板顯示
+var _save_acc := 0.0           # 定時存檔計時 (真實秒)
+const SAVE_EVERY_SEC := 120.0
 var quest_npcs := []               # 任務 NPC 視圖 (Step 8): sim.view_quest_npcs()
 var generals := []                 # 城內 Tier1 武將 (Step 13.5): sim.view_generals()
 var comp := {}                     # 登用同伴 (Step 13.5): sim.companion_view()，{} = 冇
@@ -465,6 +468,10 @@ func _process(delta: float) -> void:
 	if not autotest and not uitest and not awaiting_slot_pick and sim.tick > 0 and sim.tick % _ticks_per_day() == 0 and sim.tick != last_save_tick:
 		last_save_tick = sim.tick
 		_save_current()
+	if _can_save():
+		_save_acc += delta
+		if _save_acc >= SAVE_EVERY_SEC:
+			_save_current()
 	for f in floats: f.age += delta
 	for b in bubbles: b.age += delta
 	bubbles = bubbles.filter(func(b): return b.age < 4.0)
@@ -1349,6 +1356,9 @@ func class_has_ults() -> bool:
 
 # Android 返回鍵: 有面板就關面板（唔會一撳就退出遊戲）
 func _notification(what: int) -> void:
+	# 切後台 / 失焦 / 關閉 → 即存 (手機被系統殺都唔蝕進度)
+	if what in [NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT, NOTIFICATION_WM_CLOSE_REQUEST] and _can_save():
+		_save_current()
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST and hud != null and hud.any_panel_open():
 		hud.close_panels()
 
@@ -2075,11 +2085,24 @@ func _on_create_done() -> void:
 
 
 # 存返而家用緊嗰個角色位（cur_slot==0 = AUTOSLOT，向下兼容；否則存去嗰個 slot）
-func _save_current() -> void:
-	if cur_slot == 0:
-		SaveSys.autosave(sim)
+func _save_current() -> bool:
+	_save_acc = 0.0
+	var ok := SaveSys.autosave(sim) if cur_slot == 0 else SaveSys.save_slot(sim, cur_slot)
+	if ok:
+		last_save_ts = int(Time.get_unix_time_from_system())
 	else:
-		SaveSys.save_slot(sim, cur_slot)
+		_log("【存檔失敗】檢查裝置儲存空間")
+	return ok
+
+
+func _can_save() -> bool:
+	return not autotest and not uitest and not awaiting_slot_pick and sim != null and not sim.ent(my_id).is_empty()
+
+
+# 「更多」面板手動存檔
+func save_now() -> void:
+	if _can_save() and _save_current():
+		_log("已存檔")
 
 
 # ---- 切換/開新角色位 (U-fix: 「更多」面板嘅「切換角色」入口) ----
@@ -2087,12 +2110,22 @@ func _save_current() -> void:
 func switch_to_slot(n: int, is_new: bool) -> void:
 	if not awaiting_slot_pick:
 		_save_current()   # 現有進度先存返落佢自己嗰個 slot（開場首次揀 slot 冇「現有進度」，唔使存）
+	var old_sim := sim
+	var was_waiting := awaiting_slot_pick
+	var old_cur := cur_slot
 	awaiting_slot_pick = false
 	cur_slot = n
 	sim = Sim.new(data, 1 if autotest or uitest else randi())
 	var fresh := true
 	if not is_new and n >= 1 and SaveSys.slot_exists(n):
 		var loaded := SaveSys.read_slot(data, n)
+		if loaded == null:                 # 存檔壞晒: 唔好當空位開新角覆蓋，返去揀存檔畫面
+			_log("【讀檔失敗】角色位 %d 存檔損壞，已保留原檔" % n)
+			awaiting_slot_pick = was_waiting
+			cur_slot = old_cur
+			sim = old_sim
+			hud.open_panel("title")
+			return
 		if loaded != null:
 			sim = loaded
 			fresh = false
