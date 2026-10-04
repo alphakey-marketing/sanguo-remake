@@ -6,3 +6,8 @@ scratchpad/
 __pycache__/
 /.pi-web/
 client/assets_orig/
+Godot_*.exe
+build/
+*.apk
+*.aab
+/index.*
