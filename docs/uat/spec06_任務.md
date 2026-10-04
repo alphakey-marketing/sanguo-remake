@@ -197,3 +197,7 @@
 - `service_miyi` 係 hidden quest，記事唔顯示——密醫係 NPC 功能（對話免費醫療），唔當任務。
 - 團體任務「鬼域迷陣/亂數迷宮」日窗口（16~21日/10~15日）NPC 現身：引擎已支援 `dayWindow`，但實際日程接法/每月重複設定要留意測試覆蓋——PLAN 話連 S08f 一齊。
 - `run_tests.sh` 目前 ALL PASS（run_quest/run_hist/run_group/run_ult/run_expert 全部接入）。
+
+## 新手提示（2026-10-04，待用家手測）
+- 一次性 tips（`rules/tips.gd` + `tip_once`，`ch.tipsSeen`）、失敗原因 toast、HUD 任務追蹤（方向+距離）、工作師傅 NPC + `newbie_work` 任務。測試 `run_workzone`。
+- ⏳ 新手攻略頁未做：待用家確認內容。

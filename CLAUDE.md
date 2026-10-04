@@ -190,3 +190,13 @@
 | Spec 08 營地 Lv4+/Lv5 職位功能 | **做** → ✅ 已做 2026-09-29（待用家手測） |
 | Spec 08 軍備製作（兵工房 10 類） | **做** |
 | Spec 09 同伴戰鬥指令 | 維持 4 order + skillMode（正確，已更新 notes） |
+
+---
+
+## 17. 現況補充（2026-10-04，全部待用家手測）
+
+- 存檔：原子寫入 + `.bak` + v2 meta、壞檔唔覆蓋、存檔位卡片、立即存檔（`sim/save_sys.gd`，`run_save`）
+- 新手：一次性 tips、失敗 toast、HUD 任務追蹤、工作師傅 `newbie_work`（`rules/tips.gd`，`run_workzone`）
+- 物品：全物品說明 `rules/item_desc.gd`；解狀態藥、限時 buff 丹 `rules/pill.gd`、丸/速度丹/光/湯/行動之戒（`run_cure`，數值【自訂】）
+- 仍未做：水晶 56~58、聖者/仁者飾物 (type 3/6)、技能/戰騎仙丹限時版、新手攻略頁（待用家確認內容）
+- 預先存在失敗 leg（非今次改動）：run_char、run_recruit、run_equip 等
