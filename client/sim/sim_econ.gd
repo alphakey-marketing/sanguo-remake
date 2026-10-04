@@ -245,6 +245,38 @@ const ITEM_PILL_TOUSHI := 30059     # 透視丹 -> toushi
 
 
 # 食用/飲用消耗品【原=食物藥水回 HP、藥丸散回 MP；自訂=冇食用次數限制，用完即扣背包一件】
+# 解狀態藥 (effect 28~33)：28 中邪 / 29 封咒 / 30 媚惑 / 31 蠱毒 / 32 遲緩 / 33 全部
+const CURE_MAP := {28: ["hex"], 29: ["sealed"], 30: ["charm"], 31: ["poison"], 32: ["slow"],
+	33: ["hex", "sealed", "charm", "poison", "slow", "freeze"]}
+
+
+func _cure_ids(item: int) -> Array:
+	var out: Array = []
+	for ef in data.info.get(item, {}).get("effects", []):
+		var t := int(ef.get("type", -1))
+		if CURE_MAP.has(t):
+			for k in CURE_MAP[t]:
+				if not out.has(k):
+					out.append(k)
+	return out
+
+
+func _use_cure(id: int, e: Dictionary, item: int, cure: Array) -> void:
+	var ch: Dictionary = e["ch"]
+	var st: Dictionary = ch.get("status", {})
+	var hit := false
+	for k in cure:
+		if RulesSpell.has(st, k, tick):
+			hit = true
+	if not hit:
+		return _msg(id, "身上冇可解嘅狀態")
+	if not RulesShop.remove_item(ch["bag"], item, 1):
+		return _msg(id, "背包冇呢件")
+	for k in cure:
+		RulesSpell.clear_status(st, k)
+	_msg(id, "狀態已解")
+
+
 func cmd_use_item(id: int, item: int) -> void:
 	var e := ent(id)
 	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
@@ -263,6 +295,9 @@ func cmd_use_item(id: int, item: int) -> void:
 		ITEM_LILIAN_ELIXIR: return _use_lilian_elixir(id, e)    # 歷練神丹
 		ITEM_SKILL_ELIXIR: return _use_skill_elixir(id, e)      # 技能神丹
 		ITEM_BEAST_ELIXIR: return _use_beast_elixir(id, e)      # 戰騎神丹 (S11b)
+	var cure := _cure_ids(item)
+	if not cure.is_empty() and data.heals.get(item, {}).is_empty():
+		return _use_cure(id, e, item, cure)
 	var heal: Dictionary = data.heals.get(item, {})
 	if heal.is_empty():
 		return _msg(id, "呢件唔可以食用")

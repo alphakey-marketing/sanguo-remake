@@ -31,7 +31,7 @@ func _init() -> void:
 	check(str(t.call(30055)).contains("開鎖"), "開鎖丹")
 	check(str(t.call(54807)).contains("武將寶物"), "武將寶物: " + str(t.call(54807)))
 	check(str(t.call(31001)).contains("座騎道具"), "座騎飼料: " + str(t.call(31001)))
-	check(str(t.call(28004)).contains("未實裝"), "解咒粉標未實裝: " + str(t.call(28004)))
+	check(not str(t.call(28004)).contains("未實裝"), "解咒粉已實裝: " + str(t.call(28004)))
 	check(str(t.call(10001)).contains("武器強度"), "武器照舊顯示強度/命中")
 	for id in [32001, 32301, 32041, 25075, 54807, 31001, 28004, 10001, 65338, 28061]:
 		print("  ", id, d.names.get(id, "?"), " → ", t.call(id))
