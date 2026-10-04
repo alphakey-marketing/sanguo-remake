@@ -24,10 +24,16 @@ func _stream(name: String) -> AudioStream:
 		return _cache[name]
 	var s: AudioStream = null
 	var p := AssetLib.audio_path(name)
-	if p != "" and FileAccess.file_exists(p):
-		var o := AudioStreamOggVorbis.load_from_file(p)
+	if p != "":
+		# 匯出後 (APK/Web) 原 .ogg 唔入 pck，只剩 .import 轉換檔 → 要用 ResourceLoader
+		var o: AudioStream = null
+		if ResourceLoader.exists(p):
+			o = load(p) as AudioStream
+		elif FileAccess.file_exists(p):
+			o = AudioStreamOggVorbis.load_from_file(p)
 		if o != null:
-			o.loop = name.begins_with("bgm")
+			if o is AudioStreamOggVorbis:
+				(o as AudioStreamOggVorbis).loop = name.begins_with("bgm")
 			s = o
 	_cache[name] = s
 	return s
