@@ -277,6 +277,16 @@ func _use_cure(id: int, e: Dictionary, item: int, cure: Array) -> void:
 	_msg(id, "狀態已解")
 
 
+# 限時 buff 丹 (RulesPill)：食咗扣 1 粒，記落 ch.pills
+func _use_buff_pill(id: int, e: Dictionary, item: int, pill: Dictionary) -> void:
+	var ch: Dictionary = e["ch"]
+	if not RulesShop.remove_item(ch["bag"], item, 1):
+		return _msg(id, "背包冇呢件")
+	RulesPill.apply(ch, pill["effects"], int(pill["minutes"]), tick)
+	_sync_stats(e)
+	_msg(id, "%s：效果持續 %d 分鐘" % [str(data.names.get(item, "丹")), int(pill["minutes"])])
+
+
 func cmd_use_item(id: int, item: int) -> void:
 	var e := ent(id)
 	if e.is_empty() or not e.has("ch") or int(e["hp"]) <= 0:
@@ -295,6 +305,9 @@ func cmd_use_item(id: int, item: int) -> void:
 		ITEM_LILIAN_ELIXIR: return _use_lilian_elixir(id, e)    # 歷練神丹
 		ITEM_SKILL_ELIXIR: return _use_skill_elixir(id, e)      # 技能神丹
 		ITEM_BEAST_ELIXIR: return _use_beast_elixir(id, e)      # 戰騎神丹 (S11b)
+	var pill := RulesPill.pill_effect(data.info.get(item, {}))
+	if not pill.is_empty() and data.heals.get(item, {}).is_empty():
+		return _use_buff_pill(id, e, item, pill)
 	var cure := _cure_ids(item)
 	if not cure.is_empty() and data.heals.get(item, {}).is_empty():
 		return _use_cure(id, e, item, cure)

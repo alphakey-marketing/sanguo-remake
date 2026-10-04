@@ -433,11 +433,16 @@ func _jewel_bonus(ch: Dictionary) -> Dictionary:
 		var jd: Dictionary = data.jewel_by_item.get(int(it), {})
 		if not jd.is_empty() and str(jd.get("kind", "")) == "support" and not jd.get("effects", []).is_empty():
 			list.append(RulesJewel.jewel_bonus(jd))
-	return RulesJewel.sum_bonus(list)
+	var pb := RulesPill.bonus(ch, tick)       # 限時 buff 丹
+	list.append(pb)
+	var sb := RulesJewel.sum_bonus(list)
+	sb["hpFlat"] = int(pb.get("hpFlat", 0))
+	return sb
 
 
 func _eff_max_hp(ch: Dictionary) -> int:
-	return MathX.js_round(RulesStats.max_hp(int(ch["level"]), ch["attrs"], ch) * (1.0 + float(_jewel_bonus(ch).get("hpPct", 0.0))))
+	var jb := _jewel_bonus(ch)
+	return MathX.js_round(RulesStats.max_hp(int(ch["level"]), ch["attrs"], ch) * (1.0 + float(jb.get("hpPct", 0.0)))) + int(jb.get("hpFlat", 0))
 
 
 func _eff_max_mp(ch: Dictionary) -> int:

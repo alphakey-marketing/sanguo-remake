@@ -143,6 +143,7 @@ func _kill_mob(m: Dictionary, by: Dictionary, exp_mult: float = 1.0) -> void:
 		var e := int(shares[id_str])
 		if member.get("kind", "") == "player":
 			e = MathX.js_round(float(e) * _friend_exp_mult(member))   # U13 戰騎「神獸/王者」加成友好技
+			e = MathX.js_round(float(e) * RulesPill.exp_mult(mch, tick))   # 限時經驗丹
 		var mlv0 := int(mch["level"])
 		e = maxi(1, MathX.js_round(float(e) * RulesStats.exp_level_mult(mlv0, int(d.get("level", mlv0)))))   # 等級差修正
 		var mups := RulesStats.gain_exp(data, mch, e)

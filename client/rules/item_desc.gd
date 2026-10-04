@@ -42,8 +42,8 @@ const SUPPORT := {
 }
 
 # 單機版真係有接嘅 effect type (其餘有 label 嘅照原標籤，無 label 嘅標未實裝)
-const IMPL_TYPES := [0, 1, 28, 29, 30, 31, 32, 33, 2, 4, 5, 9, 10, 11, 12, 13, 14, 16, 19, 34, 35, 36, 37, 38, 39, 52, 53, 73, 74, 75, 99]
-const UNIMPL_LABELLED := []     # 「解除…」類單機版食藥唔會解狀態
+const IMPL_TYPES := [0, 1, 22, 28, 29, 30, 31, 32, 33, 2, 4, 5, 9, 10, 11, 12, 13, 14, 16, 19, 34, 35, 36, 37, 38, 39, 52, 53, 73, 74, 75, 99]
+const UNIMPL_LABELLED := [2, 3]     # 技能/戰騎經驗倍率丹 (限時版) 未接     # 「解除…」類單機版食藥唔會解狀態
 
 
 static func _fmt(name: String, unit: String, v: int, sign: int = 1) -> String:
@@ -134,6 +134,9 @@ static func _mount_lines(effs: Array, data: GameData) -> Array:
 static func _generic_lines(effs: Array) -> Array:
 	var out: Array = []
 	var unimpl := false
+	var pill := RulesPill.pill_effect({"effects": effs})
+	if not pill.is_empty():
+		out.append("限時丹：持續 %d 分鐘（1 分鐘 = 現實 60 秒）" % int(pill["minutes"]))
 	for e in effs:
 		var t := int(e["type"])
 		var lab := str(e["label"])

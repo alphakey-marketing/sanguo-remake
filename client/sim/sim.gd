@@ -39,7 +39,7 @@ func _safe_regen_tick() -> void:
 			continue
 		if not is_safe(int(e["x"]), int(e["y"])):
 			continue
-		var pct: float = base_pct * _friend_regen_mult(e)
+		var pct: float = base_pct * _friend_regen_mult(e) * RulesPill.regen_mult(e["ch"], tick)
 		var ch: Dictionary = e["ch"]
 		var lv := int(ch["level"])
 		ch["hp"] = mini(RulesStats.max_hp(lv, ch["attrs"], ch), int(ch["hp"]) + maxi(1, MathX.js_round(RulesStats.max_hp(lv, ch["attrs"], ch) * pct)))
