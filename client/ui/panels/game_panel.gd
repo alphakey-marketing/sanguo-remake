@@ -295,15 +295,7 @@ func item_desc(id: int) -> Array:
 	var sp: Dictionary = main.data.spell_by_item.get(id, {})
 	if not sp.is_empty():
 		out.append("術法「%s」 MP %d  Lv%d" % [sp.get("name", "?"), int(sp.get("mp", 0)), int(sp.get("lv", 1))])
-	var jd: Dictionary = main.data.jewel_by_item.get(id, {})
-	if not jd.is_empty():
-		out.append("寶石「%s」" % str(jd.get("name", "?")))
-	for e in inf.get("effects", []):
-		var lab := str(e["label"])
-		if lab == "" or int(e["type"]) in [14, 16]:
-			continue
-		var val := int(e["value"])
-		out.append(lab if val == 0 else "%s %d" % [lab, val])
+	out.append_array(RulesItemDesc.lines(id, main.data))   # 寶石/特殊道具/座騎飼料/武將寶物/其餘效果
 	return out
 
 
