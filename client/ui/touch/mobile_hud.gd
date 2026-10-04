@@ -555,8 +555,7 @@ func _draw_quest_track() -> void:
 	var tv: Dictionary = main.sim.quest_track_view()
 	if tv.is_empty():
 		return
-	var lr: Rect2 = HudLayout.log_rect(safe_rect())
-	var r := Rect2(lr.position.x, lr.end.y + 3, lr.size.x, 26)
+	var r: Rect2 = HudLayout.track_rect(safe_rect())
 	draw_rect(r, Color(0, 0, 0, 0.45))
 	var hint := str(tv.hint)
 	var cut := hint.find("　")

@@ -27,6 +27,7 @@ const POTION_GAP := 5.0
 const PORTRAIT_SZ := Vector2(150, 46)   # 角色框 (縮細; 底下另加 STATUS_ROW_H)
 const LOG_W := 200.0
 const LOG_H := 34.0
+const TRACK_H := 26.0         # 任務追蹤條 (日誌下面；搖桿區/補品欄喺佢下面，唔重疊)
 
 
 # 系統介面鍵數 (S01a, spec 01 §5): 5 級前 4 鍵，5 級後 6 鍵
@@ -90,7 +91,7 @@ static func joy_zone(size: Vector2, safe: Rect2 = Rect2()) -> Rect2:
 	if safe.size == Vector2.ZERO:
 		safe = Rect2(Vector2.ZERO, size)
 	var ctx: Rect2 = build(size, safe)["context"]["rect"]
-	var top := log_rect(safe).end.y + POTION_R * 2 + 12.0   # 角色框 + 日誌 + 補品欄下面
+	var top := log_rect(safe).end.y + TRACK_H + 3.0 + POTION_R * 2 + 12.0   # 角色框 + 日誌 + 補品欄下面
 	var right := minf(safe.position.x + size.x * 0.5, ctx.position.x - 8.0)
 	return Rect2(safe.position.x, top, right - safe.position.x, safe.end.y - top)
 
@@ -98,6 +99,12 @@ static func joy_zone(size: Vector2, safe: Rect2 = Rect2()) -> Rect2:
 # 日誌預覽（角色框下面，撳到開完整日誌面板）
 static func log_rect(safe: Rect2) -> Rect2:
 	return Rect2(safe.position.x + 4, safe.position.y + 4 + PORTRAIT_SZ.y + STATUS_ROW_H + 3, LOG_W, LOG_H)
+
+
+# 任務追蹤條: 日誌正下面
+static func track_rect(safe: Rect2) -> Rect2:
+	var lr := log_rect(safe)
+	return Rect2(lr.position.x, lr.end.y + 3.0, lr.size.x, TRACK_H)
 
 
 static func contains(el: Dictionary, p: Vector2) -> bool:
