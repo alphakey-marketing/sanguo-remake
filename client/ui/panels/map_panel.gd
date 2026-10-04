@@ -11,6 +11,7 @@ var _wpan := Vector2.ZERO        # 天下頁平移 (px)
 var _wdrag := false              # 拖動中
 var _wmoved := 0.0               # 今次按下後移動距離 (分 tap / 拖)
 var _wcentered := false          # 開頁後first次對準自己位置
+var _area_tgt := Vector2i(-1, -1)  # 區域頁: 撳咗未確認嘅目標格 (-1 = 冇)
 
 
 func _init(m: Node) -> void:
@@ -21,7 +22,7 @@ func _init(m: Node) -> void:
 
 func sig() -> String:
 	var me = main._me()
-	return JSON.stringify([tab, _info, _sel_map, main.cur_map.get("id", ""), int(me.x) if me != null else 0, int(me.y) if me != null else 0, main.sim.view_market_prices()])
+	return JSON.stringify([tab, _info, _sel_map, _area_tgt.x, _area_tgt.y, main.cur_map.get("id", ""), int(me.x) if me != null else 0, int(me.y) if me != null else 0, main.sim.view_market_prices()])
 
 
 func _build_body() -> void:
@@ -36,6 +37,15 @@ func _build_body() -> void:
 	if tab == 0:
 		view.draw.connect(func() -> void: _draw_area(view))
 		view.gui_input.connect(func(ev: InputEvent) -> void: _area_input(view, ev))
+		var arow := HBoxContainer.new()
+		arow.add_theme_constant_override("separation", 6)
+		if _area_tgt.x >= 0:
+			arow.add_child(btn("前往標記位置", func() -> void: _area_go(), 130))
+			arow.add_child(btn("取消", func() -> void:
+				_area_tgt = Vector2i(-1, -1)
+				refresh(true), 56))
+		arow.add_child(wrap_lbl("圖例：黃點 = 地標（灰 ？ = 未到過）　方塊 = 設施　藍點 = 任務 NPC　黃圈 = 你", 12, UiTheme.DIM))
+		body.add_child(arow)
 	else:
 		view.draw.connect(func() -> void: _draw_world(view))
 		view.gui_input.connect(func(ev: InputEvent) -> void: _world_input(view, ev))
@@ -44,7 +54,7 @@ func _build_body() -> void:
 		row.add_child(btn("＋", func() -> void: _zoom_world(view, 1.4), 56))
 		row.add_child(btn("－", func() -> void: _zoom_world(view, 1.0 / 1.4), 56))
 		row.add_child(btn("定位", func() -> void: _center_here(view), 72))
-		row.add_child(wrap_lbl(_info if _info != "" else "撳城池睇詳情。灰色 = 未開放（之後版本開通）", 13, UiTheme.DIM))
+		row.add_child(wrap_lbl(_info if _info != "" else "撳城池睇詳情。灰色 = 未開放", 13, UiTheme.DIM))
 		if _sel_map != "":
 			row.add_child(btn("自動前往", func() -> void: goto_sel(), 120))
 		body.add_child(row)
@@ -122,7 +132,12 @@ func _draw_area(view: Control) -> void:
 		var mp: Vector2 = at.call(int(me.x), int(me.y))
 		view.draw_circle(mp, 5, Color(1, 0.9, 0.2))
 		view.draw_arc(mp, 8, 0, TAU, 20, Color(1, 0.9, 0.2, 0.7), 1.5)
-	view.draw_string(font, off + Vector2(4, 16), String(md.name) + "　（撳任何位置自動行過去）", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, UiTheme.GOLD)
+	if _area_tgt.x >= 0:
+		var tp: Vector2 = at.call(_area_tgt.x, _area_tgt.y)
+		view.draw_arc(tp, 7, 0, TAU, 20, Color(1, 0.4, 0.3), 2.0)
+		view.draw_line(tp - Vector2(10, 0), tp + Vector2(10, 0), Color(1, 0.4, 0.3), 1.5)
+		view.draw_line(tp - Vector2(0, 10), tp + Vector2(0, 10), Color(1, 0.4, 0.3), 1.5)
+	view.draw_string(font, off + Vector2(4, 16), String(md.name) + "　（撳地圖標記，再撳「前往」）", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, UiTheme.GOLD)
 
 
 # 撳區域圖任何一格 → 自動尋路行過去 (A*, sim 處理)；撳中障礙行去最近可行格
@@ -145,8 +160,16 @@ func _area_input(view: Control, ev: InputEvent) -> void:
 			return
 		tx = fr.x
 		ty = fr.y
-	main._send({"t": "move", "x": tx, "y": ty})
-	main.marker = {"pos": Vector2(tx, ty), "t": 1.0}
+	_area_tgt = Vector2i(tx, ty)      # 先標記，撳「前往」先行 (防誤觸)
+	refresh(true)
+
+
+func _area_go() -> void:
+	if _area_tgt.x < 0:
+		return
+	main._send({"t": "move", "x": _area_tgt.x, "y": _area_tgt.y})
+	main.marker = {"pos": Vector2(_area_tgt.x, _area_tgt.y), "t": 1.0}
+	_area_tgt = Vector2i(-1, -1)
 	main.hud.close_panels()
 
 
@@ -196,7 +219,7 @@ func _draw_world(view: Control) -> void:
 	view.draw_rect(Rect2(Vector2.ZERO, view.size), Color(0.18, 0.15, 0.1, 0.6))
 	view.draw_string(font, Vector2(view.size.x - 60, 20), "豫州", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(0.8, 0.7, 0.5, 0.6))
 	view.draw_string(font, Vector2(view.size.x - 60, view.size.y - 10), "荊州", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(0.8, 0.7, 0.5, 0.6))
-	# 戰役窗口標示 (S04c): 而家開緊邊場戰役 (許昌北門義勇士兵入場) + 入場進度
+	# 戰役 + 特殊場景提示合併做一個框 (兩行)
 	var vb: Dictionary = main.sim.view_battles(main.my_id)
 	var bcol := Color(0.95, 0.75, 0.45)
 	var btxt := "戰役：而家冇窗口開緊（每場時辰窗口重開）"
@@ -208,7 +231,7 @@ func _draw_world(view: Control) -> void:
 			if bool(bb["open"]):
 				btxt = "戰役：%s 開緊（武≤%d）" % [bb["name"], int(bb["maxLevel"])]
 				break
-	view.draw_rect(Rect2(Vector2(10, 8), Vector2(230, 26)), Color(0.12, 0.1, 0.07, 0.85))
+	view.draw_rect(Rect2(Vector2(10, 8), Vector2(300, 40)), Color(0.12, 0.1, 0.07, 0.8))
 	view.draw_string(font, Vector2(16, 24), btxt, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, bcol)
 	# 特殊場景標示 (S04d): 而家開住邊啲場景入口 (荊州港口)
 	var vs: Dictionary = main.sim.view_scenes(main.my_id)
@@ -224,8 +247,7 @@ func _draw_world(view: Control) -> void:
 	elif not sopen.is_empty():
 		stxt = "特殊場景：%s 開緊（荊州港口）" % "、".join(sopen)
 		scols = Color(0.8, 0.95, 0.6)
-	view.draw_rect(Rect2(Vector2(10, 36), Vector2(230, 26)), Color(0.1, 0.12, 0.09, 0.85))
-	view.draw_string(font, Vector2(16, 52), stxt, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, scols)
+	view.draw_string(font, Vector2(16, 42), stxt, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, scols)
 	for e in w["edges"]:
 		var a: Dictionary = nodes[String(e[0])]
 		var b: Dictionary = nodes[String(e[1])]

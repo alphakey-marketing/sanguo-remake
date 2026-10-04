@@ -9,6 +9,11 @@ var sel := 0                  # 揀中物品 id（0 = 冇）
 var filter := ""
 var show_all_weapons := false
 var want_slot := -1           # 由快捷格入嚟: 裝落邊格
+var cat := 0                  # 分類篩選 (CATS 索引)
+var sort_mode := 0            # 排序 (SORTS 索引)
+var qty := 1                  # 存入 / 攞返 / 丟低 嘅數量
+const CATS := ["全部", "武器", "防具", "藥", "術書寶石", "其他"]
+const SORTS := ["預設", "名稱", "數量", "類型"]
 
 
 func _init(m: Node) -> void:
@@ -28,6 +33,7 @@ func open_filter(f: String, slot := -1) -> void:
 
 func set_tab(i: int) -> void:
 	sel = 0
+	qty = 1
 	super(i)
 
 
@@ -40,7 +46,7 @@ func close() -> void:
 func sig() -> String:
 	var ch: Dictionary = main.ch
 	return JSON.stringify([tab, sel, filter, ch.get("bag", []), ch.get("storage", []), ch.get("equip", {}),
-		ch.get("gold", 0), ch.get("storageSub", false), ch.get("tools", {}), ch.get("level", 1), ch.get("tiandi", {}), show_all_weapons])
+		ch.get("gold", 0), ch.get("storageSub", false), ch.get("tools", {}), ch.get("level", 1), ch.get("tiandi", {}), show_all_weapons, cat, sort_mode, qty])
 
 
 func _build_body() -> void:
@@ -69,6 +75,7 @@ func _build_body() -> void:
 			left.add_child(btn("顯示全部武器 ✓" if show_all_weapons else "已隱藏 %d 件本職唔可裝武器（撳顯示）" % hidden, func() -> void:
 				show_all_weapons = not show_all_weapons
 				refresh(true)))
+		_build_filter_bar(left)
 		_build_grid(left, _bag_list(ch))
 		_build_detail(right, ch)
 	elif tab == 1:
@@ -104,7 +111,59 @@ func _hidden_weapon_count(ch: Dictionary) -> int:
 	return n
 
 
-func _build_grid(parent: Control, items: Array) -> void:
+# 分類編號: 1 武器 2 防具 3 藥 4 術書/寶石 5 其他
+func _cat_of(id: int) -> int:
+	var d: GameData = main.data
+	if main.quest_items.has(id):
+		return 5
+	if d.weapons.has(id):
+		return 1
+	if d.armors.has(id):
+		return 2
+	if d.heals.has(id):
+		return 3
+	if d.spell_by_item.has(id) or d.jewel_by_item.has(id):
+		return 4
+	return 5
+
+
+func _build_filter_bar(parent: Control) -> void:
+	var f := HFlowContainer.new()
+	f.add_theme_constant_override("h_separation", 4)
+	f.add_theme_constant_override("v_separation", 4)
+	for i in CATS.size():
+		var b := btn(CATS[i], func() -> void:
+			cat = i
+			refresh(true), 44)
+		b.toggle_mode = true
+		b.set_pressed_no_signal(cat == i)
+		f.add_child(b)
+	f.add_child(btn("排序：%s" % SORTS[sort_mode], func() -> void:
+		sort_mode = (sort_mode + 1) % SORTS.size()
+		refresh(true), 80))
+	parent.add_child(f)
+
+
+# 套用分類 + 排序 (唔改原陣列)
+func _view(items: Array) -> Array:
+	var out: Array = []
+	for b in items:
+		if cat == 0 or _cat_of(int(b["id"])) == cat:
+			out.append(b)
+	if sort_mode == 1:
+		out.sort_custom(func(a, b) -> bool: return item_name(int(a["id"])) < item_name(int(b["id"])))
+	elif sort_mode == 2:
+		out.sort_custom(func(a, b) -> bool: return int(a["n"]) > int(b["n"]))
+	elif sort_mode == 3:
+		out.sort_custom(func(a, b) -> bool:
+			var ca := _cat_of(int(a["id"]))
+			var cb := _cat_of(int(b["id"]))
+			return ca < cb if ca != cb else int(a["id"]) < int(b["id"]))
+	return out
+
+
+func _build_grid(parent: Control, items_in: Array) -> void:
+	var items := _view(items_in)
 	var sc := scroll()
 	parent.add_child(sc)
 	var g := GridContainer.new()
@@ -121,6 +180,7 @@ func _build_grid(parent: Control, items: Array) -> void:
 		var id := int(b["id"])
 		var cell := btn("%s\nx%d%s" % [item_name(id).substr(0, 4), int(b["n"]), " 裝" if worn.has(id) else ""], func() -> void:
 			sel = id
+			qty = 1
 			refresh(true), CELL)
 		cell.custom_minimum_size = Vector2(CELL, CELL)
 		item_icon_btn(cell, id, true)
@@ -252,10 +312,20 @@ func _build_detail(p: Control, ch: Dictionary) -> void:
 		var sk := String(d.tool_skill[id])
 		var w: Dictionary = d.work.get(sk, d.work_adv.get(sk, {}))
 		p.add_child(btn("裝備%s工具" % str(w.get("name", sk)), func() -> void: main._send({"t": "equip_tool", "skill": sk, "item": id})))
-	if bool(ch.get("storageSub", false)) and not main.quest_items.has(id):
-		p.add_child(btn("存入天地商行 x1", func() -> void: main._send({"t": "storage_deposit", "item": id, "n": 1})))
-	if not main.quest_items.has(id):
-		p.add_child(btn("丟低 x1（S08g 城內丟物）", func() -> void: main._send({"t": "drop_item", "item": id, "n": 1})))
+	var have := RulesShop.count_item(ch["bag"], id)
+	if have > 0 and not main.quest_items.has(id):
+		qty = clampi(qty, 1, have)
+		var q := qty
+		p.add_child(stepper(q, have, func(n: int) -> void:
+			qty = n
+			refresh(true)))
+		if bool(ch.get("storageSub", false)):
+			p.add_child(btn("存入天地商行 x%d" % q, func() -> void:
+				main._send({"t": "storage_deposit", "item": id, "n": q})
+				qty = 1))
+		p.add_child(btn("丟低 x%d" % q, func() -> void:
+			main._send({"t": "drop_item", "item": id, "n": q})
+			qty = 1))
 
 
 # 天地商行頁: 訂閱開關 + 倉庫格 + 攞返 / 代賣
@@ -269,6 +339,7 @@ func _build_storage(left: Control, right: Control, ch: Dictionary) -> void:
 	var fee := int(main.data.world.get("storageFee", 200))
 	left.add_child(wrap_lbl("日費 %d 金／日（子時自動扣，現有 %d 金；唔夠錢自動退訂）" % [fee, int(ch.get("gold", 0))], 13, UiTheme.DIM))
 	var st: Array = ch.get("storage", [])
+	_build_filter_bar(left)
 	_build_grid(left, st)
 	var n := 0
 	for b in st:
@@ -281,9 +352,14 @@ func _build_storage(left: Control, right: Control, ch: Dictionary) -> void:
 	right.add_child(lbl("%s x%d" % [item_name(id), n], 17, UiTheme.GOLD))
 	for s in item_desc(id):
 		right.add_child(wrap_lbl(str(s), 13, UiTheme.DIM))
-	right.add_child(btn("攞返 x1", func() -> void: main._send({"t": "storage_withdraw", "item": id, "n": 1})))
+	qty = clampi(qty, 1, n)
+	var q := qty
+	right.add_child(stepper(q, n, func(k: int) -> void:
+		qty = k
+		refresh(true)))
+	right.add_child(btn("攞返 x%d" % q, func() -> void: main._send({"t": "storage_withdraw", "item": id, "n": q})))
 	right.add_child(btn("全部攞返 x%d" % n, func() -> void: main._send({"t": "storage_withdraw", "item": id, "n": n})))
-	right.add_child(btn("代賣 x1  (%d 金)" % main._sell_price(id), func() -> void: main._send({"t": "storage_sell", "item": id, "n": 1})))
+	right.add_child(btn("代賣 x%d  (%d 金)" % [q, main._sell_price(id) * q], func() -> void: main._send({"t": "storage_sell", "item": id, "n": q})))
 
 
 # 腳伕頁 (Step 13): 負重滿自動存邊啲材料 + 自動買/賣工具 + 工作區小屋休息

@@ -13,6 +13,8 @@ var service := false           # 打鐵鋪修理服務
 var has_master := false        # 有「大宗師」頁 (S05c)
 var master_skill := ""         # 大宗師頁面而家撳緊邊個技能
 var sel := 0
+var only_ok := false           # 只顯示做得到（等級夠 + 材料齊）
+var qty := 1                   # 製作數量
 
 
 func _init(m: Node) -> void:
@@ -58,12 +60,13 @@ func _reset(names: Array) -> void:
 
 func set_tab(i: int) -> void:
 	sel = 0
+	qty = 1
 	super(i)
 
 
 func sig() -> String:
 	var ch: Dictionary = main.ch
-	return JSON.stringify([tab, sel, master_skill, ch.get("bag", []), ch.get("workLv", {}), ch.get("tools", {}), ch.get("sp", 0), ch.get("gold", 0),
+	return JSON.stringify([tab, sel, only_ok, qty, master_skill, ch.get("bag", []), ch.get("workLv", {}), ch.get("tools", {}), ch.get("sp", 0), ch.get("gold", 0),
 		ch.get("equip", {}).get("dur", {}), ch.get("contrib", 0)])
 
 
@@ -150,6 +153,12 @@ func _build_craft(left: Control, right: Control, ch: Dictionary, skill: String) 
 		left.add_child(wrap_lbl("要%s其中一樣做到 %d 級先解鎖。" % ["/".join(names), int(ad["unlockLv"])], 14, UiTheme.DIM))
 		return
 	var counts: Dictionary = sim._bag_counts(ch.get("bag", []))
+	var fb := btn("只顯示做得到 ✓" if only_ok else "只顯示做得到", func() -> void:
+		only_ok = not only_ok
+		refresh(true))
+	fb.toggle_mode = true
+	fb.set_pressed_no_signal(only_ok)
+	left.add_child(fb)
 	var sc := scroll()
 	left.add_child(sc)
 	var list := VBoxContainer.new()
@@ -158,16 +167,22 @@ func _build_craft(left: Control, right: Control, ch: Dictionary, skill: String) 
 	sc.add_child(list)
 	var shown: Array = []
 	for r in main.data.recipes_by_skill.get(skill, []):
-		if int(r["lv"]) <= lv + LIST_AHEAD:
+		if only_ok:
+			if int(r["lv"]) <= lv and RulesWork.has_materials(counts, r["need"]):
+				shown.append(r)
+		elif int(r["lv"]) <= lv + LIST_AHEAD:
 			shown.append(r)
 	if shown.size() > LIST_MAX:
 		shown = shown.slice(shown.size() - LIST_MAX)
+	if shown.is_empty():
+		list.add_child(lbl("（冇做得到嘅配方）" if only_ok else "（冇配方）", 14, UiTheme.DIM))
 	for r in shown:
 		var id := int(r["id"])
 		var lv_ok := int(r["lv"]) <= lv
 		var mat_ok := RulesWork.has_materials(counts, r["need"])
 		var b := btn("%s  Lv%d%s" % [item_name(id), int(r["lv"]), "  ✓" if lv_ok and mat_ok else ""], func() -> void:
 			sel = id
+			qty = 1
 			refresh(true))
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		item_icon_btn(b, id)
@@ -195,7 +210,19 @@ func _build_craft(left: Control, right: Control, ch: Dictionary, skill: String) 
 	if err != "":
 		right.add_child(lbl(err, 13, UiTheme.BAD))
 	var id2 := sel
-	var b2 := btn("製作", func() -> void: main._send({"t": "craft", "item": id2}))
+	# 製作數量: 上限 = 材料夠做幾件 (最多 20)
+	var max_n := 20
+	for m in rc["need"]:
+		max_n = mini(max_n, int(counts.get(int(m[0]), 0)) / maxi(1, int(m[1])))
+	max_n = maxi(1, max_n)
+	qty = clampi(qty, 1, max_n)
+	var q := qty
+	right.add_child(stepper(q, max_n, func(n: int) -> void:
+		qty = n
+		refresh(true)))
+	var b2 := btn("製作 x%d" % q, func() -> void:
+		for i in q:
+			main._send({"t": "craft", "item": id2}))
 	b2.disabled = err != ""
 	right.add_child(b2)
 
