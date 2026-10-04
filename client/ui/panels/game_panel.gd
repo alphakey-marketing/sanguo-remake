@@ -11,11 +11,13 @@ var win: PanelContainer
 var title_lbl: Label
 var tabs_box: HBoxContainer
 var body: VBoxContainer
+const FONT_SCALE := 0.8          # 全部面板字統一縮細 (手機唔好遮住畫面)
 var tab := 0
 var tab_names: Array = []
 var _last_sig := ""
 var _t := 0.0
 var btn_h := UiTheme.BTN_H     # 細字面板 (手機) 可縮細
+var close_btn: Button
 var margin := 10.0             # 視窗離屏幕邊（細視窗例如對話框會改）
 
 
@@ -45,16 +47,30 @@ func _init(m: Node) -> void:
 	title_lbl.add_theme_color_override("font_color", UiTheme.GOLD)
 	title_lbl.custom_minimum_size.x = 80
 	top.add_child(title_lbl)
+	# 分頁掣太多就橫向捲動，唔好撐闊視窗
+	var tab_sc := ScrollContainer.new()
+	tab_sc.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	tab_sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	tab_sc.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	tab_sc.custom_minimum_size = Vector2(0, 40)
+	top.add_child(tab_sc)
 	tabs_box = HBoxContainer.new()
 	tabs_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	tabs_box.add_theme_constant_override("separation", 4)
-	top.add_child(tabs_box)
-	var x := btn("✕", close, 48)
-	top.add_child(x)
+	tab_sc.add_child(tabs_box)
+	var gap := Control.new()          # 畀浮動關閉掣留位
+	gap.custom_minimum_size = Vector2(52, 0)
+	top.add_child(gap)
+	win.clip_contents = true
+	# 浮動關閉掣: 貼住視窗預設右上角，內容幾長都唔會推出螢幕外
+	close_btn = btn("✕", close, 48)
+	close_btn.z_index = 10
+	add_child(close_btn)
 	body = VBoxContainer.new()
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	body.add_theme_constant_override("separation", 6)
 	v.add_child(body)
+	compact(12, 36.0)             # 預設細字；子類可以再 compact() 更細
 	hide()
 
 
@@ -89,6 +105,9 @@ func _layout_win() -> void:
 	var r := _win_rect(safe)
 	win.position = r.position
 	win.size = r.size
+	if close_btn != null:
+		close_btn.position = Vector2(r.end.x - 52.0, r.position.y + 2.0)
+		close_btn.size = Vector2(48.0, 36.0)
 
 
 # 預設: 差唔多成個安全區（子類可以 override 做細視窗）
@@ -101,7 +120,7 @@ func set_tabs(names: Array) -> void:
 	for c in tabs_box.get_children():
 		c.queue_free()
 	for i in names.size():
-		var b := btn(String(names[i]), func() -> void: set_tab(i), 72)
+		var b := btn(String(names[i]), func() -> void: set_tab(i), 56)
 		b.toggle_mode = true
 		b.button_pressed = i == tab
 		tabs_box.add_child(b)
@@ -227,7 +246,7 @@ func item_title(id: int, sz := 18) -> Control:
 func lbl(text: String, sz := UiTheme.FONT, col := UiTheme.TEXT) -> Label:
 	var l := Label.new()
 	l.text = text
-	l.add_theme_font_size_override("font_size", sz)
+	l.add_theme_font_size_override("font_size", maxi(10, roundi(float(sz) * FONT_SCALE)))
 	l.add_theme_color_override("font_color", col)
 	return l
 
