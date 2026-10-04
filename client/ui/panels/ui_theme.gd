@@ -101,16 +101,12 @@ static func _apply_orig_skin(t: Theme) -> void:
 
 static func _cjk_font() -> Font:
 	if _cjk == null:
-		var tc := load("res://assets_placeholder/fonts/NotoSansTC-VF.ttf") as Font
-		if tc != null:
-			_cjk = tc
-		else:
-			_cjk = load("res://assets_placeholder/fonts/NotoSansSC-VF.ttf") as Font
+		_cjk = load("res://assets_placeholder/fonts/NotoSansTC-VF.ttf") as Font
 	return _cjk
 
 
-# Embed 中文字體（Noto Sans TC/SC, OFL）。Web/iOS 唔靠 browser 中文字形 fallback（會缺口），
-# 直接 embed 兩隻 CJK 字，set 去 ThemeDB fallback（main 畫 HUD 名嗰啲 UI 都用佢）。
+# Embed 中文字體（Noto Sans TC, OFL）。Web/iOS/Android 唔靠系統中文字形 fallback（會缺口），
+# 直接 embed CJK 字，set 去 ThemeDB fallback（main 畫 HUD 名嗰啲 UI 都用佢）。
 static func install_font() -> void:
 	if _font_installed:
 		return
