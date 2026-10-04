@@ -269,6 +269,19 @@ func _run() -> void:
 	await frames(1)
 	check(int(ch["equip"]["head"]) == 16001, "背包撳裝備防具應該著上頭部")
 	hud.close_panels()
+	# 5b2. 任務指引: 篩選/類別摺疊
+	hud.open_panel("quest")
+	var qp: GamePanel = hud.panels["quest"]
+	qp.set_tab(5)
+	await frames(2)
+	check(_has_btn_text(qp, "可接"), "指引: 有篩選掣")
+	press(qp, "全部")
+	await frames(2)
+	press(qp, "新手")
+	await frames(2)
+	check(_has_btn_text(qp, "新手"), "指引: 類別展開後仍在")
+	qp.set_tab(0)
+	hud.close_panels()
 	# 5c. 角色面板裝備頁: 撳頭部格 → 卸下；撳武2 → 切換做現用
 	hud.open_panel("char")
 	var chp: GamePanel = hud.panels["char"]
@@ -838,3 +851,12 @@ func _run() -> void:
 	print("PASS: ui smoke" if fails == 0 else "FAIL: ui smoke")
 	get_tree().quit(1 if fails > 0 else 0)
 
+
+
+func _has_btn_text(n: Node, t: String) -> bool:
+	if n is Button and (n as Button).text.contains(t):
+		return true
+	for c in n.get_children():
+		if _has_btn_text(c, t):
+			return true
+	return false

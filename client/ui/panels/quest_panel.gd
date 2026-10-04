@@ -7,6 +7,8 @@ const TYPE_LABEL := {
 	"group": "義勇軍", "expert": "專長", "marry": "結婚",
 }
 const TYPE_ORDER := ["newbie", "general", "ultimate", "history", "expert", "group", "marry"]
+var _guide_filter := "avail"      # 指引篩選: avail / active / all
+var _guide_cat_open := {}        # 類別 -> 展開
 var _guide_open := {}          # quest id -> bool，指引頁撳落展開/摺埋詳情
 
 func _init(m: Node) -> void:
@@ -146,6 +148,7 @@ func _guide_section(list: Node) -> void:
 	for q in main.sim.view_quests():
 		status[String(q["id"])] = q
 	var by_type := {}
+	var avail_all: Array = []
 	for q in main.data.quests:
 		if bool(q.get("hidden", false)):
 			continue
@@ -153,15 +156,67 @@ func _guide_section(list: Node) -> void:
 		if not by_type.has(t):
 			by_type[t] = []
 		(by_type[t] as Array).append(q)
-	list.add_child(lbl("任務指引 — 全部任務點揀、邊度接", 14, UiTheme.TEXT))
+		if _guide_avail(q, status.get(String(q["id"]), {})):
+			avail_all.append(q)
+	# 篩選掣
+	var bar := HBoxContainer.new()
+	for f in [["avail", "可接"], ["active", "進行中"], ["all", "全部"]]:
+		var key: String = f[0]
+		var b := btn(("【%s】" if _guide_filter == key else "%s") % f[1], func() -> void:
+			_guide_filter = key
+			refresh(true))
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		bar.add_child(b)
+	list.add_child(bar)
+	# 建議下一步: 最多 3 條可接，新手優先、等級低優先
+	if _guide_filter == "avail" and not avail_all.is_empty():
+		avail_all.sort_custom(func(x: Dictionary, y: Dictionary) -> bool:
+			var ox := TYPE_ORDER.find(String(x.get("type", "")))
+			var oy := TYPE_ORDER.find(String(y.get("type", "")))
+			if ox != oy:
+				return ox < oy
+			return int(x.get("pre", {}).get("minLevel", 0)) < int(y.get("pre", {}).get("minLevel", 0)))
+		list.add_child(lbl("建議下一步", 16, UiTheme.GOLD))
+		for i in mini(3, avail_all.size()):
+			_guide_row(list, avail_all[i], status.get(String(avail_all[i]["id"]), {}))
 	for t in TYPE_ORDER:
 		if not by_type.has(t):
 			continue
-		list.add_child(lbl(str(TYPE_LABEL.get(t, t)), 16, UiTheme.GOLD))
+		var rows: Array = []
+		var n_avail := 0
 		for q in by_type[t]:
-			_guide_row(list, q, status.get(String(q["id"]), {}))
-	_guide_battles(list)
-	_guide_scenes(list)
+			var st: Dictionary = status.get(String(q["id"]), {})
+			if _guide_avail(q, st):
+				n_avail += 1
+			if _guide_show(q, st):
+				rows.append(q)
+		if rows.is_empty():
+			continue
+		var open := bool(_guide_cat_open.get(t, false))
+		var head := btn("%s（%d 可接／%d）%s" % [str(TYPE_LABEL.get(t, t)), n_avail, (by_type[t] as Array).size(), "▾" if open else "▸"], func() -> void:
+			_guide_cat_open[t] = not open
+			refresh(true))
+		head.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		list.add_child(head)
+		if open:
+			for q in rows:
+				_guide_row(list, q, status.get(String(q["id"]), {}))
+	if _guide_filter == "avail" and avail_all.is_empty():
+		list.add_child(lbl("暫時冇可接任務 — 升級或做完前置任務會有新嘅", 14, UiTheme.DIM))
+
+
+# 可接 = 未完成、未接、條件達標
+func _guide_avail(q: Dictionary, st: Dictionary) -> bool:
+	if bool(st.get("done", false)) or bool(st.get("active", false)):
+		return false
+	return RulesQuest.pre_ok(main.data, q, main.ch)
+
+
+func _guide_show(q: Dictionary, st: Dictionary) -> bool:
+	match _guide_filter:
+		"avail": return _guide_avail(q, st)
+		"active": return bool(st.get("active", false))
+	return true
 
 
 # 指引: 戰役 (data/battles.json) 唔喺 quests.json，另外列: 邊度報名 / 武等上限 / 每層 boss + 掉寶
@@ -217,7 +272,11 @@ func _guide_row(list: Node, q: Dictionary, st: Dictionary) -> void:
 		color = Color(0.45, 0.05, 0.02)
 	var qid := String(q["id"])
 	var open := bool(_guide_open.get(qid, false))
-	var head := btn("%s %s %s %s" % [mark, str(q["name"]), "" , "▾" if open else "▸"], func() -> void:
+	var gnpc: Dictionary = main.data.quest_npcs.get(String(q.get("giver", "")), {})
+	var gwhere := str(gnpc.get("name", ""))
+	if gwhere != "":
+		gwhere = "　%s·%s" % [gwhere, _map_name(String(gnpc.get("map", "")))]
+	var head := btn("%s %s%s %s" % [mark, str(q["name"]), gwhere, "▾" if open else "▸"], func() -> void:
 		_guide_open[qid] = not open
 		refresh(true))
 	_btn_ink(head, color)
